@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +59,17 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
     {
         List<WebElement> headerCells = elementCache().headerCells();
         return getWrapper().getTexts(headerCells);
+    }
+
+    public List<String> getEntityNames()
+    {
+        List<String> entityNames = new ArrayList<>();
+        for (WebElement row : getRows())
+        {
+            WebElement entityLink = Locator.xpath("//td/div/a").findElement(row);
+            entityNames.add(entityLink.getText());
+        }
+        return entityNames;
     }
 
     public Optional<WebElement> getOptionalRow(String linkText)
