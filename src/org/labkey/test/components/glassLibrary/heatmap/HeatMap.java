@@ -4,15 +4,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -29,6 +27,7 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
     private final Locator _loadingRowLoc = Locator.css("tbody tr.grid-loading");
     private final Locator _spinnerLoc = Locator.css("span i.fa-spinner");
     private final Locator _emptyRowLoc = Locator.css("tbody tr.grid-empty");
+    private final Locator _rowLink = Locator.xpath("//td/div/a");
 
     protected HeatMap(WebElement element, WebDriver driver)
     {
@@ -48,6 +47,12 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
         return _driver;
     }
 
+    /**
+     * Gets the column label for the column at that index; for heatmaps with 12 months, the current month index is
+     * 12, index 0 is empty string, 1 will be 'Jan', and 13 will be whatever the summary link column is
+     * @param index 0-based; month values start at 1 because the name column is at 0
+     * @return The string value of the header cell at that index
+     */
     public String getColumnByIndex(int index)
     {
         return getColumnNames().get(index);
@@ -62,58 +67,46 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
     /**
      * Each row has an anchor tag in its first column; usually it's a link to a sampletype or an assay.
      * We will refer to that link as the row's name
-     * @return
+     * @return The text value of the name link (in column 0)
      */
     public List<String> getRowNames()
     {
         List<String> rowNames = new ArrayList<>();
         for (WebElement row : getRows())
         {
-            WebElement entityLink = Locator.xpath("//td/div/a").findElement(row);
-            rowNames.add(entityLink.getText());
+            WebElement rowLink = _rowLink.findElement(row);
+            rowNames.add(rowLink.getText());
         }
         return rowNames;
     }
 
-    public Optional<WebElement> getOptionalRow(String linkText)
+    public WebElement getRow(String linkText)
     {
-        List<WebElement> rows = getRows();
-        Locator matchingLink = Locator.tag("td").append(Locator.linkWithText(linkText));
-
-        for (WebElement row : rows)
-        {
-            if (matchingLink.existsIn(row))
-            {
-                return Optional.of(row);
-            }
-        }
-
-        log("No rows matching ["+matchingLink+"] were found");
-        return Optional.empty();
+        Locator.XPathLocator matchingLink = Locator.tag("td").append(Locator.linkWithText(linkText));
+        return _rowsLoc.withChild(matchingLink).findElement(this);
     }
 
-    public WebElement getEntityLink(String linkText)
+    public WebElement getRowLink(String linkText)
     {
-        WebElement row = getOptionalRow(linkText).get();
+        WebElement row = getRow(linkText);
         return Locator.linkWithText(linkText).waitForElement(row, WAIT_FOR_JAVASCRIPT);
     }
 
-    public WebElement getSummaryLink(String rowLinkText)
+    public WebElement getSummaryLink(String rowName)
     {
-        WebElement row = getOptionalRow(rowLinkText).get();
-        return Locator.tagWithAttributeContaining("span", "title", " last 12 months")
-                .child("a").findElement(row);
+        WebElement row = getRow(rowName);
+        return Locator.tag("td").child("span").withPredicate("@title").child("a").findElement(row);
     }
 
-    public WebElement getCell(String rowLinkText, String headerText)
+    public WebElement getCell(String rowName, String headerText)
     {
-        WebElement row = getOptionalRow(rowLinkText).get();
+        WebElement row = getRow(rowName);
         return Locator.css("td[headers=\"" + headerText + "\"]").findElement(row);
     }
 
-    public String getCellColor(String rowLinkText, String headerText)
+    public String getCellColor(String rowName, String headerText)
     {
-        WebElement cell = getCell(rowLinkText, headerText);
+        WebElement cell = getCell(rowName, headerText);
         WebElement backgroundCell = Locator.tag("div").findElement(cell);
         return backgroundCell.getCssValue("background-color");
     }
@@ -133,7 +126,7 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
     {
         return !_loadingRowLoc.existsIn(this) &&
                 !_spinnerLoc.existsIn(this) &&
-                Locator.tag("td").existsIn(this);
+                _rowsLoc.existsIn(this);
     }
 
     public Boolean hasData()
@@ -143,10 +136,9 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
         else
         {
             try {
-                List<WebElement> elements = _emptyRowLoc.findElements(getComponentElement());
-                return elements.size() == 0;
+                return  _emptyRowLoc.existsIn(getComponentElement());
             }
-            catch (StaleElementReferenceException e)
+            catch (StaleElementReferenceException | NoSuchElementException e)
             {
                 // the emptyRow element is gone, which should mean there's now data.
                 return true;

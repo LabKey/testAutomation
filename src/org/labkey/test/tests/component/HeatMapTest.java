@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.glassLibrary.heatmap.HeatMap;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
@@ -21,16 +21,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-@Category({InDevelopment.class})
+@Category({DailyB.class})
 public class HeatMapTest extends BaseWebDriverTest
 {
     private static Map<String, Integer> TEST_SAMPLE_TYPES = new HashMap<>();
-    // this query is cribbed from SampleSetHeatMap.sql
+    /* this query is cribbed from SampleSetHeatMap.sql
+    *   At this time, the heatMap in core-components.view is hard-coded to consume exp.SampleSetHeatMap, the plan is to
+    *   make that configurable there.  There are other queries in use for this component, some for sampleTypes, others for
+    *   assay runs.  Having the query configurable (or perhaps, built-in) will mean we won't need to create it for the test
+    *
+    *   I did attempt to customize the query to reference the date fields on samples in the sample types created for this test,
+    *   for the purpose of back-dating them and having data in cells other than the last/current month, but was unsuccessful.
+    *
+     */
     private String HEATMAP_QUERY = "SELECT\n" +
             "  -- NOTE: Select SampleSet from TOTAL query so it will be included even if there are no samples within the date range\n" +
             "  TOTAL.SampleSet AS Protocol,\n" +
@@ -74,7 +81,6 @@ public class HeatMapTest extends BaseWebDriverTest
     public static void setupProject() throws Exception
     {
         HeatMapTest init = (HeatMapTest) getCurrentTest();
-
         init.doSetup();
     }
 
