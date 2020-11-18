@@ -20,7 +20,7 @@ public class CreateSampleTypePage extends SampleTypeDesigner<CreateSampleTypePag
 
     public static CreateSampleTypePage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "createSampleSet"));
+        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "editSampleType"));
         return new CreateSampleTypePage(driver.getDriver());
     }
 
