@@ -113,7 +113,8 @@ public class HeatMapTest extends BaseWebDriverTest
             assertThat("expect ["+expectedSampleCount+"] samples",
                     heatMap.getSummaryLink(sampleTypeName).getText(), is(expectedSampleCount));
         }
-        assertThat("", heatMap.getEntityNames(), hasItems(TEST_SAMPLE_TYPES.keySet().toArray(new String[0])));
+        assertThat("Expect all sampleTypes in query exp.SampleSetHeatMap to have made it into the HeatMap",
+                heatMap.getRowNames(), hasItems(TEST_SAMPLE_TYPES.keySet().toArray(new String[0])));
     }
 
     private TestDataGenerator makeHeatmapSampletype(String sampleTypeName, int sampleCount) throws Exception

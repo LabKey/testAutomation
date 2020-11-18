@@ -59,33 +59,36 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
         return getWrapper().getTexts(headerCells);
     }
 
-    public List<String> getEntityNames()
+    /**
+     * Each row has an anchor tag in its first column; usually it's a link to a sampletype or an assay.
+     * We will refer to that link as the row's name
+     * @return
+     */
+    public List<String> getRowNames()
     {
-        List<String> entityNames = new ArrayList<>();
+        List<String> rowNames = new ArrayList<>();
         for (WebElement row : getRows())
         {
             WebElement entityLink = Locator.xpath("//td/div/a").findElement(row);
-            entityNames.add(entityLink.getText());
+            rowNames.add(entityLink.getText());
         }
-        return entityNames;
+        return rowNames;
     }
 
     public Optional<WebElement> getOptionalRow(String linkText)
     {
         List<WebElement> rows = getRows();
-        if(rows.size() == 0)  // try again; we expect there to be rows if we're here
-        {
-            new WebDriverWait(getDriver(), 10).until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector("tbody tr"), 0));
-            rows=getRows();
-        }
+        Locator matchingLink = Locator.tag("td").append(Locator.linkWithText(linkText));
+
         for (WebElement row : rows)
         {
-            WebElement firstCell = Locator.tag("td").findElement(row);
-            if (Locator.linkWithText(linkText).existsIn(firstCell))
+            if (matchingLink.existsIn(row))
             {
                 return Optional.of(row);
             }
         }
+
+        log("No rows matching ["+matchingLink+"] were found");
         return Optional.empty();
     }
 
