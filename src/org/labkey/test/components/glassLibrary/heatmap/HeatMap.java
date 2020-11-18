@@ -131,19 +131,10 @@ public class HeatMap extends WebDriverComponent<HeatMap.ElementCache>
 
     public Boolean hasData()
     {
-        if (!isLoaded())
-            return false;
+        if (isLoaded())
+            return !_emptyRowLoc.existsIn(getComponentElement()) && _rowsLoc.existsIn(getComponentElement());
         else
-        {
-            try {
-                return  _emptyRowLoc.existsIn(getComponentElement());
-            }
-            catch (StaleElementReferenceException | NoSuchElementException e)
-            {
-                // the emptyRow element is gone, which should mean there's now data.
-                return true;
-            }
-        }
+            return false;
     }
 
     public HeatMap waitForRefresh()
