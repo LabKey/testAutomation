@@ -1047,7 +1047,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             checkLeaks();
         }
 
-        if (reenableMiniProfiler)
+        if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
             setMiniProfilerEnabled(true);
 
         resetExperimentalFlags();
