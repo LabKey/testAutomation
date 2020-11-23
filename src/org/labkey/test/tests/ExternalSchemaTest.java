@@ -186,7 +186,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/admin.view");
 
-        if (!isTextPresent("reload"))
+        if (!isElementPresent(Locator.linkWithText("reload")))
         {
             clickAndWait(Locator.linkWithText("new external schema"));
             setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);

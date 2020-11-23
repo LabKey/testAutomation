@@ -5,6 +5,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.glassLibrary.grids.EditableGrid;
+import org.labkey.test.components.glassLibrary.heatmap.HeatMap;
 import org.labkey.test.components.glassLibrary.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.EntityInsertPanel;
@@ -62,6 +63,13 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
 
         return new QueryGrid.QueryGridFinder(getDriver()).inPanelWithHeaderText("GridPanel").waitFor();
     }
+
+    public HeatMap getHeatMap()
+    {
+        getComponentSelect().select("HeatMap");
+        return new HeatMap.HeatMapFinder(getDriver()).waitFor();
+    }
+
 
     /**
      * This is here to support comparative testing of QueryGrid:QueryGridPanel components, until the latter is
