@@ -314,6 +314,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "application/x-gzip," +
                                     "application/x-zip-compressed," +
                                     "application/xml," +
+                                    "application/json" +
                                     "image/png," +
                                     "image/tiff," +
                                     "text/html," +
