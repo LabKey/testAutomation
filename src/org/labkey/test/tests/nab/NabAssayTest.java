@@ -562,7 +562,7 @@ public class NabAssayTest extends AbstractAssayTest
         wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/nabApiTest.html")));
         wikiHelper.saveWikiPage();
         waitForElement(Locator.id(TEST_DIV_ID));
-        waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2);
+        waitForElements(Locator.id(TEST_DIV_ID).child(Locator.tagWithText("div", "Success!")), 2, WAIT_FOR_PAGE);
     }
 
     private void assertStudyData(int ptidCount)
