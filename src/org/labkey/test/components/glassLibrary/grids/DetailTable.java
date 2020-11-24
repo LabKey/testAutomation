@@ -71,6 +71,17 @@ public class DetailTable extends WebDriverComponent
     }
 
     /**
+     * Gets the value of a cell identified by it's data-fieldKey attribute
+     * @param fieldKey  value of the data-fieldKey attribute on the intended element
+     * @return  Text value of the specified element
+     */
+    public String getFieldValueByKey(String fieldKey)
+    {
+        return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey)
+                .findElement(this).getText();
+    }
+
+    /**
      * Click on a cell in a grid.
      *
      * @param fieldCaption The caption/label of the field to click.
@@ -105,7 +116,7 @@ public class DetailTable extends WebDriverComponent
 
     protected static abstract class Locators
     {
-        static final Locator detailTable = Locator.css("table.detail-component--table__fixed");
+        static final Locator.XPathLocator detailTable = Locator.tagWithClass("table", "detail-component--table__fixed");
 
         static Locator fieldValue(String caption)
         {
@@ -120,12 +131,21 @@ public class DetailTable extends WebDriverComponent
 
     public static class DetailTableFinder extends WebDriverComponent.WebDriverComponentFinder<DetailTable, DetailTableFinder>
     {
+        private Locator.XPathLocator _baseLocator = Locators.detailTable;
         private Locator _locator;
 
         public DetailTableFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locators.detailTable;
+            _locator= _baseLocator;
+        }
+
+        public DetailTableFinder withTitle(String title)
+        {
+            _locator = Locator.tagWithClass("div", "panel")
+                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(title))
+                    .descendant(_baseLocator);
+            return this;
         }
 
         @Override
