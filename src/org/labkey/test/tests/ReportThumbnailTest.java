@@ -194,14 +194,14 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         setThumbnailSRC(BOX_PLOT);
-        toggleThumbnailType(BOX_PLOT, true);
+        setThumbnailTypeToAuto(BOX_PLOT);
         assertNewThumbnail(BOX_PLOT);
         assignCustomThumbnail(BOX_PLOT, TEST_THUMBNAIL, 1, 2);
         assertNewThumbnail(BOX_PLOT);
 
         goToDataViews();
         setThumbnailSRC(SCATTER_PLOT);
-        toggleThumbnailType(SCATTER_PLOT, true);
+        setThumbnailTypeToAuto(SCATTER_PLOT);
         assertNewThumbnail(SCATTER_PLOT);
         assignCustomThumbnail(SCATTER_PLOT, TEST_THUMBNAIL, 1, 2);
         assertNewThumbnail(SCATTER_PLOT);
@@ -310,7 +310,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void toggleThumbnailType(String chart, boolean useAutoThumbnail)
+    protected void setThumbnailTypeToAuto(String chart)
     {
         clickAndWait(Locator.linkWithText(chart));
         TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
@@ -320,12 +320,15 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         checker().takeScreenShot("toggleThumbnailType_SaveDialogBefore");
         saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
-        checker().takeScreenShot("toggleThumbnailType_AfterSave");
+        checker().takeScreenShot("toggleThumbnailType_ReportAfterSave");
 
         log("Open the save dialog again and validate that auto is selected.");
         saveChartDialog = chartWizard.clickSave();
 
-        checker().takeScreenShot("toggleThumbnailType_SaveDialogAgain");
+        checker().verifyTrue("It doesn't look like auto is selected as the thumbnail type.",
+                saveChartDialog.getThumbnailType().equals(SaveChartDialog.ThumbnailType.auto));
+
+        checker().takeScreenShot("toggleThumbnailType_SaveDialogOpenedAgain");
     }
 
     @LogMethod
@@ -367,9 +370,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 
         if (null == expected)
-            assertFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+            checker().verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
         else
-            assertTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
+            checker().verifyTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
                     new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
 
         THUMBNAIL_DATA = thumbnailData;

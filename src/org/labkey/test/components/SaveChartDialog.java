@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.TimeChartWizard;
@@ -50,18 +51,34 @@ public class SaveChartDialog extends Window<SaveChartDialog.Elements>
 
     public SaveChartDialog setThumbnailType(ThumbnailType thumbnail)
     {
+        RadioButton radioButton;
         switch (thumbnail)
         {
             case auto:
-                elementCache().autoThumbnail.check();
+                radioButton = elementCache().autoThumbnail;
                 break;
             case none:
-                elementCache().noThumbnail.check();
-                break;
             default:
+                radioButton = elementCache().noThumbnail;
                 break;
         }
+
+        radioButton.check();
+        WebDriverWrapper.waitFor(radioButton::isChecked, "The thumbnail option was not checked.", 500);
+
         return this;
+    }
+
+    public ThumbnailType getThumbnailType()
+    {
+        if(elementCache().autoThumbnail.isChecked())
+        {
+            return ThumbnailType.auto;
+        }
+        else
+        {
+            return ThumbnailType.none;
+        }
     }
 
     public SaveChartDialog setViewableBy(ViewableBy visibility)
