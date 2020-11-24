@@ -319,6 +319,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
         saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
+        checker().takeScreenShot("toggleThumbnailType_AfterSave");
     }
 
     @LogMethod
@@ -351,11 +352,11 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
+        // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         sleep(500);
         mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
-        // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         String thumbnailData;
         thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 
