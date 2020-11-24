@@ -317,9 +317,15 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         chartWizard.clickEdit();
         SaveChartDialog saveChartDialog = chartWizard.clickSave();
 
+        checker().takeScreenShot("toggleThumbnailType_SaveDialogBefore");
         saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
         checker().takeScreenShot("toggleThumbnailType_AfterSave");
+
+        log("Open the save dialog again and validate that auto is selected.");
+        saveChartDialog = chartWizard.clickSave();
+
+        checker().takeScreenShot("toggleThumbnailType_SaveDialogAgain");
     }
 
     @LogMethod
@@ -350,10 +356,10 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     @LogMethod
     protected void verifyThumbnail(String chart, String expected)
     {
-        goToDataViews();
-        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
         // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         sleep(500);
+        goToDataViews();
+        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
         mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
