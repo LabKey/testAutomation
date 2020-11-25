@@ -373,7 +373,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public static class DetailTableEditFinder extends WebDriverComponent.WebDriverComponentFinder<DetailTableEdit, DetailTableEditFinder>
     {
         private Locator.XPathLocator _baseLocator = Locator.tag("form")
-                .withDescendant(Locator.tagWithClass("div", "detail__editing"));
+                .withDescendant(Locator.tagWithClass("table", "detail-component--table__fixed"));
         private Locator _locator;
 
         public DetailTableEditFinder(WebDriver driver)
