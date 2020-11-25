@@ -370,9 +370,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 
         if (null == expected)
-            checker().verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailStillDefault").verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
         else
-            checker().verifyTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailNotPersisted").verifyTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
                     new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
 
         THUMBNAIL_DATA = thumbnailData;
@@ -388,7 +388,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        assertEquals("Thumbnail Revision number is not correct", String.valueOf(currentRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+        checker().verifyEquals("Thumbnail Revision number is not correct", String.valueOf(currentRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
@@ -397,7 +397,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        assertEquals("Thumbnail Revision number is not correct", String.valueOf(nextRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+        checker().verifyEquals("Thumbnail Revision number is not correct", String.valueOf(nextRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
     }
