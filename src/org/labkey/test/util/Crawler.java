@@ -161,8 +161,6 @@ public class Crawler
             new ControllerActionId("admin", "queryStackTraces"),
             new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "resetQueryStatistics"),
-            new ControllerActionId("admin", "runSystemMaintenance"),
-            new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "shortURLAdmin"),
             new ControllerActionId("admin", "showAllErrors"),
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
@@ -187,7 +185,6 @@ public class Crawler
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("harvest", "formatInvoice"),
-            new ControllerActionId("harvest", "sickSafeTime"),
             new ControllerActionId("issues", "download"),
             new ControllerActionId("list", "download"),
             new ControllerActionId("login", "createToken"),
@@ -196,7 +193,6 @@ public class Crawler
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("luminex", "exportDefaultValues"), // download action
-            new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
@@ -205,7 +201,6 @@ public class Crawler
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
-            new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "excelWebQueryDefinition"),
@@ -218,18 +213,12 @@ public class Crawler
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("search", "search"), // Tests need to wait for indexer manually
             new ControllerActionId("security", "groupExport"), // Download action
-            new ControllerActionId("security", "resetPassword"),
             new ControllerActionId("study", "confirmDeleteVisit"),
             new ControllerActionId("study", "deleteDataset"),
-            new ControllerActionId("study", "deleteDatasetReport"),
             new ControllerActionId("study", "downloadTsv"),
             new ControllerActionId("study", "importStudyFromPipeline"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
             new ControllerActionId("study", "protocolDocumentDownload"),
-            new ControllerActionId("study", "template"),
-            new ControllerActionId("study-reports", "deleteCustomQuery"),
-            new ControllerActionId("study-reports", "deleteReport"),
-            new ControllerActionId("study-reports", "deleteReports"),
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("study-samples", "downloadSpecimenList"),
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
@@ -253,11 +242,8 @@ public class Crawler
             new ControllerActionId("datafinder", "begin"),
             new ControllerActionId("ehr_compliancedb", "requirementDetails"),
             new ControllerActionId("hdrl", "begin"),
-            new ControllerActionId("nlp", "begin"),
             new ControllerActionId("onprc_billingpublic", "begin"),
-            new ControllerActionId("reagent", "begin"),
-            new ControllerActionId("su2c", "begin"),
-            new ControllerActionId("trialshare", "begin")
+            new ControllerActionId("reagent", "begin")
         );
 
         for (String controller : getExcludedControllers())
