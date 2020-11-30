@@ -318,13 +318,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         goToProjectHome();
 
-        log("Export folder. Select 'Experiments and runs' as part of the export.");
+        log("Export folder. Sample Types export should be selected by default.");
         FolderManagementPage folderManagementPage = goToFolderManagement();
         folderManagementPage.goToExportTab();
-
-        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input")
-                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
-
 
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
