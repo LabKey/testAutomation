@@ -317,10 +317,10 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         chartWizard.clickEdit();
         SaveChartDialog saveChartDialog = chartWizard.clickSave();
 
-        checker().takeScreenShot("toggleThumbnailType_SaveDialogBefore");
+        checker().takeScreenShot("setThumbnailTypeToAuto_SaveDialogBeforeSaving");
         saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
-        checker().takeScreenShot("toggleThumbnailType_ReportAfterSave");
+        checker().takeScreenShot("setThumbnailTypeToAuto_ReportPageAfterSave");
 
         log("Open the save dialog again and validate that auto is selected.");
         saveChartDialog = chartWizard.clickSave();
@@ -328,7 +328,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         checker().verifyTrue("It doesn't look like auto is selected as the thumbnail type.",
                 saveChartDialog.getThumbnailType().equals(SaveChartDialog.ThumbnailType.auto));
 
-        checker().takeScreenShot("toggleThumbnailType_SaveDialogOpenedAgain");
+        checker().takeScreenShot("setThumbnailTypeToAuto_SaveDialogOpenedAgain");
     }
 
     @LogMethod
