@@ -650,10 +650,15 @@ public class FlowTest extends BaseFlowTest
         qcReport.save();
 
         clickAndWait(Locator.linkWithText(reportName));
-        final int expectedRows = 15;
+        WebElement reportView = Locator.id("report-view").findElement(getDriver());
 
-        assertEquals("Wrong number of rows in TSV output", expectedRows + 1, Locator.css(".labkey-r-tsvout tr").findElements(getDriver()).size());
-        assertEquals("Found links to filtered out run: " + FCS_FILE_2, 0, Locator.linkContainingText("L04").findElements(getDriver()).size());
+        // wait for the ajax report to be rendered
+        var tsvOutputLoc = Locator.tagWithClass("table", "labkey-r-tsvout");
+        var tsvOutputTable = tsvOutputLoc.waitForElement(reportView, WAIT_FOR_PAGE);
+
+        final int expectedRows = 15;
+        assertEquals("Wrong number of rows in TSV output", expectedRows + 1, tsvOutputLoc.descendant("tr").findElements(reportView).size());
+        assertEquals("Found links to filtered out run: " + FCS_FILE_2, 0, Locator.linkContainingText("L04").findElements(reportView).size());
     }
 
     @LogMethod
