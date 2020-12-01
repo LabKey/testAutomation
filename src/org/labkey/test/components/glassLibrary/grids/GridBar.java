@@ -223,6 +223,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         if(!button.findOptionalElement(this).isEmpty())
         {
             WebElement btn = button.waitForElement(this, 5_000);
+            getWrapper().scrollIntoView(btn);
             btn.click();
 
             if(doAction != null)
