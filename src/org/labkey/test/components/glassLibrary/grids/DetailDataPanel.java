@@ -64,7 +64,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
                 .withTitle("Editing " + title).waitFor();
     }
 
-    public DetailTable table()
+    public DetailTable getTable()
     {
         return  elementCache().detailTable;
     }

@@ -20,7 +20,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 {
     private final WebElement _formElement;
     private final WebDriver _driver;
-    private String _sourceTitle;
     private String _title;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
@@ -39,12 +38,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public WebElement getComponentElement()
     {
         return _formElement;
-    }
-
-    public DetailTableEdit setSourcePanelTitle(String sourcePanelTitle)
-    {
-        _sourceTitle = sourcePanelTitle;
-        return this;
     }
 
     public String getTitle()
@@ -292,12 +285,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     private String getSourceTitle()
     {
-        String title;
-        if (_sourceTitle == null)
-            title = _sourceTitle;
-        else
-            title = getTitle().replace("Editing ", "");
-        return title;
+        return getTitle().replace("Editing ", "");
     }
 
     /**
