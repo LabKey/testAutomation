@@ -430,8 +430,6 @@ public class DataReportsTest extends ReportTest
         if (!TestProperties.isPrimaryUserAppAdmin())
         {
             log("Test user permissions");
-
-            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
             impersonate(AUTHOR_USER);
         }
         else
