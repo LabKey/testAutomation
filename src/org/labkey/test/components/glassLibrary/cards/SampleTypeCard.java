@@ -83,16 +83,14 @@ public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCac
                 .findWhenNeeded(this);
         final WebElement cardBlockCenterElement = Locator.tagWithClass("div", "cards__block-center")
                 .findWhenNeeded(this);
-        final WebElement cardBlockCenterContentElement = Locator.tagWithClass("div", "cards__block-center-content")
-                .findWhenNeeded(this);
         final WebElement cardBlockCenterContentImg = Locator.tagWithClass("div", "cards__block-center-content")
-                .child("img").findWhenNeeded(cardBlockCenterContentElement);
+                .child("img").findWhenNeeded(this);
     }
 
 
     public static class SampleTypeCardFinder extends WebDriverComponentFinder<SampleTypeCard, SampleTypeCardFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "cards__card");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("a", "cards__card");
         private String _title = null;
 
         public SampleTypeCardFinder(WebDriver driver)
