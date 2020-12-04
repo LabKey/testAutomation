@@ -6,7 +6,9 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-
+/**
+ * This automates the component implemented in /components/forms/detail/DetailPanelHeader.tsx
+ */
 public class DetailContainer extends WebDriverComponent<DetailContainer.ElementCache>
 {
     private final WebElement _el;

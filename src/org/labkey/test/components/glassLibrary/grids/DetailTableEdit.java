@@ -16,6 +16,9 @@ import org.openqa.selenium.WebElement;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * automates /QueryModel/DetailPanel.tsx in its editable mode
+ */
 public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementCache>
 {
     private final WebElement _formElement;

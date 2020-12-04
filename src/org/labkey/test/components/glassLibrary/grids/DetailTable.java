@@ -15,6 +15,8 @@ import java.util.Map;
  * This is a 'special' table that has only two columns, and no header. An example of this table can be seen in the
  * Sample Detail page. The first column contains the list of attributes for a given sample, and the second column
  * contains the values of the attributes.
+ *
+ * The component it automates is implemented in /components/src/public/QueryModel/DetailPanel.tsx
  */
 public class DetailTable extends WebDriverComponent
 {
