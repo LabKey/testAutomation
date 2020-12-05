@@ -529,7 +529,6 @@ public class RReportHelper
         _test.waitAndClick(Ext4Helper.Locators.tab("Report"));
         Locator.XPathLocator reportLoc = Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])");
         Locator.waitForAnyElement(_test.longWait(), reportLoc, Locators.labkeyError);
-        _test.waitForElement(reportLoc, WAIT_FOR_PAGE);
     }
 
     public void clickSourceTab()
