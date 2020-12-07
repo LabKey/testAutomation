@@ -1,9 +1,7 @@
 import org.labkey.gradle.task.ModuleDistribution
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
-import org.labkey.gradle.util.ModuleFinder
 import org.labkey.gradle.plugin.Distribution
-import org.labkey.gradle.plugin.FileModule
 
 apply plugin: 'org.labkey.distribution'
 
@@ -52,7 +50,7 @@ else
     List pathList = []
     project.rootProject.allprojects.each {
         Project otherProject ->
-            if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
+            if (otherProject != project && otherProject.getPlugins().findPlugin(Distribution.class) == null)
             {
                 project.evaluationDependsOn(otherProject.path)
                 if (otherProject.plugins.hasPlugin('org.labkey.module') || 
