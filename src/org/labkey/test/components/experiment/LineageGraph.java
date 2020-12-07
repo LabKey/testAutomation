@@ -3,7 +3,7 @@ package org.labkey.test.components.experiment;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.core.DetailComponentTable;
+import org.labkey.test.components.glassLibrary.grids.DetailTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -26,7 +26,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     public Map<String, String> getCurrentNodeData()
     {
-       return elementCache().detailsComponentTable().getData();
+       return elementCache().detailTable().getTableData();
     }
 
     public WebElement getFocusedNodeImage()
@@ -41,8 +41,8 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     /**
      * finds the list of edges/nodes to the one currently focused, by name
-     * @param listTitle
-     * @return
+     * @param listTitle The intended node's title
+     * @return a NodeDetailGroup for the specified node
      */
     public NodeDetailGroup getDetailGroup(String listTitle)
     {
@@ -57,7 +57,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     /**
      * finds all details lists in the details panels
-     * @return
+     * @return a List of NodeDetailGroup, for all shown nodes
      */
     public List<NodeDetailGroup> getDetailGroups()
     {
@@ -66,7 +66,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     /**
      * clicks the overview Link of the currently-selected node/element and optionally waits for a page load
-     * @param wait
+     * @param wait  Whether or not to expect a page load, false if not
      */
     public void clickOverviewLink(boolean wait)
     {
@@ -127,10 +127,9 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         Locator lineageLinkLoc = Locator.linkWithSpan("Lineage").withClass("lineage-data-link--text");
         WebElement nodeLineageLink = lineageLinkLoc.findWhenNeeded(nodeDetailLinksContainer);
 
-        DetailComponentTable detailsComponentTable()
+        DetailTable detailTable()
         {
-            return new DetailComponentTable.DetailComponentTableFinder(getDriver())
-                    .waitFor(nodeDetailContainer);
+            return new DetailTable.DetailTableFinder(getDriver()).waitFor(nodeDetailContainer);
         }
 
         WebElement nodeDetails = Locator.tagWithClass("div", "lineage-node-detail")

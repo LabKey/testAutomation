@@ -1,9 +1,13 @@
 package org.labkey.test.components.glassLibrary.grids;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.glassLibrary.components.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -12,15 +16,18 @@ import org.openqa.selenium.WebElement;
 import java.util.Arrays;
 import java.util.List;
 
-public class DetailTableEdit extends WebDriverComponent
+/**
+ * automates /QueryModel/DetailPanel.tsx in its editable mode
+ */
+public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementCache>
 {
-
-    private final WebElement _editPanel;
+    private final WebElement _formElement;
     private final WebDriver _driver;
+    private String _title;
 
-    protected DetailTableEdit(WebElement editPanel, WebDriver driver)
+    protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
-        _editPanel = editPanel;
+        _formElement = formElement;
         _driver = driver;
     }
 
@@ -33,7 +40,14 @@ public class DetailTableEdit extends WebDriverComponent
     @Override
     public WebElement getComponentElement()
     {
-        return _editPanel;
+        return _formElement;
+    }
+
+    public String getTitle()
+    {
+        if (_title == null)
+            _title = elementCache().header.getText();
+        return _title;
     }
 
     /**
@@ -46,7 +60,7 @@ public class DetailTableEdit extends WebDriverComponent
     public boolean isFieldEditable(String fieldCaption)
     {
         // TODO Could put a check here to see if a field is loading then return false, or wait.
-        WebElement fieldValueElement = Locators.fieldValue(fieldCaption).findElement(getComponentElement());
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(elementCache().editPanel);
         return isEditableField(fieldValueElement);
     }
 
@@ -64,7 +78,7 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public String getReadOnlyField(String fieldCaption)
     {
-        WebElement fieldValueElement = Locators.fieldValue(fieldCaption).findElement(getComponentElement());
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(elementCache().editPanel);
         return fieldValueElement.findElement(By.xpath("./div/*")).getText();
     }
 
@@ -76,7 +90,7 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public String getTextField(String fieldCaption)
     {
-        WebElement fieldValueElement = Locators.fieldValue(fieldCaption).findElement(getComponentElement());
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(elementCache().editPanel);
         WebElement textElement = fieldValueElement.findElement(By.xpath("./div/div/*"));
         if(textElement.getTagName().equalsIgnoreCase("textarea"))
             return textElement.getText();
@@ -93,11 +107,9 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public DetailTableEdit setTextField(String fieldCaption, String value)
     {
-
         if(isFieldEditable(fieldCaption))
         {
-
-            WebElement fieldValueElement = Locators.fieldValue(fieldCaption).findElement(getComponentElement());
+            WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
 
             WebElement editableElement = fieldValueElement.findElement(By.xpath("./div/div/*"));
             String elementType = editableElement.getTagName().toLowerCase().trim();
@@ -118,6 +130,16 @@ public class DetailTableEdit extends WebDriverComponent
             throw new IllegalArgumentException("Field with caption '" + fieldCaption + "' is read-only. This field can not be set.");
         }
 
+        return this;
+    }
+
+    public DetailTableEdit setInputByFieldName(String fieldName, String value)
+    {
+        Locator inputloc = Locator.tagWithClass("input", "form-control")
+            .withAttribute("name",  fieldName);
+        Input input = Input.Input(inputloc,
+                getDriver()).waitFor();
+        input.set(value);
         return this;
     }
 
@@ -145,7 +167,7 @@ public class DetailTableEdit extends WebDriverComponent
         if(isFieldEditable(fieldCaption))
         {
 
-            WebElement fieldValueElement = Locators.fieldValue(fieldCaption).findElement(getComponentElement());
+            WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
 
             WebElement editableElement = fieldValueElement.findElement(Locator.tagWithName("input", fieldCaption.toLowerCase()));
             String elementType = editableElement.getAttribute("type").toLowerCase().trim();
@@ -214,6 +236,18 @@ public class DetailTableEdit extends WebDriverComponent
     }
 
     /**
+     * clears the selections from the specified reactSelect
+     * @param fieldCaption The label text for the select box
+     * @return A reference to the current object
+     */
+    public DetailTableEdit clearSelectionValues(String fieldCaption)
+    {
+        ReactSelect reactSelect =  ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find();
+        reactSelect.clearSelection();
+        return this;
+    }
+
+    /**
      * Select a single value from a select list.
      *
      * @param fieldCaption The caption/label of the field to set.
@@ -235,8 +269,8 @@ public class DetailTableEdit extends WebDriverComponent
      **/
     public DetailTableEdit setSelectValue(String fieldCaption, List<String> selectValues)
     {
-        ReactSelect reactSelect =  ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find();
-        selectValues.forEach(s -> {reactSelect.select(s);});
+        FilteringReactSelect reactSelect =  FilteringReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find();
+        selectValues.forEach(s -> {reactSelect.typeAheadSelect(s);});
         return this;
     }
 
@@ -252,24 +286,98 @@ public class DetailTableEdit extends WebDriverComponent
         return this;
     }
 
-    protected static abstract class Locators
+    private String getSourceTitle()
     {
+        return getTitle().replace("Editing ", "");
+    }
 
-        static Locator fieldValue(String caption)
+    /**
+     * A validation message happens if a value of a particular field is out of bounds or incorrect in some other way.
+     *
+     * @return The text of the validation message or an empty string if there is none.
+     */
+    public String getValidationMessage()
+    {
+        if(elementCache().validationMsg.existsIn(this))
+            return elementCache().validationMsg.findElement(getDriver()).getText();
+        else
+            return "";
+    }
+
+    public boolean isSaveButtonEnabled()
+    {
+        return elementCache().saveButton.isEnabled();
+    }
+
+    public DetailDataPanel clickSave()
+    {
+        String title = getSourceTitle();
+        elementCache().saveButton.click();
+        return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
+    }
+
+    public String clickSaveExpectingError()
+    {
+        elementCache().saveButton.click();
+        return BootstrapLocators.errorBanner.findElement(getDriver()).getText();
+    }
+
+    public DetailDataPanel clickCancel()
+    {
+        String title = getSourceTitle();
+        elementCache().cancelButton.click();
+        return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
+    }
+
+    public String clickCancelExpectingError()
+    {
+        elementCache().cancelButton.click();
+        return BootstrapLocators.errorBanner.findElement(getDriver()).getText();
+    }
+
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends Component<?>.ElementCache
+    {
+        public WebElement header = Locator.tagWithClass("div", "detail__edit--heading")
+                .findWhenNeeded(this);
+        public WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
+                .findWhenNeeded(this);
+
+        public Locator fieldValue(String caption)
         {
             return Locator.tagWithAttribute("td", "data-caption", caption);
         }
+        public Locator validationMsg = Locator.tagWithClass("span", "validation-message");
 
+        public WebElement saveButton = Locator.tagWithAttribute("button", "type", "submit")
+                .findWhenNeeded(this);
+        public WebElement cancelButton = Locator.tagWithAttribute("button", "type", "button")
+                .findWhenNeeded(this);
     }
 
     public static class DetailTableEditFinder extends WebDriverComponent.WebDriverComponentFinder<DetailTableEdit, DetailTableEditFinder>
     {
+        private Locator.XPathLocator _baseLocator = Locator.tag("form")
+                .withDescendant(Locator.tagWithClass("table", "detail-component--table__fixed"));
         private Locator _locator;
 
         public DetailTableEditFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locator.tagWithClass("div", "detail__editing");
+            _locator= _baseLocator;
+        }
+
+        public DetailTableEditFinder withTitle(String title)
+        {
+            _locator = _baseLocator.withDescendant(Locator.tagWithClass("div", "detail__edit--heading")
+                    .withText(title));
+            return this;
         }
 
         @Override
