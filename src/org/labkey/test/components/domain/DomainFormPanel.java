@@ -318,7 +318,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         // Should only modify row collections with findFieldRows() and addFieldButton.click()
         private List<DomainFieldRow> fieldRows;
         private Map<String, Integer> fieldNames = new TreeMap<>();
-        private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row");
+        private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row").withoutClass("domain-floating-hdr");
 
         private List<DomainFieldRow> findFieldRows()
         {

@@ -427,12 +427,23 @@ public class DataReportsTest extends ReportTest
         popLocation();
         pushLocation();
 
-        signOut();
-        signIn(AUTHOR_USER, AUTHOR_USER_PW);
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            log("Test user permissions");
+            impersonate(AUTHOR_USER);
+        }
+        else
+        {
+            log("App Admin can't impersonate site roles. Just create report as primary test user.");
+        }
 
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            stopImpersonating();
+        }
 
         signOut();
         simpleSignIn();
@@ -460,8 +471,7 @@ public class DataReportsTest extends ReportTest
         _apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, getProjectName());
 
         //create R report with dev
-        signOut();
-        signIn(R_USER, "Password");
+        impersonate(R_USER);
 
         log("Access shared R script");
         navigateToFolder(getProjectName(), getFolderName());
@@ -473,8 +483,7 @@ public class DataReportsTest extends ReportTest
         DataRegionTable.DataRegion(getDriver()).find().goToReport(AUTHOR_REPORT);
 
         popLocation();
-        signOut();
-        simpleSignIn();
+        stopImpersonating();
 
         log("Change user permission");
         _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
@@ -536,8 +545,8 @@ public class DataReportsTest extends ReportTest
         log("Test showing the source tab to all users");
         createRReport(reportName, R_SCRIPT, true, true, new String[0]);
 
-        simpleSignOut();
-        signIn(READER_USER, READER_USER_PW);
+        impersonateRole("Reader");
+        clickFolder(getFolderName());
 
         navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
@@ -545,11 +554,11 @@ public class DataReportsTest extends ReportTest
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementVisible(Ext4Helper.Locators.tab("Source"));
+        stopImpersonating();
 
-        signOut();
-        simpleSignIn();
 
         log("Re-save report disabling showing the source tab to all users");
+        goToProjectHome();
         navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
@@ -559,8 +568,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
         resaveReport();
 
-        signOut();
-        signIn(READER_USER, READER_USER_PW);
+        impersonateRole("Reader");
 
         navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
@@ -569,8 +577,7 @@ public class DataReportsTest extends ReportTest
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementNotVisible(Ext4Helper.Locators.tab("Source"));
 
-        signOut();
-        simpleSignIn();
+        stopImpersonating();
 
         goToProjectHome();
     }

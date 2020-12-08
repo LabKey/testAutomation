@@ -319,7 +319,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String warningFieldMessage = noNameRow.setName("&has weird characters that make scripts hard to write")
                 .waitForWarning()
                 .detailsMessage();
-        String expectedWarning = "New Field. Warning: Field name contains special characters.";
+        String expectedWarning = "Warning: Field name contains special characters.";
+        assertThat("expected new field message", warningFieldMessage, containsString("New Field."));
         assertThat("expected error", warningFieldMessage, containsString(expectedWarning));
 
         domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
@@ -527,7 +528,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFieldRow clientFieldWarning = domainFormPanel.addField("select * from table");
 
         domainDesignerPage.clickSaveExpectingErrors();
-        String expectedWarnMsg = "New Field. Warning: Field name contains special characters.";
+        String expectedWarnMsg = "Warning: Field name contains special characters.";
         String blargErrMsg = "New Field. Error: The field name 'blarg' is already taken. Please provide a unique name for each field.";
         String reservedErrMsg = "New Field. Error: 'modified' is a reserved field name in 'fieldsWithReservedNamesSampleType'.";
         String modRowDetailsMsg = modifiedRow.waitForError()
