@@ -19,7 +19,6 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.pages.reports.ManageViewsPage;
@@ -118,10 +117,6 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
         // Regression test: Issue #18602
         _rReportHelper.clickReportTab();
-        if (isElementPresent(Locators.labkeyError))
-        {
-            refresh(); // Sometimes doesn't render on the first try.
-        }
         _rReportHelper.assertKnitrReportContents(reportContains, reportNotContains);
 
         _rReportHelper.clickSourceTab();
