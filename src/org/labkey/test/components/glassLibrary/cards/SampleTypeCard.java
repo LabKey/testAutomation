@@ -10,6 +10,9 @@ import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.html.Input.Input;
 
+/**
+ * Automates shared component implemented by /internal/components/base/cards.tsx
+ */
 public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCache>
 {
     private final WebElement _el;
@@ -41,7 +44,7 @@ public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCac
     /**
      * gets the contents of the 'content' element, minus the title (which is a child of the content element) because
      * title is separately available here
-     * @return
+     * @return the text of the 'content' element, minus the title
      */
     public String getContent()
     {
@@ -52,7 +55,7 @@ public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCac
     /**
      * To indicate that a sampleType might not have samples in it, the 'cards__block-disabled' style grays out the
      * center-block element
-     * @return
+     * @return true if the element class contains "cards__block-disabled"
      */
     public Boolean isCenterBlockDisabled()
     {
@@ -61,7 +64,7 @@ public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCac
 
     /**
      * gets the contents of the 'alt' attribute of the center Icon element
-     * @return
+     * @return The text of the 'alt' attribute
      */
     public String getIconAltString()
     {
