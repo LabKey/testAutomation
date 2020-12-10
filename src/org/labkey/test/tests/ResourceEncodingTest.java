@@ -92,7 +92,7 @@ public class ResourceEncodingTest extends BaseWebDriverTest
     {
         List<String> baseFileNames = Arrays.asList(
                 "clientapi",
-                "clientapi_core",
+                "clientapi/labkey-api-js-core",
                 "internal"
         );
 
