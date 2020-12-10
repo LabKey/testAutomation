@@ -31,6 +31,11 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
         elementCache().viewDetails.click();
     }
 
+    public String getViewDetailsSubDetails()
+    {
+        return Locator.tagWithClass("div"," labkey-error-subdetails").index(1).findElement(getDriver()).getText();
+    }
+
     public String getErrorImage()
     {
         return elementCache().errorImage.getAttribute("src");

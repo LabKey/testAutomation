@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.LabkeyErrorPage;
@@ -15,7 +16,6 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class LabkeyErrorPageTest extends BaseWebDriverTest
 {
-    private static final String EDITOR_USER = "editor_user@user.test";
     private static final String READER_USER = "reader_user@user.test";
     private static final String PROJECT_NAME = "Labkey Error Page Test";
 
@@ -29,7 +29,6 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        createUserWithPermissions(EDITOR_USER, getProjectName(), "Editor");
         createUserWithPermissions(READER_USER, getProjectName(), "Reader");
     }
 
@@ -71,6 +70,21 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
                 errorPage.getSubErrorHeading());
         checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
 
+        goToProjectHome();
+        goToAdminConsole();
+        impersonate(READER_USER);
+        errorPage = new LabkeyErrorPage(getDriver());
+        goBack();
+        checker().verifyEquals("Incorrect error heading message","Oops! An error has occurred.",
+                errorPage.getErrorHeading());
+        checker().verifyEquals("Incorrect error sub-heading message","You do not have the permissions required to access this page.",
+                errorPage.getSubErrorHeading());
+        checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
+
+        errorPage.clickViewDetails();
+        scrollIntoView(Locator.button("Stop Impersonating"));
+        checker().verifyEquals("Incorrect view details content", "You are currently impersonating: reader user\nStop Impersonating",
+                errorPage.getViewDetailsSubDetails());
     }
 
     @Test
