@@ -32,7 +32,6 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
-import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -201,7 +200,7 @@ public class ElispotAssayTest extends AbstractAssayTest
                 Arrays.asList(" "," "," "," "," "," "," "," "," "," ")); //cytokines
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "Antigen 5", "Antigen 6", "Cy3", "FITC");
         clickAndWait(Locator.linkWithText("view runs"));  // clickAndWait to try and avoid a js error that shows up on TC.
-        waitAndClick(Locator.linkWithText("run details"));
+        waitAndClick(DataRegionTable.detailsLinkLocator());
         PlateSummary plateSummary = new PlateSummary(this, 3);
         assertEquals(Arrays.asList("244.0","544.0","210.0","449.0","333.0","429.0","393.0","689.0","400.0","159.0","130.0","94.0"), plateSummary.getRowValues(E));
         plateSummary.selectMeasurement(PlateSummary.Measurement.ACTIVITY);
@@ -371,7 +370,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         _customizeViewsHelper.revertUnsavedView();
 
         clickAndWait(Locator.linkWithText("view runs"));
-        clickAndWait(Locator.linkContainingText("details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
 
         assertTextPresent(
                 "Plate Summary Information",
@@ -554,7 +553,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        clickAndWait(Locator.linkWithText("run details").index(3));
+        clickAndWait(runTable.detailsLink(3));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
         DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
@@ -600,7 +599,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         for (String item : column)
             assertEquals("Background subtraction should be true for all runs.", "true", item);
 
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
         DataRegionTable detailsTable = new CrosstabDataRegion("AntigenStats", this);
