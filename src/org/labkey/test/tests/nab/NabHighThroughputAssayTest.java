@@ -220,7 +220,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @LogMethod
     private void verifyGraphSettings(boolean verifySamplesPerGraph, boolean verifyDataIdentifiers)
     {
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
 
         log("Verify different curve types");
         DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
