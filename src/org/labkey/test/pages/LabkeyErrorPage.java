@@ -21,6 +21,11 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
         return elementCache().errorSubHeading.getText();
     }
 
+    public String getErrorInstruction()
+    {
+        return elementCache().errorInstruction.getText();
+    }
+
     public void clickBack()
     {
         elementCache().backBtn.click();
@@ -50,6 +55,7 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
     {
         WebElement errorHeading = Locator.tagWithClass("div", "labkey-error-heading").findWhenNeeded(this);
         WebElement errorSubHeading = Locator.tagWithClass("div", "labkey-error-subheading").findWhenNeeded(this);
+        WebElement errorInstruction = Locator.tagWithClass("div", " labkey-error-instruction").index(1).findWhenNeeded(this);
         WebElement errorImage = Locator.tagWithAttributeContaining("*","alt","LabKey Error").findWhenNeeded(this);
         WebElement backBtn = Locator.button("Back").findWhenNeeded(this);
         WebElement viewDetails = Locator.button("View Details").findWhenNeeded(this);

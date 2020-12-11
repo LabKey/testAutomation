@@ -37,21 +37,27 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     {
         String imageTitle = "notFound_error.svg";
         log("Verifying error message with mothership controller and action");
-        beginAt(WebTestHelper.buildURL("mothership", "ThrowNotFoundException"));
+        beginAt(WebTestHelper.buildURL("test", "NotFound"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
         checker().verifyEquals("Incorrect error heading message","Oops! The requested page cannot be found.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","This is a test message for not found exception.",
+        checker().verifyEquals("Incorrect error sub-heading message","404: page not found.",
                 errorPage.getSubErrorHeading());
         checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
 
-        goToProjectHome();
         beginAt(WebTestHelper.buildRelativeUrl("project",getCurrentContainerPath(),"beginning"));
         errorPage = new LabkeyErrorPage(getDriver());
         checker().verifyEquals("Incorrect error heading message","Oops! The requested page cannot be found.",
                 errorPage.getErrorHeading());
         checker().verifyEquals("Incorrect error sub-heading message","Unable to find action 'beginning' to handle request in controller 'project'.",
+                errorPage.getSubErrorHeading());
+
+        beginAt(WebTestHelper.buildRelativeUrl("projects",getCurrentContainerPath(),"begin"));
+        errorPage = new LabkeyErrorPage(getDriver());
+        checker().verifyEquals("Incorrect error heading message","Oops! The requested page cannot be found.",
+                errorPage.getErrorHeading());
+        checker().verifyEquals("Incorrect error sub-heading message","No LabKey Server module registered to handle request for controller: projects.",
                 errorPage.getSubErrorHeading());
 
     }
@@ -60,21 +66,12 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     public void testPermissionErrors()
     {
         String imageTitle = "permission_error.svg";
-        log("Verifying permission error message with mothership action");
-        beginAt(WebTestHelper.buildURL("mothership", "ThrowPermissionException"));
-        LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
-
-        checker().verifyEquals("Incorrect error heading message","Oops! An error has occurred.",
-                errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","You do not have the permissions required to access this page.",
-                errorPage.getSubErrorHeading());
-        checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
 
         goToProjectHome();
-        goToAdminConsole();
         impersonate(READER_USER);
-        errorPage = new LabkeyErrorPage(getDriver());
-        goBack();
+        beginAt(WebTestHelper.buildURL("test", "PermUpdate"));
+        LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
+
         checker().verifyEquals("Incorrect error heading message","Oops! An error has occurred.",
                 errorPage.getErrorHeading());
         checker().verifyEquals("Incorrect error sub-heading message","You do not have the permissions required to access this page.",
@@ -85,6 +82,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         scrollIntoView(Locator.button("Stop Impersonating"));
         checker().verifyEquals("Incorrect view details content", "You are currently impersonating: reader user\nStop Impersonating",
                 errorPage.getViewDetailsSubDetails());
+        stopImpersonating();
     }
 
     @Test
@@ -92,12 +90,12 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     {
         String imageTitle = "configuration_error.svg";
         log("Verifying configuration error message with mothership action");
-        beginAt(WebTestHelper.buildURL("mothership", "ThrowConfigurationException"));
+        beginAt(WebTestHelper.buildURL("test", "ConfigurationException"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
         checker().verifyEquals("Incorrect error heading message","Oops! A server configuration error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","The requested page cannot be found. This is a test message for configuration exception.",
+        checker().verifyEquals("Incorrect error sub-heading message","The requested page cannot be found. You have a configuration problem.",
                 errorPage.getSubErrorHeading());
         checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
 
@@ -109,13 +107,14 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     {
         String imageTitle = "code_error.svg";
         log("Verifying execution error message with mothership action");
-        beginAt(WebTestHelper.buildURL("mothership", "ThrowExecutionException"));
+        beginAt(WebTestHelper.buildURL("test", "npe"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
         checker().verifyEquals("Incorrect error heading message","Oops! An error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","This is a test message for execution exception",
-                errorPage.getSubErrorHeading());
+        checker().verifyEquals("Incorrect error instructions","Please report this bug to LabKey Support by copying " +
+                        "and pasting both your unique reference code and the full stack trace in the View Details section below.",
+                errorPage.getErrorInstruction());
         checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
 
         checkExpectedErrors(3);
