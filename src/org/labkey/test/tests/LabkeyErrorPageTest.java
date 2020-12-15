@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,24 +41,24 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         beginAt(WebTestHelper.buildURL("test", "NotFound"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
-        checker().verifyEquals("Incorrect error heading message","Oops! The requested page cannot be found.",
+        checker().verifyEquals("Incorrect error heading message", "Oops! The requested page cannot be found.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","404: page not found.",
+        checker().verifyEquals("Incorrect error sub-heading message", "404: page not found.",
                 errorPage.getSubErrorHeading());
-        checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
+        checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
-        beginAt(WebTestHelper.buildRelativeUrl("project",getCurrentContainerPath(),"beginning"));
+        beginAt(WebTestHelper.buildRelativeUrl("project", getCurrentContainerPath(), "beginning"));
         errorPage = new LabkeyErrorPage(getDriver());
-        checker().verifyEquals("Incorrect error heading message","Oops! The requested page cannot be found.",
+        checker().verifyEquals("Incorrect error heading message", "Oops! The requested page cannot be found.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","Unable to find action 'beginning' to handle request in controller 'project'.",
+        checker().verifyEquals("Incorrect error sub-heading message", "Unable to find action 'beginning' to handle request in controller 'project'.",
                 errorPage.getSubErrorHeading());
 
-        beginAt(WebTestHelper.buildRelativeUrl("projects",getCurrentContainerPath(),"begin"));
+        beginAt(WebTestHelper.buildRelativeUrl("projects", getCurrentContainerPath(), "begin"));
         errorPage = new LabkeyErrorPage(getDriver());
-        checker().verifyEquals("Incorrect error heading message","Oops! The requested page cannot be found.",
+        checker().verifyEquals("Incorrect error heading message", "Oops! The requested page cannot be found.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","No LabKey Server module registered to handle request for controller: projects.",
+        checker().verifyEquals("Incorrect error sub-heading message", "No LabKey Server module registered to handle request for controller: projects.",
                 errorPage.getSubErrorHeading());
 
     }
@@ -72,11 +73,11 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         beginAt(WebTestHelper.buildURL("test", "PermUpdate"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
-        checker().verifyEquals("Incorrect error heading message","Oops! An error has occurred.",
+        checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","You do not have the permissions required to access this page.",
+        checker().verifyEquals("Incorrect error sub-heading message", "You do not have the permissions required to access this page.",
                 errorPage.getSubErrorHeading());
-        checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
+        checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
         errorPage.clickViewDetails();
         scrollIntoView(Locator.button("Stop Impersonating"));
@@ -93,11 +94,11 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         beginAt(WebTestHelper.buildURL("test", "ConfigurationException"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
-        checker().verifyEquals("Incorrect error heading message","Oops! A server configuration error has occurred.",
+        checker().verifyEquals("Incorrect error heading message", "Oops! A server configuration error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message","The requested page cannot be found. You have a configuration problem.",
+        checker().verifyEquals("Incorrect error sub-heading message", "The requested page cannot be found. You have a configuration problem.",
                 errorPage.getSubErrorHeading());
-        checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
+        checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
         checkExpectedErrors(1);
     }
@@ -110,12 +111,12 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         beginAt(WebTestHelper.buildURL("test", "npe"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
-        checker().verifyEquals("Incorrect error heading message","Oops! An error has occurred.",
+        checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error instructions","Please report this bug to LabKey Support by copying " +
+        checker().verifyEquals("Incorrect error instructions", "Please report this bug to LabKey Support by copying " +
                         "and pasting both your unique reference code and the full stack trace in the View Details section below.",
                 errorPage.getErrorInstruction());
-        checker().verifyTrue("Incorrect error image",errorPage.getErrorImage().contains(imageTitle));
+        checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
         checkExpectedErrors(3);
     }
