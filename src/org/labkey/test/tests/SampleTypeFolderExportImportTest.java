@@ -21,6 +21,14 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
+import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -32,10 +40,12 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -48,6 +58,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.everyItem;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
 public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
@@ -332,7 +354,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         goToProjectHome(IMPORT_PROJECT_NAME);
 
         log("Validate that the number of Sample Types in the imported folder is the expected value. If not fail test.");
-        Assert.assertTrue("Does not look like the Sample Type has been imported.", isElementVisible(Locator.linkWithText(SAMPLE_TYPE_NAME)));
+        assertTrue("Does not look like the Sample Type has been imported.", isElementVisible(Locator.linkWithText(SAMPLE_TYPE_NAME)));
 
         DataRegionTable sampleTypesDataRegion = new DataRegionTable(SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME, getWrappedDriver());
 
@@ -397,6 +419,219 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         log("All done.");
     }
+
+    @Test
+    public void testExportImportDerivedSamples() throws Exception
+    {
+        String subfolder = "derivedsamplesfolder";
+        String subfolderPath = getProjectName() + "/" + subfolder;
+        String parentSampleType = "parentSamples";
+        String testSamples = "testSamples";
+        String importProject = "derived_samples_import_project";
+
+        _containerHelper.deleteProject(importProject, false); // here in case you're iterating
+        _containerHelper.createSubfolder(getProjectName(), subfolder);
+
+        // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
+
+        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
+        SampleTypeDefinition parentType = SampleTypeAPIHelper.sampleTypeDefinition(parentSampleType, testFields, null, null);
+        SampleTypeDefinition testSampleType = SampleTypeAPIHelper.sampleTypeDefinition(testSamples, testFields, null, null)
+                .addParentAlias("Parent", parentSampleType) // to derive from parent sampleType
+                .addParentAlias("SelfParent"); // to derive from samles in the current type
+
+        TestDataGenerator parentDgen = SampleTypeAPIHelper.makeSampleType(parentType, subfolderPath, null);
+        parentDgen.addCustomRow(Map.of("Name", "Parent1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
+        parentDgen.addCustomRow(Map.of("Name", "Parent2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two"));
+        parentDgen.addCustomRow(Map.of("Name", "Parent3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three"));
+        parentDgen.insertRows();
+
+        TestDataGenerator testDgen = SampleTypeAPIHelper.makeSampleType(testSampleType, subfolderPath, null);
+        testDgen.addCustomRow(Map.of("Name", "Child1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one",
+                "Parent", "Parent1"));
+        testDgen.addCustomRow(Map.of("Name", "Child2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two",
+                "Parent", "Parent2"));
+        testDgen.addCustomRow(Map.of("Name", "Child3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three",
+                "Parent", "Parent3"));
+        testDgen.addCustomRow(Map.of("Name", "Child4", "intColumn", 4, "floatColumn", 4.4, "stringColumn", "four",
+                "Parent", "Parent3, Parent2"));
+        testDgen.addCustomRow(Map.of("Name", "Child5", "intColumn", 5, "floatColumn", 5.5, "stringColumn", "five",
+                "Parent", "Parent1, Parent2"));
+        testDgen.addCustomRow(Map.of("Name", "Child6", "intColumn", 6, "floatColumn", 6.6, "stringColumn", "six",
+                "Parent", "Parent3, Parent2", "SelfParent", "Child5"));
+        testDgen.insertRows();
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Experiment Runs");
+
+        DataRegionTable sourceRunsTable = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
+        List<String> runNames = sourceRunsTable.getColumnDataAsText("Name");
+
+        clickAndWait(Locator.linkWithText(testSamples));
+        DataRegionTable sourceTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
+        CustomizeView cv = sourceTable.openCustomizeGrid();
+        cv.showHiddenItems();
+        cv.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
+        cv.clickSave().save();
+        List<Map<String, String>> sourceRowData = new ArrayList<>();
+        for (int i=0; i<6; i++)
+        {
+            sourceRowData.add(sourceTable.getRowDataAsMap(i));
+        }
+
+        // act - export to file and import the file to our designated import directory
+        goToFolderManagement()
+                .goToExportTab();
+        File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
+
+        _containerHelper.createProject(importProject);
+        importFolderFromZip(exportedFolderFile, false, 1);
+        goToProjectHome(importProject);
+
+        List<String> importedRunNames = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor()
+                .getColumnDataAsText("Name");
+        for (String sourceRun : runNames)
+        {
+            assertThat("expect all runs to come through", importedRunNames, hasItems(sourceRun));
+        }
+
+        // we expect the sample types and experiment runs webparts to come across along with the folder import
+        clickAndWait(Locator.linkWithText(testSamples));
+        DataRegionTable destSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
+        CustomizeView cv2 = destSamplesTable.openCustomizeGrid();
+        cv2.showHiddenItems();
+        cv2.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
+        cv2.clickSave().save();
+
+        List<Map<String, String>> destRowData = new ArrayList<>();
+        for (int i=0; i<6; i++)
+        {
+            destRowData.add(destSamplesTable.getRowDataAsMap(i));
+        }
+
+        // now ensure expected lineage/parentage information made it to the destination folder
+        for (Map exportedRow : sourceRowData)
+        {
+            // find the map from the exported project with the same name
+            Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))
+                    .findFirst().orElse(null);
+            assertNotNull("expect all matching rows to come through", matchingMap);
+            assertThat("expect export and import values to be equivalent",
+                    exportedRow.get("intColumn"), equalTo(matchingMap.get("intColumn")));
+            assertThat("expect export and import values to be equivalent",
+                    exportedRow.get("stringColumn"), equalTo(matchingMap.get("stringColumn")));
+            assertThat("expect export and import values to be equivalent",
+                    exportedRow.get("floatcolumn"), equalTo(matchingMap.get("floatColumn")));
+
+            List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples").toString()
+                    .replace(" ", "").split(","));
+            String[] importedParents = matchingMap.get("Inputs/Materials/parentSamples").replace(" ", "").split(",");
+            assertThat("expect lineage information to round trip with equivalent values", sourceParents, hasItems(importedParents));
+        }
+        
+        // on success, delete import folder
+        _containerHelper.deleteProject(importProject);
+    }
+
+    @Test
+    public void testExportImportSampleTypesWithAssayRuns() throws Exception
+    {
+        // in process
+        String subfolder = "samplesWithAssayRunsFolder";
+        String subfolderPath = getProjectName() + "/" + subfolder;
+        String testSamples = "testSamples";
+        String assayName = "testAssay";
+        String importProject = "assay_samples_import_project";
+
+        _containerHelper.deleteProject(importProject, false); // here in case you're iterating
+        _containerHelper.createSubfolder(getProjectName(), subfolder);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Experiment Runs");
+        portalHelper.addWebPart("Assay List");
+
+        // create a test sampleType
+        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
+        SampleTypeDefinition testSampleType = SampleTypeAPIHelper.sampleTypeDefinition(testSamples, testFields, null, null)
+                .addParentAlias("SelfParent"); // to derive from samles in the current type
+
+        TestDataGenerator parentDgen = SampleTypeAPIHelper.makeSampleType(testSampleType, subfolderPath, null);
+        parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
+        parentDgen.addCustomRow(Map.of("Name", "sample2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two"));
+        parentDgen.addCustomRow(Map.of("Name", "sample3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three"));
+        parentDgen.insertRows();
+
+        // now define an assay that references it
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(createDefaultConnection(), getProjectName());
+
+        Protocol assayProtocol = getProtocolResponse.getProtocol();
+        assayProtocol.setName(assayName)
+                .setDescription("Just a test assay");
+
+        Domain batchesDomain =  assayProtocol.getDomains().stream().filter(a->a.getName().equals("Batch Fields")).findFirst()
+                .orElseThrow(()-> new IllegalStateException("The protocol template did not supply a [Batch Fields] domain"));
+        List<PropertyDescriptor> batchFields = batchesDomain.getFields();   // keep the template-supplied fields, add the following
+        batchFields.add(new PropertyDescriptor("batchField", "string"));
+        batchesDomain.setFields(batchFields);
+        Domain runsDomain =  assayProtocol.getDomains().stream().filter(a->a.getName().equals("Run Fields")).findFirst()
+                .orElseThrow(()-> new IllegalStateException("The protocol template did not supply a [Run Fields] domain"));
+        List<PropertyDescriptor> runFields = runsDomain.getFields();
+        runFields.add(new PropertyDescriptor("runField", "string"));
+
+        runsDomain.setFields(runFields);
+        Domain resultsDomain = assayProtocol.getDomains().stream().filter(a->a.getName().equals("Data Fields")).findFirst()
+                .orElseThrow(()-> new IllegalStateException("The protocol template did not supply a [Data Fields] domain"));
+        List<PropertyDescriptor> resultsFields = resultsDomain.getFields();
+        resultsFields.add(new PropertyDescriptor("resultData", "Result Data", "string"));
+        resultsFields.add(new PropertyDescriptor("sampleId", "Sample Id", "string").setLookup("exp.materials", testSamples, subfolderPath));
+        resultsDomain.setFields(resultsFields);
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(assayProtocol);
+        Protocol serverProtocol = saveProtocolCommand.execute(createDefaultConnection(), subfolderPath).getProtocol();
+
+        // now save a couple of runs
+        Integer protocolId = Integer.parseInt(serverProtocol.getProtocolId().toString());
+        List<Map<String, Object>> runRecords1 = new ArrayList<>();
+        runRecords1.add(Map.of("sampleId", "sample1", "resultData", "this thing"));
+        runRecords1.add(Map.of("sampleId", "sample2", "resultData", "that thing"));
+        runRecords1.add(Map.of("sampleId", "sample3", "resultData", "the other thing"));
+
+        ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runRecords1);
+        importRunCommand.setName("firstRun");
+        importRunCommand.setBatchId(123);
+        importRunCommand.execute(createDefaultConnection(), subfolderPath);
+
+        List<Map<String, Object>> runRecords2 = new ArrayList<>();
+        runRecords2.add(Map.of("sampleId", "sample1", "resultData", "more thing"));
+        runRecords2.add(Map.of("sampleId", "sample2", "resultData", "less thing"));
+        runRecords2.add(Map.of("sampleId", "sample3", "resultData", "the other other thing"));
+
+        ImportRunCommand importRunCommand2 = new ImportRunCommand(protocolId, runRecords1);
+        importRunCommand2.setName("secondRun");
+        importRunCommand2.setBatchId(124);
+        importRunCommand2.execute(createDefaultConnection(), subfolderPath);
+
+        // todo: capture the run data pre-export
+
+        // now export the current folder and import it to importProject
+        goToFolderManagement()
+                .goToExportTab();
+
+        Checkbox checkbox = new Checkbox(Locator.tagWithText("label", "Experiments and runs")
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+        checkbox.check();
+        File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
+
+        _containerHelper.createProject(importProject);
+        importFolderFromZip(exportedFolderFile, false, 1);
+        goToProjectHome(importProject);
+
+        // now validate run data made it
+
+        _containerHelper.deleteProject(importProject); // clean up on success
+    }
+
 
     private StringBuilder checkDisplayFields(String displayField, List<String> columnLabels)
     {

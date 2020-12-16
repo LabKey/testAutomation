@@ -1,5 +1,6 @@
 package org.labkey.test.util.exp;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -7,10 +8,12 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +45,63 @@ public class SampleTypeAPIHelper
             throw new RuntimeException("Failed to create sample type.", e);
         }
 
+    }
+
+    static public SampleTypeDefinition sampleTypeDefinition(String sampleTypeName,
+                                                            List<FieldDefinition> fields,
+                                                            String parentAlias,
+                                                            String nameExpression)
+    {
+        SampleTypeDefinition def = new SampleTypeDefinition(sampleTypeName);
+        def.setFields(fields);
+        if (null != parentAlias)
+            def.addParentAlias(parentAlias);
+        if (null != nameExpression)
+            def.setNameExpression(nameExpression);
+
+        return def;
+    }
+
+    public static List<FieldDefinition> sampleTypeTestFields()
+    {
+        return Arrays.asList(
+                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
+                new FieldDefinition("floatColumn", FieldDefinition.ColumnType.Decimal),
+                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
+                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
+    }
+
+    static public TestDataGenerator makeSampleType(SampleTypeDefinition sampleTypeDefinition, String containerPath, String dateFormatString)
+    {
+        deleteDomain(new FieldDefinition.LookupInfo(containerPath, "samples", sampleTypeDefinition.getName()));
+
+        TestDataGenerator dgen = SampleTypeAPIHelper.createEmptySampleType(containerPath, sampleTypeDefinition);
+
+        if (null != dateFormatString)
+        {
+            dgen.addDataSupplier("DateColumn", () -> dgen.randomDateString(dateFormatString,
+                    DateUtils.addWeeks(new Date(), -39),
+                    new Date()));
+        }
+        return dgen;
+    }
+
+    static public void deleteDomain(FieldDefinition.LookupInfo targetDomain)
+    {
+        try
+        {
+            if (TestDataGenerator.doesDomainExists(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable()))
+            {
+                TestDataGenerator.deleteDomain(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable());
+            }
+
+        }
+        catch (CommandException ex)
+        {
+            throw new RuntimeException(String
+                    .format("Failed to delete '%s'.", targetDomain.getTable()), ex);
+        }
     }
 
     /**
