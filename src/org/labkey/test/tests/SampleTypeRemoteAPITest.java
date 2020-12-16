@@ -275,8 +275,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         assertEquals("cell should reflect literal value", "updatedValue", dCell.getText());
 
         // now update rows via the UI
-        String mvIndicatorColName = WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer) ?
-                "mvStringData_MVIndicator" : "mvstringdata_mvindicator";
+        String mvIndicatorColName = "mvStringDataMVIndicator";
         materialsList.updateRow(dIndex, Map.of("mvStringData", "reallyUpdatedValue", mvIndicatorColName, "Q"));  // update the underlying value but set it mv-Q
         materialsList.clickEditRow(eIndex);
         selectOptionByText(Locator.name("quf_"+mvIndicatorColName), "");    // clear the mv value, reveal underlying value
@@ -425,22 +424,14 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         materialsList.clickEditRow(0);
         setFormElement(Locator.input("quf_mvStringData"), "testValue");
 
-        /* SQL and PG handle casing differently- and labkey passes the differently-cased field names straight through.
-        * Until we figure out a way to do case-insensitive matching over xpath, fork in the test code based on which DB we're running */
-        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"), "Q");
-        else
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvstringdata_mvindicator"), "Q");
+        selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringDataMVIndicator"), "Q");
         clickButton("Submit");
 
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
         materialsList.clickEditRow(1);
         setFormElement(Locator.input("quf_mvStringData"), "otherValue");
-        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"), "N");
-        else
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvstringdata_mvindicator"), "N");
+        selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringDataMVIndicator"), "N");
         clickButton("Submit");
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
