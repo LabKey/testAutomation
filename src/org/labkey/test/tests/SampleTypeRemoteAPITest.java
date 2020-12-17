@@ -253,8 +253,8 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         // now update
         Map<String, Object> rowE = insertResponse.getRows().stream().filter(a -> a.get("name").equals("E")).findFirst().orElse(null);
         Map<String, Object> rowD = insertResponse.getRows().stream().filter(a -> a.get("name").equals("D")).findFirst().orElse(null);
-        rowE.put("mvstringdata_mvindicator", "Q");
-        rowD.put("mvstringdata_mvindicator", null);
+        rowE.put("mvstringdatamvindicator", "Q");
+        rowD.put("mvstringdatamvindicator", null);
         rowD.put("mvStringData", "updatedValue");
 
         SaveRowsResponse updateResponse = dgen.updateRows(createDefaultConnection(), Arrays.asList(rowD, rowE));
