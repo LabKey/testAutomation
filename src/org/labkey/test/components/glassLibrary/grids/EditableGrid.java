@@ -68,14 +68,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             columns.add(el.getText().trim());
         }
 
+        int rowNumberColumn;
+
         if (hasSelectColumn())
         {
             columns.set(0, SELECT_COLUMN_HEADER);
-            columns.set(1, ROW_NUMBER_COLUMN_HEADER);
+            rowNumberColumn = 1;
         }
         else
         {
-            columns.set(0, ROW_NUMBER_COLUMN_HEADER);
+            rowNumberColumn = 0;
+        }
+
+        if(columns.get(rowNumberColumn).trim().isEmpty())
+        {
+            columns.set(rowNumberColumn, ROW_NUMBER_COLUMN_HEADER);
         }
 
         return columns;
@@ -210,8 +217,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         for(WebElement row : getRows())
         {
-            if(!row.findElement(By.cssSelector("td:nth-child(" + checkColumn + ") > div"))
-                    .getAttribute("class").contains("cell-selection"))
+            String classAttribute = row.findElement(By.cssSelector("td:nth-child(" + checkColumn + ") > div"))
+                    .getAttribute("class");
+
+            if((!classAttribute.contains("cell-selection")) && (!classAttribute.contains("cell-read-only")))
             {
                 unPopulatedRows.add(rowCount);
             }
@@ -305,7 +314,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * pastes delimited text to the grid, from a single target.  The component is clever enough to target
+     * Pastes delimited text to the grid, from a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
      * @param columnName    column of the target cell
@@ -329,7 +338,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * pastes a single value into as many cells as are selected, or supports pasting a square shaped blob of data
+     * Pastes a single value into as many cells as are selected, or supports pasting a square shaped blob of data
      * of the same shape as the prescribed selection.  If a single value is supplied, that value will be put into
      * every cell in the selection.  If the data doesn't match the selection dimensions (e.g., has fewer or more columns)
      * the grid should produce an error/alert.
