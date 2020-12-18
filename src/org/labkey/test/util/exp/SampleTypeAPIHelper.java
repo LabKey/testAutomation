@@ -36,15 +36,30 @@ public class SampleTypeAPIHelper
      */
     public static TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition def)
     {
+        return createEmptySampleType(containerPath, def, null);
+    }
+
+    static public TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition, String dateFormatString)
+    {
+        deleteDomain(new FieldDefinition.LookupInfo(containerPath, "samples", sampleTypeDefinition.getName()));
+
+        TestDataGenerator dgen;
         try
         {
-            return TestDataGenerator.createDomain(containerPath, def);
+            dgen = TestDataGenerator.createDomain(containerPath, sampleTypeDefinition);
         }
         catch (CommandException e)
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }
 
+        if (null != dateFormatString)
+        {
+            dgen.addDataSupplier("DateColumn", () -> dgen.randomDateString(dateFormatString,
+                    DateUtils.addWeeks(new Date(), -39),
+                    new Date()));
+        }
+        return dgen;
     }
 
     static public SampleTypeDefinition sampleTypeDefinition(String sampleTypeName,
@@ -66,25 +81,10 @@ public class SampleTypeAPIHelper
     {
         return Arrays.asList(
                 new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("floatColumn", FieldDefinition.ColumnType.Decimal),
+                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
                 new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
                 new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
                 new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
-    }
-
-    static public TestDataGenerator makeSampleType(SampleTypeDefinition sampleTypeDefinition, String containerPath, String dateFormatString)
-    {
-        deleteDomain(new FieldDefinition.LookupInfo(containerPath, "samples", sampleTypeDefinition.getName()));
-
-        TestDataGenerator dgen = SampleTypeAPIHelper.createEmptySampleType(containerPath, sampleTypeDefinition);
-
-        if (null != dateFormatString)
-        {
-            dgen.addDataSupplier("DateColumn", () -> dgen.randomDateString(dateFormatString,
-                    DateUtils.addWeeks(new Date(), -39),
-                    new Date()));
-        }
-        return dgen;
     }
 
     static public void deleteDomain(FieldDefinition.LookupInfo targetDomain)

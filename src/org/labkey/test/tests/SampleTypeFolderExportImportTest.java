@@ -23,7 +23,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.ImportRunCommand;
-import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.remoteapi.assay.Protocol;
 import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.SaveProtocolCommand;
@@ -40,7 +39,6 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -58,12 +56,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -106,6 +101,8 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     {
         // Delete the import project if it exists.
         _containerHelper.deleteProject(IMPORT_PROJECT_NAME, false);
+        // create the import project because we'll need it
+        _containerHelper.createProject(IMPORT_PROJECT_NAME);
 
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME);
@@ -341,9 +338,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         log("Folder should have been exported!");
 
-        log("Create a new folder and import the previously exported folder.");
-
-        _containerHelper.createProject(IMPORT_PROJECT_NAME);
+        log("Import the previously exported folder.");
 
         goToProjectHome(IMPORT_PROJECT_NAME);
 
@@ -423,41 +418,42 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     @Test
     public void testExportImportDerivedSamples() throws Exception
     {
-        String subfolder = "derivedsamplesfolder";
+        String subfolder = "derivedSamplesExportFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
         String parentSampleType = "parentSamples";
         String testSamples = "testSamples";
-        String importProject = "derived_samples_import_project";
+        String importFolder = "derivedSamplesImportFolder";
 
-        _containerHelper.deleteProject(importProject, false); // here in case you're iterating
+        // create a subfolder in the import destination project
+        _containerHelper.createSubfolder(IMPORT_PROJECT_NAME, importFolder);
+        // create a subfolder in the project to hold types we'll export in this test method
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
-
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
         SampleTypeDefinition parentType = SampleTypeAPIHelper.sampleTypeDefinition(parentSampleType, testFields, null, null);
         SampleTypeDefinition testSampleType = SampleTypeAPIHelper.sampleTypeDefinition(testSamples, testFields, null, null)
                 .addParentAlias("Parent", parentSampleType) // to derive from parent sampleType
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
-        TestDataGenerator parentDgen = SampleTypeAPIHelper.makeSampleType(parentType, subfolderPath, null);
+        TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, parentType, null);
         parentDgen.addCustomRow(Map.of("Name", "Parent1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
         parentDgen.addCustomRow(Map.of("Name", "Parent2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two"));
         parentDgen.addCustomRow(Map.of("Name", "Parent3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three"));
         parentDgen.insertRows();
 
-        TestDataGenerator testDgen = SampleTypeAPIHelper.makeSampleType(testSampleType, subfolderPath, null);
-        testDgen.addCustomRow(Map.of("Name", "Child1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one",
+        TestDataGenerator testDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType, null);
+        testDgen.addCustomRow(Map.of("Name", "Child1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one",
                 "Parent", "Parent1"));
-        testDgen.addCustomRow(Map.of("Name", "Child2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two",
+        testDgen.addCustomRow(Map.of("Name", "Child2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two",
                 "Parent", "Parent2"));
-        testDgen.addCustomRow(Map.of("Name", "Child3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three",
+        testDgen.addCustomRow(Map.of("Name", "Child3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three",
                 "Parent", "Parent3"));
-        testDgen.addCustomRow(Map.of("Name", "Child4", "intColumn", 4, "floatColumn", 4.4, "stringColumn", "four",
+        testDgen.addCustomRow(Map.of("Name", "Child4", "intColumn", 4, "decimalColumn", 4.4, "stringColumn", "four",
                 "Parent", "Parent3, Parent2"));
-        testDgen.addCustomRow(Map.of("Name", "Child5", "intColumn", 5, "floatColumn", 5.5, "stringColumn", "five",
+        testDgen.addCustomRow(Map.of("Name", "Child5", "intColumn", 5, "decimalColumn", 5.5, "stringColumn", "five",
                 "Parent", "Parent1, Parent2"));
-        testDgen.addCustomRow(Map.of("Name", "Child6", "intColumn", 6, "floatColumn", 6.6, "stringColumn", "six",
+        testDgen.addCustomRow(Map.of("Name", "Child6", "intColumn", 6, "decimalColumn", 6.6, "stringColumn", "six",
                 "Parent", "Parent3, Parent2", "SelfParent", "Child5"));
         testDgen.insertRows();
 
@@ -485,9 +481,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
                 .goToExportTab();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
-        _containerHelper.createProject(importProject);
+        goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
         importFolderFromZip(exportedFolderFile, false, 1);
-        goToProjectHome(importProject);
+        goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
 
         List<String> importedRunNames = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor()
                 .getColumnDataAsText("Name");
@@ -504,13 +500,14 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         cv2.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
         cv2.clickSave().save();
 
+        // capture the data in the exported sampleType
         List<Map<String, String>> destRowData = new ArrayList<>();
         for (int i=0; i<6; i++)
         {
             destRowData.add(destSamplesTable.getRowDataAsMap(i));
         }
 
-        // now ensure expected lineage/parentage information made it to the destination folder
+        // now ensure expected data in the sampleType made it to the destination folder
         for (Map exportedRow : sourceRowData)
         {
             // find the map from the exported project with the same name
@@ -522,44 +519,37 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             assertThat("expect export and import values to be equivalent",
                     exportedRow.get("stringColumn"), equalTo(matchingMap.get("stringColumn")));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("floatcolumn"), equalTo(matchingMap.get("floatColumn")));
+                    exportedRow.get("decimalColumn"), equalTo(matchingMap.get("decimalColumn")));
 
             List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples").toString()
                     .replace(" ", "").split(","));
             String[] importedParents = matchingMap.get("Inputs/Materials/parentSamples").replace(" ", "").split(",");
             assertThat("expect lineage information to round trip with equivalent values", sourceParents, hasItems(importedParents));
         }
-        
-        // on success, delete import folder
-        _containerHelper.deleteProject(importProject);
     }
 
     @Test
     public void testExportImportSampleTypesWithAssayRuns() throws Exception
     {
-        // in process
         String subfolder = "samplesWithAssayRunsFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
         String testSamples = "testSamples";
         String assayName = "testAssay";
-        String importProject = "assay_samples_import_project";
+        String importFolder = "assaySamplesImportFolder";
 
-        _containerHelper.deleteProject(importProject, false); // here in case you're iterating
+        // create subfolders in export and import projects
+        _containerHelper.createSubfolder(IMPORT_PROJECT_NAME, importFolder);
         _containerHelper.createSubfolder(getProjectName(), subfolder);
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.addWebPart("Experiment Runs");
-        portalHelper.addWebPart("Assay List");
 
         // create a test sampleType
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
         SampleTypeDefinition testSampleType = SampleTypeAPIHelper.sampleTypeDefinition(testSamples, testFields, null, null)
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
-        TestDataGenerator parentDgen = SampleTypeAPIHelper.makeSampleType(testSampleType, subfolderPath, null);
-        parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
-        parentDgen.addCustomRow(Map.of("Name", "sample2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two"));
-        parentDgen.addCustomRow(Map.of("Name", "sample3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three"));
+        TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType, null);
+        parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
+        parentDgen.addCustomRow(Map.of("Name", "sample2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
+        parentDgen.addCustomRow(Map.of("Name", "sample3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three"));
         parentDgen.insertRows();
 
         // now define an assay that references it
@@ -612,7 +602,22 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         importRunCommand2.setBatchId(124);
         importRunCommand2.execute(createDefaultConnection(), subfolderPath);
 
-        // todo: capture the run data pre-export
+        //
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Experiment Runs");
+        portalHelper.addWebPart("Assay List");
+
+        // capture the run data pre-export
+        clickAndWait(Locator.linkWithText(assayName));
+        DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
+        clickAndWait(Locator.linkWithText("secondRun"));
+        DataRegionTable dataTable = DataRegionTable.DataRegion(getDriver()).withName("Data").waitFor();
+        List<Map<String, String>> exportData = new ArrayList<>();
+        for (int i=0; i < dataTable.getDataRowCount(); i++)
+        {
+            exportData.add(dataTable.getRowDataAsMap(i));
+        }
 
         // now export the current folder and import it to importProject
         goToFolderManagement()
@@ -623,13 +628,30 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         checkbox.check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
-        _containerHelper.createProject(importProject);
+        goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
         importFolderFromZip(exportedFolderFile, false, 1);
-        goToProjectHome(importProject);
+        goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
 
         // now validate run data made it
+        clickAndWait(Locator.linkWithText(assayName));
+        DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
+        clickAndWait(Locator.linkWithText("secondRun"));
+        DataRegionTable importedDataTable = DataRegionTable.DataRegion(getDriver()).withName("Data").waitFor();
+        List<Map<String, String>> importData = new ArrayList<>();
+        for (int i=0; i < importedDataTable.getDataRowCount(); i++)
+        {
+            importData.add(importedDataTable.getRowDataAsMap(i));
+        }
 
-        _containerHelper.deleteProject(importProject); // clean up on success
+        for (Map exportedRow : exportData)
+        {
+            // find the map from the exported project with the same name
+            Map<String, String> matchingMap = importData.stream().filter(a -> a.get("sampleId").equals(exportedRow.get("sampleId")))
+                    .findFirst().orElse(null);
+            assertNotNull("expect all matching rows to come through", matchingMap);
+            assertThat("expect export and import values to be equivalent",
+                    exportedRow.get("resultData"), equalTo(matchingMap.get("resultData")));
+        }
     }
 
 
