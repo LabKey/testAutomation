@@ -2004,7 +2004,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
-            assertTextPresent("Defined in " + moduleName + " module");
+            assertTextPresent("LabKey SQL query defined in " + moduleName + " module");
         if (!href.contains("executeQuery.view"))
             log("DEBUG: viewQueryData(" + schemaName + "." + queryName + ") doesn't use executeQuery");
         beginAt(href);
