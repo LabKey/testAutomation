@@ -195,7 +195,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getRows().size();
     }
 
-    public List<Integer> listOfnotPopulatedRows()
+    public List<Integer> listOfUnPopulatedRows()
     {
         return getRowTypes().get(0);
     }
