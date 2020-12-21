@@ -27,6 +27,9 @@ import static org.labkey.test.WebTestHelper.logToServer;
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class JUnitHeader extends BaseWebDriverTest
 {
+    // Used by 'JUnitFooter' to check for leaks from server-side tests
+    static Long startTime = null;
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -76,6 +79,7 @@ public class JUnitHeader extends BaseWebDriverTest
     @AfterClass
     public static void logStart()
     {
+        startTime = System.currentTimeMillis();
         logToServer("=== Starting Server-side JUnit Tests ===");
     }
 
