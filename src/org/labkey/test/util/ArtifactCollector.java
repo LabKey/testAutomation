@@ -176,7 +176,14 @@ public class ArtifactCollector
         // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
         _driver.beginAt("/admin/dumpHeap.view");
         String dumpMsg = Locators.bodyPanel().childTag("div").findElement(_driver.getDriver()).getText();
-        String filename = dumpMsg.replace("Heap dumped to ", "");
+        String filePrefix = "Heap dumped to ";
+        int prefixIndex = dumpMsg.indexOf(filePrefix);
+        if (prefixIndex < 0)
+        {
+            _test.checker().error("Unable to extract filename from page body. Update test or disable heap dump.\n" + dumpMsg);
+            return;
+        }
+        String filename = dumpMsg.substring(prefixIndex + filePrefix.length());
         File heapDump = new File(filename);
         File destFile = new File(ensureDumpDir(), heapDump.getName());
         try
