@@ -165,7 +165,7 @@ public class ArtifactCollector
         if (_dumpedHeap || // Only one heap dump per suite (don't want to overload TeamCity)
             !isLocalServer() ||
             _test.isGuestModeTest() ||
-            isHeapDumpCollectionEnabled()
+            !isHeapDumpCollectionEnabled()
         )
         {
             return;
