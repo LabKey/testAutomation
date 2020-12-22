@@ -180,7 +180,7 @@ public class ArtifactCollector
         int prefixIndex = dumpMsg.indexOf(filePrefix);
         if (prefixIndex < 0)
         {
-            _test.checker().error("Unable to extract filename from page body. Update test or disable heap dump.\n" + dumpMsg);
+            _test.checker().error("Unable to extract heap dump filename from page body. 'ArtifactCollector.dumpHeap' may need to be updated.\n" + dumpMsg);
             return;
         }
         String filename = dumpMsg.substring(prefixIndex + filePrefix.length());
