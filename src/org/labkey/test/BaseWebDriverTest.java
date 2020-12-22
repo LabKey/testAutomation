@@ -583,7 +583,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
-            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().withScreenshot("startupLeaks").wrapAssertion(() -> checkLeaks(null));
             checker().resetErrorTypes();
             _checkedLeaksAndErrors = true;
         }
@@ -1044,7 +1044,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
             checkErrors();
-            checkLeaks();
+            checkLeaks(null);
         }
 
         if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
@@ -1133,12 +1133,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
-    protected void checkLeaks()
+    protected void checkLeaks(Long leakCutoffTime)
     {
         if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
             return;
+
+        if (leakCutoffTime == null)
+        {
+            leakCutoffTime = testClassStartTime;
+        }
 
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
@@ -1158,7 +1163,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     sleep(10000);
                 }
             }
-            msSinceTestStart = System.currentTimeMillis() - testClassStartTime;
+            msSinceTestStart = System.currentTimeMillis() - leakCutoffTime;
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
@@ -1169,6 +1174,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             String newLeak = null;
             List<WebElement> errorRows = Locator.css("#leaks tr:not(:first-child)").findElements(getDriver());
+            assertEquals("Didn't find memTracker rows. Test Locator may need to be updated.", leakCount, errorRows.size());
             for (WebElement errorRow : errorRows)
             {
                 String ageStr = errorRow.findElement(By.cssSelector(".age")).getText();
