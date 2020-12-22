@@ -57,29 +57,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     public Boolean isLoaded()
     {
-        try
-        {
-            // If the spinner is there or the loading text then the grid is not loaded.
-            if (getWrapper().isElementVisible(Locators.loadingGrid) || getWrapper().isElementVisible(Locators.spinner))
-                return false;
-        }
-        catch (NoSuchElementException | StaleElementReferenceException nse)
-        {
-            // The elements are not there so move to the next check.
-        }
-
-        try
-        {
-            return Locator.tag("td").existsIn(this);
-        }
-        catch (NoSuchElementException | StaleElementReferenceException nse)
-        {
-            return false;
-        }
-
-//        return !Locators.loadingGrid.existsIn(this) &&
-//                !Locators.spinner.existsIn(this) &&
-//                Locator.tag("td").existsIn(this);
+        return getComponentElement().isDisplayed() &&
+                !Locators.loadingGrid.existsIn(this) &&
+                !Locators.spinner.existsIn(this) &&
+                Locator.tag("td").existsIn(this);
     }
 
     protected void waitForLoaded()
