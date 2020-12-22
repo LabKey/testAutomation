@@ -55,7 +55,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     public Boolean isLoaded()
     {
-        return !Locators.loadingGrid.existsIn(this) &&
+        return getComponentElement().isDisplayed() &&
+                !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
                 Locator.tag("td").existsIn(this);
     }
