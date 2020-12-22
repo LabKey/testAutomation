@@ -431,18 +431,18 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
-        SampleTypeDefinition parentType = SampleTypeAPIHelper.sampleTypeDefinition(parentSampleType, testFields, null, null);
-        SampleTypeDefinition testSampleType = SampleTypeAPIHelper.sampleTypeDefinition(testSamples, testFields, null, null)
+        SampleTypeDefinition parentType = new SampleTypeDefinition(parentSampleType).setFields(testFields);
+        SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
                 .addParentAlias("Parent", parentSampleType) // to derive from parent sampleType
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
-        TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, parentType, null);
+        TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, parentType);
         parentDgen.addCustomRow(Map.of("Name", "Parent1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
         parentDgen.addCustomRow(Map.of("Name", "Parent2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two"));
         parentDgen.addCustomRow(Map.of("Name", "Parent3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three"));
         parentDgen.insertRows();
 
-        TestDataGenerator testDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType, null);
+        TestDataGenerator testDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
         testDgen.addCustomRow(Map.of("Name", "Child1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one",
                 "Parent", "Parent1"));
         testDgen.addCustomRow(Map.of("Name", "Child2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two",
@@ -543,10 +543,10 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // create a test sampleType
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
-        SampleTypeDefinition testSampleType = SampleTypeAPIHelper.sampleTypeDefinition(testSamples, testFields, null, null)
+        SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
-        TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType, null);
+        TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
         parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
         parentDgen.addCustomRow(Map.of("Name", "sample2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
         parentDgen.addCustomRow(Map.of("Name", "sample3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three"));

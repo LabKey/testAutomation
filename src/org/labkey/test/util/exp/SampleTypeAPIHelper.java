@@ -1,6 +1,5 @@
 package org.labkey.test.util.exp;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -13,7 +12,6 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,20 +24,16 @@ public class SampleTypeAPIHelper
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
     public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
     public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
+    public static final String SAMPLE_NAME_EXPRESSION = "S-${now:date}-${dailySampleCount}";
 
     /**
      * Create a sample type in the specified container with the fields provided.
      *
      * @param containerPath Container in which to create the sample type.
-     * @param def domain properties for the new sample type.
+     * @param sampleTypeDefinition domain properties for the new sample type.
      * @return A TestDataGenerator for inserting rows into the created sample type.
      */
-    public static TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition def)
-    {
-        return createEmptySampleType(containerPath, def, null);
-    }
-
-    static public TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition, String dateFormatString)
+    static public TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition)
     {
         deleteDomain(new FieldDefinition.LookupInfo(containerPath, "samples", sampleTypeDefinition.getName()));
 
@@ -52,31 +46,13 @@ public class SampleTypeAPIHelper
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }
-
-        if (null != dateFormatString)
-        {
-            dgen.addDataSupplier("DateColumn", () -> dgen.randomDateString(dateFormatString,
-                    DateUtils.addWeeks(new Date(), -39),
-                    new Date()));
-        }
         return dgen;
     }
 
-    static public SampleTypeDefinition sampleTypeDefinition(String sampleTypeName,
-                                                            List<FieldDefinition> fields,
-                                                            String parentAlias,
-                                                            String nameExpression)
-    {
-        SampleTypeDefinition def = new SampleTypeDefinition(sampleTypeName);
-        def.setFields(fields);
-        if (null != parentAlias)
-            def.addParentAlias(parentAlias);
-        if (null != nameExpression)
-            def.setNameExpression(nameExpression);
-
-        return def;
-    }
-
+    /**
+     * A set of FieldDefinition provided for convenience
+     * @return
+     */
     public static List<FieldDefinition> sampleTypeTestFields()
     {
         return Arrays.asList(
@@ -87,7 +63,11 @@ public class SampleTypeAPIHelper
                 new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
     }
 
-    static public void deleteDomain(FieldDefinition.LookupInfo targetDomain)
+    /**
+     * Removes the specified domain if it exists
+     * @param targetDomain
+     */
+    public static void deleteDomain(FieldDefinition.LookupInfo targetDomain)
     {
         try
         {
