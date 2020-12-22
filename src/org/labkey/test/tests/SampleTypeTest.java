@@ -904,14 +904,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         final String REQUIRED_FIELD_NAME = "field01";
         final String MISSING_FIELD_NAME = "field02";
-        String INDICATOR_FIELD_NAME;
-
-        // Unfortunately Postgres and MSSQL case the missing indicator field differently. This causes issues when
-        // getting the data by a db query and validating it against expected values.
-        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
-            INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_MVIndicator";
-        else
-            INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "_mvindicator";
+        final String INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "MVIndicator";
 
         log("Validate missing values and required fields in a Sample Type.");
 
