@@ -12,7 +12,9 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.react.UpdatingComponent;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -55,9 +57,29 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     public Boolean isLoaded()
     {
-        return !Locators.loadingGrid.existsIn(this) &&
-                !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this);
+        try
+        {
+            // If the spinner is there or the loading text then the grid is not loaded.
+            if (getWrapper().isElementVisible(Locators.loadingGrid) || getWrapper().isElementVisible(Locators.spinner))
+                return false;
+        }
+        catch (NoSuchElementException | StaleElementReferenceException nse)
+        {
+            // The elements are not there so move to the next check.
+        }
+
+        try
+        {
+            return Locator.tag("td").existsIn(this);
+        }
+        catch (NoSuchElementException | StaleElementReferenceException nse)
+        {
+            return false;
+        }
+
+//        return !Locators.loadingGrid.existsIn(this) &&
+//                !Locators.spinner.existsIn(this) &&
+//                Locator.tag("td").existsIn(this);
     }
 
     protected void waitForLoaded()
