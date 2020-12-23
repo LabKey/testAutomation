@@ -7,6 +7,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -23,25 +24,64 @@ public class SampleTypeAPIHelper
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
     public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
     public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
+    public static final String SAMPLE_NAME_EXPRESSION = "S-${now:date}-${dailySampleCount}";
 
     /**
      * Create a sample type in the specified container with the fields provided.
      *
      * @param containerPath Container in which to create the sample type.
-     * @param def domain properties for the new sample type.
+     * @param sampleTypeDefinition domain properties for the new sample type.
      * @return A TestDataGenerator for inserting rows into the created sample type.
      */
-    public static TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition def)
+    static public TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition)
     {
+        deleteDomain(new FieldDefinition.LookupInfo(containerPath, "samples", sampleTypeDefinition.getName()));
+
+        TestDataGenerator dgen;
         try
         {
-            return TestDataGenerator.createDomain(containerPath, def);
+            dgen = TestDataGenerator.createDomain(containerPath, sampleTypeDefinition);
         }
         catch (CommandException e)
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }
+        return dgen;
+    }
 
+    /**
+     * A set of FieldDefinition provided for convenience
+     * @return
+     */
+    public static List<FieldDefinition> sampleTypeTestFields()
+    {
+        return Arrays.asList(
+                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
+                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
+                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
+                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
+    }
+
+    /**
+     * Removes the specified domain if it exists
+     * @param targetDomain
+     */
+    public static void deleteDomain(FieldDefinition.LookupInfo targetDomain)
+    {
+        try
+        {
+            if (TestDataGenerator.doesDomainExists(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable()))
+            {
+                TestDataGenerator.deleteDomain(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable());
+            }
+
+        }
+        catch (CommandException ex)
+        {
+            throw new RuntimeException(String
+                    .format("Failed to delete '%s'.", targetDomain.getTable()), ex);
+        }
     }
 
     /**

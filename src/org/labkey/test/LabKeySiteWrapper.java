@@ -999,6 +999,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         beginAt(buildURL("project", projectName, "begin"));
     }
 
+    public void goToProjectFolder(String projectName, String subfolder)
+    {
+        beginAt(buildURL("project", projectName + "/" + subfolder, "begin"));
+    }
+
     /**
      * go to the project settings page of a project
      * @param project project name
