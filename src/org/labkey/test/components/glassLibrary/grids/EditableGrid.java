@@ -363,6 +363,40 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Get the displayed pick-list for the given grid cell (td).
+     *
+     * @param gridCell The td element that contains the list.
+     * @return A list of the items in the list.
+     */
+    private List<String> getPickList(WebElement gridCell)
+    {
+        WebElement divLookup = Locators.lookupMenu.findWhenNeeded(gridCell);
+
+        // Wait for the picklist to show.
+        WebDriverWrapper.waitFor(divLookup::isDisplayed,
+                "The picklist for the cell did not appear in time.", 5_000);
+
+        List<WebElement> items = Locators.lookupItem.findElements(divLookup);
+        return getWrapper().getTexts(items);
+    }
+
+    /**
+     * Dismiss the pick-list for the cell in the grid.
+     *
+     * @param row A 0 based index for the row that the cell is on.
+     * @param columnName The name of the column for the cell.
+     * @return A reference to this EditableGrid.
+     */
+    public EditableGrid dismissPickList(int row, String columnName)
+    {
+        WebElement gridCell = getCell(row, columnName);
+        Actions builder = new Actions(getDriver());
+        builder.sendKeys(gridCell, Keys.ESCAPE).build().perform();
+
+        return this;
+    }
+
+    /**
      * For the given row get the values displayed in the picklist for the given column.
      *
      * @param row The 0 based row index.
@@ -372,6 +406,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public List<String> getPicklistForCell(int row, String columnName)
     {
         WebElement td = getCell(row, columnName);
+
+        // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
         WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
 
         List<String> pickList = new ArrayList<>();
@@ -380,21 +416,41 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Make the picklist appear.
             getWrapper().doubleClick(td);
+            pickList = getPickList(td);
+        }
 
-            WebElement divLookup = Locator.tagWithClassContaining("div", "cell-lookup-menu").findWhenNeeded(td);
+        return pickList;
+    }
 
-            // Wait for the picklist to show.
-            WebDriverWrapper.waitFor(()->divLookup.isDisplayed(),
-                    "The picklist for the cell did not appear in time.", 5_000);
+    /**
+     * For the given row and column type some text into the cell to get the 'filtered' values displayed in the picklist.
+     * If this cell is not a lookup cell, does not have a pick-list, the text will not be entered and it will return an empty list.
+     *
+     * @param row A 0 based index containing the cell.
+     * @param columnName The column of the cell.
+     * @param filterText The text to type into the cell.
+     * @return A list of the pick-list shown after the text has been entered.
+     */
+    public List<String> getFilteredPicklistForCell(int row, String columnName, String filterText)
+    {
 
+        WebElement td = getCell(row, columnName);
 
-            List<WebElement> items = Locator.tagWithClass("a", "list-group-item").findElements(divLookup);
-            pickList = getWrapper().getTexts(items);
+        // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
+        WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
 
-            // Dismiss the picklist.
-            Actions builder = new Actions(getDriver());
-            builder.sendKeys(td, Keys.ESCAPE).build().perform();
+        List<String> pickList = new ArrayList<>();
 
+        if(div != null)
+        {
+            // Get the input, will also make the pick-list show up.
+            getWrapper().doubleClick(td);
+
+            // Type the filter into the cell.
+            WebElement lookupInputCell = elementCache().lookupInputCell();
+            getWrapper().setFormElement(lookupInputCell, filterText);
+
+            pickList = getPickList(td);
         }
 
         return pickList;
@@ -698,10 +754,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
         static final Locator lookupInputCell = Locator.tagWithClass("input", "cell-lookup-input");
         static final Locator lookupMenu = Locator.tagWithClass("div", "cell-lookup-menu");
+        static final Locator lookupItem = Locator.tagWithClass("a", "list-group-item");
 
         static final Locator listGroupItem(String text)
         {
-            return Locator.tagWithClass("a", "list-group-item").withText(text);
+            return Locators.lookupItem.withText(text);
         }
 
         static final Locator itemElement(String text)
