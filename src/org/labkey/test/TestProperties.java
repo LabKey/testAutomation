@@ -126,7 +126,7 @@ public abstract class TestProperties
 
     public static boolean isHeapDumpCollectionEnabled()
     {
-        return "true".equals(System.getProperty("enable.heap.dump"));
+        return "true".equals(System.getProperty("webtest.enable.heap.dump"));
     }
 
     public static boolean isRunWebDriverHeadless()

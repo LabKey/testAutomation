@@ -62,6 +62,7 @@ public class ArtifactCollector
     // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
     private static List<Pair<File, FileFilter>> pipelineDirs = new CopyOnWriteArrayList<>();
     private static long _testStart;
+    private static boolean _dumpedHeap = false;
 
     public ArtifactCollector(BaseWebDriverTest test)
     {
@@ -161,26 +162,35 @@ public class ArtifactCollector
 
     public void dumpHeap()
     {
-        if (!isLocalServer())
+        if (_dumpedHeap || // Only one heap dump per suite (don't want to overload TeamCity)
+            !isLocalServer() ||
+            _test.isGuestModeTest() ||
+            !isHeapDumpCollectionEnabled()
+        )
+        {
             return;
-        if ( _test.isGuestModeTest() )
-            return;
-        if (!isHeapDumpCollectionEnabled())
-            return;
+        }
 
         _driver.pushLocation();
 
         // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
         _driver.beginAt("/admin/dumpHeap.view");
-        File destDir = ensureDumpDir();
         String dumpMsg = Locators.bodyPanel().childTag("div").findElement(_driver.getDriver()).getText();
-        String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
-        File heapDump = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", filename);
-        File destFile = new File(destDir, filename);
+        String filePrefix = "Heap dumped to ";
+        int prefixIndex = dumpMsg.indexOf(filePrefix);
+        if (prefixIndex < 0)
+        {
+            _test.checker().error("Unable to extract heap dump filename from page body. 'ArtifactCollector.dumpHeap' may need to be updated.\n" + dumpMsg);
+            return;
+        }
+        String filename = dumpMsg.substring(prefixIndex + filePrefix.length());
+        File heapDump = new File(filename);
+        File destFile = new File(ensureDumpDir(), heapDump.getName());
         try
         {
             Files.move(heapDump.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             publishArtifact(destFile);
+            _dumpedHeap = true;
         }
         catch (IOException e)
         {
