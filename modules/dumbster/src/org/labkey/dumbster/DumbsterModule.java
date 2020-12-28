@@ -50,14 +50,16 @@ public class DumbsterModule extends CodeOnlyModule
     @NotNull
     protected Collection<WebPartFactory> createWebPartFactories()
     {
-        return List.of(new BaseWebPartFactory("Mail Record")
-        {
-            @Override
-            public WebPartView getWebPartView(@NotNull ViewContext portalCtx, @NotNull Portal.WebPart webPart)
+        return List.of(
+            new BaseWebPartFactory("Mail Record")
             {
-                return new MailWebPart();
+                @Override
+                public WebPartView<?> getWebPartView(@NotNull ViewContext portalCtx, @NotNull Portal.WebPart webPart)
+                {
+                    return new MailWebPart();
+                }
             }
-        });
+        );
     }
 
     @Override
