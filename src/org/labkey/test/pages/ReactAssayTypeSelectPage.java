@@ -42,7 +42,8 @@ public class ReactAssayTypeSelectPage<EC extends ReactAssayTypeSelectPage.Elemen
             return selectStandardAssay();
         }
 
-        getWrapper().clickAndWait(elementCache().specialtyAssayTab);
+        getWrapper().click(elementCache().specialtyAssayTab);
+        getWrapper().waitForElementToBeVisible(elementCache().specialtySelectLocator);
         getWrapper().selectOptionByText(elementCache().specialtySelect, name);
         getWrapper().clickAndWait(elementCache().saveButton);
         return new ReactAssayDesignerPage(getDriver());
@@ -66,12 +67,16 @@ public class ReactAssayTypeSelectPage<EC extends ReactAssayTypeSelectPage.Elemen
         public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(buttonPanel);
         public final WebElement saveButton = Locator.byClass("pull-right").findWhenNeeded(buttonPanel);
 
+        public final WebElement specialtyPanel = Locator.tagWithId("div", "assay-picker-tabs-pane-specialty").findWhenNeeded(this);
+
         public final WebElement stdAssayTab = Locator.tagContainingText("a", "Standard Assay").findWhenNeeded(this);
         public final WebElement specialtyAssayTab = Locator.tagContainingText("a", "Specialty Assays").findWhenNeeded(this);
         public final WebElement importAssayTab = Locator.tagContainingText("a", "Import Assay Design").findWhenNeeded(this);
 
         public final WebElement containerSelect = Locator.tagWithId("select", "assay-type-select-container").findWhenNeeded(this);
-        public final WebElement specialtySelect = Locator.tagWithId("select", "specialty-assay-type-select").findWhenNeeded(this);
+
+        public final Locator specialtySelectLocator = Locator.tagWithId("select", "specialty-assay-type-select");
+        public final WebElement specialtySelect = specialtySelectLocator.findWhenNeeded(specialtyPanel);
 
         protected Locator.XPathLocator buttonPanelLocator()
         {
