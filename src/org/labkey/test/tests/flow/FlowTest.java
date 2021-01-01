@@ -299,7 +299,7 @@ public class FlowTest extends BaseFlowTest
         setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[]{"Keyword/ExperimentName", "Keyword/Stim", "Keyword/Comp", "Keyword/PLATE NAME", "Flag", "Name", "RowId"});
         assertTextPresent("PerCP-Cy5.5 CD8");
 
-        assertElementNotPresent(Locator.linkWithImage("/flagFCSFile.gif"));
+        assertElementNotPresent(Locator.tagWithClass("i", "lk-flag-enabled"));
         pushLocation();
         clickAndWait(Locator.linkWithText("91761.fcs"));
         waitForText(FCS_FILE_1);
@@ -312,7 +312,7 @@ public class FlowTest extends BaseFlowTest
         setFormElement(locPlateName, "FlowTest Keyword Plate Name");
         clickButton("update");
         popLocation();
-        assertElementPresent(Locator.linkWithImage("/flagFCSFile.gif"));
+        assertElementPresent(Locator.tagWithClass("i", "lk-flag-enabled"));
         assertElementNotPresent(Locator.linkWithText("91761.fcs"));
         assertElementPresent(Locator.linkWithText("FlowTest New Name"));
         assertTextPresent("FlowTest Keyword Plate Name");

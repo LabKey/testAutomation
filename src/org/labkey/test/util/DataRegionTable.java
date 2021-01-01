@@ -25,6 +25,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.MessagePrompt;
 import org.labkey.test.components.PagingWidget;
 import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.ext4.Window;
@@ -50,8 +51,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.Locator.tagWithAttribute;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -795,6 +799,105 @@ public class DataRegionTable extends DataRegion
     public boolean hasHref(int row, String columnName)
     {
         return hasHref(row, getColumnIndexStrict(columnName));
+    }
+
+    public WebElement getFlag(int row, String columnName)
+    {
+        var cell = findCell(row, columnName);
+        return tagWithAttribute("i", "flagid").findElement(cell);
+    }
+
+    public boolean isFlagEnabled(int row, String columnName)
+    {
+        var flag = getFlag(row, columnName);
+        return isFlagEnabled(flag);
+    }
+
+    private boolean isFlagEnabled(WebElement flag)
+    {
+        return flag.getAttribute("class").contains("lk-flag-enabled");
+    }
+
+    public boolean isFlagDisabled(int row, String columnName)
+    {
+        var flag = getFlag(row, columnName);
+        return isFlagDisabled(flag);
+    }
+
+    private boolean isFlagDisabled(WebElement flag)
+    {
+        return flag.getAttribute("class").contains("lk-flag-disabled");
+    }
+
+    /**
+     * Get the flag value for the column or <code>null</code> if unset.
+     */
+    public String getFlagValue(int row, String columnName)
+    {
+        var flag = getFlag(row, columnName);
+        return getFlagValue(flag);
+    }
+
+    private String getFlagValue(WebElement flag)
+    {
+        String title = flag.getAttribute("title");
+        if (isFlagEnabled(flag))
+        {
+            return title;
+        }
+        else if (isFlagDisabled(flag))
+        {
+            assertEquals("Expect unset flag title to be 'Flag for review'", title, "Flag for review");
+            return null;
+        }
+        throw new AssertionError("Expected flag class to be either 'lk-flag-enabled' or 'lk-flag-disabled'");
+    }
+
+    public void setFlagValueForSelectedRows(String columnName, String value)
+    {
+        int checkedCount = getCheckedCount();
+        assertTrue(checkedCount > 0);
+
+        var flag = getFlag(0, columnName);
+        flag.click();
+
+        var prompt = new MessagePrompt("Review", getDriver());
+        assertThat(prompt.getBody(), containsString("Enter comment for " + checkedCount + " selected rows"));
+        prompt.setValue(value).clickOK();
+    }
+
+    /**
+     * Set the flag value for the column or <code>null</code> to clear the flag.
+     */
+    public void setFlagValue(int row, String columnName, String value)
+    {
+        var flag = getFlag(row, columnName);
+        setFlagValue(flag, value);
+    }
+
+    private void setFlagValue(WebElement flag, String value)
+    {
+        flag.click();
+        new MessagePrompt("Review", getDriver()).setValue(value).clickOK();
+        assertEquals(value, getFlagValue(flag));
+    }
+
+    public void clearFlagValue(int row, String columnName)
+    {
+        setFlagValue(row, columnName, null);
+    }
+
+    /**
+     * Clear all flag values on the grid, if any.
+     */
+    public void clearFlagValues()
+    {
+        List<WebElement> allFlags = Locator.tagWithAttribute("i", "flagid").findElements(elementCache());
+        for (WebElement flag : allFlags)
+        {
+            if (isFlagEnabled(flag))
+                setFlagValue(flag, null);
+        }
     }
 
     public ColumnChartRegion createBarChart(String columnName)
