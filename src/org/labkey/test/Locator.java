@@ -532,6 +532,11 @@ public abstract class Locator extends By
         return tagWithAttribute(tag, "id", id);
     }
 
+    public static XPathLocator tagWithAttribute(String tag, String attrName)
+    {
+        return tag(tag).withAttribute(attrName);
+    }
+
     public static XPathLocator tagWithAttribute(String tag, String attrName, String attrVal)
     {
         return tag(tag).withAttribute(attrName, attrVal);
