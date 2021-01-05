@@ -17,7 +17,7 @@ project.task(
         {ModuleDistribution dist ->
             dist.subDirName = "test"
             dist.includeTarGZArchive=true
-            dist.includeEmbeddedArchive=true
+            dist.embeddedArchive="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
         }
