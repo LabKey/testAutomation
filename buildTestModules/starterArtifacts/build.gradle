@@ -30,9 +30,6 @@ dependencies {
     modules ("org.labkey.module:elispotassay:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:fcsexpress:${labkeyVersion}@module") {
-        transitive = true
-    }
     modules ("org.labkey.module:flow:${labkeyVersion}@module") {
         transitive = true
     }
