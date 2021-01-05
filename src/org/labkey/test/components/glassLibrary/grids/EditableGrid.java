@@ -203,12 +203,24 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getRows().size();
     }
 
-    public List<Integer> listOfUnPopulatedRows()
+    /**
+     * As best as possible get a list of row indices from the grid for editable rows. That is rows where the values can
+     * be entered or changed.
+     *
+     * @return A list of indices (0 based) for rows that can be edited.
+     */
+    public List<Integer> getEditableRowIndices()
     {
         return getRowTypes().get(0);
     }
 
-    public List<Integer> listOfPopulatedRows()
+    /**
+     * Some EditableGrids have read only rows. These are rows in the grid that display data but cannot be updated. As
+     * best as possible return a list of those rows.
+     *
+     * @return A list of indices (0 based) of rows that cannot be edited.
+     */
+    public List<Integer> getReadonlyRowIndices()
     {
         return getRowTypes().get(1);
     }
@@ -363,75 +375,72 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Get the displayed pick-list for the given grid cell (td).
+     * Get the displayed dropdown list for the given grid cell (td).
      *
      * @param gridCell The td element that contains the list.
      * @return A list of the items in the list.
      */
-    private List<String> getPickList(WebElement gridCell)
+    private List<String> getDropdownList(WebElement gridCell)
     {
         WebElement divLookup = Locators.lookupMenu.findWhenNeeded(gridCell);
 
-        // Wait for the picklist to show.
+        // Wait for the dropdown list to show.
         WebDriverWrapper.waitFor(divLookup::isDisplayed,
-                "The picklist for the cell did not appear in time.", 5_000);
+                "The dropdown list for the cell did not appear in time.", 5_000);
 
         List<WebElement> items = Locators.lookupItem.findElements(divLookup);
         return getWrapper().getTexts(items);
     }
 
     /**
-     * Dismiss the pick-list for the cell in the grid.
+     * Dismiss the dropdown list that is currently displayed on the grid.
      *
-     * @param row A 0 based index for the row that the cell is on.
-     * @param columnName The name of the column for the cell.
      * @return A reference to this EditableGrid.
      */
-    public EditableGrid dismissPickList(int row, String columnName)
+    public EditableGrid dismissDropdownList()
     {
-        WebElement gridCell = getCell(row, columnName);
         Actions builder = new Actions(getDriver());
-        builder.sendKeys(gridCell, Keys.ESCAPE).build().perform();
+        builder.sendKeys(getComponentElement(), Keys.ESCAPE).build().perform();
 
         return this;
     }
 
     /**
-     * For the given row get the values displayed in the picklist for the given column.
+     * For the given row get the values displayed in the dropdown list for the given column.
      *
      * @param row The 0 based row index.
      * @param columnName The name of the column.
-     * @return A list of strings from the picklist. If the cell does not have a picklist then an empty list is returned.
+     * @return A list of strings from the dropdown list. If the cell does not have a dropdown then an empty list is returned.
      */
-    public List<String> getPicklistForCell(int row, String columnName)
+    public List<String> getDropdownListForCell(int row, String columnName)
     {
         WebElement td = getCell(row, columnName);
 
         // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
         WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
 
-        List<String> pickList = new ArrayList<>();
+        List<String> listText = new ArrayList<>();
 
         if(div != null)
         {
-            // Make the picklist appear.
+            // Make the dropdown appear.
             getWrapper().doubleClick(td);
-            pickList = getPickList(td);
+            listText = getDropdownList(td);
         }
 
-        return pickList;
+        return listText;
     }
 
     /**
-     * For the given row and column type some text into the cell to get the 'filtered' values displayed in the picklist.
-     * If this cell is not a lookup cell, does not have a pick-list, the text will not be entered and it will return an empty list.
+     * For the given row and column type some text into the cell to get the 'filtered' values displayed in the dropdown list.
+     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and it will return an empty list.
      *
      * @param row A 0 based index containing the cell.
      * @param columnName The column of the cell.
      * @param filterText The text to type into the cell.
-     * @return A list of the pick-list shown after the text has been entered.
+     * @return A list values shown in the dropdown list after the text has been entered.
      */
-    public List<String> getFilteredPicklistForCell(int row, String columnName, String filterText)
+    public List<String> getFilteredDropdownListForCell(int row, String columnName, String filterText)
     {
 
         WebElement td = getCell(row, columnName);
@@ -439,21 +448,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
         WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
 
-        List<String> pickList = new ArrayList<>();
+        List<String> listText = new ArrayList<>();
 
         if(div != null)
         {
-            // Get the input, will also make the pick-list show up.
+            // Get the input, will also make the dropdown show up.
             getWrapper().doubleClick(td);
 
             // Type the filter into the cell.
             WebElement lookupInputCell = elementCache().lookupInputCell();
             getWrapper().setFormElement(lookupInputCell, filterText);
 
-            pickList = getPickList(td);
+            listText = getDropdownList(td);
         }
 
-        return pickList;
+        return listText;
     }
 
     /**
