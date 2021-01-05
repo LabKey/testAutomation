@@ -6,33 +6,18 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ReactAssayTypeSelectPage<EC extends ReactAssayTypeSelectPage.ElementCache> extends WebDriverComponent<EC>
+public class AssayTypeSelectPage<EC extends AssayTypeSelectPage.ElementCache> extends LabKeyPage<EC>
 {
-    private final WebElement el;
-    private final WebDriver driver;
-
-    public ReactAssayTypeSelectPage(WebDriver driver)
+    public AssayTypeSelectPage(WebDriver driver)
     {
-        this.driver = driver;
-        el = Locator.id("app").findElement(this.driver); // Full page component
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return driver;
+        super(driver);
     }
 
     public ReactAssayDesignerPage selectStandardAssay()
     {
-        getWrapper().click(elementCache().stdAssayTab);
-        getWrapper().clickAndWait(elementCache().saveButton);
+        click(elementCache().stdAssayTab);
+        // TODO: Verify this clickAndWait works in app environment
+        clickAndWait(elementCache().saveButton);
         return new ReactAssayDesignerPage(getDriver());
     }
 
@@ -42,26 +27,20 @@ public class ReactAssayTypeSelectPage<EC extends ReactAssayTypeSelectPage.Elemen
             return selectStandardAssay();
         }
 
-        getWrapper().click(elementCache().specialtyAssayTab);
-        getWrapper().waitForElementToBeVisible(elementCache().specialtySelectLocator);
-        getWrapper().selectOptionByText(elementCache().specialtySelect, name);
-        getWrapper().clickAndWait(elementCache().saveButton);
+        click(elementCache().specialtyAssayTab);
+        waitForElementToBeVisible(elementCache().specialtySelectLocator);
+        selectOptionByText(elementCache().specialtySelect, name);
+        // TODO: Verify this clickAndWait works in app environment
+        clickAndWait(elementCache().saveButton);
         return new ReactAssayDesignerPage(getDriver());
     }
 
-    @Override
-    protected EC elementCache()
-    {
-        return super.elementCache();
-    }
-
-    @Override
     protected EC newElementCache()
     {
-        return (EC) new ElementCache();
+        return (EC) new AssayTypeSelectPage.ElementCache();
     }
 
-    public class ElementCache extends Component<EC>.ElementCache
+    public class ElementCache extends LabKeyPage.ElementCache
     {
         protected final WebElement buttonPanel = buttonPanelLocator().findWhenNeeded(this);
         public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(buttonPanel);
