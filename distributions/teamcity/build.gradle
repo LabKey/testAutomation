@@ -17,18 +17,6 @@ project.task(
         {ModuleDistribution dist ->
             dist.subDirName = "test"
             dist.includeTarGZArchive=true
-            dist.extraFileIdentifier='-test'
-            dist.versionPrefix='Test'
-        }
-)
-
-project.task(
-        "embeddedDistribution",
-        group: GroupNames.DISTRIBUTION,
-        description: "Make a LabKey modules distribution for 'test'",
-        type: ModuleDistribution,
-        {ModuleDistribution dist ->
-            dist.subDirName = "test"
             dist.embeddedArchiveType="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
