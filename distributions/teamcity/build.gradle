@@ -29,7 +29,7 @@ project.task(
         type: ModuleDistribution,
         {ModuleDistribution dist ->
             dist.subDirName = "test"
-            dist.embeddedArchiveType="tar.gz,zip"
+            dist.embeddedArchiveType="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
         }
