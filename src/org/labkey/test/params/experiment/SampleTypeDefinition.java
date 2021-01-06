@@ -198,7 +198,7 @@ public class SampleTypeDefinition extends DomainProps
         }
         if (getInventoryMetricUnit() != null)
         {
-            options.put("metricUnit", getInventoryMetricUnit());
+            options.put("metricUnit", getInventoryMetricUnit().getValue());
         }
         if (getLabelColor() != null)
         {

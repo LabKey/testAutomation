@@ -82,7 +82,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size()));
         elementCache().addRowsButton.click();
 
-        List<Integer> rowIndices = elementCache().grid.listOfnotPopulatedRows();
+        List<Integer> rowIndices = elementCache().grid.getEditableRowIndices();
 
         if(rowIndices.size() < records.size())
         {
@@ -102,7 +102,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel setRecordValues(Map<String, Object> columnValues)
     {
-        int insertRowIndex = elementCache().grid.listOfnotPopulatedRows().get(0);
+        int insertRowIndex = elementCache().grid.getEditableRowIndices().get(0);
         return setRecordValues(columnValues, insertRowIndex);
     }
 
