@@ -48,8 +48,6 @@ if (project.hasProperty('inheritedDistPath'))
     String inheritedDistName = split[split.length - 1]
     tasks.distribution.subDirName = "test/" + inheritedDistName
     tasks.distribution.versionPrefix = "Test_" + inheritedDistName
-    tasks.embeddedDistribution.subDirName = "test/" + inheritedDistName
-    tasks.embeddedDistribution.versionPrefix = "Test_" + inheritedDistName
 }
 else
 {
