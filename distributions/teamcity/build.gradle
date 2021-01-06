@@ -60,6 +60,8 @@ if (project.hasProperty('inheritedDistPath'))
     String inheritedDistName = split[split.length - 1]
     tasks.distribution.subDirName = "test/" + inheritedDistName
     tasks.distribution.versionPrefix = "Test_" + inheritedDistName
+    tasks.embeddedDistribution.subdirName = "test/" + inheritedDistName
+    tasks.embeddedDistribution.versionPrefix = "Test_" + inheritedDistName
 }
 else
 {
@@ -69,9 +71,9 @@ else
             if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
             {
                 project.evaluationDependsOn(otherProject.path)
-                if (otherProject.plugins.hasPlugin('org.labkey.module') || 
-                    otherProject.plugins.hasPlugin('org.labkey.fileModule') ||
-                    otherProject.plugins.hasPlugin('org.labkey.javaModule'))
+                if (otherProject.plugins.hasPlugin('org.labkey.build.module') ||
+                    otherProject.plugins.hasPlugin('org.labkey.build.fileModule') ||
+                    otherProject.plugins.hasPlugin('org.labkey.build.javaModule'))
                     pathList += otherProject.path
             }
     }
