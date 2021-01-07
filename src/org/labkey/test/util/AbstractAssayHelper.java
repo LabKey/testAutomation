@@ -20,8 +20,8 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.AssayTypeSelectPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.ChooseAssayTypePage;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +75,7 @@ public abstract class AbstractAssayHelper
     {
         _test.clickButton("New Assay Design");
 
-        ReactAssayDesignerPage assayDesigner = new AssayTypeSelectPage<>(_test.getDriver()).selectAssayType(type);
+        ReactAssayDesignerPage assayDesigner = new ChooseAssayTypePage(_test.getDriver()).selectAssayType(type);
         assayDesigner.setName(name);
         return assayDesigner;
     }
