@@ -17,10 +17,12 @@ project.task(
         {ModuleDistribution dist ->
             dist.subDirName = "test"
             dist.includeTarGZArchive=true
+            dist.embeddedArchiveType="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
         }
 )
+
 
 if (project.hasProperty('inheritedDistPath'))
 {
@@ -55,7 +57,7 @@ else
             if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
             {
                 project.evaluationDependsOn(otherProject.path)
-                if (otherProject.plugins.hasPlugin('org.labkey.module') || 
+                if (otherProject.plugins.hasPlugin('org.labkey.module') ||
                     otherProject.plugins.hasPlugin('org.labkey.fileModule') ||
                     otherProject.plugins.hasPlugin('org.labkey.javaModule'))
                     pathList += otherProject.path

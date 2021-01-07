@@ -84,11 +84,11 @@ public class NotificationPanelItem extends Component
                 "Notification did not go away when marked as read: " + notificationId, 2000);
 
             if (!_panel.isNotificationPanelVisible())
-                fail("Notification panel closed unexectedly when marking a notificaiton as read");
+                fail("Notification panel closed unexpectedly when marking a notification as read");
         }
         catch (StaleElementReferenceException stale)
         {
-            fail("Unexpected navigation when marking a notificaiton as read");
+            fail("Unexpected navigation when marking a notification as read");
         }
     }
 
@@ -103,7 +103,7 @@ public class NotificationPanelItem extends Component
                     "Notification did not toggle expansion: " + notificationId, 2000);
 
             if (!_panel.isNotificationPanelVisible())
-                fail("Notification panel closed unexectedly when toggling a notification");
+                fail("Notification panel closed unexpectedly when toggling a notification");
         }
         catch (StaleElementReferenceException stale)
         {
