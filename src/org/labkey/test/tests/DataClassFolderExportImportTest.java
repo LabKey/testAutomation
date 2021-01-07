@@ -47,30 +47,29 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+        _containerHelper.deleteProject(IMPORT_PROJECT_NAME, false);
     }
 
     @BeforeClass
     public static void setupProject()
     {
         DataClassFolderExportImportTest init = (DataClassFolderExportImportTest) getCurrentTest();
-
         init.doSetup();
     }
 
     private void doSetup()
     {
-        // Delete the import project if it exists.
-        _containerHelper.deleteProject(IMPORT_PROJECT_NAME, false);
         // create the import project because we'll need it
         _containerHelper.createProject(IMPORT_PROJECT_NAME);
 
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME);
 
-        projectMenu().navigateToProject(PROJECT_NAME);
-        portalHelper.addWebPart("Data Classes");
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.addWebPart("Experiment Runs");
+        goToProjectHome(PROJECT_NAME);
+        portalHelper.doInAdminMode(ph -> {
+            ph.addWebPart("Data Classes");
+            ph.addWebPart("Experiment Runs");
+        });
     }
 
     @Before
@@ -106,28 +105,26 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         testDgen.addCustomRow(Map.of("Name", "class5", "intColumn", 5, "decimalColumn", 5.5, "stringColumn", "five"));
         testDgen.insertRows();
 
-        Integer expectedRecordCount = testDgen.getRowCount();
-
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Data Classes");
-        portalHelper.addWebPart("Experiment Runs");
+        portalHelper.doInAdminMode(ph -> {
+            ph.addWebPart("Data Classes");
+            ph.addWebPart("Experiment Runs");
+        });
 
         DataRegionTable sourceRunsTable = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
         List<String> runNames = sourceRunsTable.getColumnDataAsText("Name");
 
         clickAndWait(Locator.linkWithText(testDataClass));
         DataRegionTable sourceTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-        List<Map<String, String>> sourceRowData = new ArrayList<>();
         for (int i=0; i<_attachments.size(); i++)
-        {
+        {                           // for the nonce, we cannot add file attachments to an attachment column via remoteAPI
+                                    // issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=42191 tracks this
+                                    // until it is fixed we will have to add attachments via the UI, like this
             sourceTable.clickEditRow(i);
             setFormElement(Locator.input("quf_attachmentColumn"), _attachments.get(i));
             clickButton("Submit");
         }
-        for (int i=0; i<expectedRecordCount; i++)
-        {
-            sourceRowData.add(sourceTable.getRowDataAsMap(i));
-        }
+        List<Map<String, String>> sourceRowData = sourceTable.getTableData();
 
         // act - export to file and import the file to our designated import directory
         goToFolderManagement()
@@ -145,16 +142,11 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             assertThat("expect all runs to come through", importedRunNames, hasItems(sourceRun));
         }
 
-        // we expect the sample types and experiment runs webparts to come across along with the folder import
         clickAndWait(Locator.linkWithText(testDataClass));
-        DataRegionTable destSamplesTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();;
+        DataRegionTable destTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();;
 
         // capture the data in the exported sampleType
-        List<Map<String, String>> destRowData = new ArrayList<>();
-        for (int i=0; i<expectedRecordCount; i++)
-        {
-            destRowData.add(destSamplesTable.getRowDataAsMap(i));
-        }
+        List<Map<String, String>> destRowData = destTable.getTableData();
 
         // now ensure expected data in the sampleType made it to the destination folder
         for (Map exportedRow : sourceRowData)
@@ -163,14 +155,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))
                     .findFirst().orElse(null);
             assertNotNull("expect all matching rows to come through", matchingMap);
-            assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("intColumn"), equalTo(matchingMap.get("intColumn")));
-            assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("stringColumn"), equalTo(matchingMap.get("stringColumn")));
-            assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("decimalColumn"), equalTo(matchingMap.get("decimalColumn")));
-            assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("attachmentColumn"), equalTo(matchingMap.get("attachmentColumn")));
+            assertEquals("Expect imported rows to be equivalent to exported ones", exportedRow, matchingMap);
         }
     }
 
@@ -189,9 +174,9 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         missingValueIndicators.add(Map.of("indicator", MV_INDICATOR_02, "description", MV_DESCRIPTION_02));
         missingValueIndicators.add(Map.of("indicator", MV_INDICATOR_03, "description", MV_DESCRIPTION_03));
 
-        final String REQUIRED_FIELD_NAME = "requiredField";
-        final String MISSING_FIELD_NAME = "missingField";
-        final String INDICATOR_FIELD_NAME = MISSING_FIELD_NAME + "MVIndicator";
+        final String REQUIRED_FIELD = "requiredField";
+        final String MISSING_FIELD = "missingField";
+        final String INDICATOR_FIELD = MISSING_FIELD + "MVIndicator";
 
         String subfolder = "missingValueDataClassExportFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
@@ -223,25 +208,26 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         DataClassDefinition testType = new DataClassDefinition(testDataClass).setFields(testFields);
         TestDataGenerator testDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, testType);
 
-        testDgen.addCustomRow(Map.of("Name", "firstRow", "requiredField", "first_required",
-                "missingValueField", "has value", "missingValueFieldMVIndicator", ""));
-        testDgen.addCustomRow(Map.of("Name", "secondRow", "requiredField", "second_required",
-                "missingValueField", "", "missingValueFieldMVIndicator", "Q"));
-        testDgen.addCustomRow(Map.of("Name", "thirdRow", "requiredField", "third_required",
-                "missingValueField", "has value", "missingValueFieldMVIndicator", ""));
-        testDgen.addCustomRow(Map.of("Name", "fourthRow", "requiredField", "fourth_required",
-                "missingValueField", "", "missingValueFieldMVIndicator", ""));
-        testDgen.addCustomRow(Map.of("Name", "fifthRow", "requiredField", "fifth_required",
-                "missingValueField", "", "missingValueFieldMVIndicator", "X"));
-        testDgen.addCustomRow(Map.of("Name", "sixthRow", "requiredField", "sixth_required",
-                "missingValueField", "", "missingValueFieldMVIndicator", "N"));
+        testDgen.addCustomRow(Map.of("Name", "firstRow", REQUIRED_FIELD, "first_required",
+                MISSING_FIELD, "has value", INDICATOR_FIELD, ""));
+        testDgen.addCustomRow(Map.of("Name", "secondRow", REQUIRED_FIELD, "second_required",
+                MISSING_FIELD, "", INDICATOR_FIELD, "Q"));
+        testDgen.addCustomRow(Map.of("Name", "thirdRow", REQUIRED_FIELD, "third_required",
+                MISSING_FIELD, "has value", INDICATOR_FIELD, ""));
+        testDgen.addCustomRow(Map.of("Name", "fourthRow", REQUIRED_FIELD, "fourth_required",
+                MISSING_FIELD, "", INDICATOR_FIELD, ""));
+        testDgen.addCustomRow(Map.of("Name", "fifthRow", REQUIRED_FIELD, "fifth_required",
+                MISSING_FIELD, "", INDICATOR_FIELD, "X"));
+        testDgen.addCustomRow(Map.of("Name", "sixthRow", REQUIRED_FIELD, "sixth_required",
+                MISSING_FIELD, "", INDICATOR_FIELD, "N"));
         testDgen.insertRows();
-        int expectedRecordCount = testDgen.getRowCount();
 
         navigateToFolder(getProjectName(), subfolder);
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Data Classes");
-        portalHelper.addWebPart("Experiment Runs");
+        portalHelper.doInAdminMode(ph -> {
+            ph.addWebPart("Data Classes");
+            ph.addWebPart("Experiment Runs");
+        });
 
         // now add the missing value column to the view on the dataclass's dataregionTable
         clickAndWait(Locator.linkWithText(testDataClass));
@@ -249,11 +235,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         addHiddenColumnToDefaultView(exportTable, "missingValueFieldMVIndicator");
 
         // capture the data before exporting
-        List<Map<String, String>> sourceRowData = new ArrayList<>();
-        for (int i=0; i<expectedRecordCount; i++)
-        {
-            sourceRowData.add(exportTable.getRowDataAsMap(i));
-        }
+        List<Map<String, String>> sourceRowData = exportTable.getTableData();
 
         // act - export to file and import the file to our designated import directory
         goToFolderManagement()
@@ -265,19 +247,17 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
 
         portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Data Classes");
-        portalHelper.addWebPart("Experiment Runs");
+        portalHelper.doInAdminMode(ph -> {
+            ph.addWebPart("Data Classes");
+            ph.addWebPart("Experiment Runs");
+        });
 
         clickAndWait(Locator.linkWithText(testDataClass));
         DataRegionTable importTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         addHiddenColumnToDefaultView(importTable, "missingValueFieldMVIndicator");
 
         // capture the data after importing
-        List<Map<String, String>> destRowData = new ArrayList<>();
-        for (int i=0; i<expectedRecordCount; i++)
-        {
-            destRowData.add(importTable.getRowDataAsMap(i));
-        }
+        List<Map<String, String>> destRowData = importTable.getTableData();
 
         // now ensure expected data in the sampleType made it to the destination folder
         for (Map exportedRow : sourceRowData)
@@ -286,15 +266,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))
                     .findFirst().orElse(null);
             assertNotNull("expect all matching rows to come through", matchingMap);
-            assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("intColumn"), equalTo(matchingMap.get("intColumn")));
-
-            assertThat("expect required field values to be present",
-                    exportedRow.get("requiredField"), equalTo(matchingMap.get("requiredField")));
-            assertThat("expect missing value field values to be present",
-                    exportedRow.get("missingValueField"), equalTo(matchingMap.get("missingValueField")));
-            assertThat("expect missing value field values to be present",
-                    exportedRow.get("missingValueFieldMVIndicator"), equalTo(matchingMap.get("missingValueFieldMVIndicator")));
+            assertEquals("Expect imported rows to be equivalent to exported ones", exportedRow, matchingMap);
         }
     }
 

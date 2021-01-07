@@ -27,13 +27,12 @@ public class DataClassAPIHelper
         TestDataGenerator dgen;
         try
         {
-            dgen = TestDataGenerator.createDomain(containerPath, dataClassDefinition);
+            return TestDataGenerator.createDomain(containerPath, dataClassDefinition);
         }
         catch (CommandException e)
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }
-        return dgen;
     }
 
     /**
