@@ -34,7 +34,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     {
         click(elementCache().stdAssayTab);
         // TODO: Verify this clickAndWait works in app environment
-        clickAndWait(elementCache().saveButton);
+        clickAndWait(elementCache().selectButton);
         return new ReactAssayDesignerPage(getDriver());
     }
 
@@ -48,7 +48,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         waitForElementToBeVisible(elementCache().specialtySelectLocator);
         selectOptionByText(elementCache().specialtySelect, name);
         // TODO: Verify this clickAndWait works in app environment
-        clickAndWait(elementCache().saveButton);
+        clickAndWait(elementCache().selectButton);
         return new ReactAssayDesignerPage(getDriver());
     }
 
@@ -62,7 +62,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     {
         protected final WebElement buttonPanel = buttonPanelLocator().findWhenNeeded(this);
         public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(buttonPanel);
-        public final WebElement saveButton = Locator.byClass("pull-right").findWhenNeeded(buttonPanel);
+        public final WebElement selectButton = Locator.byClass("pull-right").findWhenNeeded(buttonPanel);
 
         public final WebElement specialtyPanel = Locator.tagWithId("div", "assay-picker-tabs-pane-specialty").findWhenNeeded(this);
 
