@@ -1,7 +1,9 @@
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'org.labkey.testRunner'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'org.labkey.build.testRunner'
+    id 'maven-publish'
+}
 
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.PomFileHelper
