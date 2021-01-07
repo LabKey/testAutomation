@@ -33,7 +33,8 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     public ReactAssayDesignerPage selectStandardAssay()
     {
         click(elementCache().stdAssayTab);
-        // TODO: Verify this clickAndWait works in app environment
+        // TODO: Verify this clickAndWait works in app environment and consider splitting out the select button to be overridden
+        // by other apps
         clickAndWait(elementCache().selectButton);
         return new ReactAssayDesignerPage(getDriver());
     }
@@ -47,7 +48,8 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         click(elementCache().specialtyAssayTab);
         waitForElementToBeVisible(elementCache().specialtySelectLocator);
         selectOptionByText(elementCache().specialtySelect, name);
-        // TODO: Verify this clickAndWait works in app environment
+        // TODO: Verify this clickAndWait works in app environment and consider splitting out the select button to be overridden
+        // by other apps
         clickAndWait(elementCache().selectButton);
         return new ReactAssayDesignerPage(getDriver());
     }
