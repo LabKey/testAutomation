@@ -535,6 +535,16 @@ public class DataRegionTable extends DataRegion
         return rowMap;
     }
 
+    public List<Map<String, String>> getTableData()
+    {
+        List<Map<String, String>> dataRows = new ArrayList<>();
+        for (int i=0; i<getDataRowCount(); i++)
+        {
+            dataRows.add(getRowDataAsMap(i));
+        }
+        return dataRows;
+    }
+
     public List<String> getRowDataAsText(int row)
     {
         final int colCount = getColumnCount();

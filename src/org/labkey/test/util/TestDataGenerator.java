@@ -432,10 +432,10 @@ public class TestDataGenerator
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
-        CreateDomainCommand createSampleTypeCommand = def.getCreateCommand();
+        CreateDomainCommand createDomainCommand = def.getCreateCommand();
         try
         {
-            createSampleTypeCommand.execute(connection, containerPath);
+            createDomainCommand.execute(connection, containerPath);
         }
         catch (IOException e)
         {
