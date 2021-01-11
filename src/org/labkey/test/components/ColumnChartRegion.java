@@ -41,7 +41,7 @@ public class ColumnChartRegion extends WebDriverComponent
     }
 
     @Override
-    protected WebDriverWrapper getWrapper()
+    public WebDriverWrapper getWrapper()
     {
         return _dataRegionTable.getWrapper();
     }

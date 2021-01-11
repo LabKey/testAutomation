@@ -77,19 +77,13 @@ public class NotificationPanelItem extends Component
         final int initialCount = _panel.getNotificationCount();
         final String notificationId = _el.getAttribute("id");
         _markAsRead.click();
-        try
-        {
-            waitFor(() -> ExpectedConditions.invisibilityOf(_el).apply(null)
-                && _panel.getNotificationCount() == initialCount - 1,
-                "Notification did not go away when marked as read: " + notificationId, 2000);
+        _panel.getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(_el));
+        _panel.clearElementCache();
+        waitFor(() -> _panel.getNotificationCount() == initialCount - 1,
+            "Notification did not go away when marked as read: " + notificationId, 2000);
 
-            if (!_panel.isNotificationPanelVisible())
-                fail("Notification panel closed unexpectedly when marking a notification as read");
-        }
-        catch (StaleElementReferenceException stale)
-        {
-            fail("Unexpected navigation when marking a notification as read");
-        }
+        if (!_panel.isNotificationPanelVisible())
+            fail("Notification panel closed unexpectedly when marking a notification as read");
     }
 
     public void toggleExpand()

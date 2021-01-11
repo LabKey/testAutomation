@@ -49,6 +49,12 @@ public class UserNotificationsPanel extends WebDriverComponent<UserNotifications
         _notificationPanel = Locator.tagWithClass("div", "labkey-notification-panel").findElement(driver);
     }
 
+    @Override
+    protected void clearElementCache() // Notification panel items can trigger panel refresh
+    {
+        super.clearElementCache();
+    }
+
     public static int getInboxCount(BaseWebDriverTest test)
     {
         String s = test.getText(inboxCount);
