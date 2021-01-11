@@ -1148,18 +1148,22 @@ public class DataRegionTable extends DataRegion
 
     private void closePhiLoggingColumnMsg()
     {
-        // If Ext4 is not on the page when column Filter is clicked, this error will show as an Ext3 dialog
+        String title = "Error";
         String msg = "Cannot choose values from a column that requires logging.";
-        if (getWrapper().isElementPresent(ExtHelper.Locators.extDialog("Error")))
+        String btn = "OK";
+
+        // If Ext4 is not on the page when column Filter is clicked, this error will show as an Ext3 dialog
+        if (getWrapper().isElementPresent(ExtHelper.Locators.extDialog(title)))
         {
-            getWrapper().assertExtMsgBox("Error", msg, "OK");
-            getWrapper()._extHelper.waitForExtDialogToDisappear("Error");
+            assertTrue(getWrapper()._extHelper.getExtMsgBoxText(title).contains(msg));
+            getWrapper()._extHelper.clickExtButton(title, btn, 0);
+            getWrapper()._extHelper.waitForExtDialogToDisappear(title);
         }
         else
         {
-            Window confirmWindow = Window.Window(getDriver()).withTitle("Error").waitFor();
-            getWrapper().waitForText(msg);
-            confirmWindow.clickButton("OK", 0);
+            Window confirmWindow = Window.Window(getDriver()).withTitle(title).waitFor();
+            assertTrue(confirmWindow.getBody().contains(msg));
+            confirmWindow.clickButton(btn, 0);
             getWrapper()._ext4Helper.waitForMaskToDisappear();
         }
     }
