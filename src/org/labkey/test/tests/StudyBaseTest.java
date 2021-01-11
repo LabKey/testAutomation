@@ -104,6 +104,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         }
 
         _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        _containerHelper.enableModule("Specimen");
         new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
