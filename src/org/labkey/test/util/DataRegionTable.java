@@ -31,6 +31,7 @@ import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
@@ -535,6 +536,16 @@ public class DataRegionTable extends DataRegion
         return rowMap;
     }
 
+    public List<Map<String, String>> getTableData()
+    {
+        List<Map<String, String>> dataRows = new ArrayList<>();
+        for (int i=0; i<getDataRowCount(); i++)
+        {
+            dataRows.add(getRowDataAsMap(i));
+        }
+        return dataRows;
+    }
+
     public List<String> getRowDataAsText(int row)
     {
         final int colCount = getColumnCount();
@@ -987,9 +998,19 @@ public class DataRegionTable extends DataRegion
 
         if (errorExpected)
         {
-            Window removeError = new Window("Error", getDriver());
-            assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
-            removeError.clickButton("OK", true);
+            // If Ext4 is not on the page when Remove Column is clicked, this error will show as a bootstrap modal (i.e. LabKeyAlert)
+            LabKeyAlert alert = LabKeyAlert.getFinder(getDriver()).find();
+            if (alert != null)
+            {
+                assertTrue(alert.getText().contains("You must select at least one field to display in the grid."));
+                alert.accept();
+            }
+            else
+            {
+                Window removeError = new Window("Error", getDriver());
+                assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
+                removeError.clickButton("OK", true);
+            }
         }
     }
 
@@ -1127,10 +1148,24 @@ public class DataRegionTable extends DataRegion
 
     private void closePhiLoggingColumnMsg()
     {
-        Window confirmWindow = Window.Window(getDriver()).withTitle("Error").waitFor();
-        getWrapper().waitForText("Cannot choose values from a column that requires logging.");
-        confirmWindow.clickButton("OK", 0);
-        getWrapper()._ext4Helper.waitForMaskToDisappear();
+        String title = "Error";
+        String msg = "Cannot choose values from a column that requires logging.";
+        String btn = "OK";
+
+        // If Ext4 is not on the page when column Filter is clicked, this error will show as an Ext3 dialog
+        if (getWrapper().isElementPresent(ExtHelper.Locators.extDialog(title)))
+        {
+            assertTrue(getWrapper()._extHelper.getExtMsgBoxText(title).contains(msg));
+            getWrapper()._extHelper.clickExtButton(title, btn, 0);
+            getWrapper()._extHelper.waitForExtDialogToDisappear(title);
+        }
+        else
+        {
+            Window confirmWindow = Window.Window(getDriver()).withTitle(title).waitFor();
+            assertTrue(confirmWindow.getBody().contains(msg));
+            confirmWindow.clickButton(btn, 0);
+            getWrapper()._ext4Helper.waitForMaskToDisappear();
+        }
     }
 
     public void setUpFacetedFilter(String columnName, String... values)
