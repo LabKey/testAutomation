@@ -38,12 +38,14 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.DataClassAPIHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -62,6 +64,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -353,7 +356,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         DataRegionTable sampleTypesDataRegion = new DataRegionTable(SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME, getWrappedDriver());
 
-        Assert.assertEquals("Number of Sample Types not as expected.", 1, sampleTypesDataRegion.getDataRowCount());
+        assertEquals("Number of Sample Types not as expected.", 1, sampleTypesDataRegion.getDataRowCount());
 
         String sampleCount = sampleTypesDataRegion.getDataAsText(0, "SampleCount" );
 
@@ -420,6 +423,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     {
         String subfolder = "derivedSamplesExportFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
+        String dataClass = "parentDataClass";
         String parentSampleType = "parentSamples";
         String testSamples = "testSamples";
         String importFolder = "derivedSamplesImportFolder";
@@ -431,10 +435,18 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
+        DataClassDefinition dataClassType = new DataClassDefinition(dataClass).setFields(DataClassAPIHelper.dataClassTestFields());
         SampleTypeDefinition parentType = new SampleTypeDefinition(parentSampleType).setFields(testFields);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
                 .addParentAlias("Parent", parentSampleType) // to derive from parent sampleType
+                .addDataParentAlias("DataClassParent", dataClass)
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
+
+        TestDataGenerator dataClassDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, dataClassType);
+        dataClassDgen.addCustomRow(Map.of("Name", "data1", "intColumn", 1, "stringColumn", "one"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data2", "intColumn", 2, "stringColumn", "two"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data3", "intColumn", 3, "stringColumn", "three"));
+        dataClassDgen.insertRows();
 
         TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, parentType);
         parentDgen.addCustomRow(Map.of("Name", "Parent1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
@@ -448,13 +460,15 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         testDgen.addCustomRow(Map.of("Name", "Child2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two",
                 "Parent", "Parent2"));
         testDgen.addCustomRow(Map.of("Name", "Child3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three",
-                "Parent", "Parent3"));
+                "Parent", "Parent3", "DataClassParent", "data1"));
         testDgen.addCustomRow(Map.of("Name", "Child4", "intColumn", 4, "decimalColumn", 4.4, "stringColumn", "four",
                 "Parent", "Parent3, Parent2"));
         testDgen.addCustomRow(Map.of("Name", "Child5", "intColumn", 5, "decimalColumn", 5.5, "stringColumn", "five",
                 "Parent", "Parent1, Parent2"));
         testDgen.addCustomRow(Map.of("Name", "Child6", "intColumn", 6, "decimalColumn", 6.6, "stringColumn", "six",
                 "Parent", "Parent3, Parent2", "SelfParent", "Child5"));
+        testDgen.addCustomRow(Map.of("Name", "Child7", "intColumn", 7, "decimalColumn", 7.7, "stringColumn", "seven",
+                "Parent", "Parent3, Parent2", "SelfParent", "Child5", "DataClassParent", "data2, data3"));
         testDgen.insertRows();
 
         PortalHelper portalHelper = new PortalHelper(this);
@@ -469,12 +483,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         CustomizeView cv = sourceTable.openCustomizeGrid();
         cv.showHiddenItems();
         cv.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
+        cv.addColumn("INPUTS/DATA/PARENTDATACLASS");
         cv.clickSave().save();
-        List<Map<String, String>> sourceRowData = new ArrayList<>();
-        for (int i=0; i<6; i++)
-        {
-            sourceRowData.add(sourceTable.getRowDataAsMap(i));
-        }
+        List<Map<String, String>> sourceRowData = sourceTable.getTableData();
 
         // act - export to file and import the file to our designated import directory
         goToFolderManagement()
@@ -498,14 +509,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         CustomizeView cv2 = destSamplesTable.openCustomizeGrid();
         cv2.showHiddenItems();
         cv2.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
+        cv.addColumn("INPUTS/DATA/PARENTDATACLASS");
         cv2.clickSave().save();
 
         // capture the data in the exported sampleType
-        List<Map<String, String>> destRowData = new ArrayList<>();
-        for (int i=0; i<6; i++)
-        {
-            destRowData.add(destSamplesTable.getRowDataAsMap(i));
-        }
+        List<Map<String, String>> destRowData = destSamplesTable.getTableData();
 
         // now ensure expected data in the sampleType made it to the destination folder
         for (Map exportedRow : sourceRowData)
@@ -514,6 +522,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))
                     .findFirst().orElse(null);
             assertNotNull("expect all matching rows to come through", matchingMap);
+
             assertThat("expect export and import values to be equivalent",
                     exportedRow.get("intColumn"), equalTo(matchingMap.get("intColumn")));
             assertThat("expect export and import values to be equivalent",
@@ -524,7 +533,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples").toString()
                     .replace(" ", "").split(","));
             String[] importedParents = matchingMap.get("Inputs/Materials/parentSamples").replace(" ", "").split(",");
-            assertThat("expect lineage information to round trip with equivalent values", sourceParents, hasItems(importedParents));
+            assertThat("expect parent sampleType derivation to round trip with equivalent values", sourceParents, hasItems(importedParents));
+            List<String> sourceDataParents = Arrays.asList(exportedRow.get("Inputs/Data/parentDataClass").toString()
+                    .replace(" ", "").split(","));
+            String[] importedDataParents = matchingMap.get("Inputs/Data/parentDataClass").replace(" ", "").split(",");
+            assertThat("expect parent dataClass derivation to round trip with equivalent values", sourceDataParents, hasItems(importedDataParents));
         }
     }
 
