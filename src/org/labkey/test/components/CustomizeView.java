@@ -81,7 +81,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     }
 
     @Override
-    protected WebDriverWrapper getWrapper()
+    public WebDriverWrapper getWrapper()
     {
         return _driver;
     }
