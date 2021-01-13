@@ -46,8 +46,8 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
     public T addParentAlias(String alias, @Nullable String optionDisplayText)
     {
         expandPropertiesPanel();
-        int initialCount = elementCache().parentAliases().size();
         elementCache().addAliasButton.click();
+        int initialCount = findEmptyAlias();
         if (optionDisplayText == null)
         {
             optionDisplayText = CURRENT_SAMPLE_TYPE;
@@ -56,7 +56,7 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return getThis();
     }
 
-    private int getParentAliasIndex(String parentAlias)
+    public int getParentAliasIndex(String parentAlias)
     {
         List<Input> inputs = elementCache().parentAliases();
         for (int i = 0; i < inputs.size(); i++)
@@ -83,7 +83,7 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return getThis();
     }
 
-    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    protected T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
         expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
@@ -114,27 +114,44 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return elementCache().parentAliasSelect(index).getSelections().get(0);
     }
 
+    protected int findEmptyAlias()
+    {
+        List<Input> aliases = elementCache().parentAliases();
+        int index = -1;
+        for(int i = 0; i < aliases.size(); i++)
+        {
+            if(aliases.get(i).getValue().isEmpty())
+            {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+
+    }
+
     protected class ElementCache extends EntityTypeDesigner<T>.ElementCache
     {
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
 
-        protected List<Input> parentAliases()
+        public List<Input> parentAliases()
         {
             return Input.Input(Locator.name("alias"), getDriver()).findAll(propertiesPanel);
         }
 
-        protected Input parentAlias(int index)
+        Input parentAlias(int index)
         {
             return parentAliases().get(index);
         }
 
-        protected ReactSelect parentAliasSelect(int index)
+        ReactSelect parentAliasSelect(int index)
         {
             return ReactSelect.finder(getDriver()).locatedBy(Locator.byClass("sampleset-insert--parent-select"))
                     .index(index).find(propertiesPanel);
         }
 
-        protected WebElement removeParentAliasIcon(int index)
+        WebElement removeParentAliasIcon(int index)
         {
             return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
         }
