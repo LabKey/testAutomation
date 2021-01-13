@@ -15,7 +15,7 @@ public class AddXarFileCommand extends PostCommand
 
     public AddXarFileCommand(File xarFile)
     {
-        super("experiment", "showAddXarFile");
+        super("experiment", "assayXarFile");
         this._file = xarFile;
     }
 
@@ -24,7 +24,7 @@ public class AddXarFileCommand extends PostCommand
     {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-        builder.addBinaryBody("uploadFile", _file, ContentType.TEXT_XML, _file.getName());
+        builder.addBinaryBody("file", _file, ContentType.TEXT_XML, _file.getName());
 
         HttpPost post = new HttpPost(uri);
         post.setEntity(builder.build());

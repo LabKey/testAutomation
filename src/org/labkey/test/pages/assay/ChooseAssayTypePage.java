@@ -30,36 +30,28 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         return new ChooseAssayTypePage(webDriverWrapper.getDriver());
     }
 
-    public ChooseAssayTypePage selectType(String providerName)
+    public ReactAssayDesignerPage selectStandardAssay()
     {
-        elementCache().getProviderRadioButton(providerName).check();
-        return this;
-    }
-
-    public ChooseAssayTypePage selectAssayContainer(String optionText)
-    {
-        elementCache().locationSelect.selectByVisibleText(optionText);
-        return this;
-    }
-
-    public void clickCancel()
-    {
-        clickAndWait(elementCache().cancelButton);
-    }
-
-    public ReactAssayDesignerPage clickNext()
-    {
-        clickAndWait(elementCache().nextButton);
-
+        click(elementCache().stdAssayTab);
+        // TODO: Verify this clickAndWait works in app environment and consider splitting out the select button to be overridden
+        // by other apps
+        clickAndWait(elementCache().selectButton);
         return new ReactAssayDesignerPage(getDriver());
     }
 
-    public String clickNextExpectingError()
+    public ReactAssayDesignerPage selectAssayType(String name)
     {
-        clickAndWait(elementCache().nextButton);
+        if (name.equals("General") || name.equals("Standard")) {
+            return selectStandardAssay();
+        }
 
-        clearCache();
-        return Locators.labkeyError.waitForElement(getDriver(), 10000).getText();
+        click(elementCache().specialtyAssayTab);
+        waitForElementToBeVisible(elementCache().specialtySelectLocator);
+        selectOptionByText(elementCache().specialtySelect, name);
+        // TODO: Verify this clickAndWait works in app environment and consider splitting out the select button to be overridden
+        // by other apps
+        clickAndWait(elementCache().selectButton);
+        return new ReactAssayDesignerPage(getDriver());
     }
 
     @Override
@@ -70,16 +62,24 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement uploadXarLink = Locator.linkWithText("Upload").findWhenNeeded(this);
+        protected final WebElement buttonPanel = buttonPanelLocator().findWhenNeeded(this);
+        public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(buttonPanel);
+        public final WebElement selectButton = Locator.byClass("pull-right").findWhenNeeded(buttonPanel);
 
-        RadioButton getProviderRadioButton(String providerName)
+        public final WebElement specialtyPanel = Locator.tagWithId("div", "assay-picker-tabs-pane-specialty").findWhenNeeded(this);
+
+        public final WebElement stdAssayTab = Locator.tagContainingText("a", "Standard Assay").findWhenNeeded(this);
+        public final WebElement specialtyAssayTab = Locator.tagContainingText("a", "Specialty Assays").findWhenNeeded(this);
+        public final WebElement importAssayTab = Locator.tagContainingText("a", "Import Assay Design").findWhenNeeded(this);
+
+        public final WebElement containerSelect = Locator.tagWithId("select", "assay-type-select-container").findWhenNeeded(this);
+
+        public final Locator specialtySelectLocator = Locator.tagWithId("select", "specialty-assay-type-select");
+        public final WebElement specialtySelect = specialtySelectLocator.findWhenNeeded(specialtyPanel);
+
+        protected Locator.XPathLocator buttonPanelLocator()
         {
-            return RadioButton.finder().withNameAndValue("providerName", providerName).find(this);
+            return Locator.byClass("assay-type-select-btns");
         }
-
-        Select locationSelect = SelectWrapper.Select(Locator.id("assayContainer")).findWhenNeeded(this);
-
-        WebElement nextButton = Locator.lkButton("Next").findWhenNeeded(this);
-        WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
     }
 }
