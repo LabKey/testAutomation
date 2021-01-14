@@ -1454,20 +1454,21 @@ public class ClientAPITest extends BaseWebDriverTest
         Connection cn = getConnection(true);
         Command<CommandResponse> command = new Command<>("bam", "boozled");
 
-        Map<String, Object> expectedProps = new HashMap<>();
-        expectedProps.put("success", false);
-        expectedProps.put("exception", "No LabKey Server module registered to handle request for controller: bam");
+        final String bogusProjectName = "BOGUS---CONTAINER---PATH";
+        final String bogusContainerPath = "/" + bogusProjectName;
 
-        runCommand(cn, command, "application/json", "text/html", 404, expectedProps);
-        runCommand(cn, command, "text/xml", "text/html", 404, expectedProps);
+        runCommand(cn, command, "application/json", "text/html", 404, null);
+        runCommand(cn, command, "text/xml", "text/html", 404, null);
         runCommand(cn, command, "text/html", "text/html", 404, null);
+        runCommand(cn, command, "application/json", "text/html", 404, null);
+        runCommand(cn, command, "text/html", "text/html", 404, null, bogusContainerPath);
 
         // An API location/command that requires permissions
         log("Testing response content type for 401");
         cn = getConnection(false);
         command = new Command<>("core", "getExtContainerAdminTree.api");
 
-        expectedProps = new HashMap<>();
+        Map<String, Object> expectedProps = new HashMap<>();
         expectedProps.put("success", false);
         expectedProps.put("exception", "You must log in to view this content.");
 
@@ -1475,6 +1476,27 @@ public class ClientAPITest extends BaseWebDriverTest
 
         command = new Command<>("query", "selectRows.api");
         validateUnauthorizedResponses(cn, command, expectedProps);
+
+        expectedProps.put("exception", "No such project: " + bogusProjectName);
+
+        // Reset command so that it's not requesting XML responses
+        command = new Command<>("query", "selectRows.api");
+
+        // Check that a bad container path produces the right kind of response
+        runCommand(cn, command, "application/json", "application/json", 404, expectedProps, bogusContainerPath);
+        // Try again requesting an XML response
+        command.getParameters().put("respFormat", "xml");
+        runCommand(cn, command, "application/json", "text/xml", 404, null, bogusContainerPath);
+
+        command = new Command<>("query", "selectRows.api");
+        // Check that an valid container with bogus parameters also does the right thing for selectRows
+        expectedProps.put("exception", "Could not find schema: ");
+        cn = getConnection(true);
+        runCommand(cn, command, "application/json", "application/json", 404, expectedProps);
+
+        // Try again requesting an XML response
+        command.getParameters().put("respFormat", "xml");
+        runCommand(cn, command, "application/json", "text/xml", 404, null);
     }
 
     private void validateUnauthorizedResponses(Connection cn, Command<CommandResponse> command, Map<String, Object> expectedProps)
@@ -1496,6 +1518,11 @@ public class ClientAPITest extends BaseWebDriverTest
      */
     private void runCommand(Connection cn, Command<CommandResponse> source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps)
     {
+        runCommand(cn, source, requestContentType, expectedResponseContentType, expectedStatus, expectedProps, "/" + getProjectName());
+    }
+
+    private void runCommand(Connection cn, Command<CommandResponse> source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps, String folderPath)
+    {
         CommandException exception = null;
 
         try
@@ -1510,7 +1537,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
                     return request;
                 }
-            }.execute(cn, "/" + getProjectName());
+            }.execute(cn, folderPath);
         }
         catch (IOException e)
         {
@@ -1536,7 +1563,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 assertNotNull("Expected properties in the response", body);
                 for (Map.Entry<String, Object> prop : expectedProps.entrySet())
                 {
-                    assertTrue("Expected body property not available", body.containsKey(prop.getKey()));
+                    assertTrue("Expected body property not available: " + prop + ", available properties are: " + body.keySet(), body.containsKey(prop.getKey()));
                     assertEquals("Expected body value for \"" + prop.getKey() + "\"", prop.getValue(), body.get(prop.getKey()));
                 }
             }
