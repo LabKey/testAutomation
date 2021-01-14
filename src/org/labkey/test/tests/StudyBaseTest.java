@@ -104,6 +104,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         }
 
         _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        _containerHelper.enableModule("Specimen");
         new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
@@ -252,6 +253,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Pipeline"));
+        checkCheckbox(Locator.checkboxByTitle("Specimen")); // Activate specimen module to enable specimen UI/webparts
         clickButton("Update Folder");
         new PortalHelper(getDriver()).doInAdminMode(portalHelper -> {
             portalHelper.addWebPart("Data Pipeline");
