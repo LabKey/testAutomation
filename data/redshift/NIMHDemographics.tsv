@@ -1,0 +1,15 @@
+10001	Nicodemus	Unknown			Rat	Leader of the rats of NIMH	Unknown	Dead	M	1969-06-23 00:00:00.0	true
+10002	Justin	Unknown			Rat	Captain of the guard	Single	Living	M	1970-08-07 00:00:00.0	true
+10003	Jenner	Unknown			Rat	Rebel	Single	Dead	M	1970-03-12 00:00:00.0	true
+10004	Sullivan	Unknown			Rat	Rebel	Single	Dead	M	1970-04-17 00:00:00.0	true
+20001	Jonathan Frisby	Frisby			Field mouse	Father	Married	Dead	M	1970-12-22 00:00:00.0	true
+20002	Mr. Agnes	Unknown			Field mouse	Chemist	Unknown	Living	M	1969-07-05 00:00:00.0	true
+20021	Mrs. Frisby	Frisby			Field mouse	Mother	Widowed	Living	F	1970-12-08 00:00:00.0	true
+20022	Teresa Frisby	Frisby	20021	20001	Field mouse	Child	Single	Living	F	1971-04-03 00:00:00.0	true
+20023	Cynthia Frisby	Frisby	20021	20001	Field mouse	Child	Single	Living	F	1971-04-03 00:00:00.0	true
+20024	Martin Frisby	Frisby	20021	20001	Field mouse	Child	Single	Living	M	1971-04-03 00:00:00.0	true
+20025	Timothy Frisby	Frisby	20021	20001	Field mouse	Child	Single	Living	M	1971-04-03 00:00:00.0	true
+20045	Auntie Shrew	Frisby			Shrew	Aunt	Married	Living	F	1970-12-17 00:00:00.0	true
+50001	Dragon	Unknown			Cat	Mouse eater	Unknown	Living	Unknown	1969-05-02 00:00:00.0	true
+50002	Jeremy	Unknown			Crow	Collector	Engaged	Living	M	1970-03-12 00:00:00.0	true
+50003	Great Owl	Unknown			Owl	Wise man	Unknown	Living	M	1965-03-15 00:00:00.0	true
