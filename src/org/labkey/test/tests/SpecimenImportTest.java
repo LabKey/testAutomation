@@ -233,7 +233,6 @@ public class SpecimenImportTest extends SpecimenBaseTest
                 }
 
                 results.add(tempRow);
-
             }
 
         }
