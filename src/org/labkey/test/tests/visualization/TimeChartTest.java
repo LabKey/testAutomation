@@ -76,6 +76,7 @@ public abstract class TimeChartTest extends ReportTest
     @LogMethod protected void configureStudy()
     {
         _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        _containerHelper.enableModule("Specimen");
         waitForText("Import Study");
         importStudyFromZip(STUDY_ZIP);
     }
