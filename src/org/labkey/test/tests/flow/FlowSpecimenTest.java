@@ -58,6 +58,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     {
         log("** Initialize Study Folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
+        _containerHelper.enableModule("Specimen");
         clickButton("Create Study");
         //use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));
