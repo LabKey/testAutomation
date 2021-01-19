@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
@@ -110,7 +111,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(fieldKey, true);
         ReactDatePicker input = elementCache().dateInput("sampleDate");
-        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
                 "the checkbox did not become enabled in time", 2000);
         input.set(dateString);
         return this;
@@ -125,7 +126,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(fieldKey, true);
         Checkbox box = getCheckBox(fieldKey);
-        getWrapper().waitFor(()-> box.getComponentElement().getAttribute("disabled")==null,
+        WebDriverWrapper.waitFor(()-> box.getComponentElement().getAttribute("disabled")==null,
                 "the checkbox did not become enabled in time", 2000);
         box.set(checked);
         return this;
@@ -191,6 +192,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return new ElementCache();
     }
 
+    @Override
     protected ElementCache elementCache()
     {
         return new ElementCache();
