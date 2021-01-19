@@ -287,6 +287,7 @@ public class TabTest extends SimpleModuleTest
         goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDY_FOLDER_TAB_NAME, "Study");
+        _containerHelper.enableModule("Specimen");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAY_FOLDER_TAB_NAME, "Assay");
         clickFolder(COLLAB_FOLDER);
         clickFolder(STUDY_FOLDER_TAB_NAME);
