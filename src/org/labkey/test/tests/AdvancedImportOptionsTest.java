@@ -125,6 +125,9 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     {
         log("Validate that the expected data has been imported.");
         log("Validate assay schedule.");
+
+        checker().takeScreenShot("Debug_Screenshot");
+
         clickTab("Assays");
         AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
         assertEquals(1, assayScheduleWebpart.getAssayRowCount());
