@@ -108,8 +108,8 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
-    // Start importing the specimen archive.  This can load in the background while executing the first set of
-    // verification steps to speed up the test.  Call waitForSpecimenImport() before verifying specimens.
+    // Start importing the specimen archive. This can load in the background while executing the first set of
+    // verification steps to speed up the test. Call waitForSpecimenImport() before verifying specimens.
     protected void startSpecimenImport(int completeJobsExpected)
     {
         startSpecimenImport(completeJobsExpected, StudyHelper.SPECIMEN_ARCHIVE_A);
