@@ -5,7 +5,7 @@ import org.labkey.gradle.util.ModuleFinder
 import org.labkey.gradle.plugin.Distribution
 import org.labkey.gradle.plugin.FileModule
 
-apply plugin: 'org.labkey.distribution'
+apply plugin: 'org.labkey.build.distribution'
 
 dist.description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
 
@@ -20,6 +20,7 @@ project.task(
             dist.embeddedArchiveType="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
+            dist.isOpenSource=true
         }
 )
 
