@@ -22,7 +22,6 @@ project.task(
             dist.embeddedArchiveType="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
-            dist.isOpenSource=true
         }
 )
 
