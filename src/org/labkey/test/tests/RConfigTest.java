@@ -26,10 +26,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locator.XPathLocator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -135,9 +137,12 @@ public class RConfigTest extends BaseWebDriverTest
         assertAttributeNotContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
         selectOptionByText(Locator.name("reportEngine"), SECONDARY_ENGINE_NAME);
         selectOptionByText(Locator.name("pipelineEngine"), SECONDARY_ENGINE_NAME);
-        assertAttributeNotContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
-        clickButton("Save", "Override Default R Configuration");
-        clickButton("Yes");
+        WebElement saveBtn = Locator.id("saveBtn").findElement(getDriver());
+        assertAttributeNotContains(saveBtn, "class", "labkey-disabled-button");
+        saveBtn.click();
+        LabKeyAlert confirmation = LabKeyAlert.getFinder(getDriver()).waitFor();
+        Assert.assertEquals("Override Default R Configuration", confirmation.getTitle());
+        confirmation.clickButton("Yes");
 
         log("Verify subfolder is inheriting the correct parent R configuration");
         navigateToFolder(getProjectName(), FOLDER_NAME);
