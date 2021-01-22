@@ -311,16 +311,22 @@ public class FieldDefinition extends PropertyDescriptor
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "string"),
+        MultiLine("Multi-Line Text", "multiLine"),
         Integer("Integer", "int"),
+        LongInteger("Long Integer", "long"),
         String("Text", "string"),
         Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),
         DateAndTime("Date Time", "dateTime"),
         Boolean("Boolean", "boolean"),
-        Double("Number (Double)", "float"),
+        Float("Float", "float"),
+        Double("Decimal (floating point)", "double"),
+        @Deprecated(since = "21.2")
         Decimal("Decimal (floating point)", "double"),
+        // Decimal is incorrectly implemented but too widely used for a quick fix.
+        // Existing usages should be switched to use 'ColumnType.Double'
+        // Then the following 'Decimal' implementation should replace the existing one.
+        // Decimal("Decimal (fixed point)", "decimal"),
         File("File", "fileLink"),
-        AutoInteger("Auto-Increment Integer", "int"),
         Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
         Attachment("Attachment", "attachment"),
         User("User", "int", null, new LookupInfo(null, "core", "users")),
