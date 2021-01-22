@@ -120,10 +120,10 @@ public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.
         private final Input subjectSuffixInput = Input.Input(Locator.name("subjectSuffix"), getDriver()).findWhenNeeded(this);
 
         private final Checkbox newRequestNotifyCheckbox = Checkbox.Checkbox(Locator.id("newRequestNotifyCheckbox")).findWhenNeeded(this);
-        private final Input newRequestNotifyInput = Input.Input(Locator.name("newRequestNotify"), getDriver()).findWhenNeeded(this);
+        private final Input newRequestNotifyInput = Input.Input(Locator.name("newRequestNotify"), getDriver()).timeout(1000).findWhenNeeded(this);
 
         private final Checkbox ccCheckbox = Checkbox.Checkbox(Locator.id("ccCheckbox")).findWhenNeeded(this);
-        private final Input ccInput = Input.Input(Locator.name("cc"), getDriver()).findWhenNeeded(this);
+        private final Input ccInput = Input.Input(Locator.name("cc"), getDriver()).timeout(1000).findWhenNeeded(this);
 
         RadioButton defaultEmailNotifyRadio(DefaultEmailNotify option)
         {

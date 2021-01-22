@@ -414,7 +414,7 @@ public class NabAssayTest extends AbstractAssayTest
             clickButton("Next");
 
             region = new DataRegionTable("Data", this);
-            region.clickHeaderButton("Copy to Study");
+            region.clickHeaderButtonAndWait("Copy to Study");
             assertStudyData(4);
 
             assertAliasedAUCStudyData();

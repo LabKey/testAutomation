@@ -5,7 +5,9 @@ import org.labkey.gradle.util.ModuleFinder
 import org.labkey.gradle.plugin.Distribution
 import org.labkey.gradle.plugin.FileModule
 
-apply plugin: 'org.labkey.distribution'
+plugins {
+    id 'org.labkey.build.distribution'
+}
 
 dist.description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
 
