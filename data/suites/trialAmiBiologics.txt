@@ -1,0 +1,8 @@
+BiologicsAPITest
+BiologicsAssayDeleteTest
+BiologicsSampleUpdateTest
+BiologicsRemoteEvalTest
+BiologicsEvalTest
+BiologicsSampleCreateTest
+BiologicsSampleDeleteTest
+BiologicsSampleUpdateTest
