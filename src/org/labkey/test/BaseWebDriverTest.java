@@ -1942,8 +1942,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void selectSchema(String schemaName)
     {
         String[] schemaParts = schemaName.split("\\.");
-        if (isExtTreeNodeSelected(schemaParts[schemaParts.length - 1]))
-            return;
 
         StringBuilder schemaWithParents = new StringBuilder();
         String separator = "";
