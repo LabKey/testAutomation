@@ -1975,8 +1975,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 WebElement folderIcon = loc.findElement(getDriver());
                 // Moving to desired tree node should dismiss tooltip from previously clicked folder
                 new Actions(getDriver()).moveToElement(folderIcon).perform();
-                click(folderIcon);
-                }, "queryTreeSelectionChange");
+                folderIcon.click();
+            }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
         }
     }
@@ -1985,8 +1985,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
+        waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
+        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
         waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
     }
