@@ -33,6 +33,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -85,18 +86,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void expandFileBrowserRootNode()
     {
-        expandFileBrowserTree();
-        waitAndClick(Locators.treeRow(0));
-        waitForElement(Locators.selectedTreeRow(0), WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void expandFileBrowserTree()
-    {
-        if (isElementPresent(Locators.collapsedFolderTree))
-        {
-            clickFileBrowserButton(BrowserAction.FOLDER_TREE);
-            waitForElementToDisappear(Locators.folderTree);
-        }
+        selectFileBrowserItem("/");
     }
 
     @LogMethod
@@ -742,6 +732,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         {
             WebElement rootNode = Locator.css("div.fbrowser .treenav-panel tr[data-recordindex = '0']").findElement(getDriver());
             clickFileBrowserButton(BrowserAction.FOLDER_TREE);
+            WebElement browser = Locators.fBrowser.findElement(getDriver());
+            new Actions(getDriver()).moveToElement(browser, 0, 0).perform(); // Dismiss tooltip
             waitForElementToDisappear(collapsedTreePanel);
             shortWait().until(ExpectedConditions.stalenessOf(rootNode));
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation

@@ -33,7 +33,7 @@ import java.util.function.BiFunction;
 public abstract class WebDriverComponent<EC extends Component.ElementCache> extends Component<EC>
 {
     private WebDriverWrapper _dWrapper;
-    protected WebDriverWrapper getWrapper()
+    public WebDriverWrapper getWrapper()
     {
         if (_dWrapper == null)
             _dWrapper = new WebDriverWrapperImpl(getDriver());

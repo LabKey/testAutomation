@@ -31,7 +31,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -129,16 +128,13 @@ public class DataReportsTest extends ReportTest
 
     protected final static String R_USER = "r_editor@report.test";
     protected final static String AUTHOR_USER = "author_user@report.test";
-    protected final static String AUTHOR_USER_PW = "Password";
-    protected final static String READER_USER = "reader_user@report.test";
-    protected final static String READER_USER_PW = "Password";
 
     private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(false, R_USER, AUTHOR_USER, READER_USER);
+        _userHelper.deleteUsers(false, R_USER, AUTHOR_USER);
         super.doCleanup(afterTest);
     }
 
@@ -160,18 +156,6 @@ public class DataReportsTest extends ReportTest
 
         // Make sure the Developers group has the Platform Developer role.
         initTest.addDeveloperGroupToPlatformDeveloperRole();
-
-        APIUserHelper apiUserHelper = new APIUserHelper(initTest);
-        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(initTest);
-
-        // Create a site-developer that is an author in the project
-        initTest.createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, initTest.getProjectName());
-        initTest.setInitialPassword(AUTHOR_USER, AUTHOR_USER_PW);
-
-        // Create a reader user
-        apiUserHelper.createUser(READER_USER, true, true);
-        initTest.setInitialPassword(READER_USER, READER_USER_PW);
-        apiPermissionsHelper.addMemberToRole(READER_USER, "Reader", PermissionsHelper.MemberType.user, initTest.getProjectName());
     }
 
     private void addDeveloperGroupToPlatformDeveloperRole()
@@ -427,15 +411,23 @@ public class DataReportsTest extends ReportTest
         popLocation();
         pushLocation();
 
-        signOut();
-        signIn(AUTHOR_USER, AUTHOR_USER_PW);
-
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            log("Test user permissions");
+            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
+            impersonate(AUTHOR_USER);
+        }
+        else
+        {
+            log("App Admin can't impersonate site roles. Just create report as primary test user.");
+        }
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
-
-        signOut();
-        simpleSignIn();
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            stopImpersonating();
+        }
 
         popLocation();
         log("Create second R script");
@@ -455,13 +447,11 @@ public class DataReportsTest extends ReportTest
         log("Check that background run works");
 
         _userHelper.createUser(R_USER);
-        setInitialPassword(R_USER, "Password");
         _apiPermissionsHelper.addUserToProjGroup(R_USER, getProjectName(), "Users");
         _apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, getProjectName());
 
         //create R report with dev
-        signOut();
-        signIn(R_USER, "Password");
+        impersonate(R_USER);
 
         log("Access shared R script");
         navigateToFolder(getProjectName(), getFolderName());
@@ -473,8 +463,7 @@ public class DataReportsTest extends ReportTest
         DataRegionTable.DataRegion(getDriver()).find().goToReport(AUTHOR_REPORT);
 
         popLocation();
-        signOut();
-        simpleSignIn();
+        stopImpersonating();
 
         log("Change user permission");
         _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
@@ -536,18 +525,15 @@ public class DataReportsTest extends ReportTest
         log("Test showing the source tab to all users");
         createRReport(reportName, R_SCRIPT, true, true, new String[0]);
 
-        simpleSignOut();
-        signIn(READER_USER, READER_USER_PW);
-
-        navigateToFolder(getProjectName(), getFolderName());
+        impersonateRole("Reader");
+        clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementVisible(Ext4Helper.Locators.tab("Source"));
+        stopImpersonating();
 
-        signOut();
-        simpleSignIn();
 
         log("Re-save report disabling showing the source tab to all users");
         navigateToFolder(getProjectName(), getFolderName());
@@ -559,8 +545,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
         resaveReport();
 
-        signOut();
-        signIn(READER_USER, READER_USER_PW);
+        impersonateRole("Reader");
 
         navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
@@ -569,8 +554,7 @@ public class DataReportsTest extends ReportTest
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementNotVisible(Ext4Helper.Locators.tab("Source"));
 
-        signOut();
-        simpleSignIn();
+        stopImpersonating();
 
         goToProjectHome();
     }

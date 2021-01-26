@@ -457,7 +457,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickFolder(SUB_FOLDER_A);
         _portalHelper.addWebPart("Assay List");
         clickButton("New Assay Design");
-        assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
+        assertElementNotPresent(Locator.tagContainingText("option", "Flow"));
 
         log("Defining a test assay at subfolder A");
         goToManageAssays();

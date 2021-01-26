@@ -104,11 +104,12 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         }
 
         _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        _containerHelper.enableModule("Specimen");
         new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
-    // Start importing the specimen archive.  This can load in the background while executing the first set of
-    // verification steps to speed up the test.  Call waitForSpecimenImport() before verifying specimens.
+    // Start importing the specimen archive. This can load in the background while executing the first set of
+    // verification steps to speed up the test. Call waitForSpecimenImport() before verifying specimens.
     protected void startSpecimenImport(int completeJobsExpected)
     {
         startSpecimenImport(completeJobsExpected, StudyHelper.SPECIMEN_ARCHIVE_A);
@@ -252,6 +253,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Pipeline"));
+        checkCheckbox(Locator.checkboxByTitle("Specimen")); // Activate specimen module to enable specimen UI/webparts
         clickButton("Update Folder");
         new PortalHelper(getDriver()).doInAdminMode(portalHelper -> {
             portalHelper.addWebPart("Data Pipeline");

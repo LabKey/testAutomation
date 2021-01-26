@@ -7,25 +7,25 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ShowCreateSampleRequestPage extends LabKeyPage<ShowCreateSampleRequestPage.ElementCache>
+public class ShowCreateSpecimenRequestPage extends LabKeyPage<ShowCreateSpecimenRequestPage.ElementCache>
 {
-    public ShowCreateSampleRequestPage(WebDriver driver)
+    public ShowCreateSpecimenRequestPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ShowCreateSampleRequestPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static ShowCreateSpecimenRequestPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         return beginAt(webDriverWrapper, webDriverWrapper.getCurrentContainerPath());
     }
 
-    public static ShowCreateSampleRequestPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
+    public static ShowCreateSpecimenRequestPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "showCreateSampleRequest"));
-        return new ShowCreateSampleRequestPage(webDriverWrapper.getDriver());
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "showCreateSpecimenRequest"));
+        return new ShowCreateSpecimenRequestPage(webDriverWrapper.getDriver());
     }
 
-    public ShowCreateSampleRequestPage setDetails(String... values)
+    public ShowCreateSpecimenRequestPage setDetails(String... values)
     {
         for (int i = 0; i < values.length; i++)
         {

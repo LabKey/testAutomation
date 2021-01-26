@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
+import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
@@ -32,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * This test checks the flow specimen foreign key behavior from flow.FCSFiles and flow.FCSAnalyses.
  */
-@Category({DailyA.class, Flow.class})
+@Category({DailyA.class, Flow.class, Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class FlowSpecimenTest extends BaseFlowTest
 {
@@ -58,6 +59,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     {
         log("** Initialize Study Folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
+        _containerHelper.enableModule("Specimen");
         clickButton("Create Study");
         //use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));

@@ -1,6 +1,6 @@
 package org.labkey.test.components.study.specimen;
 
-import org.labkey.test.pages.study.specimen.ShowCreateSampleRequestPage;
+import org.labkey.test.pages.study.specimen.ShowCreateSpecimenRequestPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 
@@ -16,10 +16,10 @@ public class SpecimenDetailGrid extends DataRegionTable
         clickHeaderMenu("Request Options", "View Existing Requests");
     }
 
-    public ShowCreateSampleRequestPage createNewRequest()
+    public ShowCreateSpecimenRequestPage createNewRequest()
     {
         clickHeaderMenu("Request Options", "Create New Request");
-        return new ShowCreateSampleRequestPage(getDriver());
+        return new ShowCreateSpecimenRequestPage(getDriver());
     }
 
     public void addToExistingRequest()

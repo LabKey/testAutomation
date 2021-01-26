@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public class EntityBulkUpdateDialog extends ModalDialog
 {
+    private final int WAIT_TIMEOUT = 2000;
+
     public EntityBulkUpdateDialog(WebDriver driver)
     {
         this(new ModalDialogFinder(driver).withTitle(" selected from "));
@@ -46,8 +49,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(columnTitle, true);
         FilteringReactSelect reactSelect = elementCache().getSelect(columnTitle);
-        getWrapper().waitFor(()-> reactSelect.isEnabled(),
-                "the ["+columnTitle+"] reactSelect did not become enabled in time", 2000);
+        WebDriverWrapper.waitFor(reactSelect::isEnabled,
+                "the ["+columnTitle+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
         selectValues.forEach(s -> {reactSelect.filterSelect(s);});
         return this;
     }
@@ -61,8 +64,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(fieldKey, true);
         Input input = elementCache().textArea(fieldKey);
-        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the input did not become enabled in time", 2000);
+        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+                "the input did not become enabled in time", WAIT_TIMEOUT);
         input.set(text);
         return this;
     }
@@ -78,8 +81,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         Input input = elementCache().textInput(fieldKey);
         setEditableState(fieldKey, true);
-        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the input did not become enabled in time", 2000);
+        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+                "the input did not become enabled in time", WAIT_TIMEOUT);
         input.set(value);
         return this;
     }
@@ -93,8 +96,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         Input input = elementCache().numericInput(fieldKey);
         setEditableState(fieldKey, true);
-        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the input did not become enabled in time", 2000);
+        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+                "the input did not become enabled in time", WAIT_TIMEOUT);
         input.set(value);
         return this;
     }
@@ -108,7 +111,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(fieldKey, true);
         ReactDatePicker input = elementCache().dateInput("sampleDate");
-        getWrapper().waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
+        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
                 "the checkbox did not become enabled in time", 2000);
         input.set(dateString);
         return this;
@@ -123,7 +126,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         setEditableState(fieldKey, true);
         Checkbox box = getCheckBox(fieldKey);
-        getWrapper().waitFor(()-> box.getComponentElement().getAttribute("disabled")==null,
+        WebDriverWrapper.waitFor(()-> box.getComponentElement().getAttribute("disabled")==null,
                 "the checkbox did not become enabled in time", 2000);
         box.set(checked);
         return this;
@@ -189,6 +192,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return new ElementCache();
     }
 
+    @Override
     protected ElementCache elementCache()
     {
         return new ElementCache();
@@ -200,41 +204,41 @@ public class EntityBulkUpdateDialog extends ModalDialog
         {
             return Locator.tagWithClass("div", "row")
                     .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
-                    .findElement(this);
+                    .waitForElement(this, WAIT_TIMEOUT);
         }
 
         public ToggleButton getToggle(String fieldKey)
         {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).find(formRow(fieldKey));
+            return new ToggleButton.ToggleButtonFinder(getDriver()).waitFor(formRow(fieldKey));
         }
 
         public FilteringReactSelect getSelect(String fieldKey)
         {
-            return FilteringReactSelect.finder(getDriver()).find(formRow(fieldKey));
+            return FilteringReactSelect.finder(getDriver()).waitFor(formRow(fieldKey));
         }
 
         public Input textInput(String fieldKey)
         {
-            WebElement inputEl = textInputLoc.findElement(formRow(fieldKey));
+            WebElement inputEl = textInputLoc.waitForElement(formRow(fieldKey), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
         public Input textArea(String fieldKey)
         {
-            WebElement inputEl = Locator.textarea(fieldKey).findElement(formRow(fieldKey));
+            WebElement inputEl = Locator.textarea(fieldKey).waitForElement(formRow(fieldKey), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
         public Input numericInput(String fieldKey)
         {
-            WebElement inputEl = numberInputLoc.findElement(formRow(fieldKey));
+            WebElement inputEl = numberInputLoc.waitForElement(formRow(fieldKey), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
         public ReactDatePicker dateInput(String fieldKey)
         {
             return new ReactDatePicker.ReactDateInputFinder(getDriver())
-                    .withInputId(fieldKey).find(formRow(fieldKey));
+                    .withInputId(fieldKey).waitFor(formRow(fieldKey));
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");

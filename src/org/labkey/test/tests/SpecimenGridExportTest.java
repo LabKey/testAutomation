@@ -50,6 +50,7 @@ public class SpecimenGridExportTest extends AbstractExportTest
         SpecimenGridExportTest initTest = (SpecimenGridExportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), "Study");
+        initTest._containerHelper.enableModule("Specimen");
         initTest.importSpecimens();
     }
 
@@ -157,7 +158,7 @@ public class SpecimenGridExportTest extends AbstractExportTest
     @Override
     protected void goToDataRegionPage()
     {
-        beginAt("/" + getProjectName() + "/study-samples-samples.view?showVials=false");
+        beginAt("/" + getProjectName() + "/study-samples-specimens.view?showVials=false");
     }
 
     @Override

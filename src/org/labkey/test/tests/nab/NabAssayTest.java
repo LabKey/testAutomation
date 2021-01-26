@@ -30,7 +30,6 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.labkey.LabKeyAlert;
-import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
@@ -385,7 +384,8 @@ public class NabAssayTest extends AbstractAssayTest
         _customizeViewsHelper.removeColumn("VirusName");
         _customizeViewsHelper.saveCustomView("CustomDetailsView");
 
-        clickAndWait(Locator.linkContainingText("details").index(1));
+        DataRegionTable runsDataRegion = new DataRegionTable("Runs", getDriver());
+        clickAndWait(runsDataRegion.detailsLink(1));
         assertNabData();
 
         clickAndWait(Locator.linkWithText("View Runs"));
@@ -399,7 +399,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
         assertTextPresent("ptid 1 C");
-        String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
+        String ptid1c_detailsURL = getAttribute(DataRegionTable.detailsLinkLocator(), "href");
         // TODO: Cant get it to scroll to this filter option...
         region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
         assertTextPresent("ptid 1 A", "ptid 1 B");
@@ -414,7 +414,7 @@ public class NabAssayTest extends AbstractAssayTest
             clickButton("Next");
 
             region = new DataRegionTable("Data", this);
-            region.clickHeaderButton("Copy to Study");
+            region.clickHeaderButtonAndWait("Copy to Study");
             assertStudyData(4);
 
             assertAliasedAUCStudyData();
@@ -498,7 +498,7 @@ public class NabAssayTest extends AbstractAssayTest
         String portalUrl = WebTestHelper.buildURL("project", getProjectName() + "/" + TEST_ASSAY_FLDR_NAB_RENAME, "begin");
         beginAt(portalUrl); // Navigate away from folder that was just renamed
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        clickAndWait(Locator.linkContainingText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
 
         assertTextPresent("Description for NAb assay");
     }
@@ -735,7 +735,7 @@ public class NabAssayTest extends AbstractAssayTest
 
         log("verify ptid + visit + date");
         clickAndWait(Locator.linkWithText("ptid + visit + date"));
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
 
         assertTextPresent("&lt; 20", 10);
 
@@ -787,19 +787,19 @@ public class NabAssayTest extends AbstractAssayTest
         log("verify ptid + visit");
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("ptid + visit"));
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisit, "A");
 
         log("verify ptid + date");
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("ptid + date"));
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantDate, "C");
 
         log("verify ptid + visit + specimenid");
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("ptid + visit + specimenid"));
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
     }
 
@@ -842,7 +842,7 @@ public class NabAssayTest extends AbstractAssayTest
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("ptid + date"));
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
         DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantDate, "C");
 
@@ -858,7 +858,7 @@ public class NabAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         DataRegionTable dataRegionTable = new DataRegionTable("Runs", this);
-        dataRegionTable.findCell(0, 0).click();
+        clickAndWait(dataRegionTable.detailsLink(0));
 
         log("Got to the QC page.");
         DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);

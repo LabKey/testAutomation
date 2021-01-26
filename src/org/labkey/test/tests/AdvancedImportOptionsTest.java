@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -302,6 +301,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Create a new project to import the existing data into multiple folders.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
+        _containerHelper.enableModule(IMPORT_PROJECT_FILE01, "Specimen");
 
         log("Create subfolders and setup permissions.");
         _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI01);

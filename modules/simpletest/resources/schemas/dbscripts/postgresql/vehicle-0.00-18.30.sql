@@ -824,3 +824,9 @@ DROP TABLE vehicle.ownerbackup;
 /* vehicle-17.10-17.20.sql */
 
 ALTER TABLE vehicle.Colors ADD TriggerScriptProperty VARCHAR(100);
+
+/* vehicle-18.20-18.30.sql */
+
+ALTER TABLE vehicle.Models ADD ThumbnailImage VARCHAR(60);
+ALTER TABLE vehicle.Models ADD Image VARCHAR(60);
+ALTER TABLE vehicle.Models ADD PopupImage VARCHAR(60);

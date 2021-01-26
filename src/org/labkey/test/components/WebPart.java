@@ -64,7 +64,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
     }
 
     @Override
-    protected WebDriverWrapper getWrapper()
+    public WebDriverWrapper getWrapper()
     {
         return _wDriver;
     }

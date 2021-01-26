@@ -65,6 +65,12 @@ public class JUnitFooter extends BaseWebDriverTest
         // Skip normal check. Server-side tests might generate expected errors.
     }
 
+    @Override
+    protected void checkLeaks(Long leakCutoffTime)
+    {
+        super.checkLeaks(JUnitHeader.startTime);
+    }
+
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;

@@ -18,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     public Boolean isLoaded()
     {
-        return !Locators.loadingGrid.existsIn(this) &&
+        return getComponentElement().isDisplayed() &&
+                !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
                 Locator.tag("td").existsIn(this);
     }
@@ -197,7 +199,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param checked       True for checked, false for unchecked
      * @return
      */
-    public ResponsiveGrid selectRows(String columnLabel, List<String> texts, boolean checked)
+    public ResponsiveGrid selectRows(String columnLabel, Collection<String> texts, boolean checked)
     {
         for (String text : texts)
         {

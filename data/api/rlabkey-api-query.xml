@@ -150,7 +150,7 @@
                 s<-getSession(baseUrl=labkey.url.base, folderPath="/%projectName%")
                 scobj <- getSchema(s, "lists")
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
-                cols <- c(names(scobj$AllTypes)[9:13], names(lucols)[8:10])
+                cols <- c(names(scobj$AllTypes)[10:14], names(lucols)[9:11])
                 simpledf <- getRows(s, scobj$AllTypes, colSelect=paste(cols, sep=","), colNameOpt="caption")
                 simpledf
             ]]>

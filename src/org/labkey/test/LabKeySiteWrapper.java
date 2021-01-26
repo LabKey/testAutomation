@@ -103,7 +103,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
  */
 public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
-    private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
+    private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = TestProperties.getServerStartupTimeout();
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
@@ -997,6 +997,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void goToProjectHome(String projectName)
     {
         beginAt(buildURL("project", projectName, "begin"));
+    }
+
+    public void goToProjectFolder(String projectName, String subfolder)
+    {
+        beginAt(buildURL("project", projectName + "/" + subfolder, "begin"));
     }
 
     /**
