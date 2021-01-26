@@ -40,7 +40,10 @@ public abstract class WebDriverUtils
 
         public boolean scrollUnderFloatingHeader(WebElement blockedElement)
         {
-            List<WebElement> floatingHeaders = Locator.findElements(_webDriver, Locators.floatingHeaderContainer(), DataRegionTable.Locators.floatingHeader().notHidden());
+            List<WebElement> floatingHeaders = Locator.findElements(_webDriver,
+                Locators.floatingHeaderContainer(),
+                Locators.appFloatingHeader(),
+                DataRegionTable.Locators.floatingHeader().notHidden());
 
             int headerHeight = 0;
             for (WebElement floatingHeader : floatingHeaders)
