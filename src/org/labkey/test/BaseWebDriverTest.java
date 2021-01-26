@@ -60,6 +60,8 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
+import org.labkey.test.pages.query.NewQueryPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
@@ -2042,29 +2044,32 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
     {
-        String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
-        beginAt(queryURL);
-        createNewQuery(schemaName);
-        waitForElement(Locator.name("ff_newQueryName"));
-        setFormElement(Locator.name("ff_newQueryName"), name);
-        clickButton("Create and Edit Source", 0);
-        waitForElement(Locators.bodyTitle("Edit " + name));
+        SourceQueryPage sourcePage = createQuery(container, name, schemaName);
+        sourcePage.setSource(sql);
         setCodeEditorValue("queryText", sql);
         if (xml != null)
         {
-            _ext4Helper.clickExt4Tab("XML Metadata");
-            setCodeEditorValue("metadataText", xml);
+            sourcePage.setMetadataXml(xml);
         }
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        sourcePage.clickSave();
         if (inheritable)
         {
+            String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
             beginAt(queryURL);
             editQueryProperties(schemaName, name);
             selectOptionByValue(Locator.name("inheritable"), "true");
             clickButton("Save");
         }
+    }
+
+    @NotNull
+    protected SourceQueryPage createQuery(String container, String name, String schemaName)
+    {
+        SourceQueryPage sourceQueryPage = NewQueryPage.beginAt(this, container, schemaName)
+            .setName(name)
+            .clickCreate();
+        waitForElement(Locators.bodyTitle("Edit " + name));
+        return sourceQueryPage;
     }
 
     public void validateQueries(boolean validateSubfolders, int waitTime)
