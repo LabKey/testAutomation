@@ -317,17 +317,20 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         chartWizard.clickEdit();
         SaveChartDialog saveChartDialog = chartWizard.clickSave();
 
+        // Functions to try and help debug failure on TeamCity. The thumbnail doesn't get set all the time. Most failures are on Windows agents.
         checker().takeScreenShot("setThumbnailTypeToAuto_SaveDialogBeforeSaving");
         saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
         checker().takeScreenShot("setThumbnailTypeToAuto_ReportPageAfterSave");
 
+        // An attempt to make sure the thumbnail has been set.
         log("Open the save dialog again and validate that auto is selected.");
         saveChartDialog = chartWizard.clickSave();
 
         checker().verifyTrue("It doesn't look like auto is selected as the thumbnail type.",
                 saveChartDialog.getThumbnailType().equals(SaveChartDialog.ThumbnailType.auto));
 
+        // One last screen shot to help with debugging the failure on TeamCity.
         checker().takeScreenShot("setThumbnailTypeToAuto_SaveDialogOpenedAgain");
     }
 

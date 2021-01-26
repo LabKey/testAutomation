@@ -63,6 +63,8 @@ public class SaveChartDialog extends Window<SaveChartDialog.Elements>
                 break;
         }
 
+        // Just a sanity check to make sure the radio buttonis checked.
+        // Here to help with debugging issue with thumbnail images.
         radioButton.check();
         WebDriverWrapper.waitFor(radioButton::isChecked, "The thumbnail option was not checked.", 500);
 
