@@ -7,7 +7,7 @@
   </datasets>
   <comments/>
   <qcStates showPrivateDataByDefault="true"/>
-  <specimens repositoryType="STANDARD" dir="specimens" file="StudyContainerTabStudy.specimens"/>
+  <specimens dir="specimens" file="StudyContainerTabStudy.specimens"/>
   <visits file="visit_map.xml"/>
   <studyDescription rendererType="TEXT_WITH_LINKS">
     <description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
