@@ -7,6 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.TestLogger;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Category({Git.class})
+@Category({Git.class, BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class AdminConsoleNavigationTest extends BaseWebDriverTest
 {
