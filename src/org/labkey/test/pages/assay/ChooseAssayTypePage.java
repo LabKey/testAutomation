@@ -1,19 +1,13 @@
 package org.labkey.test.pages.assay;
 
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.biologics.AppAssayDesignerPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 
 public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementCache>
 {
