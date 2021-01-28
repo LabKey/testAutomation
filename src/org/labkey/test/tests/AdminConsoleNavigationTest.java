@@ -29,7 +29,16 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     public void testAdminNavTrails()
     {
         Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-        ignoredLinks.addAll(List.of("Dump Heap", "Reset Site Errors", "View All Site Errors", "View All Site Errors Since Reset", "View Primary Site Log File"));
+        ignoredLinks.addAll(List.of(
+            "LDAP Sync Admin",                  // An HTML view -- difficult to customize navtrail
+            "Change User Properties",           // Generic domain action -- difficult to customize navtrail
+            "Site-Wide Terms of Use",           // Standard wiki action -- difficult to customize navtrail
+            "Dump Heap",                        // Undesired consequences
+            "Reset Site Errors",                // Undesired consequences
+            "View All Site Errors",             // No nav trail
+            "View All Site Errors Since Reset", // No nav trail
+            "View Primary Site Log File"        // No nav trail
+        ));
         ShowAdminPage.beginAt(this);
         WebElement adminLinksContainer = Locator.id("links").findElement(getDriver()); // Maybe put this in 'ShowAdminPage'
         List<WebElement> adminLinks = Locator.tag("a").findElements(adminLinksContainer);
