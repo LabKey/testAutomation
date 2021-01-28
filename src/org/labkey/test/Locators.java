@@ -37,6 +37,11 @@ public abstract class Locators
         return headerContainer().withClass("box-shadow");
     }
 
+    public static Locator.XPathLocator appFloatingHeader()
+    {
+        return Locator.tag("div").withClasses("app-header-wrapper", "scrolled");
+    }
+
     public static Locator.XPathLocator bodyPanel()
     {
         return Locator.tagWithClass("div", "lk-body-ct");

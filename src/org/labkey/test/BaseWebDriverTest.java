@@ -314,8 +314,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         SingletonWebDriver.getInstance().tearDown(closeWindow || isTestRunningOnTeamCity());
     }
 
+    private void clearLastPageInfo()
+    {
+        _lastPageTitle = null;
+        _lastPageURL = null;
+        _lastPageText = null;
+    }
+
     private void populateLastPageInfo()
     {
+        clearLastPageInfo();
         _lastPageTitle = getLastPageTitle();
         _lastPageURL = getLastPageURL();
         _lastPageText = getLastPageText();
@@ -968,6 +976,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             if (isTestRunningOnTeamCity()) // Don't risk modifying browser state when running locally
             {
+                clearLastPageInfo(); // Make sure server error screenshot doesn't reuse cached page text
                 // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
                 checker().withScreenshot(testName + "_serverErrors").wrapAssertion(this::checkErrors);
             }
