@@ -1,0 +1,473 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="getPipelineContainer" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getPipelineContainer(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $webDavURL
+                [1] "/labkey/_webdav/RlabkeyTest%20Project/%40files/"
+                $containerPath
+                [1] "/RlabkeyTest Project"
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - success saveProtocol TRUE" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 1",
+                    path="/",
+                    files=list("sample.txt"),
+                    protocolDescription = "test prot desc",
+                    pipelineDescription = "test pipe desc",
+                    jsonParameters = list(x = 1, y = 2),
+                    saveProtocol = TRUE
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $jobGUID
+                $status
+                [1] "success"
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - success saveProtocol FALSE" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 2",
+                    path="/",
+                    files=list("sample.txt"),
+                    protocolDescription = "test prot desc",
+                    pipelineDescription = "test pipe desc",
+                    jsonParameters = list(x = 1, y = 2),
+                    saveProtocol = FALSE
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $jobGUID
+                $status
+                [1] "success"
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - missing parameter definition" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 3", #using a new protocol name
+                    path="/",
+                    files=list("sample.txt")
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Error message = Parameters must be defined, either as XML or JSON
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - invalid file name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
+                    path="/",
+                    files=list("BOGUS.txt")
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Error message = Could not find file 'BOGUS.txt' in '/'
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - invalid xmlParameters type" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
+                    path="/",
+                    files=list("sample.txt"),
+                    xmlParameters = list(x = 1)
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                The xml configuration is deprecated, please use the jsonParameters option to specify your protocol description.
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - invalid jsonParameters type" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
+                    path="/",
+                    files=list("sample.txt"),
+                    jsonParameters = 123
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                The jsonParameters parameter must be a list of key / value pairs or a string representation of that list created using toJSON.
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - invalid jsonParameters for existing protocol" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
+                    path="/",
+                    files=list("sample.txt"),
+                    jsonParameters = list(x = 1)
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Error message = Cannot redefine an existing protocol
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - invalid to have both xmlParameters and jsonParameters" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 3", #using a new protocol name
+                    path="/",
+                    files=list("sample.txt"),
+                    xmlParameters = "{\"x\": 1}",
+                    jsonParameters = list(x = 1)
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Error message = The parameters should be defined as XML or JSON, not both
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - invalid to have neither xmlParameters and jsonParameters" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 3", #using a new protocol name
+                    path="/",
+                    files=list("sample.txt"),
+                    saveProtocol = TRUE
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Error message = Parameters must be defined, either as XML or JSON
+            ]]>
+        </response>
+    </test>
+
+    <test name="startAnalysis - valid retry pipeline job" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.startAnalysis(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
+                    path="/",
+                    files=list("sample.txt"),
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $jobGUID
+                $status
+                [1] "success"
+            ]]>
+        </response>
+    </test>
+
+    <test name="getProtocols - missing taskId parameter" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getProtocols(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                A value must be specified for taskId.
+            ]]>
+        </response>
+    </test>
+
+    <test name="getProtocols - invalid taskId" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getProtocols(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:BOGUS",
+                    path = "/"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 404, Error message = The pipeline 'pipelinetest:pipeline:BOGUS' was not found.
+            ]]>
+        </response>
+    </test>
+
+    <test name="getProtocols - invalid path" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getProtocols(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "BOGUS"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                HTTP request was unsuccessful. Status code = 404, Error message = Could not resolve path: BOGUS
+            ]]>
+        </response>
+    </test>
+
+    <test name="getProtocols - valid response for saved protocols" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getProtocols(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "/"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $protocols[[1]]$jsonParameters$x
+                [1] "1"
+                $protocols[[1]]$jsonParameters$y
+                [1] "2"
+                $protocols[[1]]$name
+                [1] "Rlabkey RCopy Test 1"
+                $protocols[[1]]$description
+                [1] "test prot desc"
+                $protocols[[1]]$containerPath
+                [1] "/RlabkeyTest Project"
+
+                $protocols[[2]]$jsonParameters$x
+                [1] "1"
+                $protocols[[2]]$jsonParameters$y
+                [1] "2"
+                $protocols[[2]]$name
+                [1] "Rlabkey RCopy Test 2"
+                $protocols[[2]]$description
+                [1] "test prot desc"
+                $protocols[[2]]$containerPath
+                [1] "/RlabkeyTest Project"
+
+                $defaultProtocolName
+                [1] "Rlabkey RCopy Test 1"
+            ]]>
+        </response>
+    </test>
+
+    <test name="getFileStatus - missing files parameter" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getFileStatus(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "/",
+                    protocolName = "Rlabkey RCopy Test 1"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                A value must be specified for files.
+            ]]>
+        </response>
+    </test>
+
+    <test name="getFileStatus - invalid files parameter type" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getFileStatus(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "/",
+                    protocolName = "Rlabkey RCopy Test 1",
+                    files = "BOGUS.txt"
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                The files parameter must be a list of strings.
+            ]]>
+        </response>
+    </test>
+
+    <test name="getFileStatus - unknown protocolName" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getFileStatus(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "/",
+                    protocolName = "BOGUS",
+                    files = list("sample.txt")
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $submitType
+                [1] "Retry"
+
+                $files[[1]]$name
+                [1] "sample.txt"
+
+                $files[[1]]$status
+                [1] "UNKNOWN"
+            ]]>
+        </response>
+    </test>
+
+    <test name="getFileStatus - unknown file name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getFileStatus(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "/",
+                    protocolName = "Rlabkey RCopy Test 1",
+                    files = list("BOGUS.txt")
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $submitType
+                [1] "Analyze"
+
+                $files[[1]]$name
+                [1] "BOGUS.txt"
+
+                $files[[1]]$status
+                NULL
+            ]]>
+        </response>
+    </test>
+
+    <test name="getFileStatus - valid file name" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.pipeline.getFileStatus(
+                    baseUrl=labkey.url.base,
+                    folderPath="%projectName%",
+                    taskId = "pipelinetest:pipeline:r-copy",
+                    path = "/",
+                    protocolName = "Rlabkey RCopy Test 1",
+                    files = list("sample.txt")
+                )
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $submitType
+                [1] "Retry"
+
+                $files[[1]]$name
+                [1] "sample.txt"
+
+                $files[[1]]$status
+                [1] "COMPLETE"
+            ]]>
+        </response>
+    </test>
+</ApiTests>
