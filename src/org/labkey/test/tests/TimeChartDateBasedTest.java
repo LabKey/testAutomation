@@ -77,7 +77,6 @@ public class TimeChartDateBasedTest extends TimeChartTest
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Views");
         portalHelper.addWebPart("Datasets");
-        portalHelper.addWebPart("Specimens");
     }
 
     @Override

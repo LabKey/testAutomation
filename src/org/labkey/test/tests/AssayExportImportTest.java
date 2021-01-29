@@ -29,6 +29,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
@@ -391,7 +392,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_01);
 
         goToFolderManagement().goToExportTab();
-        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input")
+        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS).precedingSibling("input")
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
         new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
@@ -497,7 +498,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_02);
 
         goToFolderManagement().goToExportTab();
-        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS).precedingSibling("input").findElement(getDriver())).check();
         new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
@@ -569,7 +570,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_03);
 
         goToFolderManagement().goToPane("tabexport");
-        new Checkbox(Locator.tagWithText("label", "Experiments and runs").precedingSibling("input").findElement(getDriver())).check();
+        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS).precedingSibling("input").findElement(getDriver())).check();
         new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
