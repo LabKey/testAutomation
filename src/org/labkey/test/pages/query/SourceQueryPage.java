@@ -41,7 +41,6 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
     public SourceQueryPage setSource(String sql)
     {
         viewSource();
-        setCodeEditorValue("queryText", "");
         setCodeEditorValue("queryText", sql);
         return this;
     }
