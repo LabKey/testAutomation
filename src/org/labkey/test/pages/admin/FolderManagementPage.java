@@ -57,19 +57,10 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new FileRootsManagementPage(getDriver());
     }
 
-    /**
-     * @deprecated Renamed {@link #goToFilesTab()}
-     */
-    @Deprecated
-    public FileRootsManagementPage goToFilesPane()
-    {
-        return goToFilesTab();
-    }
-
-    public FileRootsManagementPage goToRConfigTab()
+    public RConfigurationPage goToRConfigTab()
     {
         selectTab("rConfig");
-        return new FileRootsManagementPage(getDriver());
+        return new RConfigurationPage(getDriver());
     }
 
     public FolderTypePage goToFolderTypeTab()
