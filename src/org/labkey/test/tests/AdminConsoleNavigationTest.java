@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Category({Git.class, BVT.class})
+@Category({Git.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class AdminConsoleNavigationTest extends BaseWebDriverTest
 {
