@@ -183,7 +183,7 @@ public class StartImportPage extends LabKeyPage
         CustomViews("Custom Views"),
         DatasetData("Dataset Data"),
         DatasetDefinitions("Dataset Definitions"),
-        ExperimentsAndRuns("Experiments and runs"),
+        ExperimentsAndRuns("Experiments, Protocols, and Runs"),
         ExternalSchemaDefinitions("External schema definitions"),
         FolderTypeAndActiveModules("Folder type and active modules"),
         FullTextSearchSettings("Full-text search settings"),

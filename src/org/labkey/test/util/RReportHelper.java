@@ -28,6 +28,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
+import org.labkey.test.pages.admin.RConfigurationPage;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -277,64 +278,29 @@ public class RReportHelper
         ensureFolderREngine(engineName, engineName);
     }
 
-    public void ensureFolderREngine(String reportEngineName, String pipelineEngineName)
+    @LogMethod
+    public void ensureFolderREngine(@LoggedParam String reportEngineName, @LoggedParam String pipelineEngineName)
     {
-        _test.goToFolderManagement().goToRConfigTab();
-        Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
-        Locator overrideRadio = Locator.radioButtonByNameAndValue("overrideDefault", "override");
-
-        if (_test.isChecked(inheritRadio))
-            _test.checkRadioButton(overrideRadio);
-
-        assertTrue(reportEngineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", reportEngineName)));
-        assertTrue(pipelineEngineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", pipelineEngineName)));
-
-        Locator overrideReportEngineSelect = Locator.name("reportEngine");
-        Locator overridePipelineEngineSelect = Locator.name("pipelineEngine");
-        boolean changed = false;
-        if (reportEngineName.equals(_test.getSelectedOptionText(overrideReportEngineSelect).trim()))
+        RConfigurationPage rConfigurationPage = _test.goToFolderManagement().goToRConfigTab();
+        rConfigurationPage.setEngineOverrides(reportEngineName, pipelineEngineName);
+        if (rConfigurationPage.isSaveEnabled())
         {
-            _test.log(reportEngineName + "engine is already selected as default Report engine for folder");
-        }
-        else
-        {
-            changed = true;
-            _test.log("Change folder's Report engine to " + reportEngineName);
-            _test.selectOptionByText(overrideReportEngineSelect, reportEngineName);
-        }
-
-        if (pipelineEngineName.equals(_test.getSelectedOptionText(overridePipelineEngineSelect).trim()))
-        {
-            _test.log(pipelineEngineName + "engine is already selected as default Pipeline engine for folder");
-        }
-        else
-        {
-            changed = true;
-            _test.log("Change folder's Pipeline engine to " + pipelineEngineName);
-            _test.selectOptionByText(overridePipelineEngineSelect, pipelineEngineName);
-        }
-
-        if (changed)
-        {
-            _test.clickButton("Save", "Override Default R Configuration");
-            _test.sleep(1000);
-            _test.clickButton("Yes");
+            rConfigurationPage.save();
         }
     }
 
     public void resetFolderREngine()
     {
-        _test.goToFolderManagement().goToRConfigTab();
-        Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
+        RConfigurationPage rConfigurationPage = _test.goToFolderManagement().goToRConfigTab();
 
-        if (_test.isChecked(inheritRadio))
+        if (rConfigurationPage.isConfigInherited())
+        {
             return;
+        }
 
         _test.log("Remove folder's engine override.");
-        _test.checkRadioButton(inheritRadio);
-
-        _test.clickButton("Save", "Override Default R Configuration");
-        _test.clickButton("Yes");
+        rConfigurationPage.setInheritConfiguration();
+        rConfigurationPage.save();
     }
 
     public void setPandocEnabled(Boolean enabled)

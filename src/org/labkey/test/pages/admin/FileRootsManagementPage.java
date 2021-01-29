@@ -22,7 +22,6 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PipelineStatusTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -46,15 +45,6 @@ public class FileRootsManagementPage extends FolderManagementPage
     {
         wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath, "fileRoots"));
         return new FileRootsManagementPage(wrapper.getDriver());
-    }
-
-    /**
-     * @deprecated Renamed to {@link #selectFileRootType(FileRootOption)}
-     */
-    @Deprecated
-    public FileRootsManagementPage setFileRoot(FileRootOption fileRootOption)
-    {
-        return selectFileRootType(fileRootOption);
     }
 
     public FileRootsManagementPage selectFileRootType(FileRootOption fileRootOption)

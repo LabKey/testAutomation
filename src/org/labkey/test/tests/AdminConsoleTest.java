@@ -235,8 +235,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-          AdminConsoleTest initTest = (AdminConsoleTest)getCurrentTest();
-          initTest.createTestUser();
+        AdminConsoleTest initTest = (AdminConsoleTest)getCurrentTest();
+        initTest.createTestUser();
     }
 
     @Override
