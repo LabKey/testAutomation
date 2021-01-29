@@ -36,6 +36,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
@@ -636,7 +637,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         goToFolderManagement()
                 .goToExportTab();
 
-        Checkbox checkbox = new Checkbox(Locator.tagWithText("label", "Experiments and runs")
+        Checkbox checkbox = new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
                 .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
         checkbox.check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
