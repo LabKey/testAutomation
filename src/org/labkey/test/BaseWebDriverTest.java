@@ -1586,9 +1586,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void assertNavTrail(String... links)
     {
+        verifyNavTrail(true, links);
+    }
+
+    public boolean verifyNavTrail(boolean throwOnNoMatch, String... links)
+    {
+        Locator navTrailLocator = Locator.tagWithClass("ol", "breadcrumb");
+        boolean exists = navTrailLocator.existsIn(getDriver());
+
+        if (!exists)
+        {
+            if (throwOnNoMatch)
+                fail("NavTrail does not exist");
+            else
+                return false;
+        }
+
+        String navTrailText = navTrailLocator.findElement(getDriver()).getText();
         String expectedNavTrail = String.join("", links);
-        String navTrail = Locator.tagWithClass("ol", "breadcrumb").findElement(getDriver()).getText();
-        assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
+
+        if (throwOnNoMatch)
+            assertEquals("Nav trail does not match", expectedNavTrail, navTrailText);
+
+        return expectedNavTrail.equals(navTrailText);
     }
 
     public void clickTab(String tabname)
