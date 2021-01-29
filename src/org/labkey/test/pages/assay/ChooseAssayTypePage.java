@@ -5,7 +5,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -30,17 +29,8 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     @Override
     protected void waitForPage()
     {
-        waitFor(() -> {
-            try
-            {
-                return elementCache().stdAssayTabLocator().existsIn(getDriver()) &&
-                        elementCache().specialtyAssayTabLocator().existsIn(getDriver());
-            }
-            catch (NoSuchElementException retry)
-            {
-                return false;
-            }
-        }, WAIT_FOR_PAGE);
+        waitFor(() -> elementCache().stdAssayTabLocator().existsIn(getDriver()) &&
+                elementCache().specialtyAssayTabLocator().existsIn(getDriver()), WAIT_FOR_PAGE);
     }
 
 
