@@ -75,7 +75,8 @@ public abstract class AbstractAssayHelper
     {
         _test.clickButton("New Assay Design");
 
-        ReactAssayDesignerPage assayDesigner = new ChooseAssayTypePage(_test.getDriver()).selectAssayType(type);
+        ChooseAssayTypePage chooseAssayTypePage = new ChooseAssayTypePage(_test.getDriver());
+        ReactAssayDesignerPage assayDesigner = chooseAssayTypePage.selectAssayType(type);
         assayDesigner.setName(name);
         return assayDesigner;
     }
