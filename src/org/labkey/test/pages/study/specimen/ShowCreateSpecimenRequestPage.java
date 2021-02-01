@@ -21,7 +21,7 @@ public class ShowCreateSpecimenRequestPage extends LabKeyPage<ShowCreateSpecimen
 
     public static ShowCreateSpecimenRequestPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "showCreateSpecimenRequest"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen", containerPath, "showCreateSpecimenRequest"));
         return new ShowCreateSpecimenRequestPage(webDriverWrapper.getDriver());
     }
 
