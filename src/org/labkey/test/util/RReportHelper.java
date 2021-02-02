@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Checkbox;
@@ -527,8 +526,7 @@ public class RReportHelper
     public void clickReportTab()
     {
         _test.waitAndClick(Ext4Helper.Locators.tab("Report"));
-        Locator.XPathLocator reportLoc = Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])");
-        Locator.waitForAnyElement(_test.longWait(), reportLoc, Locators.labkeyError);
+        _test.waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void clickSourceTab()
