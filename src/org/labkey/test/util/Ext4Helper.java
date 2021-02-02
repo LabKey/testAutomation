@@ -666,7 +666,7 @@ public class Ext4Helper
 
     public void clickTabContainingText(String tabText)
     {
-        _test.click(Locators.tab(tabText));
+        _test.click(Locators.tab().containing(tabText));
     }
 
     public void waitForMaskToDisappear()
@@ -886,7 +886,7 @@ public class Ext4Helper
 
         public static Locator.XPathLocator tab(String tabName)
         {
-            return tab().containing(tabName);
+            return tab().withText(tabName);
         }
 
         public static Locator.XPathLocator ext4Button(String text)
