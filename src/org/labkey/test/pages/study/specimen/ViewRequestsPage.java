@@ -21,7 +21,7 @@ public class ViewRequestsPage extends LabKeyPage<ViewRequestsPage.ElementCache>
 
     public static ViewRequestsPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "viewRequests"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen", containerPath, "viewRequests"));
         return new ViewRequestsPage(webDriverWrapper.getDriver());
     }
 

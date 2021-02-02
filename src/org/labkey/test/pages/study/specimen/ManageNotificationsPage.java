@@ -32,7 +32,7 @@ public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.
 
     public static ManageNotificationsPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "manageNotifications"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen", containerPath, "manageNotifications"));
         return new ManageNotificationsPage(webDriverWrapper.getDriver());
     }
 
