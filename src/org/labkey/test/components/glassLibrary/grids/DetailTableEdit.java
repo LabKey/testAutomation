@@ -1,5 +1,6 @@
 package org.labkey.test.components.glassLibrary.grids;
 
+import org.eclipse.core.runtime.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
@@ -164,38 +165,24 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setBooleanField(String fieldCaption, boolean value)
     {
 
-        if(isFieldEditable(fieldCaption))
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
+        Assert.isTrue(isEditableField(fieldValueElement), String.format("Field '%s' is not editable, and cannot be set.", fieldCaption));
+
+        // The text used in the field caption and the value of the name attribute in the checkbox don't always have the same case.
+        WebElement editableElement = fieldValueElement.findElement(Locator.tagWithAttributeIgnoreCase("input", "name", fieldCaption));
+        String elementType = editableElement.getAttribute("type").toLowerCase().trim();
+
+        Assert.isTrue(elementType.equals("checkbox"), String.format("Field '%s' is not a checkbox, cannot be set to true/false.", fieldCaption));
+
+        Checkbox checkbox = new Checkbox(editableElement);
+
+        if(!value)
         {
-
-            WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
-
-            WebElement editableElement = fieldValueElement.findElement(Locator.tagWithName("input", fieldCaption.toLowerCase()));
-            String elementType = editableElement.getAttribute("type").toLowerCase().trim();
-
-            if(elementType.equals("checkbox"))
-            {
-                Checkbox checkbox = new Checkbox(editableElement);
-
-                if(checkbox.isChecked() && !value)
-                {
-                    // If value is false and the checkbox is checked, uncheck it.
-                    checkbox.check();
-                }
-                else if(!checkbox.isChecked() && value)
-                {
-                    // If value is true and the checkbox is not checked, check it.
-                    checkbox.check();
-                }
-
-            }
-            else
-            {
-                throw new NoSuchElementException("Field '" + fieldCaption + "' is not a checkbox, cannot be set to true/false.");
-            }
+            checkbox.uncheck();
         }
         else
         {
-            throw new IllegalArgumentException("Field with caption '" + fieldCaption + "' is read-only. This field can not be set.");
+            checkbox.check();
         }
 
         return this;
