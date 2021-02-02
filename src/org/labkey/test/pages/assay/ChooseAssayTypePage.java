@@ -62,8 +62,9 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         waitForElementToBeVisible(elementCache().specialtySelectLocator);
         selectOptionByText(elementCache().specialtySelect, name);
 
-        waitFor(()-> elementCache().selectButton.getText().toLowerCase().contains(name),
-            "took too long to update", 2000);
+        waitFor(()->
+           elementCache().selectButton.getText().toLowerCase().contains(name.toLowerCase()),
+            String.format("took too long for the select button text to contain the assay name [%s].", name), 2000);
 
         clickSelectButton();
         return new ReactAssayDesignerPage(getDriver());
