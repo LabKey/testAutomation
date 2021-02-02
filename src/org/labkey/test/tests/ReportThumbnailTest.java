@@ -194,14 +194,14 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         setThumbnailSRC(BOX_PLOT);
-        toggleThumbnailType(BOX_PLOT, true);
+        setThumbnailTypeToAuto(BOX_PLOT);
         assertNewThumbnail(BOX_PLOT);
         assignCustomThumbnail(BOX_PLOT, TEST_THUMBNAIL, 1, 2);
         assertNewThumbnail(BOX_PLOT);
 
         goToDataViews();
         setThumbnailSRC(SCATTER_PLOT);
-        toggleThumbnailType(SCATTER_PLOT, true);
+        setThumbnailTypeToAuto(SCATTER_PLOT);
         assertNewThumbnail(SCATTER_PLOT);
         assignCustomThumbnail(SCATTER_PLOT, TEST_THUMBNAIL, 1, 2);
         assertNewThumbnail(SCATTER_PLOT);
@@ -310,15 +310,28 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void toggleThumbnailType(String chart, boolean useAutoThumbnail)
+    protected void setThumbnailTypeToAuto(String chart)
     {
         clickAndWait(Locator.linkWithText(chart));
         TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
         chartWizard.clickEdit();
         SaveChartDialog saveChartDialog = chartWizard.clickSave();
 
+        // Functions to try and help debug failure on TeamCity. The thumbnail doesn't get set all the time. Most failures are on Windows agents.
+        checker().takeScreenShot("setThumbnailTypeToAuto_SaveDialogBeforeSaving");
         saveChartDialog.setThumbnailType(SaveChartDialog.ThumbnailType.auto);
         saveChartDialog.clickSave();
+        checker().takeScreenShot("setThumbnailTypeToAuto_ReportPageAfterSave");
+
+        // An attempt to make sure the thumbnail has been set.
+        log("Open the save dialog again and validate that auto is selected.");
+        saveChartDialog = chartWizard.clickSave();
+
+        checker().verifyTrue("It doesn't look like auto is selected as the thumbnail type.",
+                saveChartDialog.getThumbnailType().equals(SaveChartDialog.ThumbnailType.auto));
+
+        // One last screen shot to help with debugging the failure on TeamCity.
+        checker().takeScreenShot("setThumbnailTypeToAuto_SaveDialogOpenedAgain");
     }
 
     @LogMethod
@@ -349,20 +362,20 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     @LogMethod
     protected void verifyThumbnail(String chart, String expected)
     {
+        // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
+        sleep(500);
         goToDataViews();
         waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
-        sleep(500);
         mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
-        // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         String thumbnailData;
         thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 
         if (null == expected)
-            assertFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailStillDefault").verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
         else
-            assertTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailNotPersisted").verifyTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
                     new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
 
         THUMBNAIL_DATA = thumbnailData;
@@ -378,7 +391,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        assertEquals("Thumbnail Revision number is not correct", String.valueOf(currentRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+        checker().verifyEquals("Thumbnail Revision number is not correct", String.valueOf(currentRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
@@ -387,7 +400,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        assertEquals("Thumbnail Revision number is not correct", String.valueOf(nextRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+        checker().verifyEquals("Thumbnail Revision number is not correct", String.valueOf(nextRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
     }
