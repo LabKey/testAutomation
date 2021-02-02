@@ -1,6 +1,6 @@
 package org.labkey.test.components.glassLibrary.grids;
 
-import org.eclipse.core.runtime.Assert;
+import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
@@ -166,24 +166,17 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
 
         WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
-        Assert.isTrue(isEditableField(fieldValueElement), String.format("Field '%s' is not editable, and cannot be set.", fieldCaption));
+        Assert.assertTrue(String.format("Field '%s' is not editable and cannot be set.", fieldCaption), isEditableField(fieldValueElement));
 
         // The text used in the field caption and the value of the name attribute in the checkbox don't always have the same case.
         WebElement editableElement = fieldValueElement.findElement(Locator.tagWithAttributeIgnoreCase("input", "name", fieldCaption));
         String elementType = editableElement.getAttribute("type").toLowerCase().trim();
 
-        Assert.isTrue(elementType.equals("checkbox"), String.format("Field '%s' is not a checkbox, cannot be set to true/false.", fieldCaption));
+        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be set to true/false.", fieldCaption), "checkbox", elementType);
 
         Checkbox checkbox = new Checkbox(editableElement);
 
-        if(!value)
-        {
-            checkbox.uncheck();
-        }
-        else
-        {
-            checkbox.check();
-        }
+        checkbox.set(value);
 
         return this;
     }
