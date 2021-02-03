@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -430,18 +431,24 @@ public class RReportHelper
 
     public void saveReportWithName(String name, boolean isSaveAs, boolean isExternal)
     {
-        String windowTitle = isExternal ? "Create New Report" : isSaveAs ? "Save Report As" : "Save Report";
-        Locator locator = Ext4Helper.Locators.window(windowTitle).append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
-        _test.waitForElement(locator);
-        if (_test.isElementPresent(locator))
+        String windowTitle;
+        if (isExternal)
         {
-            _test.setFormElement(locator, name);
-            Window window = new Window(windowTitle, _test.getWrappedDriver());
-            if (isExternal)
-                window.clickButton("OK", 0);
-            else
-                window.clickButton("OK");
+            windowTitle = "Create New Report";
         }
+        else
+        {
+            windowTitle = isSaveAs ? "Save Report As" : "Save Report";
+        }
+
+        Window<?> window = new Window<>(windowTitle, _test.getWrappedDriver());
+        WebElement nameInput = Locator.xpath("//input[contains(@class, 'x4-form-field')]").findElement(window);
+        _test.setFormElement(nameInput, name);
+        _test.waitForFormElementToEqual(nameInput, name); // Make sure it sticks
+        if (isExternal)
+            window.clickButton("OK", 0);
+        else
+            window.clickButton("OK");
     }
 
     public void saveReport(String name)
@@ -491,7 +498,7 @@ public class RReportHelper
     public void clickSourceTab()
     {
         _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
-        _test.waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), WAIT_FOR_PAGE);
     }
 
     public void ensureFieldSetExpanded(String name)
@@ -571,11 +578,11 @@ public class RReportHelper
      */
     public WebElement assertKnitrReportContents(Locator[] reportContains, String[] reportNotContains)
     {
-        WebElement reportDiv = _test.waitForElement(Locator.css("div.reportView > div.labkey-knitr"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        WebElement reportDiv = _test.waitForElement(Locator.css("div.reportView > div.labkey-knitr"), WAIT_FOR_PAGE);
 
         for (Locator contains : reportContains)
         {
-            contains.waitForElement(reportDiv, BaseWebDriverTest.WAIT_FOR_PAGE);
+            contains.waitForElement(reportDiv, WAIT_FOR_PAGE);
         }
 
         if (reportNotContains != null)
