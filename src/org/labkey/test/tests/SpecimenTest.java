@@ -194,7 +194,7 @@ public class SpecimenTest extends SpecimenBaseTest
         clickButton("Submit");
     }
 
-    private static String[] requestColumns = {"Locked In Request", "Requestable", "Available", "Availability Reason", "Locked In Request Count", "Available Count", "Expected Available Count"};
+    private static final String[] requestColumns = {"Locked In Request", "Requestable", "Available", "Availability Reason", "Locked In Request Count", "Available Count", "Expected Available Count"};
 
     private void verifyRequestEnabled()
     {
@@ -730,7 +730,7 @@ public class SpecimenTest extends SpecimenBaseTest
 
     private void verifySpecimenAttachmentOptionChecked(SpecimensAttachment option)
     {
-        assertTitleEquals("Manage Study");
+        assertTitleContains("Manage Study: /" + getProjectName() + "/" + getFolderName());
         waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
         ManageNotificationsPage manageNotificationsPage = new ManageNotificationsPage(getDriver());
         assertTrue(manageNotificationsPage.isSpecimenAttachmentTypeChecked(option));
