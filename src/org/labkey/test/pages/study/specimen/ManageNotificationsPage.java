@@ -100,6 +100,12 @@ public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.
         return this;
     }
 
+    public boolean isSpecimenAttachmentTypeChecked(SpecimensAttachment option)
+    {
+        scrollIntoView(elementCache().saveButton); // Make sure radio buttons are fully in view
+        return elementCache().specimensAttachmentRadio(option).isChecked();
+    }
+
     public void clickSave()
     {
         clickAndWait(elementCache().saveButton);
