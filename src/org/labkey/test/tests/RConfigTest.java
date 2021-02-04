@@ -29,19 +29,21 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
+import org.labkey.test.pages.admin.RConfigurationPage;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.not;
+
 @Category({DailyB.class})
 public class RConfigTest extends BaseWebDriverTest
 {
-    private String DEFAULT_ENGINE_NAME = "R Scripting Engine";
-    private String SECONDARY_ENGINE_NAME = "R Scripting Engine 2";
-    private String DISABLED_ENGINE_NAME = "Disabled Engine";
-
-    private static final String DEFAULT_PARENT_LABEL = "Reports : R Scripting Engine\nPipeline Jobs : R Scripting Engine";
-    private static final String SECONDARY_PARENT_LABEL = "Reports : R Scripting Engine 2\nPipeline Jobs : R Scripting Engine 2";
+    private static final String DEFAULT_ENGINE_NAME = "R Scripting Engine";
+    private static final String SECONDARY_ENGINE_NAME = "R Scripting Engine 2";
+    private static final String DISABLED_ENGINE_NAME = "Disabled Engine";
 
     private String FOLDER_NAME = "subfolder";
 
@@ -118,31 +120,30 @@ public class RConfigTest extends BaseWebDriverTest
     {
         log("Navigate to 'R Config' tab in folder management page");
         goToProjectHome();
-        goToFolderManagement().goToRConfigTab();
+        RConfigurationPage rConfigurationPage = goToFolderManagement().goToRConfigTab();
 
+        checker().verifyFalse("Save button should be initially disabled", rConfigurationPage.isSaveEnabled());
         log("Verify folder is inheriting the correct parent R configuration");
-        Assert.assertEquals("Folder is not inheriting the correct parent R configuration",DEFAULT_PARENT_LABEL, getText(Locator.id("parentConfigLabel")));
-        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("overrideDefault", "parent"));
-        assertAttributeContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
+        checker().verifyEquals("Folder is not inheriting the correct parent R configuration",
+            new RConfigurationPage.FolderRConfig(true, DEFAULT_ENGINE_NAME, DEFAULT_ENGINE_NAME),
+            rConfigurationPage.getRConfig());
 
-        log("Verify only enabled, non-default engines are listed in override dropdown");
-        assertElementPresent(Locator.xpath("//select/option[normalize-space(text())=\"" + SECONDARY_ENGINE_NAME + "\"]"));
-        assertElementNotPresent("Default engine should not be listed in override dropdown", Locator.xpath("select/option[normalize-space(text())=\"" + DEFAULT_ENGINE_NAME + "\"]\n"));
-        assertElementNotPresent("Disabled engine should not be listed in override dropdown", Locator.xpath("select/option[normalize-space(text())=\"" + DISABLED_ENGINE_NAME + "\"]\n"));
+        log("Verify only enabled engines are listed in override dropdown");
+        checker().verifyThat("Report engine options.", rConfigurationPage.getReportEngineOptions(), allOf(not(hasItems(DISABLED_ENGINE_NAME)), hasItems(SECONDARY_ENGINE_NAME)));
+        checker().verifyThat("Pipeline engine options.", rConfigurationPage.getPipelineEngineOptions(), allOf(not(hasItems(DISABLED_ENGINE_NAME)), hasItems(SECONDARY_ENGINE_NAME)));
+
+        checker().screenShotIfNewError("initial_r_engine_config");
 
         log("Set folder level R configuration override");
-        checkRadioButton(Locator.radioButtonByNameAndValue("overrideDefault", "override"));
-        assertAttributeNotContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
-        selectOptionByText(Locator.name("reportEngine"), SECONDARY_ENGINE_NAME);
-        selectOptionByText(Locator.name("pipelineEngine"), SECONDARY_ENGINE_NAME);
-        assertAttributeNotContains(Locator.id("saveBtn"), "class", "labkey-disabled-button");
-        clickButton("Save", "Override Default R Configuration");
-        clickButton("Yes");
+        rConfigurationPage.setEngineOverrides(SECONDARY_ENGINE_NAME, SECONDARY_ENGINE_NAME);
+        rConfigurationPage.save();
 
         log("Verify subfolder is inheriting the correct parent R configuration");
         navigateToFolder(getProjectName(), FOLDER_NAME);
-        goToFolderManagement().goToRConfigTab();
-        Assert.assertEquals("Subfolder is not inheriting the correct parent R configuration", SECONDARY_PARENT_LABEL, getText(Locator.id("parentConfigLabel")));
+        rConfigurationPage = goToFolderManagement().goToRConfigTab();
+        Assert.assertEquals("Sub-folder is not inheriting the correct parent R configuration",
+            new RConfigurationPage.FolderRConfig(true, SECONDARY_ENGINE_NAME, SECONDARY_ENGINE_NAME),
+            rConfigurationPage.getRConfig());
     }
 
     @Test
@@ -175,9 +176,10 @@ public class RConfigTest extends BaseWebDriverTest
 
         log("Verify site default has switched in folder management page");
         goToProjectHome();
-        goToFolderManagement().goToRConfigTab();
-        Assert.assertEquals("Folder is not inheriting the correct parent R configuration", SECONDARY_PARENT_LABEL, getText(Locator.id("parentConfigLabel")));
-        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("overrideDefault", "parent"));
+        RConfigurationPage rConfigurationPage = goToFolderManagement().goToRConfigTab();
+        Assert.assertEquals("Folder is not inheriting the correct parent R configuration",
+            new RConfigurationPage.FolderRConfig(true, SECONDARY_ENGINE_NAME, SECONDARY_ENGINE_NAME),
+            rConfigurationPage.getRConfig());
     }
 
     @Test

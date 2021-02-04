@@ -37,6 +37,7 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
@@ -49,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
@@ -75,6 +77,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     private static final File RLABKEY_API_STUDY = TestFileUtils.getSampleData("api/rlabkey-api-study.xml");
     private static final File RLABKEY_API_WEBDAV = TestFileUtils.getSampleData("api/rlabkey-api-webdav.xml");
     private static final File RLABKEY_API_SECURITY = TestFileUtils.getSampleData("api/rlabkey-api-security.xml");
+    private static final File RLABKEY_API_PIPELINE = TestFileUtils.getSampleData("api/rlabkey-api-pipeline.xml");
 
     @BeforeClass
     public static void setupProject()
@@ -197,6 +200,22 @@ public class RlabkeyTest extends BaseWebDriverTest
         createCategoriesViaApi();
 
         doRLabkeyTest(RLABKEY_API_STUDY);
+    }
+
+    @Test
+    public void testRlabkeyPipelineApi() throws Exception
+    {
+        goToProjectHome();
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("fileTypes/sample.txt"));
+
+        doRLabkeyTest(RLABKEY_API_PIPELINE);
+
+        // verify the expected pipeline jobs where run and completed
+        goToProjectHome();
+        PipelineStatusTable pipelineStatusTable = goToDataPipeline();
+        assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("@files/sample (Rlabkey RCopy Test 1)"));
+        assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("test pipe desc"));
     }
 
     @Test

@@ -27,7 +27,7 @@ public class ManageRequestStatusPage extends LabKeyPage<ManageRequestStatusPage.
 
     public static ManageRequestStatusPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath, int id)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "manageRequestStatus", Maps.of("id", String.valueOf(id))));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen", containerPath, "manageRequestStatus", Maps.of("id", String.valueOf(id))));
         return new ManageRequestStatusPage(webDriverWrapper.getDriver());
     }
 

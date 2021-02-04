@@ -60,6 +60,8 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
+import org.labkey.test.pages.query.NewQueryPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
@@ -1586,9 +1588,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void assertNavTrail(String... links)
     {
+        verifyNavTrail(true, links);
+    }
+
+    public boolean verifyNavTrail(boolean throwOnNoMatch, String... links)
+    {
+        Locator navTrailLocator = Locator.tagWithClass("ol", "breadcrumb");
+        boolean exists = navTrailLocator.existsIn(getDriver());
+
+        if (!exists)
+        {
+            if (throwOnNoMatch)
+                fail("NavTrail does not exist");
+            else
+                return false;
+        }
+
+        String navTrailText = navTrailLocator.findElement(getDriver()).getText();
         String expectedNavTrail = String.join("", links);
-        String navTrail = Locator.tagWithClass("ol", "breadcrumb").findElement(getDriver()).getText();
-        assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
+
+        if (throwOnNoMatch)
+            assertEquals("Nav trail does not match", expectedNavTrail, navTrailText);
+
+        return expectedNavTrail.equals(navTrailText);
     }
 
     public void clickTab(String tabname)
@@ -1951,8 +1973,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void selectSchema(String schemaName)
     {
         String[] schemaParts = schemaName.split("\\.");
-        if (isExtTreeNodeSelected(schemaParts[schemaParts.length - 1]))
-            return;
 
         StringBuilder schemaWithParents = new StringBuilder();
         String separator = "";
@@ -1986,8 +2006,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 WebElement folderIcon = loc.findElement(getDriver());
                 // Moving to desired tree node should dismiss tooltip from previously clicked folder
                 new Actions(getDriver()).moveToElement(folderIcon).perform();
-                click(folderIcon);
-                }, "queryTreeSelectionChange");
+                folderIcon.click();
+            }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
         }
     }
@@ -1996,8 +2016,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
+        waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
+        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
         waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
     }
@@ -2052,29 +2073,32 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
     {
-        String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
-        beginAt(queryURL);
-        createNewQuery(schemaName);
-        waitForElement(Locator.name("ff_newQueryName"));
-        setFormElement(Locator.name("ff_newQueryName"), name);
-        clickButton("Create and Edit Source", 0);
-        waitForElement(Locators.bodyTitle("Edit " + name));
+        SourceQueryPage sourcePage = createQuery(container, name, schemaName);
+        sourcePage.setSource(sql);
         setCodeEditorValue("queryText", sql);
         if (xml != null)
         {
-            _ext4Helper.clickExt4Tab("XML Metadata");
-            setCodeEditorValue("metadataText", xml);
+            sourcePage.setMetadataXml(xml);
         }
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        sourcePage.clickSave();
         if (inheritable)
         {
+            String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
             beginAt(queryURL);
             editQueryProperties(schemaName, name);
             selectOptionByValue(Locator.name("inheritable"), "true");
             clickButton("Save");
         }
+    }
+
+    @NotNull
+    protected SourceQueryPage createQuery(String container, String name, String schemaName)
+    {
+        SourceQueryPage sourceQueryPage = NewQueryPage.beginAt(this, container, schemaName)
+            .setName(name)
+            .clickCreate();
+        waitForElement(Locators.bodyTitle("Edit " + name));
+        return sourceQueryPage;
     }
 
     public void validateQueries(boolean validateSubfolders, int waitTime)

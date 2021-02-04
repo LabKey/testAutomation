@@ -18,5 +18,4 @@
     <missingValueIndicator indicator="Q" label="Data currently under quality control review."/>
     <missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'."/>
   </missingValueIndicators>
-  <specimens settings="specimen_settings.xml"/>
 </study>
