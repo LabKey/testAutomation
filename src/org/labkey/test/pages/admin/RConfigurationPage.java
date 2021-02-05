@@ -103,7 +103,10 @@ public class RConfigurationPage extends FolderManagementPage
     @NotNull
     private List<String> getEnabledOptions(List<WebElement> options)
     {
-        return options.stream().filter(WebElement::isEnabled).map(WebElement::getText).collect(Collectors.toList());
+        return options.stream()
+            .filter(el -> el.getAttribute("disabled") == null) // 'isEnabled' is false if parent <select> is disabled
+            .map(WebElement::getText)
+            .collect(Collectors.toList());
     }
 
     @Override
