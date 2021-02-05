@@ -123,8 +123,8 @@ public class RConfigurationPage extends FolderManagementPage
         final WebElement parentLabel = Locator.id("parentConfigLabel").findWhenNeeded(this);
         final RadioButton parentDefaultRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("overrideDefault", "parent")).findWhenNeeded(this);
         final RadioButton overrideDefaultRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("overrideDefault", "override")).findWhenNeeded(this);
-        final Select reportEngineSelect = SelectWrapper.Select(Locator.id("reportEngine")).findWhenNeeded(this);
-        final Select pipelineEngineSelect = SelectWrapper.Select(Locator.id("pipelineEngine")).findWhenNeeded(this);
+        final Select reportEngineSelect = SelectWrapper.Select(Locator.name("reportEngine")).findWhenNeeded(this);
+        final Select pipelineEngineSelect = SelectWrapper.Select(Locator.name("pipelineEngine")).findWhenNeeded(this);
 
         protected final WebElement saveButton = Locator.id("saveBtn").findWhenNeeded(this);
     }
