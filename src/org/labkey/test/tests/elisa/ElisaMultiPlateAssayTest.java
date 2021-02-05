@@ -1,10 +1,9 @@
 package org.labkey.test.tests.elisa;
 
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.exp.PropertyDescriptor;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.Protocol;
@@ -14,6 +13,7 @@ import org.labkey.remoteapi.domain.Domain;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayDataPage;
@@ -21,7 +21,6 @@ import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.elisa.ElisaRunDetailsPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -34,14 +33,25 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class})
+@Category({DailyB.class, Assays.class})
 public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
 {
     public final String EXP_FEATURE = "elisaMultiPlateSupport";
     static final File TEST_ASSAY_ELISA_FILE1 = TestFileUtils.getSampleData("Elisa/biotek_01.xlsx");
     static final File THREE_PLATE_MSD = TestFileUtils.getSampleData("Elisa/3plateMSD.csv");
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        // Need an extra-long timeout for deleting project
+        // Issue 42163: Deleting experiment properties is slow on SQL server
+        _containerHelper.deleteProject(getProjectName(), afterTest, 6 * 60_000);
+    }
 
     @BeforeClass
     public static void setupProject()
