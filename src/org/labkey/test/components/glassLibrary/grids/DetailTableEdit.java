@@ -152,7 +152,13 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public boolean getBooleanField(String fieldCaption)
     {
-        return new Checkbox(Locator.tagWithName("input", fieldCaption.toLowerCase()).findElement(getComponentElement())).isChecked();
+        // The text used in the field caption and the value of the name attribute in the checkbox don't always have the same case.
+        WebElement editableElement = Locator.tagWithAttributeIgnoreCase("input", "name", fieldCaption).findElement(getComponentElement());
+        String elementType = editableElement.getAttribute("type").toLowerCase().trim();
+
+        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be get true/false value.", fieldCaption), "checkbox", elementType);
+
+        return new Checkbox(editableElement).isChecked();
     }
 
     /**
