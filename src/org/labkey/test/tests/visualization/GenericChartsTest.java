@@ -71,7 +71,7 @@ public abstract class GenericChartsTest extends ReportTest
 
     @Override
     @LogMethod
-    protected void doVerifySteps()
+    protected void doVerifySteps() throws Exception
     {
         testPlots();
 
@@ -101,7 +101,7 @@ public abstract class GenericChartsTest extends ReportTest
         }
     }
 
-    protected abstract void testPlots();
+    protected abstract void testPlots() throws Exception;
 
     @LogMethod
     protected void savePlot(@NotNull String name, @Nullable String description)
