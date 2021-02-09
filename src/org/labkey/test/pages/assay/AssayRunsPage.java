@@ -23,6 +23,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Map;
+
 public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 {
     public AssayRunsPage(WebDriver driver)
@@ -38,6 +40,12 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
     public static AssayRunsPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("assay", containerPath, "assayRuns"));
+        return new AssayRunsPage(driver.getDriver());
+    }
+
+    public static AssayRunsPage beginAt(WebDriverWrapper driver, String containerPath, Integer protocolId)
+    {
+        driver.beginAt(WebTestHelper.buildURL("assay", containerPath, "assayRuns", Map.of("rowId", protocolId)));
         return new AssayRunsPage(driver.getDriver());
     }
 

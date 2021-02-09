@@ -14,8 +14,6 @@ import org.labkey.remoteapi.assay.SaveProtocolCommand;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.ChartTypeDialog;
@@ -32,17 +30,10 @@ import java.util.Map;
 @Category({DailyC.class, Charting.class})
 public class AssayRunFilterTest extends BaseWebDriverTest
 {
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
     @BeforeClass
     public static void setupProject()
     {
         AssayRunFilterTest init = (AssayRunFilterTest) getCurrentTest();
-
         init.doSetup();
     }
 
@@ -99,7 +90,7 @@ public class AssayRunFilterTest extends BaseWebDriverTest
         ImportRunResponse execute = importRunCommand2.execute(createDefaultConnection(), getProjectName());
 
         // create an unfiltered chart
-        AssayDataPage resultsPage = goToAssayRunsPage(assayName).clickViewResults();
+        AssayDataPage resultsPage = AssayDataPage.beginAt(this, getProjectName(), protocolId);
         DataRegionTable dataTable = resultsPage.getDataTable();
         dataTable.createChart()
                 .setChartType(ChartTypeDialog.ChartType.Scatter)
@@ -110,21 +101,21 @@ public class AssayRunFilterTest extends BaseWebDriverTest
                 .setReportName("HeightWeightAll").clickSave();
 
         // view the unfilteredChart, with a filter on run
-        AssayRunsPage runsPage = goToAssayRunsPage(assayName);
+        AssayRunsPage runsPage = AssayRunsPage.beginAt(this, getProjectName(), protocolId);
         AssayDataPage dataPage = runsPage.clickAssayIdLink("firstRun");
         dataPage.getDataTable().clickReportMenu(false,"HeightWeightAll");
         String expected = "848688909294168170172174176178180182184186188Dataweightheight";
         assertSVG(expected, 0);
 
         // now filter on the other run and verify expected results
-        dataPage = goToAssayRunsPage(assayName).clickAssayIdLink("secondRun");
+        dataPage = AssayRunsPage.beginAt(this, getProjectName(), protocolId).clickAssayIdLink("secondRun");
         String secondRunExpected = "63.56464.56565.56666.567171172173174175176177178Dataweightheight";
         dataPage.getDataTable().clickReportMenu(false,"HeightWeightAll");
         assertSVG(secondRunExpected);
 
         // now verify filter built into a chart will be applied when also filtering based on run
         // create filter to show only firstRun results
-        goToAssayRunsPage(assayName)
+        AssayRunsPage.beginAt(this, getProjectName(), protocolId)
                 .clickAssayIdLink("firstRun")
                 .getDataTable()
                 .createChart()
@@ -135,7 +126,7 @@ public class AssayRunFilterTest extends BaseWebDriverTest
                 .clickSave()
                 .setReportName("HeightWeightFirstRun").clickSave();
         // now filter to see only secondRun results
-        goToAssayRunsPage(assayName)
+        AssayRunsPage.beginAt(this, getProjectName(), protocolId)
                 .clickAssayIdLink("secondRun")
                 .getDataTable()
                 .clickReportMenu(false, "HeightWeightFirstRun");
@@ -164,14 +155,6 @@ public class AssayRunFilterTest extends BaseWebDriverTest
         SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(protocol);
         ProtocolResponse savedProtocolResponse = saveProtocolCommand.execute(cn, getProjectName());
         return savedProtocolResponse.getProtocol();
-    }
-
-    private AssayRunsPage goToAssayRunsPage(String assayName)
-    {
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(assayName));
-        return new AssayRunsPage(getDriver());
     }
 
     @Override
