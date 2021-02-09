@@ -16,6 +16,15 @@
 package org.labkey.test.tests.visualization;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
+import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.ProtocolResponse;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -36,10 +45,13 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.ViewDatasetDataPage;
+import org.labkey.test.pages.assay.AssayDataPage;
+import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -80,7 +92,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
     @Override
     @LogMethod
-    protected void testPlots()
+    protected void testPlots() throws Exception
     {
         doManageViewsScatterPlotTest();
         doMultiYAxisScatterPlotTest();
@@ -94,6 +106,116 @@ public class ScatterPlotTest extends GenericChartsTest
         doMostlyNumericDataPlotTest();
         doDeleteMeasureTest(); // Uses scatter plot created by doCustomizeScatterPlotTest()
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
+        testAssayRunFilters();
+    }
+
+    public void testAssayRunFilters() throws Exception
+    {
+        String assayName = "test_assay_for_run_filters";
+        Protocol newAssay = getProtocol(assayName, "General");
+
+        goToProjectHome();
+        new PortalHelper(this).addBodyWebPart("Assay List");
+
+        // add a couple of results fields
+        Domain resultsDomain = newAssay.getDomains().get(2);
+        List<PropertyDescriptor> resultsFields = resultsDomain.getFields();
+        resultsFields.add(new PropertyDescriptor("height", "height", "double"));
+        resultsFields.add(new PropertyDescriptor("weight", "weight", "double"));
+        resultsDomain.setFields(resultsFields);
+        Protocol serverProtocol = saveProtocol(createDefaultConnection(), newAssay);
+
+        // add runs to
+        // protocolId comes back as a long, but ImportRunCommand weirdly requires an int
+        Integer protocolId = Integer.parseInt(serverProtocol.getProtocolId().toString());
+
+        List<Map<String, Object>> runRecords = new ArrayList<>();
+        runRecords.add(Map.of("height", 168, "weight", 83.2));
+        runRecords.add(Map.of("height", 178, "weight", 93.2));
+        runRecords.add(Map.of("height", 188, "weight", 87.2));
+        runRecords.add(Map.of("height", 186, "weight", 94));
+
+        ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runRecords);
+        importRunCommand.setName("firstRun");
+        importRunCommand.setBatchId(123);
+        importRunCommand.execute(createDefaultConnection(), getProjectName());
+
+        List<Map<String, Object>> run2Records = new ArrayList<>();
+        run2Records.add(Map.of("height", 178, "weight", 63.2));
+        run2Records.add(Map.of("height", 174, "weight", 65.2));
+        run2Records.add(Map.of("height", 171, "weight", 67.2));
+
+        ImportRunCommand importRunCommand2 = new ImportRunCommand(protocolId, run2Records);
+        importRunCommand2.setName("secondRun");
+        importRunCommand2.setBatchId(124);
+        ImportRunResponse execute = importRunCommand2.execute(createDefaultConnection(), getProjectName());
+
+        // create an unfiltered chart
+        AssayDataPage resultsPage = AssayDataPage.beginAt(this, getProjectName(), protocolId);
+        DataRegionTable dataTable = resultsPage.getDataTable();
+        dataTable.createChart()
+                .setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis("height")
+                .setXAxis("weight")
+                .clickApply()
+                .clickSave()
+                .setReportName("HeightWeightAll").clickSave();
+
+        // view the unfilteredChart, with a filter on run
+        AssayRunsPage runsPage = AssayRunsPage.beginAt(this, getProjectName(), protocolId);
+        AssayDataPage dataPage = runsPage.clickAssayIdLink("firstRun");
+        dataPage.getDataTable().clickReportMenu(false,"HeightWeightAll");
+        String expected = "848688909294168170172174176178180182184186188Dataweightheight";
+        assertSVG(expected, 0);
+
+        // now filter on the other run and verify expected results
+        dataPage = AssayRunsPage.beginAt(this, getProjectName(), protocolId).clickAssayIdLink("secondRun");
+        String secondRunExpected = "63.56464.56565.56666.567171172173174175176177178Dataweightheight";
+        dataPage.getDataTable().clickReportMenu(false,"HeightWeightAll");
+        assertSVG(secondRunExpected);
+
+        // now verify filter built into a chart will be applied when also filtering based on run
+        // create filter to show only firstRun results
+        AssayRunsPage.beginAt(this, getProjectName(), protocolId)
+                .clickAssayIdLink("firstRun")
+                .getDataTable()
+                .createChart()
+                .setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis("height")
+                .setXAxis("weight")
+                .clickApply()
+                .clickSave()
+                .setReportName("HeightWeightFirstRun").clickSave();
+        // now filter to see only secondRun results
+        AssayRunsPage.beginAt(this, getProjectName(), protocolId)
+                .clickAssayIdLink("secondRun")
+                .getDataTable()
+                .clickReportMenu(false, "HeightWeightFirstRun");
+        // expect both filters to result in 0 records shown
+        waitForText("The response returned 0 rows of data.");
+        assertSVG("00.20.40.60.8100.10.20.30.40.50.60.70.80.91Dataweightheight");
+    }
+
+    private Protocol getProtocol(String assayName, String providerName) throws Exception
+    {
+        // get the template from the server
+        Connection cn = createDefaultConnection();
+        String containerPath = getProjectName();
+        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
+        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(cn, containerPath);
+
+        // modify the protocol according to our needs
+        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
+        newAssayProtocol.setName(assayName);
+
+        return newAssayProtocol;
+    }
+
+    private Protocol saveProtocol(Connection cn, Protocol protocol) throws Exception
+    {
+        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(protocol);
+        ProtocolResponse savedProtocolResponse = saveProtocolCommand.execute(cn, getProjectName());
+        return savedProtocolResponse.getProtocol();
     }
 
     private void doMostlyNumericDataPlotTest()
