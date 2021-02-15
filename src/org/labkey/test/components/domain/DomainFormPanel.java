@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
@@ -207,6 +208,18 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return exportFiles[0];
     }
 
+    public DomainFormPanel clickDeleteFields()
+    {
+        getWrapper().scrollIntoView(elementCache().deleteFieldsButton);
+        elementCache().deleteFieldsButton.click();
+
+        ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Delete Selected Fields").timeout(1000).waitFor();
+        confirmDialog.dismiss("Yes, Delete Fields");
+
+        return this;
+    }
+
     public DomainFormPanel setInferFieldFile(File file)
     {
         getWrapper().setFormElement(elementCache().fileUploadInput, file);
@@ -298,6 +311,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         };
 
         protected WebElement exportFieldsButton = Locator.tagWithClass("div", "domain-toolbar-export-btn")
+                .findWhenNeeded(this);
+
+        protected WebElement deleteFieldsButton = Locator.tagWithClass("div", "domain-toolbar-delete-btn")
                 .findWhenNeeded(this);
 
         protected void clearFieldCache()

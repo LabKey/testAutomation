@@ -9,6 +9,7 @@ import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.domain.UnsavedChangesModalDialog;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -58,6 +59,11 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
                 .expand();
     }
 
+    public DomainDesignerPage checkSelectAll(boolean value)
+    {
+        elementCache().selectAll.set(value);
+        return this;
+    }
     /**
      * Get a list of the Domain Panels on this page.
      * @return List of DomainFormElement
@@ -152,5 +158,8 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title)
                     .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
         }
+
+        public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
+                .findWhenNeeded(this));
     }
 }
