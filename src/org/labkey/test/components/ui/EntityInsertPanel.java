@@ -158,7 +158,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public EntityBulkInsertDialog clickBulkInsert()
     {
         elementCache().bulkInsert.click();
-        return new EntityBulkInsertDialog(this);
+        return new EntityBulkInsertDialog(getDriver());
     }
 
     public boolean isBulkInsertVisible()

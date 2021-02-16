@@ -6,24 +6,55 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
 public class EntityBulkInsertDialog extends ModalDialog
 {
-    private EntityInsertPanel _panel;
 
-    public EntityBulkInsertDialog(EntityInsertPanel panel)
+    public EntityBulkInsertDialog(WebDriver driver)
     {
-        this(new ModalDialogFinder(panel.getDriver()).withTitle("Bulk Creation of"));
-        _panel = panel;
+        this(new ModalDialogFinder(driver).withTitle("Bulk Creation of"));
     }
 
     private EntityBulkInsertDialog(ModalDialogFinder finder)
     {
         super(finder);
+    }
+
+    public EntityBulkInsertDialog selectDerivativesOption()
+    {
+        elementCache().derivativesOption.check();
+        return this;
+    }
+
+    public EntityBulkInsertDialog selectPooledOption()
+    {
+        elementCache().poolOption.check();
+        return this;
+    }
+
+    public String getSelectedOption()
+    {
+        String option = "";
+
+        if(elementCache().derivativesOption.isDisplayed())
+        {
+            if(elementCache().derivativesOption.isChecked())
+            {
+                option = elementCache().derivativesOption.getComponentElement().getAttribute("value");
+            }
+            else
+            {
+                option = elementCache().poolOption.getComponentElement().getAttribute("value");
+            }
+        }
+
+        return option;
     }
 
     public EntityBulkInsertDialog setQuantity(int quantity)
@@ -40,6 +71,11 @@ public class EntityBulkInsertDialog extends ModalDialog
     public String getQuantity()
     {
         return getWrapper().getFormElement(elementCache().quantity);
+    }
+
+    public String getQuanityLabel()
+    {
+        return elementCache().quantityLabel.getText();
     }
 
     public EntityBulkInsertDialog setDescription(String description)
@@ -208,11 +244,19 @@ public class EntityBulkInsertDialog extends ModalDialog
         WebElement addRowsButton = Locator.tagWithClass("button", "test-loc-submit-for-edit-button")
                 .findWhenNeeded(getComponentElement());
 
+        WebElement quantityLabel = Locator.tagWithAttribute("label", "for", "numItems")
+                .findWhenNeeded(getComponentElement());
 
         WebElement quantity = Locator.tagWithId("input", "numItems")
                 .findWhenNeeded(getComponentElement());
 
         WebElement description = Locator.tagWithId("textarea", "Description")
+                .findWhenNeeded(getComponentElement());
+
+        RadioButton derivativesOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Derivatives")
+                .findWhenNeeded(getComponentElement());
+
+        RadioButton poolOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Pooled Samples")
                 .findWhenNeeded(getComponentElement());
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
