@@ -339,6 +339,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         runApiTests();
     }
 
+    // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
+    // tests want
+    protected void setupAdvancedRepositoryType()
+    {
+        setupRepositoryType(true, false, true);
+    }
+
     @LogMethod
     protected void setupRepositoryType(boolean advanced, boolean editable, boolean requests)
     {
