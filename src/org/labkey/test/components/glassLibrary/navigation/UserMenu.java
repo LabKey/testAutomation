@@ -26,12 +26,6 @@ public abstract class UserMenu extends BootstrapMenu
         return new MultiMenu.MultiMenuFinder(driver).withButtonId(MENU_ID).wrap(factory);
     }
 
-    protected LabKeyPage<?> switchToLabkey()
-    {
-        clickSubMenu(true, "Switch to LabKey");
-        return new LabKeyPage<>(getDriver());
-    }
-
     // TODO: Placeholder for product update
     protected LabKeyPage<?> login()
     {
