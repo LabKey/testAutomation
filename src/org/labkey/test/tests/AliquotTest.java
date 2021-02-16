@@ -66,12 +66,11 @@ public class AliquotTest extends SpecimenBaseTest
 
         clickButton("Create Study");
         setFormElement(Locator.name("label"), getStudyLabel());
-        click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
         clickButton("Create Study");
+        setupRepositoryType(true, true, false);
+        setupRequestabilityRules();
 
         setPipelineRoot(StudyHelper.getPipelinePath());
-
-        setupRequestabilityRules();
         startSpecimenImport(1);
         waitForSpecimenImport();
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), "Category1", "Participant", null, false, PTIDS[0], PTIDS[1]);
@@ -109,6 +108,7 @@ public class AliquotTest extends SpecimenBaseTest
 
         clickFolder(getFolderName());
         waitAndClick(Locator.linkWithText("Manage Study"));
+        // TODO: set up advanced repository
         waitAndClick(Locator.linkWithText("Manage Requestability Rules"));
         waitForElement(Locator.xpath("//div[contains(@class, 'x-grid3-row')]//div[text()='Locked In Request Check']"));
 

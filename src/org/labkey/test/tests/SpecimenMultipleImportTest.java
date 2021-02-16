@@ -60,8 +60,8 @@ public class SpecimenMultipleImportTest extends StudyBaseTest
 
         clickButton("Create Study");
         setFormElement(Locator.name("label"), getStudyLabel());
-        click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
         clickButton("Create Study");
+        setupRepositoryType(true, true, false);
 
         setPipelineRoot(StudyHelper.getPipelinePath());
 

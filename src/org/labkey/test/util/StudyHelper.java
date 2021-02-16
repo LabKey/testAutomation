@@ -481,12 +481,6 @@ public class StudyHelper
         VISIT
     }
 
-    public enum RepositoryType
-    {
-        SIMPLE,
-        ADVANCED
-    }
-
     public enum SecurityMode
     {
         BASIC_READ,
