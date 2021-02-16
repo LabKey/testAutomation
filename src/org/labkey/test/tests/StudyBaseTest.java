@@ -338,29 +338,4 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         runUITests();
         runApiTests();
     }
-
-    // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
-    // tests want
-    protected void setupAdvancedRepositoryType()
-    {
-        setupRepositoryType(true, false, true);
-    }
-
-    @LogMethod
-    protected void setupRepositoryType(boolean advanced, boolean editable, boolean requests)
-    {
-        log("Setup specimen repository type settings");
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Change Repository Type"));
-        waitForElement(Locator.tagContainingText("h3","Manage Repository Settings"));
-        checkRadioButton(Locator.radioButtonByName("simple").index(advanced ? 1 : 0)); // Advanced repository type?
-
-        if (advanced)
-        {
-            checkRadioButton(Locator.radioButtonByName("specimenDataEditable").index(editable ? 1 : 0)); // Editable specimen data?
-            checkRadioButton(Locator.radioButtonByName("enableRequests").index(requests ? 0 : 1)); // Enabled specimen requests?
-        }
-
-        clickButton("Submit");
-    }
 }
