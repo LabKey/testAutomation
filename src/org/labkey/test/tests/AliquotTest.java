@@ -108,7 +108,6 @@ public class AliquotTest extends SpecimenBaseTest
 
         clickFolder(getFolderName());
         waitAndClick(Locator.linkWithText("Manage Study"));
-        // TODO: set up advanced repository
         waitAndClick(Locator.linkWithText("Manage Requestability Rules"));
         waitForElement(Locator.xpath("//div[contains(@class, 'x-grid3-row')]//div[text()='Locked In Request Check']"));
 
