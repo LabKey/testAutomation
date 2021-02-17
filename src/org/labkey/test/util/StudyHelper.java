@@ -475,16 +475,35 @@ public class StudyHelper
         return TestFileUtils.getSampleData("study/" + relativePath);
     }
 
+    // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
+    // tests want
+    public void setupAdvancedRepositoryType()
+    {
+        setupRepositoryType(true, false, true);
+    }
+
+    @LogMethod
+    public void setupRepositoryType(boolean advanced, boolean editable, boolean requests)
+    {
+        _test.log("Setup specimen repository type settings");
+        _test.clickTab("Manage");
+        _test.clickAndWait(Locator.linkWithText("Change Repository Type"));
+        _test.waitForElement(Locator.tagContainingText("h3","Manage Repository Settings"));
+        _test.checkRadioButton(Locator.radioButtonByName("simple").index(advanced ? 1 : 0)); // Advanced repository type?
+
+        if (advanced)
+        {
+            _test.checkRadioButton(Locator.radioButtonByName("specimenDataEditable").index(editable ? 1 : 0)); // Editable specimen data?
+            _test.checkRadioButton(Locator.radioButtonByName("enableRequests").index(requests ? 0 : 1)); // Enabled specimen requests?
+        }
+
+        _test.clickButton("Submit");
+    }
+
     public enum TimepointType
     {
         DATE,
         VISIT
-    }
-
-    public enum RepositoryType
-    {
-        SIMPLE,
-        ADVANCED
     }
 
     public enum SecurityMode
