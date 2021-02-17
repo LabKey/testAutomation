@@ -26,19 +26,45 @@ public class EntityBulkInsertDialog extends ModalDialog
         super(finder);
     }
 
+    /**
+     * Option at the top of the dialog to make the samples derive from the identified parents.
+     *
+     * @return A reference to this dialog.
+     */
     public EntityBulkInsertDialog selectDerivativesOption()
     {
         elementCache().derivativesOption.check();
         return this;
     }
 
+    /**
+     * Option at the top of the dialog to make the samples pool (aliquot) from the identified parents.
+     *
+     * @return A reference to this dialog.
+     */
     public EntityBulkInsertDialog selectPooledOption()
     {
         elementCache().poolOption.check();
         return this;
     }
 
-    public String getSelectedOption()
+    /**
+     * Check to see if the creation type options are displayed.
+     *
+     * @return True if either option is visible, false otherwise.
+     */
+    public boolean creationTypeOptionsVisible()
+    {
+        // Unlikely one option would be visible without the other.
+        return elementCache().poolOption.isDisplayed() || elementCache().derivativesOption.isDisplayed();
+    }
+
+    /**
+     * Get the text of the currently selected creation type. If the options are not present return an empty string.
+     *
+     * @return The text of the current selected creation type.
+     */
+    public String getCreationTypeSelected()
     {
         String option = "";
 
@@ -73,7 +99,12 @@ public class EntityBulkInsertDialog extends ModalDialog
         return getWrapper().getFormElement(elementCache().quantity);
     }
 
-    public String getQuanityLabel()
+    /**
+     * Get the label next to the quantity text box. This will change depending upon the creation option selected.
+     *
+     * @return The text of the label next to the quantity box.
+     */
+    public String getQuantityLabel()
     {
         return elementCache().quantityLabel.getText();
     }
@@ -114,7 +145,7 @@ public class EntityBulkInsertDialog extends ModalDialog
     public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
-        selectValues.forEach(s -> {reactSelect.filterSelect(s);});
+        selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
