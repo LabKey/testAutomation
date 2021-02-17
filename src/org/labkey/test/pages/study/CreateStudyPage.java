@@ -23,7 +23,6 @@ import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.util.StudyHelper.RepositoryType;
 import static org.labkey.test.util.StudyHelper.SecurityMode;
 import static org.labkey.test.util.StudyHelper.TimepointType;
 
@@ -75,12 +74,6 @@ public class CreateStudyPage extends LabKeyPage
     public CreateStudyPage setDefaultTimepointDuration(String defaultTimepointDuration)
     {
         _test.setFormElement(elements().defaultTimepointDurationInput, defaultTimepointDuration);
-        return this;
-    }
-
-    public CreateStudyPage setRepositoryType(RepositoryType repositoryType)
-    {
-        elements().repositoryTypeRadio(repositoryType).click();
         return this;
     }
 
@@ -142,11 +135,6 @@ public class CreateStudyPage extends LabKeyPage
         final WebElement startDateInput = new LazyWebElement(Locator.name("startDate"), this);
         final WebElement defaultTimepointDurationInput = new LazyWebElement(Locator.name("defaultTimepointDuration"), this);
 
-        final WebElement repositoryTypeRadio(RepositoryType type)
-        {
-            return new LazyWebElement(Locator.radioButtonByNameAndValue("simpleRepository", RepositoryType.SIMPLE == type ? "true" : "false"), this);
-        }
-
         final WebElement securityModeSelect = new LazyWebElement(Locator.name("securityString"), this);
 
         final WebElement shareDatasetsRadio(boolean share)
@@ -161,5 +149,4 @@ public class CreateStudyPage extends LabKeyPage
         final WebElement createStudyButton = new LazyWebElement(Locator.lkButton("Create Study"), this);
         final WebElement backButton = new LazyWebElement(Locator.lkButton("Back"), this);
     }
-
 }
