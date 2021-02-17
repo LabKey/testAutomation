@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,6 +49,7 @@ public class StudyHelper
     public static final File SPECIMEN_ARCHIVE_B = TestFileUtils.getSampleData("study/specimens/sample_b.specimens");
 
     protected BaseWebDriverTest _test;
+    private Boolean _specimenModulePresent = null;
 
     public StudyHelper(BaseWebDriverTest test)
     {
@@ -286,7 +288,12 @@ public class StudyHelper
         _test.clickButton("Export Study");
 
         _test.waitForElement(Locator.tagWithClass("table", "export-location"));
-        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        if (isSpecimenModulePresent())
+        {
+            studyObjects = new ArrayList<>(studyObjects);
+            studyObjects.add("Specimen");
+        }
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
         List<String> missingObjects = new ArrayList<>();
         for (String obj : studyObjects)
@@ -338,9 +345,12 @@ public class StudyHelper
         _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 5 : Specimens
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-        _test.clickButton("Next", 0);
+        // Wizard page 5 : Specimens, if present
+        if (isSpecimenModulePresent())
+        {
+            _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+            _test.clickButton("Next", 0);
+        }
 
         // Wizard Page 6 : Study Objects
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
@@ -498,6 +508,18 @@ public class StudyHelper
         }
 
         _test.clickButton("Submit");
+    }
+
+    public boolean isSpecimenModulePresent()
+    {
+        if (null == _specimenModulePresent)
+        {
+            AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
+            Set<String> allModules = containerHelper.getAllModules();
+            _specimenModulePresent = allModules.contains("specimen");
+        }
+
+        return _specimenModulePresent;
     }
 
     public enum TimepointType

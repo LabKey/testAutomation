@@ -104,7 +104,8 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         }
 
         _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
-        _containerHelper.enableModule("Specimen");
+        if (_studyHelper.isSpecimenModulePresent())
+            _containerHelper.enableModule("Specimen");
         new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
@@ -114,6 +115,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     {
         startSpecimenImport(completeJobsExpected, StudyHelper.SPECIMEN_ARCHIVE_A);
     }
+
     protected void startSpecimenImport(int completeJobsExpected, File specimenArchive)
     {
         _specimenImporter = new SpecimenImporter(new File(StudyHelper.getPipelinePath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
@@ -211,6 +213,11 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
         waitForText("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets",
                 "Dataset Data", "Specimens", "Specimen Settings", "Participant Comment Settings");
+
+        if (_studyHelper.isSpecimenModulePresent())
+        {
+            assertTextPresent("Specimens", "Specimen Settings");
+        }
 
         if (uncheckObjects != null)
         {
