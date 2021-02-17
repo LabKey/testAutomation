@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FieldEditorAddRowSelectionActionTest extends BaseWebDriverTest
+public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 {
     private final static String PROJECT_NAME = "Field Editor Add Row Selection Action Test";
 
     @BeforeClass
     public static void setupProject()
     {
-        FieldEditorAddRowSelectionActionTest init = (FieldEditorAddRowSelectionActionTest) getCurrentTest();
+        FieldEditorRowSelectionActionTest init = (FieldEditorRowSelectionActionTest) getCurrentTest();
         init.doSetup();
     }
 
@@ -46,13 +46,7 @@ public class FieldEditorAddRowSelectionActionTest extends BaseWebDriverTest
     {
         return Arrays.asList("study");
     }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
+    
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
