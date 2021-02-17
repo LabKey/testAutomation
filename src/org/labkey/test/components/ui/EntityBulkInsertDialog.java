@@ -2,6 +2,7 @@ package org.labkey.test.components.ui;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
@@ -208,6 +209,19 @@ public class EntityBulkInsertDialog extends ModalDialog
         }
     }
 
+    /**
+     * Click the 'Add' button and wait for an alert (error) message to be shown on the dialog.
+     *
+     * @return The text displayed in the alert.
+     */
+    public String clickAddRowsExpectError()
+    {
+        elementCache().addRowsButton.click();
+        WebDriverWrapper.waitFor(()->elementCache().alert.isDisplayed(), "Expected alert error was not shown.", 500);
+
+        return elementCache().alert.getText();
+    }
+
     public void clickCancel()
     {
         elementCache().cancelButton.click();
@@ -288,6 +302,9 @@ public class EntityBulkInsertDialog extends ModalDialog
                 .findWhenNeeded(getComponentElement());
 
         RadioButton poolOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Pooled Samples")
+                .findWhenNeeded(getComponentElement());
+
+        WebElement alert = Locator.tagWithClassContaining("div", "alert-danger")
                 .findWhenNeeded(getComponentElement());
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
