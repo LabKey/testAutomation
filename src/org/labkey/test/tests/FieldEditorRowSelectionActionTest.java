@@ -27,10 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category(DailyA.class)
-@BaseWebDriverTest.ClassTimeout(minutes = 4)
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 {
-    private final static String PROJECT_NAME = "Field Editor Add Row Selection Action Test";
+    private final static String PROJECT_NAME = "Field Editor Row Selection Action Test";
 
     @BeforeClass
     public static void setupProject()
@@ -122,7 +122,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         File downloadedFile = domainFormPanel.clickExportFields();
         checker().verifyEquals("Non selected fields are imported", Arrays.asList("FirstName"), getFieldsFromExportFile(downloadedFile));
 
-        domainDesignerPage.checkSelectAll(true);
+        domainFormPanel.checkSelectAll(true);
         downloadedFile = domainFormPanel.clickExportFields();
         checker().verifyEquals("Exported fields are not same UI fields", getFieldsFromExportFile(downloadedFile), domainFormPanel.fieldNames());
 
@@ -167,6 +167,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         checker().verifyTrue("The exported fields do not match the UI fields",
                 domainFormPanel.fieldNames().equals(getFieldsFromExportFile(downloadedFile)));
 
+        assayDesignerPage.clickSave();
     }
 
     @Test
@@ -183,8 +184,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         table.clickHeaderButtonAndWait("Admin");
 
         DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
-        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-
+        DomainFormPanel domainFormPanel = domainDesignerPage.expandFieldsPanel("Fields");
         domainFormPanel.addField("Test1").setSelectRowField(true);
         domainFormPanel.addField("Test2").setSelectRowField(true);
         domainFormPanel.addField("Test3").setSelectRowField(true);

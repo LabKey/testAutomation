@@ -59,11 +59,6 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
                 .expand();
     }
 
-    public DomainDesignerPage checkSelectAll(boolean value)
-    {
-        elementCache().selectAll.set(value);
-        return this;
-    }
     /**
      * Get a list of the Domain Panels on this page.
      * @return List of DomainFormElement
@@ -159,7 +154,5 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
                     .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
         }
 
-        public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
-                .findWhenNeeded(this));
     }
 }

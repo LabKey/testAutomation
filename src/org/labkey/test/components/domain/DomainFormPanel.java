@@ -4,7 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
@@ -199,6 +201,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
+    public DomainFormPanel checkSelectAll(boolean value)
+    {
+        elementCache().selectAll.set(value);
+        return this;
+    }
+
     public File clickExportFields() throws Exception
     {
         getWrapper().scrollIntoView(elementCache().exportFieldsButton);
@@ -288,6 +296,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     protected class ElementCache extends DomainPanel<ElementCache, DomainFormPanel>.ElementCache
     {
+        public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
+                .findWhenNeeded(this));
+
         protected WebElement addFieldButton = new WebElementWrapper()
         {
             WebElement el = Locator.css(".domain-form-add-btn .btn").findWhenNeeded(DomainFormPanel.this);
