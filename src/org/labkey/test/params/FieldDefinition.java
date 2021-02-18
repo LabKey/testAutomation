@@ -311,7 +311,7 @@ public class FieldDefinition extends PropertyDescriptor
 
     public enum ColumnType
     {
-        MultiLine("Multi-Line Text", "string"),
+        MultiLine("Multi-Line Text", "multiLine"),
         Integer("Integer", "int"),
         String("Text", "string"),
         Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),

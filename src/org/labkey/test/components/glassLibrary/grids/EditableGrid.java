@@ -119,6 +119,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return this;
     }
 
+    public EditableGrid selectAll(boolean checked)
+    {
+        if(hasSelectColumn())
+        {
+            getWrapper().setCheckbox(elementCache().selectColumn.get(), checked);
+        }
+        else
+        {
+            throw new NoSuchElementException("There is no select checkbox for all rows.");
+        }
+        return this;
+    }
+
     private List<WebElement> getRows()
     {
         waitForLoaded();
