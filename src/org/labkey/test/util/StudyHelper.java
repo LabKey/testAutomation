@@ -48,8 +48,9 @@ public class StudyHelper
     public static final File SPECIMEN_ARCHIVE_A = TestFileUtils.getSampleData("study/specimens/sample_a.specimens");
     public static final File SPECIMEN_ARCHIVE_B = TestFileUtils.getSampleData("study/specimens/sample_b.specimens");
 
+    private static Boolean _specimenModulePresent = null;
+
     protected BaseWebDriverTest _test;
-    private Boolean _specimenModulePresent = null;
 
     public StudyHelper(BaseWebDriverTest test)
     {
