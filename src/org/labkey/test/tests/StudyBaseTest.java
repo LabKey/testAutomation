@@ -260,12 +260,14 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Pipeline"));
-        checkCheckbox(Locator.checkboxByTitle("Specimen")); // Activate specimen module to enable specimen UI/webparts
+        if (_studyHelper.isSpecimenModulePresent())
+            checkCheckbox(Locator.checkboxByTitle("Specimen")); // Activate specimen module to enable specimen UI/webparts
         clickButton("Update Folder");
         new PortalHelper(getDriver()).doInAdminMode(portalHelper -> {
             portalHelper.addWebPart("Data Pipeline");
             portalHelper.addWebPart("Datasets");
-            portalHelper.addWebPart("Specimens");
+            if (_studyHelper.isSpecimenModulePresent())
+                portalHelper.addWebPart("Specimens");
             portalHelper.addWebPart("Views");
         });
         setPipelineRoot(pipelinePath);
