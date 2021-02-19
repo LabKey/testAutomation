@@ -93,7 +93,14 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         private static final int DEFAULT_TIMEOUT = 10000;
         private int timeout = 0;
         private Integer index = null;
+        private boolean lazy = false;
         private S _context;
+
+        public F lazy()
+        {
+            this.lazy = true;
+            return getThis();
+        }
 
         public F timeout(int timeout)
         {
@@ -169,8 +176,15 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
         public C find(S context)
         {
-            _context = context;
-            return construct(findElement(context));
+            if (lazy)
+            {
+                return findWhenNeeded(context);
+            }
+            else
+            {
+                _context = context;
+                return construct(findElement(context));
+            }
         }
 
         public List<C> findAll(S context)
@@ -203,12 +217,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         @Deprecated
         public C findOrNull(S context)
         {
-            _context = context;
-            WebElement elementOrNull = buildLocator().findElementOrNull(context);
-            if (elementOrNull == null)
-                return null;
-            else
-                return construct(elementOrNull);
+            return findOptional(context).orElse(null);
         }
 
         public Optional<C> findOptional(S context)

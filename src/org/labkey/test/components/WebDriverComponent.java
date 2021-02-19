@@ -86,7 +86,7 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
         @Deprecated
         public C findOrNull()
         {
-            return super.findOrNull(getDriver());
+            return findOptional().orElse(null);
         }
 
         public Optional<C> findOptional()
