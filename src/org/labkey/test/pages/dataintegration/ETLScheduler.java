@@ -17,31 +17,25 @@ package org.labkey.test.pages.dataintegration;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ETLScheduler extends LabKeyPage
+public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
 {
-    private final Elements _elements;
-
     public ETLScheduler(BaseWebDriverTest test)
     {
         super(test);
-        _elements = new Elements();
     }
 
     public static ETLScheduler beginAt(BaseWebDriverTest test)
@@ -57,29 +51,24 @@ public class ETLScheduler extends LabKeyPage
 
     public TransformRow transform(String transformId)
     {
-        return elements().findTransformRow(transformId);
+        return elementCache().findTransformRow(transformId);
     }
 
     public LabKeyPage viewProcessedJobs()
     {
-        _test.clickAndWait(elements().viewProcessedJobsButton);
+        _test.clickAndWait(elementCache().viewProcessedJobsButton);
         return new LabKeyPage(_test);
     }
 
-    private Elements elements()
+    @Override
+    protected Elements elementCache()
     {
-        return _elements;
+        return new Elements();
     }
 
-    private class Elements extends ComponentElements
+    protected class Elements extends LabKeyPage<?>.ElementCache
     {
         private Map<String, TransformRow> transformRows = new HashMap<>();
-
-        @Override
-        protected SearchContext getContext()
-        {
-            return getDriver();
-        }
 
         protected TransformRow findTransformRow(String transformId)
         {
@@ -90,16 +79,13 @@ public class ETLScheduler extends LabKeyPage
         protected WebElement viewProcessedJobsButton = new LazyWebElement(Locator.lkButton("View Processed Jobs"), this);
     }
 
-    public class TransformRow extends Component
+    public class TransformRow extends Component<TransformRow.RowElements>
     {
         WebElement componentElement;
-
-        RowElements elements;
 
         protected TransformRow(WebElement context)
         {
             this.componentElement = context;
-            elements = new RowElements();
         }
 
         @Override
@@ -108,29 +94,24 @@ public class ETLScheduler extends LabKeyPage
             return componentElement;
         }
 
-        public RowElements elements()
-        {
-            return elements;
-        }
-
         public String getName()
         {
-            return elements().name.getText();
+            return elementCache().name.getText();
         }
 
         public String getSourceModule()
         {
-            return elements().sourceModule.getText();
+            return elementCache().sourceModule.getText();
         }
 
         public boolean isEnabled()
         {
-            return elements().enabledCheckbox.isSelected();
+            return elementCache().enabledCheckbox.isSelected();
         }
 
         public TransformRow setEnabled(boolean enable)
         {
-            _test.setCheckbox(elements().enabledCheckbox, enable);
+            _test.setCheckbox(elementCache().enabledCheckbox, enable);
             return this;
         }
 
@@ -147,41 +128,41 @@ public class ETLScheduler extends LabKeyPage
 
         public String getSchedule()
         {
-            return elements().schedule.getText();
+            return elementCache().schedule.getText();
         }
 
         public String getLastStatus()
         {
-            return elements().lastStatus.getText();
+            return elementCache().lastStatus.getText();
         }
 
         public LabKeyPage clickLastStatus()
         {
-            _test.clickAndWait(elements().lastStatus.findElement(By.cssSelector("a")));
+            _test.clickAndWait(elementCache().lastStatus.findElement(By.cssSelector("a")));
 
             return new LabKeyPage(_test);
         }
 
         public String getLastRun()
         {
-            return elements().lastRun.getText();
+            return elementCache().lastRun.getText();
         }
 
         public LabKeyPage clickLastRun()
         {
-            _test.clickAndWait(elements().lastRun.findElement(By.cssSelector("a")));
+            _test.clickAndWait(elementCache().lastRun.findElement(By.cssSelector("a")));
 
             return new LabKeyPage(_test);
         }
 
         public String getLastChecked()
         {
-            return elements().lastChecked.getText();
+            return elementCache().lastChecked.getText();
         }
 
         public LabKeyPage runNow()
         {
-            _test.clickAndWait(elements().runNowButton);
+            _test.clickAndWait(elementCache().runNowButton);
 
             return new LabKeyPage(_test);
         }
@@ -203,6 +184,12 @@ public class ETLScheduler extends LabKeyPage
                     .clickSubMenu(false, "Truncate and Reset");
 
             return new Confirm();
+        }
+
+        @Override
+        protected RowElements newElementCache()
+        {
+            return new RowElements();
         }
 
         public class Confirm
@@ -237,7 +224,7 @@ public class ETLScheduler extends LabKeyPage
             }
         }
 
-        private class RowElements extends ComponentElements
+        private class RowElements extends Component<?>.ElementCache
         {
             // Column numbers
             private final int NAME = 1;
@@ -248,12 +235,6 @@ public class ETLScheduler extends LabKeyPage
             private final int LAST_STATUS = 5;
             private final int LAST_RUN = 6;
             private final int LAST_CHECKED = 7;
-
-            @Override
-            protected SearchContext getContext()
-            {
-                return TransformRow.this.getComponentElement();
-            }
 
             WebElement name = new LazyWebElement(Locator.css("td:nth-of-type(" + NAME + ")"), this);
             WebElement sourceModule = new LazyWebElement(Locator.css("td:nth-of-type(" + SOURCE_MODULE + ")"), this);
