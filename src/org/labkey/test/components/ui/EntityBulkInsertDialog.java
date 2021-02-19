@@ -2,28 +2,86 @@ package org.labkey.test.components.ui;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
 public class EntityBulkInsertDialog extends ModalDialog
 {
-    private EntityInsertPanel _panel;
 
-    public EntityBulkInsertDialog(EntityInsertPanel panel)
+    public EntityBulkInsertDialog(WebDriver driver)
     {
-        this(new ModalDialogFinder(panel.getDriver()).withTitle("Bulk Creation of"));
-        _panel = panel;
+        this(new ModalDialogFinder(driver).withTitle("Bulk Creation of"));
     }
 
     private EntityBulkInsertDialog(ModalDialogFinder finder)
     {
         super(finder);
+    }
+
+    /**
+     * Option at the top of the dialog to make the samples derive from the identified parents.
+     *
+     * @return A reference to this dialog.
+     */
+    public EntityBulkInsertDialog selectDerivativesOption()
+    {
+        elementCache().derivativesOption.check();
+        return this;
+    }
+
+    /**
+     * Option at the top of the dialog to make the samples pool (aliquot) from the identified parents.
+     *
+     * @return A reference to this dialog.
+     */
+    public EntityBulkInsertDialog selectPooledOption()
+    {
+        elementCache().poolOption.check();
+        return this;
+    }
+
+    /**
+     * Check to see if the creation type options are displayed.
+     *
+     * @return True if either option is visible, false otherwise.
+     */
+    public boolean creationTypeOptionsVisible()
+    {
+        // Unlikely one option would be visible without the other.
+        return elementCache().poolOption.isDisplayed() || elementCache().derivativesOption.isDisplayed();
+    }
+
+    /**
+     * Get the text of the currently selected creation type. If the options are not present return an empty string.
+     *
+     * @return The text of the current selected creation type.
+     */
+    public String getCreationTypeSelected()
+    {
+        String option = "";
+
+        if(elementCache().derivativesOption.isDisplayed())
+        {
+            if(elementCache().derivativesOption.isChecked())
+            {
+                option = elementCache().derivativesOption.getComponentElement().getAttribute("value");
+            }
+            else
+            {
+                option = elementCache().poolOption.getComponentElement().getAttribute("value");
+            }
+        }
+
+        return option;
     }
 
     public EntityBulkInsertDialog setQuantity(int quantity)
@@ -40,6 +98,16 @@ public class EntityBulkInsertDialog extends ModalDialog
     public String getQuantity()
     {
         return getWrapper().getFormElement(elementCache().quantity);
+    }
+
+    /**
+     * Get the label next to the quantity text box. This will change depending upon the creation option selected.
+     *
+     * @return The text of the label next to the quantity box.
+     */
+    public String getQuantityLabel()
+    {
+        return elementCache().quantityLabel.getText();
     }
 
     public EntityBulkInsertDialog setDescription(String description)
@@ -78,7 +146,7 @@ public class EntityBulkInsertDialog extends ModalDialog
     public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
-        selectValues.forEach(s -> {reactSelect.filterSelect(s);});
+        selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
@@ -139,6 +207,19 @@ public class EntityBulkInsertDialog extends ModalDialog
         {
             // Do nothing if stale.
         }
+    }
+
+    /**
+     * Click the 'Add' button and wait for an alert (error) message to be shown on the dialog.
+     *
+     * @return The text displayed in the alert.
+     */
+    public String clickAddRowsExpectError()
+    {
+        elementCache().addRowsButton.click();
+        WebDriverWrapper.waitFor(()->elementCache().alert.isDisplayed(), "Expected alert error was not shown.", 500);
+
+        return elementCache().alert.getText();
     }
 
     public void clickCancel()
@@ -208,11 +289,22 @@ public class EntityBulkInsertDialog extends ModalDialog
         WebElement addRowsButton = Locator.tagWithClass("button", "test-loc-submit-for-edit-button")
                 .findWhenNeeded(getComponentElement());
 
+        WebElement quantityLabel = Locator.tagWithAttribute("label", "for", "numItems")
+                .findWhenNeeded(getComponentElement());
 
         WebElement quantity = Locator.tagWithId("input", "numItems")
                 .findWhenNeeded(getComponentElement());
 
         WebElement description = Locator.tagWithId("textarea", "Description")
+                .findWhenNeeded(getComponentElement());
+
+        RadioButton derivativesOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Derivatives")
+                .findWhenNeeded(getComponentElement());
+
+        RadioButton poolOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Pooled Samples")
+                .findWhenNeeded(getComponentElement());
+
+        WebElement alert = Locator.tagWithClassContaining("div", "alert-danger")
                 .findWhenNeeded(getComponentElement());
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");

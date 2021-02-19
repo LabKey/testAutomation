@@ -114,6 +114,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public DomainFieldRow setSelectRowField(boolean checked)
+    {
+        elementCache().fieldSelectCheckbox.set(checked);
+        return this;
+    }
+
     public String detailsMessage()
     {
         return elementCache().fieldDetailsMessage.getText().trim();
@@ -709,6 +715,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
         public final Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
+
+        public final Checkbox fieldSelectCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-selected")
+                    .findWhenNeeded(this));
 
         public final WebElement fieldDetailsMessage = Locator.css(".domain-field-details, .domain-field-details-expanded")
                 .findWhenNeeded(this);
