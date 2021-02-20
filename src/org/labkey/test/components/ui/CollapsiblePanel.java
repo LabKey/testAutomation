@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary;
+package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;

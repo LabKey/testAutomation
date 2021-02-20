@@ -1,4 +1,4 @@
-package org.labkey.test.components.labkey.ui;
+package org.labkey.test.components.ui.files;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * Wraps 'packages/components/src/components/files/FileTree.tsx' from labkey-ui-components
- * TODO: Merge with {@link org.labkey.test.components.glassLibrary.files.FileSelectTree}
+ * TODO: Merge with {@link FileSelectTree}
  * 'FileSelectTree' assumes that rows have checkboxes, this component doesn't support checkboxes at all
  */
 public class FileTree extends WebDriverComponent<FileTree.ElementCache>

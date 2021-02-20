@@ -1,4 +1,4 @@
-package org.labkey.test.components.labkey.ui.core;
+package org.labkey.test.components.ui.base;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;

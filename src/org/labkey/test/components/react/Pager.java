@@ -11,6 +11,10 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Optional;
 
+/**
+ * Wrapper for UI component defined in 'packages/components/src/internal/components/gridbar/PageSizeSelector.tsx'
+ * Or maybe 'packages/components/src/internal/components/pagination/PageSizeMenu.tsx'
+ */
 public class Pager extends WebDriverComponent<Pager.ElementCache>
 {
     private final WebElement _el;

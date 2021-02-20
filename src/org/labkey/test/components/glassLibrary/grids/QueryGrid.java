@@ -7,7 +7,7 @@ package org.labkey.test.components.glassLibrary.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.glassLibrary.components.OmniBox;
+import org.labkey.test.components.ui.OmniBox;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

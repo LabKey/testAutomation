@@ -1,13 +1,14 @@
-package org.labkey.test.components.ui;
+package org.labkey.test.components.ui.entities;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
+import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.react.ReactDatePicker;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

@@ -1,9 +1,9 @@
-package org.labkey.test.components.ui;
+package org.labkey.test.components.ui.entities;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.glassLibrary.grids.EditableGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;

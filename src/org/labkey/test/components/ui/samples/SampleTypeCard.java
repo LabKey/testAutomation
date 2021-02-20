@@ -1,17 +1,14 @@
-package org.labkey.test.components.glassLibrary.cards;
+package org.labkey.test.components.ui.samples;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.components.html.Input.Input;
-
 /**
- * Automates shared component implemented by /internal/components/base/cards.tsx
+ * Automates shared component implemented by /internal/components/samples/SampleSetCards.tsx
+ * TODO: Pull generic functionality into a base component for '/internal/components/base/Cards.tsx'
  */
 public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCache>
 {

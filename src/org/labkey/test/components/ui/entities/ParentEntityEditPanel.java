@@ -1,12 +1,12 @@
-package org.labkey.test.components.glassLibrary;
+package org.labkey.test.components.ui.entities;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.glassLibrary.components.FilteringReactSelect;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.FilteringReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
