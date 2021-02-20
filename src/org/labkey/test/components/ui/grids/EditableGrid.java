@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary.grids;
+package org.labkey.test.components.ui.grids;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;

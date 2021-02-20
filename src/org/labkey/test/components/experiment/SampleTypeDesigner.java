@@ -1,4 +1,4 @@
-package org.labkey.test.components.labkey.ui.samples;
+package org.labkey.test.components.experiment;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;

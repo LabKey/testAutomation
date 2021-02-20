@@ -1,15 +1,11 @@
-package org.labkey.test.components.labkey.ui.samples;
+package org.labkey.test.components.experiment;
 
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.components.Component;
-import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.util.List;
 

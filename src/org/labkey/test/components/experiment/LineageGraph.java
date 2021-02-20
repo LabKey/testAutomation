@@ -3,7 +3,7 @@ package org.labkey.test.components.experiment;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.glassLibrary.grids.DetailTable;
+import org.labkey.test.components.ui.grids.DetailTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 

@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary.navigation;
+package org.labkey.test.components.ui.navigation;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.react.MultiMenu;

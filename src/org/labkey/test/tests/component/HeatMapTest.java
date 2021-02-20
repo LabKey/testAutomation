@@ -8,7 +8,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.glassLibrary.heatmap.HeatMap;
+import org.labkey.test.components.ui.heatmap.HeatMap;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;

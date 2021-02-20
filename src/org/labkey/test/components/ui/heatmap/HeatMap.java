@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary.heatmap;
+package org.labkey.test.components.ui.heatmap;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;

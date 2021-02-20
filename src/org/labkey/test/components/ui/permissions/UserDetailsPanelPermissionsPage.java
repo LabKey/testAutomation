@@ -1,4 +1,4 @@
-package org.labkey.test.components.glassLibrary.permissions;
+package org.labkey.test.components.ui.permissions;
 
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;

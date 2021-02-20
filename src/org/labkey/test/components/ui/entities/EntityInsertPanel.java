@@ -4,7 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.components.glassLibrary.grids.EditableGrid;
+import org.labkey.test.components.ui.grids.EditableGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
