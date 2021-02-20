@@ -306,11 +306,11 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Create subfolders and setup permissions.");
         _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI01);
-        _containerHelper.enableModule(IMPORT_PROJECT_FILE01 + "/" + IMPORT_FOLDER_MULTI01, "Specimen");
+        _containerHelper.enableModule("Specimen");
         _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI02);
-        _containerHelper.enableModule(IMPORT_PROJECT_FILE01 + "/" + IMPORT_FOLDER_MULTI02, "Specimen");
+        _containerHelper.enableModule("Specimen");
         _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI03);
-        _containerHelper.enableModule(IMPORT_PROJECT_FILE01 + "/" + IMPORT_FOLDER_MULTI03, "Specimen");
+        _containerHelper.enableModule("Specimen");
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
 
