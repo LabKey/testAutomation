@@ -290,7 +290,7 @@ public class StudyHelper
 
         _test.waitForElement(Locator.tagWithClass("table", "export-location"));
         List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
-        if (isSpecimenModulePresent())
+        if (isSpecimenModuleActive())
         {
             studyObjects = new ArrayList<>(studyObjects);
             studyObjects.add("Specimen");
@@ -346,8 +346,8 @@ public class StudyHelper
         _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 5 : Specimens, if present
-        if (isSpecimenModulePresent())
+        // Wizard page 5 : Specimens, if present & active
+        if (isSpecimenModuleActive())
         {
             _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
             _test.clickButton("Next", 0);
@@ -521,6 +521,15 @@ public class StudyHelper
         }
 
         return _specimenModulePresent;
+    }
+
+    public boolean isSpecimenModuleActive()
+    {
+        if (isSpecimenModulePresent())
+            return false;
+
+        AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
+        return containerHelper.getActiveModules().contains("Specimen");
     }
 
     public enum TimepointType
