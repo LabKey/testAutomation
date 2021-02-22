@@ -525,7 +525,7 @@ public class StudyHelper
 
     public boolean isSpecimenModuleActive()
     {
-        if (isSpecimenModulePresent())
+        if (!isSpecimenModulePresent())
             return false;
 
         AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
