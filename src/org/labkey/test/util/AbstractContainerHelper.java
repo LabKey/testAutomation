@@ -53,8 +53,8 @@ public abstract class AbstractContainerHelper
 {
     protected BaseWebDriverTest _test;
 
-    private static Set<String> _createdProjects = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
+    private static final Set<String> _createdProjects = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
 
     public AbstractContainerHelper(BaseWebDriverTest test)
     {
@@ -169,8 +169,7 @@ public abstract class AbstractContainerHelper
     {
         GetModulesResponse modulesResponse = getModules("home");
         Set<String> modules = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-        modulesResponse.getModules().stream()
-                .forEach(module -> modules.add(module.getName()));
+        modulesResponse.getModules().forEach(module -> modules.add(module.getName()));
         return modules;
     }
 
