@@ -293,7 +293,7 @@ public class StudyHelper
         if (isSpecimenModuleActive())
         {
             studyObjects = new ArrayList<>(studyObjects);
-            studyObjects.add("Specimen");
+            studyObjects.add("Specimens");
         }
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
         List<String> missingObjects = new ArrayList<>();
