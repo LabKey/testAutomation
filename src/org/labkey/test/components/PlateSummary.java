@@ -17,7 +17,6 @@ package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -27,12 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class PlateSummary extends Component
+public class PlateSummary extends Component<PlateSummary.Elements>
 {
     protected final BaseWebDriverTest _test;
     protected Measurement _measurement;
     private final WebElement summaryGrid;
-    private Elements _elements;
 
     public PlateSummary(BaseWebDriverTest test, int plateSummaryIndex)
     {
@@ -49,12 +47,12 @@ public class PlateSummary extends Component
 
     public String getCellValue(Row row, int col)
     {
-        return elements().getCells(row.index).get(col).getText();
+        return elementCache().getCells(row.index).get(col).getText();
     }
 
     public List<String> getRowValues(Row row)
     {
-        return _test.getTexts(elements().getCells(row.index));
+        return _test.getTexts(elementCache().getCells(row.index));
     }
 
     public List<String> getColumnValues(int col)
@@ -81,12 +79,12 @@ public class PlateSummary extends Component
     {
         _test._ext4Helper.selectRadioButton("Measurement", measurement.label);
         _measurement = measurement;
-        _test.shortWait().until(ExpectedConditions.visibilityOf(elements().getCells(0).get(0)));
+        _test.shortWait().until(ExpectedConditions.visibilityOf(elementCache().getCells(0).get(0)));
     }
 
     private int getRowCount()
     {
-        return elements().getDataRows().size();
+        return elementCache().getDataRows().size();
     }
 
     public enum Row
@@ -116,23 +114,16 @@ public class PlateSummary extends Component
         }
     }
 
-    private Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
-        if (_elements == null)
-            _elements = new Elements();
-        return _elements;
+        return new Elements();
     }
 
-    protected class Elements extends ComponentElements
+    protected class Elements extends Component<?>.ElementCache
     {
         private List<WebElement> dateRows;
         private Map<Measurement, Map<Integer, List<WebElement>>> dataCells;
-
-        @Override
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
 
         public List<WebElement> getDataRows()
         {
