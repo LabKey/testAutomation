@@ -3,17 +3,17 @@
         <formData>{
             type: 'list',
             label: 'Controller',
-            participantIds: [999320016, 999320010, 999320018, 999320021, 999320029]
+            participantIds: [999320016, 999320485, 999321033, 999321029, 999320719]
             }
         </formData>
-        <url>participant-group/StudyVerifyProject/My%20Study/createParticipantCategory.view?</url>
+        <url>StudyVerifyProject/My%20Study/participant-group-createParticipantCategory.view?</url>
         <response>{
             "category": {
             "shared": true,
             "autoUpdate": false,
             "label": "Controller",
             "type": "list",
-            "participantIds": ["999320016", "999320010", "999320018", "999320021", "999320029"]
+            "participantIds": ["999320016", "999320485", "999321033", "999321029", "999320719"]
             },
             "success": true
             }
@@ -23,17 +23,17 @@
         <formData>{
             type: 'list',
             label: 'Elite Controller',
-            participantIds: [999320033, 999320036, 999320038]
+            participantIds: [999320703, 999320695, 999320687]
             }
         </formData>
-        <url>participant-group/StudyVerifyProject/My%20Study/createParticipantCategory.view?</url>
+        <url>StudyVerifyProject/My%20Study/participant-group-createParticipantCategory.view?</url>
         <response>{
             "category": {
             "shared": true,
             "autoUpdate": false,
             "label": "Elite Controller",
             "type": "list",
-            "participantIds": ["999320033", "999320036", "999320038"]
+            "participantIds": ["999320703", "999320695", "999320687"]
             },
             "success": true
             }
@@ -44,24 +44,24 @@
         <formData>{
             type: 'list',
             label: 'Non Controller',
-            participantIds: [999320170, 999320173, 999320176]
+            participantIds: [999320652, 999320660, 999320671]
             }
         </formData>
-        <url>participant-group/StudyVerifyProject/My%20Study/createParticipantCategory.view?</url>
+        <url>StudyVerifyProject/My%20Study/participant-group-createParticipantCategory.view?</url>
         <response>{
             "category": {
             "shared": true,
             "autoUpdate": false,
             "label": "Non Controller",
             "type": "list",
-            "participantIds": ["999320170", "999320173", "999320176"]
+            "participantIds": ["999320652", "999320660", "999320671"]
             },
             "success": true
             }
         </response>
     </test>
     <test name="group categories" type="get">
-        <url>participant-group/StudyVerifyProject/My%20Study/getParticipantCategories.view?</url>
+        <url>StudyVerifyProject/My%20Study/participant-group-getParticipantCategories.view?</url>
         <response>{
         "categories": [
             {
@@ -84,10 +84,10 @@
                 "type": "list",
                 "participantIds": [
                     "999320016",
-                    "999320010",
-                    "999320018",
-                    "999320021",
-                    "999320029"
+                    "999320485",
+                    "999321033",
+                    "999321029",
+                    "999320719"
                 ]
             },
             {
@@ -97,9 +97,9 @@
                 "rowId": 317,
                 "type": "list",
                 "participantIds": [
-                    "999320033",
-                    "999320036",
-                    "999320038"
+                    "999320703",
+                    "999320695",
+                    "999320687"
                 ]
             },
             {
@@ -108,9 +108,9 @@
                 "label": "Non Controller",
                 "type": "list",
                 "participantIds": [
-                    "999320170",
-                    "999320173",
-                    "999320176"
+                    "999320652",
+                    "999320660",
+                    "999320671"
                 ]
             }
         ],
