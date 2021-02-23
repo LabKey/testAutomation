@@ -214,7 +214,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         waitForText("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets",
                 "Dataset Data", "Participant Comment Settings");
 
-        if (_studyHelper.isSpecimenModulePresent())
+        if (_studyHelper.isSpecimenModuleActive())
         {
             assertTextPresent("Specimens", "Specimen Settings");
         }
