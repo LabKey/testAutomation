@@ -1,8 +1,7 @@
 package org.labkey.test.components.ui.user;
 
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.ui.ConfirmationDialog;
-import org.labkey.test.components.ui.DeleteConfirmationDialog;
+import org.labkey.test.components.experiment.DeleteConfirmationDialog;
 import org.labkey.test.pages.LabKeyPage;
 
 import java.util.function.Supplier;

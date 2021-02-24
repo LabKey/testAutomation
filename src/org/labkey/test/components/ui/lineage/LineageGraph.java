@@ -1,4 +1,4 @@
-package org.labkey.test.components.experiment;
+package org.labkey.test.components.ui.lineage;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
