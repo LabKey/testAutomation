@@ -6,37 +6,49 @@ import org.labkey.test.pages.LabKeyPage;
 
 import java.util.function.Supplier;
 
-/**
- * Wraps the UI component defined by 'internal/components/user/UserActivateChangeConfirmModal.tsx'
- */
-public class UserActivateDeactivateConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage<?>> extends ConfirmationDialog<SourcePage, ConfirmPage>
+public class UserActivateDeactivateConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
 {
-    private final boolean _activate;
+    private final SourcePage _sourcePage;
+    private final Supplier<ConfirmPage> _confirmPageSupplier;
 
-    public UserActivateDeactivateConfirmationDialog(boolean activate, SourcePage sourcePage)
+    public UserActivateDeactivateConfirmationDialog(SourcePage sourcePage)
     {
-        this(activate, sourcePage, () -> null);
+        this(sourcePage, () -> null);
     }
 
-    protected UserActivateDeactivateConfirmationDialog(boolean activate, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public UserActivateDeactivateConfirmationDialog(SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        super(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle("user"), sourcePage, confirmPageSupplier);
-        _activate = activate;
+        this("user", sourcePage, confirmPageSupplier);
+    }
+
+    protected UserActivateDeactivateConfirmationDialog(String partialTitle, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
+    }
+
+    protected UserActivateDeactivateConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        super(finder);
+        _sourcePage = sourcePage;
+        _confirmPageSupplier = confirmPageSupplier;
     }
 
     public ConfirmPage confirmDeactivate()
     {
-        return confirm();
+        this.dismiss("Yes, Deactivate");
+        return _confirmPageSupplier.get();
     }
 
     public ConfirmPage confirmReactivate()
     {
-        return confirm();
+        this.dismiss("Yes, Reactivate");
+        return _confirmPageSupplier.get();
     }
 
-    @Override
-    protected String getConfirmButtonText()
+    public SourcePage cancelDelete()
     {
-        return "Yes, " + (_activate ? "Reactivate" : "Deactivate");
+        this.dismiss("Cancel");
+        return _sourcePage;
     }
+
 }

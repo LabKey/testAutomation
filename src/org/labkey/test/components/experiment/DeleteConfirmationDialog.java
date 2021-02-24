@@ -6,11 +6,11 @@ import org.labkey.test.pages.LabKeyPage;
 
 import java.util.function.Supplier;
 
-/**
- * Wraps several confirmation dialogs
- */
-public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage<?>> extends ConfirmationDialog<SourcePage, ConfirmPage>
+public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
 {
+    private final SourcePage _sourcePage;
+    private final Supplier<ConfirmPage> _confirmPageSupplier;
+
     public DeleteConfirmationDialog(SourcePage sourcePage)
     {
         this(sourcePage, () -> null);
@@ -23,28 +23,37 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     protected DeleteConfirmationDialog(String partialTitle, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        super(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
+    }
+
+    protected DeleteConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        super(finder);
+        _sourcePage = sourcePage;
+        _confirmPageSupplier = confirmPageSupplier;
     }
 
     public SourcePage cancelDelete()
     {
-        return cancel();
+        this.dismiss("Cancel");
+        return _sourcePage;
     }
 
     public ConfirmPage confirmDelete()
     {
-        return confirm();
+        this.dismiss("Yes, Delete");
+        return _confirmPageSupplier.get();
+    }
+
+    public ConfirmPage confirmPermanentlyDelete()
+    {
+        this.dismiss("Yes, Permanently Delete");
+        return _confirmPageSupplier.get();
     }
 
     public SourcePage clickDismiss()
     {
         this.dismiss("Dismiss");
-        return getSourcePage();
-    }
-
-    @Override
-    protected String getConfirmButtonText()
-    {
-        return "Yes, Delete";
+        return _sourcePage;
     }
 }
