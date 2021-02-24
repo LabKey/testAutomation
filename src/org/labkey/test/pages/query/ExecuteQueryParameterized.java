@@ -15,58 +15,47 @@
  */
 package org.labkey.test.pages.query;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapperImpl;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
 
-public class ExecuteQueryParameterized extends LabKeyPage
+public class ExecuteQueryParameterized extends LabKeyPage<ExecuteQueryParameterized.Elements>
 {
-    private final Elements _elements;
-
     public ExecuteQueryParameterized(WebDriver driver)
     {
         super(driver);
-        _elements = new Elements();
     }
 
     public ExecuteQueryParameterized setParameters(Map<String, String> data)
     {
         for(String key : data.keySet())
         {
-            setFormElement(elements().findInputField(key), data.get(key));
+            setFormElement(elementCache().findInputField(key), data.get(key));
         }
         return this;
     }
 
     public DataRegionTable submit()
     {
-        clickAndWait(elements().submitButton);
+        clickAndWait(elementCache().submitButton);
         return new DataRegionTable("query", new WebDriverWrapperImpl(getDriver()));
     }
 
-    private Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
-        return _elements;
+        return new Elements();
     }
 
-    private class Elements extends ComponentElements
+    protected class Elements extends LabKeyPage<?>.ElementCache
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getDriver();
-        }
-
         WebElement findInputField(String fieldKey)
         {
             return Locator.tag("input").attributeEndsWith("name", ".param." + fieldKey).findElement(this);
