@@ -94,13 +94,13 @@ public class CreateStudyPage extends LabKeyPage<CreateStudyPage.Elements>
     public LabKeyPage createStudy()
     {
         clickAndWait(elementCache().createStudyButton);
-        return null;
+        return new LabKeyPage(this);
     }
 
     public LabKeyPage cancel()
     {
         clickAndWait(elementCache().backButton);
-        return null;
+        return new LabKeyPage(this);
     }
 
     @Override
