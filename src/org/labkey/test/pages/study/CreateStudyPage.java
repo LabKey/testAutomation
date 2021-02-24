@@ -17,19 +17,15 @@ package org.labkey.test.pages.study;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.util.StudyHelper.SecurityMode;
 import static org.labkey.test.util.StudyHelper.TimepointType;
 
-public class CreateStudyPage extends LabKeyPage
+public class CreateStudyPage extends LabKeyPage<CreateStudyPage.Elements>
 {
-    private Elements _elements;
-
     public CreateStudyPage(BaseWebDriverTest test)
     {
         super(test);
@@ -37,92 +33,84 @@ public class CreateStudyPage extends LabKeyPage
 
     public CreateStudyPage setLabel(String label)
     {
-        _test.setFormElement(elements().studyLabelInput, label);
+        setFormElement(elementCache().studyLabelInput, label);
         return this;
     }
 
     public CreateStudyPage setSubjectNounSingular(String nounSingular)
     {
-        _test.setFormElement(elements().subjectNounSingularInput, nounSingular);
+        setFormElement(elementCache().subjectNounSingularInput, nounSingular);
         return this;
     }
 
     public CreateStudyPage setSubjectNounPlural(String nounPlural)
     {
-        _test.setFormElement(elements().subjectNounPluralInput, nounPlural);
+        setFormElement(elementCache().subjectNounPluralInput, nounPlural);
         return this;
     }
 
     public CreateStudyPage setSubjectColumnName(String columnName)
     {
-        _test.setFormElement(elements().subjectColumnNameInput, columnName);
+        setFormElement(elementCache().subjectColumnNameInput, columnName);
         return this;
     }
 
     public CreateStudyPage setTimepointType(TimepointType type)
     {
-        elements().timepointTypeRadio(type).click();
+        elementCache().timepointTypeRadio(type).click();
         return this;
     }
 
     public CreateStudyPage setStartDate(String startDate)
     {
-        _test.setFormElement(elements().startDateInput, startDate);
+        setFormElement(elementCache().startDateInput, startDate);
         return this;
     }
 
     public CreateStudyPage setDefaultTimepointDuration(String defaultTimepointDuration)
     {
-        _test.setFormElement(elements().defaultTimepointDurationInput, defaultTimepointDuration);
+        setFormElement(elementCache().defaultTimepointDurationInput, defaultTimepointDuration);
         return this;
     }
 
     public CreateStudyPage setSecurityMode(SecurityMode securityMode)
     {
-        _test.selectOptionByValue(elements().securityModeSelect, securityMode.toString());
+        selectOptionByValue(elementCache().securityModeSelect, securityMode.toString());
         return this;
     }
 
     public CreateStudyPage setSharedDatasets(boolean share)
     {
-        elements().shareDatasetsRadio(share).click();
+        elementCache().shareDatasetsRadio(share).click();
         return this;
     }
 
     public CreateStudyPage setShareTimepoints(boolean share)
     {
-        elements().shareTimepointsRadio(share).click();
+        elementCache().shareTimepointsRadio(share).click();
         return this;
     }
 
     public LabKeyPage createStudy()
     {
-        _test.clickAndWait(elements().createStudyButton);
-        return new LabKeyPage(_test);
+        clickAndWait(elementCache().createStudyButton);
+        return new LabKeyPage(this);
     }
 
     public LabKeyPage cancel()
     {
-        _test.clickAndWait(elements().backButton);
-        return new LabKeyPage(_test);
+        clickAndWait(elementCache().backButton);
+        return new LabKeyPage(this);
     }
 
-    private Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
-        if (null == _elements)
-            _elements = new Elements();
-
-        return _elements;
+        return new Elements();
     }
 
-    private class Elements extends ComponentElements
+    protected class Elements extends LabKeyPage<?>.ElementCache
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getDriver();
-        }
-
         final WebElement studyLabelInput = new LazyWebElement(Locator.name("label"), this);
         final WebElement subjectNounSingularInput = new LazyWebElement(Locator.name("subjectNounSingular"), this);
         final WebElement subjectNounPluralInput = new LazyWebElement(Locator.name("subjectNounPlural"), this);

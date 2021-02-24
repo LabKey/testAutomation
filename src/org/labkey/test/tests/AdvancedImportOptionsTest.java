@@ -29,6 +29,7 @@ import org.labkey.test.components.studydesigner.ImmunizationScheduleWebpart;
 import org.labkey.test.components.studydesigner.VaccineDesignWebpart;
 import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.study.ManageDatasetQCStatesPage;
+import org.labkey.test.pages.study.QCStateTableRow;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
@@ -210,7 +211,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate QC State.");
         ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
         List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
-        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(row -> row.getState()).collect(Collectors.toList());
+        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(QCStateTableRow::getState).collect(Collectors.toList());
         assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
@@ -277,7 +278,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate QC State.");
         ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
         List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
-        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(row -> row.getState()).collect(Collectors.toList());
+        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(QCStateTableRow::getState).collect(Collectors.toList());
         assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
