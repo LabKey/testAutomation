@@ -1,4 +1,4 @@
-package org.labkey.test.components.experiment;
+package org.labkey.test.components.ui;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;

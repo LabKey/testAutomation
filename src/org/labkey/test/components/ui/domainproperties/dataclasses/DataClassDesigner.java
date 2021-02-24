@@ -1,6 +1,7 @@
-package org.labkey.test.components.experiment;
+package org.labkey.test.components.ui.domainproperties.dataclasses;
 
 import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.domainproperties.EntityTypeDesigner;
 import org.openqa.selenium.WebDriver;
 
 /**

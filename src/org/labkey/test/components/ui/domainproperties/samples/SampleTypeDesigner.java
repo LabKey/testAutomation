@@ -1,9 +1,10 @@
-package org.labkey.test.components.experiment;
+package org.labkey.test.components.ui.domainproperties.samples;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.ui.domainproperties.EntityTypeDesigner;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

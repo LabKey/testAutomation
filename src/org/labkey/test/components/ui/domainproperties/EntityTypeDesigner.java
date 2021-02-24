@@ -1,4 +1,4 @@
-package org.labkey.test.components.experiment;
+package org.labkey.test.components.ui.domainproperties;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.domain.DomainDesigner;
