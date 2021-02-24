@@ -29,7 +29,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.core.ProjectMenu;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;

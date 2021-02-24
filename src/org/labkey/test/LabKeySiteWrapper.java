@@ -45,7 +45,7 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
@@ -1249,7 +1249,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.components.api.ProjectMenu#open}
+     * @deprecated Use {@link ProjectMenu#open}
      */
     @Deprecated
     public void openProjectMenu()

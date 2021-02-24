@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.components.api;
+package org.labkey.test.components.core;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
