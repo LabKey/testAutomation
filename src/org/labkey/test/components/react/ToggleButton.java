@@ -1,4 +1,4 @@
-package org.labkey.test.components.html;
+package org.labkey.test.components.react;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;

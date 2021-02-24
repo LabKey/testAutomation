@@ -9,7 +9,7 @@ import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.html.ToggleButton;
+import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.study.AdvancedDatasetSettingsDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.openqa.selenium.WebDriver;

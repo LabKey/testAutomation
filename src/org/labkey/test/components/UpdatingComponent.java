@@ -1,4 +1,4 @@
-package org.labkey.test.components.react;
+package org.labkey.test.components;
 
 
 public interface UpdatingComponent

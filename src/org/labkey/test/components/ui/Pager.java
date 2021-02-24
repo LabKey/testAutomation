@@ -2,10 +2,12 @@
  * Copyright (c) 2019 LabKey Corporation. All rights reserved. No portion of this work may be reproduced in
  * any form or by any electronic or mechanical means without written permission from LabKey Corporation.
  */
-package org.labkey.test.components.react;
+package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.DropdownButtonGroup;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
