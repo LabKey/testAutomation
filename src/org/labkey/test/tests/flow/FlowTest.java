@@ -788,7 +788,7 @@ public class FlowTest extends BaseFlowTest
 
         assertTitleContains(reportName);
         assertTextPresent(errorText);
-        checkExpectedErrors(2);
+        checkExpectedErrors(1);
 
         // Subsequent tests expect there to be no ERRORs in pipeline. Delete errored pipeline job
         PipelineStatusTable pipelineStatusTable = PipelineStatusTable.viewJobsForContainer(this, getContainerPath());
