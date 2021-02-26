@@ -3,7 +3,7 @@ package org.labkey.test.pages.core.login;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.html.ToggleButton;
+import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 

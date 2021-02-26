@@ -3,7 +3,7 @@ package org.labkey.test.params.experiment;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
-import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
+import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 

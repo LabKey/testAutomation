@@ -2,10 +2,8 @@ package org.labkey.test.pages.experiment;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
+import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-
 
 public class CreateSampleTypePage extends SampleTypeDesigner<CreateSampleTypePage>
 {

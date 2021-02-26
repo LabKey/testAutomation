@@ -26,7 +26,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.domain.DomainFieldRow;
-import org.labkey.test.components.experiment.LineageGraph;
+import org.labkey.test.components.ui.lineage.LineageGraph;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
