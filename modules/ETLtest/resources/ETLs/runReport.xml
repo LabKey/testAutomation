@@ -7,7 +7,15 @@
             <taskref ref="org.labkey.di.pipeline.RunReportTask">
                 <settings>
                     <setting name="reportId" value="module:ETLtest/etlReport.R"/>
-                    <setting name="greeter" value="ETL"/>
+                    <setting name="greeter" value="STEP1"/>
+                </settings>
+            </taskref>
+        </transform>
+        <transform id="step2" type="TaskRefTransformStep">
+            <taskref ref="org.labkey.di.pipeline.RunReportTask">
+                <settings>
+                    <setting name="reportId" value="module:ETLtest/etlReport.R"/>
+                    <setting name="greeter" value="STEP2"/>
                 </settings>
             </taskref>
         </transform>
