@@ -129,7 +129,7 @@ public class ProductMenu extends BaseBootstrapMenu
 
         WebElement menuSectionHeader(String headerText)
         {
-            return Locator.byClass("menu-section-header").findElement(menuSection(headerText));
+            return Locator.byClass("menu-section-header").childTag("a").findElement(menuSection(headerText));
         }
 
         WebElement menuSectionBody(String headerText)
