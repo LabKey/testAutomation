@@ -230,7 +230,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Create GPAT assay from " + dataFile.getName());
         _uploadHelper.uploadFile(dataFile);
         beginAt(WebTestHelper.buildURL("pipeline", getProjectName(), "browse"));
-        _fileBrowserHelper.importFile(dataFile.getName(), "Create New General Assay Design");
+        _fileBrowserHelper.importFile(dataFile.getName(), "Create New Standard Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
         if (assayName != null)
         {

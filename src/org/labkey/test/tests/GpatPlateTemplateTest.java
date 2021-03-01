@@ -42,7 +42,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
         goToProjectHome();
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.createAssayWithPlateSupport(ASSAY_NAME);
-        createPlateTemplate(templateName, "blank", "GPAT (General)");
+        createPlateTemplate(templateName, "blank", "Standard");
     }
 
     @Override
