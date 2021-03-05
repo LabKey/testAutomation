@@ -42,7 +42,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
         goToProjectHome();
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.createAssayWithPlateSupport(ASSAY_NAME);
-        createPlateTemplate(templateName, "blank", "GPAT (General)");
+        createPlateTemplate(templateName, "blank", "Standard", true);
     }
 
     @Override
@@ -128,8 +128,8 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
     public void verifyTemplateOptions()
     {
         goToProjectHome();
-        createPlateTemplate("Elisa template", "blank", "ELISA");
-        createPlateTemplate("ELISpot template", "blank", "ELISpot");
+        createPlateTemplate("Elisa template", "blank", "ELISA", false);
+        createPlateTemplate("ELISpot template", "blank", "ELISpot", false);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
@@ -162,14 +162,14 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 
     }
 
-    private void createPlateTemplate(String templateName, String templateType, String assayType)
+    private void createPlateTemplate(String templateName, String templateType, String assayType, boolean configureWells)
     {
         PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
         params.setTemplateType(templateType);
         params.setAssayType(assayType);
         PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this, params);
 
-        if (assayType.contains("GPAT"))
+        if (configureWells)
         {
             plateDesigner.createWellGroup("SAMPLE", "SA01");
             plateDesigner.createWellGroup("SAMPLE", "SA02");
