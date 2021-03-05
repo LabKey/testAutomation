@@ -155,10 +155,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
-    public EntityBulkInsertDialog clickBulkInsert()
+    public EntityBulkInsertDialog clickBulkInsert(String insertDialogTitle)
     {
         elementCache().bulkInsert.click();
-        return new EntityBulkInsertDialog(getDriver());
+        return new EntityBulkInsertDialog(getDriver(), insertDialogTitle);
     }
 
     public boolean isBulkInsertVisible()
