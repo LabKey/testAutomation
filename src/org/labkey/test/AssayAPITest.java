@@ -509,7 +509,7 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         PlateDesignerPage.PlateDesignerParams params = new PlateDesignerPage.PlateDesignerParams(8, 12);
         params.setTemplateType("blank");
-        params.setAssayType("GPAT (General)");
+        params.setAssayType("Standard");
         PlateDesignerPage plateDesigner = PlateDesignerPage.beginAt(this,params);
 
         // create the sample well groups
