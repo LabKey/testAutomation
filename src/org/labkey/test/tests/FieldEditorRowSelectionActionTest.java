@@ -108,6 +108,12 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
     public void testDatasetActions() throws Exception
     {
         String datasetName = "Physical Exam";
+        List<String> expectedHeadersWithoutOntology = Arrays.asList("Name", "Range URI", "Required", "Lock Type", "Lookup Container", "Lookup Schema", "Lookup Query",
+                "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "Url", "Conditional Formats", "Property Validators",
+                "Hidden", "Shown In Update View", "Shown In Insert View", "Shown In Details View", "Default Value Type", "Default Value", "Default Display Value", "Phi",
+                "Exclude From Shifting", "Measure", "Dimension", "Recommended Variable", "Mv Enabled");
+        _containerHelper.disableModules("Ontology");
+
         goToProjectHome();
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(),
                 "study", datasetName);
@@ -129,7 +135,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 
         domainFormPanel.switchMode("Detail Mode");
         checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
-        checker().verifyEquals("Incorrect header values in detail mode", expectedHeaders, domainFormPanel.getDetailModeHeaders());
+        checker().verifyEquals("Incorrect header values in detail mode", expectedHeadersWithoutOntology, domainFormPanel.getDetailModeHeaders());
 
         log("Checking the links in detail mode");
         Locator.linkWithText("Language").findElement(getDriver()).click();
@@ -139,6 +145,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
                 domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
 
         domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
+        _containerHelper.enableModule("Ontology");
     }
 
     @Test
