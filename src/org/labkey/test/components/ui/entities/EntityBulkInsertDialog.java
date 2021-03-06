@@ -20,12 +20,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog(WebDriver driver)
     {
-        this(new ModalDialogFinder(driver).withTitle("Bulk Creation of"));
-    }
-
-    public EntityBulkInsertDialog(WebDriver driver, String dialogTitle)
-    {
-        this(new ModalDialogFinder(driver).withTitle(dialogTitle));
+        this(new ModalDialogFinder(driver).withTitle("Bulk"));
     }
 
     private EntityBulkInsertDialog(ModalDialogFinder finder)
