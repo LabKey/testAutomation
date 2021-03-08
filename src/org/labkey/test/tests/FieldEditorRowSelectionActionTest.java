@@ -12,7 +12,6 @@ import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -27,10 +26,14 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category(DailyA.class)
-@BaseWebDriverTest.ClassTimeout(minutes = 2)
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 {
     private final static String PROJECT_NAME = "Field Editor Row Selection Action Test";
+    List<String> expectedHeaders = Arrays.asList("Name", "Range URI", "Required", "Lock Type", "Lookup Container", "Lookup Schema", "Lookup Query",
+            "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "Url", "Conditional Formats", "Property Validators",
+            "Hidden", "Shown In Update View", "Shown In Insert View", "Shown In Details View", "Default Value Type", "Default Value", "Default Display Value", "Phi",
+            "Exclude From Shifting", "Measure", "Dimension", "Recommended Variable", "Mv Enabled");
 
     @BeforeClass
     public static void setupProject()
@@ -50,10 +53,11 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
     {
         return Arrays.asList("study");
     }
-    
+
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
+
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"), false, 1);
 
         goToProjectHome();
@@ -83,6 +87,19 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 
         checker().verifyTrue("Exported Fields are not same as UI", uiFields.equals(exportedFields));
 
+        log("Verifying the toggle between summary view and detail view list domain");
+        checker().verifyTrue("Incorrect default display mode", domainFormPanel.isSummaryMode());
+
+        domainFormPanel.switchMode("Detail Mode");
+        checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
+        checker().verifyEquals("Incorrect header values in detail mode in list domain", expectedHeaders, domainFormPanel.getDetailModeHeaders());
+
+        Locator.linkWithText("FirstName").findElement(getDriver()).click();
+        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
+        checker().verifyTrue("Clicked row is not expanded in summary mode", domainFormPanel.getField("FirstName").isExpanded());
+        checker().verifyEquals("Inconsistent number of rows in summary and detail mode",
+                domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
+
         domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
     }
 
@@ -91,7 +108,6 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
     {
         String datasetName = "Physical Exam";
         goToProjectHome();
-
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(),
                 "study", datasetName);
 
@@ -105,10 +121,24 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 
         File downloadedFile = domainFormPanel.clickExportFields();
         ArrayList<String> exportedFields = getFieldsFromExportFile(downloadedFile);
-
         checker().verifyTrue("Exported Fields are not same as UI", exportedFields.equals(domainFormPanel.fieldNames()));
 
+        log("Verifying the toggle between summary view and detail view");
+        checker().verifyTrue("Incorrect default display mode", domainFormPanel.isSummaryMode());
+
+        domainFormPanel.switchMode("Detail Mode");
+        checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
+        checker().verifyEquals("Incorrect header values in detail mode", expectedHeaders, domainFormPanel.getDetailModeHeaders());
+
+        log("Checking the links in detail mode");
+        Locator.linkWithText("Language").findElement(getDriver()).click();
+        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
+        checker().verifyTrue("Clicked row is not expanded in summary mode", domainFormPanel.getField("Language").isExpanded());
+        checker().verifyEquals("Inconsistent number of rows in summary and detail mode",
+                domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
+
         domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
+
     }
 
     @Test
@@ -167,6 +197,20 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         checker().verifyTrue("The exported fields do not match the UI fields",
                 domainFormPanel.fieldNames().equals(getFieldsFromExportFile(downloadedFile)));
 
+        log("Verifying the toggle between summary view and detail view for Results domain");
+        checker().verifyTrue("Incorrect default display mode for result domain", domainFormPanel.isSummaryMode());
+
+        domainFormPanel.switchMode("Detail Mode");
+        checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
+        List<String> actualHeaders = domainFormPanel.getDetailModeHeaders();
+        checker().verifyEquals("Incorrect header values in detail mode in result domain", expectedHeaders, actualHeaders);
+
+        Locator.linkWithText("Date").findElement(getDriver()).click();
+        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
+        checker().verifyTrue("Clicked row is not expanded in summary mode", domainFormPanel.getField("Date").isExpanded());
+        checker().verifyEquals("Inconsistent number of rows in summary and detail mode",
+                domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
+
         assayDesignerPage.clickSave();
     }
 
@@ -180,7 +224,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(issueName));
-        DataRegionTable table = new DataRegionTable("issues-testissues",getDriver());
+        DataRegionTable table = new DataRegionTable("issues-testissues", getDriver());
         table.clickHeaderButtonAndWait("Admin");
 
         DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());

@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.params.FieldDefinition;
@@ -228,6 +227,51 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
+    public String getMode()
+    {
+        String button = elementCache().toggleButton.getAttribute("class");
+        if (button != null && button.contains("default"))
+            return "Summary Mode";
+        else
+            return "Detail Mode";
+    }
+
+    public DomainFormPanel switchMode(String name)
+    {
+        if (!getMode().equals(name))
+            elementCache().toggleButton.click();
+
+        return this;
+    }
+
+    public boolean isSummaryMode()
+    {
+        return getMode().equals("Summary Mode");
+    }
+
+    public boolean isDetailMode()
+    {
+        return getMode().equals("Detail Mode");
+    }
+
+    public List<String> getDetailModeHeaders()
+    {
+        List<String> headers = new ArrayList();
+        for (WebElement e : Locator.xpath("//table/thead/tr/th").findElements(this))
+            if (!e.getText().isBlank())
+                headers.add(e.getText().trim());
+
+        return headers;
+    }
+
+    public int getRowCountInDetailMode()
+    {
+        if (!getMode().equals("Detail Mode"))
+            switchMode("Detail Mode");
+
+        return Locator.xpath("//table/tbody/tr").findElements(this).size();
+    }
+
     public DomainFormPanel setInferFieldFile(File file)
     {
         getWrapper().setFormElement(elementCache().fileUploadInput, file);
@@ -298,6 +342,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     {
         public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
                 .findWhenNeeded(this));
+
+        public final WebElement toggleButton = Locator.tagWithAttributeContaining("div", "id", "domain-toggle-summary").
+                findWhenNeeded(this);
 
         protected WebElement addFieldButton = new WebElementWrapper()
         {
