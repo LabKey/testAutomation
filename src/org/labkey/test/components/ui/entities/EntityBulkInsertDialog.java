@@ -4,10 +4,10 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDatePicker;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +20,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog(WebDriver driver)
     {
-        this(new ModalDialogFinder(driver).withTitle("Bulk Creation of"));
+        this(new ModalDialogFinder(driver).withTitle("Bulk"));
     }
 
     private EntityBulkInsertDialog(ModalDialogFinder finder)
