@@ -76,6 +76,10 @@ public class LabKeyExpectedConditions
             @Override
             public WebElement apply(WebDriver driver)
             {
+                if (!el.isDisplayed())
+                {
+                    return null;
+                }
                 Point firstPosition;
                 Point secondPosition;
                 Dimension firstDimension;
