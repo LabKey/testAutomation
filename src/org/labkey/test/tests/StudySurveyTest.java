@@ -91,9 +91,11 @@ public class StudySurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("_surveyLabel_"), surveyLabel);
         setFormElement(Locator.name("participantid"), "1");
         setFormElement(Locator.name("date"), getDate(0));
-        clickButton("Submit completed form", 0);
-        _extHelper.waitForExtDialog("Success");
-        _extHelper.waitForExtDialogToDisappear("Success");
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Submit completed form", 0);
+            _extHelper.waitForExtDialog("Success");
+        });
 
         String newDate = getDate(2);
         goToProjectHome();
