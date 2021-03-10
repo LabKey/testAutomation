@@ -20,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
@@ -27,6 +28,8 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -126,6 +129,38 @@ public class DataClassTest extends BaseWebDriverTest
         domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
+    }
+
+    @Test
+    public void testIgnoreReservedFieldNames()
+    {
+        final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
+                "These fields are already used by LabKey to support this data class: " +
+                "Name, Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container.";
+
+        List<String> lines = new ArrayList<>();
+        lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,created,createdby,modified,modifiedBy,Container,SampleID");
+
+        if (!TestFileUtils.getTestTempDir().exists())
+            TestFileUtils.getTestTempDir().mkdirs();
+        File inferenceFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "InferFieldsForDataClass.csv", String.join(System.lineSeparator(), lines));
+
+        goToProjectHome();
+
+        String name = "Ignore Reserved Fields";
+        log("Create a Data class Type.");
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(name);
+
+        log("Infer fields from a file that contains some reserved fields.");
+        DomainFormPanel domainForm = createPage
+                .getDomainEditor()
+                .setInferFieldFile(inferenceFile);
+        checker().verifyEquals("Reserved field warning not as expected",  expectedInfoMsg, domainForm.getPanelAlertText());
+        createPage.clickSave();
+        DataRegionTable drt = DataRegion(getDriver()).find();
+        checker().verifyTrue("Data class not found in list of data classes", drt.getColumnDataAsText("Name").contains(name));
+        log("End of test.");
     }
 
     @Test
