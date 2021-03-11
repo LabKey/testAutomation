@@ -1099,7 +1099,7 @@ public class Crawler
             if (rethrow instanceof AssertionError)
                 throw rethrow; // AssertionErrors already contain page and origin information.
             else
-                throw new RuntimeException("Crawler triggered " + rethrow.getClass().getSimpleName() + ".\n" +
+                throw new RuntimeException("Crawler threw " + rethrow.getClass().getSimpleName() + ".\n" +
                     "Target page: " + relativeURL + "\n" +
                     originMessage, rethrow);
         }
