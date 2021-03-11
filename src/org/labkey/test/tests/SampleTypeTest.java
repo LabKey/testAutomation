@@ -68,6 +68,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyC.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -1241,6 +1242,42 @@ public class SampleTypeTest extends BaseWebDriverTest
                 Arrays.asList("The SampleId field name is reserved for imported or generated sample ids."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
+    }
+
+    @Test
+    public void testIgnoreReservedFieldNames()
+    {
+        final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
+                "These fields are already used by LabKey to support this sample type: " +
+                "Name, Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container, SampleId, SampleID.";
+
+        List<String> lines = new ArrayList<>();
+        lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,SampleId,created,createdby,modified,modifiedBy,Container,SampleID");
+
+        if (!TestFileUtils.getTestTempDir().exists())
+            TestFileUtils.getTestTempDir().mkdirs();
+        File inferenceFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "InferFieldsForSampleType.csv", String.join(System.lineSeparator(), lines));
+
+        log("Create a Sample Type.");
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+
+        clickProject(PROJECT_NAME);
+        String name = "Infer Fields";
+        CreateSampleTypePage createPage = sampleHelper
+                .goToCreateNewSampleType()
+                .setName(name);
+
+        log("Infer fields from a file that contains some reserved fields.");
+
+        DomainFormPanel domainForm = createPage
+                .getFieldsPanel()
+                .setInferFieldFile(inferenceFile);
+        checker().verifyEquals("Reserved field warning not as expected",  expectedInfoMsg, domainForm.getPanelAlertText());
+        createPage.clickSave();
+        DataRegionTable drt = DataRegion(getDriver()).find();
+        checker().verifyTrue("Sample type not found in list of sample types", drt.getColumnDataAsText("Name").contains(name));
+
+        log("End of test.");
     }
 
     @Test

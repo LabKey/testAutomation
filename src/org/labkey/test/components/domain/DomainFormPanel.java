@@ -317,6 +317,11 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return getPanelAlertWebElement().getText();
     }
 
+    public String getPanelAlertText(int index)
+    {
+        return getPanelAlertWebElement(index).getText();
+    }
+
     /**
      * There may be an element in the alert that a test will need to interact with so return the alert element and let
      * the test find the control it needs.
@@ -324,12 +329,17 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public WebElement getPanelAlertWebElement()
     {
+        return getPanelAlertWebElement(0);
+    }
+
+    public WebElement getPanelAlertWebElement(int index)
+    {
         getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
 
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        return BootstrapLocators.infoBanner.existsIn(getDriver()) ? BootstrapLocators.infoBanner.findElement(getDriver()) : null;
+        return BootstrapLocators.infoBanner.index(index).findOptionalElement(this).orElse(null);
     }
 
     @Override
