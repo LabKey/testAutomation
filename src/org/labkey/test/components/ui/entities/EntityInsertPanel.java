@@ -8,9 +8,12 @@ import org.labkey.test.components.ui.grids.EditableGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * This class automates the UI component defined in <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/EntityInsertPanel.tsx">components/entities/EntityInsertPanel.tsx</a>
@@ -47,6 +50,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel addParent(String label, String parentType)
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
         elementCache().addParent.click();
         getEntityTypeSelect(label).select(parentType);
         return this;
@@ -157,6 +161,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityBulkInsertDialog clickBulkInsert()
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsert));
         elementCache().bulkInsert.click();
         return new EntityBulkInsertDialog(getDriver());
     }
@@ -211,7 +216,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement bulkInsert = Locator.button("Bulk Insert").findWhenNeeded(this);
         WebElement bulkUpdate = Locator.button("Bulk update").findWhenNeeded(this);
         WebElement deleteRows = deleteRowsBtnLoc.findWhenNeeded(this);
-        EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).findWhenNeeded();
+        EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
         WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(this);
         WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(this);
 
