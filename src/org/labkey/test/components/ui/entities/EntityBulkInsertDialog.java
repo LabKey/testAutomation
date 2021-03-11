@@ -14,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EntityBulkInsertDialog extends ModalDialog
 {
@@ -192,6 +193,18 @@ public class EntityBulkInsertDialog extends ModalDialog
         return elementCache().checkBox(fieldKey).get();
     }
 
+    public Optional<WebElement> validationMessage()
+    {
+        return elementCache().validationMessage.findOptionalElement(this);
+    }
+
+    public String waitForValidationError()
+    {
+        WebDriverWrapper.waitFor(()-> validationMessage().isPresent(),
+                "Field validation error did not appear", 2000);
+        return validationMessage().get().getText();
+    }
+
     public void clickAddRows()
     {
         elementCache().addRowsButton.click();
@@ -253,6 +266,8 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
+        public Locator validationMessage = Locator.tagWithClass("span", "validation-message");
+
         public WebElement formRow(String fieldKey)
         {
             return Locator.tagWithClass("div", "row")
