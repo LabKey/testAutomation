@@ -160,7 +160,6 @@ public class DataClassTest extends BaseWebDriverTest
         createPage.clickSave();
         DataRegionTable drt = DataRegion(getDriver()).find();
         checker().verifyTrue("Data class not found in list of data classes", drt.getColumnDataAsText("Name").contains(name));
-        log("End of test.");
     }
 
     @Test

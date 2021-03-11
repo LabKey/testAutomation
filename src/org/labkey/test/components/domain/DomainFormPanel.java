@@ -334,14 +334,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public WebElement getPanelAlertWebElement(int index)
     {
-
         getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
 
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        return BootstrapLocators.infoBanner.existsIn(getDriver()) ?
-                BootstrapLocators.infoBanner.findElements(getDriver()).get(index) : null;
+        return BootstrapLocators.infoBanner.index(index).findOptionalElement(this).orElse(null);
     }
 
     @Override
