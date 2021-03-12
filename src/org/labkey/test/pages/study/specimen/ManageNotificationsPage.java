@@ -108,6 +108,16 @@ public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.
 
     public void clickSave()
     {
+        // Wait for auto-complete text areas to render
+        if (elementCache().newRequestNotifyCheckbox.isChecked())
+        {
+            shortWait().until(ExpectedConditions.visibilityOf(elementCache().newRequestNotifyInput.getComponentElement()));
+        }
+        if (elementCache().ccCheckbox.isChecked())
+        {
+            shortWait().until(ExpectedConditions.visibilityOf(elementCache().ccInput.getComponentElement()));
+        }
+
         clickAndWait(elementCache().saveButton);
     }
 
