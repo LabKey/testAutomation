@@ -1,9 +1,11 @@
 package org.labkey.test.components.ui.entities;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -86,7 +88,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size()));
         elementCache().addRowsButton.click();
 
-        List<Integer> rowIndices = elementCache().grid.getEditableRowIndices();
+        List<Integer> rowIndices = grid().getEditableRowIndices();
 
         if(rowIndices.size() < records.size())
         {
@@ -106,7 +108,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel setRecordValues(Map<String, Object> columnValues)
     {
-        int insertRowIndex = elementCache().grid.getEditableRowIndices().get(0);
+        int insertRowIndex = grid().getEditableRowIndices().get(0);
         return setRecordValues(columnValues, insertRowIndex);
     }
 
@@ -114,7 +116,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     {
         for(String columnName : columnValues.keySet())
         {
-            elementCache().grid.setCellValue(row, columnName, columnValues.get(columnName));
+            grid().setCellValue(row, columnName, columnValues.get(columnName));
         }
 
         return this;
@@ -122,58 +124,89 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EditableGrid getEditableGrid()
     {
-        return elementCache().grid;
+        showGrid();
+        return grid();
+    }
+
+    public FileUploadPanel getFileUploadPanel()
+    {
+        showFileUpload();
+        return fileUploadPanel();
+    }
+
+    private EditableGrid grid()
+    {
+        return new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
+    }
+
+    private FileUploadPanel fileUploadPanel()
+    {
+        return new FileUploadPanel.FileUploadPanelFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
     }
 
     public List<String> getColumnHeaders()
     {
-        return elementCache().grid.getColumnNames();
+        showGrid();
+        return grid().getColumnNames();
     }
 
     public List<Map<String, String>> getGridData()
     {
-        return elementCache().grid.getGridData();
+        showGrid();
+        return grid().getGridData();
     }
 
     public boolean isGridVisible()
     {
-        return elementCache().grid.isDisplayed();
+        return grid().isDisplayed();
     }
 
     public EntityInsertPanel setAddRows(int numOfRows)
     {
+        showGrid();
         getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(numOfRows));
         return this;
     }
 
     public EntityInsertPanel clickAddRows()
     {
+        showGrid();
         elementCache().addRowsButton.click();
         return this;
     }
 
     public EntityInsertPanel clickRemove()
     {
+        showGrid();
         getEditableGrid().doAndWaitForUpdate(()->
-                elementCache().deleteRows.click());
+                elementCache().deleteRowsBtn().click());
         return this;
     }
 
     public EntityBulkInsertDialog clickBulkInsert()
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsert));
-        elementCache().bulkInsert.click();
+        showGrid();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn()));
+        elementCache().bulkInsertBtn().click();
         return new EntityBulkInsertDialog(getDriver());
     }
 
     public boolean isBulkInsertVisible()
     {
-        return isElementVisible(elementCache().bulkInsert);
+        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+                isElementVisible(elementCache().bulkInsertBtn());
     }
 
     public boolean isDeleteRowsVisible()
     {
-        return isElementVisible(elementCache().deleteRows);
+        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+                isElementVisible(elementCache().deleteRowsBtn());
+    }
+
+    public boolean isFileUploadVisible()
+    {
+        return modeSelectListItem("from File").withClass("active").findOptionalElement(this).isPresent() &&
+                isElementVisible(fileUploadPanel().getComponentElement());
     }
 
     protected boolean isElementVisible(WebElement element)
@@ -201,6 +234,44 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         }
     }
 
+    private EntityInsertPanel showGrid()
+    {
+        if (!isGridVisible())
+            elementCache().modeSelectListItem("from Grid")
+                    .waitForElement(this, 2000).click();
+
+        WebDriverWrapper.waitFor(()-> isGridVisible(),
+                "the grid did bot become visible", 2000);
+        return this;
+    }
+
+    private EntityInsertPanel showFileUpload()
+    {
+        if (!isFileUploadVisible())
+            elementCache().modeSelectListItem("from File")
+                    .waitForElement(this, 2000).click();
+
+        WebDriverWrapper.waitFor(()-> isFileUploadVisible(),
+                "the file upload panel did bot become visible", 2000);
+        return this;
+    }
+
+    private void waitForLoaded()
+    {
+        WebDriverWrapper.waitFor(()-> isGridVisible() || isFileUploadVisible(),
+                "The insert panel did not become loaded", WAIT_FOR_JAVASCRIPT);
+    }
+
+    /**
+     * finds the mode select buttons, to switch between grid input and file upload
+     * @param containsText
+     * @return
+     */
+    private Locator.XPathLocator modeSelectListItem(String containsText)
+    {
+        return Locator.tagWithClass("li", "list-group-item").containing(containsText);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -209,14 +280,33 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     protected class ElementCache extends Component.ElementCache
     {
+        public ElementCache()
+        {
+            waitForLoaded();
+        }
+
+        Locator modeSelectListItem(String containsText)
+        {
+            return Locator.tagWithClass("li", "list-group-item").containing(containsText);
+        }
+
         Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
                 Locator.button("Delete rows"),
                 Locator.buttonContainingText("Remove"));
 
-        WebElement bulkInsert = Locator.button("Bulk Insert").findWhenNeeded(this);
-        WebElement bulkUpdate = Locator.button("Bulk update").findWhenNeeded(this);
-        WebElement deleteRows = deleteRowsBtnLoc.findWhenNeeded(this);
-        EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
+        WebElement bulkInsertBtn()
+        {
+            return Locator.button("Bulk Insert").findElement(this);
+        }
+        WebElement bulkUpdateBtn()
+        {
+            return Locator.button("Bulk update").findElement(this);
+        }
+        WebElement deleteRowsBtn()
+        {
+            return deleteRowsBtnLoc.findElement(this);
+        }
+
         WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(this);
         WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(this);
 
