@@ -898,16 +898,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
 
-        createNewQuery(schemaName, tableName);
-
-        waitForElement(Locator.xpath("//input[@name='ff_newQueryName']"));
-        setFormElement(Locator.xpath("//input[@name='ff_newQueryName']"), queryName);
-        click(Locator.xpath("//select[@name='ff_baseTableName']"));
-
-        clickButton("Create and Edit Source");
-        Locator saveAndFinishBtn = Locator.tagWithClass("span", "x4-btn-button").withChild(Locator.tagWithText("span", "Save & Finish"));
-        waitForElement(saveAndFinishBtn);
-        clickAndWait(saveAndFinishBtn);
+        createNewQuery(schemaName, tableName)
+            .setName(queryName)
+            .setBaseTable(tableName)
+            .clickCreate()
+            .clickSaveAndFinish();
     }
 
 }

@@ -82,6 +82,12 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
         return this;
     }
 
+    public ExecuteQueryPage clickSaveAndFinish()
+    {
+        clickAndWait(Ext4Helper.Locators.ext4Button("Save & Finish").findElement(getDriver()));
+        return new ExecuteQueryPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
