@@ -24,7 +24,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCache>
@@ -166,15 +165,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         WebDriverWrapper.waitFor(() -> elementCache().advancedSettingsBtn.isEnabled(),
                 "the Advanced Settings button did not become enabled", 5000);
-        int trycount = 0;
-        do
-        {
-            getWrapper().log("clicking advanced settings button try=["+trycount+"]");
-            elementCache().advancedSettingsBtn.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
-            trycount++;
-            assertTrue("advanced settings dialog did not appear in time",trycount < 4);
-        }while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
+        elementCache().advancedSettingsBtn.click();
+        Locator.tagWithClass("div", "modal-backdrop").waitForElement(getDriver(), 1000);
 
         return new AdvancedSettingsDialog(this);
     }
@@ -184,14 +176,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         if (!isExpanded())
         {
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().expandToggle));
-
-            for (int i=0; i < 3; i++)
-            {
-                elementCache().expandToggle.click();
-                getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-                if (WebDriverWrapper.waitFor(this::isExpanded, 1000))
-                    break;
-            }
+            getWrapper().scrollIntoView(elementCache().expandToggle);
+            elementCache().expandToggle.click();
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
             WebDriverWrapper.waitFor(this::isExpanded,
                     "the field row did not become expanded", 1500);
         }
