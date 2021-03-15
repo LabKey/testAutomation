@@ -958,6 +958,38 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
     }
 
+    @Test
+    public void testIgnoreReservedFieldNames()
+    {
+        final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
+                "These fields are already used by LabKey: " +
+                "Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container.";
+
+        List<String> lines = new ArrayList<>();
+        lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,created,createdby,modified,modifiedBy,Container,SampleID");
+
+        if (!TestFileUtils.getTestTempDir().exists())
+            TestFileUtils.getTestTempDir().mkdirs();
+        File inferenceFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "InferFieldsForList.csv", String.join(System.lineSeparator(), lines));
+
+        goToProjectHome();
+
+        String name = "Ignore Reserved Fields List";
+
+        log("Infer fields from a file that contains some reserved fields.");
+        EditListDefinitionPage listEditPage = _listHelper.beginCreateList(PROJECT_VERIFY, name);
+        DomainFormPanel domainForm = listEditPage.getFieldsPanel()
+                .setInferFieldFile(inferenceFile);
+
+        checker().verifyEquals("Reserved field warning not as expected",  expectedInfoMsg, domainForm.getPanelAlertText(1));
+        listEditPage.selectAutoIntegerKeyField();
+        listEditPage.clickSave();
+        goToProjectHome();
+        checker().verifyTrue("Link to new list not present", Locator.linkWithText(name).existsIn(getDriver()));
+
+        log("End of test.");
+    }
+
     @LogMethod
     private void customFormattingTest()
     {

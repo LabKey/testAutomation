@@ -31,6 +31,7 @@ import org.labkey.test.util.WorkbookHelper;
 import org.labkey.test.util.WorkbookHelper.WorkbookFolderType;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,19 +90,21 @@ public class WorkbookTest extends BaseWebDriverTest
         assertEquals("id's generated when workbooks are created should be sequential", Arrays.asList(1, 2, 3), ids);
 
         // Edit Workbook Name
-        waitAndClick(Locator.css(".wb-name + .labkey-edit-in-place"));
-        WebElement nameInput = waitForElement(Locator.css(".wb-name + .labkey-edit-in-place + input"));
+        WebElement wbNameEl = Locator.css(".wb-name + .labkey-edit-in-place").waitForElement(shortWait());
+        wbNameEl.click();
+        WebElement nameInput = Locator.xpath(".").followingSibling("input").waitForElement(wbNameEl, 1000);
         nameInput.sendKeys(Keys.DELETE, "Renamed" + DEFAULT_WORKBOOK_NAME);
+        fireEvent(nameInput, SeleniumEvent.blur);
+        shortWait().until(ExpectedConditions.stalenessOf(nameInput));
+
+        // Make sure that the edit stuck
+        assertEquals("Renamed" + DEFAULT_WORKBOOK_NAME, wbNameEl.getText());
 
         // Change the focus to trigger a save
         click(Locator.id("wb-description"));
-
-        // Make sure that the edit stuck
-        assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
-
         Locator emptyDescription = Locator.id("wb-description").withText("No description provided. Click to add one.");
         // Clear description
-        setFormElement(Locator.css("#wb-description + textarea"), "");
+        Locator.css("#wb-description + textarea").waitForElement(shortWait()).clear();
         waitForElement(emptyDescription);
 
         // Check that title and description are saved

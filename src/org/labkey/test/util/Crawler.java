@@ -193,6 +193,7 @@ public class Crawler
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("luminex", "exportDefaultValues"), // download action
+            new ControllerActionId("ms2", "exportProteinCoverageMap"),
             new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
@@ -1098,7 +1099,9 @@ public class Crawler
             if (rethrow instanceof AssertionError)
                 throw rethrow; // AssertionErrors already contain page and origin information.
             else
-                throw new RuntimeException(relativeURL + "\nTriggered an exception." + originMessage, rethrow);
+                throw new RuntimeException("Crawler threw " + rethrow.getClass().getSimpleName() + ".\n" +
+                    "Target page: " + relativeURL + "\n" +
+                    originMessage, rethrow);
         }
 
         if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
