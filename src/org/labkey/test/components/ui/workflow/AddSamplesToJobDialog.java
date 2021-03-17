@@ -13,8 +13,8 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class AddSamplesToJobDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
 {
-    private  SourcePage _sourcePage;
-    private  Supplier<ConfirmPage> _confirmPageSupplier;
+    private final SourcePage _sourcePage;
+    private final Supplier<ConfirmPage> _confirmPageSupplier;
 
     public AddSamplesToJobDialog(SourcePage sourcePage)
     {
@@ -34,8 +34,8 @@ public class AddSamplesToJobDialog<SourcePage extends WebDriverWrapper, ConfirmP
     protected AddSamplesToJobDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
         super(finder);
-        _sourcePage = _sourcePage;
-        _confirmPageSupplier = _confirmPageSupplier;
+        _sourcePage = sourcePage;
+        _confirmPageSupplier = confirmPageSupplier;
     }
 
     public ConfirmPage addToExistingJob(String jobName)
