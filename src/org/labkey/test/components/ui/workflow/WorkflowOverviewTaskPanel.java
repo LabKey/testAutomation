@@ -1,12 +1,12 @@
 package org.labkey.test.components.ui.workflow;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.ui.grids.GridRow;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
-import org.labkey.test.pages.samplemanagement.workflow.WorkflowJobTasksPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -15,6 +15,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class WorkflowOverviewTaskPanel extends WebDriverComponent<WorkflowOverviewTaskPanel.ElementCache>
@@ -65,6 +66,8 @@ public class WorkflowOverviewTaskPanel extends WebDriverComponent<WorkflowOvervi
      */
     public List<Map<String, String>> getTasks()
     {
+        WebDriverWrapper.waitFor(() -> elementCache().tasksGrid.isLoaded(),
+                "the tasks grid did not become loaded", WAIT_FOR_JAVASCRIPT);
         return elementCache().tasksGrid.getRowMaps();
     }
 
@@ -73,10 +76,9 @@ public class WorkflowOverviewTaskPanel extends WebDriverComponent<WorkflowOvervi
      * @param taskName The name of the task.
      * @return A reference to this panel.
      */
-    public WorkflowJobTasksPage clickTaskName(String taskName)
+    public void clickTaskName(String taskName)
     {
         Locator.linkWithText(taskName).findElement(componentElement).click();
-        return new WorkflowJobTasksPage(getWrapper());
     }
 
     /**
@@ -84,13 +86,12 @@ public class WorkflowOverviewTaskPanel extends WebDriverComponent<WorkflowOvervi
      * @param taskNumber The value in the 'Task #' column.
      * @return A reference to this panel.
      */
-    public WorkflowJobTasksPage clickTaskOnRow(int taskNumber)
+    public void clickTaskOnRow(int taskNumber)
     {
         // Allow for 0 based index in the collection and 1 based number for task number.
         int rowNumber = taskNumber - 1;
         List<GridRow> rows = elementCache().tasksGrid.getRows();
         rows.get(rowNumber).findElements(Locator.tag("a")).get(0).click();
-        return new WorkflowJobTasksPage(getWrapper());
     }
 
     /**
@@ -172,14 +173,20 @@ public class WorkflowOverviewTaskPanel extends WebDriverComponent<WorkflowOvervi
 
     protected class ElementCache extends Component.ElementCache
     {
-        ResponsiveGrid tasksGrid = new ResponsiveGrid.ResponsiveGridFinder(getDriver()).findWhenNeeded();
+        ResponsiveGrid tasksGrid = new ResponsiveGrid.ResponsiveGridFinder(getDriver())
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
 
         // The references to the buttons go stale if the state of the job has changed.
-        WebElement completeTaskButton = Locator.buttonContainingText("Complete Current Task").refindWhenNeeded(componentElement);
-        WebElement stateDropdownButton = Locator.tagWithClassContaining("div", "dropdown").childTag("button").withAttribute("id", "split-btn-group-dropdown-btn").refindWhenNeeded(componentElement);
+        WebElement completeTaskButton = Locator.buttonContainingText("Complete Current Task")
+                .refindWhenNeeded(componentElement).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement stateDropdownButton = Locator.tagWithClassContaining("div", "dropdown")
+                .childTag("button").withAttribute("id", "split-btn-group-dropdown-btn")
+                .refindWhenNeeded(componentElement).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement completeAllMenuItem = Locator.linkWithText("Complete All Tasks").withAttribute("role", "menuitem").parent("li").findWhenNeeded(componentElement);
-        WebElement reactivateMenuItem = Locator.linkWithText("Reactivate Job").withAttribute("role", "menuitem").parent("li").findWhenNeeded(componentElement);
+        WebElement completeAllMenuItem = Locator.linkWithText("Complete All Tasks").withAttribute("role", "menuitem")
+                .parent("li").findWhenNeeded(componentElement).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement reactivateMenuItem = Locator.linkWithText("Reactivate Job").withAttribute("role", "menuitem")
+                .parent("li").findWhenNeeded(componentElement);
 
     }
 
