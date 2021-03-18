@@ -373,6 +373,31 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
     }
 
     /**
+     * <p>
+     *     A dataset will be highlighted in bold if it needs special considerations. For example datasets that are
+     *     alt-ids may require that the user has read access if they want to insert new records in another dataset that
+     *     uses the alt-ids.
+     * </p>
+     * <p>
+     *     This will return true if a dataset is in bold in the per-dataset permissions grid.
+     * </p>
+     *
+     * @param datasetName Name of the dataset.
+     * @return True if the dataset name is in bold, false otherwise.
+     */
+    public boolean isDatasetHighlighted(String datasetName)
+    {
+
+        Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
+
+        return isElementPresent(Locator.tag("table")
+                .childTag("tbody")
+                .childTag("tr")
+                .childTag("td").withText(datasetName).childTag("b"));
+
+    }
+
+    /**
      * Private function. Get the column index of the given group in the Per Dataset Permissions table. Asserts that
      * the group has per-dataset permissions. Basically this is used to identify which combo-box should be used when
      * setting a per-dataset permission for a group.
