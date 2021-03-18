@@ -122,6 +122,11 @@ public class DefineJobTaskRow extends DefineTaskRowBase
         return this;
     }
 
+    public boolean isLocked()
+    {
+        return Locator.tagWithClass("span", "domain-field-lock-icon").existsIn(this);
+    }
+
     @Override
     protected ElementCache elementCache()
     {
