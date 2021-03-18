@@ -2,12 +2,14 @@ package org.labkey.test.components.ui.workflow;
 
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.domain.DomainPanel;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Wraps the expand/collapse task editor pane in job create page(s)
@@ -56,6 +58,24 @@ public class JobTasksPanel extends DomainPanel
         return tasks.get(tasks.size() - 1);
     }
 
+    public boolean areTasksEditable()
+    {
+        return !getTaskRows().stream().anyMatch(a-> a.isLocked());
+    }
+
+    public Optional<WebElement> editFromTemplateBtn()
+    {
+        return elementCache().editTasksBtnLoc.findOptionalElement(this);
+    }
+
+    public JobTasksPanel enableTaskEditing()
+    {
+        if (!areTasksEditable() && editFromTemplateBtn().isPresent())
+            editFromTemplateBtn().get().click();
+        WebDriverWrapper.waitFor(()-> areTasksEditable(), 2000);
+        return this;
+    }
+
     public JobTasksPanel removeTask(String taskName)
     {
         getTask(taskName).deleteTask();
@@ -81,6 +101,8 @@ public class JobTasksPanel extends DomainPanel
 
     protected class ElementCache extends DomainPanel.ElementCache
     {
+        Locator editTasksBtnLoc = Locator.tagWithAttribute("button", "title",
+                "If you choose to edit the tasks, you will no longer be creating the job from this template.");
 
         WebElement addTaskBtn = Locator.tagWithClass("span", "container--action-button")
                 .withChild(Locator.tagWithClass("i", "container--addition-icon"))
