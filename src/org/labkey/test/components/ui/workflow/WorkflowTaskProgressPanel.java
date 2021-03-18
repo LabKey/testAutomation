@@ -5,7 +5,6 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.pages.samplemanagement.assay.AssayImportPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -276,10 +275,9 @@ public class WorkflowTaskProgressPanel extends WebDriverComponent<WorkflowTaskPr
         }
     }
 
-    public AssayImportPage clickImportData()
+    public void clickImportData()
     {
         Locators.importDataButton.findElement(componentElement).click();
-        return new AssayImportPage(getWrapper());
     }
 
     private static class Locators

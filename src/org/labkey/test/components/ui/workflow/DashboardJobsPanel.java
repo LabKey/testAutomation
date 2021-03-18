@@ -4,9 +4,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.pages.samplemanagement.workflow.WorkflowJobDesignPage;
-import org.labkey.test.pages.samplemanagement.workflow.WorkflowJobOverviewPage;
-import org.labkey.test.pages.samplemanagement.workflow.WorkflowsPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -53,16 +50,14 @@ public class DashboardJobsPanel extends WebDriverComponent<DashboardJobsPanel.El
         }
     }
 
-    public WorkflowJobDesignPage clickStartNewJob()
+    public void clickStartNewJob()
     {
         elementCache().startNewJobLink.click();
-        return new WorkflowJobDesignPage(getWrapper());
     }
 
-    public WorkflowsPage clickJobsHome()
+    public void clickJobsHome()
     {
         elementCache().jobsHomeLink.click();
-        return new WorkflowsPage(getWrapper());
     }
 
     public DashboardJobsPanel clickYourQueueTab()
@@ -87,29 +82,27 @@ public class DashboardJobsPanel extends WebDriverComponent<DashboardJobsPanel.El
         return this;
     }
 
-    public WorkflowJobOverviewPage clickYourQueueJob(String jobTitle)
+    public void clickYourQueueJob(String jobTitle)
     {
         if(!isYourQueueTabSelected())
             clickYourQueueTab();
 
-        return clickJobNameInQueue(jobTitle, elementCache().mineWorkflowPanel);
+        clickJobNameInQueue(jobTitle, elementCache().mineWorkflowPanel);
     }
 
-    public WorkflowJobOverviewPage clickActiveQueueJob(String jobTitle)
+    public void clickActiveQueueJob(String jobTitle)
     {
         if(!isActiveJobsTabSelected())
             clickActiveJobsTab();
 
-        return clickJobNameInQueue(jobTitle, elementCache().activeWorkflowPanel);
+        clickJobNameInQueue(jobTitle, elementCache().activeWorkflowPanel);
     }
 
-    private WorkflowJobOverviewPage clickJobNameInQueue(String jobTitle, WebElement panel)
+    private void clickJobNameInQueue(String jobTitle, WebElement panel)
     {
         waitFor(()-> Locator.linkWithText(jobTitle).findElement(panel).isDisplayed(), 5_000);
 
         Locator.linkWithText(jobTitle).findElement(panel).click();
-
-        return new WorkflowJobOverviewPage(getWrapper());
     }
 
     public List<String> getYourJobsList()

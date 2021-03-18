@@ -6,7 +6,6 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.grids.QueryGrid;
-import org.labkey.test.util.samplemanagement.SMTestUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -28,24 +27,8 @@ public class WorkflowJobSamplesSearchPanel extends WebDriverComponent<WorkflowJo
 
     public boolean isSearchFilterExpanded()
     {
-        // If any of the controls are visible consider the filters expanded.
-        boolean isExpanded;
-
-        try
-        {
-            return SMTestUtils.isVisible(elementCache().ofSampleType()) ||
-                    SMTestUtils.isVisible(elementCache().createdBy()) ||
-                    SMTestUtils.isVisible(elementCache().fromParent())||
-                    SMTestUtils.isVisible(elementCache().dateFrom()) ||
-                    SMTestUtils.isVisible(elementCache().dateTo());
-        }
-        catch (IndexOutOfBoundsException | NoSuchElementException notThere)
-        {
-            // The combo-boxes, in the element cache, use their ordinal position to be found, if they are not there
-            // (not visible) a IndexOutOfBoundsException is thrown.
-            return false;
-        }
-
+        // if the toggle contains an i.fa-chevron-right, it is collapsed.  If down, it is expanded
+        return Locator.tagWithClass("i", "fa-shevron-down").existsIn(elementCache().searchFilterToggle());
     }
 
     public String getToggleText()
@@ -208,7 +191,7 @@ public class WorkflowJobSamplesSearchPanel extends WebDriverComponent<WorkflowJo
      */
     public QueryGrid getSamplesGridPanel()
     {
-        if(!SMTestUtils.isVisible(Locators.noSampleFoundYet, this))
+        if(!Locators.noSampleFoundYet.existsIn(this))
         {
             return elementCache().samplesGrid();
         }
@@ -300,7 +283,7 @@ public class WorkflowJobSamplesSearchPanel extends WebDriverComponent<WorkflowJo
     {
         try
         {
-            return SMTestUtils.isVisible(elementCache().clearAll());
+            return elementCache().clearAll().isDisplayed();
         }
         catch (NoSuchElementException nse)
         {

@@ -4,7 +4,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ui.grids.QueryGrid;
-import org.labkey.test.util.samplemanagement.SMTestUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -36,7 +35,7 @@ public class WorkflowJobIncludedSamplesPanel extends WebDriverComponent<Workflow
 
         try
         {
-            if(SMTestUtils.isVisible(Locators.noSamplesAdded, this))
+            if(Locators.noSamplesAdded.existsIn( this))
             {
                 isLoaded = true;
             }
@@ -65,7 +64,7 @@ public class WorkflowJobIncludedSamplesPanel extends WebDriverComponent<Workflow
      */
     public QueryGrid getSamplesGridPanel()
     {
-        if(!SMTestUtils.isVisible(Locators.noSamplesAdded, this))
+        if(!Locators.noSamplesAdded.existsIn( this))
         {
             return elementCache().samplesGrid();
         }

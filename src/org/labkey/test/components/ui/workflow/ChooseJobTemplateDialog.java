@@ -1,18 +1,38 @@
 package org.labkey.test.components.ui.workflow;
 
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.pages.samplemanagement.workflow.WorkflowJobDesignPage;
-import org.openqa.selenium.WebDriver;
+import org.labkey.test.pages.LabKeyPage;
 
 import java.util.List;
+import java.util.function.Supplier;
 
-public class ChooseJobTemplateDialog extends ModalDialog
+public class ChooseJobTemplateDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
 {
+    private final SourcePage _sourcePage;
+    private final Supplier<ConfirmPage> _confirmPageSupplier;
 
-    public ChooseJobTemplateDialog(WebDriver driver)
+    public ChooseJobTemplateDialog(SourcePage sourcePage)
     {
-        super(new ModalDialogFinder(driver).withTitle("Choose a Template").waitFor().getComponentElement(), driver);
+        this(sourcePage, () -> null);
+    }
+
+    public ChooseJobTemplateDialog(SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        this("Choose a Template", sourcePage, confirmPageSupplier);
+    }
+
+    protected ChooseJobTemplateDialog(String partialTitle, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
+    }
+
+    protected ChooseJobTemplateDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        super(finder);
+        _sourcePage = sourcePage;
+        _confirmPageSupplier = confirmPageSupplier;
     }
 
     /**
@@ -22,11 +42,11 @@ public class ChooseJobTemplateDialog extends ModalDialog
      * @param templateName The name of the template to apply.
      * @return A new instance of a {link org.labkey.test.pages.samplemanagement.workflow.WorkflowJobDesignPage};
      */
-    public WorkflowJobDesignPage applyTemplate(String templateName)
+    public ConfirmPage applyTemplate(String templateName)
     {
         elementCache().templateList.typeAheadSelect(templateName);
         dismiss("Choose Template");
-        return new WorkflowJobDesignPage(getWrapper());
+        return _confirmPageSupplier.get();
     }
 
     /**
