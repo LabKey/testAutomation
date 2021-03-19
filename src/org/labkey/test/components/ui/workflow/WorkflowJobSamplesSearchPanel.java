@@ -27,8 +27,11 @@ public class WorkflowJobSamplesSearchPanel extends WebDriverComponent<WorkflowJo
 
     public boolean isSearchFilterExpanded()
     {
-        // if the toggle contains an i.fa-chevron-right, it is collapsed.  If down, it is expanded
-        return Locator.tagWithClass("i", "fa-shevron-down").existsIn(elementCache().searchFilterToggle());
+        // if the toggle contains an i.fa-chevron-right, and text "Show filters" it is collapsed.
+        // If down, and text is "Hide filters", it is expanded.
+        WebElement toggle = elementCache().searchFilterToggle();
+        return Locator.tagWithClass("i", "fa-chevron-down").existsIn(toggle) &&
+                toggle.getText().equals("Hide filters");
     }
 
     public String getToggleText()
