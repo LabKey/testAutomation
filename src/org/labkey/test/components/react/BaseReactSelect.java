@@ -32,11 +32,12 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     final WebDriver _driver;
     final WebDriverWrapper _wrapper;
     private final String LOADING_TEXT = "loading...";
+    protected static final String SELECTOR_CLASS = "select-input";
 
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
     {
         // Component needs to be refinding because Select may go stale after loading initial selections
-        _componentElement = new RefindingWebElement(Locator.xpath("(.|./div)").withClass("Select"), selectOrParent);
+        _componentElement = new RefindingWebElement(Locator.xpath("(.|./div)").withClass(SELECTOR_CLASS), selectOrParent);
         _driver = driver;
         _wrapper = new WebDriverWrapperImpl(driver);
     }
@@ -47,10 +48,10 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         {
             WebElement selectMenuElement = Locators.selectMenu.findElementOrNull(getComponentElement());
 
-            if((selectMenuElement != null && selectMenuElement.isDisplayed()) && isLoading())
+            if ((selectMenuElement != null && selectMenuElement.isDisplayed()) && isLoading())
                 waitForLoaded();
 
-            return (selectMenuElement != null && selectMenuElement.isDisplayed()) || hasClass("is-open");
+            return (selectMenuElement != null && selectMenuElement.isDisplayed()) || isOpen();
         }
         catch (NoSuchElementException | StaleElementReferenceException see)
         {
@@ -60,14 +61,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     private boolean hasClass(String cls)
     {
-        String attr = getComponentElement().getAttribute("class");
-        return attr != null && attr.contains(cls);
+        return Locator.tagWithClassContaining("div", cls).existsIn(getComponentElement());
     }
 
     /* tells us whether or not the current instance of ReactSelect is in multiple-select mode */
     public boolean isMulti()
     {
-        return hasClass("Select--multi");
+        return hasClass("select-input__value-container--is-multi");
     }
 
     public boolean isSearchable()
@@ -77,17 +77,17 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     public boolean isClearable()
     {
-        return hasClass("is-clearable");
+        return hasClass("select-input__clear-indicator");
     }
 
     public boolean isEnabled()
     {
-        return !hasClass("is-disabled");
+        return !hasClass("select-input__control--is-disabled");
     }
 
     public boolean hasValue()
     {
-        return hasClass("has-value");
+        return hasClass("select-input__value-container--has-value");
     }
 
     public boolean isLoading()
@@ -95,6 +95,11 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         // if either are present, we're loading options
         return Locators.loadingSpinner.existsIn(getComponentElement()) ||
                 getComponentElement().getText().equalsIgnoreCase(LOADING_TEXT);
+    }
+
+    public boolean isOpen()
+    {
+        return hasClass("select-input__control--menu-is-open");
     }
 
     protected T waitForLoaded()
@@ -346,20 +351,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     public static abstract class Locators
     {
-        final public static Locator.XPathLocator option = Locator.tagWithClass("div", "Select-option");
-        public static Locator options = Locator.tagWithClass("div", "Select-option");
-        public static Locator placeholder = Locator.tagWithClass("div", "Select-placeholder");
+        final public static Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
+        public static Locator options = Locator.tagWithClass("div", "select-input__option");
+        public static Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
         public static Locator createOptionPlaceholder = Locator.tagWithClass("div", "Select-create-option-placeholder");
-        public static Locator clear = Locator.tagWithClass("span","Select-clear-zone");
-        public static Locator arrow = Locator.tagWithClass("span","Select-arrow-zone");
-        public static Locator selectMenu = Locator.tagWithClass("div", "Select-menu");
+        public static Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
+        public static Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
+        public static Locator selectMenu = Locator.tagWithClass("div", "select-input__menu-list");
         public static Locator.XPathLocator selectedItems = Locator.tagWithClass("span", "Select-value-label");
-        public static Locator loadingSpinner = Locator.tagWithClass("span", "Select-loading");
-        final public static Locator listItems = Locator.tagWithClass("div", "Select-option");
+        public static Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
+        final public static Locator listItems = Locator.tagWithClass("div", "select-input__option");
 
         public static Locator.XPathLocator selectContainer()
         {
-            return Locator.tagWithClassContaining("div", "Select");
+            return Locator.tagWithClassContaining("div", BaseReactSelect.SELECTOR_CLASS);
         }
 
         public static Locator.XPathLocator selectValueLabelContaining(String valueContains)
@@ -373,13 +378,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         public static Locator.XPathLocator container(String inputName)
         {
-            return Locator.tagWithClass("div", "Select").withDescendant(
+            return Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS).withDescendant(
                     Locator.tagWithId("input", inputName));
         }
 
         public static Locator.XPathLocator containerWithDescendant(Locator.XPathLocator descendant)
         {
-            return Locator.tagWithClass("div", "Select").withDescendant(descendant);
+            return Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS).withDescendant(descendant);
         }
 
         public static Locator.XPathLocator container(List<String> inputNames)
@@ -390,7 +395,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
                 childXpath.append(" or @id=" + Locator.xq(inputNames.get(i)) + "");
             }
             childXpath.append("]");
-            return Locator.tagWithClass("div", "Select").withDescendant(
+            return Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS).withDescendant(
                     Locator.xpath(childXpath.toString()));
         }
 
@@ -402,19 +407,19 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
                 childXpath.append(" or starts-with(@id, '"+inputNames.get(i)+"')");
             }
             childXpath.append("]");
-            return Locator.tagWithClass("div", "Select").withDescendant(
+            return Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS).withDescendant(
                     Locator.xpath(childXpath.toString()));
         }
 
         public static Locator.XPathLocator containerById(String inputId)
         {
-            return Locator.tagWithClass("div", "Select").withDescendant(
+            return Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS).withDescendant(
                     Locator.tagWithId("input", inputId));
         }
 
         public static Locator.XPathLocator containerByName(String inputName)
         {
-            return Locator.tagWithClass("div", "Select").withDescendant(
+            return Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS).withDescendant(
                     Locator.tagWithName("input", inputName));
         }
 
@@ -480,7 +485,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         public BaseReactSelectFinder<Select> followingLabelWithSpan(String labelText)
         {
-            _locator = Locator.tag("label").withChild(Locator.tagWithText("span", labelText)).followingSibling("div").child(Locator.tagWithClass("div", "Select"));
+            _locator = Locator.tag("label").withChild(Locator.tagWithText("span", labelText)).followingSibling("div").child(Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS));
             return this;
         }
 
