@@ -100,6 +100,16 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
     }
 
     /**
+     * Get the value set in the Study Security Type selection box.
+     *
+     * @return A {@link StudySecurityType}.
+     */
+    public StudySecurityType getSecurityType()
+    {
+        return StudySecurityType.valueOf(getSelectedOptionValue(elementCache().securityType.getWrappedElement()));
+    }
+
+    /**
      * Is the 'Study Security' panel for groups visible.
      *
      * @return True if visible false otherwise.
@@ -172,7 +182,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      *
      * @return List of the roles displayed.
      */
-    public List<String> getAllowedGroupRoles()
+    public List<GroupSecuritySetting> getAllowedGroupRoles()
     {
         Assert.assertTrue(GROUP_PANEL_NOT_VISIBLE, isGroupStudySecurityVisible());
 
@@ -184,7 +194,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
         // The first text entry can be ignored because it is the empty column header above the group names.
         // All the remaining text/roles need to have the trailing '?' removed, which is the help icon after each role.
 
-        List<String> roles = new ArrayList<>();
+        List<GroupSecuritySetting> roles = new ArrayList<>();
 
         for(WebElement th : thElements)
         {
@@ -193,7 +203,15 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
             if(!text.isBlank())
             {
                 text = text.trim().substring(0, text.lastIndexOf("?"));
-                roles.add(text);
+
+                if(text.equalsIgnoreCase("EDIT ALL"))
+                    roles.add(GroupSecuritySetting.EDIT_ALL);
+                else if(text.equalsIgnoreCase("READ ALL"))
+                    roles.add(GroupSecuritySetting.READ_ALL);
+                else if(text.equalsIgnoreCase("PER DATASET"))
+                    roles.add(GroupSecuritySetting.PER_DATASET);
+                else
+                    roles.add(GroupSecuritySetting.NONE);
             }
         }
 
@@ -249,7 +267,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      *
      * @return True if visible false otherwise.
      */
-    boolean isDatasetPermissionPanelVisible()
+    public boolean isDatasetPermissionPanelVisible()
     {
         return elementCache().datasetSecurityForm.isDisplayed();
     }
@@ -338,6 +356,43 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
 
         return null;
     }
+
+    // The place holder text in the dropdown used to set permissions for a dataset.
+    private static final String PER_DS_PLACE_HOLDER = "set all to";
+
+    /**
+     * Get the role options that are available for 'Per Dataset Permissions'. This will look only at the select control
+     * at the top of the column for a given group.
+     *
+     * @param groupName Name of the a group.
+     * @return A list of available roles defined by {@link DatasetRoles}.
+     */
+    public List<DatasetRoles> getAllowedDatasetPermissions(String groupName)
+    {
+        Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
+
+        List<String> stringRoles = getSelectOptions(elementCache().allDSPermissionsLocator(groupName));
+        List<DatasetRoles> roles = new ArrayList<>();
+
+        for(String role : stringRoles)
+        {
+            if(!role.toLowerCase().contains(PER_DS_PLACE_HOLDER.toLowerCase()))
+            {
+
+                if (role.equals(DatasetRoles.NONE.getText()))
+                    roles.add(DatasetRoles.NONE);
+                if (role.equals(DatasetRoles.READER.getText()))
+                    roles.add(DatasetRoles.READER);
+                if (role.equals(DatasetRoles.EDITOR.getText()))
+                    roles.add(DatasetRoles.EDITOR);
+                if (role.equals(DatasetRoles.AUTHOR.getText()))
+                    roles.add(DatasetRoles.AUTHOR);
+            }
+        }
+
+        return roles;
+    }
+
     /**
      * Get a list of the datasets that can have individual permissions set.
      *
@@ -363,7 +418,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
         {
             String text = td.getText();
 
-            if(!text.isBlank() && !text.contains("set all to"))
+            if(!text.isBlank() && !text.contains(PER_DS_PLACE_HOLDER))
             {
                 dataClasses.add(td.getText());
             }
@@ -398,6 +453,21 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
     }
 
     /**
+     * Return the list of groups shown in the 'Per Dataset Permissions' panel.
+     *
+     * @return A list of group names.
+     */
+    public List<String> getGroupsListedInPerDatasets()
+    {
+        List<WebElement> thElements = Locator.tag("table")
+                .childTag("tbody")
+                .childTag("tr").position(1)
+                .childTag("th").findElements(elementCache().datasetSecurityForm);
+
+        return getTexts(thElements);
+    }
+
+    /**
      * Private function. Get the column index of the given group in the Per Dataset Permissions table. Asserts that
      * the group has per-dataset permissions. Basically this is used to identify which combo-box should be used when
      * setting a per-dataset permission for a group.
@@ -409,14 +479,11 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
     {
         int index = -1;
 
-        List<WebElement> thElements = Locator.tag("table")
-                .childTag("tbody")
-                .childTag("tr").position(1)
-                .childTag("th").findElements(elementCache().datasetSecurityForm);
+        List<String> groups = getGroupsListedInPerDatasets();
 
-        for(int i = 0; i < thElements.size(); i++)
+        for(int i = 0; i < groups.size(); i++)
         {
-            if(thElements.get(i).getText().equals(groupName))
+            if(groups.get(i).equals(groupName))
             {
                 index = i;
                 break;
@@ -524,9 +591,14 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
                     .childTag("select").findElements(datasetSecurityForm).get(position);
         }
 
+        final private Locator allDSPermissionsLocator(String groupName)
+        {
+            return Locator.tagWithName("select", groupName);
+        }
+
         final WebElement allDatasetPermissionSelect(String groupName)
         {
-            return Locator.tagWithName("select", groupName).findElement(datasetSecurityForm);
+            return allDSPermissionsLocator(groupName).findElement(datasetSecurityForm);
         }
 
         final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(datasetSecurityForm);
