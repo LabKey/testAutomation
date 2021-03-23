@@ -287,8 +287,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebDriverWrapper.waitFor(()-> {
             try
             {
-                return entityTypeSelect().hasSelection() && isGridVisible() ||
-                        entityTypeSelect().hasSelection() && isFileUploadVisible() ||
+                return  isGridVisible() ||          // when uploading assay data there is no target select
+                        isFileUploadVisible() ||
                         entityTypeSelect().isInteractive();
             }catch (NoSuchElementException nse)
             {
