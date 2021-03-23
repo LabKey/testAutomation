@@ -304,7 +304,8 @@ public class TestDataGenerator
         {
             for (Integer index: _indices.keySet())
             {
-                builder.append(row.get(_indices.get(index).getName()) + "\t");
+                String keyAtIndex = _indices.get(index).getName().toLowerCase();
+                builder.append(row.get(keyAtIndex) + "\t");
             }
             builder.append("\n");
         }
