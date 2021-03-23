@@ -69,14 +69,15 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
         return this;
     }
 
-    public ManageDatasetQCStatesPage setDefaultAssayQCState(String state)
+    public ManageDatasetQCStatesPage setDefaultPublishDataQCState(String state)
     {
-        selectOptionByText(elementCache().defaultAssayQCState, state);
+        selectOptionByText(elementCache().defaultPublishDataQCState, state);
         return this;
     }
-    public String getDefaultAssayQCState()
+
+    public String getDefaultPublishDataQCState()
     {
-        return getSelectedOptionText(elementCache().defaultAssayQCState);
+        return getSelectedOptionText(elementCache().defaultPublishDataQCState);
     }
 
     public ManageDatasetQCStatesPage setDefaultDirectEntryQCState(String state)
@@ -133,6 +134,6 @@ public class ManageDatasetQCStatesPage extends LabKeyPage<ManageDatasetQCStatesP
         Locator.XPathLocator defaultPipelineQCStateLoc = Locator.name("defaultPipelineQCState");
 
         Locator.XPathLocator defaultVisibilityLoc = Locator.name("showPrivateDataByDefault");
-        Locator.XPathLocator defaultAssayQCState = Locator.name("defaultAssayQCState");
+        Locator.XPathLocator defaultPublishDataQCState = Locator.name("defaultPublishDataQCState");
     }
 }
