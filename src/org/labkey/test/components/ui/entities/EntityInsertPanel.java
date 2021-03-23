@@ -17,6 +17,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -144,7 +145,12 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     private EditableGrid grid()
     {
-        return new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
+        return elementCache().grid;
+    }
+
+    private Optional<EditableGrid> optionalGrid()
+    {
+        return new EditableGrid.EditableGridFinder(_driver).findOptional(this);
     }
 
     public EntityInsertPanel setUpdateDataForFileUpload(boolean checked)
@@ -157,6 +163,11 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     private FileUploadPanel fileUploadPanel()
     {
         return new FileUploadPanel.FileUploadPanelFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
+    }
+
+    private Optional<FileUploadPanel> optionalFileUploadPanel()
+    {
+        return new FileUploadPanel.FileUploadPanelFinder(getDriver()).findOptional();
     }
 
     public List<String> getColumnHeaders()
@@ -173,7 +184,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public boolean isGridVisible()
     {
-        return grid().isDisplayed();
+        var optionalGrid = optionalGrid();
+        return optionalGrid.isPresent() && optionalGrid.get().isDisplayed();
     }
 
     public EntityInsertPanel setAddRows(int numOfRows)
@@ -209,18 +221,21 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public boolean isBulkInsertVisible()
     {
         return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+                elementCache().bulkInsertBtnLoc.existsIn(this) &&
                 isElementVisible(elementCache().bulkInsertBtn());
     }
 
     public boolean isDeleteRowsVisible()
     {
         return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+                elementCache().deleteRowsBtnLoc.existsIn(this) &&
                 isElementVisible(elementCache().deleteRowsBtn());
     }
 
     public boolean isFileUploadVisible()
     {
         return modeSelectListItem("from File").withClass("active").findOptionalElement(this).isPresent() &&
+                optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
     }
 
@@ -328,10 +343,11 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
                 Locator.button("Delete rows"),
                 Locator.buttonContainingText("Remove"));
+        Locator bulkInsertBtnLoc = Locator.button("Bulk Insert");
 
         WebElement bulkInsertBtn()
         {
-            return Locator.button("Bulk Insert").findElement(this);
+            return bulkInsertBtnLoc.findElement(this);
         }
         WebElement bulkUpdateBtn()
         {
@@ -352,6 +368,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
                 .withChild(Locator.tagWithClass("span", "entity-mergeoption-checkbox"))
                 .child("input").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         Checkbox updateDataCheckbox = new Checkbox(updateCheckboxElem);
+        EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
     }
 
     public static class EntityInsertPanelFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, EntityInsertPanelFinder>
