@@ -2058,25 +2058,32 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return checker.get();
     }
 
-    public void waitForEquals(String message, Supplier expected, Supplier actual, int wait)
+    public static void waitForEquals(String message, Supplier<?> expected, Supplier<?> actual, int wait)
     {
-        waitFor(() -> Objects.equals(expected.get(), actual.get()), wait);
-
-        assertEquals(message, expected.get(), actual.get());
+        if (!waitFor(() -> Objects.equals(expected.get(), actual.get()), wait))
+        {
+            assertEquals(message, expected.get(), actual.get());
+        }
     }
 
-    public void waitForNotEquals(String message, Supplier expected, Supplier actual, int wait)
+    public static void waitForNotEquals(String message, Supplier<?> expected, Supplier<?> actual, int wait)
     {
-        waitFor(() -> !Objects.equals(expected.get(), actual.get()), wait);
-
-        assertNotEquals(message, expected.get(), actual.get());
+        if (!waitFor(() -> !Objects.equals(expected.get(), actual.get()), wait))
+        {
+            assertNotEquals(message, expected.get(), actual.get());
+        }
     }
 
     public static void waitFor(Supplier<Boolean> checker, String failMessage, int wait)
     {
+        waitFor(checker, () -> failMessage, wait);
+    }
+
+    public static void waitFor(Supplier<Boolean> checker, Supplier<String> failMessage, int wait)
+    {
         if (!waitFor(checker, wait))
         {
-            throw new TimeoutException(failMessage + TestLogger.formatElapsedTime(wait));
+            throw new TimeoutException(failMessage.get() + TestLogger.formatElapsedTime(wait));
         }
     }
 

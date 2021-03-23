@@ -32,6 +32,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
@@ -193,6 +194,7 @@ public class Crawler
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("luminex", "exportDefaultValues"), // download action
+            new ControllerActionId("ms2", "exportProteinCoverageMap"),
             new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
@@ -228,6 +230,18 @@ public class Crawler
             new ControllerActionId("targetedms", "downloadDocument"),
             new ControllerActionId("test", "npe"),
             new ControllerActionId("wiki", "download"),
+
+                // These actions can generate a PDF download response if format=pdf is added to the URL, so they can
+                // trip up the crawler. See issue 42661
+                new ControllerActionId("targetedms", "precursorChromatogramChart"),
+                new ControllerActionId("targetedms", "transitionChromatogramChart"),
+                new ControllerActionId("targetedms", "generalMoleculeChromatogramChart"),
+                new ControllerActionId("targetedms", "peptideChromatogramChart"),
+                new ControllerActionId("targetedms", "moleculeChromatogramChart"),
+                new ControllerActionId("targetedms", "sampleFileChromatogramChart"),
+                new ControllerActionId("targetedms", "showPeakAreas"),
+                new ControllerActionId("targetedms", "showRetentionTimesChart"),
+
 
             // Disable crawler for single-page apps until we make `beginAt` work with them
             new ControllerActionId("biologics", "app"),
@@ -1097,8 +1111,13 @@ public class Crawler
 
             if (rethrow instanceof AssertionError)
                 throw rethrow; // AssertionErrors already contain page and origin information.
+            else if (rethrow instanceof TimeoutException)
+                throw new RuntimeException(relativeURL + " failed to render. " + originMessage +
+                        " It may be a file download which is unsupported by the crawler", rethrow); // Improve error reporting for downloads, see issue 42661
             else
-                throw new RuntimeException(relativeURL + "\nTriggered an exception." + originMessage, rethrow);
+                throw new RuntimeException("Crawler threw " + rethrow.getClass().getSimpleName() + ".\n" +
+                    "Target page: " + relativeURL + "\n" +
+                    originMessage, rethrow);
         }
 
         if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)

@@ -29,7 +29,7 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
 
     public static DomainDesignerPage beginAt(WebDriverWrapper driver, String containerPath, String schema, String query)
     {
-        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "domainDesigner", Maps.of("schemaName", schema, "queryName", query)));
+        driver.beginAt(WebTestHelper.buildURL("core", containerPath, "domainDesigner", Maps.of("schemaName", schema, "queryName", query)));
         return new DomainDesignerPage(driver.getDriver());
     }
 

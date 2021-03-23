@@ -2061,13 +2061,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     // Careful: If baseQueryName isn't provided, the first table in the schema will be used as the base query.
-    public void createNewQuery(@NotNull String schemaName, @Nullable String baseQueryName)
+    public NewQueryPage createNewQuery(@NotNull String schemaName, @Nullable String baseQueryName)
     {
         if (baseQueryName != null)
             selectQuery(schemaName, baseQueryName);
         else
             selectSchema(schemaName);
         clickAndWait(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[contains(text(), 'Create New Query')]"));
+
+        return new NewQueryPage(getDriver());
     }
 
 
