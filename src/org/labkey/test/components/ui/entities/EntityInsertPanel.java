@@ -42,7 +42,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public ReactSelect getEntityTypeSelect(String labelText)
     {
-        return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).waitFor();
+        return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).waitFor(getDriver());
     }
 
     public EntityInsertPanel addParent(String label, String parentType)
