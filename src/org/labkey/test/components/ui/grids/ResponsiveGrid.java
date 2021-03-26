@@ -433,7 +433,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      *
-     * @return a List&#60;String&#62; containing the text of each column header
+     * @return  a List<String> containing the text of each column header
      */
     public List getColumnNames()
     {
@@ -480,7 +480,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      *
-     * @return a list of Map&#60;String, String&#62; containing keys and values for each row
+     * @return a list of Map<String, String> containing keys and values for each row
      */
     public List<Map<String, String>> getRowMaps()
     {

@@ -13,8 +13,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-// Replacing the @see org.labkey.test.pages.samplemanagement.... for now. The javadoc compiler cannot resolve the
-// reference to the module. Don't have time to investigate a fix for this pr.
 /**
  * <p>
  * This is a base class for the edit lineage panels that are shown on the sample overview page. Samples can have two
@@ -25,10 +23,11 @@ import java.util.List;
  * <p>
  *  It is not intended that this base class to be exposed directly from a page. Rather the derived classes
  *  EditParentsPanel and EditSourcesPanel are the classes that should be exposed on the form.
- *  </p>
- * <p>see org.labkey.test.pages.samplemanagement.samples.EditParentsPanel</p>
- * <p>see org.labkey.test.pages.samplemanagement.samples.EditSourcesPanel</p>
+ * @see org.labkey.test.pages.samplemanagement.samples.EditParentsPanel
+ * @see org.labkey.test.pages.samplemanagement.samples.EditSourcesPanel
  * @see <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/ParentEntityEditPanel.tsx">ParentEntityEditPanel.tsx</a>
+ *
+ * </p>
  */
 public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPanel.ElementCache>
 {

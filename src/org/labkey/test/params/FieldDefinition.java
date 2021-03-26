@@ -560,15 +560,13 @@ public class FieldDefinition extends PropertyDescriptor
             return json;
         }
 
-        // Even with the <pre> tag the & needs to be escaped for a javadoc compile.
-        // "expression": "~gt=34&~lt=99", & -> &#38;
         /**
          * JSON for a field validator looks something like this:
          * <pre>
          * {
          *   "description": "description",
          *   "errorMessage": "error message",
-         *   "expression": "~gt=34&#38;~lt=99",
+         *   "expression": "~gt=34&~lt=99",
          *   "name": "V range 1",
          *   "new": true,
          *   "properties": {
