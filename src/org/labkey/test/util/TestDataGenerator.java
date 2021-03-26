@@ -479,7 +479,6 @@ public class TestDataGenerator
      * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
      * @param queryName The name of the query to look for. For example for a sample type it would be its name.
      * @return True if it exists in the given container false otherwise.
-     * @throws IOException Thrown if there is an issue while looking for the domain.
      */
     public static boolean doesDomainExists(final String containerPath, final String schema,
                                                 final String queryName)
