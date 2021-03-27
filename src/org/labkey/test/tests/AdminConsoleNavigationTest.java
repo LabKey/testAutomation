@@ -33,7 +33,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
             "LDAP Sync Admin",                  // An HTML view -- difficult to customize navtrail
             "Authentication",                   // Slow to load
             "Change User Properties",           // Generic domain action -- difficult to customize navtrail
-            "Site-Wide Terms of Use",           // Standard wiki action -- difficult to customize navtrail
             "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
             "Dump Heap",                        // Undesired consequences
             "Memory Usage",                     // Slow to load
