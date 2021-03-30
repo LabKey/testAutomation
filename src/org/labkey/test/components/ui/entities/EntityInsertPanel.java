@@ -275,14 +275,15 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
-    public ResponsiveGrid uploadFileExpectingPreview(File file)
+    public ResponsiveGrid uploadFileExpectingPreview(File file, boolean updateData)
     {
         showFileUpload();
+        setUpdateDataForFileUpload(updateData);
         fileUploadPanel().uploadFile(file);
         return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(this);
     }
 
-    public EntityInsertPanel showFileUpload()
+    public FileUploadPanel showFileUpload()
     {
         if (!isFileUploadVisible())
         {
@@ -294,7 +295,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         clearElementCache();
         WebDriverWrapper.waitFor(()-> isFileUploadVisible(),
                 "the file upload panel did bot become visible", 2000);
-        return this;
+        return fileUploadPanel();
     }
 
     private void waitForLoaded()

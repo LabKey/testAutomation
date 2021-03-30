@@ -104,7 +104,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
         testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
-        var previewGrid = testPanel.uploadFileExpectingPreview(testFile);
+        var previewGrid = testPanel.uploadFileExpectingPreview(testFile, true);
 
         clickFileImport();  // the file import submit button is different from the grid submit button
 
