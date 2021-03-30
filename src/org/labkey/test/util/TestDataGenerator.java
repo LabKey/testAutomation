@@ -198,8 +198,8 @@ public class TestDataGenerator
             {
                 PropertyDescriptor columnDefinition = _columns.get(key);
                 // get the column definition
-                String columnName = columnDefinition.getName().toLowerCase();
-                String columnType = columnDefinition.getRangeURI().toLowerCase();
+                String columnName = columnDefinition.getName();
+                String columnType = columnDefinition.getRangeURI();
 
                 Object columnValue;
                 columnValue = _dataSuppliers.getOrDefault(columnName, getDefaultDataSupplier(columnType)).get();
@@ -211,7 +211,7 @@ public class TestDataGenerator
 
     private Supplier<Object> getDefaultDataSupplier(String columnType)
     {
-        switch (columnType)
+        switch (columnType.toLowerCase())
         {
             case "string":
                 return () -> randomString(20);
@@ -304,7 +304,7 @@ public class TestDataGenerator
         {
             for (Integer index: _indices.keySet())
             {
-                String keyAtIndex = _indices.get(index).getName().toLowerCase();
+                String keyAtIndex = _indices.get(index).getName();
                 builder.append(row.get(keyAtIndex) + "\t");
             }
             builder.append("\n");
