@@ -210,7 +210,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
         // Lookup column should only have count
         setColumns("CreatedBy");
-        _summaryStatisticsHelper.verifySummaryStatisticsDialog("CreatedBy", "integer", true, false);
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog("createdBy", "integer", true, false);
     }
 
     @Test
