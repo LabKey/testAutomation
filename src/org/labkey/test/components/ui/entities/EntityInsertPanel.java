@@ -54,6 +54,12 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return ReactSelect.finder(getDriver()).withIdStartingWith("targetEntityType").waitFor();
     }
 
+    /**
+     * use parameterless entityTypeSelect(), above
+     * @param labelText
+     * @return
+     */
+    @Deprecated
     public ReactSelect getEntityTypeSelect(String labelText)
     {
         return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).waitFor();
