@@ -178,6 +178,12 @@ public class Ext4GridRef extends Ext4CmpRef
         Locator.xpath("../../td").withClass("x4-trigger-cell").findElement(el).click();
     }
 
+    public void clickDownArrowOnGrid(@LoggedParam int rowIdx, @LoggedParam String colName)
+    {
+        WebElement el = startEditing(rowIdx, colName);
+        Locator.xpath("../../td/div").withClass("x4-form-arrow-trigger").findElement(el).click();
+    }
+
     public void waitForGridEditorToDisappear()
     {
         WebDriverWrapper.waitFor(() -> getActiveGridEditor() == null,
