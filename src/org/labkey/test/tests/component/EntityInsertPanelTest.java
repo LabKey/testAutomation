@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ui.entities.EntityInsertPanel;
@@ -100,7 +99,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         SampleTypeDefinition props = new SampleTypeDefinition(sampleTypeName).setFields(standardTestSampleFields());
         TestDataGenerator dgen = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props)
                 .withGeneratedRows(10);
-        File testFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "fileUploadTest.tsv", dgen.writeTsvContents());
+        File testFile = dgen.writeData("fileUploadTest.tsv");
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
         testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
