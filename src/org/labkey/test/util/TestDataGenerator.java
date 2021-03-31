@@ -161,7 +161,7 @@ public class TestDataGenerator
      */
     public TestDataGenerator addCustomRow(Map<String, Object> customRow)
     {
-        _rows.add(customRow);
+        _rows.add(new CaseInsensitiveHashMap<>(customRow));
         return this;
     }
 
@@ -205,7 +205,7 @@ public class TestDataGenerator
                 columnValue = _dataSuppliers.getOrDefault(columnName, getDefaultDataSupplier(columnType)).get();
                 newRow.put(columnName, columnValue);
             }
-            getRows().add(newRow);
+            addCustomRow(newRow);
         }
     }
 
