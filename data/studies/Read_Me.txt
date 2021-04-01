@@ -1,7 +1,7 @@
 3/31/21
-Below is a list of the study archive files (zip files) in this folder and the tests that use them. Hopefully this will help the next person who has to work on study imports and can better identify what tests would be impacted if a file is changed.
-
-No guarantee on the accuracy of the list of test cases.
+Below is a list of the study archive files (zip files) in this folder and the tests that may (note the word may) use them.
+For example AltIdStudy is imported in StudyBaseTest, however that does not mean that all the test classes the derive from StudyBaseTest use that imported study. Most do not, but this does give you a starting point of where to look if you change a study archive.
+Also there are no guarantees on the accuracy of the list of test classes, new classes may have been added after this was written.
 
 I suspect this will go stale at some point and will need to be updated or replaced with something better.
 
