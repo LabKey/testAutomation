@@ -322,10 +322,12 @@ public class TestDataGenerator
      * Creates a file containing the contents of the current rows, formatted in TSV.
      * The file is written to the test temp dir
      * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
-     * @return
+     * @return File object pointing at created TSV
      */
     public File writeData(String fileName)
     {
+        if (!TestFileUtils.getTestTempDir().exists())
+            TestFileUtils.getTestTempDir().mkdirs();
         return TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), fileName, writeTsvContents());
     }
 
