@@ -66,7 +66,7 @@ AltIdStudy.folder.zip
 	TruncationTest.java (DailyA)
 
 CAVDTestStudy.folder.zip
-	Not used?
+	CAVDStudyTest in customModules
 
 CohortStudy.zip
 	CohortTest.java (DailyB)
