@@ -34,10 +34,12 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -161,7 +163,7 @@ public class TestDataGenerator
      */
     public TestDataGenerator addCustomRow(Map<String, Object> customRow)
     {
-        _rows.add(customRow);
+        _rows.add(new CaseInsensitiveHashMap<>(customRow));
         return this;
     }
 
@@ -198,20 +200,20 @@ public class TestDataGenerator
             {
                 PropertyDescriptor columnDefinition = _columns.get(key);
                 // get the column definition
-                String columnName = columnDefinition.getName().toLowerCase();
-                String columnType = columnDefinition.getRangeURI().toLowerCase();
+                String columnName = columnDefinition.getName();
+                String columnType = columnDefinition.getRangeURI();
 
                 Object columnValue;
                 columnValue = _dataSuppliers.getOrDefault(columnName, getDefaultDataSupplier(columnType)).get();
                 newRow.put(columnName, columnValue);
             }
-            getRows().add(newRow);
+            addCustomRow(newRow);
         }
     }
 
     private Supplier<Object> getDefaultDataSupplier(String columnType)
     {
-        switch (columnType)
+        switch (columnType.toLowerCase())
         {
             case "string":
                 return () -> randomString(20);
@@ -291,6 +293,10 @@ public class TestDataGenerator
         return ThreadLocalRandom.current().nextBoolean();
     }
 
+    /**
+     * generates tsv-formatted content using the rows in the current instance;
+     * @return
+     */
     public String writeTsvContents()
     {
         StringBuilder builder = new StringBuilder();
@@ -304,12 +310,23 @@ public class TestDataGenerator
         {
             for (Integer index: _indices.keySet())
             {
-                String keyAtIndex = _indices.get(index).getName().toLowerCase();
+                String keyAtIndex = _indices.get(index).getName();
                 builder.append(row.get(keyAtIndex) + "\t");
             }
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    /**
+     * Creates a file containing the contents of the current rows, formatted in TSV.
+     * The file is written to the test temp dir
+     * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @return
+     */
+    public File writeData(String fileName)
+    {
+        return TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), fileName, writeTsvContents());
     }
 
     public DomainResponse createDomain(Connection cn, String domainKind) throws IOException, CommandException
