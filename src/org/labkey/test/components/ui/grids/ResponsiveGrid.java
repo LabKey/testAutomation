@@ -541,11 +541,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public String getColumnTitleAttribute(String columnText)
     {
-        var cell = elementCache().getColumnHeaderCell(columnText);
-        if (null == cell.getAttribute("title"))
-            return null;
-        else
-            return cell.getAttribute("title");
+        return elementCache().getColumnHeaderCell(columnText).getAttribute("title");
     }
 
     /**
