@@ -421,8 +421,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
 
     protected final void assertPythonScriptContents(String pythonScript, String filterColumn)
     {
-        assertTrue("Script is missing labkey library", pythonScript.contains("import labkey"));
-        assertTrue("Script is missing labkey.query.select_rows call", pythonScript.contains("labkey.query.select_rows("));
+        assertTrue("Script is missing labkey library", pythonScript.contains("from labkey.api_wrapper import APIWrapper"));
+        assertTrue("Script is missing labkey.query.select_rows call", pythonScript.contains("api.query.select_rows("));
         assertTrue("Script is missing schema_name property", pythonScript.contains("schema_name='" + getDataRegionSchemaName() + "'"));
         assertTrue("Script is missing query_name property", pythonScript.contains("query_name='" + getDataRegionQueryName() + "'"));
         if (null != filterColumn)
