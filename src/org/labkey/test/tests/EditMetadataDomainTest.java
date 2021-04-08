@@ -65,7 +65,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
         DomainFormPanel formPanel = metadataPage.fieldsPanel();
 
         log("Verifying new alias field is added");
-        metadataPage.clickAliasField("Name");
+        metadataPage.aliasField("Name");
         checker().verifyEquals("Incorrect domain fields",
                 Arrays.asList("diImportHash", "Modified", "container", "CreatedBy", "lastIndexed",
                         "Created", "ModifiedBy", "id", "name", "firstCol", "EntityId", "Wrappedname"), formPanel.fieldNames());
@@ -75,13 +75,13 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
         metadataPage.clickSave();
 
         log("Verifying domain saves the alias field when revisiting");
-        metadataPage.clickAliasField("First Col");
+        metadataPage.aliasField("First Col");
         metadataPage.clickSave();
         checker().verifyEquals("Incorrect domain field value after save",
                 Arrays.asList("diImportHash", "Modified", "container", "CreatedBy", "lastIndexed",
                         "Created", "ModifiedBy", "id", "name", "firstCol", "EntityId", "WrappedfirstCol"), formPanel.fieldNames());
 
-        metadataPage.clickResetToDefault();
+        metadataPage.resetToDefault();
         checker().verifyEquals("Incorrect domain field value after reset to default",
                 Arrays.asList("diImportHash", "Modified", "container", "CreatedBy", "lastIndexed",
                         "Created", "ModifiedBy", "id", "name", "firstCol", "EntityId"), formPanel.fieldNames());

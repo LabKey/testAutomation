@@ -37,7 +37,7 @@ public class EditMetadataPage extends BaseDomainDesigner<EditMetadataPage.Elemen
         return this;
     }
 
-    public void clickResetToDefault()
+    public void resetToDefault()
     {
         WebDriverWrapper.waitFor(elementCache().resetToDefaultBtn::isEnabled,
                 "The alias button did not become enabled as expected", 2000);
@@ -45,7 +45,7 @@ public class EditMetadataPage extends BaseDomainDesigner<EditMetadataPage.Elemen
         new ModalDialog(new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Confirm Reset")).dismiss("Reset");
     }
 
-    public EditMetadataPage clickAliasField(String fieldName)
+    public EditMetadataPage aliasField(String fieldName)
     {
         WebDriverWrapper.waitFor(elementCache().aliasFieldBtn::isEnabled,
                 "The alias button did not become enabled as expected", 2000);
