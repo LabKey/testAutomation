@@ -517,13 +517,11 @@ public class FlowTest extends BaseFlowTest
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("49 sample descriptions"));
-        assertTextPresent(
-                "49 sample descriptions",
-                "10 samples are not joined",
-                "39 FCS Files",
-                "have been joined",
-                "0 FCS Files",
-                "are not joined");
+
+        assertElementContains(Locator.linkWithId("all-samples"), "49 sample descriptions");
+        assertElementContains(Locator.linkWithId("linked-fcsfiles"), "39 FCS Files");
+        assertElementContains(Locator.linkWithId("unlinked-samples"), "10 samples");
+        assertElementContains(Locator.linkWithId("unlinked-fcsfiles"), "0 FCS Files");
     }
 
     @LogMethod
