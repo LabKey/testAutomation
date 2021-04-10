@@ -9,9 +9,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
-import org.labkey.test.components.UpdatingComponent;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -522,6 +522,28 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 .child(Locator.tagWithClass("div", "grid-message")).findElements(this));
     }
 
+    /** The responsiveGrid now supports redacting fields
+     *
+     * @param columnText the column name.  (uses starts-with matching)
+     * @return  true if the specified grid header cell has the 'phi-protected' class on it
+     */
+    public boolean getColumnPHIProtected(String columnText)
+    {
+        return elementCache().getColumnHeaderCell(columnText)
+                .getAttribute("class").contains("phi-protected");
+    }
+
+    /**
+     *  Gets the title attribute of the column header cell, if it has one
+     * @param columnText The text with which to find the cell (uses startswith matching)
+     * @return  the contents of the 'title' attribute of the cell, or null if the attribute is
+     * not present.
+     */
+    public String getColumnTitleAttribute(String columnText)
+    {
+        return elementCache().getColumnHeaderCell(columnText).getAttribute("title");
+    }
+
     /**
      * supports chaining between base and derived instances
      * @return  magic
@@ -572,7 +594,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         {
             if (!headerCells.containsKey(headerText))
             {
-                WebElement headerCell = Locator.xpath("//th[./span[contains(text(), '" + headerText + "')]]").findElement(this);
+                WebElement headerCell = Locator.tagWithClass("th", "grid-header-cell")
+                        .withChild(Locator.tag("span").startsWith(headerText)).findElement(this);
                 headerCells.put(headerText, headerCell);
             }
             return headerCells.get(headerText);
