@@ -15,7 +15,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -66,9 +65,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
 
         log("Verifying new alias field is added");
         metadataPage.aliasField("Name");
-        checker().verifyEquals("Incorrect domain fields",
-                Arrays.asList("diImportHash", "Modified", "container", "CreatedBy", "lastIndexed",
-                        "Created", "ModifiedBy", "id", "name", "firstCol", "EntityId", "Wrappedname"), formPanel.fieldNames());
+        checker().verifyTrue("Missing wrapped field", formPanel.fieldNames().contains("Wrappedname"));
 
         log("Verifying alias field can be deleted");
         formPanel.getField("Wrappedname").clickRemoveField(false);
@@ -77,14 +74,10 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
         log("Verifying domain saves the alias field when revisiting");
         metadataPage.aliasField("First Col");
         metadataPage.clickSave();
-        checker().verifyEquals("Incorrect domain field value after save",
-                Arrays.asList("diImportHash", "Modified", "container", "CreatedBy", "lastIndexed",
-                        "Created", "ModifiedBy", "id", "name", "firstCol", "EntityId", "WrappedfirstCol"), formPanel.fieldNames());
+        checker().verifyTrue("Missing wrapped field", formPanel.fieldNames().contains("WrappedfirstCol"));
 
         metadataPage.resetToDefault();
-        checker().verifyEquals("Incorrect domain field value after reset to default",
-                Arrays.asList("diImportHash", "Modified", "container", "CreatedBy", "lastIndexed",
-                        "Created", "ModifiedBy", "id", "name", "firstCol", "EntityId"), formPanel.fieldNames());
+        checker().verifyFalse("Wrapped field present after reset", formPanel.fieldNames().contains("WrappedfirstCol"));
         metadataPage.clickSave();
     }
 
