@@ -77,7 +77,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
         checker().verifyTrue("Missing wrapped field", formPanel.fieldNames().contains("WrappedfirstCol"));
 
         metadataPage.resetToDefault();
-        checker().verifyFalse("Missing wrapped field", formPanel.fieldNames().contains("WrappedfirstCol"));
+        checker().verifyFalse("Wrapped field present after reset", formPanel.fieldNames().contains("WrappedfirstCol"));
         metadataPage.clickSave();
     }
 
