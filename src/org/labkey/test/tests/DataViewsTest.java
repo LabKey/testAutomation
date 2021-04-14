@@ -131,7 +131,7 @@ public class DataViewsTest extends ParticipantListTest
         assertElementPresent(PortalHelper.Locators.webPartTitle(RENAMED_WEBPART_TITLE));
         final Locator displayedDataViewsRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
         waitForElement(displayedDataViewsRow);
-        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(displayedDataViewsRow));
+        assertEquals("Incorrect number of datasets after filter", 8, getElementCount(displayedDataViewsRow));
 
         log("Verify cancel button");
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
@@ -145,7 +145,7 @@ public class DataViewsTest extends ParticipantListTest
         assertTextNotPresent("nothing");
         assertTextPresent(RENAMED_WEBPART_TITLE);
         waitForElement(displayedDataViewsRow);
-        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(displayedDataViewsRow));
+        assertEquals("Incorrect number of datasets after filter", 8, getElementCount(displayedDataViewsRow));
 
         log("Verify category management: delete");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
@@ -476,7 +476,7 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
         assertTextPresentInThisOrder(CATEGORIES[0], "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
-                "Chart View: Systolic vs Diastolic", "Crosstab: MouseId Counts",
+                "Crosstab: MouseId Counts",
                 "DEM-1: Demographics", "FPX-1: Final Complete Physical Exam", "PRE-1: Pre-Existing Conditions",
                 "R Report: Dataset Column Names", "RCP-1: Reactogenicity-Resolution", "Scatter: Systolic vs Diastolic",
                 "SCL-1: Specimen Collection", "Time Chart: Body Temp + Pulse For Group 2", "Types",

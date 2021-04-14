@@ -97,7 +97,6 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         assertTextPresent("Participation and Genetic Consent",
                 "Box Plot - Antigen Spot Counts",
                 "Renal Study",
-                "Participant Weight",
                 "Physical Exam",
                 "R Regression: Blood Pressure: All");
         assertTextNotPresent("HIV Test Results",
