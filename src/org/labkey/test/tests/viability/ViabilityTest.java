@@ -375,6 +375,6 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, "TargetStudy"));
 
         // UNDONE: participant/visit resolver test
-        // UNDONE: copy-to-study
+        // UNDONE: link to study
     }
 }

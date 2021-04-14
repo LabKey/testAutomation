@@ -149,7 +149,7 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
     }
 
     @Test
-    public void testAssayCopyToStudyMV()
+    public void testAssayLinkToStudyMV()
     {
         final String ASSAY_NAME = "MVAssay";
         final String ASSAY_RUN_SINGLE_COLUMN = "MVAssayRunSingleColumn";
@@ -174,16 +174,16 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
 
-        log("Copy to study");
+        log("Link to study");
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        clickButton("Copy to Study");
+        clickButton("Link to Study");
 
         clickButton("Next");
 
-        clickButton("Copy to Study");
+        clickButton("Link to Study");
         validateSingleColumnData();
     }
 

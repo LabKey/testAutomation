@@ -164,14 +164,14 @@ public class FlowSpecimenTest extends BaseFlowTest
         // Copy the sample wells to the STUDY_FOLDER
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         click(Locator.checkboxByName(".toggle"));
-        clickButton("Copy to Study");
+        clickButton("Link to Study");
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Next");
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
         assertEquals(PTID, getFormElement(Locator.name("participantId").index(0)));
         assertEquals(DATE, getFormElement(Locator.name("date").index(0)));
-        clickButton("Copy to Study");
+        clickButton("Link to Study");
 
         assertTitleContains("Dataset: Flow");
         assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
