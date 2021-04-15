@@ -35,7 +35,7 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
     @Override
     protected void waitForPage()
     {
-        waitFor(()-> elementCache().upsellBanner().isPresent() ||
+        waitFor(()-> elementCache().EnableModuleBanner().isPresent() ||
                     elementCache().importOptionPickerBanner().isPresent() ||
                     elementCache().configureQueryBasedConnectionPane().isPresent() ||
                     elementCache().freezerProBanner().isPresent(),
@@ -46,9 +46,9 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
      * If no importer is enabled in the current folder, an upsell banner should appear.
      * @return true if upsell banner is present
      */
-    public boolean isUpsellBannerShown()
+    public boolean isEnableModuleBannerShown()
     {
-        return elementCache().upsellBanner().isPresent();
+        return elementCache().EnableModuleBanner().isPresent();
     }
 
     public boolean isImportOptionPickerShown()
@@ -88,11 +88,12 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        // the upsell banner will be present if the current folder does not have Professional enabled in it
-        Optional<WebElement> upsellBanner()
+        // the enable module banner will be present if the current folder does not have Professional enabled in it,
+        // but the Professional module is available within the folder
+        Optional<WebElement> EnableModuleBanner()
         {
-            return Locator.tagWithClass("div", "alert-info")
-                    .withDescendant(Locator.tag("h3").withText("Specimen Import is not available with your current edition of LabKey Server."))
+            return Locator.tagWithClass("div", "alert-warning")
+                    .withText("External Specimen Import is not currently available for this folder. To use External import, enable the Professional Module for this folder.")
                     .findOptionalElement(getDriver());
         }
 
