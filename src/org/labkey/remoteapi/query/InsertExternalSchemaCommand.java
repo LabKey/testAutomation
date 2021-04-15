@@ -5,32 +5,22 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
+import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 public class InsertExternalSchemaCommand extends PostCommand<CommandResponse>
 {
-    /*
-    schemaType: external
-userSchemaName: fdahpuserregws
-dataSource: labkeyDataSource
-sourceSchemaName: fdahpuserregws
-includeSystem: on
-@includeSystem:
-@editable:
-indexable: on
-@indexable:
-@fastCacheRefresh:
-metaData:
-tables: List.of("apppropertiesdetails", "authinfo", "loginattempts", "passwordhistory", "userappdetails", "userdetails");
-X-LABKEY-CSRF: 1f4f5eb0adc721ba44c3e44ee58c3e59
-X-LABKEY-CSRF: 1f4f5eb0adc721ba44c3e44ee58c3e59
-     */
     private final Params _params;
 
     public InsertExternalSchemaCommand(Params params)
@@ -56,12 +46,34 @@ X-LABKEY-CSRF: 1f4f5eb0adc721ba44c3e44ee58c3e59
         return request;
     }
 
+    @Override
+    public CommandResponse execute(Connection connection, String folderPath) throws IOException, CommandException
+    {
+        CommandResponse response = super.execute(connection, folderPath);
+        validateTables(connection, folderPath);
+        return response;
+    }
+
+    private void validateTables(Connection connection, String folderPath) throws IOException, CommandException
+    {
+        GetQueriesCommand command = new GetQueriesCommand(_params.userSchemaName);
+        GetQueriesResponse response = command.execute(connection, folderPath);
+        try
+        {
+            Assert.assertEquals(String.format("Wrong tables published to %s schema '%s'.", _params.schemaType(), _params.userSchemaName),
+                    new HashSet<>(_params.tables), new HashSet<>(response.getQueryNames()));
+        }
+        catch (AssertionError e)
+        {
+            throw new CommandException(e.getMessage());
+        }
+    }
+
     public static class Params
     {
         private String userSchemaName;
         private String sourceSchemaName;
-        private String tables = "";
-        private String schemaType = "external";
+        private List<String> tables = new ArrayList<>();
         private String dataSource = "labkeyDataSource";
         private boolean includeSystem = true;
         private boolean editable = false;
@@ -80,8 +92,8 @@ X-LABKEY-CSRF: 1f4f5eb0adc721ba44c3e44ee58c3e59
             List<NameValuePair> form = new ArrayList<>();
             form.add(new BasicNameValuePair("userSchemaName", userSchemaName));
             form.add(new BasicNameValuePair("sourceSchemaName", sourceSchemaName));
-            form.add(new BasicNameValuePair("tables", tables));
-            form.add(new BasicNameValuePair("schemaType", schemaType));
+            form.add(new BasicNameValuePair("tables", String.join(",", tables)));
+            form.add(new BasicNameValuePair("schemaType", schemaType()));
             form.add(new BasicNameValuePair("dataSource", dataSource));
             if (includeSystem)
             {
@@ -104,6 +116,11 @@ X-LABKEY-CSRF: 1f4f5eb0adc721ba44c3e44ee58c3e59
             return new UrlEncodedFormEntity(form);
         }
 
+        protected String schemaType()
+        {
+            return "external";
+        }
+
         public Params setUserSchemaName(String userSchemaName)
         {
             this.userSchemaName = userSchemaName;
@@ -116,15 +133,9 @@ X-LABKEY-CSRF: 1f4f5eb0adc721ba44c3e44ee58c3e59
             return this;
         }
 
-        public Params setTables(List<String> tables)
+        public Params setTables(Collection<String> tables)
         {
-            this.tables = String.join(",", tables);
-            return this;
-        }
-
-        public Params setSchemaType(String schemaType)
-        {
-            this.schemaType = schemaType;
+            this.tables = new ArrayList<>(tables);
             return this;
         }
 
