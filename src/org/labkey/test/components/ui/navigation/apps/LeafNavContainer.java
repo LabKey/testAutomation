@@ -6,6 +6,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 public class LeafNavContainer extends BaseNavContainer
 {
     protected LeafNavContainer(WebElement element, WebDriver driver)
@@ -26,7 +28,13 @@ public class LeafNavContainer extends BaseNavContainer
 
     public void clickItem(String itemText)
     {
-        getWrapper().clickAndWait(elementCache().clickableItem.withText(itemText).waitForElement(elementCache().navList, 2000));
+        clickItem(itemText, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void clickItem(String itemText, int wait)
+    {
+        var item = elementCache().clickableItem.withText(itemText).waitForElement(elementCache().navList, 2000);
+        getWrapper().clickAndWait(item, wait);
     }
 
     @Override
