@@ -12,7 +12,8 @@ import java.util.Optional;
 
 /**
  * If the current folder has 0 specimen importers (implemented in Professional, and FreezerPro) enabled in it,
- * the user will be shown an upsell banner
+ * but the modules are available on the server, the user will be shown call to action to enable the modules.
+ * If 0 importer modules are available, the user will be shown an upsell banner.
  *
  * If the user has >1, this page will show a configuration selection (pick which one- QueryBased, FreezerPro)
  *
@@ -43,8 +44,8 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
     }
 
     /**
-     * If no importer is enabled in the current folder, an upsell banner should appear.
-     * @return true if upsell banner is present
+     * If no importer is enabled in the current folder, a call-to-action enable-module banner should appear.
+     * @return true if banner is present
      */
     public boolean isEnableModuleBannerShown()
     {
