@@ -55,6 +55,7 @@ public class SaveModulePropertiesCommand extends PostCommand<CommandResponse>
             propJson.put("moduleName", prop.getModuleName());
             propJson.put("propName", prop.getPropertyName());
             propJson.put("value", prop.getValue());
+            properties.add(propJson);
         }
         json.put("properties", properties);
         return json;
