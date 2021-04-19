@@ -88,7 +88,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         // Issue 16945: flow specimen FK doesn't work for 'fake' FCS file wells created during FlowJo import
         verifyFCSAnalysisSpecimenFK();
 
-        copyFlowResultsToStudy();
+        linkFlowResultsToStudy();
 
         // Issue 16945: flow specimen FK doesn't work for 'fake' FCS file wells created during FlowJo import
         verifyFlowDatasetSpecimenFK();
@@ -159,15 +159,15 @@ public class FlowSpecimenTest extends BaseFlowTest
     }
 
     @LogMethod
-    private void copyFlowResultsToStudy()
+    private void linkFlowResultsToStudy()
     {
-        // Copy the sample wells to the STUDY_FOLDER
+        // Link the sample wells to the STUDY_FOLDER
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         click(Locator.checkboxByName(".toggle"));
         clickButton("Link to Study");
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Next");
-        assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
+        assertTitleContains("Link to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
         assertEquals(PTID, getFormElement(Locator.name("participantId").index(0)));
         assertEquals(DATE, getFormElement(Locator.name("date").index(0)));
