@@ -246,15 +246,15 @@ public class RlabkeyTest extends BaseWebDriverTest
         scriptReplacements.put("downloadDir", downloadDir.getAbsolutePath().replaceAll("\\\\", "/"));
 
         // Setup files in simulated target server
-        webDav.putRandomBytes("remote/readChecks/getMe.txt");
-        webDav.putRandomBytes("remote/readChecks/getMe/a.txt");
-        webDav.putRandomBytes("remote/readChecks/getMe/subdir/b.txt");
+        webDav.putRandomAlphanumeric("remote/readChecks/getMe.txt");
+        webDav.putRandomAlphanumeric("remote/readChecks/getMe/a.txt");
+        webDav.putRandomAlphanumeric("remote/readChecks/getMe/subdir/b.txt");
         webDav.mkDir("remote/readChecks/getMe/empty_subdir");
         webDav.mkDir("remote/readChecks/empty_dir");
         webDav.mkDir("remote/writeChecks");
         webDav.mkDir("remote/writeChecks/deleteMe_empty");
-        webDav.putRandomBytes("remote/writeChecks/deleteMe/file.txt");
-        webDav.putRandomBytes("remote/writeChecks/deleteMe.txt");
+        webDav.putRandomAlphanumeric("remote/writeChecks/deleteMe/file.txt");
+        webDav.putRandomAlphanumeric("remote/writeChecks/deleteMe.txt");
         File remoteDir = new File(downloadDir.getParentFile(), "remote");
         scriptReplacements.put("remoteDir", remoteDir.getAbsolutePath().replaceAll("\\\\", "/"));
 

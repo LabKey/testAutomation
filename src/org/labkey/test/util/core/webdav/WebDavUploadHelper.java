@@ -170,13 +170,13 @@ public class WebDavUploadHelper
         _sardine.put(putUrl, fileContents.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void putRandomBytes(String relativePath) throws IOException
+    public void putRandomAlphanumeric(String relativePath) throws IOException
     {
-        putRandomBytes(relativePath, 5);
+        putRandomAlphanumeric(relativePath, 5);
     }
 
-    public void putRandomBytes(String relativePath, int size) throws IOException
+    public void putRandomAlphanumeric(String relativePath, int size) throws IOException
     {
-        WebDavUtils.putRandomBytes(_sardine, _urlFactory.getPath(relativePath), size);
+        WebDavUtils.putRandomAlphanumeric(_sardine, _urlFactory.getPath(relativePath), size);
     }
 }
