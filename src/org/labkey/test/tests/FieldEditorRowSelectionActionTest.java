@@ -34,6 +34,10 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
             "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "Url", "Conditional Formats", "Property Validators",
             "Hidden", "Shown In Update View", "Shown In Insert View", "Shown In Details View", "Default Value Type", "Default Value", "Default Display Value", "Phi",
             "Exclude From Shifting", "Measure", "Dimension", "Recommended Variable", "Mv Enabled");
+    List<String> expectedListHeaders = Arrays.asList("Name", "Range URI", "Required", "Is Primary Key", "Lock Type", "Lookup Container", "Lookup Schema", "Lookup Query",
+            "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "Url", "Conditional Formats", "Property Validators",
+            "Hidden", "Shown In Update View", "Shown In Insert View", "Shown In Details View", "Default Value Type", "Default Value", "Default Display Value", "Phi",
+            "Exclude From Shifting", "Measure", "Dimension", "Recommended Variable", "Mv Enabled");
 
     @BeforeClass
     public static void setupProject()
@@ -92,7 +96,8 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 
         domainFormPanel.switchMode("Detail Mode");
         checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
-        checker().verifyEquals("Incorrect header values in detail mode in list domain", expectedHeaders, domainFormPanel.getDetailModeHeaders());
+        checker().verifyEquals("Incorrect header values in detail mode in list domain",
+                expectedListHeaders, domainFormPanel.getDetailModeHeaders());
 
         Locator.linkWithText("FirstName").findElement(getDriver()).click();
         checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
