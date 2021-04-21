@@ -18,6 +18,8 @@ import java.util.Optional;
 
 public class EntityBulkInsertDialog extends ModalDialog
 {
+    private Locator SUBMIT_BTN_LOC =  Locator.tagWithClass("button", "test-loc-submit-for-edit-button");
+    private Locator CANCEL_BTN_LOC = Locator.tagWithClass("button", "test-loc-cancel-button");
 
     public EntityBulkInsertDialog(WebDriver driver)
     {
@@ -147,14 +149,14 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
-        FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
         selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
     public List<String> getSelectionField(String fieldCaption)
     {
-        FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
         return reactSelect.getSelections();
     }
 
@@ -195,7 +197,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     /**
      * Finds a validation/error message in the dialog, if one exists.
-     * @return
+     * @return the optional element containing the message
      */
     public Optional<WebElement> validationMessage()
     {
@@ -205,7 +207,7 @@ public class EntityBulkInsertDialog extends ModalDialog
     /**
      * Gets the text value of an error/warning message in the dialog, if it exists within 2 seconds.
      * Treats non-existence of the error message as a failure
-     * @return
+     * @return The text of the error message, if it appears.
      */
     public String waitForValidationError()
     {
@@ -262,11 +264,18 @@ public class EntityBulkInsertDialog extends ModalDialog
         }
     }
 
+    protected boolean isLoaded()
+    {
+        return CANCEL_BTN_LOC.existsIn(this ) && SUBMIT_BTN_LOC.existsIn(this);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
+        waitForReady(super.newElementCache());
         return new ElementCache();
     }
+
     @Override
     protected ElementCache elementCache()
     {
@@ -275,6 +284,11 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
+        private ElementCache()
+        {
+            WebDriverWrapper.waitFor(EntityBulkInsertDialog.this::isLoaded,
+                    "the dialog took too long to become enabled", 2000);
+        }
         public Locator validationMessage = Locator.tagWithClass("span", "validation-message");
 
         public WebElement formRow(String fieldKey)
@@ -282,6 +296,11 @@ public class EntityBulkInsertDialog extends ModalDialog
             return Locator.tagWithClass("div", "row")
                     .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
                     .findElement(this);
+        }
+
+        public FilteringReactSelect selectionField(String fieldCaption)
+        {
+            return FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find(this);
         }
 
         public Checkbox checkBox(String fieldKey)
@@ -308,11 +327,9 @@ public class EntityBulkInsertDialog extends ModalDialog
                     .withInputId(fieldKey).find(formRow(fieldKey));
         }
 
-        WebElement cancelButton = Locator.tagWithClass("button", "test-loc-cancel-button")
-                .findWhenNeeded(getComponentElement());
+        WebElement cancelButton = CANCEL_BTN_LOC.findWhenNeeded(getComponentElement());
 
-        WebElement addRowsButton = Locator.tagWithClass("button", "test-loc-submit-for-edit-button")
-                .findWhenNeeded(getComponentElement());
+        WebElement addRowsButton = SUBMIT_BTN_LOC.findWhenNeeded(getComponentElement());
 
         WebElement quantityLabel = Locator.tagWithAttribute("label", "for", "numItems")
                 .findWhenNeeded(getComponentElement());
