@@ -272,8 +272,7 @@ public class EntityBulkInsertDialog extends ModalDialog
     @Override
     protected ElementCache newElementCache()
     {
-        waitForReady(super.newElementCache());
-        return new ElementCache();
+        return (ElementCache) waitForReady(super.newElementCache());
     }
 
     @Override
