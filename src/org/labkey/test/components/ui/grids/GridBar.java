@@ -386,19 +386,26 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public enum ExportType
     {
-        CSV("fa-file-o"),
-        EXCEL("fa-file-excel-o"),
-        TSV("fa-file-text-o");
+        CSV("fa-file-o", ','),
+        EXCEL("fa-file-excel-o", null),
+        TSV("fa-file-text-o", '\t');
 
         private final String _cssClass;
+        private final Character _separator;
 
-        ExportType(String cssClass)
+        ExportType(String cssClass, Character separator)
         {
             _cssClass = cssClass;
+            _separator = separator;
         }
         public String buttonCssClass()
         {
             return _cssClass;
+        }
+
+        public Character getSeparator()
+        {
+            return _separator;
         }
     }
 }
