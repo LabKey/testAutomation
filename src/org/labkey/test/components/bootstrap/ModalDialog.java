@@ -54,11 +54,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         return new ModalDialogFinder(driver);
     }
 
-    protected ElementCache waitForReady(ElementCache ec)
+    @Override
+    protected void waitForReady(ElementCache ec)
     {
         ec.body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
         WebDriverWrapper.waitFor(() -> ec.body.getText().length() > 0, "Modal dialog not ready", 2000);
-        return ec;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     @Override
     protected ElementCache newElementCache()
     {
-        return waitForReady(new ElementCache());
+        return new ElementCache();
     }
 
     @Override
