@@ -152,7 +152,7 @@ public class NabAssayTest extends AbstractAssayTest
 
     private void createStudySubfolder()
     {
-        // create a study so we can test copy-to-study later:
+        // create a study so we can test link to study later:
         _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDY1);
 
         PortalHelper portalHelper = new PortalHelper(this);
@@ -408,13 +408,13 @@ public class NabAssayTest extends AbstractAssayTest
         if (isStudyModuleInstalled())
         {
             region.checkAllOnPage();
-            region.clickHeaderButton("Copy to Study");
+            region.clickHeaderButton("Link to Study");
 
             selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
             clickButton("Next");
 
             region = new DataRegionTable("Data", this);
-            region.clickHeaderButtonAndWait("Copy to Study");
+            region.clickHeaderButtonAndWait("Link to Study");
             assertStudyData(4);
 
             assertAliasedAUCStudyData();
@@ -459,7 +459,7 @@ public class NabAssayTest extends AbstractAssayTest
             clickAndWait(Locator.linkWithText("assay"));
             assertNabData();
 
-            // no permission to details page for "ptid 1 C"; it wasn't copied to the study
+            // no permission to details page for "ptid 1 C"; it wasn't linked to the study
             beginAt(ptid1c_detailsURL);
             assertEquals(403, getResponseCode());
 
