@@ -15,15 +15,12 @@
  */
 package org.labkey.test;
 
+import org.labkey.test.params.ModuleProperty;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
-public class ModulePropertyValue
+public class ModulePropertyValue extends ModuleProperty
 {
-    private String _moduleName;
-    private String _containerPath;
-    private String _propertyName;
-    private String _value;
-    private InputType _inputType;
+    private final InputType _inputType;
 
     public enum InputType
     {
@@ -78,14 +75,9 @@ public class ModulePropertyValue
         }
     }
 
-    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String value, InputType inputType)
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, Object value, InputType inputType)
     {
-        _moduleName = moduleName;
-        _containerPath = containerPath;
-        if (!_containerPath.startsWith("/"))
-            _containerPath = "/" + _containerPath;
-        _propertyName = propertyName;
-        _value = value;
+        super(moduleName, containerPath, propertyName, value);
         _inputType = inputType;
     }
 
@@ -94,24 +86,9 @@ public class ModulePropertyValue
         this(moduleName, containerPath, propertyName, value, InputType.text);
     }
 
-    public String getModuleName()
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, boolean value)
     {
-        return _moduleName;
-    }
-
-    public String getContainerPath()
-    {
-        return _containerPath;
-    }
-
-    public String getPropertyName()
-    {
-        return _propertyName;
-    }
-
-    public String getValue()
-    {
-        return _value;
+        this(moduleName, containerPath, propertyName, value, InputType.checkbox);
     }
 
     public InputType getInputType()
