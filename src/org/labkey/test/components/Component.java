@@ -17,6 +17,7 @@ package org.labkey.test.components;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.labkey.test.Locator;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -28,6 +29,8 @@ import java.util.function.Function;
 
 public abstract class Component<EC extends Component.ElementCache> implements SearchContext
 {
+    private boolean _cacheCreated = false;
+
     public abstract WebElement getComponentElement();
 
     @Override
@@ -53,9 +56,14 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     protected EC elementCache()
     {
         if (null == _elementCache)
+        {
             _elementCache = newElementCache();
+            waitForReady(_elementCache);
+        }
         return _elementCache;
     }
+
+    protected void waitForReady(EC ec) { }
 
     protected EC newElementCache()
     {
@@ -65,10 +73,23 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     protected void clearElementCache()
     {
         _elementCache = null;
+        _cacheCreated = false;
     }
 
     public abstract class ElementCache implements SearchContext
     {
+        protected ElementCache()
+        {
+            if (_cacheCreated)
+            {
+                TestLogger.warn("Misused element cache in " + Component.this.getClass().getName());
+            }
+            else
+            {
+                _cacheCreated = true;
+            }
+        }
+
         @Override
         public List<WebElement> findElements(By by)
         {
