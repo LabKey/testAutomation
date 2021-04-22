@@ -12,15 +12,13 @@ import org.labkey.test.components.react.ReactDatePicker;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.Optional;
 
 public class EntityBulkInsertDialog extends ModalDialog
 {
-    private Locator SUBMIT_BTN_LOC =  Locator.tagWithClass("button", "test-loc-submit-for-edit-button");
-    private Locator CANCEL_BTN_LOC = Locator.tagWithClass("button", "test-loc-cancel-button");
-
     public EntityBulkInsertDialog(WebDriver driver)
     {
         this(new ModalDialogFinder(driver).withTitle("Bulk"));
@@ -264,15 +262,17 @@ public class EntityBulkInsertDialog extends ModalDialog
         }
     }
 
-    protected boolean isLoaded()
+    @Override
+    protected void waitForReady(ModalDialog.ElementCache ec)
     {
-        return CANCEL_BTN_LOC.existsIn(this ) && SUBMIT_BTN_LOC.existsIn(this);
+        super.waitForReady(ec);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable( ((ElementCache)ec).addRowsButton ));
     }
 
     @Override
     protected ElementCache newElementCache()
     {
-        return (ElementCache) waitForReady(super.newElementCache());
+        return new ElementCache();
     }
 
     @Override
@@ -283,11 +283,6 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        private ElementCache()
-        {
-            WebDriverWrapper.waitFor(EntityBulkInsertDialog.this::isLoaded,
-                    "the dialog took too long to become enabled", 2000);
-        }
         public Locator validationMessage = Locator.tagWithClass("span", "validation-message");
 
         public WebElement formRow(String fieldKey)
@@ -326,9 +321,11 @@ public class EntityBulkInsertDialog extends ModalDialog
                     .withInputId(fieldKey).find(formRow(fieldKey));
         }
 
-        WebElement cancelButton = CANCEL_BTN_LOC.findWhenNeeded(getComponentElement());
+        WebElement cancelButton = Locator.tagWithClass("button", "test-loc-cancel-button")
+                .findWhenNeeded(getComponentElement());
 
-        WebElement addRowsButton = SUBMIT_BTN_LOC.findWhenNeeded(getComponentElement());
+        WebElement addRowsButton = Locator.tagWithClass("button", "test-loc-submit-for-edit-button")
+                .findWhenNeeded(getComponentElement());
 
         WebElement quantityLabel = Locator.tagWithAttribute("label", "for", "numItems")
                 .findWhenNeeded(getComponentElement());
