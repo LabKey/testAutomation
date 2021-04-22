@@ -53,9 +53,14 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     protected EC elementCache()
     {
         if (null == _elementCache)
+        {
             _elementCache = newElementCache();
+            waitForReady(_elementCache);
+        }
         return _elementCache;
     }
+
+    protected void waitForReady(EC ec) { }
 
     protected EC newElementCache()
     {
