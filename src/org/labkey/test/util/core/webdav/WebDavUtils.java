@@ -17,6 +17,7 @@ package org.labkey.test.util.core.webdav;
 
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
@@ -26,6 +27,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class WebDavUtils
@@ -98,5 +100,12 @@ public class WebDavUtils
         byte[] fileBytes = new byte[fileSize];
         random.nextBytes(fileBytes);
         sardine.put(fullDavUrl, fileBytes);
+    }
+
+    @LogMethod
+    public static void putRandomAlphanumeric(Sardine sardine, @LoggedParam String fullDavUrl, int fileSize) throws IOException
+    {
+        String random = RandomStringUtils.randomAlphanumeric(fileSize);
+        sardine.put(fullDavUrl, random.getBytes(StandardCharsets.UTF_8));
     }
 }
