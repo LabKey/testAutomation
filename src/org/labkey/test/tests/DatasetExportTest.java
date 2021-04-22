@@ -109,10 +109,10 @@ public class DatasetExportTest extends AssayResultsExportTest
 
         DataRegionTable assayResults = new DataRegionTable(super.getDataRegionId(), this);
         assayResults.checkAll();
-        clickButton("Copy to Study");
+        clickButton("Link to Study");
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickButton("Next");
-        clickButton("Copy to Study");
+        clickButton("Link to Study");
     }
 
     @Override
