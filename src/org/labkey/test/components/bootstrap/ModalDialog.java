@@ -135,12 +135,6 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         return new ElementCache();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return waitForReady(new ElementCache());
-    }
-
     protected class ElementCache extends Component<ElementCache>.ElementCache
     {
         public final WebElement title = Locators.title.findWhenNeeded(getComponentElement());
