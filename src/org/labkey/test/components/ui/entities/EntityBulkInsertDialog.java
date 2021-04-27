@@ -12,13 +12,13 @@ import org.labkey.test.components.react.ReactDatePicker;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.Optional;
 
 public class EntityBulkInsertDialog extends ModalDialog
 {
-
     public EntityBulkInsertDialog(WebDriver driver)
     {
         this(new ModalDialogFinder(driver).withTitle("Bulk"));
@@ -147,14 +147,14 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
     {
-        FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
         selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
     public List<String> getSelectionField(String fieldCaption)
     {
-        FilteringReactSelect reactSelect = FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find();
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
         return reactSelect.getSelections();
     }
 
@@ -195,7 +195,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     /**
      * Finds a validation/error message in the dialog, if one exists.
-     * @return
+     * @return the optional element containing the message
      */
     public Optional<WebElement> validationMessage()
     {
@@ -205,7 +205,7 @@ public class EntityBulkInsertDialog extends ModalDialog
     /**
      * Gets the text value of an error/warning message in the dialog, if it exists within 2 seconds.
      * Treats non-existence of the error message as a failure
-     * @return
+     * @return The text of the error message, if it appears.
      */
     public String waitForValidationError()
     {
@@ -263,10 +263,18 @@ public class EntityBulkInsertDialog extends ModalDialog
     }
 
     @Override
+    protected void waitForReady(ModalDialog.ElementCache ec)
+    {
+        super.waitForReady(ec);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable( ((ElementCache)ec).addRowsButton ));
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
+
     @Override
     protected ElementCache elementCache()
     {
@@ -282,6 +290,11 @@ public class EntityBulkInsertDialog extends ModalDialog
             return Locator.tagWithClass("div", "row")
                     .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
                     .findElement(this);
+        }
+
+        public FilteringReactSelect selectionField(String fieldCaption)
+        {
+            return FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find(this);
         }
 
         public Checkbox checkBox(String fieldKey)
