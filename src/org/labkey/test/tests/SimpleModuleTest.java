@@ -1525,7 +1525,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", prop1, prop1Value));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/" + getProjectName() + "/" + FOLDER_NAME, propTextArea , "updated1\nupdated2", ModulePropertyValue.InputType.textarea));
-        propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCheckbox", "true", ModulePropertyValue.InputType.checkbox));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCheckbox", true));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestSelect", "value1", ModulePropertyValue.InputType.select));
         propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCombo", "comboValue1", ModulePropertyValue.InputType.combo));
 
@@ -1657,9 +1657,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
         beginAt(subfolderPath);
         propList.forEach(property ->
         {
+            Object expectedValue = String.valueOf(property.getValue());
             Object actualValue = executeScript("return LABKEY.getModuleContext('simpletest')." + property.getPropertyName());
-            if (!property.getValue().equals(actualValue))
-                errors.add(property.getPropertyName() + " has incorrect value. Expected " + property.getValue() + " but was " + actualValue);
+            if (!expectedValue.equals(actualValue))
+                errors.add(property.getPropertyName() + " has incorrect value. Expected " + expectedValue + " but was " + actualValue);
         });
         if (!errors.isEmpty())
         {

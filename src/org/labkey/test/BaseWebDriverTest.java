@@ -1567,7 +1567,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             else
                 log("setting property: " + desc + " to value: " + value.getValue());
             String val = value.getInputType().valueToString(ref.getValue());
-            if((StringUtils.isEmpty(val) != StringUtils.isEmpty(value.getValue())) || !val.equals(value.getValue()))
+            if((StringUtils.isEmpty(val) != StringUtils.isEmpty(String.valueOf(value.getValue()))) || !val.equals(value.getValue()))
             {
                 changed = true;
                 ref.setValue(value.getValue());
