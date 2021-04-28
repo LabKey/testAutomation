@@ -683,7 +683,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 clickAndWait(Locator.lkButton("Next"));
                 // admin-newInstallSiteSettings
                 assertElementPresent(Locator.id("rootPath"));
-                uncheckCheckbox(Locator.name("allowReporting"));
                 clickAndWait(Locator.lkButton("Next"));
                 // admin-installComplete
                 clickAndWait(Locator.linkContainingText("Go to the server's Home page"));
