@@ -48,6 +48,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
@@ -693,6 +694,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 String displayName = AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername())
                         + (WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2);
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), displayName);
+
+                if (!TestProperties.isDevModeEnabled())
+                {
+                    TestLogger.log("Disable mothership reporting when bootstrapping in production mode");
+                    CustomizeSitePage customizeSitePage = CustomizeSitePage.beginAt(this);
+                    customizeSitePage.setUsageReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report usage to labkey.org
+                    customizeSitePage.setExceptionReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report exceptions to labkey.org
+                    // Note: leave the self-report setting unchanged
+                    customizeSitePage.save();
+                }
             }
             else // Just upgrading
             {
