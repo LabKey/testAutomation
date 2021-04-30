@@ -88,12 +88,6 @@ public class BasicTest extends BaseWebDriverTest
             checker().verifyEquals("Wrong server mode",
                     TestProperties.isDevModeEnabled() ? "Development" : "Production", mode); // Verify whether we're running in dev mode
 
-        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
-        customizeSitePage.setUsageReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report usage to labkey.org
-        customizeSitePage.setExceptionReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report exceptions to labkey.org
-        // Note: leave the self-report setting unchanged
-        customizeSitePage.save();
-
         // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
         if (TestProperties.isDevModeEnabled() && !TestProperties.isPrimaryUserAppAdmin())
         {
