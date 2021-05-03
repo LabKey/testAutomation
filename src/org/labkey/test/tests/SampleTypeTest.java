@@ -1239,7 +1239,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("sampleid");
         checker().verifyEquals("Sample Type SampleId field name error",
-                Arrays.asList("The SampleId field name is reserved for imported or generated sample ids."),
+                Arrays.asList("The SampleID field name is reserved for imported or generated sample ids."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
     }
