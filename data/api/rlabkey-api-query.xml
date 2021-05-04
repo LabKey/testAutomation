@@ -258,7 +258,7 @@
         </url>
         <response>
             <![CDATA[
-                HTTP request was unsuccessful. Status code = 400, Error message = Could not convert value 'string' for field 'IntFld'; expected type Integer
+                HTTP request was unsuccessful. Status code = 400, Error message = Could not convert value 'string' (String) for Integer field 'IntFld'
             ]]>
         </response>
     </test>
