@@ -325,6 +325,7 @@ public class FieldDefinition extends PropertyDescriptor
         Attachment("Attachment", "attachment"),
         User("User", "int", null, new LookupInfo(null, "core", "users")),
         Lookup("Lookup", null),
+        OntologyLookup("Ontology Lookup", null),
         Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials"));
 
         private final String _label; // the display value in the UI for this kind of field
