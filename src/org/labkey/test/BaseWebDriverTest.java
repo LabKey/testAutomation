@@ -2438,6 +2438,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return exportIconLoc.findElements(getDriver()).size();
     }
 
+    // Note: Keep in sync with OntologyManager.getStandardConversionErrorMessage()
+    public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
+    {
+        String fromType = (value instanceof String) ? "" : "(" + (value.getClass().getSimpleName() + ") ");
+        return "Could not convert value " + fromType + "'" + value + "' for field '" + fieldName + "'; expected type " + targetClass.getSimpleName();
+    }
+
     public void clickExportScriptIcon(String chartParentCls, int chartIndex)
     {
         Locator.XPathLocator chartLoc = Locator.tagWithClass("div", chartParentCls).index(chartIndex);
