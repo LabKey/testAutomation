@@ -475,7 +475,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         setType(FieldDefinition.ColumnType.OntologyLookup);
         setSelectedOntology(ontology)
                 .setConceptImportField(importField)
-                .setConceptImportLabelField(labelField);
+                .setConceptLabelField(labelField);
         return this;
     }
 
@@ -488,8 +488,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setSelectedOntology(String ontology)
     {
         expand();
-        elementCache().getOntologySelect().selectByVisibleText(ontology);
+        elementCache().getOntologySelect().selectByValue(ontology);
         return this;
+    }
+
+    public String getSelectedOntology()
+    {
+        expand();
+        return elementCache().getOntologySelect().getFirstSelectedOption().getAttribute("value");
     }
 
     public DomainFieldRow setConceptImportField(String importField)
@@ -499,7 +505,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public DomainFieldRow setConceptImportLabelField(String labelField)
+    public DomainFieldRow setConceptLabelField(String labelField)
     {
         expand();
         elementCache().getConceptLabelFieldSelect().selectByVisibleText(labelField);

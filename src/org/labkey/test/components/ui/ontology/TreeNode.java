@@ -8,6 +8,9 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * wraps nodes in the ontologyTreePanel
+ */
 public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
 {
     private final WebElement _el;
@@ -108,8 +111,8 @@ public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement caretContainer = Locator.tagWithAttributeContaining("div", "style", "transform: rotateZ")
-                .withDescendant(Locator.tag("polygon")).findWhenNeeded(this);
-        final WebElement caret = Locator.tag("polygon").findElement(caretContainer);
+                .findWhenNeeded(this);
+        final WebElement caret = Locator.tag("polygon").findWhenNeeded(caretContainer);
         final WebElement checkboxContainer = Locator.tagWithClass("span", "filetree-checkbox-container")
                 .refindWhenNeeded(this).withTimeout(1500);
         final WebElement resourceRow = Locator.tagWithClass("div", "filetree-resource-row")
@@ -131,7 +134,8 @@ public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
     {
         // this locator finds only children of the UL, which hopefully filters
         private final Locator.XPathLocator _baseLocator = Locator.tag("ul").child(Locator.tag("li")
-                .withChild(Locator.tagWithClass("span", "filetree-checkbox-container")));
+                .withChild(Locator.tag("div")
+                        .withChild(Locator.tagWithClass("span", "filetree-checkbox-container"))));
         private String _title = null;
 
         public TreeNodeFinder(WebDriver driver)
@@ -155,10 +159,8 @@ public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withChild(Locator.tag("div")
-                                .withChild(Locator.tag("div")
-                                .withChild(Locator.tagWithClass("div", "filetree-resource-row")
-                                        .withAttribute("title", _title))));
+                return _baseLocator.withDescendant(Locator.tagWithClass("div", "filetree-resource-row")
+                                        .withAttribute("title", _title));
             else
                 return _baseLocator;
         }

@@ -47,6 +47,7 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
         for (int i=1; i < nodes.size(); i++)
         {
             currentNode = currentNode.getChild(nodes.get(i));
+            currentNode.select();
         }
         return currentNode;
     }
@@ -59,10 +60,9 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        WebElement nodeContainer = Locator.tag("ul").findWhenNeeded(this);
+        WebElement nodeContainer = Locator.tag("ul").parent().findWhenNeeded(this);
         TreeNode rootElement = new TreeNode.TreeNodeFinder(getDriver()).waitFor(nodeContainer);
     }
-
 
     public static class OntologyTreePanelFinder extends WebDriverComponentFinder<OntologyTreePanel, OntologyTreePanelFinder>
     {

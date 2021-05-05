@@ -40,6 +40,11 @@ public class FieldDefinition extends PropertyDescriptor
     private String _url;
     private List<FieldValidator<?>> _validators;
     private String _importAliases;
+    private String _sourceOntology;
+    private String _conceptLabelColumn;
+    private String _conceptImportColumn;
+    private String _principalConceptCode;
+    private String _principalConceptSearchExpression;
 
     public FieldDefinition(String name, ColumnType type)
     {
@@ -91,6 +96,14 @@ public class FieldDefinition extends PropertyDescriptor
             getValidators().stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
             json.put("propertyValidators", propertyValidators);
         }
+        if (getSourceOntology() != null)
+            json.put("sourceOntology", getSourceOntology());
+        if (getConceptLabelColumn() != null)
+            json.put("conceptLabelColumn", getConceptLabelColumn());
+        if (getConceptImportColumn() != null)
+            json.put("conceptImportColumn", getConceptImportColumn());
+        if (getPrincipalConceptCode() != null)
+            json.put("principalConceptCode", getPrincipalConceptCode());
 
         return json;
     }
@@ -279,6 +292,61 @@ public class FieldDefinition extends PropertyDescriptor
     {
         _scale = scale;
         return this;
+    }
+
+    public FieldDefinition setSourceOntology(String sourceOntology)
+    {
+        _sourceOntology = sourceOntology;
+        return this;
+    }
+
+    public String getSourceOntology()
+    {
+        return _sourceOntology;
+    }
+
+    public FieldDefinition setConceptLabelColumn(String conceptLabelColumn)
+    {
+        _conceptLabelColumn = conceptLabelColumn;
+        return this;
+    }
+
+    public String getConceptLabelColumn()
+    {
+        return _conceptLabelColumn;
+    }
+
+    public FieldDefinition setConceptImportColumn(String conceptImportColumn)
+    {
+        _conceptImportColumn = conceptImportColumn;
+        return this;
+    }
+
+    public String getConceptImportColumn()
+    {
+        return _conceptImportColumn;
+    }
+
+    public FieldDefinition setPrincipalConceptCode(String conceptCode)
+    {
+        _principalConceptCode = conceptCode;
+        return this;
+    }
+
+    public String getPrincipalConceptCode()
+    {
+        return _principalConceptCode;
+    }
+
+    public FieldDefinition setPrincipalConceptSearchExpression(String searchExpression)
+    {
+        _principalConceptSearchExpression = searchExpression;
+        return this;
+    }
+
+    public String getPrincipalConceptSearchExpression()
+    {
+        return _principalConceptSearchExpression;
     }
 
     public enum RangeType

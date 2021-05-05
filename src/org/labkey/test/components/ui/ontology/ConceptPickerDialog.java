@@ -6,6 +6,8 @@ import org.labkey.test.components.ui.ontology.OntologyTreeSearch;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class ConceptPickerDialog extends ModalDialog
@@ -21,16 +23,45 @@ public class ConceptPickerDialog extends ModalDialog
     }
 
     // optional ontology select, in case there are multiple ontologies
-    // searchPath
-    // getPathInformation
 
+    /**
+     * uses the search bar to select an item in the ontology tree
+     * @param conceptSearchExpression an expression close enough to the target node to hit
+     * @param code  the intended concept code
+     * @return the current dialog
+     */
     public ConceptPickerDialog searchConcept(String conceptSearchExpression, String code)
     {
         elementCache().searchBox.selectItemWithCode(conceptSearchExpression, code);
         return this;
     }
 
+    /**
+     * uses the information tabs to get the name of the selected concept
+     * @return the contents of the 'title' element on the overview tab panel
+     */
+    public String getSelectedConcept()
+    {
+        return elementCache().infoTabs.getTitle();
+    }
 
+    /**
+     * uses the information tabs to obtain the concept code
+     * @return the contents of the 'code' span on the overview tab panel
+     */
+    public String getSelectedConceptCode()
+    {
+        return elementCache().infoTabs.getCode();
+    }
+
+    /**
+     * uses the information tabs to obtain the parts of the current-selected path
+     * @return contents of spans in the pathContainer
+     */
+    public List<String> getSelectedConceptPath()
+    {
+        return elementCache().infoTabs.getSelectedPath();
+    }
 
     public void clickApply()
     {
@@ -56,14 +87,9 @@ public class ConceptPickerDialog extends ModalDialog
 
         final OntologyTreePanel treePanel = new OntologyTreePanel.OntologyTreePanelFinder(getDriver())
                 .findWhenNeeded(this);
-        // tree control
-        // tab views
-        // cancel/apply buttons
 
-//        final WebElement fileTreeContainer = Locator.tagWithClass("div", "filetree-container")
-//                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-//        final WebElement infoTabsContainer = Locator.id("concept-information-tabs")
-//                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final ConceptInfoTabs infoTabs = new ConceptInfoTabs.ConceptInfoTabsFinder(getDriver())
+                .findWhenNeeded(this);
     }
 
 
