@@ -676,8 +676,8 @@ public class ListTest extends BaseWebDriverTest
         // create the list for this case
         String multiErrorListName = "multiErrorBatchList";
         String[] expectedErrors = new String[]{
-                "Could not convert 'green' for field ShouldInsertCorrectly, should be of type Boolean",
-                "Could not convert 'five' for field Id, should be of type Integer; Missing value for required property: Id"
+            getConversionErrorMessage("green", "ShouldInsertCorrectly", Boolean.class),
+            getConversionErrorMessage("five", "Id", Integer.class) + "; Missing value for required property: Id"
         };
 
         createList(multiErrorListName, BatchListColumns, BatchListData);
