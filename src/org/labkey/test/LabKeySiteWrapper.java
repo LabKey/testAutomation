@@ -1586,7 +1586,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickButton("Confirm Delete");
     }
 
-    // Note: Keep in sync with OntologyManager.getStandardConversionErrorMessage()
+    // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
     // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
     public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
     {
