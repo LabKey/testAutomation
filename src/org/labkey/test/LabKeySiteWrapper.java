@@ -48,6 +48,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.components.ui.navigation.UserMenu;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
@@ -133,7 +134,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
             waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
-                    Locator.tagWithId("a", "user-menu-dropdown"));
+                    UserMenu.AppUserMenu());
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
@@ -156,7 +157,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 if (isElementPresent(SiteNavBar.Locators.userMenu))
                     return true;
 
-                if(isElementPresent(Locator.tagWithId("a", "user-menu-dropdown")))
+                if(isElementPresent(UserMenu.AppUserMenu()))
                 {
                     goToHome();
                     return true;

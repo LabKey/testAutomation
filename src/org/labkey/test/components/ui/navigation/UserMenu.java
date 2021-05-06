@@ -45,4 +45,14 @@ public abstract class UserMenu extends BootstrapMenu
     {
         return Locator.id(MENU_ID);
     }
+
+    /**
+     * The button for the drop down user menu. The user menu on the SampleManager app is an example of this button.
+     *
+     * @return A locator to the drop down user menu button.
+     */
+    public static Locator AppUserMenu()
+    {
+        return Locator.tagWithId("a", "user-menu-dropdown");
+    }
 }
