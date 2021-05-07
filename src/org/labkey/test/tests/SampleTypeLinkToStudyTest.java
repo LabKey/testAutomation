@@ -93,7 +93,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 .setFields(List.of(
                         new FieldDefinition("VisitDate", FieldDefinition.ColumnType.VisitDate),
                         new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data2);
-
     }
 
     @Test
@@ -172,7 +171,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         for (int i = 0; i < numOfRowsToBeLinked; i++)
             samplesTable.checkCheckbox(i);
 
-
         samplesTable.clickHeaderButtonAndWait("Link to Study");
 
         log("Link to study: Choose target");
@@ -208,7 +206,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
             table.checkCheckbox(i);
         table.clickHeaderButton("Recall");
         acceptAlert();
-
     }
 
     @Override
