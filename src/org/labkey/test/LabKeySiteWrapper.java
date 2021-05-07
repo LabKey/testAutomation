@@ -154,14 +154,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // verify we're signed in now
             if (!waitFor(() ->
             {
-                if (isElementPresent(SiteNavBar.Locators.userMenu))
-                    return true;
-
                 if(isElementPresent(UserMenu.AppUserMenu()))
                 {
                     goToHome();
-                    return true;
                 }
+
+                if (isElementPresent(SiteNavBar.Locators.userMenu))
+                    return true;
 
                 bypassSecondaryAuthentication();
                 return false;
