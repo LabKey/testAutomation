@@ -325,6 +325,8 @@ public class FieldDefinition extends PropertyDescriptor
         Attachment("Attachment", "attachment"),
         User("User", "int", null, new LookupInfo(null, "core", "users")),
         Lookup("Lookup", null),
+        VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
+        VisitDate("Visit Date","dateTime","http://cpas.labkey.com/Study#VisitId",null),
         Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials"));
 
         private final String _label; // the display value in the UI for this kind of field
