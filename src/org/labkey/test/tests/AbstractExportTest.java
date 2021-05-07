@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -271,6 +273,23 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         {
             assertScriptContentLineCount(javaScriptScript, 35);
             assertJavaScriptScriptContents(javaScriptScript, testColumn);
+        });
+
+        // Issue 42976: SQL wildcard should not be prefixed by '!' in exported scripts
+        dataRegion.setFilter(testColumn, "Contains One Of (example usage: a;b;c)", "under_score;two;");
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
+        {
+            assertScriptContentLineCount(javaScriptScript, 35);
+            assertThat(javaScriptScript, CoreMatchers.containsString("LABKEY.Filter.create('" + testColumn + "', 'under_score;two;', LABKEY.Filter.Types.CONTAINS_ONE_OF)"));
+        });
+
+        // multi-value separator ';' escaping uses json encoded filter value
+        dataRegion.setFilter(testColumn, "Contains One Of (example usage: a;b;c)", "{json:[\"a;b;c\",\"Z\"]}");
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
+        {
+            assertScriptContentLineCount(javaScriptScript, 35);
+            // NOTE: The json string contains quote characters which are backslash escaped and then we need to backslash escape both in the java string
+            assertThat(javaScriptScript, CoreMatchers.containsString("LABKEY.Filter.create('" + testColumn + "', '{json:[\\\"a;b;c\\\",\\\"Z\\\"]}', LABKEY.Filter.Types.CONTAINS_ONE_OF)"));
         });
     }
 
