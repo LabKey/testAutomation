@@ -79,7 +79,7 @@ public class AuditLogTest extends BaseWebDriverTest
     public static final String GROUP_AUDIT_EVENT = "Group events";
     public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
-    public static final String ASSAY_AUDIT_EVENT = "Link to Study Assay events";
+    public static final String ASSAY_AUDIT_EVENT = "Link to Study events";
 
     private static final String AUDIT_TEST_USER = "audit_user1@auditlog.test";
     private static final String AUDIT_TEST_USER2 = "audit_user2@auditlog.test";
