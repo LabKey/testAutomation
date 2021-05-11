@@ -64,14 +64,14 @@ public class FieldDefinition extends PropertyDescriptor
     }
 
     @Override
-    public JSONObject toJSONObject()
+    public JSONObject toJSONObject(boolean forProtocol)
     {
         if (getType() != null && getType().getRangeURI() == null)
         {
             throw new IllegalArgumentException("`FieldDefinition` cannot be used to create column over API: " + getType().name());
         }
 
-        JSONObject json = super.toJSONObject();
+        JSONObject json = super.toJSONObject(forProtocol);
         if (getScale() != null)
             json.put("scale", getScale());
         if (isPrimaryKey() != null)
