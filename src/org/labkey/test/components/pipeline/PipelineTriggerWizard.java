@@ -17,20 +17,18 @@ package org.labkey.test.components.pipeline;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.components.labkey.LabKeyAlert;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWizard.ElementCache>
 {
@@ -39,7 +37,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard(WebDriver driver)
     {
-        _el = Locator.tagWithId("form", "pipelineForm").findWhenNeeded(driver);
+        _el = Locator.tagWithClass("div", "create-pipeline-trigger").findWhenNeeded(driver);
         _driver = driver;
     }
 
@@ -120,13 +118,13 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard goToDetails()
     {
-        elementCache().detailsLink.click();
+        elementCache().detailsButton.click();
         return this;
     }
 
     public PipelineTriggerWizard goToConfiguration()
     {
-        elementCache().configurationLink.click();
+        elementCache().configurationButton.click();
         return this;
     }
 
@@ -168,7 +166,15 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public boolean isMoveEnabled()
     {
-        return elementCache().containerMoveInput.getComponentElement().getAttribute("disabled") == null;
+        try {
+            elementCache().containerMoveInput.getComponentElement();
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public PipelineTriggerWizard setCopy(String value)
@@ -183,11 +189,17 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
-    public PipelineTriggerWizard addCustomParamter(String key, String value, @NotNull Integer index)
+    public PipelineTriggerWizard showAdvanced()
+    {
+        elementCache().showAdvanced.click();
+        return this;
+    }
+
+    public PipelineTriggerWizard addCustomParameter(String key, String value, @NotNull Integer index)
     {
         elementCache().addCustomParam.click();
-        Input keyInput = new Input(Locator.tagWithAttribute("input", "name", "customParamKey").findElements(this).get(index), getDriver());
-        Input valueInput = new Input(Locator.tagWithAttribute("input", "name", "customParamValue").findElements(this).get(index), getDriver());
+        Input keyInput = new Input(Locator.tagWithAttribute("input", "name", "custom-param-key-" + index).findElement(this), getDriver());
+        Input valueInput = new Input(Locator.tagWithAttribute("input", "name", "custom-param-value-" + index).findElement(this), getDriver());
 
         keyInput.setValue(key);
         valueInput.setValue(value);
@@ -197,7 +209,9 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard removeCustomParameter(@NotNull Integer index)
     {
-        WebElement deleteIcon =  Locator.id("extraParams").append(Locator.byClass("removeParamTrigger"))
+
+        WebElement deleteIcon =  Locator.tagWithClass("div", "custom-parameter")
+                .append(Locator.tagWithClass("span", "fa-trash"))
                 .findElements(this).get(index);
 
         deleteIcon.click();
@@ -210,13 +224,11 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         getWrapper().clickAndWait(elementCache().saveButton);
     }
 
-    public ModalDialog saveAndExpectError()
+    public void saveAndExpectError(String error)
     {
         goToConfiguration();
         elementCache().saveButton.click();
-        LabKeyAlert labKeyAlert = new LabKeyAlert(getDriver(), 10000);
-        assertEquals("Pipeline Trigger Wizard did not produce an error as expected", "Error", labKeyAlert.getTitle());
-        return labKeyAlert;
+        assertTrue("Pipeline Trigger Wizard did not produce an error as expected", elementCache().error.getText().contains(error));
     }
 
     public void cancelEditing()
@@ -233,12 +245,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     protected class ElementCache extends Component.ElementCache
     {
-        public ElementCache()
-        {
-            if (getWrapper().getUrlParameters().containsKey("rowId"))
-                // Wait for saved config to populate form
-                Locators.pageSignal("triggerConfigLoaded").waitForElement(getDriver(), 10000);
-        }
+//        public ElementCache()
+//        {
+//            if (getWrapper().getUrlParameters().containsKey("rowId"))
+//                // Wait for saved config to populate form
+//                Locators.pageSignal("triggerConfigLoaded").waitForElement(getDriver(), 10000);
+//        }
 
         //details page elements
         Input nameInput = new Input(Locator.tagWithName("input", "name").findWhenNeeded(this), getDriver());
@@ -254,18 +266,21 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Checkbox recursiveCheckbox = new Checkbox(Locator.tagWithName("input", "recursive").findWhenNeeded(this));
         Input filePatternInput =  new Input(Locator.tagWithName("input", "filePattern").findWhenNeeded(this), getDriver());
         Input quietInput =  new Input(Locator.tagWithName("input", "quiet").findWhenNeeded(this), getDriver());
-        Input containerMoveInput =  new Input(Locator.tagWithName("input", "containerMove").findWhenNeeded(this), getDriver());
-        Input subdirectoryMoveInput = new Input(Locator.tagWithName("input", "directoryMove").findWhenNeeded(this), getDriver());
+        Input containerMoveInput =  new Input(Locator.tagWithName("input", "moveContainer").findWhenNeeded(this), getDriver());
+        Input subdirectoryMoveInput = new Input(Locator.tagWithName("input", "moveDirectory").findWhenNeeded(this), getDriver());
         Input copyInput =  new Input(Locator.tagWithName("input", "copy").findWhenNeeded(this), getDriver());
         Input paramFunctionInput =  new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
-        WebElement addCustomParam = Locator.linkContainingText("add custom parameter").findWhenNeeded(this);
+        WebElement showAdvanced = Locator.tagWithText("div", "Show Advanced Settings").findWhenNeeded(this);
+        WebElement addCustomParam = Locator.tagWithText("div", "Add Custom Parameter").findWhenNeeded(this);
 
         //navgiation elements
-        WebElement detailsLink = Locator.linkWithHref("#details").findWhenNeeded(this);
-        WebElement configurationLink = Locator.linkWithHref("#configuration").findWhenNeeded(this);
+        WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
+        WebElement configurationButton = Locator.buttonContainingText("Configuration").findWhenNeeded(this);
 
         //page actions
-        WebElement saveButton = Locator.linkContainingText("Save").findWhenNeeded(this);
-        WebElement cancelButton = Locator.linkContainingText("Cancel").findWhenNeeded(this);
+        WebElement saveButton = Locator.buttonContainingText("save").findWhenNeeded(this);
+        WebElement cancelButton = Locator.linkContainingText("cancel").findWhenNeeded(this);
+
+        WebElement error = Locator.tagWithClass("div", "alert-danger").findWhenNeeded(this);
     }
 }
