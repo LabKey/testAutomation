@@ -16,6 +16,7 @@
 package org.labkey.test.util.search;
 
 import org.apache.http.HttpStatus;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -28,26 +29,54 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 
 public abstract class SearchAdminAPIHelper
 {
+
+    public static void waitForIndexer()
+    {
+        waitForIndexer(WAIT_FOR_PAGE);
+    }
+
     /**
      * Wait for search indexer to be idle via SearchController.WaitForIndexerAction
      */
     @LogMethod(quiet = true)
-    public static void waitForIndexer()
+    public static void waitForIndexer(int timeout)
     {
         // Invoke a special server action that waits until all previous indexer tasks are complete
-        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer")).getResponseCode();
-        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+        var cmd = new PostCommand("search", "waitForIndexer");
+        cmd.setTimeout(timeout);
+        executeWaitForIndexer(cmd);
+    }
+
+    public static void waitForIndexerBackground()
+    {
+        waitForIndexerBackground(WAIT_FOR_PAGE);
     }
 
     @LogMethod(quiet = true)
-    public static void waitForIndexerBackground()
+    public static void waitForIndexerBackground(int timeout)
     {
         // Invoke a special server action that waits until all previous indexer tasks are complete, even wait for background indexing tasks to complete (e.g. deleteContainer)
-        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer", Map.of("priority","background"))).getResponseCode();
-        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+        var cmd = new PostCommand("search", "waitForIndexer");
+        cmd.setTimeout(timeout);
+        cmd.setParameters(Map.of("priority","background"));
+
+        executeWaitForIndexer(cmd);
+    }
+
+    private static void executeWaitForIndexer(PostCommand cmd)
+    {
+        try
+        {
+            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), null);
+            assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response.getStatusCode());
+        } catch (Exception cmdException)
+        {
+            throw new RuntimeException("an error occurred while waiting for search indexing to finish", cmdException);
+        }
     }
 
     @LogMethod(quiet = true)
