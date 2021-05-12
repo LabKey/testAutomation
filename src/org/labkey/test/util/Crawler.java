@@ -1247,7 +1247,7 @@ public class Crawler
     /** Ignore GWT deferredjs loading issue when navigating away from designer pages */
     private boolean isRealFailure(Exception e)
     {
-        return e instanceof UnhandledAlertException && ((UnhandledAlertException)e).getAlertText().contains("Script Tag Failure - no status available");
+        return !(e instanceof UnhandledAlertException) || !((UnhandledAlertException)e).getAlertText().contains("Script Tag Failure - no status available");
     }
 
     private void testInjection(URL start)
