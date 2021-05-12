@@ -1,0 +1,23 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          name="filewatcher-test-custom-fields" version="0.1">
+    <description>Custom Fields</description>
+    <help>Script Based File Watcher with Custom Fields</help>
+    <tasks>
+        <taskref ref="pipelinetest:task:r-copy-inline"/>
+    </tasks>
+    <customFields>
+        <text name="testText" label="Test Text" required="true" placeholder="placeholder text" />
+        <textarea name="testTextArea" label="Test Text Area" required="true" />
+        <number name="testNumber" label="Test Number" required="true" />
+        <checkbox name="testCheckBox" label="Test Checkbox" required="true" />
+        <radio name="testRadio" label="Test Radio" required="true">
+            <option label="Value 1" value="value1"/>
+            <option label="Value 2" value="value2"/>
+        </radio>
+        <select name="testSelect" label="Test Select" required="true" placeholder="placeholder option">
+            <option label="Value 1" value="value1"/>
+            <option label="Value 2" value="value2"/>
+        </select>
+        <text name="testTextNotRequired" label="Test Text Not Required" required="false" />
+    </customFields>
+</pipeline>
