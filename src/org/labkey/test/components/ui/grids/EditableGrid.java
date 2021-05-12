@@ -335,9 +335,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             for(String _value : values)
             {
-                getWrapper().setFormElement(lookupInputCell, _value); // Add the RETURN to close the inputCell.
-                WebElement listItem = elementCache().listGroupItem(_value);
-                listItem.click();
+                getWrapper().setFormElement(lookupInputCell, _value);
+
+                // was previously using elementCache().listGroupItem(_value).click() but the click would attempt to
+                // scroll the list item into view which would result in the menu being reattached to the input element,
+                // see changes in labkey-ui-components for issue 43051
+                lookupInputCell.sendKeys(Keys.DOWN, Keys.ENTER);
 
                 // If after selecting a value the grid text is equal to the item list then it was a single select
                 // list box and we are done, otherwise we need to wait for the appropriate element.
