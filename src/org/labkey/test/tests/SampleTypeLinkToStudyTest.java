@@ -9,6 +9,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -32,6 +33,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String SAMPLE_TYPE2 = "Sample type 2";
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    protected String now = LocalDateTime.now().format(_dateTimeFormatter);
 
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
@@ -61,13 +63,12 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(DATE_BASED_STUDY);
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
-        createSampleTypes();
+        //createSampleTypes();
     }
 
     private void createSampleTypes()
     {
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        String now = LocalDateTime.now().format(_dateTimeFormatter);
         log("Creating sample types");
         String data1 = "Name\tVisitId\tVisitDate\tParticipantId\n" +
                 "blood\t1\t" + now + "\tP1\n" +
@@ -127,7 +128,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1);
 
-        recallDataset(DATE_BASED_STUDY,SAMPLE_TYPE2,1);
+        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE2, 1);
 
         log("Verifying log entries");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -160,8 +161,77 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         table = new DataRegionTable("Dataset", getDriver());
         checker().verifyEquals("Incorrect of " + SAMPLE_TYPE1 + "to study" + DATE_BASED_STUDY, 1, table.getDataRowCount());
 
-        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE1,1);
-        recallDataset(VISIT_BASED_STUDY,SAMPLE_TYPE1,1);
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyTrue("Missing linked column for Visit based study",
+                samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyTrue("Missing linked column for Date based study",
+                samplesTable.getColumnNames().contains("linked_to_Date_Based_Study_Test_Project_Study"));
+
+        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE1, 1);
+        recallDataset(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1);
+    }
+
+    @Test
+    public void testAutoLinkToStudy()
+    {
+        String sampleName = "SampleTypeWithAutoLinkToStudy";
+
+        log("Creating sample type with auto link enabled");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleName)
+                .setAutoLinkDataToStudy("/" + VISIT_BASED_STUDY)
+                .setFields(List.of(
+                        new FieldDefinition("VisitID", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("Date", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("ParticipantID", FieldDefinition.ColumnType.Subject))));
+
+        log("Inserting row into the sample type");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(sampleName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "one");
+        setFormElement(Locator.name("quf_VisitID"), "1");
+        setFormElement(Locator.name("quf_Date"), "12/12/2020");
+        setFormElement(Locator.name("quf_ParticipantID"), "P1");
+        clickButton("Submit");
+
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyTrue("Missing linked column",
+                samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyEquals("Missing auto link for the inserted row", "linked",
+                samplesTable.getDataAsText(0,"linked_to_Visit_Based_Study_Test_Project_Study"));
+
+    }
+
+    @Test
+    public void testDeleteLinkedSampleType()
+    {
+        String sampleName = "SampleTypeDelete";
+        log("Creating sample types for deletion");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        String data = "Name\tVisitId\tVisitDate\tParticipantId\n" +
+                "blood\t1\t" + now + "\tP1\n" +
+                "urine\t2\t" + now + "\tP2\n";
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleName)
+                .setFields(List.of(
+                        new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("VisitDate", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data);
+
+        log("Linking sample types to studies");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(VISIT_BASED_STUDY, sampleName, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(DATE_BASED_STUDY, sampleName, 2);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        deleteSampleTypeRows(sampleName, 1);
     }
 
     private void linkToStudy(String targetStudy, String sampleName, int numOfRowsToBeLinked)
@@ -202,10 +272,25 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(study);
         clickAndWait(Locator.linkWithText(sampleType));
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
-        for(int i=0; i < numOfRows ; i++)
+        for (int i = 0; i < numOfRows; i++)
             table.checkCheckbox(i);
         table.clickHeaderButton("Recall");
         acceptAlert();
+    }
+
+    private void deleteSampleTypeRows(String sampleName, int numOfRows)
+    {
+        clickAndWait(Locator.linkWithText(sampleName));
+
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        for (int i = 0; i < numOfRows; i++)
+            samplesTable.checkCheckbox(i);
+        samplesTable.clickHeaderButton("Delete");
+
+        Window error = Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor();
+        log("Delete message : " + error.getBody());
+        error.clickButton("Yes, Delete", true);
+
     }
 
     @Override
