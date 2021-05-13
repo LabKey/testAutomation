@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyC.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 2)
+@BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 {
     final static String SAMPLE_TYPE_PROJECT = "Sample Type Test Project";
@@ -63,7 +63,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(DATE_BASED_STUDY);
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
-        //createSampleTypes();
+        createSampleTypes();
     }
 
     private void createSampleTypes()
@@ -203,7 +203,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyTrue("Missing linked column",
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
         checker().verifyEquals("Missing auto link for the inserted row", "linked",
-                samplesTable.getDataAsText(0,"linked_to_Visit_Based_Study_Test_Project_Study"));
+                samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
 
     }
 
@@ -231,7 +231,20 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         linkToStudy(DATE_BASED_STUDY, sampleName, 2);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        deleteSampleTypeRows(sampleName, 1);
+        clickAndWait(Locator.linkWithText(sampleName));
+
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.checkCheckbox(0);
+        samplesTable.clickHeaderButton("Delete");
+
+        Window error = Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor();
+        String expectedErrorMsg = "The selected sample will be permanently deleted.\n" +
+                "\n" +
+                "The selected row(s) will also be deleted from the linked dataset(s) in the following studies:\n" +
+                DATE_BASED_STUDY + " Study\n" + VISIT_BASED_STUDY + " Study\n" + "Deletion cannot be undone. Do you want to proceed?";
+        checker().verifyEquals("Incorrect delete message", expectedErrorMsg, error.getBody());
+        error.clickButton("Yes, Delete", true);
+
     }
 
     private void linkToStudy(String targetStudy, String sampleName, int numOfRowsToBeLinked)
@@ -253,7 +266,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     private void verifyLinkToHistory(String expectedComments)
     {
         clickButton("Link to Study History");
-        DataRegionTable table = new DataRegionTable("query", getDriver());
+        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         checker().verifyEquals("Mismatch in the comment", expectedComments, table.getDataAsText(0, "comment"));
     }
 
@@ -262,7 +275,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToAdminConsole().clickAuditLog();
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Link to Study events"));
 
-        DataRegionTable auditTable = new DataRegionTable("query", getDriver());
+        DataRegionTable auditTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         checker().verifyEquals("Incorrect audit log entry for Link to Study events", Comment,
                 auditTable.getDataAsText(0, "comment"));
     }
@@ -278,20 +291,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         acceptAlert();
     }
 
-    private void deleteSampleTypeRows(String sampleName, int numOfRows)
-    {
-        clickAndWait(Locator.linkWithText(sampleName));
-
-        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        for (int i = 0; i < numOfRows; i++)
-            samplesTable.checkCheckbox(i);
-        samplesTable.clickHeaderButton("Delete");
-
-        Window error = Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor();
-        log("Delete message : " + error.getBody());
-        error.clickButton("Yes, Delete", true);
-
-    }
 
     @Override
     protected @Nullable String getProjectName()
