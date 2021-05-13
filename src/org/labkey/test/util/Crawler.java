@@ -401,7 +401,7 @@ public class Crawler
         return _crawlStats;
     }
 
-    public class CrawlStats
+    public static class CrawlStats
     {
         private final int _newPages;
         private final int _uniqueActions;
@@ -650,7 +650,7 @@ public class Crawler
 
     public static class ControllerActionId
     {
-        @NotNull private String _controller;
+        @NotNull private final String _controller;
         @NotNull private String _action = "";
         private String _folder;
 
@@ -756,7 +756,7 @@ public class Crawler
 
     public static class ActionProfiler
     {
-        private Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
+        private final Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
 
         public void updateActionProfile(String relativeUrl, long loadTime)
         {
@@ -767,20 +767,18 @@ public class Crawler
                 _actionProfiles.put(actionId, new ActionProfile(relativeUrl, loadTime));
         }
 
-        private class ActionProfile
+        private static class ActionProfile
         {
             private long _invocations;
             private long _longestLoad;
             private long _totalTime;
-            private String _urlForLongest;
-            private ControllerActionId _actionId;
+            private final ControllerActionId _actionId;
 
             ActionProfile(String relativeURL, long loadTime)
             {
                 _actionId = new ControllerActionId(relativeURL);
                 _invocations = 1;
                 _totalTime = _longestLoad = loadTime;
-                _urlForLongest = relativeURL;
             }
 
             public void updateActionProfile(String relativeURL, long loadTime)
@@ -794,7 +792,6 @@ public class Crawler
                 if (loadTime > _longestLoad)
                 {
                     _longestLoad = loadTime;
-                    _urlForLongest = relativeURL;
                 }
             }
 
@@ -939,14 +936,7 @@ public class Crawler
         int currentDepth = 0;
         int maxDepth = 0;
         final Timer crawlTimer = new Timer(_maxCrawlTime);
-        PriorityQueue<UrlToCheck> urlsToCheck = new PriorityQueue<UrlToCheck>(new Comparator<UrlToCheck>()
-        {
-            @Override
-            public int compare(UrlToCheck u1, UrlToCheck u2)
-            {
-                return Double.compare(u1.priority,u2.priority);
-            }
-        });
+        PriorityQueue<UrlToCheck> urlsToCheck = new PriorityQueue<>(Comparator.comparingDouble(u -> u.priority));
         urlsToCheck.addAll(_startingUrls);
 
         TestLogger.log("Crawl depth : " + currentDepth);
@@ -998,7 +988,7 @@ public class Crawler
         _urlsChecked.add(stripQueryParams(relativeURL));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
-        String originMessage = origin != null ? "\nOriginating page: " + origin.toString() : "";
+        String originMessage = origin != null ? "\nOriginating page: " + origin : "";
 
         try
         {
@@ -1013,8 +1003,7 @@ public class Crawler
             }
             catch (UnhandledAlertException alert)
             {
-                // Ignore GWT deferredjs loading issue when navigating away from designer pages
-                if (!alert.getAlertText().contains("Script Tag Failure - no status available"))
+                if (isRealFailure(alert))
                     throw alert;
             }
 
@@ -1061,7 +1050,7 @@ public class Crawler
                 }
 
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
-                    _warnings.add("Action does not specify title: " + actionId.toString());
+                    _warnings.add("Action does not specify title: " + actionId);
 
                 if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
                 {
@@ -1255,6 +1244,12 @@ public class Crawler
         }
     }
 
+    /** Ignore GWT deferredjs loading issue when navigating away from designer pages */
+    private boolean isRealFailure(Exception e)
+    {
+        return !(e instanceof UnhandledAlertException) || !((UnhandledAlertException)e).getAlertText().contains("Script Tag Failure - no status available");
+    }
+
     private void testInjection(URL start)
     {
         String base = stripQueryParams(stripHash(start.toString()));
@@ -1309,9 +1304,12 @@ public class Crawler
             }
             catch (Exception ex)
             {
-                throw new AssertionError("Non-injection error while attempting script injection on " + actionId.toString() + "\n" +
-                        "param: " + paramMalicious + "\n" +
-                        "URL: " + urlMalicious, ex);
+                if (isRealFailure(ex))
+                {
+                    throw new AssertionError("Non-injection error while attempting script injection on " + actionId + "\n" +
+                            "param: " + paramMalicious + "\n" +
+                            "URL: " + urlMalicious, ex);
+                }
             }
         }
         // TODO this blows up jquery document completed handling, which causes pageload to not fire and then timeout
@@ -1360,12 +1358,11 @@ public class Crawler
                     }
                 })
                 .collect(Collectors.toList());
-    };
+    }
 
     String queryStringFromEntries(List<Map.Entry<String,String>> list)
     {
         StringBuilder sb = new StringBuilder();
-        String and = "";
         list.forEach(e ->
         {
             if (sb.length()!=0)
