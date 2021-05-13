@@ -134,7 +134,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
             waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
-                    UserMenu.AppUserMenu());
+                    UserMenu.appUserMenu());
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
@@ -154,7 +154,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // verify we're signed in now
             if (!waitFor(() ->
             {
-                if(isElementPresent(UserMenu.AppUserMenu()))
+                if(isElementPresent(UserMenu.appUserMenu()))
                 {
                     goToHome();
                 }

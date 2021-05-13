@@ -43,7 +43,7 @@ public abstract class UserMenu extends BootstrapMenu
     @Override
     protected Locator getToggleLocator()
     {
-        return Locator.id(MENU_ID);
+        return appUserMenu();
     }
 
     /**
@@ -51,8 +51,8 @@ public abstract class UserMenu extends BootstrapMenu
      *
      * @return A locator to the drop down user menu button.
      */
-    public static Locator AppUserMenu()
+    public static Locator appUserMenu()
     {
-        return Locator.tagWithId("a", "user-menu-dropdown");
+        return Locator.tagWithId("a", MENU_ID);
     }
 }
