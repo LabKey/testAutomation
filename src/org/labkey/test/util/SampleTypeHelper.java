@@ -74,6 +74,10 @@ public class SampleTypeHelper extends WebDriverWrapper
         CreateSampleTypePage createPage = goToCreateNewSampleType();
 
         createPage.setName(props.getName());
+        if(props.getAutoLinkDataToStudy() != null)
+        {
+            createPage.setAutoLinkDataToStudy(props.getAutoLinkDataToStudy());
+        }
         if (props.getNameExpression() != null)
         {
             createPage.setNameExpression(props.getNameExpression());

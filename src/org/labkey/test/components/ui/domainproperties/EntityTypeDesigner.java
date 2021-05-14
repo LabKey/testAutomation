@@ -4,8 +4,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
 
@@ -79,10 +81,21 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         elementCache().nameExpressionInput.set(nameExpression);
         return getThis();
     }
-
     public String getNameExpression()
     {
         return elementCache().nameExpressionInput.get();
+    }
+
+    public  T setAutoLinkDataToStudy(String value)
+    {
+        expandPropertiesPanel();
+        elementCache().autoLinkDataToStudy.selectByVisibleText(value);
+        return  getThis();
+    }
+
+    public String getAutoLinkDataToStudy()
+    {
+        return elementCache().autoLinkDataToStudy.toString();
     }
 
     public T setDescription(String description)
@@ -102,5 +115,8 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
         protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
         protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
+
+        protected final Select autoLinkDataToStudy = SelectWrapper.Select(Locator.id("entity-autoLinkTargetContainerId"))
+                .findWhenNeeded(this);
     }
 }

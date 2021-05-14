@@ -25,6 +25,7 @@ public class SampleTypeDefinition extends DomainProps
     private String _name;
     private String _nameExpression;
     private String _description;
+    private String _autoLinkDataToStudy;
     private List<FieldDefinition> _fields = new ArrayList<>();
     private Map<String, String> _parentAliases = new HashMap<>();
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
@@ -69,6 +70,16 @@ public class SampleTypeDefinition extends DomainProps
     public SampleTypeDefinition setDescription(String description)
     {
         _description = description;
+        return this;
+    }
+    public String getAutoLinkDataToStudy()
+    {
+        return _autoLinkDataToStudy;
+    }
+
+    public SampleTypeDefinition setAutoLinkDataToStudy(String value)
+    {
+        _autoLinkDataToStudy = value;
         return this;
     }
 
@@ -195,6 +206,10 @@ public class SampleTypeDefinition extends DomainProps
                 importAliases.put(columnName, aliasTable);
             }
             options.put("importAliases", importAliases);
+        }
+        if(getAutoLinkDataToStudy() != null)
+        {
+           options.put("autoLinkTargetContainerId", getAutoLinkDataToStudy());
         }
         if (getInventoryMetricUnit() != null)
         {
