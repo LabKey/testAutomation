@@ -3,8 +3,6 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -12,7 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.components.html.Input.Input;
 
 /**
  * TabbedGridPanel wraps components/src/public/QueryModel/TabbedGridPanel.tsx
@@ -42,7 +39,6 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         return _driver;
     }
 
-
     public List<String> getTabs()
     {
         return getWrapper().getTexts(elementCache().navTabs());
@@ -51,7 +47,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
     private boolean isSelected(String tabText)
     {
         String tabClass = elementCache().navTab(tabText).getAttribute("class");
-        return tabClass != null &&"active".equals(tabClass);
+        return "active".equals(tabClass);
     }
 
     public QueryGrid selectGrid(String tabText)
@@ -63,6 +59,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
             tab.click();
             getWrapper().waitFor(()-> isSelected(tabText), "tab did not become selected in time", 2000);
         }
+
         return getSelectedGrid();
     }
 
@@ -77,25 +74,24 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         return new ElementCache();
     }
 
-
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement body = Locator.tagWithClass("div", "tabbed-grid-panel__body")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         final Locator navTab = Locator.tagWithClass("ul", "nav-tabs")
                 .child(Locator.tag("li").withChild(Locator.tag("a")));
+
         List<WebElement> navTabs()
         {
             return navTab.findElements(body);
         }
+
         WebElement navTab(String text)
         {
             return Locator.tagWithClass("ul", "nav-tabs")
                     .child(Locator.tag("li").withChild(Locator.tag("a").withText(text))).findElement(body);
         }
-
     }
-
 
     public static class TabbedGridPanelFinder extends WebDriverComponentFinder<TabbedGridPanel, TabbedGridPanelFinder>
     {
@@ -124,8 +120,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         {
             if (_title != null)
                 return _baseLocator.withChild(Locator.tagWithClass("div", "tabbed-grid-panel__title").withText(_title));
-            else
-                return _baseLocator;
+            return _baseLocator;
         }
     }
 }
