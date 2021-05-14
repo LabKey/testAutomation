@@ -26,6 +26,7 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -48,7 +49,14 @@ public abstract class SearchAdminAPIHelper
         // Invoke a special server action that waits until all previous indexer tasks are complete
         var cmd = new PostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
-        executeWaitForIndexer(cmd);
+        try
+        {
+            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), null);
+            assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response.getStatusCode());
+        } catch (Exception cmdException)
+        {
+            throw new RuntimeException("an error occurred while waiting for search indexing to finish", cmdException);
+        }
     }
 
     public static void waitForIndexerBackground()
@@ -64,11 +72,6 @@ public abstract class SearchAdminAPIHelper
         cmd.setTimeout(timeout);
         cmd.setParameters(new HashMap<>(Map.of("priority", "background")));
 
-        executeWaitForIndexer(cmd);
-    }
-
-    private static void executeWaitForIndexer(PostCommand cmd)
-    {
         try
         {
             var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), null);
