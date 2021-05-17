@@ -253,7 +253,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         if (isGridPanel())
         {
-            if (elementCache().clearAllBtnLoc.existsIn(this))
+            if (elementCache().clearBtnLoc.existsIn(this))
                 doAndWaitForUpdate(() ->
                         elementCache().clearAllSelectionStatusBtn().click());
             else
@@ -310,8 +310,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         Locator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         Locator selectAllBtnLoc = Locator.tagWithClass("span", "selection-status__select-all")
                 .child(Locator.buttonContainingText("Select all"));
-        Locator clearAllBtnLoc = Locator.tagWithClass("span", "selection-status__clear-all")
-                .child(Locator.button("Clear all"));
+        Locator clearBtnLoc = Locator.tagWithClass("span", "selection-status__clear-all")
+                .child(Locator.tagContainingText("button", "Clear"));
 
         WebElement selectionStatusContainer()
         {
@@ -319,7 +319,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         }
         WebElement clearAllSelectionStatusBtn()
         {
-            return clearAllBtnLoc.findElement(selectionStatusContainer());
+            return clearBtnLoc.findElement(selectionStatusContainer());
         }
         WebElement selectAllN_Btn()
         {
