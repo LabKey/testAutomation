@@ -84,7 +84,7 @@ public class FieldDefinition extends PropertyDescriptor
             json.put("shownInUpdateView", getShownInUpdateView());
         if (getLookupValidatorEnabled() != null)
             json.put("lookupValidatorEnabled", getLookupValidatorEnabled());
-        if (getType().getConceptURI() != null)
+        if (getType() != null && getType().getConceptURI() != null)
             json.put("conceptURI", getType().getConceptURI());
         if (getURL() != null)
             json.put("url", getURL());
