@@ -631,6 +631,7 @@ public class FieldDefinition extends PropertyDescriptor
         {
             JSONObject json = new JSONObject();
             json.put("name", _name);
+            json.put("expression", getExpression());
             if (_description != null)
             {
                 json.put("description", _description);
