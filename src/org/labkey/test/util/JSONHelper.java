@@ -49,7 +49,7 @@ public class JSONHelper
             Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
     };
 
-    private ArrayList<Pattern> _ignoredElements;
+    private final ArrayList<Pattern> _ignoredElements;
 
     public JSONHelper()
     {
@@ -108,32 +108,32 @@ public class JSONHelper
         }
     }
 
-    public boolean compareMap(Map map1, Map map2)
+    public boolean compareMap(Map map1, Map map2, boolean fatal)
     {
         for (Object key : map1.keySet())
         {
             if (map2.containsKey(key))
             {
-                if (!skipElement(String.valueOf(key)) && !compareElement(map1.get(key), map2.get(key)))
+                if (!skipElement(String.valueOf(key)) && !compareElement(map1.get(key), map2.get(key), fatal))
                 {
-                    log("Error found in: " + String.valueOf(key), true);
+                    log("Error found in: " + key, fatal);
                     return false;
                 }
             }
             else
             {
-                log("Comparison of maps failed: could not find key: " + key, true);
+                log("Comparison of maps failed: could not find key: " + key, fatal);
                 return false;
             }
         }
         return true;
     }
 
-    public boolean compareList(List list1, List list2)
+    public boolean compareList(List list1, List list2, boolean fatal)
     {
         if (list1.size() != list2.size())
         {
-            log("Comparison of lists failed: sizes are different", true);
+            log("Comparison of lists failed: sizes are different", fatal);
             return false;
         }
 
@@ -141,9 +141,9 @@ public class JSONHelper
         for (int i=0; i < list1.size(); i++)
         {
             boolean matched = false;
-            for (int j=0; j < list2.size(); j++)
+            for (Object o : list2)
             {
-                if (compareElement(list1.get(i), list2.get(j), false))
+                if (compareElement(list1.get(i), o, false))
                 {
                     matched = true;
                     break;
@@ -151,8 +151,8 @@ public class JSONHelper
             }
             if (!matched)
             {
-                log("Failed to match two specified lists.  " + list1.get(i) + " was not found in list2.\nList 1: " +
-                        list1.toString() + "\nList 2: " + list2.toString(), true);
+                log("Failed to match two specified lists. " + list1.get(i) + " was not found in list2.\nList 1: " +
+                        list1 + "\nList 2: " + list2, fatal);
                 return false;
             }
         }
@@ -167,9 +167,9 @@ public class JSONHelper
     private boolean compareElement(Object o1, Object o2, boolean fatal)
     {
         if (o1 instanceof Map)
-            return compareMap((Map)o1, (Map)o2);
+            return compareMap((Map)o1, (Map)o2, fatal);
         if (o1 instanceof List)
-            return compareList((List)o1, (List)o2);
+            return compareList((List)o1, (List)o2, fatal);
         if (StringUtils.equals(String.valueOf(o1), String.valueOf(o2)))
             return true;
 
@@ -192,5 +192,4 @@ public class JSONHelper
         }
         return false;
     }
-
 }
