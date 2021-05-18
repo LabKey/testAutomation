@@ -156,7 +156,7 @@
             <![CDATA[
                 Rows via createAndLoad = 3
                 Rows via insert = 2
-                Violation of UNIQUE KEY constraint 'UQ_Material_LSID'. Cannot insert duplicate key in object 'exp.Material'.
+                duplicate key
                 Rows via merge = 10
                 Has audit transaction id = TRUE
              ]]>
