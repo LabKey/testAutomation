@@ -81,15 +81,15 @@
             <![CDATA[
                 library(Rlabkey)
                 df <- data.frame(name=c("test1","test2","test3"), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
-                labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="SampleSet", df=df, name="test sample type with load data")
+                info <- labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="SampleSet", df=df, name="test sample type with load data")
+                print(paste("Create successful = ", info$success, sep=""))
+                print(paste("Rows via createAndLoad = ", info$rowCount, sep=""))
             ]]>
         </url>
         <response>
             <![CDATA[
-                $success
-                [1] TRUE
-                $rowCount
-                [1] 3
+                Create successful = TRUE
+                Rows via createAndLoad = 3
              ]]>
         </response>
     </test>
@@ -98,15 +98,67 @@
             <![CDATA[
                 library(Rlabkey)
                 df <- data.frame(name=c("test1","test2","test3"), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
-                labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="DataClass", df=df, name="test data class with load data")
+                info <- labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="DataClass", df=df, name="test data class with load data")
+                print(paste("Create successful = ", info$success, sep=""))
+                print(paste("Rows via createAndLoad = ", info$rowCount, sep=""))
             ]]>
         </url>
         <response>
             <![CDATA[
-                $success
-                [1] TRUE
-                $rowCount
-                [1] 3
+                Create successful = TRUE
+                Rows via createAndLoad = 3
+             ]]>
+        </response>
+    </test>
+    <test name="insert and merge into sample type" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                name <- "test insert and merge into sample type"
+                df <- data.frame(name=c("test1","test2","test3"), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                info <- labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="SampleSet", df=df, name=name)
+                print(paste("Rows via createAndLoad = ", info$rowCount, sep=""))
+
+                # insert via labkey.query.import
+                df <- data.frame(name=c("test4","test5"), customInt=c(4:5), customString=c("aaa", "bbb"))
+                info <- labkey.query.import(
+                    baseUrl=labkey.url.base, folderPath="%projectName%",
+                    schemaName="samples", queryName=name, toImport=df
+                )
+                print(paste("Rows via insert = ", info$rowCount, sep=""))
+
+                # now try labkey.query.import which should fail with duplicate key message
+                df <- data.frame(
+                    name=c("test1","test2","test3","test4","test5","test6","test7","test8","test9","test10"),
+                    customInt=c(101:110)
+                )
+                info <- labkey.query.import(
+                    baseUrl=labkey.url.base, folderPath="%projectName%",
+                    schemaName="samples", queryName=name, toImport=df
+                )
+                print(paste("Error = ", info$exception, sep=""))
+
+                # now merge via labkey.query.import, 5 update and 5 inserts
+                df <- data.frame(
+                    name=c("test1","test2","test3","test4","test5","test6","test7","test8","test9","test10"),
+                    customInt=c(101:110)
+                )
+                info <- labkey.query.import(
+                    baseUrl=labkey.url.base, folderPath="%projectName%",
+                    schemaName="samples", queryName=name, toImport=df,
+                    options=list(insertOption = "MERGE", auditBehavior = "DETAILED")
+                )
+                print(paste("Rows via merge = ", info$rowCount, sep=""))
+                print(paste("Has audit transaction id = ", !is.na(info$transactionAuditId), sep=""))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Rows via createAndLoad = 3
+                Rows via insert = 2
+                Violation of UNIQUE KEY constraint 'UQ_Material_LSID'. Cannot insert duplicate key in object 'exp.Material'.
+                Rows via merge = 10
+                Has audit transaction id = TRUE
              ]]>
         </response>
     </test>

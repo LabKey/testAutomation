@@ -56,15 +56,15 @@
             <![CDATA[
                 library(Rlabkey)
                 df <- data.frame(ParticipantID=c(1,1,1), Visit=c(1,2,3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
-                labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", df=df, name="test dataset with load data")
+                info <- labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", df=df, name="test dataset with load data")
+                print(paste("Create successful = ", info$success, sep=""))
+                print(paste("Rows via createAndLoad = ", info$rowCount, sep=""))
             ]]>
         </url>
         <response>
             <![CDATA[
-                $success
-                [1] TRUE
-                $rowCount
-                [1] 3
+                Create successful = TRUE
+                Rows via createAndLoad = 3
             ]]>
         </response>
     </test>

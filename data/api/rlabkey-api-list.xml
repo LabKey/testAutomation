@@ -134,15 +134,15 @@
             <![CDATA[
                 library(Rlabkey)
                 df <- data.frame(intKey=c(1:3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
-                labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="IntList", df=df, name="test list with load data", options=list(keyName = "intKey"))
+                info <- labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="IntList", df=df, name="test list with load data", options=list(keyName = "intKey"))
+                print(paste("Create successful = ", info$success, sep=""))
+                print(paste("Rows via createAndLoad = ", info$rowCount, sep=""))
             ]]>
         </url>
         <response>
             <![CDATA[
-                $success
-                [1] TRUE
-                $rowCount
-                [1] 3
+                Create successful = TRUE
+                Rows via createAndLoad = 3
              ]]>
         </response>
     </test>
