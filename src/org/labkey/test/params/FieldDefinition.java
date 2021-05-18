@@ -174,7 +174,7 @@ public class FieldDefinition extends PropertyDescriptor
         if (validators != null)
         {
             propertyValidators = new JSONArray();
-            getValidators().stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
+            validators.stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
         }
         setFieldProperty("propertyValidators", propertyValidators);
         _validators = validators;
