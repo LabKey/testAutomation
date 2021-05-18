@@ -80,6 +80,18 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         if (fieldDefinition.getLookupValidatorEnabled() != null)
             fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
 
+        // ontology-specific
+        if (fieldDefinition.getSourceOntology() != null)
+            fieldRow.setSelectedOntology(fieldDefinition.getSourceOntology());
+        if (fieldDefinition.getConceptImportColumn() != null)
+            fieldRow.setConceptImportField(fieldDefinition.getConceptImportColumn());
+        if (fieldDefinition.getConceptLabelColumn() != null)
+            fieldRow.setConceptLabelField(fieldDefinition.getConceptLabelColumn());
+        if (fieldDefinition.getPrincipalConceptCode() != null)
+            fieldRow.clickSelectConcept()
+                    .searchConcept(fieldDefinition.getPrincipalConceptSearchExpression(), fieldDefinition.getPrincipalConceptCode())
+                    .clickApply();
+
         if (fieldDefinition.getValidators() != null && !fieldDefinition.getValidators().isEmpty())
         {
             List<FieldDefinition.RegExValidator> regexValidators = new ArrayList<>();
