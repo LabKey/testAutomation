@@ -86,26 +86,10 @@
         </url>
         <response>
             <![CDATA[
-                $rowsAffected
+                $success
+                [1] TRUE
+                $rowCount
                 [1] 3
-
-                $queryName
-                [1] "test sample type with load data"
-
-                $schemaName
-                [1] "samples"
-
-                $rows[[1]]$name
-                [1] "test1"
-
-                $rows[[3]]$customInt
-                [1] 3
-
-                $rows[[3]]$customString
-                [1] "ccc"
-
-                $command
-                [1] "insert"
              ]]>
         </response>
     </test>
@@ -119,26 +103,10 @@
         </url>
         <response>
             <![CDATA[
-                $rowsAffected
+                $success
+                [1] TRUE
+                $rowCount
                 [1] 3
-
-                $queryName
-                [1] "test data class with load data"
-
-                $schemaName
-                [1] "exp.data"
-
-                $rows[[1]]$name
-                [1] "test1"
-
-                $rows[[3]]$customInt
-                [1] 3
-
-                $rows[[3]]$customString
-                [1] "ccc"
-
-                $command
-                [1] "insert"
              ]]>
         </response>
     </test>

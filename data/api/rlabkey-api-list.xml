@@ -139,26 +139,10 @@
         </url>
         <response>
             <![CDATA[
-                $rowsAffected
+                $success
+                [1] TRUE
+                $rowCount
                 [1] 3
-
-                $queryName
-                [1] "test list with load data"
-
-                $schemaName
-                [1] "lists"
-
-                $rows[[1]]$intKey
-                [1] 1
-
-                $rows[[3]]$customInt
-                [1] 3
-
-                $rows[[3]]$customString
-                [1] "ccc"
-
-                $command
-                [1] "insert"
              ]]>
         </response>
     </test>
