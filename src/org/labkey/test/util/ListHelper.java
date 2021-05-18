@@ -507,14 +507,20 @@ public class ListHelper extends LabKeySiteWrapper
     @Deprecated
     public static class ListColumn extends FieldDefinition
     {
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator<?> validator, String url, Integer scale)
         {
             super(name);
             setLabel(label);
-            setType(type.toNew());
             setDescription(description);
             setFormat(format);
-            setLookup(lookup);
+            if (lookup != null)
+            {
+                setLookup(lookup);
+            }
+            else
+            {
+                setType(type.toNew());
+            }
             if (validator != null)
                 setValidators(List.of(validator));
             setURL(url);
