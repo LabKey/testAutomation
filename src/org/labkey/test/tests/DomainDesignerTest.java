@@ -1597,7 +1597,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
             String fieldName = intendedField.getName();
 
             // first check that properties that came back from domain creation match what we sent in
-            if (fieldName != "name") // name is a magic column that must be specified when creating a sampleType
+            if (!fieldName.equals("name")) // name is a magic column that must be specified when creating a sampleType
             {                        // but which is never on the domain, cannot be added or imported or exported
                 PropertyDescriptor createdField = createdFields.stream().filter(a -> a.getName().equals(fieldName)).findFirst().orElse(null);
                 assertNotNull("expected field [" + fieldName + "] was not created", createdField);
@@ -1703,10 +1703,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 actualField.getMeasure(), is(intendedField.getMeasure()));
         assertThat("Format property should export",
                 actualField.getFormat(), is(intendedField.getFormat()));
-        if (intendedField.getAllProperties() != null)
-            assertThat("Key field property should export",
-                    actualField.getAllProperties().get("isPrimaryKey"),     // at some point, it will be nice to put isPrimaryKey on PropertyDescriptor
-                    is(intendedField.getAllProperties().get("isPrimaryKey")));  // even if as only a getter
+        assertThat("Key field property should export",
+                nullToFalse(actualField.getAllProperties().get("isPrimaryKey")),
+                is(nullToFalse(intendedField.getAllProperties().get("isPrimaryKey"))));
 
         for (ConditionalFormat intendedFormat : intendedField.getConditionalFormats())
         {
@@ -1716,6 +1715,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
         }
         // would like to do validators, but this part of the remoteAPI is incomplete; validators are settable
         // on FieldDefinition, but not gettable on PropertyDescriptor
+    }
+
+    private Object nullToFalse(Object val)
+    {
+        return val == null ? false : val;
     }
 
     private ArrayListMap<String, PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws Exception
