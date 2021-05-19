@@ -87,10 +87,10 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
             return navTab.findElements(body);
         }
 
-        WebElement navTab(String text)
+        WebElement navTab(String tabTextStartsWith)
         {
             return Locator.tagWithClass("ul", "nav-tabs")
-                    .child(Locator.tag("li").withChild(Locator.tag("a").withText(text))).findElement(body);
+                    .child(Locator.tag("li").withChild(Locator.tag("a").startsWith(tabTextStartsWith))).findElement(body);
         }
     }
 
