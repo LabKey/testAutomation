@@ -63,6 +63,12 @@ public class ConceptPickerDialog extends ModalDialog
         return elementCache().infoTabs.getSelectedPath();
     }
 
+    public ConceptPickerDialog selectNodeFromPath(List<String> pathToNode)
+    {
+        elementCache().treePanel.openToPath(pathToNode);
+        return this;
+    }
+
     public void clickApply()
     {
         dismiss("Apply");
