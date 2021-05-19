@@ -13,8 +13,9 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * TabbedGridPanel wraps components/src/public/QueryModel/TabbedGridPanel.tsx
- * The model of a tabbed grid panel is different from previous models; rather than being a component of the
- * QueryGrid, the TabbedGridPanel contains multiple grids that are shown/hidden via bootstrap style
+ * The model of a tabbed grid panel is different from previous models; rather than conceiving the tabs to
+ * be a subcomponent of a constant QueryGrid, the TabbedGridPanel uses reactBootstrap to swap one or many
+ * grids into or out of existence, while showing only the selected one.
  */
 public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementCache>
 {
