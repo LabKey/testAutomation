@@ -211,7 +211,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickTab("Manage");
         clickButton("Export Study");
 
-        waitForText("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Datasets: Assay Dataset Definitions",
+        waitForText("Visit Map", "Cohort Settings", "QC State Settings", "Datasets: Study Dataset Definitions", "Datasets: Assay Dataset Definitions",
                 "Datasets: Assay Dataset Data", "Participant Comment Settings");
 
         if (_studyHelper.isSpecimenModuleActive())
