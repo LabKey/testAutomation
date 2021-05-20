@@ -289,7 +289,7 @@ public class StudyHelper
         _test.clickButton("Export Study");
 
         _test.waitForElement(Locator.tagWithClass("table", "export-location"));
-        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "Datasets: Study Dataset Definitions", "Datasets: Assay Dataset Definitions", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         if (isSpecimenModuleActive())
         {
             studyObjects = new ArrayList<>(studyObjects);
