@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.components.html.Input.Input;
@@ -71,6 +72,8 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
     public String getTitle()
     {
         showOverview();
+        if (elementCache().noneSelectedElement().isPresent())
+            return elementCache().noneSelectedElement().get().getText();
         return elementCache().title.getText();
     }
 
@@ -122,6 +125,10 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
         {
             return Locator.tagWithClass("ul", "synonyms-text").child(Locator.tag("li"))
                     .findElements(overviewPane);
+        }
+        Optional<WebElement> noneSelectedElement()
+        {
+            return Locator.tagWithClass("div", "none-selected").findOptionalElement(overviewPane);
         }
 
         // path info pane
