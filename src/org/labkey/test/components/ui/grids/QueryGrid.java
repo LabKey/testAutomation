@@ -197,6 +197,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    public QueryGrid filterOn(String columnName, OmniBox.FilterOperator operator, String value)
+    {
+        return filterOn(columnName, operator.getValue(), value);
+    }
+
     /**
      * adds a filter expression to the table via the omnibox, and waits for the grid to update
      * @param columnName

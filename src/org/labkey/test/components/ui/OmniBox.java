@@ -164,6 +164,11 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         elementCache().input.sendKeys(Keys.BACK_SPACE);
     }
 
+    public OmniBox setFilter(String columnName, FilterOperator operator, @Nullable String value)
+    {
+        return setFilter(columnName, operator.getValue(), value);
+    }
+
     public OmniBox setFilter(String columnName, String operator, @Nullable String value)
     {
         String val  = value != null ? enquoteIfMultiWord(value) : "";
@@ -267,6 +272,38 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         protected Locator locator()
         {
             return _locator;
+        }
+    }
+
+    /**
+     * Enum for the various filter operations that the OmniBox allows.
+     */
+    public enum FilterOperator
+    {
+        EQUAL("="),
+        NOT_EQUAL("<>"),
+        GREATER_THAN(">"),
+        LESS_THAN("<"),
+        GREATER_THAN_OR_EQUALS(">="),
+        LESS_THAN_OR_EQUALS("=<"),
+        HAS_ANY_VALUE("has any value"),
+        IS_BLANK("is blank"),
+        IS_NOT_BLANK("is not blank"),
+        CONTAINS("contains"),
+        DOES_NOT_CONTAINS("does not contain"),
+        STARTS_WITH("starts with"),
+        DOES_NOT_START_WITH("does not start with");
+
+        private final String operator;
+
+        FilterOperator(String value)
+        {
+            this.operator = value;
+        }
+
+        public String getValue()
+        {
+            return operator;
         }
     }
 
