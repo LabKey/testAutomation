@@ -304,12 +304,12 @@ public class FieldDefinition extends PropertyDescriptor
 
     public String getPrincipalConceptCode()
     {
-        return (String) getFieldProperty("conceptCode");
+        return (String) getFieldProperty("principalConceptCode");
     }
 
-    public FieldDefinition setPrincipalConceptCode(String conceptCode)
+    public FieldDefinition setPrincipalConceptCode(String principalConceptCode)
     {
-        setFieldProperty("conceptCode", conceptCode);
+        setFieldProperty("principalConceptCode", principalConceptCode);
         return this;
     }
 
