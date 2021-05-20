@@ -22,33 +22,26 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FieldDefinition extends PropertyDescriptor
 {
     // for UI helpers
     private ColumnType _type;
     private LookupInfo _lookup;
-
-    // Field properties not supported by PropertyDescriptor
-    private Integer _scale;
-    private Boolean _shownInDetailsView;
-    private Boolean _shownInInsertView;
-    private Boolean _shownInUpdateView;
-    private Boolean _isPrimaryKey;
-    private Boolean _lookupValidatorEnabled;
-    private String _url;
-    private List<FieldValidator<?>> _validators;
-    private String _importAliases;
-    private String _sourceOntology;
-    private String _conceptLabelColumn;
-    private String _conceptImportColumn;
-    private String _principalConceptCode;
     private String _principalConceptSearchExpression;
+
+    // Stash validator collection to avoid having to convert back from JSON Maps
+    private List<FieldValidator<?>> _validators;
+
+    // Collection of JSON properties not explicitly known by 'PropertyDescriptor'
+    private final Map<String, Object> _extraFieldProperties = new HashMap<>();
 
     public FieldDefinition(String name, ColumnType type)
     {
-        super(name, type.getRangeURI());
+        setName(name);
         setType(type);
     }
 
@@ -64,55 +57,9 @@ public class FieldDefinition extends PropertyDescriptor
     }
 
     @Override
-    public JSONObject toJSONObject(boolean forProtocol)
+    public Map<String, Object> getAllProperties()
     {
-        if (getType() != null && getType().getRangeURI() == null)
-        {
-            throw new IllegalArgumentException("`FieldDefinition` cannot be used to create column over API: " + getType().name());
-        }
-
-        JSONObject json = super.toJSONObject(forProtocol);
-        if (getScale() != null)
-            json.put("scale", getScale());
-        if (isPrimaryKey() != null)
-            json.put("isPrimaryKey", isPrimaryKey());
-        if (getShownInDetailsView() != null)
-            json.put("shownInDetailsView", getShownInDetailsView());
-        if (getShownInInsertView() != null)
-            json.put("shownInInsertView", getShownInInsertView());
-        if (getShownInUpdateView() != null)
-            json.put("shownInUpdateView", getShownInUpdateView());
-        if (getLookupValidatorEnabled() != null)
-            json.put("lookupValidatorEnabled", getLookupValidatorEnabled());
-        if (getType().getConceptURI() != null)
-            json.put("conceptURI", getType().getConceptURI());
-        if (getURL() != null)
-            json.put("url", getURL());
-        if (getImportAliases() != null)
-            json.put("importAliases", getImportAliases());
-        if (getValidators() != null)
-        {
-            JSONArray propertyValidators = new JSONArray();
-            getValidators().stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
-            json.put("propertyValidators", propertyValidators);
-        }
-        if (getSourceOntology() != null)
-            json.put("sourceOntology", getSourceOntology());
-        if (getConceptLabelColumn() != null)
-            json.put("conceptLabelColumn", getConceptLabelColumn());
-        if (getConceptImportColumn() != null)
-            json.put("conceptImportColumn", getConceptImportColumn());
-        if (getPrincipalConceptCode() != null)
-            json.put("principalConceptCode", getPrincipalConceptCode());
-
-        return json;
-    }
-
-    @Override
-    public FieldDefinition setLabel(String label)
-    {
-        super.setLabel(label);
-        return this;
+        return _extraFieldProperties;
     }
 
     public ColumnType getType()
@@ -122,6 +69,11 @@ public class FieldDefinition extends PropertyDescriptor
 
     public FieldDefinition setType(ColumnType type)
     {
+        if (type == ColumnType.Lookup)
+        {
+            throw new IllegalArgumentException("Use 'setLookup' or construct with 'FieldDefinition(String, LookupInfo)' to create lookup fields");
+        }
+
         _type = type;
         if (type.getLookupInfo() != null)
         {
@@ -131,6 +83,16 @@ public class FieldDefinition extends PropertyDescriptor
                     type.getLookupInfo().getFolder());
         }
         super.setRangeURI(type.getRangeURI());
+        setFieldProperty("conceptURI", type.getConceptURI());
+        return this;
+    }
+
+    // Override return type of PropertyDescriptor setters
+
+    @Override
+    public FieldDefinition setLabel(String label)
+    {
+        super.setLabel(label);
         return this;
     }
 
@@ -162,6 +124,13 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    @Override
+    public FieldDefinition setHidden(Boolean hidden)
+    {
+        super.setHidden(hidden);
+        return this;
+    }
+
     public LookupInfo getLookup()
     {
         return _lookup;
@@ -169,23 +138,29 @@ public class FieldDefinition extends PropertyDescriptor
 
     public FieldDefinition setLookup(LookupInfo lookup)
     {
-        if (lookup == null)
-        {
-            super.setLookup(null, null, null);
-        }
-        else
-        {
-            super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
-            setRangeURI(lookup.getTableType().getRangeURI());
-        }
+        super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
+        setRangeURI(lookup.getTableType().getRangeURI());
         _lookup = lookup;
         return this;
     }
 
     @Override
-    public PropertyDescriptor setLookup(String schema, String query, String container)
+    public FieldDefinition setLookup(String schema, String query, String container)
     {
-        return setLookup(new LookupInfo(container, schema, query));
+        setLookup(new LookupInfo(container, schema, query));
+        return this;
+    }
+
+    // Additional field properties, not currently supported by 'PropertyDescriptor'
+
+    private Object getFieldProperty(String propertyName)
+    {
+        return _extraFieldProperties.get(propertyName);
+    }
+
+    private void setFieldProperty(String propertyName, Object value)
+    {
+        _extraFieldProperties.put(propertyName, value);
     }
 
     public List<FieldValidator<?>> getValidators()
@@ -195,158 +170,158 @@ public class FieldDefinition extends PropertyDescriptor
 
     public FieldDefinition setValidators(List<FieldValidator<?>> validators)
     {
+        JSONArray propertyValidators = null;
+        if (validators != null)
+        {
+            propertyValidators = new JSONArray();
+            validators.stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
+        }
+        setFieldProperty("propertyValidators", propertyValidators);
         _validators = validators;
         return this;
     }
 
     public String getURL()
     {
-        return _url;
+        return (String) getFieldProperty("URL");
     }
 
     public FieldDefinition setURL(String url)
     {
-        _url = url;
+        setFieldProperty("URL", url);
         return this;
     }
 
     public String getImportAliases()
     {
-        return _importAliases;
+        return (String) getFieldProperty("importAliases");
     }
 
     public FieldDefinition setImportAliases(String importAliases)
     {
-        _importAliases = importAliases;
+        setFieldProperty("importAliases", importAliases);
         return this;
     }
 
     public Integer getScale()
     {
-        return _scale;
+        return (Integer) getFieldProperty("scale");
     }
 
-    @Override
-    public FieldDefinition setHidden(Boolean hidden)
+    public FieldDefinition setScale(Integer scale)
     {
-        super.setHidden(hidden);
+        setFieldProperty("scale", scale);
         return this;
     }
 
     public Boolean isPrimaryKey()
     {
-        return  _isPrimaryKey;
+        return (Boolean) getFieldProperty("isPrimaryKey");
     }
 
     public FieldDefinition setPrimaryKey(Boolean isPrimaryKey)
     {
-        _isPrimaryKey = isPrimaryKey;
+        setFieldProperty("isPrimaryKey", isPrimaryKey);
         return this;
     }
 
     public Boolean getLookupValidatorEnabled()
     {
-        return _lookupValidatorEnabled;
+        return (Boolean) getFieldProperty("lookupValidatorEnabled");
     }
 
     public FieldDefinition setLookupValidatorEnabled(Boolean lookupValidatorEnabled)
     {
-        _lookupValidatorEnabled = lookupValidatorEnabled;
+        setFieldProperty("lookupValidatorEnabled", lookupValidatorEnabled);
         return this;
     }
 
     public Boolean getShownInDetailsView()
     {
-        return _shownInDetailsView;
+        return (Boolean) getFieldProperty("shownInDetailsView");
     }
 
     public FieldDefinition setShownInDetailsView(Boolean shownInDetailsView)
     {
-        _shownInDetailsView = shownInDetailsView;
+        setFieldProperty("shownInDetailsView", shownInDetailsView);
         return this;
     }
 
     public Boolean getShownInInsertView()
     {
-        return _shownInInsertView;
+        return (Boolean) getFieldProperty("shownInInsertView");
     }
 
     public FieldDefinition setShownInInsertView(Boolean shownInInsertView)
     {
-        _shownInInsertView = shownInInsertView;
+        setFieldProperty("shownInInsertView", shownInInsertView);
         return this;
     }
 
     public Boolean getShownInUpdateView()
     {
-        return _shownInUpdateView;
+        return (Boolean) getFieldProperty("shownInUpdateView");
     }
 
     public FieldDefinition setShownInUpdateView(Boolean shownInUpdateView)
     {
-        _shownInUpdateView = shownInUpdateView;
-        return this;
-    }
-
-    public FieldDefinition setScale(Integer scale)
-    {
-        _scale = scale;
-        return this;
-    }
-
-    public FieldDefinition setSourceOntology(String sourceOntology)
-    {
-        _sourceOntology = sourceOntology;
+        setFieldProperty("shownInUpdateView", shownInUpdateView);
         return this;
     }
 
     public String getSourceOntology()
     {
-        return _sourceOntology;
+        return (String) getFieldProperty("sourceOntology");
     }
 
-    public FieldDefinition setConceptLabelColumn(String conceptLabelColumn)
+    public FieldDefinition setSourceOntology(String sourceOntology)
     {
-        _conceptLabelColumn = conceptLabelColumn;
+        setFieldProperty("sourceOntology", sourceOntology);
         return this;
     }
 
     public String getConceptLabelColumn()
     {
-        return _conceptLabelColumn;
+        return (String) getFieldProperty("conceptLabelColumn");
     }
 
-    public FieldDefinition setConceptImportColumn(String conceptImportColumn)
+    public FieldDefinition setConceptLabelColumn(String conceptLabelColumn)
     {
-        _conceptImportColumn = conceptImportColumn;
+        setFieldProperty("conceptLabelColumn", conceptLabelColumn);
         return this;
     }
 
     public String getConceptImportColumn()
     {
-        return _conceptImportColumn;
+        return (String) getFieldProperty("conceptImportColumn");
     }
 
-    public FieldDefinition setPrincipalConceptCode(String conceptCode)
+    public FieldDefinition setConceptImportColumn(String conceptImportColumn)
     {
-        _principalConceptCode = conceptCode;
+        setFieldProperty("conceptImportColumn", conceptImportColumn);
         return this;
     }
 
     public String getPrincipalConceptCode()
     {
-        return _principalConceptCode;
+        return (String) getFieldProperty("conceptCode");
     }
 
-    public FieldDefinition setPrincipalConceptSearchExpression(String searchExpression)
+    public FieldDefinition setPrincipalConceptCode(String conceptCode)
     {
-        _principalConceptSearchExpression = searchExpression;
+        setFieldProperty("conceptCode", conceptCode);
         return this;
     }
 
     public String getPrincipalConceptSearchExpression()
     {
         return _principalConceptSearchExpression;
+    }
+
+    public FieldDefinition setPrincipalConceptSearchExpression(String searchExpression)
+    {
+        _principalConceptSearchExpression = searchExpression;
+        return this;
     }
 
     public enum RangeType
@@ -388,7 +363,6 @@ public class FieldDefinition extends PropertyDescriptor
         Double("Number (Double)", "float"),
         Decimal("Decimal (floating point)", "double"),
         File("File", "fileLink"),
-        AutoInteger("Auto-Increment Integer", "int"),
         Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
         Attachment("Attachment", "attachment"),
         User("User", "int", null, new LookupInfo(null, "core", "users")),
@@ -532,17 +506,26 @@ public class FieldDefinition extends PropertyDescriptor
 
     public static class LookupInfo
     {
-        private String _folder;
-        private String _schema;
-        private String _table;
+        private final String _folder;
+        private final String _schema;
+        private final String _table;
         private ColumnType _tableType;
 
         public LookupInfo(@Nullable String folder, String schema, String table)
         {
-            _folder = ("".equals(folder) ? null : folder);
-            //container must exactly match an item in the dropdown
-            if(_folder != null && !_folder.startsWith("/"))
-                _folder = "/" + _folder;
+            if (folder == null || folder.isEmpty())
+            {
+                _folder = null;
+            }
+            else if (!folder.startsWith("/"))
+            {
+                //container must exactly match an item in the dropdown
+                _folder = "/" + folder;
+            }
+            else
+            {
+                _folder = folder;
+            }
 
             _schema = ("".equals(schema) ? null : schema);
             _table = ("".equals(table) ? null : table);
@@ -569,12 +552,6 @@ public class FieldDefinition extends PropertyDescriptor
             return _tableType;
         }
 
-        @Deprecated (forRemoval = true)
-        public LookupInfo setTableType(String tableType)
-        {
-            _tableType = "int".equals(tableType) ? ColumnType.Integer : ColumnType.String;
-            return this;
-        }
         public LookupInfo setTableType(ColumnType tableType)
         {
             _tableType = tableType;
@@ -584,9 +561,9 @@ public class FieldDefinition extends PropertyDescriptor
 
     public static abstract class FieldValidator<V extends FieldValidator<V>>
     {
-        private String _name;
-        private String _description;
-        private String _message;
+        private final String _name;
+        private final String _description;
+        private final String _message;
 
         private boolean _failOnMatch = false;
 
@@ -648,7 +625,7 @@ public class FieldDefinition extends PropertyDescriptor
          *   "type": "Range"
          * }
          * </pre>
-         * @return
+         * @return Serializable representation of field validator
          */
         protected JSONObject toJSONObject()
         {
@@ -673,7 +650,7 @@ public class FieldDefinition extends PropertyDescriptor
 
     public static class RegExValidator extends FieldValidator<RegExValidator>
     {
-        private String _expression;
+        private final String _expression;
 
         public RegExValidator(String name, String description, String message, String expression)
         {
@@ -702,10 +679,10 @@ public class FieldDefinition extends PropertyDescriptor
 
     public static class RangeValidator extends FieldValidator<RangeValidator>
     {
-        private RangeType _firstType;
-        private String _firstRange;
-        private RangeType _secondType;
-        private String _secondRange;
+        private final RangeType _firstType;
+        private final String _firstRange;
+        private final RangeType _secondType;
+        private final String _secondRange;
 
         public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
         {
