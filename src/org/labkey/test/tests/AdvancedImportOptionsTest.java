@@ -344,7 +344,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Import into multiple folders from the same template");
         importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
         importPage.setSelectSpecificImportOptions(true);
-        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.StudyDatasetData, false);
+        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.DatasetData, false);
         importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.DatasetDefinitions, false);
         importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.Specimens, false);
         importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.SpecimenSettings, false);
