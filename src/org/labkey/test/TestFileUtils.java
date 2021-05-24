@@ -316,6 +316,15 @@ public abstract class TestFileUtils
         catch (IOException ignore) { }
     }
 
+    /**
+     *
+     * @param dir Location to create new file
+     * @param fileName Name of file to be created
+     * @param contents Text contents of file
+     * @return File object pointing to new file
+     * @deprecated Use {@link #writeFile(File, String)} or {@link #writeTempFile(String, String)}
+     */
+    @Deprecated
     public static File saveFile(File dir, String fileName, String contents)
     {
         File tsvFile = new File(dir, fileName);
@@ -331,6 +340,28 @@ public abstract class TestFileUtils
         }
     }
 
+    /**
+     * Write text to a file in the test temp directory. Temp directory will be created if it does not exist.
+     * @param name Name of the file to be created. An existing file will be overwritten
+     * @param contents text to write to the file
+     * @return File object pointing to the new file
+     * @throws IOException If an I/O error occurs when opening or writing to the file
+     */
+    public static File writeTempFile(String name, String contents) throws IOException
+    {
+        File file = new File(getTestTempDir(), name);
+        FileUtils.forceMkdirParent(file);
+
+        return writeFile(file, contents);
+    }
+
+    /**
+     * Write text to a file
+     * @param file target file. Parent directory should exist. Existing file will be overwritten.
+     * @param contents text to write to the file
+     * @return the initially provided file
+     * @throws IOException If an I/O error occurs when opening or writing to the file
+     */
     public static File writeFile(File file, String contents) throws IOException
     {
         try (Writer writer = PrintWriters.getPrintWriter(file))
@@ -338,14 +369,6 @@ public abstract class TestFileUtils
             writer.write(contents);
             return file;
         }
-    }
-
-    public static File writeTempFile(String name, String contents) throws IOException
-    {
-        File file = new File(getTestTempDir(), name);
-        FileUtils.forceMkdirParent(file);
-
-        return writeFile(file, contents);
     }
 
     public static String readPdfText(File pdf)
