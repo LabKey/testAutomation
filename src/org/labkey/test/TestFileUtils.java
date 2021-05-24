@@ -320,16 +320,32 @@ public abstract class TestFileUtils
     {
         File tsvFile = new File(dir, fileName);
 
-        try (Writer writer = PrintWriters.getPrintWriter(tsvFile))
+        try
         {
-            writer.write(contents);
-            return tsvFile;
+            return writeFile(tsvFile, contents);
         }
         catch (IOException e)
         {
             e.printStackTrace(System.err);
             return null;
         }
+    }
+
+    public static File writeFile(File file, String contents) throws IOException
+    {
+        try (Writer writer = PrintWriters.getPrintWriter(file))
+        {
+            writer.write(contents);
+            return file;
+        }
+    }
+
+    public static File writeTempFile(String name, String contents) throws IOException
+    {
+        File file = new File(getTestTempDir(), name);
+        FileUtils.forceMkdirParent(file);
+
+        return writeFile(file, contents);
     }
 
     public static String readPdfText(File pdf)
