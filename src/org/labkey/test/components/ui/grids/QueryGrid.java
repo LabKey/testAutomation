@@ -197,18 +197,29 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    /**
+     * Adds a filter expression to the table via the omnibox, and waits for the grid to update.
+     *
+     * @param columnName Name of the column to filter on.
+     * @param operator Enum value of the operator {@link OmniBox.FilterOperator}.
+     * @param value The value to compare to.
+     * @return The QueryGrid after the filter has been applied.
+     */
     public QueryGrid filterOn(String columnName, OmniBox.FilterOperator operator, String value)
     {
         return filterOn(columnName, operator.getValue(), value);
     }
 
     /**
-     * adds a filter expression to the table via the omnibox, and waits for the grid to update
+     * @deprecated Use the filterOn method that takes an enum.
+     * @see QueryGrid#filterOn(String, OmniBox.FilterOperator, String) 
+     *
      * @param columnName
      * @param operator
      * @param value
      * @return
      */
+    @Deprecated(forRemoval=true)
     public QueryGrid filterOn(String columnName, String operator, String value)
     {
         doAndWaitForUpdate(()-> getOmniBox().setFilter(columnName, operator, value));

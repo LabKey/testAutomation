@@ -164,14 +164,26 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         elementCache().input.sendKeys(Keys.BACK_SPACE);
     }
 
+    /**
+     * Set a column filter in the OmniBox.
+     *
+     * @param columnName Name of the column to filter on.
+     * @param operator The filter {@link FilterOperator} to use.
+     * @param value The value to compare to.
+     * @return A reference to this OmniBox.
+     */
     public OmniBox setFilter(String columnName, FilterOperator operator, @Nullable String value)
     {
         return setFilter(columnName, operator.getValue(), value);
     }
 
+    /**
+     * @deprecated Use the overloaded method that takes an enum.
+     * @see OmniBox#setFilter(String, FilterOperator, String)
+     */
+    @Deprecated(forRemoval=true)
     public OmniBox setFilter(String columnName, String operator, @Nullable String value)
     {
-        String val  = value != null ? enquoteIfMultiWord(value) : "";
         StringBuilder expectedFilterText = new StringBuilder();     // this builds the text to search for as a filter-item in the box
         expectedFilterText.append(columnName);
         expectedFilterText.append(" " + operator);
