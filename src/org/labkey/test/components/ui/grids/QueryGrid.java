@@ -219,7 +219,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param value
      * @return
      */
-    @Deprecated(forRemoval=true)
+    @Deprecated
     public QueryGrid filterOn(String columnName, String operator, String value)
     {
         doAndWaitForUpdate(()-> getOmniBox().setFilter(columnName, operator, value));
