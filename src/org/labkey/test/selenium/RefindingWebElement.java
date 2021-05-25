@@ -15,6 +15,7 @@
  */
 package org.labkey.test.selenium;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -32,12 +33,12 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
 {
     private final List<Consumer<WebElement>> _listeners = new ArrayList<>();
 
-    public RefindingWebElement(Locator locator, SearchContext searchContext)
+    public RefindingWebElement(@NotNull Locator locator, @NotNull SearchContext searchContext)
     {
         super(locator, searchContext);
     }
 
-    public RefindingWebElement(WebElement element, SearchContext searchContext)
+    public RefindingWebElement(@NotNull WebElement element, @NotNull SearchContext searchContext)
     {
         this(Locator.id(element.getAttribute("id")), searchContext);
         withRefindListener(this::assertUniqueId);
@@ -55,7 +56,7 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
      * Refinding reliability depends on the specificity of the provided Locator
      * There is no verification that the provided WebElement matches the provided Locator and SearchContext
      */
-    public RefindingWebElement(WebElement element, Locator locator, SearchContext searchContext)
+    public RefindingWebElement(@NotNull WebElement element, @NotNull Locator locator, @NotNull SearchContext searchContext)
     {
         this(locator, searchContext);
         setWrappedElement(element);
