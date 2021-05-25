@@ -15,6 +15,7 @@
  */
 package org.labkey.test.selenium;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -24,7 +25,7 @@ import org.openqa.selenium.WebElement;
  */
 public class EphemeralWebElement extends LazyWebElement<EphemeralWebElement>
 {
-    public EphemeralWebElement(Locator locator, SearchContext searchContext)
+    public EphemeralWebElement(@NotNull Locator locator, @NotNull SearchContext searchContext)
     {
         super(locator, searchContext);
     }

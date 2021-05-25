@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 public class ReclickingWebElement extends WebElementDecorator
 {
-    public ReclickingWebElement(WebElement decoratedElement)
+    public ReclickingWebElement(@NotNull WebElement decoratedElement)
     {
         super(decoratedElement);
     }
