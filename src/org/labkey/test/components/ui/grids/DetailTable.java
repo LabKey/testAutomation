@@ -1,8 +1,10 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,7 +20,7 @@ import java.util.Map;
  *
  * The component it automates is implemented in /components/src/public/QueryModel/DetailPanel.tsx
  */
-public class DetailTable extends WebDriverComponent
+public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 {
     private final WebElement _tableElement;
     private final WebDriver _driver;
@@ -61,6 +63,22 @@ public class DetailTable extends WebDriverComponent
     // TODO Not sure if the get & click methods are correct (or appropriate?), for a @glass component.
     //  It may be appropriate to have these interfaces but maybe the way the cell is identified should be different.
 
+    private WebElement getField(String identifier)
+    {
+        if(elementCache().dataCaptionField(identifier).isDisplayed())
+        {
+            return elementCache().dataCaptionField(identifier);
+        }
+        else if (elementCache().siblingField(identifier).isDisplayed())
+        {
+            return elementCache().siblingField(identifier);
+        }
+        else
+        {
+            throw new NoSuchElementException(String.format("Could not find field '%s'.", identifier));
+        }
+    }
+
     /**
      * Return the value of a cell identified by the text in the left most column.
      *
@@ -69,7 +87,7 @@ public class DetailTable extends WebDriverComponent
      **/
     public String getFieldValue(String fieldCaption)
     {
-        return Locators.fieldValue(fieldCaption).findElement(getDriver()).getText();
+        return getField(fieldCaption).getText();
     }
 
     /**
@@ -90,7 +108,7 @@ public class DetailTable extends WebDriverComponent
      **/
     public void clickField(String fieldCaption)
     {
-        Locators.fieldValue(fieldCaption).findElement(getDriver()).click();
+        Locator.tag("a").findElement(getField(fieldCaption)).click();
     }
 
     /**
@@ -120,14 +138,29 @@ public class DetailTable extends WebDriverComponent
     {
         static final Locator.XPathLocator detailTable = Locator.tagWithClass("table", "detail-component--table__fixed");
 
-        static Locator fieldValue(String caption)
-        {
-            return Locator.tagWithAttribute("td", "data-caption", caption);
-        }
-
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
+
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends Component<?>.ElementCache
+    {
+        public final WebElement dataCaptionField(String caption)
+        {
+            return Locator.tagWithAttribute("td", "data-caption", caption).findWhenNeeded(this);
+        }
+
+        public final WebElement siblingField(String caption)
+        {
+            return Locator.tagContainingText("td", caption).followingSibling("td").findWhenNeeded(this);
+        }
 
     }
 
