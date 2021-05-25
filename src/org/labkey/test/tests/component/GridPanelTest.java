@@ -6,6 +6,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.ui.OmniBox.FilterOperator;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
@@ -135,7 +136,7 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "filtered_grid_selection_samples");
 
         // confirm that selectAll is limited to just the records in a filtered set
-        grid.filterOn("Description", "=", "used to test issue 39011");
+        grid.filterOn("Description", FilterOperator.EQUAL, "used to test issue 39011");
         grid.selectAllRows();
         grid.clearSortsAndFilters();
         assertThat(grid.getSelectedRows().size(), is(16));
@@ -179,7 +180,7 @@ public class GridPanelTest extends BaseWebDriverTest
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         QueryGrid grid = testPage.getGridPanel("samples", "tiny_sampleset");
 
-        grid.filterOn("description", "=", "used to test single-page filter selection");
+        grid.filterOn("description", FilterOperator.EQUAL, "used to test single-page filter selection");
         grid.selectAllRows();
 
         assertThat(grid.getSelectionStatusCount(), is ("5 of 5 selected"));
@@ -209,7 +210,7 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "filtered_grid_multipageselection_samples");
 
         // confirm that selectAll is limited to just the records in a filtered set
-        grid.filterOn("Description", "=", "used to test issue 39011");
+        grid.filterOn("Description", FilterOperator.EQUAL, "used to test issue 39011");
         grid.selectAllRows();
         grid.clearSortsAndFilters();
         assertThat(grid.getSelectionStatusCount(), is("64 of 124 selected"));
@@ -248,7 +249,7 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "search_for_description_expression");
 
         // prove we can filter on this criteria
-        grid.filterOn("Description", "contains", "off-view");
+        grid.filterOn("Description", FilterOperator.CONTAINS, "off-view");
         assertThat(grid.getGridBar().pager().summary(), is ("1 - 5"));
         grid.clearSortsAndFilters();
 
@@ -274,28 +275,28 @@ public class GridPanelTest extends BaseWebDriverTest
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         QueryGrid grid = testPage.getGridPanel("samples", "empty_filter_test_set");
 
-        grid.filterOn("Description", "is blank", null);
+        grid.filterOn("Description", FilterOperator.IS_BLANK, null);
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
         grid.clearSortsAndFilters();
 
-        grid.filterOn("String Column", "contains",  "filtered_x");
+        grid.filterOn("String Column", FilterOperator.CONTAINS,  "filtered_x");
         assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
         grid.clearSortsAndFilters();
 
-        grid.filterOn("String Column", "does not contain", "filtered_x");
+        grid.filterOn("String Column", FilterOperator.DOES_NOT_CONTAINS, "filtered_x");
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
         grid.clearSortsAndFilters();
 
-        grid.filterOn("Sample Date", "is not blank", null);
+        grid.filterOn("Sample Date", FilterOperator.IS_NOT_BLANK, null);
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
         grid.clearSortsAndFilters();
 
-        grid.filterOn("Sample Date", "is blank", null);
+        grid.filterOn("Sample Date", FilterOperator.IS_BLANK, null);
         assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
         grid.clearSortsAndFilters();
 
         // re-enable this when 41169 is fixed
-//        grid.filterOn("Int Column", "has any value", null);
+//        grid.filterOn("Int Column", FilterOperator.HAS_ANY_VALUE, null);
 //        assertThat("[has any value] filter does not work as expected " +
 //                "https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41169",
 //                grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
@@ -351,7 +352,7 @@ public class GridPanelTest extends BaseWebDriverTest
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         QueryGrid grid = testPage.getGridPanel("samples", "remove_filters_with_selections_set");
 
-        grid.filterOn("Int Column", "is not blank", null);
+        grid.filterOn("Int Column", FilterOperator.IS_NOT_BLANK, null);
 
         grid.selectAllRows();
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
@@ -390,7 +391,7 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "deselect_with_filter");
 
         grid.selectAllRows();
-        grid.filterOn("String Column", "does not contain", "filtered_y");
+        grid.filterOn("String Column", FilterOperator.DOES_NOT_CONTAINS, "filtered_y");
 
         assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
         assertThat(grid.getSelectionStatusCount(), is("30 of 30 selected"));

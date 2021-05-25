@@ -164,9 +164,26 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         elementCache().input.sendKeys(Keys.BACK_SPACE);
     }
 
+    /**
+     * Set a column filter in the OmniBox.
+     *
+     * @param columnName Name of the column to filter on.
+     * @param operator The filter {@link FilterOperator} to use.
+     * @param value The value to compare to.
+     * @return A reference to this OmniBox.
+     */
+    public OmniBox setFilter(String columnName, FilterOperator operator, @Nullable String value)
+    {
+        return setFilter(columnName, operator.getValue(), value);
+    }
+
+    /**
+     * @deprecated Use the overloaded method that takes an enum.
+     * @see OmniBox#setFilter(String, FilterOperator, String)
+     */
+    @Deprecated
     public OmniBox setFilter(String columnName, String operator, @Nullable String value)
     {
-        String val  = value != null ? enquoteIfMultiWord(value) : "";
         StringBuilder expectedFilterText = new StringBuilder();     // this builds the text to search for as a filter-item in the box
         expectedFilterText.append(columnName);
         expectedFilterText.append(" " + operator);
@@ -267,6 +284,38 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         protected Locator locator()
         {
             return _locator;
+        }
+    }
+
+    /**
+     * Enum for the various filter operations that the OmniBox allows.
+     */
+    public enum FilterOperator
+    {
+        EQUAL("="),
+        NOT_EQUAL("<>"),
+        GREATER_THAN(">"),
+        LESS_THAN("<"),
+        GREATER_THAN_OR_EQUALS(">="),
+        LESS_THAN_OR_EQUALS("=<"),
+        HAS_ANY_VALUE("has any value"),
+        IS_BLANK("is blank"),
+        IS_NOT_BLANK("is not blank"),
+        CONTAINS("contains"),
+        DOES_NOT_CONTAINS("does not contain"),
+        STARTS_WITH("starts with"),
+        DOES_NOT_START_WITH("does not start with");
+
+        private final String operator;
+
+        FilterOperator(String value)
+        {
+            this.operator = value;
+        }
+
+        public String getValue()
+        {
+            return operator;
         }
     }
 
