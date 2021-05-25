@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.Locator.tag;
 
 public class ListHelper extends LabKeySiteWrapper
 {
@@ -121,12 +122,23 @@ public class ListHelper extends LabKeySiteWrapper
     public void importDataFromFile(@LoggedParam File inputFile, int wait)
     {
         clickImportData();
-        click(Locator.tagWithClass("h3", "panel-title").containing("Upload file"));
+        chooseFileUpload();
         setFormElement(Locator.name("file"), inputFile);
         clickButton("Submit", wait);
     }
 
-    public void checkIndexFileAttachements(boolean index)
+    public void chooseFileUpload()
+    {
+        click(Locator.tagWithClass("h3", "panel-title").containing("Upload file"));
+    }
+
+    public void chooseCopyPasteText()
+    {
+        click(Locator.tagWithClass("h3", "panel-title").containing("Copy/paste text"));
+    }
+
+
+    public void checkIndexFileAttachments(boolean index)
     {
         Locator indexFileAttachmentsCheckbox = Locator.checkboxByLabel("Index file attachments", false);
         if (index)
@@ -369,6 +381,16 @@ public class ListHelper extends LabKeySiteWrapper
         submitImportTsv_success();
     }
 
+    public boolean isMergeOptionPresent()
+    {
+        return isElementPresent(Locator.tagContainingText("label", "Update data"));
+    }
+
+    public void chooseMerge(boolean isFileUpload)
+    {
+        click(tag("input").withAttribute("type", "button").index(isFileUpload ? 0 : 2));
+    }
+
     public EditListDefinitionPage goToEditDesign(String listName)
     {
         goToList(listName);
@@ -381,6 +403,11 @@ public class ListHelper extends LabKeySiteWrapper
         // if we are on the Manage List page, click the list name first
         if (isElementPresent(Locators.bodyTitle("Available Lists")))
             clickAndWait(Locator.linkWithText(listName));
+    }
+
+    public void beginAtList(String projectName, String listName)
+    {
+        beginAt("/query/" + EscapeUtil.encode(projectName) + "/executeQuery.view?schemaName=lists&query.queryName=" + listName);
     }
 
     /**

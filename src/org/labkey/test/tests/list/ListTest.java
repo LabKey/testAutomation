@@ -681,7 +681,7 @@ public class ListTest extends BaseWebDriverTest
         };
 
         createList(multiErrorListName, BatchListColumns, BatchListData);
-        beginAt("/query/" + EscapeUtil.encode(PROJECT_VERIFY) + "/executeQuery.view?schemaName=lists&query.queryName=" + multiErrorListName);
+        _listHelper.beginAtList(PROJECT_VERIFY, multiErrorListName);
         _listHelper.clickImportData();
 
         // insert the new list data and verify the expected errors appear
@@ -691,10 +691,66 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testListMerge()
+    {
+        String mergeListName = "listForMerging";
+        createList(mergeListName, BatchListColumns, BatchListData);
+        _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
+
+        _listHelper.clickImportData();
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available", _listHelper.isMergeOptionPresent());
+        _listHelper.chooseFileUpload();
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available", _listHelper.isMergeOptionPresent());
+        _listHelper.chooseCopyPasteText();
+
+        log("Try to upload the same data without choosing to merge.  Errors are expected.");
+        String[] expectedErrors = new String[]{
+                "duplicate key value violates unique constraint"
+        };
+        setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData), expectedErrors);
+
+        log("Upload the same data using the merge operation. No errors should result.");
+        _listHelper.chooseMerge(false);
+        setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData));
+        verifyListData(BatchListColumns, BatchListData);
+
+        log("Now upload some new data and modify existing data");
+        _listHelper.clickImportData();
+        _listHelper.chooseMerge(false);
+        setListImportAsTestDataField(toTSV(BatchListMergeColumns, BatchListMergeData));
+        verifyListData(BatchListColumns, BatchListAfterMergeData);
+    }
+
+    @Test
+    public void testAutoIncrementKeyListNoMerge()
+    {
+        String mergeListName = "autoIncrementIdList";
+
+        _listHelper.createList(PROJECT_VERIFY, mergeListName, ListColumnType.AutoInteger, "Key", col("Name", ListColumnType.String));
+
+        _listHelper.clickImportData();
+        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", _listHelper.isMergeOptionPresent());
+    }
+
+    private void verifyListData(List<ListColumn> columns, String[][] data)
+    {
+        final DataRegionTable dataRegion = DataRegion(getDriver()).withName("query").find();
+        for (int r = 0; r < data.length; r++)
+        {
+            Map<String, String> row = dataRegion.getRowDataAsMap(r);
+            for (int c = 0; c < columns.size(); c++)
+            {
+                ListColumn column = columns.get(c);
+                checker().verifyEquals(String.format("Value for column %s in row %d not as expected", column.getName(), r), data[r][c], row.get(column.getName()));
+            }
+        }
+    }
+
+    @Test
     public void testAddListColumnOverRemoteAPI() throws Exception
     {
         List<FieldDefinition> cols = Arrays.asList(
-               new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                new FieldDefinition("name", FieldDefinition.ColumnType.String),
                 new FieldDefinition("title", FieldDefinition.ColumnType.String),
                 new FieldDefinition("dewey", FieldDefinition.ColumnType.Decimal)
         );
@@ -1292,7 +1348,7 @@ public class ListTest extends BaseWebDriverTest
     );
     String[][] Cdata = new String[][]
     {
-        {"1", "one C"},
+            {"1", "one C"},
     };
 
     List<ListHelper.ListColumn> BatchListColumns = Arrays.asList(
@@ -1301,6 +1357,12 @@ public class ListTest extends BaseWebDriverTest
             col("LastName", ListColumnType.String),
             col("IceCreamFlavor", ListColumnType.String),
             col("ShouldInsertCorrectly", ListColumnType.Boolean)
+    );
+
+    List<ListHelper.ListColumn> BatchListMergeColumns = Arrays.asList(
+            BatchListColumns.get(0),
+            BatchListColumns.get(1),
+            BatchListColumns.get(3)
     );
     String[][] BatchListData = new String[][]
             {
@@ -1314,6 +1376,19 @@ public class ListTest extends BaseWebDriverTest
                     {"five", "Crunch", "Test", "Rum Raisin", "false"},
                     {"6", "Will", "ShouldPass", "Rocky Road", "true"},
                     {"7", "Liam", "ShouldPass", "Chocolate", "true"},
+            };
+    String[][] BatchListMergeData = new String[][]
+            {
+                    {"2", "Jane", ""},
+                    {"3", "Jeffrey", "Strawberry"},
+                    {"8", "Jamie", "Salted Caramel"},
+            };
+    String[][] BatchListAfterMergeData = new String[][]
+            {
+                    {"1", "Joe", "Test", "Vanilla", "true"},
+                    {"2", "Jane", "Test", " ", "true"},
+                    {"3", "Jeffrey", "BugCatcher", "Strawberry", "true"},
+                    {"8", "Jamie", "", "Salted Caramel", ""},
             };
 
     String toTSV(List<ListHelper.ListColumn> cols, String[][] data)
