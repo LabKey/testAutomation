@@ -181,7 +181,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
      * @deprecated Use the overloaded method that takes an enum.
      * @see OmniBox#setFilter(String, FilterOperator, String)
      */
-    @Deprecated(forRemoval=true)
+    @Deprecated
     public OmniBox setFilter(String columnName, String operator, @Nullable String value)
     {
         StringBuilder expectedFilterText = new StringBuilder();     // this builds the text to search for as a filter-item in the box

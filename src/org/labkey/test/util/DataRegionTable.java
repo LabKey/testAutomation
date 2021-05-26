@@ -37,7 +37,7 @@ import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
-import org.labkey.test.selenium.WebElementWrapper;
+import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -408,14 +408,8 @@ public class DataRegionTable extends DataRegion
         col += hasSelectors() ? 1 : 0;
         final WebElement cell = elementCache().getCell(row, col);
         final WebElement link = Locator.xpath("a").findElement(cell);
-        return new WebElementWrapper()
+        return new WebElementDecorator(link)
         {
-            @Override
-            public WebElement getWrappedElement()
-            {
-                return link;
-            }
-
             @Override
             public void click()
             {
