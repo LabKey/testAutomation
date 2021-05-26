@@ -9,6 +9,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.ontology.ConceptPickerDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -503,6 +504,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         elementCache().getConceptImportFieldSelect().selectByVisibleText(importField);
         return this;
+    }
+
+    /**
+     * Allows test code to get which ontologies are available for selection
+     * @return a list of the full text shown in the options
+     */
+    public List<String> getConceptImportSelectOptions()
+    {
+        expand();
+        return getWrapper().getTexts(elementCache().getOntologySelect().getOptions());
     }
 
     public DomainFieldRow setConceptLabelField(String labelField)
