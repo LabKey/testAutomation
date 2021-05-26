@@ -37,6 +37,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.tag;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class ListHelper extends LabKeySiteWrapper
 {
@@ -408,6 +409,20 @@ public class ListHelper extends LabKeySiteWrapper
     public void beginAtList(String projectName, String listName)
     {
         beginAt("/query/" + EscapeUtil.encode(projectName) + "/executeQuery.view?schemaName=lists&query.queryName=" + listName);
+    }
+
+    public void verifyListData(List<ListColumn> columns, String[][] data, DeferredErrorCollector checker)
+    {
+        final DataRegionTable dataRegion = DataRegion(getDriver()).withName("query").find();
+        for (int r = 0; r < data.length; r++)
+        {
+            Map<String, String> row = dataRegion.getRowDataAsMap(r);
+            for (int c = 0; c < columns.size(); c++)
+            {
+                ListColumn column = columns.get(c);
+                checker.verifyEquals(String.format("Value for column %s in row %d not as expected", column.getName(), r), data[r][c], row.get(column.getName()));
+            }
+        }
     }
 
     /**

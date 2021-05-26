@@ -698,27 +698,30 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
 
         _listHelper.clickImportData();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available", _listHelper.isMergeOptionPresent());
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", _listHelper.isMergeOptionPresent());
         _listHelper.chooseFileUpload();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available", _listHelper.isMergeOptionPresent());
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", _listHelper.isMergeOptionPresent());
         _listHelper.chooseCopyPasteText();
 
         log("Try to upload the same data without choosing to merge.  Errors are expected.");
         String[] expectedErrors = new String[]{
                 "duplicate key value violates unique constraint"
         };
-        setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData), expectedErrors);
+        setListImportAsTestDataField(toTSV(BatchListColumns, BatchListMergeData), expectedErrors);
+        _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
+        _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Upload the same data using the merge operation. No errors should result.");
+        _listHelper.clickImportData();
         _listHelper.chooseMerge(false);
         setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData));
-        verifyListData(BatchListColumns, BatchListData);
+        _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Now upload some new data and modify existing data");
         _listHelper.clickImportData();
         _listHelper.chooseMerge(false);
         setListImportAsTestDataField(toTSV(BatchListMergeColumns, BatchListMergeData));
-        verifyListData(BatchListColumns, BatchListAfterMergeData);
+        _listHelper.verifyListData(BatchListColumns, BatchListAfterMergeData, checker());
     }
 
     @Test
@@ -730,20 +733,6 @@ public class ListTest extends BaseWebDriverTest
 
         _listHelper.clickImportData();
         checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", _listHelper.isMergeOptionPresent());
-    }
-
-    private void verifyListData(List<ListColumn> columns, String[][] data)
-    {
-        final DataRegionTable dataRegion = DataRegion(getDriver()).withName("query").find();
-        for (int r = 0; r < data.length; r++)
-        {
-            Map<String, String> row = dataRegion.getRowDataAsMap(r);
-            for (int c = 0; c < columns.size(); c++)
-            {
-                ListColumn column = columns.get(c);
-                checker().verifyEquals(String.format("Value for column %s in row %d not as expected", column.getName(), r), data[r][c], row.get(column.getName()));
-            }
-        }
     }
 
     @Test
@@ -1388,7 +1377,7 @@ public class ListTest extends BaseWebDriverTest
                     {"1", "Joe", "Test", "Vanilla", "true"},
                     {"2", "Jane", "Test", " ", "true"},
                     {"3", "Jeffrey", "BugCatcher", "Strawberry", "true"},
-                    {"8", "Jamie", "", "Salted Caramel", ""},
+                    {"8", "Jamie", " ", "Salted Caramel", " "},
             };
 
     String toTSV(List<ListHelper.ListColumn> cols, String[][] data)
