@@ -39,6 +39,7 @@ import org.openqa.selenium.WebDriverException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -1247,7 +1248,7 @@ public class Crawler
     /** Ignore GWT deferredjs loading issue when navigating away from designer pages */
     private boolean isRealFailure(Exception e)
     {
-        return !(e instanceof UnhandledAlertException) || !((UnhandledAlertException)e).getAlertText().contains("Script Tag Failure - no status available");
+        return !(e instanceof UnhandledAlertException && e.getMessage().contains("Script Tag Failure - no status available"));
     }
 
     private void testInjection(URL start)
@@ -1350,7 +1351,7 @@ public class Crawler
                     String v = i==-1 ? "" : pair.substring(i+1);
                     try
                     {
-                        return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k), URLDecoder.decode(v));
+                        return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k, StandardCharsets.UTF_8), URLDecoder.decode(v, StandardCharsets.UTF_8));
                     }
                     catch (IllegalArgumentException ex)
                     {
@@ -1367,9 +1368,9 @@ public class Crawler
         {
             if (sb.length()!=0)
                 sb.append('&');
-            sb.append(URLEncoder.encode(e.getKey()));
+            sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8));
             sb.append('=');
-            sb.append(null==e.getValue()?"":URLEncoder.encode(e.getValue()));
+            sb.append(null==e.getValue()?"":URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8));
         }
         );
         return sb.toString();
