@@ -705,7 +705,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Try to upload the same data without choosing to merge.  Errors are expected.");
         String[] expectedErrors = new String[]{
-                "duplicate key value violates unique constraint"
+                "duplicate key value"
         };
         setListImportAsTestDataField(toTSV(BatchListColumns, BatchListMergeData), expectedErrors);
         _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
