@@ -1,12 +1,13 @@
 package org.labkey.test.components.ui.ontology;
 
-import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.ui.ontology.OntologyTreeSearch;
+import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -21,8 +22,6 @@ public class ConceptPickerDialog extends ModalDialog
     {
         super(finder);
     }
-
-    // optional ontology select, in case there are multiple ontologies
 
     /**
      * uses the search bar to select an item in the ontology tree
@@ -63,9 +62,68 @@ public class ConceptPickerDialog extends ModalDialog
         return elementCache().infoTabs.getSelectedPath();
     }
 
+    /**
+     * uses the treePanel control to expand the nodes in order
+     * @param pathToNode
+     * @return the current dialog
+     */
+    public ConceptPickerDialog selectNodeFromPath(List<String> pathToNode)
+    {
+        elementCache().treePanel.openToPath(pathToNode);
+        return this;
+    }
+
+    /**
+     * This select is only shown if there are multiple ontologies available to choose from.
+     * When it is shown, no ontology-specific controls (like the tree view, the search bar, or the
+     * info tabs will be shown.
+     * Note that when shown to select concept for an ontology lookup field, the ontology is selected
+     * at the field-row level and this select will not be shown in this dialog.  For any other field
+     * this select should be shown.
+     * @return  Whether or not the ontology select is present
+     */
+    public boolean hasOntologySelect()
+    {
+        return elementCache().selectOntologySelect().isPresent();
+    }
+
+    /**
+     * When the select-ontology select appears, this sets it.  Once set, the select should disappear
+     * and the rest of the controls should appear in the dialog
+     * @param ontology The option to select from the ontology select
+     * @return the current dialog
+     */
+    public ConceptPickerDialog selectOntology(String ontology)
+    {
+        getWrapper().waitFor(() -> elementCache().selectOntologySelect().isPresent(),
+                "the ontology select did not become present", WAIT_FOR_JAVASCRIPT);
+        var select = elementCache().selectOntologySelect().get();
+        var selectElement = select.getComponentElement();
+        select.select(ontology);
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(selectElement));
+        return this;
+    }
+
+    /**
+     * gets the options in the ontology select
+     * @return A list of string values from the options present in the select
+     */
+    public List<String> getAvailableOntologies()
+    {
+        getWrapper().waitFor(() -> elementCache().selectOntologySelect().isPresent(),
+                "the ontology select did not become present", WAIT_FOR_JAVASCRIPT);
+        var select = elementCache().selectOntologySelect().get();
+        return select.getOptions();
+    }
+
     public void clickApply()
     {
         dismiss("Apply");
+    }
+
+    public void clickCancel()
+    {
+        dismiss("Cancel");
     }
 
     @Override
@@ -90,6 +148,12 @@ public class ConceptPickerDialog extends ModalDialog
 
         final ConceptInfoTabs infoTabs = new ConceptInfoTabs.ConceptInfoTabsFinder(getDriver())
                 .findWhenNeeded(this);
+
+        Optional<ReactSelect> selectOntologySelect()
+        {
+            return ReactSelect.finder(getDriver())
+                    .withId("ontology-select").findOptional();
+        }
     }
 
 
