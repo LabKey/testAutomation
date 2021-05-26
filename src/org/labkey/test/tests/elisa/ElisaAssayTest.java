@@ -26,6 +26,7 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 
@@ -70,6 +71,8 @@ public class ElisaAssayTest extends AbstractAssayTest
     @Test
     public void runUITests() throws Exception
     {
+        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(), "elisaMultiPlateSupport");
+
         log("Starting ELISA Assay BVT Test");
 
         //revert to the admin user

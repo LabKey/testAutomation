@@ -1,16 +1,12 @@
 package org.labkey.test.pages.assay;
 
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
 public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementCache>
 {
@@ -30,36 +26,53 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         return new ChooseAssayTypePage(webDriverWrapper.getDriver());
     }
 
-    public ChooseAssayTypePage selectType(String providerName)
+    @Override
+    protected void waitForPage()
     {
-        elementCache().getProviderRadioButton(providerName).check();
-        return this;
+        waitFor(() -> elementCache().stdAssayTabLocator().existsIn(getDriver()) &&
+                elementCache().specialtyAssayTabLocator().existsIn(getDriver()), WAIT_FOR_PAGE);
     }
 
-    public ChooseAssayTypePage selectAssayContainer(String optionText)
-    {
-        elementCache().locationSelect.selectByVisibleText(optionText);
-        return this;
-    }
 
-    public void clickCancel()
+    public ReactAssayDesignerPage selectStandardAssay()
     {
-        clickAndWait(elementCache().cancelButton);
-    }
+        elementCache().stdAssayTab.click();
 
-    public ReactAssayDesignerPage clickNext()
-    {
-        clickAndWait(elementCache().nextButton);
+        WebElement standardPanel = elementCache().stdAssayPaneLocator().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        waitFor(()-> standardPanel.getAttribute("class") != null &&
+                standardPanel.getAttribute("class").contains("active"),
+                "took too long to select the standard assay panel", 2000);
 
+        clickSelectButton();
         return new ReactAssayDesignerPage(getDriver());
     }
 
-    public String clickNextExpectingError()
+    public ReactAssayDesignerPage selectAssayType(String name)
     {
-        clickAndWait(elementCache().nextButton);
+        if (name.equals("General") || name.equals("Standard")) {
+            return selectStandardAssay();
+        }
 
-        clearCache();
-        return Locators.labkeyError.waitForElement(getDriver(), 10000).getText();
+        elementCache().specialtyAssayTab.click();
+        WebElement specialtyPanel = elementCache().specialtyAssayPaneLocator().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        waitFor(()-> specialtyPanel.getAttribute("class") != null &&
+                        specialtyPanel.getAttribute("class").contains("active"),
+                "took too long to select the specialty assay panel", 2000);
+
+        waitForElementToBeVisible(elementCache().specialtySelectLocator);
+        selectOptionByText(elementCache().specialtySelect, name);
+
+        waitFor(()->
+           elementCache().selectButton.getText().toLowerCase().contains(name.toLowerCase()),
+            String.format("took too long for the select button text to contain the assay name [%s].", name), 2000);
+
+        clickSelectButton();
+        return new ReactAssayDesignerPage(getDriver());
+    }
+
+    protected void clickSelectButton()
+    {
+        clickAndWait(elementCache().selectButton);
     }
 
     @Override
@@ -70,16 +83,40 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement uploadXarLink = Locator.linkWithText("Upload").findWhenNeeded(this);
+        public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(getDriver());
+        // selectButton's text changes depending upon which assay is selected- it can be 'Choose Standard Assay' or 'Choose x Assay'
+        public final WebElement selectButton = Locator.tagWithClass("button", "pull-right").findWhenNeeded(getDriver());
 
-        RadioButton getProviderRadioButton(String providerName)
+        public final WebElement specialtyPanel = Locator.tagWithId("div", "assay-picker-tabs-pane-specialty").findWhenNeeded(this);
+
+        public final WebElement stdAssayTab = stdAssayTabLocator().findWhenNeeded(this);
+        public final WebElement specialtyAssayTab = specialtyAssayTabLocator().findWhenNeeded(this);
+        public final WebElement importAssayTab = Locator.tagContainingText("a", "Import Assay Design").findWhenNeeded(this);
+
+        public final WebElement containerSelect = Locator.tagWithId("select", "assay-type-select-container").findWhenNeeded(this);
+
+        public final Locator specialtySelectLocator = Locator.tagWithId("select", "specialty-assay-type-select");
+        public final WebElement specialtySelect = specialtySelectLocator.findWhenNeeded(specialtyPanel);
+
+        protected Locator.XPathLocator buttonPanelLocator()
         {
-            return RadioButton.finder().withNameAndValue("providerName", providerName).find(this);
+            return Locator.byClass("assay-designer-section");
         }
-
-        Select locationSelect = SelectWrapper.Select(Locator.id("assayContainer")).findWhenNeeded(this);
-
-        WebElement nextButton = Locator.lkButton("Next").findWhenNeeded(this);
-        WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
+        public Locator.XPathLocator stdAssayTabLocator()
+        {
+            return Locator.id("assay-picker-tabs-tab-standard");
+        }
+        public Locator.XPathLocator stdAssayPaneLocator()
+        {
+            return Locator.id("assay-picker-tabs-pane-standard");
+        }
+        public Locator.XPathLocator specialtyAssayTabLocator()
+        {
+            return Locator.id("assay-picker-tabs-tab-specialty");
+        }
+        public Locator.XPathLocator specialtyAssayPaneLocator()
+        {
+            return Locator.id("assay-picker-tabs-pane-specialty");
+        }
     }
 }

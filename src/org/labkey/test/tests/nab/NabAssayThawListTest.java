@@ -29,6 +29,7 @@ import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -212,7 +213,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
     {
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        clickAndWait(Locator.linkWithText("run details"));
+        clickAndWait(DataRegionTable.detailsLinkLocator());
     }
 
     protected void verifyRunDetails()

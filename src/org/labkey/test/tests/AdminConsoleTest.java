@@ -130,13 +130,11 @@ public class AdminConsoleTest extends BaseWebDriverTest
                 "credits",
                 "data sources",
                 "dump heap",
-                "environment variables",
                 "memory usage",
                 "queries",
                 "reset site errors",
                 "running threads",
                 "site validation",
-                "system properties",
                 "view all site errors",
                 "view all site errors since reset",
                 "view primary site log file"));
@@ -147,8 +145,19 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertTrue("Missing expected admin console links: " + expectedLinkTexts, expectedLinkTexts.isEmpty());
 
         // confirm that NONE of the following are visible to AppAdmin:
-        List<String> notShownLinks = Arrays.asList("files","flow cytometry","experimental features","mascot server",
-                "ldap sync admin","notification service","ms2", "check database", "loggers", "sql scripts");
+        List<String> notShownLinks = Arrays.asList(
+                "files",
+                "flow cytometry",
+                "experimental features",
+                "mascot server",
+                "ldap sync admin",
+                "notification service",
+                "ms2",
+                "check database",
+                "loggers",
+                "sql scripts",
+                "environment variables",
+                "system properties");
         for (String linkText: notShownLinks)
         {
             assertElementNotPresent(Locator.linkWithText(linkText));
@@ -235,8 +244,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-          AdminConsoleTest initTest = (AdminConsoleTest)getCurrentTest();
-          initTest.createTestUser();
+        AdminConsoleTest initTest = (AdminConsoleTest)getCurrentTest();
+        initTest.createTestUser();
     }
 
     @Override

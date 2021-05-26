@@ -102,7 +102,7 @@ public class ReportSecurityTest extends ReportTest
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
-        selectOptionByText(Locator.name("dataset.1"), "Read");
+        selectOptionByText(Locator.name("dataset.1"), "Reader");
         clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']").append(Locator.lkButton("Save")));
     }
 

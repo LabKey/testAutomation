@@ -117,18 +117,8 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     @LogMethod
     public PipelineStatusDetailsPage waitForStatus(String status, int wait)
     {
-        waitFor(() -> status.equals(getStatus()),
-                "Expected status '" + status + "', but was '" + getStatus() + "'",
-                wait);
-        return this;
-    }
-
-    @LogMethod
-    public PipelineStatusDetailsPage waitForStatus(Set<String> status, int wait)
-    {
-        waitFor(() -> status.contains(getStatus()),
-                "Expected status to be one of '" + StringUtils.join(status, "', '") + "'",
-                wait);
+        waitForFinish(wait);
+        assertStatus(status);
         return this;
     }
 
@@ -137,7 +127,15 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
      */
     public PipelineStatusDetailsPage waitForFinish()
     {
-        waitForStatus(FINISHED_STATES, DEFAULT_PIPELINE_WAIT);
+        return waitForFinish(DEFAULT_PIPELINE_WAIT);
+    }
+
+    /**
+     * Wait for job to finish: status is either COMPLETE, ERROR, or CANCELLED
+     */
+    public PipelineStatusDetailsPage waitForFinish(int timoutMs)
+    {
+        waitFor(() -> FINISHED_STATES.contains(getStatus()), () -> "Pipeline job did not finish. Final state: " + getStatus(), timoutMs);
         return this;
     }
 

@@ -129,4 +129,21 @@
             ]]>
         </response>
     </test>
+    <test name="create list and load data" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                df <- data.frame(intKey=c(1:3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                info <- labkey.domain.createAndLoad(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="IntList", df=df, name="test list with load data", options=list(keyName = "intKey"))
+                print(paste("Create successful = ", info$success, sep=""))
+                print(paste("Rows via createAndLoad = ", info$rowCount, sep=""))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Create successful = TRUE
+                Rows via createAndLoad = 3
+             ]]>
+        </response>
+    </test>
 </ApiTests>

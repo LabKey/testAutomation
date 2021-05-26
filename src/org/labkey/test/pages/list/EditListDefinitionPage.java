@@ -22,7 +22,7 @@ import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.html.ToggleButton;
+import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;

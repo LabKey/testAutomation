@@ -2,7 +2,7 @@ package org.labkey.test.components.study;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.study.DatasetDesignerPage;

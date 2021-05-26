@@ -28,6 +28,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
+import org.labkey.test.pages.admin.RConfigurationPage;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -38,6 +39,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -277,64 +279,29 @@ public class RReportHelper
         ensureFolderREngine(engineName, engineName);
     }
 
-    public void ensureFolderREngine(String reportEngineName, String pipelineEngineName)
+    @LogMethod
+    public void ensureFolderREngine(@LoggedParam String reportEngineName, @LoggedParam String pipelineEngineName)
     {
-        _test.goToFolderManagement().goToRConfigTab();
-        Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
-        Locator overrideRadio = Locator.radioButtonByNameAndValue("overrideDefault", "override");
-
-        if (_test.isChecked(inheritRadio))
-            _test.checkRadioButton(overrideRadio);
-
-        assertTrue(reportEngineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", reportEngineName)));
-        assertTrue(pipelineEngineName + " engine does not exist.", _test.isElementPresent(Locator.tagWithText("option", pipelineEngineName)));
-
-        Locator overrideReportEngineSelect = Locator.name("reportEngine");
-        Locator overridePipelineEngineSelect = Locator.name("pipelineEngine");
-        boolean changed = false;
-        if (reportEngineName.equals(_test.getSelectedOptionText(overrideReportEngineSelect).trim()))
+        RConfigurationPage rConfigurationPage = _test.goToFolderManagement().goToRConfigTab();
+        rConfigurationPage.setEngineOverrides(reportEngineName, pipelineEngineName);
+        if (rConfigurationPage.isSaveEnabled())
         {
-            _test.log(reportEngineName + "engine is already selected as default Report engine for folder");
-        }
-        else
-        {
-            changed = true;
-            _test.log("Change folder's Report engine to " + reportEngineName);
-            _test.selectOptionByText(overrideReportEngineSelect, reportEngineName);
-        }
-
-        if (pipelineEngineName.equals(_test.getSelectedOptionText(overridePipelineEngineSelect).trim()))
-        {
-            _test.log(pipelineEngineName + "engine is already selected as default Pipeline engine for folder");
-        }
-        else
-        {
-            changed = true;
-            _test.log("Change folder's Pipeline engine to " + pipelineEngineName);
-            _test.selectOptionByText(overridePipelineEngineSelect, pipelineEngineName);
-        }
-
-        if (changed)
-        {
-            _test.clickButton("Save", "Override Default R Configuration");
-            _test.sleep(1000);
-            _test.clickButton("Yes");
+            rConfigurationPage.save();
         }
     }
 
     public void resetFolderREngine()
     {
-        _test.goToFolderManagement().goToRConfigTab();
-        Locator inheritRadio = Locator.radioButtonByNameAndValue("overrideDefault", "parent");
+        RConfigurationPage rConfigurationPage = _test.goToFolderManagement().goToRConfigTab();
 
-        if (_test.isChecked(inheritRadio))
+        if (rConfigurationPage.isConfigInherited())
+        {
             return;
+        }
 
         _test.log("Remove folder's engine override.");
-        _test.checkRadioButton(inheritRadio);
-
-        _test.clickButton("Save", "Override Default R Configuration");
-        _test.clickButton("Yes");
+        rConfigurationPage.setInheritConfiguration();
+        rConfigurationPage.save();
     }
 
     public void setPandocEnabled(Boolean enabled)
@@ -464,18 +431,24 @@ public class RReportHelper
 
     public void saveReportWithName(String name, boolean isSaveAs, boolean isExternal)
     {
-        String windowTitle = isExternal ? "Create New Report" : isSaveAs ? "Save Report As" : "Save Report";
-        Locator locator = Ext4Helper.Locators.window(windowTitle).append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
-        _test.waitForElement(locator);
-        if (_test.isElementPresent(locator))
+        String windowTitle;
+        if (isExternal)
         {
-            _test.setFormElement(locator, name);
-            Window window = new Window(windowTitle, _test.getWrappedDriver());
-            if (isExternal)
-                window.clickButton("OK", 0);
-            else
-                window.clickButton("OK");
+            windowTitle = "Create New Report";
         }
+        else
+        {
+            windowTitle = isSaveAs ? "Save Report As" : "Save Report";
+        }
+
+        Window<?> window = new Window<>(windowTitle, _test.getWrappedDriver());
+        WebElement nameInput = Locator.xpath("//input[contains(@class, 'x4-form-field')]").findElement(window);
+        _test.setFormElement(nameInput, name);
+        _test.waitForFormElementToEqual(nameInput, name); // Make sure it sticks
+        if (isExternal)
+            window.clickButton("OK", 0);
+        else
+            window.clickButton("OK");
     }
 
     public void saveReport(String name)
@@ -525,7 +498,7 @@ public class RReportHelper
     public void clickSourceTab()
     {
         _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
-        _test.waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), WAIT_FOR_PAGE);
     }
 
     public void ensureFieldSetExpanded(String name)
@@ -605,11 +578,11 @@ public class RReportHelper
      */
     public WebElement assertKnitrReportContents(Locator[] reportContains, String[] reportNotContains)
     {
-        WebElement reportDiv = _test.waitForElement(Locator.css("div.reportView > div.labkey-knitr"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        WebElement reportDiv = _test.waitForElement(Locator.css("div.reportView > div.labkey-knitr"), WAIT_FOR_PAGE);
 
         for (Locator contains : reportContains)
         {
-            contains.waitForElement(reportDiv, BaseWebDriverTest.WAIT_FOR_PAGE);
+            contains.waitForElement(reportDiv, WAIT_FOR_PAGE);
         }
 
         if (reportNotContains != null)

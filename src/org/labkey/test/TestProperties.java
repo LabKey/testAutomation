@@ -126,7 +126,7 @@ public abstract class TestProperties
 
     public static boolean isHeapDumpCollectionEnabled()
     {
-        return "true".equals(System.getProperty("enable.heap.dump"));
+        return "true".equals(System.getProperty("webtest.enable.heap.dump"));
     }
 
     public static boolean isRunWebDriverHeadless()
@@ -196,6 +196,24 @@ public abstract class TestProperties
     public static boolean isTrialServer()
     {
         return "true".equals(System.getProperty("webtest.server.trial"));
+    }
+
+    /**
+     * Parses system property 'webtest.server.startup.timeout' to determine maximum allowed server startup time.
+     * If property is not defined or is not an integer, it defaults to 60 seconds.
+     * @return Maximum number of seconds to wait for server startup
+     */
+    public static int getServerStartupTimeout()
+    {
+        String property = System.getProperty("webtest.server.startup.timeout");
+        try
+        {
+            return Integer.parseInt(property);
+        }
+        catch (NumberFormatException nfe)
+        {
+            return 60;
+        }
     }
 
     public static String ensureGeckodriverExeProperty()

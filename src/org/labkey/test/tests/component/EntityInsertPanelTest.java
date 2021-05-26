@@ -8,14 +8,16 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.components.ui.EntityInsertPanel;
+import org.labkey.test.components.ui.entities.EntityInsertPanel;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +92,25 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         dgen.deleteDomain(createDefaultConnection());
     }
 
+    @Test
+    public void testFileUpload() throws Exception
+    {
+        String sampleTypeName = "insert_from_file";
+        SampleTypeDefinition props = new SampleTypeDefinition(sampleTypeName).setFields(standardTestSampleFields());
+        TestDataGenerator dgen = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props)
+                .withGeneratedRows(10);
+        File testFile = dgen.writeData("fileUploadTest.tsv");
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
+        testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
+        var previewGrid = testPanel.uploadFileExpectingPreview(testFile, true);
+
+        clickFileImport();  // the file import submit button is different from the grid submit button
+
+        var selectRowsResponse = executeSelectRowCommand("exp.materials", sampleTypeName);
+        assertThat(selectRowsResponse.getRows().size(), is(10));
+    }
+
     public WebElement clickFinishExpectingSuccess(String buttonText)
     {
         waitFor(()-> isSubmitEnabled(),
@@ -107,6 +128,18 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
     private boolean isSubmitEnabled()
     {
         return null == submitButton().getAttribute("disabled");
+    }
+
+    public void clickFileImport()
+    {
+        WebElement button = fileImportSubmitButton();
+        shortWait().until(ExpectedConditions.elementToBeClickable(button));
+        button.click();
+    }
+
+    private WebElement fileImportSubmitButton()
+    {
+        return Locator.button("Import").findElement(getDriver());
     }
 
     protected List<FieldDefinition> standardTestSampleFields()

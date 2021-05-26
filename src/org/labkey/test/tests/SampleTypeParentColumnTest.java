@@ -10,7 +10,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
-import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
+import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;

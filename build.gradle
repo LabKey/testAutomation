@@ -1,7 +1,9 @@
-apply plugin: 'java'
-apply plugin: 'java-library'
-apply plugin: 'org.labkey.testRunner'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'org.labkey.build.testRunner'
+    id 'maven-publish'
+}
 
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.PomFileHelper
@@ -14,6 +16,8 @@ project.configurations {
 }
 
 project.dependencies {
+
+    implementation "org.xerial:sqlite-jdbc:3.7.2" // declaring SQLite here to be used in targettedMS test
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
     implementation("commons-io:commons-io:${commonsIoVersion}")

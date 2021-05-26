@@ -3,7 +3,7 @@ package org.labkey.test.components.list;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.glassLibrary.components.ReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.core.login.SvgCheckbox;

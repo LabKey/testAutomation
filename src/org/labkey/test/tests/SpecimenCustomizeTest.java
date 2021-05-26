@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Specimen;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.params.FieldDefinition;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyC.class})
+@Category({DailyC.class, Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class SpecimenCustomizeTest extends SpecimenBaseTest
 {
@@ -67,7 +68,7 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
 
     @Override
     @LogMethod
-    protected void doVerifySteps() throws Exception
+    protected void doVerifySteps()
     {
         configureSpecimenProperties();
 
@@ -82,13 +83,13 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
 
     private void configureSpecimenProperties()
     {
-
         goToManageStudy();
         clickAndWait(Locator.linkContainingText("Edit Specimen Event fields"));
 
         DomainDesignerPage designerPage = new DomainDesignerPage(getDriver());
         designerPage.fieldsPanel().addField(new FieldDefinition("Tally").setType(ColumnType.Integer));
-        designerPage.fieldsPanel().addField(new FieldDefinition("Note").setType(ColumnType.String));
+        // Set a couple import aliases to test them below: Issue 39672
+        designerPage.fieldsPanel().addField(new FieldDefinition("Note").setType(ColumnType.String).setImportAliases("Comment,Notables"));
         designerPage.fieldsPanel().addField(new FieldDefinition("Minutes").setType(ColumnType.Decimal));
         designerPage.fieldsPanel().addField(new FieldDefinition("Flag").setType(ColumnType.Boolean));
         designerPage.clickFinish();
@@ -327,6 +328,7 @@ public class SpecimenCustomizeTest extends SpecimenBaseTest
         waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
         DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
 
+        // This tests import aliases, since the "Note" column in Rollup.specimens has the column header "Notables": Issue 39672
         List<String> actual = table.getColumnDataAsText("CombineNote");
         List<String> expected = Arrays.asList("novials1002", "novials1001, novials1003", " ", " ", " ", " ", " ",
                 "unavailable2", "unavailable1, unavailable22", " ", "note1, note101", "note2", " ", " ", " ", " ", " ");

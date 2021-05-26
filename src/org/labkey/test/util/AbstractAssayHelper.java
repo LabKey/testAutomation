@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.ChooseAssayTypePage;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,10 +74,9 @@ public abstract class AbstractAssayHelper
     public ReactAssayDesignerPage createAssayDesign(String type, String name)
     {
         _test.clickButton("New Assay Design");
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
-        _test.clickButton("Next");
 
-        ReactAssayDesignerPage assayDesigner = new ReactAssayDesignerPage(_test.getDriver());
+        ChooseAssayTypePage chooseAssayTypePage = new ChooseAssayTypePage(_test.getDriver());
+        ReactAssayDesignerPage assayDesigner = chooseAssayTypePage.selectAssayType(type);
         assayDesigner.setName(name);
         return assayDesigner;
     }

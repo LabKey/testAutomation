@@ -9,6 +9,7 @@ import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.domain.UnsavedChangesModalDialog;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -28,7 +29,7 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
 
     public static DomainDesignerPage beginAt(WebDriverWrapper driver, String containerPath, String schema, String query)
     {
-        driver.beginAt(WebTestHelper.buildURL("experiment", containerPath, "domainDesigner", Maps.of("schemaName", schema, "queryName", query)));
+        driver.beginAt(WebTestHelper.buildURL("core", containerPath, "domainDesigner", Maps.of("schemaName", schema, "queryName", query)));
         return new DomainDesignerPage(driver.getDriver());
     }
 
@@ -152,5 +153,6 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
             return new DomainFormPanel.DomainFormPanelFinder(getDriver()).withTitle(title)
                     .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
         }
+
     }
 }

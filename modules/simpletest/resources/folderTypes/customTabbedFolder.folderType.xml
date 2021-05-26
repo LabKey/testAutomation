@@ -88,6 +88,7 @@
    <ft:modules>
        <ft:moduleName>Core</ft:moduleName>
        <ft:moduleName>simpletest</ft:moduleName>
+       <ft:moduleName>Specimen</ft:moduleName>
        <ft:moduleName>Study</ft:moduleName>
        <ft:moduleName>Query</ft:moduleName>
    </ft:modules>

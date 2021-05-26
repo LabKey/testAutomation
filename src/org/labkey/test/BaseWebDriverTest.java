@@ -60,6 +60,8 @@ import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
+import org.labkey.test.pages.query.NewQueryPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
@@ -314,8 +316,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         SingletonWebDriver.getInstance().tearDown(closeWindow || isTestRunningOnTeamCity());
     }
 
+    private void clearLastPageInfo()
+    {
+        _lastPageTitle = null;
+        _lastPageURL = null;
+        _lastPageText = null;
+    }
+
     private void populateLastPageInfo()
     {
+        clearLastPageInfo();
         _lastPageTitle = getLastPageTitle();
         _lastPageURL = getLastPageURL();
         _lastPageText = getLastPageText();
@@ -583,7 +593,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
-            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().withScreenshot("startupLeaks").wrapAssertion(() -> checkLeaks(null));
             checker().resetErrorTypes();
             _checkedLeaksAndErrors = true;
         }
@@ -968,6 +978,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             if (isTestRunningOnTeamCity()) // Don't risk modifying browser state when running locally
             {
+                clearLastPageInfo(); // Make sure server error screenshot doesn't reuse cached page text
                 // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
                 checker().withScreenshot(testName + "_serverErrors").wrapAssertion(this::checkErrors);
             }
@@ -1044,10 +1055,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
             checkErrors();
-            checkLeaks();
+            checkLeaks(null);
         }
 
-        if (reenableMiniProfiler)
+        if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
             setMiniProfilerEnabled(true);
 
         resetExperimentalFlags();
@@ -1133,12 +1144,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
-    protected void checkLeaks()
+    protected void checkLeaks(Long leakCutoffTime)
     {
         if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
             return;
+
+        if (leakCutoffTime == null)
+        {
+            leakCutoffTime = testClassStartTime;
+        }
 
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
@@ -1158,7 +1174,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     sleep(10000);
                 }
             }
-            msSinceTestStart = System.currentTimeMillis() - testClassStartTime;
+            msSinceTestStart = System.currentTimeMillis() - leakCutoffTime;
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
@@ -1169,6 +1185,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             String newLeak = null;
             List<WebElement> errorRows = Locator.css("#leaks tr:not(:first-child)").findElements(getDriver());
+            assertEquals("Didn't find memTracker rows. Test Locator may need to be updated.", leakCount, errorRows.size());
             for (WebElement errorRow : errorRows)
             {
                 String ageStr = errorRow.findElement(By.cssSelector(".age")).getText();
@@ -1550,7 +1567,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             else
                 log("setting property: " + desc + " to value: " + value.getValue());
             String val = value.getInputType().valueToString(ref.getValue());
-            if((StringUtils.isEmpty(val) != StringUtils.isEmpty(value.getValue())) || !val.equals(value.getValue()))
+            if((StringUtils.isEmpty(val) != StringUtils.isEmpty(String.valueOf(value.getValue()))) || !val.equals(value.getValue()))
             {
                 changed = true;
                 ref.setValue(value.getValue());
@@ -1571,9 +1588,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void assertNavTrail(String... links)
     {
+        verifyNavTrail(true, links);
+    }
+
+    public boolean verifyNavTrail(boolean throwOnNoMatch, String... links)
+    {
+        Locator navTrailLocator = Locator.tagWithClass("ol", "breadcrumb");
+        boolean exists = navTrailLocator.existsIn(getDriver());
+
+        if (!exists)
+        {
+            if (throwOnNoMatch)
+                fail("NavTrail does not exist");
+            else
+                return false;
+        }
+
+        String navTrailText = navTrailLocator.findElement(getDriver()).getText();
         String expectedNavTrail = String.join("", links);
-        String navTrail = Locator.tagWithClass("ol", "breadcrumb").findElement(getDriver()).getText();
-        assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
+
+        if (throwOnNoMatch)
+            assertEquals("Nav trail does not match", expectedNavTrail, navTrailText);
+
+        return expectedNavTrail.equals(navTrailText);
     }
 
     public void clickTab(String tabname)
@@ -1936,8 +1973,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void selectSchema(String schemaName)
     {
         String[] schemaParts = schemaName.split("\\.");
-        if (isExtTreeNodeSelected(schemaParts[schemaParts.length - 1]))
-            return;
 
         StringBuilder schemaWithParents = new StringBuilder();
         String separator = "";
@@ -1971,8 +2006,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 WebElement folderIcon = loc.findElement(getDriver());
                 // Moving to desired tree node should dismiss tooltip from previously clicked folder
                 new Actions(getDriver()).moveToElement(folderIcon).perform();
-                click(folderIcon);
-                }, "queryTreeSelectionChange");
+                folderIcon.click();
+            }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
         }
     }
@@ -1981,8 +2016,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
+        waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
+        WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
         waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
     }
@@ -2004,7 +2040,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
-            assertTextPresent("Defined in " + moduleName + " module");
+            assertTextPresent("LabKey SQL query defined in " + moduleName + " module");
         if (!href.contains("executeQuery.view"))
             log("DEBUG: viewQueryData(" + schemaName + "." + queryName + ") doesn't use executeQuery");
         beginAt(href);
@@ -2025,41 +2061,46 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     // Careful: If baseQueryName isn't provided, the first table in the schema will be used as the base query.
-    public void createNewQuery(@NotNull String schemaName, @Nullable String baseQueryName)
+    public NewQueryPage createNewQuery(@NotNull String schemaName, @Nullable String baseQueryName)
     {
         if (baseQueryName != null)
             selectQuery(schemaName, baseQueryName);
         else
             selectSchema(schemaName);
         clickAndWait(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[contains(text(), 'Create New Query')]"));
+
+        return new NewQueryPage(getDriver());
     }
 
 
     protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
     {
-        String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
-        beginAt(queryURL);
-        createNewQuery(schemaName);
-        waitForElement(Locator.name("ff_newQueryName"));
-        setFormElement(Locator.name("ff_newQueryName"), name);
-        clickButton("Create and Edit Source", 0);
-        waitForElement(Locators.bodyTitle("Edit " + name));
+        SourceQueryPage sourcePage = createQuery(container, name, schemaName);
+        sourcePage.setSource(sql);
         setCodeEditorValue("queryText", sql);
         if (xml != null)
         {
-            _ext4Helper.clickExt4Tab("XML Metadata");
-            setCodeEditorValue("metadataText", xml);
+            sourcePage.setMetadataXml(xml);
         }
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        sourcePage.clickSave();
         if (inheritable)
         {
+            String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
             beginAt(queryURL);
             editQueryProperties(schemaName, name);
             selectOptionByValue(Locator.name("inheritable"), "true");
             clickButton("Save");
         }
+    }
+
+    @NotNull
+    protected SourceQueryPage createQuery(String container, String name, String schemaName)
+    {
+        SourceQueryPage sourceQueryPage = NewQueryPage.beginAt(this, container, schemaName)
+            .setName(name)
+            .clickCreate();
+        waitForElement(Locators.bodyTitle("Edit " + name));
+        return sourceQueryPage;
     }
 
     public void validateQueries(boolean validateSubfolders, int waitTime)

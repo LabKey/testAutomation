@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -41,9 +40,9 @@ public class DatasetInsertPage extends InsertPage
         waitForElement(Locator.tag("*").attributeStartsWith("name", "quf_"));
     }
 
-    public void insert(Map<String,String> values)
+    public void insert(Map<String, String> values)
     {
-        insert(values,true,"");
+        insert(values, true, "");
     }
 
     public void insert(Map<String, String> values, boolean expectSuccess, String errorMsg)
@@ -55,6 +54,7 @@ public class DatasetInsertPage extends InsertPage
             switch (type)
             {
                 case "text":
+                case "file":
                     setFormElement(fieldInput, entry.getValue());
                     break;
                 case "checkbox":
@@ -83,7 +83,7 @@ public class DatasetInsertPage extends InsertPage
 
         if (errorMsg != null && !errorMsg.isEmpty())
         {
-            if(!expectSuccess)
+            if (!expectSuccess)
                 assertTextPresent(errorMsg);
             else
                 assertTextNotPresent(errorMsg);

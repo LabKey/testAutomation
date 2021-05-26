@@ -34,10 +34,12 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -161,7 +163,7 @@ public class TestDataGenerator
      */
     public TestDataGenerator addCustomRow(Map<String, Object> customRow)
     {
-        _rows.add(customRow);
+        _rows.add(new CaseInsensitiveHashMap<>(customRow));
         return this;
     }
 
@@ -198,20 +200,20 @@ public class TestDataGenerator
             {
                 PropertyDescriptor columnDefinition = _columns.get(key);
                 // get the column definition
-                String columnName = columnDefinition.getName().toLowerCase();
-                String columnType = columnDefinition.getRangeURI().toLowerCase();
+                String columnName = columnDefinition.getName();
+                String columnType = columnDefinition.getRangeURI();
 
                 Object columnValue;
                 columnValue = _dataSuppliers.getOrDefault(columnName, getDefaultDataSupplier(columnType)).get();
                 newRow.put(columnName, columnValue);
             }
-            getRows().add(newRow);
+            addCustomRow(newRow);
         }
     }
 
     private Supplier<Object> getDefaultDataSupplier(String columnType)
     {
-        switch (columnType)
+        switch (columnType.toLowerCase())
         {
             case "string":
                 return () -> randomString(20);
@@ -291,6 +293,10 @@ public class TestDataGenerator
         return ThreadLocalRandom.current().nextBoolean();
     }
 
+    /**
+     * generates tsv-formatted content using the rows in the current instance;
+     * @return
+     */
     public String writeTsvContents()
     {
         StringBuilder builder = new StringBuilder();
@@ -304,11 +310,25 @@ public class TestDataGenerator
         {
             for (Integer index: _indices.keySet())
             {
-                builder.append(row.get(_indices.get(index).getName()) + "\t");
+                String keyAtIndex = _indices.get(index).getName();
+                builder.append(row.get(keyAtIndex) + "\t");
             }
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    /**
+     * Creates a file containing the contents of the current rows, formatted in TSV.
+     * The file is written to the test temp dir
+     * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @return File object pointing at created TSV
+     */
+    public File writeData(String fileName)
+    {
+        if (!TestFileUtils.getTestTempDir().exists())
+            TestFileUtils.getTestTempDir().mkdirs();
+        return TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), fileName, writeTsvContents());
     }
 
     public DomainResponse createDomain(Connection cn, String domainKind) throws IOException, CommandException
@@ -432,10 +452,10 @@ public class TestDataGenerator
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
-        CreateDomainCommand createSampleTypeCommand = def.getCreateCommand();
+        CreateDomainCommand createDomainCommand = def.getCreateCommand();
         try
         {
-            createSampleTypeCommand.execute(connection, containerPath);
+            createDomainCommand.execute(connection, containerPath);
         }
         catch (IOException e)
         {
@@ -479,7 +499,6 @@ public class TestDataGenerator
      * @param schema The schema of the domain. For example for sample types it would be 'exp.data'.
      * @param queryName The name of the query to look for. For example for a sample type it would be its name.
      * @return True if it exists in the given container false otherwise.
-     * @throws IOException Thrown if there is an issue while looking for the domain.
      */
     public static boolean doesDomainExists(final String containerPath, final String schema,
                                                 final String queryName)

@@ -18,7 +18,7 @@ package org.labkey.test.selenium;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 public class ReclickingWebElement extends WebElementDecorator
 {
-    public ReclickingWebElement(WebElement decoratedElement)
+    public ReclickingWebElement(@NotNull WebElement decoratedElement)
     {
         super(decoratedElement);
     }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="etlReport" xmlns="http://labkey.org/query/xml">
+    <Properties>
+        <Prop name="runInBackground">true</Prop>
+        <Prop name="includedReports">module:ETLTest/reports/schemas/etlReportHelper.R</Prop>
+    </Properties>
+    <tags/>
+</ReportDescriptor>

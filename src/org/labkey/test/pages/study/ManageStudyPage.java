@@ -66,6 +66,12 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
         return new DomainDesignerPage(getDriver());
     }
 
+    public ConfigureImporterPage clickConfigureSpecimenImport()
+    {
+        waitAndClickAndWait(Locator.linkWithText("Configure specimen import"));
+        return new ConfigureImporterPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

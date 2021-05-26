@@ -35,7 +35,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -253,8 +252,8 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         // now update
         Map<String, Object> rowE = insertResponse.getRows().stream().filter(a -> a.get("name").equals("E")).findFirst().orElse(null);
         Map<String, Object> rowD = insertResponse.getRows().stream().filter(a -> a.get("name").equals("D")).findFirst().orElse(null);
-        rowE.put("mvstringdata_mvindicator", "Q");
-        rowD.put("mvstringdata_mvindicator", null);
+        rowE.put("mvstringdatamvindicator", "Q");
+        rowD.put("mvstringdatamvindicator", null);
         rowD.put("mvStringData", "updatedValue");
 
         SaveRowsResponse updateResponse = dgen.updateRows(createDefaultConnection(), Arrays.asList(rowD, rowE));
@@ -275,8 +274,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         assertEquals("cell should reflect literal value", "updatedValue", dCell.getText());
 
         // now update rows via the UI
-        String mvIndicatorColName = WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer) ?
-                "mvStringData_MVIndicator" : "mvstringdata_mvindicator";
+        String mvIndicatorColName = "mvStringDataMVIndicator";
         materialsList.updateRow(dIndex, Map.of("mvStringData", "reallyUpdatedValue", mvIndicatorColName, "Q"));  // update the underlying value but set it mv-Q
         materialsList.clickEditRow(eIndex);
         selectOptionByText(Locator.name("quf_"+mvIndicatorColName), "");    // clear the mv value, reveal underlying value
@@ -425,22 +423,14 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         materialsList.clickEditRow(0);
         setFormElement(Locator.input("quf_mvStringData"), "testValue");
 
-        /* SQL and PG handle casing differently- and labkey passes the differently-cased field names straight through.
-        * Until we figure out a way to do case-insensitive matching over xpath, fork in the test code based on which DB we're running */
-        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"), "Q");
-        else
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvstringdata_mvindicator"), "Q");
+        selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringDataMVIndicator"), "Q");
         clickButton("Submit");
 
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 
         materialsList.clickEditRow(1);
         setFormElement(Locator.input("quf_mvStringData"), "otherValue");
-        if(WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.MicrosoftSQLServer))
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringData_MVIndicator"), "N");
-        else
-            selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvstringdata_mvindicator"), "N");
+        selectOptionByText(Locator.tagWithAttribute("select", "name", "quf_mvStringDataMVIndicator"), "N");
         clickButton("Submit");
         materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
 

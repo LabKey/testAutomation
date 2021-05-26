@@ -72,7 +72,6 @@ public class ViabilityTest extends AbstractViabilityTest
         createViabilityAssay();
         setupPipeline();
 
-
         runUploadTest();
         runReRunTest();
         runResultSpecimenLookupTest();
@@ -317,10 +316,10 @@ public class ViabilityTest extends AbstractViabilityTest
         selectOptionByText(Locator.name("_pool_1604505335_0_TargetStudy"), targetStudyOptionText);
         assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_1594020325_1_TargetStudy")));
         checkCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
-        assertEquals("Target study didn't propogate with 'Same' checkbox.",
+        assertEquals("Target study didn't propagate with 'Same' checkbox.",
                 getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
                 getSelectedOptionValue(Locator.name("_pool_1594020325_1_TargetStudy")));
-        assertEquals("Target study didn't propogate with 'Same' checkbox.",
+        assertEquals("Target study didn't propagate with 'Same' checkbox.",
                 getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
                 getSelectedOptionValue(Locator.name("_pool_161400006115_3_TargetStudy")));
         uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
@@ -376,6 +375,6 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, "TargetStudy"));
 
         // UNDONE: participant/visit resolver test
-        // UNDONE: copy-to-study
+        // UNDONE: link to study
     }
 }

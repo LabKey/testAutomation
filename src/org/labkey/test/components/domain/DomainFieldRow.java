@@ -9,6 +9,8 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.ontology.ConceptPickerDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.ElementNotInteractableException;
@@ -23,6 +25,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -111,6 +114,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setRequiredField(boolean checked)
     {
         elementCache().fieldRequiredCheckbox.set(checked);
+        return this;
+    }
+
+    public DomainFieldRow setSelectRowField(boolean checked)
+    {
+        elementCache().fieldSelectCheckbox.set(checked);
         return this;
     }
 
@@ -460,6 +469,80 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().getLookupValidatorEnabledCheckbox().get();
     }
 
+    // ontology lookup settings
+
+    public DomainFieldRow setOntology(String ontology, String importField, String labelField)
+    {
+        setType(FieldDefinition.ColumnType.OntologyLookup);
+        setSelectedOntology(ontology)
+                .setConceptImportField(importField)
+                .setConceptLabelField(labelField);
+        return this;
+    }
+
+    public DomainFieldRow setOntologyLookup()
+    {
+        setType(FieldDefinition.ColumnType.OntologyLookup);
+        return this;
+    }
+
+    public DomainFieldRow setSelectedOntology(String ontology)
+    {
+        expand();
+        elementCache().getOntologySelect().selectByValue(ontology);
+        return this;
+    }
+
+    public String getSelectedOntology()
+    {
+        expand();
+        return elementCache().getOntologySelect().getFirstSelectedOption().getAttribute("value");
+    }
+
+    public DomainFieldRow setConceptImportField(String importField)
+    {
+        expand();
+        elementCache().getConceptImportFieldSelect().selectByVisibleText(importField);
+        return this;
+    }
+
+    /**
+     * Allows test code to get which ontologies are available for selection
+     * @return a list of the full text shown in the options
+     */
+    public List<String> getConceptImportSelectOptions()
+    {
+        expand();
+        return getWrapper().getTexts(elementCache().getOntologySelect().getOptions());
+    }
+
+    public DomainFieldRow setConceptLabelField(String labelField)
+    {
+        expand();
+        elementCache().getConceptLabelFieldSelect().selectByVisibleText(labelField);
+        return this;
+    }
+
+    public ConceptPickerDialog clickSelectConcept()
+    {
+        expand();
+        elementCache().selectConceptButton().click();
+        return new ConceptPickerDialog(new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Select Concept"));
+    }
+
+    public Optional<WebElement> optionalOntologyConceptLink()
+    {
+        return elementCache().selectedConceptLink();
+    }
+
+    public DomainFieldRow clickRemoveOntologyConcept()
+    {
+        WebDriverWrapper.waitFor(()-> elementCache().selectedConceptLink().isPresent(),
+                "the expected ontology link is not present", 2000);
+        elementCache().removeSelectedConceptLink().get().click();
+        return this;
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
@@ -668,7 +751,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row").withoutClass("domain-floating-hdr");
         private String _title = null;
         private DomainFormPanel _domainFormPanel;
 
@@ -709,6 +792,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
         public final Checkbox fieldRequiredCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-required-")
                 .findWhenNeeded(this));
+
+        public final Checkbox fieldSelectCheckbox = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-selected")
+                    .findWhenNeeded(this));
 
         public final WebElement fieldDetailsMessage = Locator.css(".domain-field-details, .domain-field-details-expanded")
                 .findWhenNeeded(this);
@@ -784,6 +870,54 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             Select select = SelectWrapper.Select(Locator.name("domainpropertiesrow-sampleTypeSelect")).find(this);
             return waitForSelectToLoad(select);
         }
+
+        // ontology lookup settings
+        public Select getOntologySelect()
+        {
+            Select select = SelectWrapper.Select(Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-sourceOntology")).waitFor(this);
+            return waitForSelectToLoad(select);
+        }
+
+        public Select getConceptImportFieldSelect()
+        {
+            Select select = SelectWrapper.Select(
+                    Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-conceptImportColumn"))
+                    .waitFor(this);
+            return waitForSelectToLoad(select);
+        }
+
+        public Select getConceptLabelFieldSelect()
+        {
+            Select select = SelectWrapper.Select(
+                    Locator.tagWithAttributeContaining("select", "id", "domainpropertiesrow-conceptLabelColumn"))
+                    .waitFor(this);
+            return waitForSelectToLoad(select);
+        }
+
+        public WebElement selectConceptButton()
+        {
+            return Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
+                    .withText("Select Concept")
+                    .waitForElement(this, 2000);
+        }
+
+        Optional<WebElement> selectedConceptLink()
+        {
+            return Locator.tagWithClass("table", "domain-annotation-table")
+                    .descendant(Locator.tagWithClass("td", "content")
+                            .child(Locator.tagWithClass("a", "domain-annotation-item")))
+                    .findOptionalElement(this);
+        }
+
+        Optional<WebElement> removeSelectedConceptLink()
+        {
+            return Locator.tagWithClass("table", "domain-annotation-table")
+                    .descendant(Locator.tagWithClass("td", "content")
+                            .child(Locator.tagWithClass("a", "domain-validator-link")
+                            .child(Locator.tagWithClass("i", "fa-remove"))))
+                    .findOptionalElement(this);
+        }
+
 
         private Select waitForSelectToLoad(Select select)
         {

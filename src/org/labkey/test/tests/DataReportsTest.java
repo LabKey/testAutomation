@@ -170,8 +170,7 @@ public class DataReportsTest extends ReportTest
     @Before
     public void preTest()
     {
-        goToProjectHome();
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
     }
 
     @Override @Ignore // Mask base StudyTest test method
@@ -464,8 +463,9 @@ public class DataReportsTest extends ReportTest
         DataRegionTable.DataRegion(getDriver()).find().goToReport(AUTHOR_REPORT);
 
         popLocation();
-        log("Change user permission");
         stopImpersonating();
+
+        log("Change user permission");
         _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
 
         log("Create a new R script that uses other R scripts");
@@ -534,9 +534,9 @@ public class DataReportsTest extends ReportTest
         assertElementVisible(Ext4Helper.Locators.tab("Source"));
         stopImpersonating();
 
+
         log("Re-save report disabling showing the source tab to all users");
-        goToProjectHome();
-        clickFolder(getFolderName());
+        navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
@@ -546,13 +546,16 @@ public class DataReportsTest extends ReportTest
         resaveReport();
 
         impersonateRole("Reader");
-        clickFolder(getFolderName());
+
+        navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementNotVisible(Ext4Helper.Locators.tab("Source"));
+
         stopImpersonating();
+
         goToProjectHome();
     }
 

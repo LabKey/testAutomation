@@ -299,7 +299,7 @@ public class FlowTest extends BaseFlowTest
         setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[]{"Keyword/ExperimentName", "Keyword/Stim", "Keyword/Comp", "Keyword/PLATE NAME", "Flag", "Name", "RowId"});
         assertTextPresent("PerCP-Cy5.5 CD8");
 
-        assertElementNotPresent(Locator.linkWithImage("/flagFCSFile.gif"));
+        assertElementNotPresent(Locator.tagWithClass("i", "lk-flag-enabled"));
         pushLocation();
         clickAndWait(Locator.linkWithText("91761.fcs"));
         waitForText(FCS_FILE_1);
@@ -312,7 +312,7 @@ public class FlowTest extends BaseFlowTest
         setFormElement(locPlateName, "FlowTest Keyword Plate Name");
         clickButton("update");
         popLocation();
-        assertElementPresent(Locator.linkWithImage("/flagFCSFile.gif"));
+        assertElementPresent(Locator.tagWithClass("i", "lk-flag-enabled"));
         assertElementNotPresent(Locator.linkWithText("91761.fcs"));
         assertElementPresent(Locator.linkWithText("FlowTest New Name"));
         assertTextPresent("FlowTest Keyword Plate Name");
@@ -517,13 +517,11 @@ public class FlowTest extends BaseFlowTest
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("49 sample descriptions"));
-        assertTextPresent(
-                "49 sample descriptions",
-                "10 samples are not joined",
-                "39 FCS Files",
-                "have been joined",
-                "0 FCS Files",
-                "are not joined");
+
+        assertElementContains(Locator.linkWithId("all-samples"), "49 sample descriptions");
+        assertElementContains(Locator.linkWithId("linked-fcsfiles"), "39 FCS Files");
+        assertElementContains(Locator.linkWithId("unlinked-samples"), "10 samples");
+        assertElementContains(Locator.linkWithId("unlinked-fcsfiles"), "0 FCS Files");
     }
 
     @LogMethod
@@ -650,10 +648,15 @@ public class FlowTest extends BaseFlowTest
         qcReport.save();
 
         clickAndWait(Locator.linkWithText(reportName));
-        final int expectedRows = 15;
+        WebElement reportView = Locator.id("report-view").findElement(getDriver());
 
-        assertEquals("Wrong number of rows in TSV output", expectedRows + 1, Locator.css(".labkey-r-tsvout tr").findElements(getDriver()).size());
-        assertEquals("Found links to filtered out run: " + FCS_FILE_2, 0, Locator.linkContainingText("L04").findElements(getDriver()).size());
+        // wait for the ajax report to be rendered
+        var tsvOutputLoc = Locator.tagWithClass("table", "labkey-r-tsvout");
+        var tsvOutputTable = tsvOutputLoc.waitForElement(reportView, WAIT_FOR_PAGE);
+
+        final int expectedRows = 15;
+        assertEquals("Wrong number of rows in TSV output", expectedRows + 1, tsvOutputLoc.descendant("tr").findElements(reportView).size());
+        assertEquals("Found links to filtered out run: " + FCS_FILE_2, 0, Locator.linkContainingText("L04").findElements(reportView).size());
     }
 
     @LogMethod
@@ -783,7 +786,7 @@ public class FlowTest extends BaseFlowTest
 
         assertTitleContains(reportName);
         assertTextPresent(errorText);
-        checkExpectedErrors(2);
+        checkExpectedErrors(1);
 
         // Subsequent tests expect there to be no ERRORs in pipeline. Delete errored pipeline job
         PipelineStatusTable pipelineStatusTable = PipelineStatusTable.viewJobsForContainer(this, getContainerPath());

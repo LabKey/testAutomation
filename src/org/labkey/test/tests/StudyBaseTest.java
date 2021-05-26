@@ -104,15 +104,18 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         }
 
         _containerHelper.createSubfolder(getProjectName(), getFolderName(), "Study");
+        if (_studyHelper.isSpecimenModulePresent())
+            _containerHelper.enableModule("Specimen");
         new ApiPermissionsHelper(this).checkInheritedPermissions();
     }
 
-    // Start importing the specimen archive.  This can load in the background while executing the first set of
-    // verification steps to speed up the test.  Call waitForSpecimenImport() before verifying specimens.
+    // Start importing the specimen archive. This can load in the background while executing the first set of
+    // verification steps to speed up the test. Call waitForSpecimenImport() before verifying specimens.
     protected void startSpecimenImport(int completeJobsExpected)
     {
         startSpecimenImport(completeJobsExpected, StudyHelper.SPECIMEN_ARCHIVE_A);
     }
+
     protected void startSpecimenImport(int completeJobsExpected, File specimenArchive)
     {
         _specimenImporter = new SpecimenImporter(new File(StudyHelper.getPipelinePath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
@@ -209,7 +212,12 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickButton("Export Study");
 
         waitForText("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets",
-                "Dataset Data", "Specimens", "Specimen Settings", "Participant Comment Settings");
+                "Dataset Data", "Participant Comment Settings");
+
+        if (_studyHelper.isSpecimenModuleActive())
+        {
+            assertTextPresent("Specimens", "Specimen Settings");
+        }
 
         if (uncheckObjects != null)
         {
@@ -252,11 +260,14 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Pipeline"));
+        if (_studyHelper.isSpecimenModulePresent())
+            checkCheckbox(Locator.checkboxByTitle("Specimen")); // Activate specimen module to enable specimen UI/webparts
         clickButton("Update Folder");
         new PortalHelper(getDriver()).doInAdminMode(portalHelper -> {
             portalHelper.addWebPart("Data Pipeline");
             portalHelper.addWebPart("Datasets");
-            portalHelper.addWebPart("Specimens");
+            if (_studyHelper.isSpecimenModulePresent())
+                portalHelper.addWebPart("Specimens");
             portalHelper.addWebPart("Views");
         });
         setPipelineRoot(pipelinePath);

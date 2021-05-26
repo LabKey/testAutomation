@@ -45,9 +45,11 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.components.ui.navigation.UserMenu;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
@@ -103,7 +105,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
  */
 public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
-    private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
+    private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = TestProperties.getServerStartupTimeout();
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
@@ -131,7 +133,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
-            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
+            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
+                    UserMenu.appUserMenu());
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
@@ -151,8 +154,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // verify we're signed in now
             if (!waitFor(() ->
             {
+                if(isElementPresent(UserMenu.appUserMenu()))
+                {
+                    goToHome();
+                }
+
                 if (isElementPresent(SiteNavBar.Locators.userMenu))
                     return true;
+
                 bypassSecondaryAuthentication();
                 return false;
             }, defaultWaitForPage))
@@ -683,7 +692,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 clickAndWait(Locator.lkButton("Next"));
                 // admin-newInstallSiteSettings
                 assertElementPresent(Locator.id("rootPath"));
-                uncheckCheckbox(Locator.name("allowReporting"));
                 clickAndWait(Locator.lkButton("Next"));
                 // admin-installComplete
                 clickAndWait(Locator.linkContainingText("Go to the server's Home page"));
@@ -694,6 +702,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 String displayName = AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername())
                         + (WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2);
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), displayName);
+
+                if (!TestProperties.isDevModeEnabled())
+                {
+                    TestLogger.log("Disable mothership reporting when bootstrapping in production mode");
+                    CustomizeSitePage customizeSitePage = CustomizeSitePage.beginAt(this);
+                    customizeSitePage.setUsageReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report usage to labkey.org
+                    customizeSitePage.setExceptionReportingLevel(CustomizeSitePage.ReportingLevel.NONE); // Don't report exceptions to labkey.org
+                    // Note: leave the self-report setting unchanged
+                    customizeSitePage.save();
+                }
             }
             else // Just upgrading
             {
@@ -999,6 +1017,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         beginAt(buildURL("project", projectName, "begin"));
     }
 
+    public void goToProjectFolder(String projectName, String subfolder)
+    {
+        beginAt(buildURL("project", projectName + "/" + subfolder, "begin"));
+    }
+
     /**
      * go to the project settings page of a project
      * @param project project name
@@ -1244,7 +1267,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.components.api.ProjectMenu#open}
+     * @deprecated Use {@link ProjectMenu#open}
      */
     @Deprecated
     public void openProjectMenu()
@@ -1379,11 +1402,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
     {
+        return executeSelectRowCommand(schemaName, queryName, containerFilter, path, filters, List.of("*"));
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter,
+                                                         String path, @Nullable List<Filter> filters, @Nullable List<String> requestedColumns)
+    {
         Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);
-        selectCmd.setColumns(Arrays.asList("*"));
+        selectCmd.setColumns(requestedColumns);
         if (filters != null)
             selectCmd.setFilters(filters);
 
@@ -1563,5 +1592,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (deleteRuns && isElementPresent(Locator.id("deleteRuns")))
             checkCheckbox(Locator.id("deleteRuns"));
         clickButton("Confirm Delete");
+    }
+
+    // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
+    // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
+    public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
+    {
+        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + targetClass.getSimpleName() + " field '" + fieldName + "'";
     }
 }

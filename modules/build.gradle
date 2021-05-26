@@ -2,7 +2,6 @@
 subprojects { Project p ->
     if (p.getProjectDir().exists())
     {
-        apply plugin: 'java'
         if (p.file("src").exists())
             apply plugin: 'org.labkey.module'
         else

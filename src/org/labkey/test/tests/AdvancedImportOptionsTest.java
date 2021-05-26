@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -30,6 +29,7 @@ import org.labkey.test.components.studydesigner.ImmunizationScheduleWebpart;
 import org.labkey.test.components.studydesigner.VaccineDesignWebpart;
 import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.study.ManageDatasetQCStatesPage;
+import org.labkey.test.pages.study.QCStateTableRow;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
@@ -211,7 +211,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate QC State.");
         ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
         List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
-        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(row -> row.getState()).collect(Collectors.toList());
+        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(QCStateTableRow::getState).collect(Collectors.toList());
         assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
@@ -278,7 +278,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate QC State.");
         ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
         List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
-        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(row -> row.getState()).collect(Collectors.toList());
+        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(QCStateTableRow::getState).collect(Collectors.toList());
         assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
@@ -302,6 +302,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Create a new project to import the existing data into multiple folders.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
+        _containerHelper.enableModule(IMPORT_PROJECT_FILE01, "Specimen");
 
         log("Create subfolders and setup permissions.");
         _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI01);

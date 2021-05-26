@@ -39,6 +39,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.query.InsertExternalSchemaPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SchemaHelper;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -186,13 +187,14 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/admin.view");
 
-        if (!isTextPresent("reload"))
+        if (!isElementPresent(Locator.linkWithText("reload")))
         {
             clickAndWait(Locator.linkWithText("new external schema"));
-            setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
-            setFormElement(Locator.name("sourceSchemaName"), DB_SCHEMA_NAME);
-            setFormElement(Locator.name("metaData"), TestFileUtils.getFileContents("server/modules/platform/core/resources/schemas/test.xml"));
-            clickButton("Create");
+            new InsertExternalSchemaPage(getDriver())
+                .setName(USER_SCHEMA_NAME)
+                .setSourceSchema(DB_SCHEMA_NAME)
+                .setMetadata(TestFileUtils.getFileContents("server/modules/platform/core/resources/schemas/test.xml"))
+                .clickCreate();
         }
 
         assertTextPresent(USER_SCHEMA_NAME);

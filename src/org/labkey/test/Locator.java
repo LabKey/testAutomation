@@ -532,6 +532,11 @@ public abstract class Locator extends By
         return tagWithAttribute(tag, "id", id);
     }
 
+    public static XPathLocator tagWithAttribute(String tag, String attrName)
+    {
+        return tag(tag).withAttribute(attrName);
+    }
+
     public static XPathLocator tagWithAttribute(String tag, String attrName, String attrVal)
     {
         return tag(tag).withAttribute(attrName, attrVal);
@@ -540,6 +545,11 @@ public abstract class Locator extends By
     public static XPathLocator tagWithAttributeContaining(String tag, String attrName, String attrVal)
     {
         return tag(tag).withAttributeContaining(attrName, attrVal);
+    }
+
+    public static XPathLocator tagWithAttributeIgnoreCase(String tag, String attrName, String attrVal)
+    {
+        return tag(tag).withAttributeIgnoreCase(attrName, attrVal);
     }
 
     public static XPathLocator tagWithClass(String tag, String cssClass)
@@ -939,7 +949,7 @@ public abstract class Locator extends By
 
     public static String cq(String value)
     {
-        return "\"" + value.replace("\\\\", "\\\\\\\\").replace("\"", "\\\\\"") + "\"";
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 
     private static class XPathCSSLocator extends XPathLocator
@@ -1406,6 +1416,13 @@ public abstract class Locator extends By
         public XPathLocator withAttributeContaining(String attrName, String partialAttrVal)
         {
             return this.withPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
+        }
+
+        public XPathLocator withAttributeIgnoreCase(String attrName, String attrVal)
+        {
+            return this.withPredicate(
+                    String.format("translate(@%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')=%s",
+                            attrName, xq(attrVal.toLowerCase())));
         }
 
         public XPathLocator withoutAttribute(String attrName, String attrVal)

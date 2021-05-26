@@ -3,7 +3,7 @@ package org.labkey.test.params.experiment;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
-import org.labkey.test.components.labkey.ui.samples.SampleTypeDesigner;
+import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 
@@ -25,10 +25,15 @@ public class SampleTypeDefinition extends DomainProps
     private String _name;
     private String _nameExpression;
     private String _description;
+    private String _autoLinkDataToStudy;
     private List<FieldDefinition> _fields = new ArrayList<>();
     private Map<String, String> _parentAliases = new HashMap<>();
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
     private Set<String> _dataParentAliases = new HashSet<>();
+
+    // Currently these values are only used by the SampleManager module.
+    private MetricUnit _inventoryMetricUnit;
+    private String _labelColor;
 
     public SampleTypeDefinition(String name)
     {
@@ -65,6 +70,38 @@ public class SampleTypeDefinition extends DomainProps
     public SampleTypeDefinition setDescription(String description)
     {
         _description = description;
+        return this;
+    }
+    public String getAutoLinkDataToStudy()
+    {
+        return _autoLinkDataToStudy;
+    }
+
+    public SampleTypeDefinition setAutoLinkDataToStudy(String value)
+    {
+        _autoLinkDataToStudy = value;
+        return this;
+    }
+
+    protected MetricUnit getInventoryMetricUnit()
+    {
+        return _inventoryMetricUnit;
+    }
+
+    protected SampleTypeDefinition setInventoryMetricUnit(MetricUnit inventoryMetricUnit)
+    {
+        _inventoryMetricUnit = inventoryMetricUnit;
+        return this;
+    }
+
+    protected String getLabelColor()
+    {
+        return _labelColor;
+    }
+
+    protected SampleTypeDefinition setLabelColor(String color)
+    {
+        _labelColor = color;
         return this;
     }
 
@@ -169,6 +206,18 @@ public class SampleTypeDefinition extends DomainProps
                 importAliases.put(columnName, aliasTable);
             }
             options.put("importAliases", importAliases);
+        }
+        if(getAutoLinkDataToStudy() != null)
+        {
+           options.put("autoLinkTargetContainerId", getAutoLinkDataToStudy());
+        }
+        if (getInventoryMetricUnit() != null)
+        {
+            options.put("metricUnit", getInventoryMetricUnit().getValue());
+        }
+        if (getLabelColor() != null)
+        {
+            options.put("labelColor", getLabelColor());
         }
         return options;
     }

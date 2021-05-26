@@ -20,10 +20,8 @@ import org.labkey.test.CachingLocator;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -32,10 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OverviewPage extends LabKeyPage
+public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
 {
-    Elements _elements;
-
     public OverviewPage(WebDriver driver)
     {
         super(driver);
@@ -49,14 +45,14 @@ public class OverviewPage extends LabKeyPage
 
     public boolean isParticipantCountShown()
     {
-        return elements().participantCountCheckbox.isSelected();
+        return elementCache().participantCountCheckbox.isSelected();
     }
 
     public OverviewPage showParticipantCounts()
     {
         if (!isParticipantCountShown())
         {
-            clickAndWait(elements().participantCountCheckbox);
+            clickAndWait(elementCache().participantCountCheckbox);
             return new OverviewPage(getDriver());
         }
         return this;
@@ -66,7 +62,7 @@ public class OverviewPage extends LabKeyPage
     {
         if (isParticipantCountShown())
         {
-            clickAndWait(elements().participantCountCheckbox);
+            clickAndWait(elementCache().participantCountCheckbox);
             return new OverviewPage(getDriver());
         }
         return this;
@@ -74,14 +70,14 @@ public class OverviewPage extends LabKeyPage
 
     public boolean isRowCountShown()
     {
-        return elements().rowCountCheckbox.isSelected();
+        return elementCache().rowCountCheckbox.isSelected();
     }
 
     public OverviewPage showRowCounts()
     {
         if (!isRowCountShown())
         {
-            clickAndWait(elements().rowCountCheckbox);
+            clickAndWait(elementCache().rowCountCheckbox);
             return new OverviewPage(getDriver());
         }
         return this;
@@ -91,7 +87,7 @@ public class OverviewPage extends LabKeyPage
     {
         if (isRowCountShown())
         {
-            clickAndWait(elements().rowCountCheckbox);
+            clickAndWait(elementCache().rowCountCheckbox);
             return new OverviewPage(getDriver());
         }
         return this;
@@ -137,7 +133,7 @@ public class OverviewPage extends LabKeyPage
     public Map<String, List<CountPair>> getDatasetRowData(@Nullable Integer leftVisitIndex, @Nullable Integer endVisitIndex)
     {
         Map<String, List<CountPair>> datasetRowData = new HashMap<>();
-        List<WebElement> overviewRows = elements().getStudyOverviewRows();
+        List<WebElement> overviewRows = elementCache().getStudyOverviewRows();
         overviewRows = overviewRows.subList(1, overviewRows.size());
 
         for (WebElement row : overviewRows)
@@ -182,28 +178,21 @@ public class OverviewPage extends LabKeyPage
 
     public List<String> getVisits()
     {
-        WebElement headerRow = elements().getStudyOverviewRows().get(0);
+        WebElement headerRow = elementCache().getStudyOverviewRows().get(0);
         List<WebElement> visitCells = Locator.css("td").findElements(headerRow);
         visitCells = visitCells.subList(1, visitCells.size() - 1);
 
         return getTexts(visitCells);
     }
 
-    public Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
-        if (_elements == null)
-            _elements = new Elements();
-        return _elements;
+        return new Elements();
     }
-    
-    private class Elements extends ComponentElements
-    {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getDriver();
-        }
 
+    protected class Elements extends LabKeyPage<?>.ElementCache
+    {
         public final WebElement participantCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"), this);
         public final WebElement rowCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"), this);
         public final WebElement studyOverview = new LazyWebElement(Locator.tagWithId("table", "studyOverview"), this);
@@ -216,10 +205,10 @@ public class OverviewPage extends LabKeyPage
         }
     }
 
-    public class CountPair
+    public static class CountPair
     {
-        private Integer participantCount;
-        private Integer rowCount;
+        private final Integer participantCount;
+        private final Integer rowCount;
         
         CountPair(Integer participantCount, Integer rowCount)
         {

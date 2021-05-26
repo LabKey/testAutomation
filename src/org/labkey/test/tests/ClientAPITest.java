@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
@@ -71,8 +72,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
@@ -1448,51 +1452,92 @@ public class ClientAPITest extends BaseWebDriverTest
         // 30509: For 401 and 404, respond with same ContentType as request
         log("Testing response content type for 404");
         Connection cn = getConnection(true);
-        Command command = new Command("bam", "boozled");
+        Command<CommandResponse> command = new Command<>("bam", "boozled");
 
-        Map<String, Object> expectedProps = new HashMap<>();
-        expectedProps.put("success", false);
-        expectedProps.put("exception", "No LabKey Server module registered to handle request for controller: bam");
+        final String bogusProjectName = "BOGUS---CONTAINER---PATH";
+        final String bogusContainerPath = "/" + bogusProjectName;
 
-        runCommand(cn, command, "application/json", 404, expectedProps);
-        runCommand(cn, command, "text/xml", 404, expectedProps);
-        runCommand(cn, command, "text/html", 404, null);
+        runCommand(cn, command, "application/json", "text/html", 404, null);
+        runCommand(cn, command, "text/xml", "text/html", 404, null);
+        runCommand(cn, command, "text/html", "text/html", 404, null);
+        runCommand(cn, command, "application/json", "text/html", 404, null);
+        runCommand(cn, command, "text/html", "text/html", 404, null, bogusContainerPath);
 
         // An API location/command that requires permissions
         log("Testing response content type for 401");
         cn = getConnection(false);
-        command = new Command("core", "getExtContainerAdminTree.api");
+        command = new Command<>("core", "getExtContainerAdminTree.api");
 
-        expectedProps = new HashMap<>();
+        Map<String, Object> expectedProps = new HashMap<>();
         expectedProps.put("success", false);
-        expectedProps.put("exception", "User does not have permission to perform this operation.");
+        expectedProps.put("exception", "You must log in to view this content.");
 
-        runCommand(cn, command, "application/json", 401, null);
-        runCommand(cn, command, "text/xml", 401, null);
-        runCommand(cn, command, "text/html", 401, null);
+        validateUnauthorizedResponses(cn, command, expectedProps);
+
+        command = new Command<>("query", "selectRows.api");
+        validateUnauthorizedResponses(cn, command, expectedProps);
+
+        expectedProps.put("exception", "No such project: " + bogusProjectName);
+
+        // Reset command so that it's not requesting XML responses
+        command = new Command<>("query", "selectRows.api");
+
+        // Check that a bad container path produces the right kind of response
+        runCommand(cn, command, "application/json", "application/json", 404, expectedProps, bogusContainerPath);
+        // Try again requesting an XML response
+        command.getParameters().put("respFormat", "xml");
+        runCommand(cn, command, "application/json", "text/xml", 404, null, bogusContainerPath);
+
+        command = new Command<>("query", "selectRows.api");
+        // Check that an valid container with bogus parameters also does the right thing for selectRows
+        expectedProps.put("exception", "Could not find schema: ");
+        cn = getConnection(true);
+        runCommand(cn, command, "application/json", "application/json", 404, expectedProps);
+
+        // Try again requesting an XML response
+        command.getParameters().put("respFormat", "xml");
+        runCommand(cn, command, "application/json", "text/xml", 404, null);
+    }
+
+    private void validateUnauthorizedResponses(Connection cn, Command<CommandResponse> command, Map<String, Object> expectedProps)
+    {
+        runCommand(cn, command, "application/json", "application/json", 401, expectedProps);
+        runCommand(cn, command, "text/xml", "application/json", 401, expectedProps);
+        runCommand(cn, command, "text/html", "application/json", 401, expectedProps);
+
+        command.getParameters().put("respFormat", "xml");
+
+        runCommand(cn, command, "application/json", "text/xml", 401, expectedProps);
+        runCommand(cn, command, "text/xml", "text/xml", 401, expectedProps);
+        runCommand(cn, command, "text/html", "text/xml", 401, expectedProps);
     }
 
     /**
      * Run a Command that makes a request using the specified contentType. That contentType, expectedStatus,
      * and expectedProps are checked against the response to validate if an expected response was received.
      */
-    private void runCommand(Connection cn, Command source, String contentType, int expectedStatus, @Nullable Map<String, Object> expectedProps)
+    private void runCommand(Connection cn, Command<CommandResponse> source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps)
+    {
+        runCommand(cn, source, requestContentType, expectedResponseContentType, expectedStatus, expectedProps, "/" + getProjectName());
+    }
+
+    private void runCommand(Connection cn, Command<CommandResponse> source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps, String folderPath)
     {
         CommandException exception = null;
 
         try
         {
-            new Command(source)
+            new Command<>(source)
             {
                 @Override
                 protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws CommandException, URISyntaxException
                 {
                     HttpUriRequest request = super.getHttpRequest(connection, folderPath);
-                    request.setHeader("Content-Type", contentType);
+                    request.setHeader("Content-Type", requestContentType);
 
                     return request;
                 }
-            }.execute(cn, "/" + getProjectName());
+            }.execute(cn, folderPath);
         }
         catch (IOException e)
         {
@@ -1508,18 +1553,18 @@ public class ClientAPITest extends BaseWebDriverTest
             String responseContentType = exception.getContentType() == null ? "null" : exception.getContentType();
 
             assertEquals("Expected status code to match", expectedStatus, exception.getStatusCode());
-            assertTrue("Expected contentType to match", responseContentType.contains(contentType));
+            assertThat(responseContentType, containsString(expectedResponseContentType));
 
             // Command only supports parsing the body of a JSON response.
-            if ("application/json".equalsIgnoreCase(contentType) && expectedProps != null && expectedProps.size() > 0)
+            if ("application/json".equalsIgnoreCase(expectedResponseContentType) && expectedProps != null && expectedProps.size() > 0)
             {
                 Map<String, Object> body = exception.getProperties();
 
-                assertTrue("Expected properties in the response", body != null);
+                assertNotNull("Expected properties in the response", body);
                 for (Map.Entry<String, Object> prop : expectedProps.entrySet())
                 {
-                    assertTrue("Expected body property not available", body.containsKey(prop.getKey()));
-                    assertTrue("Expected body value for \"" + prop.getKey() + "\"", prop.getValue().equals(body.get(prop.getKey())));
+                    assertTrue("Expected body property not available: " + prop + ", available properties are: " + body.keySet(), body.containsKey(prop.getKey()));
+                    assertEquals("Expected body value for \"" + prop.getKey() + "\"", prop.getValue(), body.get(prop.getKey()));
                 }
             }
         }

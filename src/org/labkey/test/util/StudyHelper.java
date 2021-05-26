@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +47,8 @@ public class StudyHelper
 {
     public static final File SPECIMEN_ARCHIVE_A = TestFileUtils.getSampleData("study/specimens/sample_a.specimens");
     public static final File SPECIMEN_ARCHIVE_B = TestFileUtils.getSampleData("study/specimens/sample_b.specimens");
+
+    private static Boolean _specimenModulePresent = null;
 
     protected BaseWebDriverTest _test;
 
@@ -286,7 +289,12 @@ public class StudyHelper
         _test.clickButton("Export Study");
 
         _test.waitForElement(Locator.tagWithClass("table", "export-location"));
-        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        if (isSpecimenModuleActive())
+        {
+            studyObjects = new ArrayList<>(studyObjects);
+            studyObjects.add("Specimens");
+        }
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
         List<String> missingObjects = new ArrayList<>();
         for (String obj : studyObjects)
@@ -338,9 +346,12 @@ public class StudyHelper
         _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 5 : Specimens
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-        _test.clickButton("Next", 0);
+        // Wizard page 5 : Specimens, if present & active
+        if (isSpecimenModuleActive())
+        {
+            _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+            _test.clickButton("Next", 0);
+        }
 
         // Wizard Page 6 : Study Objects
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
@@ -475,16 +486,56 @@ public class StudyHelper
         return TestFileUtils.getSampleData("study/" + relativePath);
     }
 
+    // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
+    // tests want
+    public void setupAdvancedRepositoryType()
+    {
+        setupRepositoryType(true, false, true);
+    }
+
+    @LogMethod
+    public void setupRepositoryType(boolean advanced, boolean editable, boolean requests)
+    {
+        _test.log("Setup specimen repository type settings");
+        _test.clickTab("Manage");
+        _test.clickAndWait(Locator.linkWithText("Change Repository Type"));
+        _test.waitForElement(Locator.tagContainingText("h3","Manage Repository Settings"));
+        _test.checkRadioButton(Locator.radioButtonByName("simple").index(advanced ? 1 : 0)); // Advanced repository type?
+
+        if (advanced)
+        {
+            _test.checkRadioButton(Locator.radioButtonByName("specimenDataEditable").index(editable ? 1 : 0)); // Editable specimen data?
+            _test.checkRadioButton(Locator.radioButtonByName("enableRequests").index(requests ? 0 : 1)); // Enabled specimen requests?
+        }
+
+        _test.clickButton("Submit");
+    }
+
+    public boolean isSpecimenModulePresent()
+    {
+        if (null == _specimenModulePresent)
+        {
+            AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
+            Set<String> allModules = containerHelper.getAllModules();
+            _specimenModulePresent = allModules.contains("specimen");
+        }
+
+        return _specimenModulePresent;
+    }
+
+    public boolean isSpecimenModuleActive()
+    {
+        if (!isSpecimenModulePresent())
+            return false;
+
+        AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
+        return containerHelper.getActiveModules().contains("Specimen");
+    }
+
     public enum TimepointType
     {
         DATE,
         VISIT
-    }
-
-    public enum RepositoryType
-    {
-        SIMPLE,
-        ADVANCED
     }
 
     public enum SecurityMode

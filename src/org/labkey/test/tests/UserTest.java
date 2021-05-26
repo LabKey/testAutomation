@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -259,6 +260,36 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         _userHelper.deleteUsers(false, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
+    }
+
+    @Test
+    public void testCustomFieldLogin()
+    {
+        String customFieldValue = "loginCredentials";
+        setInitialPassword(NORMAL_USER, TEST_PASSWORD);
+
+        goToSiteUsers();
+        DataRegionTable table = new DataRegionTable("Users", getDriver());
+        table.clickHeaderButtonAndWait("Change User Properties");
+
+        log("Adding the custom field to core.Users");
+        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+        domainFormPanel.addField("UID")
+                .setType(FieldDefinition.ColumnType.String);
+        domainDesignerPage.clickSave();
+
+        log("Adding value to the custom field");
+        navigateToUserDetails(NORMAL_USER);
+        clickButton("Edit");
+        setFormElement(Locator.name("quf_UID"), customFieldValue);
+        clickButton("Submit");
+
+        signOut();
+
+        log("Sign in using custom field value");
+        attemptSignIn(customFieldValue, TEST_PASSWORD);
+        Assert.assertEquals("Logged in as wrong user", NORMAL_USER, getCurrentUser());
     }
 
     private void changeEmailAddress(String currentEmail, String newEmail, String password)

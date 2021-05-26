@@ -26,19 +26,20 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.core.ProjectMenu;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -64,6 +65,22 @@ import static org.junit.Assert.fail;
 
 public class Crawler
 {
+    private static final MultiValuedMap<ControllerActionId, String> _parametersInjected = new HashSetValuedHashMap<>();
+    private static final Set<ControllerActionId> _actionsVisited = new HashSet<>();
+    private static final Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
+    private static final Set<String> _urlsChecked = new HashSet<>();
+    private static final ActionProfiler _actionProfiler = new ActionProfiler();
+    private static final Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
+
+    // All parameters seen by the crawler. Used to randomly attempt injection against parameters not found in UI
+    private static final LinkedHashMap<String,String> _dictionary = new LinkedHashMap<>();
+
+    static
+    {
+        Arrays.asList("rowid", "name", "userId", "query.sort", "query.rowid~eq", "query.name~contains", "returnUrl")
+            .forEach(s -> _dictionary.put(s,""));
+    }
+
     private final List<ControllerActionId> _excludedActions;
     private final List<ControllerActionId> _terminalActions;
     private final List<ControllerActionId> _actionsExcludedFromInjection;
@@ -71,34 +88,15 @@ public class Crawler
     private final Collection<String> _adminControllers;
     private final Collection<String> _forbiddenWords;
     private final boolean _prioritizeAdminPages;
-
-    // Replacements to make in HTML source before looking for "forbidden" words.
-    private static Map<String, String> _sourceReplacements = new CaseInsensitiveHashMap<>();
-
-    // All parameters seen by the crawler. Used to randomly attempt injection against parameters not found in UI
-    private static LinkedHashMap<String,String> _dictionary = new LinkedHashMap<>();
-    static
-    {
-        Arrays.asList("rowid", "name", "userId", "query.sort", "query.rowid~eq", "query.name~contains", "returnUrl")
-                .forEach(s -> _dictionary.put(s,""));
-    }
-
-    private static MultiValuedMap<ControllerActionId, String> _parametersInjected = new HashSetValuedHashMap<>();
-    private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
-    private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
-    private static Set<String> _urlsChecked = new HashSet<>();
-    public static ActionProfiler _actionProfiler = new ActionProfiler();
-    private int _remainingAttemptsToGetProjectLinks = 4;
-    private int _maxDepth = 4;
     private final ArrayList<UrlToCheck> _startingUrls = new ArrayList<>();
-
     private final Duration _maxCrawlTime;
-
-    private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
     private final List<String> _warnings = new ArrayList<>();
     private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+
+    private int _remainingAttemptsToGetProjectLinks = 4;
+    private int _maxDepth = 4;
 
     public Crawler(BaseWebDriverTest test, Duration crawlTime)
     {
@@ -152,24 +150,22 @@ public class Crawler
         List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(
             list,
-            new ControllerActionId("admin", "resetErrorMark"),
-            new ControllerActionId("admin", "doCheck"),
-            new ControllerActionId("admin", "runSystemMaintenance"),
+            new ControllerActionId("admin", "actions"), // Gets hit often in normal testing
+            new ControllerActionId("admin", "addTab"),
+            new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
             new ControllerActionId("admin", "deleteFolder"),
-            new ControllerActionId("admin", "memTracker"),
-            new ControllerActionId("admin", "setAdminMode"),
+            new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "dumpHeap"),
             new ControllerActionId("admin", "exportQueries"), // download action
             new ControllerActionId("admin", "getSchemaXmlDoc"), // download action
-            new ControllerActionId("admin", "addTab"),
-            new ControllerActionId("admin", "actions"), // Gets hit often in normal testing
-            new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
-            new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
-            new ControllerActionId("admin", "resetQueryStatistics"),
-            new ControllerActionId("admin", "queryStackTraces"),
             new ControllerActionId("admin", "mapNetworkDrive"), // 404 on non-Windows
+            new ControllerActionId("admin", "memTracker"),
+            new ControllerActionId("admin", "queryStackTraces"),
+            new ControllerActionId("admin", "resetErrorMark"),
+            new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("admin", "shortURLAdmin"),
             new ControllerActionId("admin", "showAllErrors"),
+            new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "showPrimaryLog"), // Can take very long to load
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
@@ -191,77 +187,78 @@ public class Crawler
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("harvest", "formatInvoice"),
-            new ControllerActionId("harvest", "sickSafeTime"),
             new ControllerActionId("issues", "download"),
             new ControllerActionId("list", "download"),
+            new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
-            new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("luminex", "exportDefaultValues"), // download action
-            new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
+            new ControllerActionId("ms2", "exportProteinCoverageMap"),
             new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
-            new ControllerActionId("ms2", "showParamsFile"),
             new ControllerActionId("ms2", "showList"),
+            new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "doProteinSearch"),
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
-            new ControllerActionId("pipeline-status", "providerAction"), // Re-triggers previously expected errors
             new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
-            new ControllerActionId("query", "printRows"),
+            new ControllerActionId("query", "excelWebQueryDefinition"),
             new ControllerActionId("query", "exportExcelTemplate"), // Download action
             new ControllerActionId("query", "exportRowsExcel"),
-            new ControllerActionId("query", "excelWebQueryDefinition"),
+            new ControllerActionId("query", "printRows"),
             new ControllerActionId("reports", "crosstabExport"), // Download action
+            new ControllerActionId("reports", "download"),
             new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
-            new ControllerActionId("reports", "download"),
             new ControllerActionId("search", "search"), // Tests need to wait for indexer manually
             new ControllerActionId("security", "groupExport"), // Download action
-            new ControllerActionId("security", "resetPassword"),
             new ControllerActionId("study", "confirmDeleteVisit"),
-            new ControllerActionId("study", "template"),
-            new ControllerActionId("study", "downloadTsv"),
-            new ControllerActionId("study", "deleteDatasetReport"),
             new ControllerActionId("study", "deleteDataset"),
+            new ControllerActionId("study", "downloadTsv"),
             new ControllerActionId("study", "importStudyFromPipeline"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
             new ControllerActionId("study", "protocolDocumentDownload"),
-            new ControllerActionId("study-reports", "deleteReports"),
-            new ControllerActionId("study-reports", "deleteReport"),
-            new ControllerActionId("study-reports", "deleteCustomQuery"),
+            new ControllerActionId("specimen", "download"),
+            new ControllerActionId("specimen", "downloadSpecimenList"),
+            new ControllerActionId("specimen", "emailLabSpecimenLists"),
+            new ControllerActionId("specimen", "getSpecimenExcel"),
             new ControllerActionId("study-security", "exportSecurityPolicy"),
-            new ControllerActionId("study-samples", "downloadSpecimenList"),
-            new ControllerActionId("study-samples", "emailLabSpecimenLists"),
-            new ControllerActionId("study-samples", "getSpecimenExcel"),
-            new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("targetedms", "downloadDocument"),
             new ControllerActionId("test", "npe"),
             new ControllerActionId("wiki", "download"),
 
-                // Disable crawler for single-page apps until we make `beginAt` work with them
-                new ControllerActionId("biologics", "app"),
-                new ControllerActionId("cds", "app"),
-                new ControllerActionId("samplemanager", "app"),
+                // These actions can generate a PDF download response if format=pdf is added to the URL, so they can
+                // trip up the crawler. See issue 42661
+                new ControllerActionId("targetedms", "precursorChromatogramChart"),
+                new ControllerActionId("targetedms", "transitionChromatogramChart"),
+                new ControllerActionId("targetedms", "generalMoleculeChromatogramChart"),
+                new ControllerActionId("targetedms", "peptideChromatogramChart"),
+                new ControllerActionId("targetedms", "moleculeChromatogramChart"),
+                new ControllerActionId("targetedms", "sampleFileChromatogramChart"),
+                new ControllerActionId("targetedms", "showPeakAreas"),
+                new ControllerActionId("targetedms", "showRetentionTimesChart"),
 
-                // Actions that error with no parameters. Generally linked from admin-spider.view
-                new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
 
-                // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
-                new ControllerActionId("nlp", "begin"),
-                new ControllerActionId("biologics", "begin"),
-                new ControllerActionId("reagent", "begin"),
-                new ControllerActionId("su2c", "begin"),
-                new ControllerActionId("trialshare", "begin"),
-                new ControllerActionId("ehr_compliancedb", "requirementDetails"),
-                new ControllerActionId("onprc_billingpublic", "begin"),
-                new ControllerActionId("hdrl", "begin")
+            // Disable crawler for single-page apps until we make `beginAt` work with them
+            new ControllerActionId("biologics", "app"),
+            new ControllerActionId("cds", "app"),
+            new ControllerActionId("samplemanager", "app"),
 
+            // Actions that error with no parameters. Generally linked from admin-spider.view
+            new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
+
+            // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
+            new ControllerActionId("biologics", "begin"),
+            new ControllerActionId("datafinder", "begin"),
+            new ControllerActionId("ehr_compliancedb", "requirementDetails"),
+            new ControllerActionId("hdrl", "begin"),
+            new ControllerActionId("onprc_billingpublic", "begin"),
+            new ControllerActionId("reagent", "begin")
         );
 
         for (String controller : getExcludedControllers())
@@ -405,7 +402,7 @@ public class Crawler
         return _crawlStats;
     }
 
-    public class CrawlStats
+    public static class CrawlStats
     {
         private final int _newPages;
         private final int _uniqueActions;
@@ -654,7 +651,7 @@ public class Crawler
 
     public static class ControllerActionId
     {
-        @NotNull private String _controller;
+        @NotNull private final String _controller;
         @NotNull private String _action = "";
         private String _folder;
 
@@ -760,7 +757,7 @@ public class Crawler
 
     public static class ActionProfiler
     {
-        private Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
+        private final Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
 
         public void updateActionProfile(String relativeUrl, long loadTime)
         {
@@ -771,20 +768,18 @@ public class Crawler
                 _actionProfiles.put(actionId, new ActionProfile(relativeUrl, loadTime));
         }
 
-        private class ActionProfile
+        private static class ActionProfile
         {
             private long _invocations;
             private long _longestLoad;
             private long _totalTime;
-            private String _urlForLongest;
-            private ControllerActionId _actionId;
+            private final ControllerActionId _actionId;
 
             ActionProfile(String relativeURL, long loadTime)
             {
                 _actionId = new ControllerActionId(relativeURL);
                 _invocations = 1;
                 _totalTime = _longestLoad = loadTime;
-                _urlForLongest = relativeURL;
             }
 
             public void updateActionProfile(String relativeURL, long loadTime)
@@ -798,7 +793,6 @@ public class Crawler
                 if (loadTime > _longestLoad)
                 {
                     _longestLoad = loadTime;
-                    _urlForLongest = relativeURL;
                 }
             }
 
@@ -943,14 +937,7 @@ public class Crawler
         int currentDepth = 0;
         int maxDepth = 0;
         final Timer crawlTimer = new Timer(_maxCrawlTime);
-        PriorityQueue<UrlToCheck> urlsToCheck = new PriorityQueue<UrlToCheck>(new Comparator<UrlToCheck>()
-        {
-            @Override
-            public int compare(UrlToCheck u1, UrlToCheck u2)
-            {
-                return Double.compare(u1.priority,u2.priority);
-            }
-        });
+        PriorityQueue<UrlToCheck> urlsToCheck = new PriorityQueue<>(Comparator.comparingDouble(u -> u.priority));
         urlsToCheck.addAll(_startingUrls);
 
         TestLogger.log("Crawl depth : " + currentDepth);
@@ -1002,7 +989,7 @@ public class Crawler
         _urlsChecked.add(stripQueryParams(relativeURL));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
-        String originMessage = origin != null ? "\nOriginating page: " + origin.toString() : "";
+        String originMessage = origin != null ? "\nOriginating page: " + origin : "";
 
         try
         {
@@ -1017,8 +1004,7 @@ public class Crawler
             }
             catch (UnhandledAlertException alert)
             {
-                // Ignore GWT deferredjs loading issue when navigating away from designer pages
-                if (!alert.getAlertText().contains("Script Tag Failure - no status available"))
+                if (isRealFailure(alert))
                     throw alert;
             }
 
@@ -1065,7 +1051,7 @@ public class Crawler
                 }
 
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
-                    _warnings.add("Action does not specify title: " + actionId.toString());
+                    _warnings.add("Action does not specify title: " + actionId);
 
                 if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
                 {
@@ -1115,8 +1101,13 @@ public class Crawler
 
             if (rethrow instanceof AssertionError)
                 throw rethrow; // AssertionErrors already contain page and origin information.
+            else if (rethrow instanceof TimeoutException)
+                throw new RuntimeException(relativeURL + " failed to render. " + originMessage +
+                        " It may be a file download which is unsupported by the crawler", rethrow); // Improve error reporting for downloads, see issue 42661
             else
-                throw new RuntimeException(relativeURL + "\nTriggered an exception." + originMessage, rethrow);
+                throw new RuntimeException("Crawler threw " + rethrow.getClass().getSimpleName() + ".\n" +
+                    "Target page: " + relativeURL + "\n" +
+                    originMessage, rethrow);
         }
 
         if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
@@ -1165,9 +1156,6 @@ public class Crawler
         if (!_forbiddenWords.isEmpty())
         {
             String responseText = _test.getResponseText().toLowerCase();
-
-            for (Map.Entry<String, String> entry : _sourceReplacements.entrySet())
-                responseText = responseText.replaceAll(entry.getKey(), entry.getValue());
 
             //loop through forbidden words#BLOCKED
             for (String word : _forbiddenWords)
@@ -1257,6 +1245,12 @@ public class Crawler
         }
     }
 
+    /** Ignore GWT deferredjs loading issue when navigating away from designer pages */
+    private boolean isRealFailure(Exception e)
+    {
+        return !(e instanceof UnhandledAlertException && e.getMessage().contains("Script Tag Failure - no status available"));
+    }
+
     private void testInjection(URL start)
     {
         String base = stripQueryParams(stripHash(start.toString()));
@@ -1311,9 +1305,12 @@ public class Crawler
             }
             catch (Exception ex)
             {
-                throw new AssertionError("Injection error from " + actionId.toString() + "\n" +
-                        "param: " + paramMalicious + "\n" +
-                        "URL: " + urlMalicious, ex);
+                if (isRealFailure(ex))
+                {
+                    throw new AssertionError("Non-injection error while attempting script injection on " + actionId + "\n" +
+                            "param: " + paramMalicious + "\n" +
+                            "URL: " + urlMalicious, ex);
+                }
             }
         }
         // TODO this blows up jquery document completed handling, which causes pageload to not fire and then timeout
@@ -1354,7 +1351,7 @@ public class Crawler
                     String v = i==-1 ? "" : pair.substring(i+1);
                     try
                     {
-                        return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k), URLDecoder.decode(v));
+                        return new AbstractMap.SimpleImmutableEntry<>(URLDecoder.decode(k, StandardCharsets.UTF_8), URLDecoder.decode(v, StandardCharsets.UTF_8));
                     }
                     catch (IllegalArgumentException ex)
                     {
@@ -1362,19 +1359,18 @@ public class Crawler
                     }
                 })
                 .collect(Collectors.toList());
-    };
+    }
 
     String queryStringFromEntries(List<Map.Entry<String,String>> list)
     {
         StringBuilder sb = new StringBuilder();
-        String and = "";
         list.forEach(e ->
         {
             if (sb.length()!=0)
                 sb.append('&');
-            sb.append(URLEncoder.encode(e.getKey()));
+            sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8));
             sb.append('=');
-            sb.append(null==e.getValue()?"":URLEncoder.encode(e.getValue()));
+            sb.append(null==e.getValue()?"":URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8));
         }
         );
         return sb.toString();

@@ -24,7 +24,7 @@ public class ManageRequestPage extends LabKeyPage<ManageRequestPage.ElementCache
 
     public static ManageRequestPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath, int id)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("study-samples", containerPath, "manageRequest", Maps.of("id", String.valueOf(id))));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen", containerPath, "manageRequest", Maps.of("id", String.valueOf(id))));
         return new ManageRequestPage(webDriverWrapper.getDriver());
     }
 

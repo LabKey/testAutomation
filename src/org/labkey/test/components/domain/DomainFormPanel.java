@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.WebDriver;
@@ -69,12 +71,26 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)
             fieldRow.setUrl(fieldDefinition.getURL());
+        if (fieldDefinition.getImportAliases() != null)
+            fieldRow.setImportAliases(fieldDefinition.getImportAliases());
         if (fieldDefinition.getMvEnabled())
             fieldRow.setMissingValuesEnabled(fieldDefinition.getMvEnabled());
         if (fieldDefinition.getRequired())
             fieldRow.setRequiredField(fieldDefinition.getRequired());
         if (fieldDefinition.getLookupValidatorEnabled() != null)
             fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
+
+        // ontology-specific
+        if (fieldDefinition.getSourceOntology() != null)
+            fieldRow.setSelectedOntology(fieldDefinition.getSourceOntology());
+        if (fieldDefinition.getConceptImportColumn() != null)
+            fieldRow.setConceptImportField(fieldDefinition.getConceptImportColumn());
+        if (fieldDefinition.getConceptLabelColumn() != null)
+            fieldRow.setConceptLabelField(fieldDefinition.getConceptLabelColumn());
+        if (fieldDefinition.getPrincipalConceptCode() != null)
+            fieldRow.clickSelectConcept()
+                    .searchConcept(fieldDefinition.getPrincipalConceptSearchExpression(), fieldDefinition.getPrincipalConceptCode())
+                    .clickApply();
 
         if (fieldDefinition.getValidators() != null && !fieldDefinition.getValidators().isEmpty())
         {
@@ -115,26 +131,29 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public DomainFieldRow addField(String name)
     {
+        if (isManuallyDefineFieldsPresent())
+            return manuallyDefineFields(name);
+
         getWrapper().scrollIntoView(elementCache().addFieldButton, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFieldButton)); // give modal dialogs time to disappear
         elementCache().addFieldButton.click();
+
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
         DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
-
         newFieldRow.setName(name);
         return newFieldRow;
     }
 
     public boolean isManuallyDefineFieldsPresent()
     {
-        return getWrapper().isElementPresent(elementCache().manuallyDefineFieldsLoc);
+        return getThis().findElements(elementCache().manuallyDefineFieldsLoc).size() > 0;
     }
 
     public DomainFieldRow manuallyDefineFields(String name)
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineFieldsLink, true);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineFieldsLink)); // give modal dialogs time to disappear
-        elementCache().manuallyDefineFieldsLink.click();
+        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
+        elementCache().manuallyDefineButton.click();
 
         DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
@@ -193,6 +212,78 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
+    public DomainFormPanel checkSelectAll(boolean value)
+    {
+        elementCache().selectAll.set(value);
+        return this;
+    }
+
+    public File clickExportFields() throws Exception
+    {
+        getWrapper().scrollIntoView(elementCache().exportFieldsButton);
+        File[] exportFiles =  getWrapper().doAndWaitForDownload(()-> {
+            elementCache().exportFieldsButton.click();
+        }, 1);
+        return exportFiles[0];
+    }
+
+    public DomainFormPanel clickDeleteFields()
+    {
+        getWrapper().scrollIntoView(elementCache().deleteFieldsButton);
+        elementCache().deleteFieldsButton.click();
+
+        ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Delete Selected Fields").timeout(1000).waitFor();
+        confirmDialog.dismiss("Yes, Delete Fields");
+
+        return this;
+    }
+
+    public String getMode()
+    {
+        String button = elementCache().toggleButton.getAttribute("class");
+        if (button != null && button.contains("default"))
+            return "Summary Mode";
+        else
+            return "Detail Mode";
+    }
+
+    public DomainFormPanel switchMode(String name)
+    {
+        if (!getMode().equals(name))
+            elementCache().toggleButton.click();
+
+        return this;
+    }
+
+    public boolean isSummaryMode()
+    {
+        return getMode().equals("Summary Mode");
+    }
+
+    public boolean isDetailMode()
+    {
+        return getMode().equals("Detail Mode");
+    }
+
+    public List<String> getDetailModeHeaders()
+    {
+        List<String> headers = new ArrayList();
+        for (WebElement e : Locator.xpath("//table/thead/tr/th").findElements(this))
+            if (!e.getText().isBlank())
+                headers.add(e.getText().trim());
+
+        return headers;
+    }
+
+    public int getRowCountInDetailMode()
+    {
+        if (!getMode().equals("Detail Mode"))
+            switchMode("Detail Mode");
+
+        return Locator.xpath("//table/tbody/tr").findElements(this).size();
+    }
+
     public DomainFormPanel setInferFieldFile(File file)
     {
         getWrapper().setFormElement(elementCache().fileUploadInput, file);
@@ -238,6 +329,11 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return getPanelAlertWebElement().getText();
     }
 
+    public String getPanelAlertText(int index)
+    {
+        return getPanelAlertWebElement(index).getText();
+    }
+
     /**
      * There may be an element in the alert that a test will need to interact with so return the alert element and let
      * the test find the control it needs.
@@ -245,12 +341,17 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public WebElement getPanelAlertWebElement()
     {
+        return getPanelAlertWebElement(0);
+    }
+
+    public WebElement getPanelAlertWebElement(int index)
+    {
         getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
                 "the info alert did not appear as expected", 1000);
 
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        return BootstrapLocators.infoBanner.existsIn(getDriver()) ? BootstrapLocators.infoBanner.findElement(getDriver()) : null;
+        return BootstrapLocators.infoBanner.index(index).findOptionalElement(this).orElse(null);
     }
 
     @Override
@@ -261,6 +362,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     protected class ElementCache extends DomainPanel<ElementCache, DomainFormPanel>.ElementCache
     {
+        public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
+                .findWhenNeeded(this));
+
+        public final WebElement toggleButton = Locator.tagWithAttributeContaining("div", "id", "domain-toggle-summary").
+                findWhenNeeded(this);
+
         protected WebElement addFieldButton = new WebElementWrapper()
         {
             WebElement el = Locator.css(".domain-form-add-btn .btn").findWhenNeeded(DomainFormPanel.this);
@@ -283,6 +390,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             }
         };
 
+        protected WebElement exportFieldsButton = Locator.tagWithClass("div", "domain-toolbar-export-btn")
+                .findWhenNeeded(this);
+
+        protected WebElement deleteFieldsButton = Locator.tagWithClass("div", "domain-toolbar-delete-btn")
+                .findWhenNeeded(this);
+
         protected void clearFieldCache()
         {
             fieldRows = null;
@@ -292,7 +405,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         // Should only modify row collections with findFieldRows() and addFieldButton.click()
         private List<DomainFieldRow> fieldRows;
         private Map<String, Integer> fieldNames = new TreeMap<>();
-        private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row");
+        private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row").withoutClass("domain-floating-hdr");
 
         private List<DomainFieldRow> findFieldRows()
         {
@@ -325,10 +438,29 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             return fieldRows.get(fieldNames.get(name));
         }
 
-        Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("span", "domain-form-add-link");
-        WebElement manuallyDefineFieldsLink = manuallyDefineFieldsLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("div", "domain-form-manual-btn");
+        protected WebElement manuallyDefineButton = new WebElementWrapper()
+        {
+            WebElement el = Locator.css(".domain-form-manual-btn").findWhenNeeded(DomainFormPanel.this);
 
-        WebElement fileUploadInput = Locator.inputById("fileUpload").findWhenNeeded(this).withTimeout(2000);
+            @Override
+            public WebElement getWrappedElement()
+            {
+                return el;
+            }
+
+            @Override
+            public void click()
+            {
+                super.click();
+                WebDriverWrapper.waitFor(() -> {
+                    clearFieldCache();
+                    return findFieldRows().size() == 1;
+                }, "New manually defined field didn't appear", 10000);
+            }
+        };
+
+        WebElement fileUploadInput = Locator.tagWithClass("input", "file-upload--input").findWhenNeeded(DomainFormPanel.this).withTimeout(2000);
 
     }
 

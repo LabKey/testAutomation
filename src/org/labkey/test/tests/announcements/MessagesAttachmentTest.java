@@ -70,13 +70,13 @@ public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWind
 
     private void doSetup() throws Exception
     {
-        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName());
 
         TestFileUtils.extractTarGz(FILES_ARCHIVE, EXTRACTION_DIR);
     }
 
     @Test
-    public void testMessageAttachmentInjection() throws Exception
+    public void testMessageAttachmentInjection()
     {
         final String messageTitle = "Attempt Message Attachment Injection";
 
@@ -97,7 +97,7 @@ public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWind
     }
 
     @Test
-    public void testResponseAttachmentInjection() throws Exception
+    public void testResponseAttachmentInjection()
     {
         final String messageTitle = "Attempt Response Attachment Injection";
 
@@ -120,7 +120,7 @@ public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWind
     }
 
     @Test
-    public void testMessageAttachmentDeletion() throws Exception
+    public void testMessageAttachmentDeletion()
     {
         final String messageTitle = "Attempt Message Attachment Deletion";
 

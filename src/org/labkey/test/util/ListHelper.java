@@ -298,18 +298,22 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void createListFromFile(String containerPath, String listName, File inputFile)
     {
+        inferFieldsFromFile(containerPath, listName, inputFile)
+                .clickSave(); // assumes we intend to import from file
+    }
+
+    public EditListDefinitionPage inferFieldsFromFile(String containerPath, String listName, File inputFile)
+    {
         EditListDefinitionPage listEditPage = beginCreateList(containerPath, listName);
         listEditPage.getFieldsPanel()
-            .setInferFieldFile(inputFile);
+                .setInferFieldFile(inputFile);
 
         // assumes we intend to key on auto-integer
         DomainFieldRow keyRow = listEditPage.getFieldsPanel().getField("Key");
         if (keyRow != null)
             keyRow.clickRemoveField(false);
         listEditPage.selectAutoIntegerKeyField();
-
-        // assumes we intend to import from file
-        listEditPage.clickSave();
+        return listEditPage;
     }
 
     /**
@@ -503,14 +507,20 @@ public class ListHelper extends LabKeySiteWrapper
     @Deprecated
     public static class ListColumn extends FieldDefinition
     {
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator<?> validator, String url, Integer scale)
         {
             super(name);
             setLabel(label);
-            setType(type.toNew());
             setDescription(description);
             setFormat(format);
-            setLookup(lookup);
+            if (lookup != null)
+            {
+                setLookup(lookup);
+            }
+            else
+            {
+                setType(type.toNew());
+            }
             if (validator != null)
                 setValidators(List.of(validator));
             setURL(url);

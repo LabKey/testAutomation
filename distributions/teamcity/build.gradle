@@ -1,9 +1,16 @@
 import org.labkey.gradle.task.ModuleDistribution
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
+import org.labkey.gradle.util.ModuleFinder
 import org.labkey.gradle.plugin.Distribution
+import org.labkey.gradle.plugin.FileModule
 
-apply plugin: 'org.labkey.distribution'
+plugins {
+    id 'org.labkey.build.distribution'
+}
+
+if (!BuildUtils.isOpenSource(project))
+    apply plugin: 'org.labkey.build.applyLicenses'
 
 dist.description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
 
@@ -15,10 +22,12 @@ project.task(
         {ModuleDistribution dist ->
             dist.subDirName = "test"
             dist.includeTarGZArchive=true
+            dist.embeddedArchiveType="tar.gz"
             dist.extraFileIdentifier='-test'
             dist.versionPrefix='Test'
         }
 )
+
 
 if (project.hasProperty('inheritedDistPath'))
 {
@@ -50,10 +59,10 @@ else
     List pathList = []
     project.rootProject.allprojects.each {
         Project otherProject ->
-            if (otherProject != project && otherProject.getPlugins().findPlugin(Distribution.class) == null)
+            if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
             {
                 project.evaluationDependsOn(otherProject.path)
-                if (otherProject.plugins.hasPlugin('org.labkey.module') || 
+                if (otherProject.plugins.hasPlugin('org.labkey.module') ||
                     otherProject.plugins.hasPlugin('org.labkey.fileModule') ||
                     otherProject.plugins.hasPlugin('org.labkey.javaModule'))
                     pathList += otherProject.path

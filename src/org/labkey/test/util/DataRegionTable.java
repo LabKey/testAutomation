@@ -25,17 +25,19 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.MessagePrompt;
 import org.labkey.test.components.PagingWidget;
 import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
-import org.labkey.test.selenium.WebElementWrapper;
+import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -50,8 +52,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.Locator.tagWithAttribute;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -403,14 +408,8 @@ public class DataRegionTable extends DataRegion
         col += hasSelectors() ? 1 : 0;
         final WebElement cell = elementCache().getCell(row, col);
         final WebElement link = Locator.xpath("a").findElement(cell);
-        return new WebElementWrapper()
+        return new WebElementDecorator(link)
         {
-            @Override
-            public WebElement getWrappedElement()
-            {
-                return link;
-            }
-
             @Override
             public void click()
             {
@@ -529,6 +528,16 @@ public class DataRegionTable extends DataRegion
             rowMap.put(colName, getDataAsText(row, colName));
         }
         return rowMap;
+    }
+
+    public List<Map<String, String>> getTableData()
+    {
+        List<Map<String, String>> dataRows = new ArrayList<>();
+        for (int i=0; i<getDataRowCount(); i++)
+        {
+            dataRows.add(getRowDataAsMap(i));
+        }
+        return dataRows;
     }
 
     public List<String> getRowDataAsText(int row)
@@ -797,6 +806,105 @@ public class DataRegionTable extends DataRegion
         return hasHref(row, getColumnIndexStrict(columnName));
     }
 
+    public WebElement getFlag(int row, String columnName)
+    {
+        var cell = findCell(row, columnName);
+        return tagWithAttribute("i", "flagid").findElement(cell);
+    }
+
+    public boolean isFlagEnabled(int row, String columnName)
+    {
+        var flag = getFlag(row, columnName);
+        return isFlagEnabled(flag);
+    }
+
+    private boolean isFlagEnabled(WebElement flag)
+    {
+        return flag.getAttribute("class").contains("lk-flag-enabled");
+    }
+
+    public boolean isFlagDisabled(int row, String columnName)
+    {
+        var flag = getFlag(row, columnName);
+        return isFlagDisabled(flag);
+    }
+
+    private boolean isFlagDisabled(WebElement flag)
+    {
+        return flag.getAttribute("class").contains("lk-flag-disabled");
+    }
+
+    /**
+     * Get the flag value for the column or <code>null</code> if unset.
+     */
+    public String getFlagValue(int row, String columnName)
+    {
+        var flag = getFlag(row, columnName);
+        return getFlagValue(flag);
+    }
+
+    private String getFlagValue(WebElement flag)
+    {
+        String title = flag.getAttribute("title");
+        if (isFlagEnabled(flag))
+        {
+            return title;
+        }
+        else if (isFlagDisabled(flag))
+        {
+            assertEquals("Expect unset flag title to be 'Flag for review'", title, "Flag for review");
+            return null;
+        }
+        throw new AssertionError("Expected flag class to be either 'lk-flag-enabled' or 'lk-flag-disabled'");
+    }
+
+    public void setFlagValueForSelectedRows(String columnName, String value)
+    {
+        int checkedCount = getCheckedCount();
+        assertTrue(checkedCount > 0);
+
+        var flag = getFlag(0, columnName);
+        flag.click();
+
+        var prompt = new MessagePrompt("Review", getDriver());
+        assertThat(prompt.getBody(), containsString("Enter comment for " + checkedCount + " selected rows"));
+        prompt.setValue(value).clickOK();
+    }
+
+    /**
+     * Set the flag value for the column or <code>null</code> to clear the flag.
+     */
+    public void setFlagValue(int row, String columnName, String value)
+    {
+        var flag = getFlag(row, columnName);
+        setFlagValue(flag, value);
+    }
+
+    private void setFlagValue(WebElement flag, String value)
+    {
+        flag.click();
+        new MessagePrompt("Review", getDriver()).setValue(value).clickOK();
+        assertEquals(value, getFlagValue(flag));
+    }
+
+    public void clearFlagValue(int row, String columnName)
+    {
+        setFlagValue(row, columnName, null);
+    }
+
+    /**
+     * Clear all flag values on the grid, if any.
+     */
+    public void clearFlagValues()
+    {
+        List<WebElement> allFlags = Locator.tagWithAttribute("i", "flagid").findElements(elementCache());
+        for (WebElement flag : allFlags)
+        {
+            if (isFlagEnabled(flag))
+                setFlagValue(flag, null);
+        }
+    }
+
     public ColumnChartRegion createBarChart(String columnName)
     {
         return createColumnChart(columnName, "Bar Chart");
@@ -884,9 +992,19 @@ public class DataRegionTable extends DataRegion
 
         if (errorExpected)
         {
-            Window removeError = new Window("Error", getDriver());
-            assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
-            removeError.clickButton("OK", true);
+            // If Ext4 is not on the page when Remove Column is clicked, this error will show as a bootstrap modal (i.e. LabKeyAlert)
+            LabKeyAlert alert = LabKeyAlert.getFinder(getDriver()).find();
+            if (alert != null)
+            {
+                assertTrue(alert.getText().contains("You must select at least one field to display in the grid."));
+                alert.accept();
+            }
+            else
+            {
+                Window removeError = new Window("Error", getDriver());
+                assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
+                removeError.clickButton("OK", true);
+            }
         }
     }
 
@@ -1024,10 +1142,24 @@ public class DataRegionTable extends DataRegion
 
     private void closePhiLoggingColumnMsg()
     {
-        Window confirmWindow = Window.Window(getDriver()).withTitle("Error").waitFor();
-        getWrapper().waitForText("Cannot choose values from a column that requires logging.");
-        confirmWindow.clickButton("OK", 0);
-        getWrapper()._ext4Helper.waitForMaskToDisappear();
+        String title = "Error";
+        String msg = "Cannot choose values from a column that requires logging.";
+        String btn = "OK";
+
+        // If Ext4 is not on the page when column Filter is clicked, this error will show as an Ext3 dialog
+        if (getWrapper().isElementPresent(ExtHelper.Locators.extDialog(title)))
+        {
+            assertTrue(getWrapper()._extHelper.getExtMsgBoxText(title).contains(msg));
+            getWrapper()._extHelper.clickExtButton(title, btn, 0);
+            getWrapper()._extHelper.waitForExtDialogToDisappear(title);
+        }
+        else
+        {
+            Window confirmWindow = Window.Window(getDriver()).withTitle(title).waitFor();
+            assertTrue(confirmWindow.getBody().contains(msg));
+            confirmWindow.clickButton(btn, 0);
+            getWrapper()._ext4Helper.waitForMaskToDisappear();
+        }
     }
 
     public void setUpFacetedFilter(String columnName, String... values)
