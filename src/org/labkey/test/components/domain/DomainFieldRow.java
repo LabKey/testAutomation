@@ -506,6 +506,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    /**
+     * Allows test code to get which ontologies are available for selection
+     * @return a list of the full text shown in the options
+     */
     public List<String> getConceptImportSelectOptions()
     {
         expand();
