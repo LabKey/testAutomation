@@ -187,7 +187,7 @@
             <![CDATA[
                 library(Rlabkey)
                 c("remote file.exists pre", file.exists("%remoteDir%/writeChecks/putMe.txt"))
-                c("webdav.put", labkey.webdav.put(localFile="%remoteDir%/readChecks/getMe.txt", baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/putMe.txt"))
+                c("webdav.put", labkey.webdav.put(localFile="%remoteDir%/readChecks/getMe.txt", baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/writeChecks/putMe.txt", description="with test description"))
                 c("remote file.exists post", file.exists("%remoteDir%/writeChecks/putMe.txt"))
                 c("remote file.info.size", file.info("%remoteDir%/writeChecks/putMe.txt")$size)
             ]]>
