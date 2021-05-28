@@ -322,11 +322,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
 
-        // Double click to edit the cell.
-        Actions actions = new Actions(getDriver());
-        actions.doubleClick(gridCell).perform();
+        // Select the cell.
+        selectCell(gridCell);
 
-        // Check to see if the double click caused a select list to appear if it did select from it.
+        // Activate the cell.
+        var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(gridCell);
+        cellContent.sendKeys(Keys.ENTER);
+
         if (value instanceof List)
         {
             // If this is a list assume that it will need a lookup.
@@ -346,13 +348,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // If after selecting a value the grid text is equal to the item list then it was a single select
                 // list box and we are done, otherwise we need to wait for the appropriate element.
 
-                if (!gridCell.getText().trim().equalsIgnoreCase(_value))
+                if (!getCellValue(gridCell).equalsIgnoreCase(_value))
                 {
                     getWrapper().waitForElementToBeVisible(Locators.itemElement(_value));
                 }
-
             }
-
         }
         else
         {
@@ -371,9 +371,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // at the end of it.
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
-
         }
-
     }
 
     /**
@@ -385,10 +383,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public String getCellValue(int row, String columnName)
     {
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        return getCellValue(getCell(row, columnName));
+    }
 
-        return gridCell.getText().trim();
+    private String getCellValue(WebElement cell)
+    {
+        return cell.getText().trim();
     }
 
     /**
@@ -619,7 +619,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * puts the specified cell into a selected state, (appears as a dark-blue outline) with an active input present in it.
+     * puts the specified cell into a selected state (appears as a dark-blue outline) with an active input present in it.
      * @param cell
      */
     private void selectCell(WebElement cell)
@@ -645,7 +645,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     *  tests the specified cell element to see if it is highlit as a single-or-multi-cell selection area.  this appears as
+     *  tests the specified cell element to see if it is highlighted as a single-or-multi-cell selection area.  this appears as
      *  light-blue background, and is distinct from 'selected'
      * @param cell
      * @return
