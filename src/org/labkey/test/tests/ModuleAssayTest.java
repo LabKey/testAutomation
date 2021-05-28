@@ -214,7 +214,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTextPresent("First Batch", "Created By");
         assertTextNotPresent("Modified", "Run Count");
 
-        batchDt.goToView( "default");
+        batchDt.goToView( "Default");
 
         log("Visit batch details page");
         DataRegionTable table = new DataRegionTable("Batches", this);
@@ -246,7 +246,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTextPresent("Assay Id", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
         assertTextNotPresent("Modified", "Run Count");
 
-        runsDt.goToView("default");
+        runsDt.goToView("Default");
 
         log("Visit run details page");
         runsDt.setSort("Name", SortDirection.ASC);
@@ -273,7 +273,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay Id", "run01.tsv");
         assertTextNotPresent("MetaOverride Double Run", "Run Count", "Target Study");
 
-        dataTable.goToView(  "default");
+        dataTable.goToView(  "Default");
 
         log("Visit result details page");
         clickAndWait(dataTable.detailsLink(0));

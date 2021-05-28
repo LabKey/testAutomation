@@ -312,9 +312,9 @@ public class CustomizeViewTest extends BaseWebDriverTest
         }
 
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        drt.goToView("default");
+        drt.goToView("Default");
         drt.getViewsMenu().expand();
-        assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
+        assertTextPresentInThisOrder("Default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 
     private void createList()

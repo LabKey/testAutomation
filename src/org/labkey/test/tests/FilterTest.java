@@ -557,7 +557,7 @@ public class FilterTest extends BaseWebDriverTest
             region.goToReport(R_VIEW);
             Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getName(), filter1Type, filter1, filter2Type, filter2);
-            new ReportDataRegion(TABLE_NAME, this).goToView("default");
+            new ReportDataRegion(TABLE_NAME, this).goToView("Default");
 
             log("** Checking filter values in filter dialog");
             region = new DataRegionTable(TABLE_NAME, this);
