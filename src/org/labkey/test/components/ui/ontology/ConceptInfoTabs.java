@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.components.html.Input.Input;
@@ -68,9 +69,16 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
         return this;
     }
 
+    /**
+     * If no concept is selected, the 'none selected' element will be present.
+     * If a concept is selected, returns the text in the title element
+     * @return The text of the title element, or that of the 'none selected' element if none is selected
+     */
     public String getTitle()
     {
         showOverview();
+        if (elementCache().noneSelectedElement().isPresent())
+            return elementCache().noneSelectedElement().get().getText();
         return elementCache().title.getText();
     }
 
@@ -122,6 +130,12 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
         {
             return Locator.tagWithClass("ul", "synonyms-text").child(Locator.tag("li"))
                     .findElements(overviewPane);
+        }
+
+        // if no concept is selected, this element will be shown instead of the 'title' element
+        Optional<WebElement> noneSelectedElement()
+        {
+            return Locator.tagWithClass("div", "none-selected").findOptionalElement(overviewPane);
         }
 
         // path info pane

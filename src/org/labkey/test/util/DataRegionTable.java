@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2019 LabKey Corporation
+ * Copyright (c) 2008-2021 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.RefindingWebElement;
-import org.labkey.test.selenium.WebElementWrapper;
+import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -408,14 +408,8 @@ public class DataRegionTable extends DataRegion
         col += hasSelectors() ? 1 : 0;
         final WebElement cell = elementCache().getCell(row, col);
         final WebElement link = Locator.xpath("a").findElement(cell);
-        return new WebElementWrapper()
+        return new WebElementDecorator(link)
         {
-            @Override
-            public WebElement getWrappedElement()
-            {
-                return link;
-            }
-
             @Override
             public void click()
             {
@@ -1044,9 +1038,8 @@ public class DataRegionTable extends DataRegion
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter)
     {
-        int waitMillis = isAsync() ? 0 : getUpdateTimeout();
-        setUpFilter(columnName, filterType, filter, false);
-        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", waitMillis));
+        setUpFilter(columnName, filterType, filter);
+        doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : getUpdateTimeout()));
     }
 
     /**
@@ -1056,23 +1049,7 @@ public class DataRegionTable extends DataRegion
     @LogMethod (quiet = true)
     public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis)
     {
-        setFilter(columnName, filterType, filter, waitMillis, false);
-    }
-
-    @LogMethod (quiet = true)
-    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, boolean isPHILoggingColumn)
-    {
-        setFilter(columnName, filterType, filter, isAsync() ? 0 : getUpdateTimeout(), isPHILoggingColumn);
-    }
-
-    /**
-     * @deprecated Use {@link #setUpdateTimeout(int)} and {@link #setAsync(boolean)} to specify expected behavior
-     */
-    @Deprecated
-    @LogMethod (quiet = true)
-    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis, boolean isPHILoggingColumn)
-    {
-        setUpFilter(columnName, filterType, filter, isPHILoggingColumn);
+        setUpFilter(columnName, filterType, filter);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", waitMillis));
     }
 
@@ -1092,20 +1069,10 @@ public class DataRegionTable extends DataRegion
 
     public void setUpFilter(String columnName, String filterType, String filter)
     {
-        setUpFilter(columnName, filterType, filter, false);
-    }
-
-    public void setUpFilter(String columnName, String filterType, String filter, boolean isPHILoggingColumn)
-    {
-        setUpFilter(columnName, filterType, filter, null, null, isPHILoggingColumn);
+        setUpFilter(columnName, filterType, filter, null, null);
     }
 
     public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2)
-    {
-        setUpFilter(columnName, filter1Type, filter1, filter2Type, filter2, false);
-    }
-
-    public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2, boolean isPHILoggingColumn)
     {
         String log = "Setting filter in " + getDataRegionName() + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
         if (filter2Type != null)
@@ -1119,10 +1086,6 @@ public class DataRegionTable extends DataRegion
         if (getWrapper().isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
         {
             TestLogger.log("Switching to advanced filter UI");
-
-            if (isPHILoggingColumn)
-                closePhiLoggingColumnMsg();
-
             getWrapper()._extHelper.clickExtTab("Choose Filters");
             getWrapper().waitForElement(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
@@ -1143,28 +1106,6 @@ public class DataRegionTable extends DataRegion
             {
                 getWrapper().setFormElement(Locator.id("value_2"), filter2);
             }
-        }
-    }
-
-    private void closePhiLoggingColumnMsg()
-    {
-        String title = "Error";
-        String msg = "Cannot choose values from a column that requires logging.";
-        String btn = "OK";
-
-        // If Ext4 is not on the page when column Filter is clicked, this error will show as an Ext3 dialog
-        if (getWrapper().isElementPresent(ExtHelper.Locators.extDialog(title)))
-        {
-            assertTrue(getWrapper()._extHelper.getExtMsgBoxText(title).contains(msg));
-            getWrapper()._extHelper.clickExtButton(title, btn, 0);
-            getWrapper()._extHelper.waitForExtDialogToDisappear(title);
-        }
-        else
-        {
-            Window confirmWindow = Window.Window(getDriver()).withTitle(title).waitFor();
-            assertTrue(confirmWindow.getBody().contains(msg));
-            confirmWindow.clickButton(btn, 0);
-            getWrapper()._ext4Helper.waitForMaskToDisappear();
         }
     }
 
@@ -1227,20 +1168,8 @@ public class DataRegionTable extends DataRegion
 
     public void clearAllFilters(String columnName)
     {
-        clearAllFilters(columnName, false);
-    }
-
-    public void clearAllFilters(String columnName, boolean isPHILoggingColumn)
-    {
         TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
         openFilterDialog(columnName);
-        if (isPHILoggingColumn)
-        {
-            if (getWrapper().isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
-            {
-                closePhiLoggingColumnMsg();
-            }
-        }
         doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : getUpdateTimeout()));
     }
 

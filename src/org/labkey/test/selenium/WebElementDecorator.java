@@ -15,13 +15,14 @@
  */
 package org.labkey.test.selenium;
 
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.WebElement;
 
 public abstract class WebElementDecorator extends WebElementWrapper
 {
     private final WebElement _decoratedElement;
 
-    protected WebElementDecorator(WebElement decoratedElement)
+    protected WebElementDecorator(@NotNull WebElement decoratedElement)
     {
         _decoratedElement = decoratedElement;
     }
