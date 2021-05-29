@@ -11,6 +11,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
@@ -81,7 +82,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             rowNumberColumn = 0;
         }
 
-        if(columns.get(rowNumberColumn).trim().isEmpty())
+        if (columns.get(rowNumberColumn).trim().isEmpty())
         {
             columns.set(rowNumberColumn, ROW_NUMBER_COLUMN_HEADER);
         }
@@ -107,7 +108,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public EditableGrid selectRow(int index, boolean checked)
     {
-        if(hasSelectColumn())
+        if (hasSelectColumn())
         {
             WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
             getWrapper().setCheckbox(checkBox, checked);
@@ -121,7 +122,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public EditableGrid selectAll(boolean checked)
     {
-        if(hasSelectColumn())
+        if (hasSelectColumn())
         {
             getWrapper().setCheckbox(elementCache().selectColumn.get(), checked);
         }
@@ -145,7 +146,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         List<String> columnNames = getColumnNames();
         int numOfRows = getRowCount();
 
-        for(int rowIndex = 0; rowIndex < numOfRows; rowIndex++)
+        for (int rowIndex = 0; rowIndex < numOfRows; rowIndex++)
         {
             WebElement row = getRow(rowIndex);
             List<WebElement> cells = row.findElements(By.tagName("td"));
@@ -153,14 +154,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             int index = 0;
             String columnName;
-            for(WebElement cell : cells)
+            for (WebElement cell : cells)
             {
                 columnName = columnNames.get(index);
 
-                if(columnName.equals(SELECT_COLUMN_HEADER))
+                if (columnName.equals(SELECT_COLUMN_HEADER))
                 {
                     // Special case the check box.
-                    if(null == cell.findElement(By.tagName("input")).getAttribute("checked"))
+                    if (null == cell.findElement(By.tagName("input")).getAttribute("checked"))
                         mapData.put(columnName, "false");
                     else
                         mapData.put(columnName, cell.findElement(By.tagName("input")).getAttribute("checked").trim().toLowerCase());
@@ -248,12 +249,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         int checkColumn = getColumnNames().size() - 1;
         int rowCount = 0;
 
-        for(WebElement row : getRows())
+        for (WebElement row : getRows())
         {
             String classAttribute = row.findElement(By.cssSelector("td:nth-child(" + checkColumn + ") > div"))
                     .getAttribute("class");
 
-            if((!classAttribute.contains("cell-selection")) && (!classAttribute.contains("cell-read-only")))
+            if ((!classAttribute.contains("cell-selection")) && (!classAttribute.contains("cell-read-only")))
             {
                 unPopulatedRows.add(rowCount);
             }
@@ -292,9 +293,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         List<Map<String, String>> gridData = getGridData();
         int index = 0;
 
-        for(Map<String, String> rowData : gridData)
+        for (Map<String, String> rowData : gridData)
         {
-            if(rowData.get(columnNameToSearch).equals(valueToSearch))
+            if (rowData.get(columnNameToSearch).equals(valueToSearch))
             {
                 setCellValue(index, columnNameToSet, valueToSet);
                 break;
@@ -321,19 +322,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
 
-        // Double click to edit the cell.
-        Actions actions = new Actions(getDriver());
-        actions.doubleClick(gridCell).perform();
+        // Select the cell.
+        selectCell(gridCell);
 
-        // Check to see if the double click caused a select list to appear if it did select from it.
-        if(value instanceof List)
+        // Activate the cell.
+        var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(gridCell);
+        cellContent.sendKeys(Keys.ENTER);
+
+        if (value instanceof List)
         {
             // If this is a list assume that it will need a lookup.
             List<String> values = (List)value;
 
             WebElement lookupInputCell = elementCache().lookupInputCell();
 
-            for(String _value : values)
+            for (String _value : values)
             {
                 getWrapper().setFormElement(lookupInputCell, _value);
 
@@ -345,13 +348,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // If after selecting a value the grid text is equal to the item list then it was a single select
                 // list box and we are done, otherwise we need to wait for the appropriate element.
 
-                if(!gridCell.getText().trim().equalsIgnoreCase(_value))
+                if (!getCellValue(gridCell).equalsIgnoreCase(_value))
                 {
                     getWrapper().waitForElementToBeVisible(Locators.itemElement(_value));
                 }
-
             }
-
         }
         else
         {
@@ -370,9 +371,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // at the end of it.
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
-
         }
-
     }
 
     /**
@@ -384,10 +383,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public String getCellValue(int row, String columnName)
     {
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        return getCellValue(getCell(row, columnName));
+    }
 
-        return gridCell.getText().trim();
+    private String getCellValue(WebElement cell)
+    {
+        return cell.getText().trim();
     }
 
     /**
@@ -415,8 +416,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid dismissDropdownList()
     {
-        Actions builder = new Actions(getDriver());
-        builder.sendKeys(getComponentElement(), Keys.ESCAPE).build().perform();
+        var menu = Locators.lookupMenu.findOptionalElement(getComponentElement());
+
+        if (menu.isPresent())
+        {
+            Actions builder = new Actions(getDriver());
+            builder.sendKeys(elementCache().lookupInputCell(), Keys.ESCAPE).build().perform();
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(menu.get()));
+        }
 
         return this;
     }
@@ -437,7 +444,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         List<String> listText = new ArrayList<>();
 
-        if(div != null)
+        if (div != null)
         {
             // Make the dropdown appear.
             getWrapper().doubleClick(td);
@@ -466,7 +473,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         List<String> listText = new ArrayList<>();
 
-        if(div != null)
+        if (div != null)
         {
             // Get the input, will also make the dropdown show up.
             getWrapper().doubleClick(td);
@@ -612,7 +619,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * puts the specified cell into a selected state, (appears as a dark-blue outline) with an active input present in it.
+     * puts the specified cell into a selected state (appears as a dark-blue outline) with an active input present in it.
      * @param cell
      */
     private void selectCell(WebElement cell)
@@ -638,7 +645,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     *  tests the specified cell element to see if it is highlit as a single-or-multi-cell selection area.  this appears as
+     *  tests the specified cell element to see if it is highlighted as a single-or-multi-cell selection area.  this appears as
      *  light-blue background, and is distinct from 'selected'
      * @param cell
      * @return
@@ -703,7 +710,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             return getComponentElement().isDisplayed();
         }
-        catch(NoSuchElementException nse)
+        catch (NoSuchElementException nse)
         {
             return false;
         }
@@ -774,7 +781,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
-//        static final Locator headerCells = Locator.xpath("//thead/tr/th[contains(@class, 'grid-header-cell')]");
         static final Locator headerCells = Locator.xpath("//thead/tr/th");
         static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
         static final Locator lookupInputCell = Locator.tagWithClass("input", "cell-lookup-input");
@@ -815,5 +821,4 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return _locator;
         }
     }
-
 }
