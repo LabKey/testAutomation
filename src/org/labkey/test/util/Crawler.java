@@ -226,22 +226,31 @@ public class Crawler
             new ControllerActionId("specimen", "downloadSpecimenList"),
             new ControllerActionId("specimen", "emailLabSpecimenLists"),
             new ControllerActionId("specimen", "getSpecimenExcel"),
+
+            // We're in the process of moving actions from the "specimen" controller in the study module to the
+            // "specimen2" controller in the specimen module. For now, exclude both sets. After migration is complete,
+            // eliminate the "specimen2" variants.
+            new ControllerActionId("specimen2", "download"),
+            new ControllerActionId("specimen2", "downloadSpecimenList"),
+            new ControllerActionId("specimen2", "emailLabSpecimenLists"),
+            new ControllerActionId("specimen2", "getSpecimenExcel"),
+
             new ControllerActionId("study-security", "exportSecurityPolicy"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("targetedms", "downloadDocument"),
             new ControllerActionId("test", "npe"),
             new ControllerActionId("wiki", "download"),
 
-                // These actions can generate a PDF download response if format=pdf is added to the URL, so they can
-                // trip up the crawler. See issue 42661
-                new ControllerActionId("targetedms", "precursorChromatogramChart"),
-                new ControllerActionId("targetedms", "transitionChromatogramChart"),
-                new ControllerActionId("targetedms", "generalMoleculeChromatogramChart"),
-                new ControllerActionId("targetedms", "peptideChromatogramChart"),
-                new ControllerActionId("targetedms", "moleculeChromatogramChart"),
-                new ControllerActionId("targetedms", "sampleFileChromatogramChart"),
-                new ControllerActionId("targetedms", "showPeakAreas"),
-                new ControllerActionId("targetedms", "showRetentionTimesChart"),
+            // These actions can generate a PDF download response if format=pdf is added to the URL, so they can
+            // trip up the crawler. See issue 42661
+            new ControllerActionId("targetedms", "precursorChromatogramChart"),
+            new ControllerActionId("targetedms", "transitionChromatogramChart"),
+            new ControllerActionId("targetedms", "generalMoleculeChromatogramChart"),
+            new ControllerActionId("targetedms", "peptideChromatogramChart"),
+            new ControllerActionId("targetedms", "moleculeChromatogramChart"),
+            new ControllerActionId("targetedms", "sampleFileChromatogramChart"),
+            new ControllerActionId("targetedms", "showPeakAreas"),
+            new ControllerActionId("targetedms", "showRetentionTimesChart"),
 
 
             // Disable crawler for single-page apps until we make `beginAt` work with them
