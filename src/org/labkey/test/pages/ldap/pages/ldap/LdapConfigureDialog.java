@@ -128,6 +128,17 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
         return elementCache().saslCheckbox.get();
     }
 
+    public LdapConfigureDialog enableReadAttribute(boolean enable)
+    {
+        elementCache().readAttributeCheckBox.set(enable);
+        return this;
+    }
+
+    public boolean isReadAttributeEnabled()
+    {
+        return elementCache().readAttributeCheckBox.get();
+    }
+
     public LdapTestPage openLdapTestWindow()
     {
         elementCache().testButton.click();
@@ -169,6 +180,8 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
         SvgCheckbox searchCheckBox = new SvgCheckbox(Locator.tagWithClass("span", "search")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
+        SvgCheckbox readAttributeCheckBox = new SvgCheckbox(Locator.tagWithClass("span", "readAttributes")
+            .findWhenNeeded(this).withTimeout(2000), getDriver());
         Input userInput = new Input(Locator.input("username")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
         Input passwordInput = new Input(Locator.input("password")
