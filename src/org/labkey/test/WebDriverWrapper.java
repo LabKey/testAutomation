@@ -1033,6 +1033,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return beginAt(relativeURL, millis, false);
     }
 
+    /**
+     * Open the specified URL in the browser. Might trigger a page load or a download.
+     * @param relativeURL URL to navigate to
+     * @param millis Max wait for page to load
+     * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
+     * @return duration in milliseconds
+     */
     public long beginAt(String relativeURL, int millis, boolean allowDownload)
     {
         if (relativeURL.startsWith(getBaseURL()))
@@ -1065,7 +1072,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Mutable<Boolean> navigated = new MutableObject<>(true);
                 final long startTime = System.currentTimeMillis();
 
-                elapsedTime = doAndMaybeWaitForPageToLoad(millis, mightGoStale -> {
+                elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
+                    final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
                     getDriver().navigate().to(fullURL);
                     ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
                     //noinspection ResultOfMethodCallIgnored
@@ -1898,13 +1906,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return doAndWaitForPageToLoad(func, defaultWaitForPage);
     }
 
-    public long doAndWaitForPageToLoad(Runnable func, final int msWait)
+    public long doAndWaitForPageToLoad(Runnable runnable, final int msWait)
     {
-        Function<WebElement, Boolean> funcS = (el) -> { func.run(); return true; };
-        return doAndMaybeWaitForPageToLoad(msWait, funcS);
+        Supplier<Boolean> supplier = () -> { runnable.run(); return true; };
+        return doAndMaybeWaitForPageToLoad(msWait, supplier);
     }
 
-    public long doAndMaybeWaitForPageToLoad(int msWait, Function<WebElement, Boolean> funcS)
+    /**
+     * Perform some action then wait for the page to load if the result of the action indicates to do so.
+     * @param msWait Maximum milliseconds to wait for the page to load. '0' for no wait.
+     * @param action Performs some action that might trigger a page load. Should return 'true' to wait for a page load.
+     * @return total duration in milliseconds
+     */
+    public long doAndMaybeWaitForPageToLoad(int msWait, Supplier<Boolean> action)
     {
         long startTime = System.currentTimeMillis();
         WebElement toBeStale = null;
@@ -1919,7 +1933,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
         }
 
-        Boolean shouldWait = funcS.apply(toBeStale);
+        Boolean shouldWait = action.get();
 
         if (msWait > 0 && shouldWait)
         {
