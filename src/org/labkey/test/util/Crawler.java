@@ -156,8 +156,6 @@ public class Crawler
             new ControllerActionId("admin", "deleteFolder"),
             new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "dumpHeap"),
-            new ControllerActionId("admin", "exportQueries"), // download action
-            new ControllerActionId("admin", "getSchemaXmlDoc"), // download action
             new ControllerActionId("admin", "mapNetworkDrive"), // 404 on non-Windows
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "queryStackTraces"),
@@ -168,98 +166,31 @@ public class Crawler
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "showPrimaryLog"), // Can take very long to load
             new ControllerActionId("admin-sql", "saveReorderedScript"),
-            new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
-            new ControllerActionId("assay", "downloadSampleQCData"),
-            new ControllerActionId("assay", "template"),
-            new ControllerActionId("cds", "exportTourDefinitions"), // Download action
-            new ControllerActionId("cds", "permissionsReportExport"),
-            new ControllerActionId("core", "downloadFileLink"), // Download action
             new ControllerActionId("dumbster", "begin"),
-            new ControllerActionId("experiment", "exportProtocols"),
-            new ControllerActionId("experiment", "exportRunFiles"),
-            new ControllerActionId("experiment", "exportSampleType"),
-            new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
-            new ControllerActionId("flow-compensation", "download"),
-            new ControllerActionId("flow-editscript", "download"),
-            new ControllerActionId("flow-run", "download"),
-            new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
-            new ControllerActionId("harvest", "formatInvoice"),
-            new ControllerActionId("issues", "download"),
-            new ControllerActionId("list", "download"),
             new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
-            new ControllerActionId("luminex", "exportDefaultValues"), // download action
-            new ControllerActionId("ms2", "exportProteinCoverageMap"),
-            new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
+            new ControllerActionId("ms2", "pepSearch"), // TODO: Issue 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "doProteinSearch"),
-            new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
-            new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
-            new ControllerActionId("query", "excelWebQueryDefinition"),
-            new ControllerActionId("query", "exportExcelTemplate"), // Download action
-            new ControllerActionId("query", "exportRowsExcel"),
-            new ControllerActionId("query", "printRows"),
-            new ControllerActionId("reports", "crosstabExport"), // Download action
-            new ControllerActionId("reports", "download"),
-            new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
-            new ControllerActionId("search", "search"), // Tests need to wait for indexer manually
-            new ControllerActionId("security", "groupExport"), // Download action
-            new ControllerActionId("study", "confirmDeleteVisit"),
-            new ControllerActionId("study", "deleteDataset"),
-            new ControllerActionId("study", "downloadTsv"),
             new ControllerActionId("study", "importStudyFromPipeline"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
-            new ControllerActionId("study", "protocolDocumentDownload"),
-            new ControllerActionId("specimen", "download"),
-            new ControllerActionId("specimen", "downloadSpecimenList"),
-            new ControllerActionId("specimen", "emailLabSpecimenLists"),
-            new ControllerActionId("specimen", "getSpecimenExcel"),
-
-            // We're in the process of moving actions from the "specimen" controller in the study module to the
-            // "specimen2" controller in the specimen module. For now, exclude both sets. After migration is complete,
-            // eliminate the "specimen2" variants.
-            new ControllerActionId("specimen2", "download"),
-            new ControllerActionId("specimen2", "downloadSpecimenList"),
-            new ControllerActionId("specimen2", "emailLabSpecimenLists"),
-            new ControllerActionId("specimen2", "getSpecimenExcel"),
-
-            new ControllerActionId("study-security", "exportSecurityPolicy"),
-            new ControllerActionId("targetedms", "downloadChromLibrary"),
-            new ControllerActionId("targetedms", "downloadDocument"),
-            new ControllerActionId("test", "npe"),
-            new ControllerActionId("wiki", "download"),
-
-            // These actions can generate a PDF download response if format=pdf is added to the URL, so they can
-            // trip up the crawler. See issue 42661
-            new ControllerActionId("targetedms", "precursorChromatogramChart"),
-            new ControllerActionId("targetedms", "transitionChromatogramChart"),
-            new ControllerActionId("targetedms", "generalMoleculeChromatogramChart"),
-            new ControllerActionId("targetedms", "peptideChromatogramChart"),
-            new ControllerActionId("targetedms", "moleculeChromatogramChart"),
-            new ControllerActionId("targetedms", "sampleFileChromatogramChart"),
-            new ControllerActionId("targetedms", "showPeakAreas"),
-            new ControllerActionId("targetedms", "showRetentionTimesChart"),
-
 
             // Disable crawler for single-page apps until we make `beginAt` work with them
             new ControllerActionId("biologics", "app"),
             new ControllerActionId("cds", "app"),
             new ControllerActionId("samplemanager", "app"),
-
-            // Actions that error with no parameters. Generally linked from admin-spider.view
-            new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
 
             // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
             new ControllerActionId("biologics", "begin"),
@@ -325,8 +256,6 @@ public class Crawler
     {
         Set<String> actionNames = Collections.newSetFromMap(new CaseInsensitiveMap<>());
 
-        actionNames.add("export");
-        actionNames.add("download");
         actionNames.add("expandCollapse");
 
         return actionNames;
@@ -986,6 +915,11 @@ public class Crawler
         crawlLink(new UrlToCheck(null, url, -1));
     }
 
+    private long beginAt(String relativeUrl)
+    {
+        return _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true);
+    }
+
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
     {
         String relativeURL = urlToCheck.getRelativeURL();
@@ -1004,7 +938,7 @@ public class Crawler
         {
             try
             {
-                long loadTime = _test.beginAt(relativeURL
+                long loadTime = beginAt(relativeURL
                         .replace("[", "%5B")
                         .replace("]", "%5D")
                         .replace("{", "%7B")
@@ -1272,7 +1206,7 @@ public class Crawler
             query = query.substring(1);
 
         Consumer<String> urlTester = urlMalicious -> {
-            _test.beginAt(urlMalicious);
+            beginAt(urlMalicious);
             _test.executeScript("return;"); // Trigger UnhandledAlertException
         };
 

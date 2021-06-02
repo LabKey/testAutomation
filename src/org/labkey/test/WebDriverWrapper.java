@@ -19,12 +19,15 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -85,6 +88,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -125,6 +129,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1025,6 +1030,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long beginAt(String relativeURL, int millis)
     {
+        return beginAt(relativeURL, millis, false);
+    }
+
+    public long beginAt(String relativeURL, int millis, boolean allowDownload)
+    {
         if (relativeURL.startsWith(getBaseURL()))
             relativeURL = relativeURL.substring(getBaseURL().length());
         relativeURL = stripContextPath(relativeURL);
@@ -1032,11 +1042,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         try
         {
+            String messagePrefix = "Navigating to ";
             if (relativeURL.length() == 0)
-                logMessage = "Navigating to root";
+            {
+                logMessage = messagePrefix + "root";
+            }
             else
             {
-                logMessage = "Navigating to " + relativeURL;
+                logMessage = messagePrefix + relativeURL;
                 if (relativeURL.charAt(0) != '/')
                 {
                     relativeURL = "/" + relativeURL;
@@ -1045,7 +1058,43 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
 
-            long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
+            long elapsedTime;
+
+            if (allowDownload)
+            {
+                Mutable<Boolean> navigated = new MutableObject<>(true);
+                final long startTime = System.currentTimeMillis();
+
+                elapsedTime = doAndMaybeWaitForPageToLoad(millis, mightGoStale -> {
+                    getDriver().navigate().to(fullURL);
+                    ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
+                    //noinspection ResultOfMethodCallIgnored
+                    WebDriverWrapper.waitFor(() -> {
+                        if (stalenessOf.apply(null))
+                        {
+                            // Wait for page to load when element goes stale
+                            return true; // Stop waiting
+                        }
+                        else if (getDownloadedFiles(startTime).length > 0)
+                        {
+                            navigated.setValue(false); // Don't wait for page load when a download occurs
+                            return true; // Stop waiting
+                        }
+                        return false; // No navigation or download detected. Continue waiting.
+                    }, millis);
+                    return navigated.getValue();
+                });
+
+                if (!navigated.getValue())
+                {
+                    logMessage = logMessage.replace(messagePrefix, "Downloading from ");
+                }
+            }
+            else
+            {
+                elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
+            }
+
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
@@ -1851,6 +1900,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long doAndWaitForPageToLoad(Runnable func, final int msWait)
     {
+        Function<WebElement, Boolean> funcS = (el) -> { func.run(); return true; };
+        return doAndMaybeWaitForPageToLoad(msWait, funcS);
+    }
+
+    public long doAndMaybeWaitForPageToLoad(int msWait, Function<WebElement, Boolean> funcS)
+    {
         long startTime = System.currentTimeMillis();
         WebElement toBeStale = null;
 
@@ -1864,9 +1919,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
         }
 
-        func.run();
+        Boolean shouldWait = funcS.apply(toBeStale);
 
-        if (msWait > 0)
+        if (msWait > 0 && shouldWait)
         {
             waitForPageToLoad(toBeStale, msWait);
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
@@ -2126,27 +2181,42 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
         final File downloadDir = BaseWebDriverTest.getDownloadDir();
-        File[] existingFilesArray = downloadDir.listFiles();
-        final List<File> existingFiles;
-
-        if (existingFilesArray != null)
-            existingFiles = Arrays.asList(existingFilesArray);
-        else
-            existingFiles = new ArrayList<>();
+        final long startTime = System.currentTimeMillis();
 
         func.run();
 
+        File[] newFiles = getNewFiles(expectedFileCount, downloadDir, startTime);
+
+        log("File(s) downloaded to " + downloadDir);
+        for (File newFile : newFiles)
+        {
+            log("  File downloaded: " + newFile.getName());
+        }
+        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
+
+        if (getDriver() instanceof FirefoxDriver)
+            Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
+
+        return newFiles;
+    }
+
+    public File[] getDownloadedFiles(long modifiedSince)
+    {
+        return getNewFiles(0, BaseWebDriverTest.getDownloadDir(), modifiedSince);
+    }
+
+    @Nullable
+    public static File[] getNewFiles(int minFileCount, File downloadDir, long modifiedSince)
+    {
         final FileFilter tempFilesFilter = file -> file.getName().contains(".part") ||
                 file.getName().contains(".com.google.Chrome") ||
                 file.getName().contains(".crdownload") || TEMP_FILE_PATTERN.matcher(file.getName()).matches();
 
-        final FileFilter newFileFilter = file -> !existingFiles.contains(file) &&
-                !tempFilesFilter.accept(file) &&
-                file.length() > 0;
+        final FileFilter newFileFilter = file -> file.lastModified() > modifiedSince;
 
         waitFor(() ->{
                     final File[] files = downloadDir.listFiles(newFileFilter);
-                    return files != null && files.length >= expectedFileCount;
+                    return files != null && files.length >= minFileCount;
                 },
                 "File(s) did not appear in download dir: " + downloadDir.toString(), WAIT_FOR_PAGE);
 
@@ -2166,28 +2236,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     for (File file : files)
                         downloadSize.add(file.length());
 
-                    if (downloadSize.getValue() == previousSize)
+                    if (downloadSize.getValue() == previousSize && downloadDir.listFiles(tempFilesFilter).length == 0)
                         stabilityDuration.increment();
                     else
                         stabilityDuration.setValue(0);
 
                     return stabilityDuration.getValue() > 5;
                 },
-                "File(s) didn't finish downloading to " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
+                "File(s) didn't finish downloading to " + downloadDir.toString(), WAIT_FOR_PAGE);
 
-        File[] newFiles = downloadDir.listFiles(newFileFilter);
-
-        log("File(s) downloaded to " + downloadDir);
-        for (File newFile : newFiles)
-        {
-            log("  File downloaded: " + newFile.getName());
-        }
-        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
-
-        if (getDriver() instanceof FirefoxDriver)
-            Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
-
-        return newFiles;
+        return downloadDir.listFiles(newFileFilter);
     }
 
     public WebElement waitForElement(final Locator locator)
