@@ -85,7 +85,8 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     }
 
     /**
-     * If this sample is an aliquot there will be two tables in the panel, the first table will contain the aliquot information.
+     * If this sample is an aliquot there will be multiple tables in the panel, the first table will contain the aliquot
+     * information (under the 'Aliquot Data' header). This will return that table.
      *
      * @return A {@link DetailTable}.
      */
@@ -98,6 +99,24 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
         // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
         return tables.get(0);
+    }
+
+    /**
+     * If this sample is an aliquot there will be multiple tables in the panel, the second table is under the 'Original
+     * Sample Data' header, but is a separate table from the other original data displayed and may only be one or two
+     * lines. The fields 'Original sample' and 'Sample description' will show up here.
+     *
+     * @return A {@link DetailTable}.
+     */
+    public DetailTable getAliquotDetailMetaTable()
+    {
+        List<DetailTable> tables = elementCache().detailTables();
+
+        if(tables.size() == 1)
+            throw new RuntimeException("There does not appear to be an 'Aliquot (details meta)' table in this panel.");
+
+        // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
+        return tables.get(1);
     }
 
     @Override
