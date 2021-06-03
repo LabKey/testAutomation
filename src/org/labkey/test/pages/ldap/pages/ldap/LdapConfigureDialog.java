@@ -9,6 +9,11 @@ import org.labkey.test.pages.ldap.params.ldap.LdapAuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+/**
+ * moved from
+    https://github.com/LabKey/ldap/blob/9c17b2fe8aa111a0b023dddee8ede5da4f6d3556/test/src/org/labkey/test/pages/ldap/LdapConfigureDialog.java
+ */
+
 public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 {
     public LdapConfigureDialog(LoginConfigRow row)

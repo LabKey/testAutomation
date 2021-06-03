@@ -5,6 +5,10 @@ import org.labkey.test.pages.ldap.pages.ldap.LdapConfigureDialog;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 
+/**
+ * Moved from
+ * https://github.com/LabKey/ldap/blob/9c17b2fe8aa111a0b023dddee8ede5da4f6d3556/test/src/org/labkey/test/params/ldap/LdapAuthenticationProvider.java
+ */
 public class LdapAuthenticationProvider extends AuthenticationProvider<LdapConfigureDialog>
 {
     @Override
