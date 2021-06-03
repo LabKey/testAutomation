@@ -30,6 +30,7 @@ import org.labkey.test.util.SampleTypeHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -132,6 +133,40 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         assertTextPresent(nameExpression);
 
+        DataRegionTable materialTable = new DataRegionTable("Material", this);
+        List<String> names = materialTable.getColumnDataAsText("Name");
+
+        assertTrue(names.get(0).startsWith("SS_"));
+        String batchRandomId = names.get(0).split("_")[1];
+
+        assertTrue(names.get(1).equals("Bob_" + batchRandomId));
+
+        assertTrue(names.get(2).equals("Susie"));
+        assertTrue(names.get(3).equals("Bob"));
+    }
+
+    @Test
+    public void testParentAliasExpression()
+    {
+        String nameExpression = "${Parent:first:defaultValue('SS')}_${batchRandomId}";
+        String data = "Name\tB\tParent\n" +
+
+                // Name provided
+                "Bob\tb\t\n" +
+                "Susie\tb\t\n" +
+
+                // Name generated and uses first input "Bob"
+                "\tb\tBob,Susie\n" +
+
+                // Name generated and uses defaultValue('SS')
+                "\tb\t\n";
+
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition("ParentAliasInputsExpressionTest")
+                        .setNameExpression(nameExpression)
+                        .setParentAliases(Map.of("Parent", "(Current Sample Type)"))
+                        .setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String))),
+                data);
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
 
