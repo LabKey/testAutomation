@@ -248,14 +248,19 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
                 doAndWaitForUpdate(()->
                         elementCache().selectAllN_Btn().click());
             else
-                doAndWaitForUpdate(()->
+                doAndWaitForUpdate(() ->
                         selectAllOnPage(true, null));
         }
         else
-            doAndWaitForUpdate(()->
+            doAndWaitForUpdate(() ->
                     getGridBar().selectAllRows());
 
         return this;
+    }
+
+    public boolean hasItemsSelected()
+    {
+        return Locator.tagWithClass("span", "selection-status__count").existsIn(this);
     }
 
     public String getSelectionStatusCount()
