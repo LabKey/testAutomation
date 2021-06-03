@@ -1074,8 +1074,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                 elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
                     final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
-                    getDriver().navigate().to(fullURL);
                     ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
+                    executeScript("document.location = arguments[0]", fullURL);
                     //noinspection ResultOfMethodCallIgnored
                     WebDriverWrapper.waitFor(() -> {
                         if (stalenessOf.apply(null))
