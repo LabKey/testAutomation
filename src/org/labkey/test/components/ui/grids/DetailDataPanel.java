@@ -54,7 +54,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     }
 
     /**
-     * If this sample is an aliquot clicking the edit button will only allow the user to edit the description property.
+     * If this is an aliquot sample clicking the edit button will only allow the user to edit the description property.
      * No other fields are editable.
      *
      * @return A {@link DetailTableEdit}
@@ -72,7 +72,8 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     }
 
     /**
-     * Get the table that has the details fields (i.e. column data) for this sample.
+     * Get the table that has the details fields (i.e. column data) for this item. If this is an aliquot sample this
+     * table will have the fields from the parent sample.
      *
      * @return A {@link DetailTable}.
      */
@@ -85,7 +86,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     }
 
     /**
-     * If this sample is an aliquot there will be multiple tables in the panel, the first table will contain the aliquot
+     * If this is an aliquot sample there will be multiple tables in the panel, the first table will contain the aliquot
      * information (under the 'Aliquot Data' header). This will return that table.
      *
      * @return A {@link DetailTable}.
@@ -102,7 +103,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     }
 
     /**
-     * If this sample is an aliquot there will be multiple tables in the panel, the second table is under the 'Original
+     * If this an aliquot sample there will be multiple tables in the panel, the second table is under the 'Original
      * Sample Data' header, but is a separate table from the other original data displayed and may only be one or two
      * lines. The fields 'Original sample' and 'Sample description' will show up here.
      *
@@ -135,6 +136,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
                     .findOptionalElement(heading);
         }
 
+        // If this panel is for an aliquot sample there will be more than one table present.
         final List<DetailTable> detailTables()
         {
             return new DetailTable.DetailTableFinder(getDriver()).findAll(this);

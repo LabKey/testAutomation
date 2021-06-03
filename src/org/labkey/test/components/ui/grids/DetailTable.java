@@ -63,6 +63,13 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     // TODO Not sure if the get & click methods are correct (or appropriate?), for a @glass component.
     //  It may be appropriate to have these interfaces but maybe the way the cell is identified should be different.
 
+    /**
+     * Rather than add yet another method to get a field value, do a 'best guess' to find the appropriate field. This
+     * will return the first field that meets the criteria.
+     *
+     * @param identifier Some text string that can identify the field.
+     * @return A web element that either had an attribute value equal to the identifier, or had a text in a sibling field (label) with the identifier.
+     */
     private WebElement getField(String identifier)
     {
         if(elementCache().dataCaptionField(identifier).isDisplayed())
@@ -108,6 +115,8 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      **/
     public void clickField(String fieldCaption)
     {
+        // Should not click the container, it could be a td which would miss the clickable element.
+        // Maybe this shouldn't assume an anchor but should be a generic(*)?
         Locator.tag("a").findElement(getField(fieldCaption)).click();
     }
 
@@ -157,6 +166,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
             return Locator.tagWithAttribute("td", "data-caption", caption).findWhenNeeded(this);
         }
 
+        // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
         public final WebElement siblingField(String caption)
         {
             return Locator.tagContainingText("td", caption).followingSibling("td").findWhenNeeded(this);
