@@ -69,7 +69,6 @@ public class Crawler
     private static final Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static final Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static final Set<String> _urlsChecked = new HashSet<>();
-    private static final ActionProfiler _actionProfiler = new ActionProfiler();
     private static final Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
 
     // All parameters seen by the crawler. Used to randomly attempt injection against parameters not found in UI
@@ -183,6 +182,7 @@ public class Crawler
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("project", "togglePageAdminMode"),
+            new ControllerActionId("query", "printRows"), // Data region print button. 404s on "TargetedMS Runs" grid
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("study", "importStudyFromPipeline"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
@@ -693,124 +693,6 @@ public class Crawler
         }
     }
 
-    public static class ActionProfiler
-    {
-        private final Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
-
-        public void updateActionProfile(String relativeUrl, long loadTime)
-        {
-            ControllerActionId actionId = new ControllerActionId(relativeUrl);
-            if (_actionProfiles.containsKey(actionId))
-                _actionProfiles.get(actionId).updateActionProfile(relativeUrl, loadTime);
-            else
-                _actionProfiles.put(actionId, new ActionProfile(relativeUrl, loadTime));
-        }
-
-        private static class ActionProfile
-        {
-            private long _invocations;
-            private long _longestLoad;
-            private long _totalTime;
-            private final ControllerActionId _actionId;
-
-            ActionProfile(String relativeURL, long loadTime)
-            {
-                _actionId = new ControllerActionId(relativeURL);
-                _invocations = 1;
-                _totalTime = _longestLoad = loadTime;
-            }
-
-            public void updateActionProfile(String relativeURL, long loadTime)
-            {
-                if (!_actionId.equals(new ControllerActionId(relativeURL)))
-                    throw new IllegalArgumentException("Actions don't match");
-
-                _invocations++;
-                _totalTime += loadTime;
-
-                if (loadTime > _longestLoad)
-                {
-                    _longestLoad = loadTime;
-                }
-            }
-
-            public ControllerActionId getActionId()
-            {return _actionId;}
-
-            public String getAction()
-            {return _actionId.getAction();}
-
-            public String getController()
-            {return _actionId.getController();}
-
-            public long getInvocations()
-            {return _invocations;}
-
-            public long getLongestLoad()
-            {return _longestLoad;}
-
-            public long getTotalTime()
-            {return _totalTime;}
-        }
-
-        public String toHtml()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("<table cellspacing=0 cellpadding=3>\n");
-            sb.append("<tr>");
-            sb.append("<td>");
-            sb.append("Controller");
-            sb.append("</td><td style=\"padding-left:10;\">");
-            sb.append("Action");
-            sb.append("</td>");
-            sb.append("<td>");
-            sb.append("Slowest Instance");
-            sb.append("</td>");
-            sb.append("<td>");
-            sb.append("Invocation Count (crawler)");
-            sb.append("</td>");
-            sb.append("<td>");
-            sb.append("Total time");
-            sb.append("</td>");
-            sb.append("</tr>\n");
-
-            for (ActionProfile action : _actionProfiles.values())
-            {
-                sb.append("<tr>");
-                sb.append("<td valign=top align=right>").append(action.getController()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getAction()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getLongestLoad()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getInvocations()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getTotalTime()).append("</td>");
-                sb.append("</tr>\n");
-            }
-
-            sb.append("</table>\n");
-
-            return sb.toString();
-        }
-
-        public String toTsv()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("Controller\tAction\tSlowest Instance\tInvocation Count (crawler)\tTotal time\n");
-
-            for (ActionProfile action : _actionProfiles.values())
-            {
-                sb.append(action.getController()).append("\t");
-                sb.append(action.getAction()).append("\t");
-                sb.append(action.getLongestLoad()).append("\t");
-                sb.append(action.getInvocations()).append("\t");
-                sb.append(action.getTotalTime());
-                sb.append("\n");
-            }
-
-            return sb.toString();
-        }
-    }
-
     @LogMethod
     public void crawlAllLinks()
     {
@@ -915,9 +797,9 @@ public class Crawler
         crawlLink(new UrlToCheck(null, url, -1));
     }
 
-    private long beginAt(String relativeUrl)
+    private void beginAt(String relativeUrl)
     {
-        return _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true);
+        _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true);
     }
 
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
@@ -938,12 +820,11 @@ public class Crawler
         {
             try
             {
-                long loadTime = beginAt(relativeURL
+                beginAt(relativeURL
                         .replace("[", "%5B")
                         .replace("]", "%5D")
                         .replace("{", "%7B")
                         .replace("}", "%7D")); // Escape brackets to prevent 400 errors
-                _actionProfiler.updateActionProfile(relativeURL, loadTime);
             }
             catch (UnhandledAlertException alert)
             {

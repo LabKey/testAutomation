@@ -129,7 +129,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1030,22 +1029,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long beginAt(String relativeURL, int millis)
     {
-        return beginAt(relativeURL, millis, false);
+        long startTime = System.currentTimeMillis();
+        beginAt(relativeURL, millis, false);
+        return System.currentTimeMillis() - startTime;
     }
 
     /**
      * Open the specified URL in the browser. Might trigger a page load or a download.
+     * Intended for use by the crawler. See {@link Crawler}.beginAt()
      * @param relativeURL URL to navigate to
      * @param millis Max wait for page to load
      * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
-     * @return duration in milliseconds
      */
-    public long beginAt(String relativeURL, int millis, boolean allowDownload)
+    public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
     {
         if (relativeURL.startsWith(getBaseURL()))
             relativeURL = relativeURL.substring(getBaseURL().length());
         relativeURL = stripContextPath(relativeURL);
         String logMessage = "";
+        Mutable<File[]> downloadedFiles = new MutableObject<>(new File[]{});
 
         try
         {
@@ -1075,6 +1077,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
                     final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
                     ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
+                    // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
                     executeScript("document.location = arguments[0]", fullURL);
                     //noinspection ResultOfMethodCallIgnored
                     WebDriverWrapper.waitFor(() -> {
@@ -1083,10 +1086,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                             // Wait for page to load when element goes stale
                             return true; // Stop waiting
                         }
-                        else if (getDownloadedFiles(startTime).length > 0)
+                        else
                         {
-                            navigated.setValue(false); // Don't wait for page load when a download occurs
-                            return true; // Stop waiting
+                            downloadedFiles.setValue(getDownloadedFiles(startTime));
+                            if (downloadedFiles.getValue().length > 0)
+                            {
+                                navigated.setValue(false); // Don't wait for page load when a download occurs
+                                return true; // Stop waiting
+                            }
                         }
                         return false; // No navigation or download detected. Continue waiting.
                     }, millis);
@@ -1106,11 +1113,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
-            return elapsedTime;
+            return downloadedFiles.getValue();
         }
         finally
         {
             log(logMessage); // log after navigation to
+            Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
+                log("  \u2517" + file.getName()); // Log downloaded files
+            });
         }
     }
 
