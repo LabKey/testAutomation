@@ -739,32 +739,26 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
         public WebElement inputCell()
         {
-            getWrapper().waitForElementToBeVisible(Locators.inputCell);
             return Locators.inputCell.findElement(getComponentElement());
         }
 
         public WebElement lookupInputCell()
         {
-            getWrapper().waitForElementToBeVisible(Locators.lookupInputCell);
             return Locators.lookupInputCell.findElement(getComponentElement());
         }
 
         public WebElement lookupMenu()
         {
-            getWrapper().waitForElementToBeVisible(Locators.lookupMenu);
             return Locators.lookupMenu.findElement(getComponentElement());
         }
 
         public WebElement listGroupItem(String text)
         {
-            getWrapper().waitForElementToBeVisible(Locators.lookupMenu);
-            getWrapper().waitForElementToBeVisible(Locators.listGroupItem(text));
             return Locators.listGroupItem(text).findElement(getComponentElement());
         }
 
         public WebElement itemElement(String text)
         {
-            getWrapper().waitForElementToBeVisible(Locators.itemElement(text));
             return Locators.itemElement(text).findElement(getComponentElement());
         }
 
