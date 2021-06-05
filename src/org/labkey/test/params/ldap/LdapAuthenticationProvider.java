@@ -1,7 +1,7 @@
-package org.labkey.test.pages.ldap.params.ldap;
+package org.labkey.test.params.ldap;
 
 import org.labkey.test.pages.core.login.LoginConfigRow;
-import org.labkey.test.pages.ldap.pages.ldap.LdapConfigureDialog;
+import org.labkey.test.pages.ldap.LdapConfigureDialog;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 

@@ -1,4 +1,4 @@
-package org.labkey.test.pages.ldap.pages.ldap;
+package org.labkey.test.pages.ldap;
 
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;

@@ -1,11 +1,11 @@
-package org.labkey.test.pages.ldap.pages.ldap;
+package org.labkey.test.pages.ldap;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.core.login.AuthDialogBase;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.SvgCheckbox;
-import org.labkey.test.pages.ldap.params.ldap.LdapAuthenticationProvider;
+import org.labkey.test.params.ldap.LdapAuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
