@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -96,7 +97,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         List<DetailTable> tables = elementCache().detailTables();
 
         if(tables.size() == 1)
-            throw new RuntimeException("There does not appear to be an 'Aliquot' table in this panel.");
+            throw new NoSuchElementException("There does not appear to be an 'Aliquot' table in this panel.");
 
         // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
         return tables.get(0);
@@ -114,7 +115,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         List<DetailTable> tables = elementCache().detailTables();
 
         if(tables.size() == 1)
-            throw new RuntimeException("There does not appear to be an 'Aliquot (details meta)' table in this panel.");
+            throw new NoSuchElementException("There does not appear to be an 'Aliquot (details meta)' table in this panel.");
 
         // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
         return tables.get(1);
