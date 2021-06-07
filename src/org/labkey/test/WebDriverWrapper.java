@@ -69,6 +69,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -1888,19 +1889,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
-            executeAsyncScript("" +
-                    "try " +
-                    "{" +
-                    apiName + ".onReady(callback);" +
-                    "}" +
-                    "catch(e)" +
-                    "{" +
-                    "  callback();" +
-                    "}");
+            executeAsyncScript(apiName + ".onReady(callback);");
         }
-        catch (TimeoutException e)
+        catch (ScriptTimeoutException e)
         {
-            throw new RuntimeException("Timed out waiting for " + apiName + ".onReady(). Check server log for JavaScript errors.", e);
+            throw new ScriptTimeoutException("Timed out waiting for " + apiName + ".onReady(). Check server log for JavaScript errors.", e);
         }
     }
 

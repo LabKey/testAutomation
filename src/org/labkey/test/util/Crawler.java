@@ -31,7 +31,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.openqa.selenium.Alert;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
@@ -224,6 +223,7 @@ public class Crawler
 
         // Don't crawl test modules
         controllers.add("chartingapi");
+        controllers.add("editableModule");
         controllers.add("ETLtest");
         controllers.add("footerTest");
         controllers.add("linkedschematest");
@@ -792,7 +792,8 @@ public class Crawler
         return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed(), _warnings);
     }
 
-    public void validatePage(String url)
+    @LogMethod
+    public void validatePage(@LoggedParam String url)
     {
         crawlLink(new UrlToCheck(null, url, -1));
     }
@@ -871,7 +872,7 @@ public class Crawler
                         _test.projectMenu().open();
                         _remainingAttemptsToGetProjectLinks = 0; // Got em
                     }
-                    catch (NoSuchElementException ignore) { } // Hiccup with the project menu. Don't worry about it
+                    catch (WebDriverException ignore) { } // Hiccup with the project menu, try again next time.
                 }
 
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
