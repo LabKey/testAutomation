@@ -3,9 +3,11 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -52,6 +54,12 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         return elementCache().editButton().isPresent();
     }
 
+    /**
+     * If this is an aliquot sample clicking the edit button will only allow the user to edit the description property.
+     * No other fields are editable.
+     *
+     * @return A {@link DetailTableEdit}
+     */
     public DetailTableEdit clickEdit()
     {
         String title = getTitle();
@@ -64,9 +72,53 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
                 .withTitle("Editing " + title).waitFor();
     }
 
+    /**
+     * Get the table that has the details fields (i.e. column data) for this item. If this is an aliquot sample this
+     * table will have the fields from the parent sample.
+     *
+     * @return A {@link DetailTable}.
+     */
     public DetailTable getTable()
     {
-        return  elementCache().detailTable;
+        List<DetailTable> tables = elementCache().detailTables();
+
+        // As of release 21.05 the table with the column values for the sample is the last table in the panel.
+        return  tables.get(tables.size() - 1);
+    }
+
+    /**
+     * If this is an aliquot sample there will be multiple tables in the panel, the first table will contain the aliquot
+     * information (under the 'Aliquot Data' header). This will return that table.
+     *
+     * @return A {@link DetailTable}.
+     */
+    public DetailTable getAliquotTable()
+    {
+        List<DetailTable> tables = elementCache().detailTables();
+
+        if(tables.size() == 1)
+            throw new NoSuchElementException("There does not appear to be an 'Aliquot' table in this panel.");
+
+        // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
+        return tables.get(0);
+    }
+
+    /**
+     * If this an aliquot sample there will be multiple tables in the panel, the second table is under the 'Original
+     * Sample Data' header, but is a separate table from the other original data displayed and may only be one or two
+     * lines. The fields 'Original sample' and 'Sample description' will show up here.
+     *
+     * @return A {@link DetailTable}.
+     */
+    public DetailTable getAliquotDetailMetaTable()
+    {
+        List<DetailTable> tables = elementCache().detailTables();
+
+        if(tables.size() == 1)
+            throw new NoSuchElementException("There does not appear to be an 'Aliquot (details meta)' table in this panel.");
+
+        // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
+        return tables.get(1);
     }
 
     @Override
@@ -78,12 +130,19 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement heading = Locator.tagWithClass("div", "detail__edit--heading").findWhenNeeded(this);
+
         public Optional<WebElement> editButton()
         {
             return Locator.tagWithClass("div", "detail__edit-button")
                     .findOptionalElement(heading);
         }
-        final DetailTable detailTable = new DetailTable.DetailTableFinder(getDriver()).findWhenNeeded(this);
+
+        // If this panel is for an aliquot sample there will be more than one table present.
+        final List<DetailTable> detailTables()
+        {
+            return new DetailTable.DetailTableFinder(getDriver()).findAll(this);
+        }
+
     }
 
     public static class DetailDataPanelFinder extends WebDriverComponentFinder<DetailDataPanel, DetailDataPanelFinder>

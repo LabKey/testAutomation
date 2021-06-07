@@ -1,8 +1,10 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,7 +20,7 @@ import java.util.Map;
  *
  * The component it automates is implemented in /components/src/public/QueryModel/DetailPanel.tsx
  */
-public class DetailTable extends WebDriverComponent
+public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 {
     private final WebElement _tableElement;
     private final WebDriver _driver;
@@ -62,6 +64,29 @@ public class DetailTable extends WebDriverComponent
     //  It may be appropriate to have these interfaces but maybe the way the cell is identified should be different.
 
     /**
+     * Rather than add yet another method to get a field value, do a 'best guess' to find the appropriate field. This
+     * will return the first field that meets the criteria.
+     *
+     * @param identifier Some text string that can identify the field.
+     * @return A web element that either had an attribute value equal to the identifier, or had a text in a sibling field (label) with the identifier.
+     */
+    private WebElement getField(String identifier)
+    {
+        if(elementCache().dataCaptionField(identifier).isDisplayed())
+        {
+            return elementCache().dataCaptionField(identifier);
+        }
+        else if (elementCache().siblingField(identifier).isDisplayed())
+        {
+            return elementCache().siblingField(identifier);
+        }
+        else
+        {
+            throw new NoSuchElementException(String.format("Could not find field '%s'.", identifier));
+        }
+    }
+
+    /**
      * Return the value of a cell identified by the text in the left most column.
      *
      * @param fieldCaption The caption/label of the field to get.
@@ -69,7 +94,7 @@ public class DetailTable extends WebDriverComponent
      **/
     public String getFieldValue(String fieldCaption)
     {
-        return Locators.fieldValue(fieldCaption).findElement(getDriver()).getText();
+        return getField(fieldCaption).getText();
     }
 
     /**
@@ -90,7 +115,9 @@ public class DetailTable extends WebDriverComponent
      **/
     public void clickField(String fieldCaption)
     {
-        Locators.fieldValue(fieldCaption).findElement(getDriver()).click();
+        // Should not click the container, it could be a td which would miss the clickable element.
+        // Maybe this shouldn't assume an anchor but should be a generic(*)?
+        Locator.tag("a").findElement(getField(fieldCaption)).click();
     }
 
     /**
@@ -120,14 +147,30 @@ public class DetailTable extends WebDriverComponent
     {
         static final Locator.XPathLocator detailTable = Locator.tagWithClass("table", "detail-component--table__fixed");
 
-        static Locator fieldValue(String caption)
-        {
-            return Locator.tagWithAttribute("td", "data-caption", caption);
-        }
-
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
+
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends Component<?>.ElementCache
+    {
+        public final WebElement dataCaptionField(String caption)
+        {
+            return Locator.tagWithAttribute("td", "data-caption", caption).findWhenNeeded(this);
+        }
+
+        // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
+        public final WebElement siblingField(String caption)
+        {
+            return Locator.tagContainingText("td", caption).followingSibling("td").findWhenNeeded(this);
+        }
 
     }
 
