@@ -39,6 +39,16 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
         return elementCache().rootElement;
     }
 
+    public TreeNode getVisibleActiveNode()
+    {
+        return new TreeNode.TreeNodeFinder(getDriver()).activeOnly().waitFor(this);
+    }
+
+    public List<TreeNode> getFilteringNodes()
+    {
+        return new TreeNode.TreeNodeFinder(getDriver()).withSelectedFilter().findAll(this);
+    }
+
     public TreeNode openToPath(List<String> nodes)
     {
         var currentNode = getRootNode();
