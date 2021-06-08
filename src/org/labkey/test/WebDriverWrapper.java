@@ -1073,7 +1073,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (allowDownload)
             {
                 Mutable<Boolean> navigated = new MutableObject<>(true);
-                final long startTime = System.currentTimeMillis();
+                final long earliestModified = System.currentTimeMillis() - 1000; // Account for large timestamp granularity
 
                 elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
                     final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
@@ -1089,7 +1089,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         }
                         else
                         {
-                            downloadedFiles.setValue(getDownloadedFiles(startTime));
+                            downloadedFiles.setValue(getDownloadedFiles(earliestModified));
                             if (downloadedFiles.getValue().length > 0)
                             {
                                 navigated.setValue(false); // Don't wait for page load when a download occurs
@@ -2197,11 +2197,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
         final File downloadDir = BaseWebDriverTest.getDownloadDir();
-        final long startTime = System.currentTimeMillis();
+        final long lastModified = downloadDir.lastModified();
+        //noinspection ResultOfMethodCallIgnored
+        waitFor(() -> downloadDir.lastModified() > lastModified, 1_000); // Account for large timestamp granularity
 
         func.run();
 
-        File[] newFiles = getNewFiles(expectedFileCount, downloadDir, startTime);
+        File[] newFiles = getNewFiles(expectedFileCount, downloadDir, lastModified);
 
         log("File(s) downloaded to " + downloadDir);
         for (File newFile : newFiles)

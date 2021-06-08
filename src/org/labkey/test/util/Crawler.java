@@ -19,6 +19,7 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -92,6 +94,7 @@ public class Crawler
     private final List<String> _warnings = new ArrayList<>();
     private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+    private final long _downloadCutoff;
 
     private int _remainingAttemptsToGetProjectLinks = 4;
     private int _maxDepth = 4;
@@ -117,6 +120,7 @@ public class Crawler
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
         _actionsMayLinkTo404 = getAllowed404Sources();
         _injectionCheckEnabled = injectionTest;
+        _downloadCutoff = BaseWebDriverTest.getDownloadDir().lastModified();
         for (String project : projects)
         {
             addProject(project);
@@ -800,7 +804,20 @@ public class Crawler
 
     private void beginAt(String relativeUrl)
     {
+        deleteCrawlerDownloads();
         _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true);
+    }
+
+    private void deleteCrawlerDownloads()
+    {
+        File[] downloadedByCrawler = BaseWebDriverTest.getDownloadDir().listFiles(file -> file.lastModified() > _downloadCutoff);
+        if (downloadedByCrawler != null)
+        {
+            for (File toDelete : downloadedByCrawler)
+            {
+                FileUtils.deleteQuietly(toDelete);
+            }
+        }
     }
 
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
