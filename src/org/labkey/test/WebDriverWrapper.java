@@ -1857,7 +1857,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
-        waitForOnReady("LABKEY.Utils");
 
         List<WebElement> apps = Locator.findElements(getDriver(),
             Locator.tagWithAttributeContaining("div", "id", "error-handler-app"), // from errorView.jsp
