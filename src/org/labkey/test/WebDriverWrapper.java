@@ -2220,7 +2220,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public File[] getDownloadedFiles(long modifiedSince)
     {
-        return getNewFiles(0, BaseWebDriverTest.getDownloadDir(), modifiedSince);
+        File downloadDir = BaseWebDriverTest.getDownloadDir();
+        if (!downloadDir.isDirectory())
+        {
+            return new File[]{};
+        }
+        return getNewFiles(0, downloadDir, modifiedSince);
     }
 
     @Nullable
