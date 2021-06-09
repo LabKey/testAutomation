@@ -58,6 +58,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.tagWithAttribute;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
@@ -1091,6 +1092,7 @@ public class DataRegionTable extends DataRegion
         }
 
         //Select combo box item
+        sleep(1000);
         getWrapper()._extHelper.selectComboBoxItem("Filter Type:", filter1Type);
 
         if (filter1 != null && !filter1Type.contains("Blank"))
@@ -1123,7 +1125,7 @@ public class DataRegionTable extends DataRegion
         openFilterDialog(columnName);
         String columnLabel = elementCache().getColumnHeader(columnName).getText();
 
-        WebDriverWrapper.sleep(500);
+        sleep(500);
 
         // Clear selections.
         assertEquals("Faceted filter tab should be selected.", "Choose Values", getWrapper().getText(Locator.css(".x-tab-strip-active")));
