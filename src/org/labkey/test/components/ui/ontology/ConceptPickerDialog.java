@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.ontology;
 
+import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
@@ -31,8 +32,8 @@ public class ConceptPickerDialog extends ModalDialog
      */
     public ConceptPickerDialog searchConcept(String conceptSearchExpression, String code)
     {
-        doAndWaitForElementToRefresh(() -> elementCache().searchBox.selectItemWithCode(conceptSearchExpression, code),
-                new ConceptInfoTabs.ConceptInfoTabsFinder(getDriver()).locator(), WAIT_FOR_JAVASCRIPT);
+        elementCache().searchBox.selectItemWithCode(conceptSearchExpression, code);
+        getWrapper().waitForElement(Locator.tagWithClass("span", "code").withText(code));
         return this;
     }
 
