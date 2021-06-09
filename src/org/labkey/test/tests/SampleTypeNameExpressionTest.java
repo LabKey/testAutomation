@@ -30,6 +30,7 @@ import org.labkey.test.util.SampleTypeHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeNameExprTest";
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
 
     @Override
     public List<String> getAssociatedModules()
@@ -111,37 +113,69 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     @Test
     public void testInputsExpression()
     {
-        String nameExpression = "${Inputs:first:defaultValue('SS')}_${batchRandomId}";
-        String data = "Name\tB\tMaterialInputs/InputsExpressionTest\n" +
+        verifyNames(
+                "InputsExpressionTest",
+                "Name\tB\tMaterialInputs/InputsExpressionTest",
+                "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Pat");
+    }
+
+    @Test
+    public void testParentAliasExpression()
+    {
+        verifyNames(
+                "ParentAliasInputsExpressionTest",
+                "Name\tB\tParent",
+                "${Parent:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                "Parent", "Jessi");
+    }
+
+    @Test
+    public void testMaterialInputsExpressionWithParentAliasData()
+    {
+        verifyNames(
+                "MaterialInputsExpressionWithParentAliasData",
+                "Name\tB\tParent",
+                "${MaterialInputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                "Parent", "Sam");
+    }
+
+    private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix)
+    {
+        String name1 = namePrefix + "_1";
+        String name2 = namePrefix + "_2";
+        String data = header + "\n" +
 
                 // Name provided
-                "Bob\tb\t\n" +
-                "Susie\tb\t\n" +
+                name1 + "\tb\t\n" +
+                name2 + "\tb\t\n" +
 
                 // Name generated and uses first input "Bob"
-                "\tb\tBob,Susie\n" +
+                "\tb\t" + name1 + "," + name2 + "\n" +
 
                 // Name generated and uses defaultValue('SS')
                 "\tb\t\n";
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        sampleHelper.createSampleType(new SampleTypeDefinition("InputsExpressionTest")
-                .setNameExpression(nameExpression)
-                .setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String))),
-                data);
+        SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName)
+                .setNameExpression(nameExpression);
+        if (currentTypeAlias != null)
+            definition = definition.setParentAliases(Map.of(currentTypeAlias, "(Current Sample Type)"));
+        definition = definition.setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String)));
+        sampleHelper.createSampleType(definition, data);
 
         assertTextPresent(nameExpression);
 
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
 
-        assertTrue(names.get(0).startsWith("SS_"));
+        assertTrue("First name (" + names.get(0) + ") not as expected", names.get(0).startsWith(DEFAULT_SAMPLE_PARENT_VALUE + "_"));
         String batchRandomId = names.get(0).split("_")[1];
 
-        assertTrue(names.get(1).equals("Bob_" + batchRandomId));
+        assertEquals("Second name not as expected",  name1 + "_" + batchRandomId, names.get(1));
 
-        assertTrue(names.get(2).equals("Susie"));
-        assertTrue(names.get(3).equals("Bob"));
+        assertEquals("Third name not as expected", name2,  names.get(2));
+        assertEquals("Fourth name not as expected", name1, names.get(3));
     }
 
 }
