@@ -433,6 +433,7 @@ public class ExtHelper
         Locator.XPathLocator comboListItemLoc = Locators.comboListItem().withText(selection);
         WebElement comboListItem = comboListItemLoc.findWhenNeeded(_test.getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(comboListItem);
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(comboListItem));
         _test.waitAndClick(comboListItemLoc);
         if (_test.isElementPresent(comboListItemLoc))
         {
