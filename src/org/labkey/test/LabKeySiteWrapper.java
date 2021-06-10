@@ -1373,6 +1373,21 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             goToHome();
     }
 
+    /**
+     * Impersonate a user and perform some action.
+     * Stops impersonating and returns to initial page when complete.
+     * @param email User to impersonate
+     * @param action Runnable to invoke while impersonating
+     */
+    public void doAsUser(String email, Runnable action)
+    {
+        pushLocation();
+        impersonate(email);
+        action.run();
+        stopImpersonating(false);
+        popLocation();
+    }
+
     public void goToHome()
     {
         beginAt(WebTestHelper.buildURL("project", "home", "begin"));
