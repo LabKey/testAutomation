@@ -5,6 +5,9 @@ import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 
@@ -39,29 +42,39 @@ public class LoggedOutDialog extends ModalDialog
     }
 
     /**
-     *
-     * @return
+     *  Checks the background/masked elements behind the dialog to ensure that the expected content
+     *  areas are blurred/styled as expected.
+     *  Because not all of these page sections are present in all situations (notably, in apps like
+     *  SM, FM, Biologics) this checks for the ones present, and if any of them are both present and
+     *  not styled as expected, will return false.
+     * @return True if all page sections that are present are styled with 'lk-content-blur', otherwise false
      */
     public boolean isContentBlurred()
     {
+        List<Boolean> factors = new ArrayList<>();
         Boolean headerBlurred = null;
         var lkHeader = elementCache().lkHeader.findOptionalElement(getDriver());
         if (lkHeader.isPresent())
-            headerBlurred = lkHeader.get().getAttribute("class").contains("lk-content-blur");
+            factors.add(lkHeader.get().getAttribute("class").contains("lk-content-blur"));
 
         Boolean bodyBlurred = null;
         var lkBody = elementCache().lkBody.findOptionalElement(getDriver());
         if (lkBody.isPresent())
-            bodyBlurred = lkBody.get().getAttribute("class").contains("lk-content-blur");
+            factors.add(lkBody.get().getAttribute("class").contains("lk-content-blur"));
 
         Boolean footerBlurred = null;
         var footerBlock = elementCache().footerBlock.findOptionalElement(getDriver());
         if (footerBlock.isPresent())
-            footerBlurred = footerBlock.get().getAttribute("class").contains("lk-content-blur");
+            factors.add(footerBlock.get().getAttribute("class").contains("lk-content-blur"));
 
-        return (headerBlurred != null && headerBlurred.booleanValue()) &&
-                (bodyBlurred != null && bodyBlurred.booleanValue()) &&
-                (footerBlurred != null && footerBlurred.booleanValue());
+        // if any of these bodyParts are present and don't have the lk-content-blur style applied, return false
+        // otherwise, true
+        for(Boolean fact : factors)
+        {
+            if(!fact)
+                return false;
+        }
+        return true;
     }
 
 
