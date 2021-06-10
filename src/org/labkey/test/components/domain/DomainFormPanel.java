@@ -89,7 +89,9 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setConceptLabelField(fieldDefinition.getConceptLabelColumn());
         if (fieldDefinition.getPrincipalConceptCode() != null)
             fieldRow.clickSelectConcept()
+                    .selectOntology(fieldDefinition.getPrincipalConceptSearchSourceOntology())
                     .searchConcept(fieldDefinition.getPrincipalConceptSearchExpression(), fieldDefinition.getPrincipalConceptCode())
+                    .waitForActiveTreeNode()
                     .clickApply();
 
         if (fieldDefinition.getValidators() != null && !fieldDefinition.getValidators().isEmpty())

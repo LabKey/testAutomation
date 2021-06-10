@@ -31,6 +31,7 @@ public class FieldDefinition extends PropertyDescriptor
     // for UI helpers
     private ColumnType _type;
     private LookupInfo _lookup;
+    private String _principalConceptSearchSourceOntology;
     private String _principalConceptSearchExpression;
 
     // Stash validator collection to avoid having to convert back from JSON Maps
@@ -313,13 +314,19 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public String getPrincipalConceptSearchSourceOntology()
+    {
+        return _principalConceptSearchSourceOntology;
+    }
+
     public String getPrincipalConceptSearchExpression()
     {
         return _principalConceptSearchExpression;
     }
 
-    public FieldDefinition setPrincipalConceptSearchExpression(String searchExpression)
+    public FieldDefinition setPrincipalConceptSearchExpression(String ontologyName, String searchExpression)
     {
+        _principalConceptSearchSourceOntology = ontologyName;
         _principalConceptSearchExpression = searchExpression;
         return this;
     }
