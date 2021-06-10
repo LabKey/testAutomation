@@ -36,6 +36,7 @@ import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
@@ -58,6 +59,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.tagWithAttribute;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
@@ -730,18 +732,17 @@ public class DataRegionTable extends DataRegion
         setRowData(data, validateText);
     }
 
-    //todo: return edit page
-    public void clickEditRow(int rowIndex)
+    public UpdateQueryRowPage clickEditRow(int rowIndex)
     {
         WebElement updateLink = updateLink(rowIndex);
         getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
         getWrapper().clickAndWait(updateLink);
+        return new UpdateQueryRowPage(getDriver());
     }
 
-    //todo: return edit page
-    public void clickEditRow(String key)
+    public UpdateQueryRowPage clickEditRow(String key)
     {
-        clickEditRow(getRowIndexStrict(key));
+        return clickEditRow(getRowIndexStrict(key));
     }
 
     public void clickRowDetails(int rowIndex)
@@ -758,7 +759,11 @@ public class DataRegionTable extends DataRegion
 
     protected void setRowData(Map<String, ?> data, boolean validateText)
     {
-        new ListHelper(getWrapper()).setRowData(data, validateText);
+        new UpdateQueryRowPage(getDriver()).update(data);
+        if (validateText)
+        {
+            getWrapper().assertTextPresent(String.valueOf(data.values().iterator().next()));  //make sure some text from the map is present
+        }
     }
 
     public String getDetailsHref(int row)
@@ -1091,6 +1096,7 @@ public class DataRegionTable extends DataRegion
         }
 
         //Select combo box item
+        sleep(1000);
         getWrapper()._extHelper.selectComboBoxItem("Filter Type:", filter1Type);
 
         if (filter1 != null && !filter1Type.contains("Blank"))
@@ -1123,7 +1129,7 @@ public class DataRegionTable extends DataRegion
         openFilterDialog(columnName);
         String columnLabel = elementCache().getColumnHeader(columnName).getText();
 
-        WebDriverWrapper.sleep(500);
+        sleep(500);
 
         // Clear selections.
         assertEquals("Faceted filter tab should be selected.", "Choose Values", getWrapper().getText(Locator.css(".x-tab-strip-active")));
