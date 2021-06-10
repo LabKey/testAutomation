@@ -17,6 +17,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
@@ -113,7 +114,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Creating the list via API");
-        ListDefinition listDef = new ListDefinition(listName);
+        ListDefinition listDef = new VarListDefinition(listName);
         listDef.setKeyName("id");
         listDef.addField(new FieldDefinition("name", FieldDefinition.ColumnType.String));
         listDef.addField(new FieldDefinition("lookUpField",
