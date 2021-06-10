@@ -94,6 +94,6 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
     protected void assertElementType(WebElement el)
     {
         String tag = el.getTagName();
-        Assert.assertTrue("Not an input or textarea: " + el.toString(), Arrays.asList("input", "textarea").contains(tag));
+        Assert.assertTrue("Not an input or textarea: " + el, Arrays.asList("input", "textarea").contains(tag));
     }
 }
