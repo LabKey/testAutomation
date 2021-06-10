@@ -2228,7 +2228,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 file.getName().contains(".crdownload") || TEMP_FILE_PATTERN.matcher(file.getName()).matches();
 
         final List<File> ignoredFilesList = ignoredFiles == null ? List.of() : Arrays.asList(ignoredFiles);
-        final FileFilter newFileFilter = ignoredFilesList::contains;
+        final FileFilter newFileFilter = file -> !ignoredFilesList.contains(file);
 
         waitFor(() ->{
                     final File[] files = downloadDir.listFiles(newFileFilter);
