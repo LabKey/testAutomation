@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.ontology;
 
+import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +33,7 @@ public class ConceptPickerDialog extends ModalDialog
     public ConceptPickerDialog searchConcept(String conceptSearchExpression, String code)
     {
         elementCache().searchBox.selectItemWithCode(conceptSearchExpression, code);
+        getWrapper().waitForElement(Locator.tagWithClass("span", "code").withText(code));
         return this;
     }
 
@@ -77,13 +79,11 @@ public class ConceptPickerDialog extends ModalDialog
      * This select is only shown if there are multiple ontologies available to choose from.
      * When it is shown, no ontology-specific controls (like the tree view, the search bar, or the
      * info tabs will be shown.
-     * Note that when shown to select concept for an ontology lookup field, the ontology is selected
-     * at the field-row level and this select will not be shown in this dialog.  For any other field
-     * this select should be shown.
      * @return  Whether or not the ontology select is present
      */
     public boolean hasOntologySelect()
     {
+        waitForReady(elementCache());
         return elementCache().selectOntologySelect().isPresent();
     }
 
@@ -114,6 +114,12 @@ public class ConceptPickerDialog extends ModalDialog
                 "the ontology select did not become present", WAIT_FOR_JAVASCRIPT);
         var select = elementCache().selectOntologySelect().get();
         return select.getOptions();
+    }
+
+    public ConceptPickerDialog waitForActiveTreeNode()
+    {
+        elementCache().treePanel.waitForActiveNode();
+        return this;
     }
 
     public void clickApply()
