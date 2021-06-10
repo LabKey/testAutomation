@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ListDefinition extends DomainProps
+public abstract class ListDefinition extends DomainProps
 {
-    private static final String DOMAIN_KIND = "VarList";
-
     private String _name;
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
     private String _keyName;
+    // API Options
+    private String _titleColumn;
 
     public ListDefinition(String name)
     {
@@ -74,6 +74,17 @@ public class ListDefinition extends DomainProps
         return this;
     }
 
+    public String getTitleColumn()
+    {
+        return _titleColumn;
+    }
+
+    public ListDefinition setTitleColumn(String titleColumn)
+    {
+        _titleColumn = titleColumn;
+        return this;
+    }
+
     /*
     DomainProps
      */
@@ -90,19 +101,16 @@ public class ListDefinition extends DomainProps
 
     @NotNull
     @Override
-    protected String getKind()
-    {
-        return DOMAIN_KIND;
-    }
-
-    @NotNull
-    @Override
     protected Map<String, Object> getOptions()
     {
         Map<String, Object> options = new HashMap<>();
         options.put("name", getName());
         options.put("description", getDescription());
         options.put("keyName", getKeyName());
+        if (getTitleColumn() != null)
+        {
+            options.put("titleColumn", getTitleColumn());
+        }
         return options;
     }
 
