@@ -1048,7 +1048,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             relativeURL = relativeURL.substring(getBaseURL().length());
         relativeURL = stripContextPath(relativeURL);
         String logMessage = "";
-        Mutable<File[]> downloadedFiles = new MutableObject<>(new File[]{});
+        Mutable<File[]> downloadedFiles = new MutableObject<>();
 
         try
         {
@@ -1073,7 +1073,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (allowDownload)
             {
                 Mutable<Boolean> navigated = new MutableObject<>(true);
-                final long earliestModified = System.currentTimeMillis() - 1000; // Account for large timestamp granularity
+                final File downloadDir = BaseWebDriverTest.getDownloadDir();
+                final File[] existingDownloads = downloadDir.listFiles();
 
                 elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
                     final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
@@ -1087,9 +1088,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
                             // Wait for page to load when element goes stale
                             return true; // Stop waiting
                         }
-                        else
+                        else if (downloadDir.isDirectory()) // Don't check for download if dir doesn't exist
                         {
-                            downloadedFiles.setValue(getDownloadedFiles(earliestModified));
+                            File[] filesArray = getNewFiles(0, downloadDir, existingDownloads);
+                            downloadedFiles.setValue(filesArray);
                             if (downloadedFiles.getValue().length > 0)
                             {
                                 navigated.setValue(false); // Don't wait for page load when a download occurs
@@ -1119,9 +1121,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         finally
         {
             log(logMessage); // log after navigation to
-            Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
-                log("  \u2517" + file.getName()); // Log downloaded files
-            });
+            if (downloadedFiles.getValue() != null)
+            {
+                Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
+                    log("  \u2517" + file.getName()); // Log downloaded files
+                });
+            }
         }
     }
 
@@ -2197,13 +2202,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
         final File downloadDir = BaseWebDriverTest.getDownloadDir();
-        final long lastModified = downloadDir.lastModified();
-        //noinspection ResultOfMethodCallIgnored
-        waitFor(() -> downloadDir.lastModified() > lastModified, 1_000); // Account for large timestamp granularity
+        File[] existingFiles = downloadDir.listFiles();
 
         func.run();
 
-        File[] newFiles = getNewFiles(expectedFileCount, downloadDir, lastModified);
+        File[] newFiles = getNewFiles(expectedFileCount, downloadDir, existingFiles);
 
         log("File(s) downloaded to " + downloadDir);
         for (File newFile : newFiles)
@@ -2218,24 +2221,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return newFiles;
     }
 
-    public File[] getDownloadedFiles(long modifiedSince)
-    {
-        File downloadDir = BaseWebDriverTest.getDownloadDir();
-        if (!downloadDir.isDirectory())
-        {
-            return new File[]{};
-        }
-        return getNewFiles(0, downloadDir, modifiedSince);
-    }
-
-    @Nullable
-    public static File[] getNewFiles(int minFileCount, File downloadDir, long modifiedSince)
+    public static File[] getNewFiles(int minFileCount, File downloadDir, @Nullable File[] ignoredFiles)
     {
         final FileFilter tempFilesFilter = file -> file.getName().contains(".part") ||
                 file.getName().contains(".com.google.Chrome") ||
                 file.getName().contains(".crdownload") || TEMP_FILE_PATTERN.matcher(file.getName()).matches();
 
-        final FileFilter newFileFilter = file -> file.lastModified() > modifiedSince;
+        final List<File> ignoredFilesList = ignoredFiles == null ? List.of() : Arrays.asList(ignoredFiles);
+        final FileFilter newFileFilter = ignoredFilesList::contains;
 
         waitFor(() ->{
                     final File[] files = downloadDir.listFiles(newFileFilter);
