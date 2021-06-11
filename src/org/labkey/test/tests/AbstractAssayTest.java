@@ -191,6 +191,9 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         goToProjectHome(getProjectName());
 
+        // Some test use a stand alone specimen file. Before the file can be imported the Specimen module needs to be enabled.
+        _containerHelper.enableModule("Specimen");
+
         log("Setting up groups, users and initial permissions");
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
 

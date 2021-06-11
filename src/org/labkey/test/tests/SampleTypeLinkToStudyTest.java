@@ -267,7 +267,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     {
         clickButton("Link to Study History");
         DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-        checker().verifyEquals("Mismatch in the comment", expectedComments, table.getDataAsText(0, "comment"));
+        checker().verifyEquals("Mismatch in the comment", expectedComments, table.getDataAsText(0, "Comment"));
     }
 
     private void verifyAuditLogEvents(String Comment)
@@ -277,7 +277,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         DataRegionTable auditTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         checker().verifyEquals("Incorrect audit log entry for Link to Study events", Comment,
-                auditTable.getDataAsText(0, "comment"));
+                auditTable.getDataAsText(0, "Comment"));
     }
 
     private void recallDataset(String study, String sampleType, int numOfRows)

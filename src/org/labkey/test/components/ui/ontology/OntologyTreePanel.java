@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.ontology;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.BaseReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -39,6 +40,16 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
         return elementCache().rootElement;
     }
 
+    public TreeNode getVisibleActiveNode()
+    {
+        return new TreeNode.TreeNodeFinder(getDriver()).activeOnly().waitFor(this);
+    }
+
+    public List<TreeNode> getFilteringNodes()
+    {
+        return new TreeNode.TreeNodeFinder(getDriver()).withSelectedFilter().findAll(this);
+    }
+
     public TreeNode openToPath(List<String> nodes)
     {
         var currentNode = getRootNode();
@@ -52,6 +63,13 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
         return currentNode;
     }
 
+    public OntologyTreePanel waitForActiveNode()
+    {
+        getWrapper().waitForElementToDisappear(elementCache().loadingSpinner);
+        getWrapper().waitForElement(elementCache().activeNode);
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -61,6 +79,8 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
     protected class ElementCache extends Component<?>.ElementCache
     {
         WebElement nodeContainer = Locator.tag("ul").parent().findWhenNeeded(this);
+        Locator activeNode = Locator.tagWithClass("div", "filetree-node-active");
+        Locator loadingSpinner = BaseReactSelect.Locators.loadingSpinner;
         TreeNode rootElement = new TreeNode.TreeNodeFinder(getDriver()).waitFor(nodeContainer);
     }
 

@@ -1,10 +1,13 @@
 package org.labkey.test.params.property;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.test.util.TestDataGenerator;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,5 +34,11 @@ public abstract class DomainProps
     public TestDataGenerator getTestDataGenerator(String containerPath)
     {
         return new TestDataGenerator(getSchemaName(), getQueryName(), containerPath).withColumns(getDomainDesign().getFields());
+    }
+
+    public final TestDataGenerator create(Connection connection, String containerPath) throws IOException, CommandException
+    {
+        getCreateCommand().execute(connection, containerPath);
+        return getTestDataGenerator(containerPath);
     }
 }
