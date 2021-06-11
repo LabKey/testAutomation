@@ -18,13 +18,15 @@ public class ProductsNavContainer extends BaseNavContainer
         super(element, driver);
     }
 
+    public boolean productEnabled(Product product)
+    {
+        return getProduct(product).isEnabled();
+    }
 
-
-    public ProjectsNavContainer clickProduct(Product product)
+    public LeafNavContainer clickProduct(Product product)
     {
         getProduct(product).clickNavIcon();
-        return new ProjectsNavContainer.ProjectsNavContainerFinder(getDriver()).withBackNavTitle(product.getName())
-                .waitFor();
+        return new LeafNavContainer.LeafNavContainerFinder(getDriver()).withTitle(product.getName()).waitFor();
     }
 
     public LKSNavContainer clickLabkey()

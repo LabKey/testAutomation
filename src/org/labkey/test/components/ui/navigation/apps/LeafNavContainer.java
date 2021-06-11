@@ -15,10 +15,10 @@ public class LeafNavContainer extends BaseNavContainer
         super(element, driver);
     }
 
-    public ProjectsNavContainer clickBack()
+    public ProductsNavContainer clickBack()
     {
         elementCache().backLink.click();
-        return new ProjectsNavContainer.ProjectsNavContainerFinder(getDriver()).waitFor();
+        return new ProductsNavContainer.ProductNavContainerFinder(getDriver()).withTitle("Applications").waitFor();
     }
 
     public List<String> getItems()
