@@ -401,9 +401,11 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void goToList(String listName)
     {
-        // if we are on the Manage List page, click the list name first
-        if (isElementPresent(Locators.bodyTitle("Available Lists")))
-            clickAndWait(Locator.linkWithText(listName));
+        if (!isElementPresent(Locators.bodyTitle("Available Lists")))
+        {
+            goToManageLists();
+        }
+        clickAndWait(Locator.linkWithText(listName));
     }
 
     public void beginAtList(String projectName, String listName)
