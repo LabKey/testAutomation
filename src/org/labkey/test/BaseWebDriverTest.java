@@ -1792,7 +1792,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         // if the row does not exist then most likely the cohort passed in is incorrect
         int rowIndex = cohortTable.getRowIndex("Label", cohort);
-        cohortTable.updateRow(rowIndex, Map.of("enrolled", Boolean.toString(enroll)), true);
+        cohortTable.updateRow(rowIndex, Map.of("enrolled", enroll), true);
     }
 
     public void setExportPhi(PhiSelectType exportPhiLevel)
