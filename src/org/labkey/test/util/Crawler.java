@@ -227,14 +227,6 @@ public class Crawler
             new ControllerActionId("specimen", "emailLabSpecimenLists"),
             new ControllerActionId("specimen", "getSpecimenExcel"),
 
-            // We're in the process of moving actions from the "specimen" controller in the study module to the
-            // "specimen2" controller in the specimen module. For now, exclude both sets. After migration is complete,
-            // eliminate the "specimen2" variants.
-            new ControllerActionId("specimen2", "download"),
-            new ControllerActionId("specimen2", "downloadSpecimenList"),
-            new ControllerActionId("specimen2", "emailLabSpecimenLists"),
-            new ControllerActionId("specimen2", "getSpecimenExcel"),
-
             new ControllerActionId("study-security", "exportSecurityPolicy"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("targetedms", "downloadDocument"),

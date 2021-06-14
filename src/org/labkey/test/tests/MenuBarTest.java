@@ -166,7 +166,7 @@ public class MenuBarTest extends BaseWebDriverTest
         _extHelper.selectComboBoxItem("Query", "Participant");
         waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Title Column", "ParticipantId");
-        _extHelper.setExtFormElementByLabel("URL", "/specimen2-typeParticipantReport.view?participantId=${participantId}");
+        _extHelper.setExtFormElementByLabel("URL", "/specimen-typeParticipantReport.view?participantId=${participantId}");
         _extHelper.clickExtButton("Submit");
 
         // Should take us to participant report page
