@@ -2,12 +2,19 @@ package org.labkey.test.components.bootstrap;
 
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.PasswordUtil;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 
@@ -38,7 +45,31 @@ public class LoggedOutDialog extends ModalDialog
 
     public void clickReloadPage()
     {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().reloadPageBtn));
         elementCache().reloadPageBtn.click();
+    }
+
+    public void reloadPageAndConfirmPostLoginRedirect(String expectedURL)
+    {
+        clickReloadPage();  // dismisses the dialog
+
+        // at this point, we're either at a login page already, or at a public page showing a link to one
+        // when we add biologics to this, there will likely be a third case to handle here
+        WebElement el = Locator.waitForAnyElement(new FluentWait<SearchContext>(getDriver()).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                org.labkey.test.Locators.signInLink,
+                Locator.tagWithName("form", "login"));
+
+        if (el.getAttribute("class").equals("header-link"))
+            getWrapper().clickAndWait(el);
+
+        // We should now be on the regular login page, without the beginAt action simpleSignIn does
+        getWrapper().assertElementPresent(Locator.tagWithName("form", "login"));
+        getWrapper().setFormElement(Locator.name("email"), PasswordUtil.getUsername());
+        getWrapper().setFormElement(Locator.name("password"), PasswordUtil.getPassword());
+        getWrapper().clickButton("Sign In", 0);
+
+        var returnUrl = getWrapper().getCurrentRelativeURL();
+        assertThat("Signing back in did not take us back to the expected page.", expectedURL, is(returnUrl));
     }
 
     /**
@@ -52,17 +83,14 @@ public class LoggedOutDialog extends ModalDialog
     public boolean isContentBlurred()
     {
         List<Boolean> factors = new ArrayList<>();
-        Boolean headerBlurred = null;
         var lkHeader = elementCache().lkHeader.findOptionalElement(getDriver());
         if (lkHeader.isPresent())
             factors.add(lkHeader.get().getAttribute("class").contains("lk-content-blur"));
 
-        Boolean bodyBlurred = null;
         var lkBody = elementCache().lkBody.findOptionalElement(getDriver());
         if (lkBody.isPresent())
             factors.add(lkBody.get().getAttribute("class").contains("lk-content-blur"));
 
-        Boolean footerBlurred = null;
         var footerBlock = elementCache().footerBlock.findOptionalElement(getDriver());
         if (footerBlock.isPresent())
             factors.add(footerBlock.get().getAttribute("class").contains("lk-content-blur"));
