@@ -18,13 +18,15 @@ public class ProductsNavContainer extends BaseNavContainer
         super(element, driver);
     }
 
+    public boolean productEnabled(Product product)
+    {
+        return getProduct(product).isEnabled();
+    }
 
-
-    public ProjectsNavContainer clickProduct(Product product)
+    public LeafNavContainer clickProduct(Product product)
     {
         getProduct(product).clickNavIcon();
-        return new ProjectsNavContainer.ProjectsNavContainerFinder(getDriver()).withBackNavTitle(product.getName())
-                .waitFor();
+        return new LeafNavContainer.LeafNavContainerFinder(getDriver()).withTitle(product.getName()).waitFor();
     }
 
     public LKSNavContainer clickLabkey()
@@ -49,7 +51,17 @@ public class ProductsNavContainer extends BaseNavContainer
                 .waitFor(elementCache().navList);
     }
 
-    public WebElement getFooterLink()
+    public boolean hasMenuSettingsLink()
+    {
+        return Locator.linkWithText("Menu Settings").existsIn(elementCache().footer);
+    }
+
+    public WebElement getMenuSettingsLink()
+    {
+        return Locator.linkWithText("Menu Settings").waitForElement(elementCache().footer, 2000);
+    }
+
+    public WebElement getDocumentationFooterLink()
     {
         return Locator.linkWithText("More LabKey Solutions").waitForElement(elementCache().footer, 2000);
     }
@@ -72,7 +84,6 @@ public class ProductsNavContainer extends BaseNavContainer
         final WebElement footer = Locator.tagWithClass("div", "product-navigation-footer")
                 .findWhenNeeded(this).withTimeout(2000);
     }
-
 
     public static class ProductNavContainerFinder extends BaseNavContainerFinder<ProductsNavContainer, ProductsNavContainer.ProductNavContainerFinder>
     {
