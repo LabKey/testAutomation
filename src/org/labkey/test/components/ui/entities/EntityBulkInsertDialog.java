@@ -14,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,13 +42,24 @@ public class EntityBulkInsertDialog extends ModalDialog
     }
 
     /**
-     * Option at the top of the dialog to make the samples pool (aliquot) from the identified parents.
+     * Option at the top of the dialog to make the samples pool from the identified parents.
      *
      * @return A reference to this dialog.
      */
     public EntityBulkInsertDialog selectPooledOption()
     {
         elementCache().poolOption.check();
+        return this;
+    }
+
+    /**
+     * Option at the top of the dialog to make the samples aliquoted from the identified parent.
+     *
+     * @return A reference to this dialog.
+     */
+    public EntityBulkInsertDialog selectAliquotOption()
+    {
+        elementCache().aliquotOption.check();
         return this;
     }
 
@@ -100,6 +112,28 @@ public class EntityBulkInsertDialog extends ModalDialog
     public String getQuantity()
     {
         return getWrapper().getFormElement(elementCache().quantity);
+    }
+
+    /**
+     * Get a list of the fields that can be set for this entity. Note if a field is marked as required the '*' will be
+     * returned as part of the field name.
+     *
+     * @return A list of the fields for the entity.
+     */
+    public List<String> getFieldNames()
+    {
+        // Could be shortened to do something like this, but wanted to clean up the values returned.
+        // return elementCache().fieldNames().stream().map(el -> el.getText().trim()).collect(Collectors.toList());
+
+        List<String> fieldNames = new ArrayList<>();
+
+        for(WebElement el : elementCache().fieldNames())
+        {
+            String temp = el.getText();
+            fieldNames.add(temp.replace("*", "").trim());
+        }
+
+        return fieldNames;
     }
 
     /**
@@ -156,6 +190,19 @@ public class EntityBulkInsertDialog extends ModalDialog
     {
         FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
         return reactSelect.getSelections();
+    }
+
+    /**
+     * Clear the value(s) from a field that is a drop down selection field.
+     *
+     * @param fieldCaption Caption for the field.
+     * @return This insert dialog.
+     */
+    public EntityBulkInsertDialog clearSelectionField(String fieldCaption)
+    {
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
+        reactSelect.clearSelection();
+        return this;
     }
 
     public EntityBulkInsertDialog setFieldWithId(String id, String value)
@@ -245,6 +292,16 @@ public class EntityBulkInsertDialog extends ModalDialog
         return elementCache().alert.getText();
     }
 
+    /**
+     * Get the text from the 'add' button. Text may change depending upon what is being added.
+     *
+     * @return Text on the add button.
+     */
+    public String getAddButtonText()
+    {
+        return elementCache().addRowsButton.getText();
+    }
+
     public void clickCancel()
     {
         elementCache().cancelButton.click();
@@ -321,6 +378,11 @@ public class EntityBulkInsertDialog extends ModalDialog
                     .withInputId(fieldKey).find(formRow(fieldKey));
         }
 
+        public List<WebElement> fieldNames()
+        {
+            return fieldLabels.findElements(this);
+        }
+
         WebElement cancelButton = Locator.tagWithClass("button", "test-loc-cancel-button")
                 .findWhenNeeded(getComponentElement());
 
@@ -342,12 +404,16 @@ public class EntityBulkInsertDialog extends ModalDialog
         RadioButton poolOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Pooled Samples")
                 .findWhenNeeded(getComponentElement());
 
+        RadioButton aliquotOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Aliquots")
+                .findWhenNeeded(getComponentElement());
+
         WebElement alert = Locator.tagWithClassContaining("div", "alert-danger")
                 .findWhenNeeded(getComponentElement());
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
         final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
+        final Locator fieldLabels = Locator.tag("hr").followingSibling("div").childTag("label");
     }
 
 }
