@@ -60,6 +60,11 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
         return new LabKeyPage(_test);
     }
 
+    public int rowCount()
+    {
+        return Locator.xpath("//tr[@transformId]").findElements(getDriver()).size();
+    }
+
     @Override
     protected Elements elementCache()
     {
