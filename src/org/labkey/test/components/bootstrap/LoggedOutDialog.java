@@ -69,7 +69,7 @@ public class LoggedOutDialog extends ModalDialog
         getWrapper().clickButton("Sign In", 0);
 
         var returnUrl = getWrapper().getCurrentRelativeURL();
-        assertThat("Signing back in did not take us back to the expected page.", expectedURL, is(returnUrl));
+        assertThat("Signing back in did not take us back to the expected page.", returnUrl, is(expectedURL));
     }
 
     /**
