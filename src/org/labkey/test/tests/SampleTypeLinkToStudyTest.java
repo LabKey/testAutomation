@@ -7,9 +7,12 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -21,14 +24,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({DailyC.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 4)
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 {
     final static String SAMPLE_TYPE_PROJECT = "Sample Type Test Project";
     final static String VISIT_BASED_STUDY = "Visit Based Study Test Project";
     final static String DATE_BASED_STUDY = "Date Based Study Test Project";
+    final static String ASSAY_NAME = "Test assay";
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
 
@@ -247,6 +252,111 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
     }
 
+    @Test
+    public void testLineageSupport()
+    {
+        String derivedSampleName = "Derived Plasma";
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        String data = "Name\tVisitId\tVisitDate\tParticipantId\n" +
+                "BL-1\t1\t" + now + "\tP1\n" +
+                "BL-2\t2\t" + now + "\tP2\n";
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition("Blood")
+                .setFields(List.of(
+                        new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("VisitDate", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        data = "Name\tVolume\n" +
+                "PL-1\t10\n";
+        sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition("Plasma")
+                .setFields(List.of(
+                        new FieldDefinition("Volume", FieldDefinition.ColumnType.Integer))), data);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText("Blood"));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.setSort("Name", SortDirection.ASC);
+        samplesTable.checkCheckbox(0);
+        samplesTable.clickHeaderButton("Derive Samples");
+        selectOptionByText(Locator.name("targetSampleTypeId"), "Plasma in /" + SAMPLE_TYPE_PROJECT);
+        clickButton("Next");
+        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
+        setFormElement(Locator.name("outputSample1_Volume"), "1");
+        clickButton("Submit");
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText("Plasma"));
+
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        CustomizeView customizeView = samplesTable.getCustomizeView();
+        customizeView.openCustomizeViewPanel();
+        customizeView.showHiddenItems();
+        customizeView.addColumn("INPUTS/MATERIALS/BLOOD/VisitDate");
+        customizeView.addColumn("INPUTS/MATERIALS/BLOOD/ParticipantId");
+        customizeView.saveCustomView();
+        samplesTable.checkCheckbox(samplesTable.getRowIndex("Name", derivedSampleName));
+        samplesTable.clickHeaderButtonAndWait("Link to Study");
+
+        log("Link to study: Choose target");
+        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        clickButton("Next");
+        new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
+
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+        Map<String, String> rowData = table.getRowDataAsMap(0);
+        checker().verifyEquals("Incorrect Name linked", derivedSampleName, rowData.get("Name"));
+        checker().verifyEquals("Incorrect Participant ID linked", "P1", rowData.get("ParticipantId"));
+        checker().verifyEquals("Incorrect Date linked", now, rowData.get("date"));
+
+    }
+
+    @Test
+    public void testAssaySupport()
+    {
+        String importData = "Samples\nstool";
+        String runName = "First Run";
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        goToManageAssays();
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", ASSAY_NAME);
+        assayDesignerPage.goToResultsFields()
+                .removeField("ParticipantID")
+                .removeField("Date")
+                .addField("Samples")
+                .setType(FieldDefinition.ColumnType.Sample)
+                .setSampleType(SAMPLE_TYPE1);
+        assayDesignerPage.clickFinish();
+
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        DataRegionTable table = new DataRegionTable("Runs", getDriver());
+        table.clickHeaderButton("Import Data");
+        clickButton("Next");
+        setFormElement(Locator.name("name"), runName);
+        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        clickButton("Save and Finish");
+
+        clickAndWait(Locator.linkWithText(runName));
+        table = new DataRegionTable("Data", getDriver());
+        CustomizeView customizeView = table.getCustomizeView();
+        customizeView.openCustomizeViewPanel();
+        customizeView.showHiddenItems();
+        customizeView.addColumn("Samples/ParticipantId");
+        customizeView.addColumn("Samples/VisitDate");
+        customizeView.saveCustomView();
+
+        table.checkCheckbox(0);
+        table.clickHeaderButton("Link to Study");
+        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        clickButton("Next");
+
+        checker().verifyEquals("Incorrect Participant ID deduced", "P4", Locator.name("participantId").findElement(getDriver()).getText());
+        checker().verifyEquals("Incorrect Visit ID deduced", now, Locator.name("date").findElement(getDriver()).getText());
+
+        new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
+    }
+
     private void linkToStudy(String targetStudy, String sampleName, int numOfRowsToBeLinked)
     {
         clickAndWait(Locator.linkWithText(sampleName));
@@ -290,7 +400,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         table.clickHeaderButton("Recall");
         acceptAlert();
     }
-
 
     @Override
     protected @Nullable String getProjectName()
