@@ -13,6 +13,7 @@ import org.openqa.selenium.WebElement;
  */
 public class AppsMenu extends BaseBootstrapMenu
 {
+
     protected AppsMenu(WebElement element, WebDriver driver)
     {
         super(driver, element);
@@ -30,35 +31,15 @@ public class AppsMenu extends BaseBootstrapMenu
     }
 
     /**
-     *  Navigates to the specifed location.
+     *  Navigates to the specified location.
      * @param product   The product- SampleManager, or Biologics.  (If LabKey, use navigateToLabKey instead)
-     * @param project   The project to navigate to
      * @param node      The product section in the target project
      */
-    public void navigateTo(ProductsNavContainer.Product product, String project, String node)
+    public void navigateTo(ProductsNavContainer.Product product, String node)
     {
-        /*
-            If we are navigating to a Biologics or SampleManager project and there is only on project of that type
-            on the system, the menu component won't show the projects pane (making the user click once extra is
-            redundant).  If clickProduct fails to find a projects panel, attempt to find the leafContainer directly
-            and complete the action
-         */
         var productsPanel = showProductsPanel();
-        ProjectsNavContainer projectsPanel = null;
-        try
-        {
-            projectsPanel = productsPanel.clickProduct(product);
-        } catch (NoSuchElementException nse)
-        {
-            // assume here that the project choice was not presented, attempt to find the leaf-level container
-            // and complete the navigation
-            new LeafNavContainer.LeafNavContainerFinder(getDriver()).withBackNavTitle(project)
-                    .waitFor()
-                    .clickItem(node);
-        }
-
-        // if we're here, we were shown (and have found) the projects panel. Select the project and finish navigating
-        projectsPanel.clickProject(project)
+        productsPanel
+                .clickProduct(product)
                 .clickItem(node);
     }
 
