@@ -23,7 +23,7 @@ public class TypeSummaryReportPage extends LabKeyPage<TypeSummaryReportPage.Elem
 
     public static TypeSummaryReportPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen2", containerPath, "typeSummaryReport"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("specimen", containerPath, "typeSummaryReport"));
         return new TypeSummaryReportPage(webDriverWrapper.getDriver());
     }
 
