@@ -1732,11 +1732,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void createUserWithPermissions(String userName, String projectName, String permissions)
     {
         _userHelper.createUser(userName, true);
-        if(projectName==null)
-            goToProjectHome();
-        else
-            goToProjectHome(projectName);
-        _permissionsHelper.setUserPermissions(userName, permissions);
+        new ApiPermissionsHelper(this)
+                .addMemberToRole(userName, permissions, PermissionsHelper.MemberType.user, projectName);
     }
 
     public ApiPermissionsHelper createSiteDeveloper(String userEmail)

@@ -483,6 +483,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             return this;
         }
 
+        /**
+         * Find Select within a &lt;FormGroup&gt; based on the FormGroup's label.
+         * Assumes that the FormGroup has a FormLabel.
+         * @param labelText Text of the FormGroup's FormLabel
+         * @return component finder that will find the specified Select
+         */
+        public BaseReactSelectFinder<Select> withinFormGroup(String labelText)
+        {
+            _locator = Locator.tagWithClass("div", "form-group")
+                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
+                    .descendant(Locators.selectContainer());
+            return this;
+        }
+
         public BaseReactSelectFinder<Select> withLabelContaining(String label)
         {
             _locator = ReactSelect.Locators.containerWithDescendant(Locator.tag("input")
