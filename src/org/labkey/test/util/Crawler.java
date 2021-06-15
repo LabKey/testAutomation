@@ -19,6 +19,7 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
@@ -31,11 +32,11 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.openqa.selenium.Alert;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -69,7 +70,6 @@ public class Crawler
     private static final Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static final Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static final Set<String> _urlsChecked = new HashSet<>();
-    private static final ActionProfiler _actionProfiler = new ActionProfiler();
     private static final Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
 
     // All parameters seen by the crawler. Used to randomly attempt injection against parameters not found in UI
@@ -94,6 +94,7 @@ public class Crawler
     private final List<String> _warnings = new ArrayList<>();
     private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+    private final long _downloadCutoff;
 
     private int _remainingAttemptsToGetProjectLinks = 4;
     private int _maxDepth = 4;
@@ -119,6 +120,7 @@ public class Crawler
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
         _actionsMayLinkTo404 = getAllowed404Sources();
         _injectionCheckEnabled = injectionTest;
+        _downloadCutoff = BaseWebDriverTest.getDownloadDir().lastModified();
         for (String project : projects)
         {
             addProject(project);
@@ -156,8 +158,6 @@ public class Crawler
             new ControllerActionId("admin", "deleteFolder"),
             new ControllerActionId("admin", "doCheck"),
             new ControllerActionId("admin", "dumpHeap"),
-            new ControllerActionId("admin", "exportQueries"), // download action
-            new ControllerActionId("admin", "getSchemaXmlDoc"), // download action
             new ControllerActionId("admin", "mapNetworkDrive"), // 404 on non-Windows
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "queryStackTraces"),
@@ -168,90 +168,32 @@ public class Crawler
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "showPrimaryLog"), // Can take very long to load
             new ControllerActionId("admin-sql", "saveReorderedScript"),
-            new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
-            new ControllerActionId("assay", "downloadSampleQCData"),
-            new ControllerActionId("assay", "template"),
-            new ControllerActionId("cds", "exportTourDefinitions"), // Download action
-            new ControllerActionId("cds", "permissionsReportExport"),
-            new ControllerActionId("core", "downloadFileLink"), // Download action
             new ControllerActionId("dumbster", "begin"),
-            new ControllerActionId("experiment", "exportProtocols"),
-            new ControllerActionId("experiment", "exportRunFiles"),
-            new ControllerActionId("experiment", "exportSampleType"),
-            new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
-            new ControllerActionId("flow-compensation", "download"),
-            new ControllerActionId("flow-editscript", "download"),
-            new ControllerActionId("flow-run", "download"),
-            new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
-            new ControllerActionId("harvest", "formatInvoice"),
-            new ControllerActionId("issues", "download"),
-            new ControllerActionId("list", "download"),
             new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
-            new ControllerActionId("luminex", "exportDefaultValues"), // download action
-            new ControllerActionId("ms2", "exportProteinCoverageMap"),
-            new ControllerActionId("ms2", "pepSearch"), // TODO: 36995: Check for SQL injection in StatementWrapper is not precise enough
+            new ControllerActionId("ms2", "pepSearch"), // TODO: Issue 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "doProteinSearch"),
-            new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
-            new ControllerActionId("pipeline-status", "showFile"), // Download action
             new ControllerActionId("project", "togglePageAdminMode"),
-            new ControllerActionId("query", "excelWebQueryDefinition"),
-            new ControllerActionId("query", "exportExcelTemplate"), // Download action
-            new ControllerActionId("query", "exportRowsExcel"),
-            new ControllerActionId("query", "printRows"),
-            new ControllerActionId("reports", "crosstabExport"), // Download action
-            new ControllerActionId("reports", "download"),
-            new ControllerActionId("reports", "downloadInputData"),
+            new ControllerActionId("query", "printRows"), // Data region print button. 404s on "TargetedMS Runs" grid
             new ControllerActionId("reports", "streamFile"),
-            new ControllerActionId("search", "search"), // Tests need to wait for indexer manually
-            new ControllerActionId("security", "groupExport"), // Download action
-            new ControllerActionId("study", "confirmDeleteVisit"),
-            new ControllerActionId("study", "deleteDataset"),
-            new ControllerActionId("study", "downloadTsv"),
             new ControllerActionId("study", "importStudyFromPipeline"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
-            new ControllerActionId("study", "protocolDocumentDownload"),
-            new ControllerActionId("specimen", "download"),
-            new ControllerActionId("specimen", "downloadSpecimenList"),
-            new ControllerActionId("specimen", "emailLabSpecimenLists"),
-            new ControllerActionId("specimen", "getSpecimenExcel"),
-
-            new ControllerActionId("study-security", "exportSecurityPolicy"),
-            new ControllerActionId("targetedms", "downloadChromLibrary"),
-            new ControllerActionId("targetedms", "downloadDocument"),
-            new ControllerActionId("test", "npe"),
-            new ControllerActionId("wiki", "download"),
-
-            // These actions can generate a PDF download response if format=pdf is added to the URL, so they can
-            // trip up the crawler. See issue 42661
-            new ControllerActionId("targetedms", "precursorChromatogramChart"),
-            new ControllerActionId("targetedms", "transitionChromatogramChart"),
-            new ControllerActionId("targetedms", "generalMoleculeChromatogramChart"),
-            new ControllerActionId("targetedms", "peptideChromatogramChart"),
-            new ControllerActionId("targetedms", "moleculeChromatogramChart"),
-            new ControllerActionId("targetedms", "sampleFileChromatogramChart"),
-            new ControllerActionId("targetedms", "showPeakAreas"),
-            new ControllerActionId("targetedms", "showRetentionTimesChart"),
-
 
             // Disable crawler for single-page apps until we make `beginAt` work with them
             new ControllerActionId("biologics", "app"),
             new ControllerActionId("cds", "app"),
             new ControllerActionId("samplemanager", "app"),
-
-            // Actions that error with no parameters. Generally linked from admin-spider.view
-            new ControllerActionId("user", "changeEmail"), // NotFoundException from changeEmail.jsp
 
             // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
             new ControllerActionId("biologics", "begin"),
@@ -285,6 +227,7 @@ public class Crawler
 
         // Don't crawl test modules
         controllers.add("chartingapi");
+        controllers.add("editableModule");
         controllers.add("ETLtest");
         controllers.add("footerTest");
         controllers.add("linkedschematest");
@@ -317,8 +260,6 @@ public class Crawler
     {
         Set<String> actionNames = Collections.newSetFromMap(new CaseInsensitiveMap<>());
 
-        actionNames.add("export");
-        actionNames.add("download");
         actionNames.add("expandCollapse");
 
         return actionNames;
@@ -756,124 +697,6 @@ public class Crawler
         }
     }
 
-    public static class ActionProfiler
-    {
-        private final Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
-
-        public void updateActionProfile(String relativeUrl, long loadTime)
-        {
-            ControllerActionId actionId = new ControllerActionId(relativeUrl);
-            if (_actionProfiles.containsKey(actionId))
-                _actionProfiles.get(actionId).updateActionProfile(relativeUrl, loadTime);
-            else
-                _actionProfiles.put(actionId, new ActionProfile(relativeUrl, loadTime));
-        }
-
-        private static class ActionProfile
-        {
-            private long _invocations;
-            private long _longestLoad;
-            private long _totalTime;
-            private final ControllerActionId _actionId;
-
-            ActionProfile(String relativeURL, long loadTime)
-            {
-                _actionId = new ControllerActionId(relativeURL);
-                _invocations = 1;
-                _totalTime = _longestLoad = loadTime;
-            }
-
-            public void updateActionProfile(String relativeURL, long loadTime)
-            {
-                if (!_actionId.equals(new ControllerActionId(relativeURL)))
-                    throw new IllegalArgumentException("Actions don't match");
-
-                _invocations++;
-                _totalTime += loadTime;
-
-                if (loadTime > _longestLoad)
-                {
-                    _longestLoad = loadTime;
-                }
-            }
-
-            public ControllerActionId getActionId()
-            {return _actionId;}
-
-            public String getAction()
-            {return _actionId.getAction();}
-
-            public String getController()
-            {return _actionId.getController();}
-
-            public long getInvocations()
-            {return _invocations;}
-
-            public long getLongestLoad()
-            {return _longestLoad;}
-
-            public long getTotalTime()
-            {return _totalTime;}
-        }
-
-        public String toHtml()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("<table cellspacing=0 cellpadding=3>\n");
-            sb.append("<tr>");
-            sb.append("<td>");
-            sb.append("Controller");
-            sb.append("</td><td style=\"padding-left:10;\">");
-            sb.append("Action");
-            sb.append("</td>");
-            sb.append("<td>");
-            sb.append("Slowest Instance");
-            sb.append("</td>");
-            sb.append("<td>");
-            sb.append("Invocation Count (crawler)");
-            sb.append("</td>");
-            sb.append("<td>");
-            sb.append("Total time");
-            sb.append("</td>");
-            sb.append("</tr>\n");
-
-            for (ActionProfile action : _actionProfiles.values())
-            {
-                sb.append("<tr>");
-                sb.append("<td valign=top align=right>").append(action.getController()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getAction()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getLongestLoad()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getInvocations()).append("</td>");
-                sb.append("<td style=\"padding-left:10;\">").append(action.getTotalTime()).append("</td>");
-                sb.append("</tr>\n");
-            }
-
-            sb.append("</table>\n");
-
-            return sb.toString();
-        }
-
-        public String toTsv()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("Controller\tAction\tSlowest Instance\tInvocation Count (crawler)\tTotal time\n");
-
-            for (ActionProfile action : _actionProfiles.values())
-            {
-                sb.append(action.getController()).append("\t");
-                sb.append(action.getAction()).append("\t");
-                sb.append(action.getLongestLoad()).append("\t");
-                sb.append(action.getInvocations()).append("\t");
-                sb.append(action.getTotalTime());
-                sb.append("\n");
-            }
-
-            return sb.toString();
-        }
-    }
-
     @LogMethod
     public void crawlAllLinks()
     {
@@ -973,9 +796,28 @@ public class Crawler
         return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed(), _warnings);
     }
 
-    public void validatePage(String url)
+    @LogMethod
+    public void validatePage(@LoggedParam String url)
     {
         crawlLink(new UrlToCheck(null, url, -1));
+    }
+
+    private void beginAt(String relativeUrl)
+    {
+        deleteCrawlerDownloads();
+        _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true);
+    }
+
+    private void deleteCrawlerDownloads()
+    {
+        File[] downloadedByCrawler = BaseWebDriverTest.getDownloadDir().listFiles(file -> file.lastModified() > _downloadCutoff);
+        if (downloadedByCrawler != null)
+        {
+            for (File toDelete : downloadedByCrawler)
+            {
+                FileUtils.deleteQuietly(toDelete);
+            }
+        }
     }
 
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
@@ -996,12 +838,11 @@ public class Crawler
         {
             try
             {
-                long loadTime = _test.beginAt(relativeURL
+                beginAt(relativeURL
                         .replace("[", "%5B")
                         .replace("]", "%5D")
                         .replace("{", "%7B")
                         .replace("}", "%7D")); // Escape brackets to prevent 400 errors
-                _actionProfiler.updateActionProfile(relativeURL, loadTime);
             }
             catch (UnhandledAlertException alert)
             {
@@ -1048,7 +889,7 @@ public class Crawler
                         _test.projectMenu().open();
                         _remainingAttemptsToGetProjectLinks = 0; // Got em
                     }
-                    catch (NoSuchElementException ignore) { } // Hiccup with the project menu. Don't worry about it
+                    catch (WebDriverException ignore) { } // Hiccup with the project menu, try again next time.
                 }
 
                 if (code == 200 && _test.getDriver().getTitle().isEmpty())
@@ -1264,7 +1105,7 @@ public class Crawler
             query = query.substring(1);
 
         Consumer<String> urlTester = urlMalicious -> {
-            _test.beginAt(urlMalicious);
+            beginAt(urlMalicious);
             _test.executeScript("return;"); // Trigger UnhandledAlertException
         };
 

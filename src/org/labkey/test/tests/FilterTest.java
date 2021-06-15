@@ -16,54 +16,59 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
-import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.issues.IssuesTest;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ReportDataRegion;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.params.FieldDefinition.ColumnType;
+import static org.labkey.test.params.FieldDefinition.LookupInfo;
+import static org.labkey.test.util.PermissionsHelper.MemberType;
 
-/**conceptually filter and list are separate, but
- * it was convenient to use the list test helpers for filter
- */
 @Category({DailyB.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FilterTest extends BaseWebDriverTest
 {
+    protected final static String EDITOR1 = "filter_editor1@filter.test";
+    protected final static String EDITOR2 = "filter_editor2@filter.test";
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";
     protected final static String FACET_TEST_LIST = "FacetList";
 
     protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
-    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     protected final static String LIST_KEY_NAME2 = "Color";
-    protected final static String HIDDEN_TEXT = "CantSeeMe";
 
-    protected final ListHelper.ListColumn _listCol1 = new ListHelper.ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
-    protected final ListHelper.ListColumn _listCol2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateAndTime, "When to wear the color", "M");
-    protected final ListHelper.ListColumn _listCol3 = new ListHelper.ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
-    protected final ListHelper.ListColumn _listCol4 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
-    protected final ListHelper.ListColumn _listCol5 = new ListHelper.ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
-    protected final ListHelper.ListColumn _listCol6 = new ListHelper.ListColumn("Aliased,Column", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
+    protected final FieldDefinition _listColKey = new FieldDefinition("Color", ColumnType.String);
+    protected final FieldDefinition _listCol1 = new FieldDefinition("Desc", ColumnType.String).setLabel("Description").setDescription("What the color is like");
+    protected final FieldDefinition _listCol2 = new FieldDefinition("Month", ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
+    protected final FieldDefinition _listCol3 = new FieldDefinition("JewelTone", ColumnType.Boolean).setLabel("Jewel Tone").setDescription("Am I a jewel tone?");
+    protected final FieldDefinition _listCol4 = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
+    protected final FieldDefinition _listCol5 = new FieldDefinition("HiddenColumn", ColumnType.String).setLabel("CantSeeMe").setDescription("I should be hidden!");
+    protected final FieldDefinition _listCol6 = new FieldDefinition("Aliased,Column", ColumnType.String).setLabel("Element").setDescription("I show aliased data.");
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
@@ -72,10 +77,10 @@ public class FilterTest extends BaseWebDriverTest
             { "10", "9", "8", "7"},
             { "Water", "Earth", "Fire", "Air"}};
     protected final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
-    protected final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
-    protected final static String LIST2_KEY_NAME = "Car";
 
-    protected final ListHelper.ListColumn _list2Col1 = new ListHelper.ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new ListHelper.LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.String));
+    protected final FieldDefinition _list2ColKey = new FieldDefinition("Car", ColumnType.String);
+    protected final FieldDefinition _list2Col1 = new FieldDefinition(LIST_KEY_NAME2, new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(ColumnType.String)).setDescription("The color of the car");
+    protected final FieldDefinition _list2ColYear = new FieldDefinition("year", ColumnType.Integer).setLabel("year");
 
     @Override
     protected BrowserType bestBrowser()
@@ -89,90 +94,89 @@ public class FilterTest extends BaseWebDriverTest
         return "FilterVerifyProject";
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        super.doCleanup(afterTest);
+        _userHelper.deleteUsers(false, EDITOR1, EDITOR2);
+    }
+
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws Exception
     {
         FilterTest init = (FilterTest)getCurrentTest();
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws Exception
     {
         new RReportHelper(this).ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
-    }
+        _userHelper.createUser(EDITOR1);
+        _userHelper.createUser(EDITOR2);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.addMemberToRole(EDITOR1, "Editor", MemberType.user, getProjectName());
+        apiPermissionsHelper.addMemberToRole(EDITOR2, "Editor", MemberType.user, getProjectName());
 
-    @Test
-    public void testSteps()
-    {
         createList();
-        filterTest();
-
         createList2();
-        facetedFilterTest();
-        maskedFacetTest();
-        containerFilterFacetTest();
-        searchFilterTest();
     }
 
     @LogMethod
-    void createList()
+    void createList() throws Exception
     {
-        StringBuilder testDataFull = new StringBuilder();
-        testDataFull.append(StringUtils.join(Arrays.asList(LIST_KEY_NAME2, _listCol1.getName(), _listCol2.getName(), _listCol3.getName(), _listCol4.getName(), _listCol6.getName()), "\t"));
-        testDataFull.append("\n");
-        for (int i=0 ; i<TEST_DATA[0].length ; i++)
-        {
-            testDataFull.append(StringUtils.join(Arrays.asList(
-                    TEST_DATA[0][i],
-                    TEST_DATA[1][i],
-                    CONVERTED_MONTHS[i],
-                    TEST_DATA[2][i],
-                    TEST_DATA[4][i],
-                    (i==TEST_DATA[0].length-1) ? "" : TEST_DATA[5][i] // NOTE make last row blank
-                    ),"\t"));
-            testDataFull.append("\n");
-        }
+        Connection connection = createDefaultConnection();
 
         log("Add list -- " + LIST_NAME_COLORS);
-        _listHelper.createList(getProjectName(), LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
-        log("Set title field of 'Colors' to 'Desc'");
-        _listHelper.goToList(LIST_NAME_COLORS);
-        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
-        listDefinitionPage.openAdvancedListSettings()
-                .setFieldUsedForDisplayTitle("Desc")
-                .clickApply();
-        listDefinitionPage.clickSave();
+        ListDefinition listDefinition = new VarListDefinition(LIST_NAME_COLORS)
+                .setFields(List.of(_listColKey, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6))
+                .setTitleColumn(_listCol1.getName());
+        TestDataGenerator dataGenerator = listDefinition.create(connection, getProjectName());
 
         log("Import data to the list");
-        _listHelper.goToList(LIST_NAME_COLORS);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(testDataFull.toString());
+        for (int i=0 ; i<TEST_DATA[0].length ; i++)
+        {
+            dataGenerator.addCustomRow(Map.of(
+                    _listColKey.getName(), TEST_DATA[0][i],
+                    _listCol1.getName(), TEST_DATA[1][i],
+                    _listCol2.getName(), CONVERTED_MONTHS[i],
+                    _listCol3.getName(), TEST_DATA[2][i],
+                    _listCol4.getName(), TEST_DATA[4][i],
+                    _listCol6.getName(), (i==TEST_DATA[0].length-1) ? "" : TEST_DATA[5][i] // NOTE make last row blank
+            ));
+        }
+        dataGenerator.insertRows(connection);
 
+        _listHelper.goToList(LIST_NAME_COLORS);
         new RReportHelper(this).createRReport(R_VIEW);
         _listHelper.goToManageLists();
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
     }
 
     @LogMethod
-    protected void createList2()
+    protected void createList2() throws Exception
     {
-        ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
-        _listHelper.createList(getProjectName(), FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
-        _listHelper.goToList(FACET_TEST_LIST);
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), "Car\tColor\tyear\n" +
-                "1\tBlue\t1980\n" +
-                "2\tRed\t1970\n" +
-                "3\tYellow\t1990\n");
+        ListDefinition list2 = new VarListDefinition(FACET_TEST_LIST)
+                .setFields(List.of(_list2ColKey, _list2Col1, _list2ColYear));
+        Connection connection = createDefaultConnection();
+        TestDataGenerator dataGenerator = list2.create(connection, getProjectName());
 
-        clickButton("Submit", 0);
-        waitForElement(Locator.css(".lk-body-title h3").withText(FACET_TEST_LIST));
+        dataGenerator.addCustomRow(Map.of("Car", 1, "Color", "Blue", "Year", 1980));
+        dataGenerator.addCustomRow(Map.of("Car", 2, "Color", "Red", "Year", 1970));
+        dataGenerator.addCustomRow(Map.of("Car", 3, "Color", "Yellow", "Year", 1990));
+        dataGenerator.insertRows(connection);
     }
 
-    @LogMethod
-    private void facetedFilterTest()
+    @Before
+    public void preTest()
     {
+        goToProjectHome();
+    }
+
+    @Test
+    public void testFacetedFilter()
+    {
+        _listHelper.goToList(FACET_TEST_LIST);
         DataRegionTable region = new DataRegionTable("query", this);
         verifyColumnValues(region, "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
@@ -250,9 +254,10 @@ public class FilterTest extends BaseWebDriverTest
         verifyColumnValues(region, "year", "1980", "1970", "1990");
     }
 
-    @LogMethod
-    private void maskedFacetTest()
+    @Test
+    public void testMaskedFacet()
     {
+        _listHelper.goToList(FACET_TEST_LIST);
         DataRegionTable region = new DataRegionTable("query", this);
         region.setFacetedFilter("year", "1980", "1990");
         verifyFacetOptions(region, "Car", "1", "3");
@@ -265,10 +270,9 @@ public class FilterTest extends BaseWebDriverTest
         verifyFacetOptions(region, "Car", "3");
     }
 
-    @LogMethod
-    private void containerFilterFacetTest()
+    @Test
+    public void testContainerFilterFacet()
     {
-        goToProjectHome();
         IssuesHelper issuesHelper = new IssuesHelper(this);
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
@@ -377,14 +381,55 @@ public class FilterTest extends BaseWebDriverTest
         assertEquals("Unexpected filter options", Arrays.asList(expectedOptions), actualOptions);
     }
 
-    @LogMethod
-    protected void filterTest()
+    @Test
+    public void testFilters()
     {
+        _listHelper.goToList(LIST_NAME_COLORS);
+
         validFiltersGenerateCorrectResultsTest();
 
         invalidFiltersGenerateCorrectErrorTest();
 
         filterCancelButtonWorksTest();
+    }
+
+    /**
+     * Issue 40362: Automated Regression Coverage for ~me~ filter value
+     */
+    @Test
+    public void testUserMeFilter()
+    {
+        _listHelper.goToList(LIST_NAME_COLORS);
+
+        final DataRegionTable list = new DataRegionTable(TABLE_NAME, this);
+
+        // Modify a row as EDITOR1
+        doAsUser(EDITOR1, () -> list.updateRow(1, Map.of("HiddenColumn", "edit1")));
+
+        // Modify a row as EDITOR2
+        doAsUser(EDITOR2, () -> list.updateRow(2, Map.of("HiddenColumn", "edit2")));
+
+        list.ensureColumnPresent("ModifiedBy");
+        int userColumn = list.getColumnIndex("ModifiedBy");
+        String name0 = getDisplayName();
+        String name1 = _userHelper.getDisplayNameForEmail(EDITOR1);
+        String name2 = _userHelper.getDisplayNameForEmail(EDITOR2);
+
+        list.setFilter("ModifiedBy", "Equals", "~me~");
+        assertEquals("ModifiedBy: Equals '~me~'",
+                List.of(name0, name0), list.getColumnDataAsText(userColumn));
+
+        list.setFilter("ModifiedBy", "Contains", "~me~");
+        assertEquals("ModifiedBy: Contains '~me~'",
+                List.of(name0, name0), list.getColumnDataAsText(userColumn));
+
+        list.setFilter("ModifiedBy", "Does Not Equal Any Of (example usage: a;b;c)", "~me~");
+        assertEquals("ModifiedBy: Does Not Equal Any Of (~me~)",
+                List.of(name1, name2), list.getColumnDataAsText(userColumn));
+
+        list.setFilter("ModifiedBy", "Equals One Of (example usage: a;b;c)", "~me~;" + name1);
+        assertEquals("ModifiedBy: Equals One Of (~me~;editor1)",
+                List.of(name0, name1, name0), list.getColumnDataAsText(userColumn));
     }
 
     @LogMethod
@@ -420,15 +465,14 @@ public class FilterTest extends BaseWebDriverTest
 
     private String[][] generateInvalidFilterTestArgs()
     {
-        String[][] args = {
+
+        return new String[][]{
                 {TABLE_NAME, getBooleanColumnName(), "Equals", "foo", "foo is not a valid boolean"},
                 {TABLE_NAME, getStringColumnName(), "Equals", "", EMPTY_FILTER_VAL_ERROR_MSG},
                 {TABLE_NAME, getDateColumnName(), "Equals", TRICKY_CHARACTERS, TRICKY_CHARACTERS + " is not a valid date"},
                 {TABLE_NAME, getIntColumnName(), "Equals", "ab123", "Invalid value: ab123"},
                 {TABLE_NAME, getIntColumnName(), "Equals", "", EMPTY_FILTER_VAL_ERROR_MSG},
         };
-
-        return args;
     }
 
     private String getStringColumnName()
@@ -617,11 +661,10 @@ public class FilterTest extends BaseWebDriverTest
         assertElementNotPresent("Expected message to disappear", Locator.css(".labkey-dataregion-msg"));
     }
 
-    @LogMethod
-    public void searchFilterTest()
+    @Test
+    public void testSearchFilter()
     {
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
+        _listHelper.goToList(LIST_NAME_COLORS);
 
         DataRegionTable region = new DataRegionTable(TABLE_NAME, this.getDriver());
 

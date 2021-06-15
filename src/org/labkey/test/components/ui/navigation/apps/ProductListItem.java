@@ -44,6 +44,11 @@ public class ProductListItem extends WebDriverComponent<ProductListItem.ElementC
         elementCache().navIcon.click();
     }
 
+    public boolean isEnabled()
+    {
+        return !_el.getAttribute("class").contains("labkey-page-nav-disabled");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

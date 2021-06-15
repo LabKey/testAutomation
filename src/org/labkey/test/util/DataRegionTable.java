@@ -36,6 +36,7 @@ import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
@@ -706,43 +707,42 @@ public class DataRegionTable extends DataRegion
     }
 
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
-    public void updateRow(String key, Map<String, String> data)
+    public void updateRow(String key, Map<String, ?> data)
     {
         updateRow(key, data, true);
     }
 
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
-    public void updateRow(String key, Map<String, String> data, boolean validateText)
+    public void updateRow(String key, Map<String, ?> data, boolean validateText)
     {
         clickEditRow(key);
 
         setRowData(data, validateText);
     }
 
-    public void updateRow(int rowIndex, Map<String, String> data)
+    public void updateRow(int rowIndex, Map<String, ?> data)
     {
         updateRow(rowIndex, data, true);
     }
 
-    public void updateRow(int rowIndex, Map<String, String> data, boolean validateText)
+    public void updateRow(int rowIndex, Map<String, ?> data, boolean validateText)
     {
         clickEditRow(rowIndex);
 
         setRowData(data, validateText);
     }
 
-    //todo: return edit page
-    public void clickEditRow(int rowIndex)
+    public UpdateQueryRowPage clickEditRow(int rowIndex)
     {
         WebElement updateLink = updateLink(rowIndex);
         getWrapper().fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
         getWrapper().clickAndWait(updateLink);
+        return new UpdateQueryRowPage(getDriver());
     }
 
-    //todo: return edit page
-    public void clickEditRow(String key)
+    public UpdateQueryRowPage clickEditRow(String key)
     {
-        clickEditRow(getRowIndexStrict(key));
+        return clickEditRow(getRowIndexStrict(key));
     }
 
     public void clickRowDetails(int rowIndex)
@@ -759,7 +759,11 @@ public class DataRegionTable extends DataRegion
 
     protected void setRowData(Map<String, ?> data, boolean validateText)
     {
-        new ListHelper(getWrapper()).setRowData(data, validateText);
+        new UpdateQueryRowPage(getDriver()).update(data);
+        if (validateText)
+        {
+            getWrapper().assertTextPresent(String.valueOf(data.values().iterator().next()));  //make sure some text from the map is present
+        }
     }
 
     public String getDetailsHref(int row)
