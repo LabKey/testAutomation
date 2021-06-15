@@ -1,7 +1,7 @@
 package org.labkey.test.components.ui.navigation.apps;
 
 import org.labkey.test.Locator;
-import org.openqa.selenium.NotFoundException;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -39,19 +39,7 @@ public class LeafNavContainer extends BaseNavContainer
         // if navigating to an item in the current application, the document itself may not reload, so a clickAndWait won't succeed.
         // Look for a change in the URL instead.
         item.click();
-        int tries = 1;
-        try
-        {
-            while(currentUrl.equals(getDriver().getCurrentUrl()) && (tries < 10))
-            {
-                wait(wait/10);
-                tries++;
-            }
-        }
-        catch (InterruptedException e)
-        {
-            throw new NotFoundException("Navigation to " + itemText + " was interrupted.");
-        }
+        WebDriverWrapper.waitFor(()->!currentUrl.equals(getDriver().getCurrentUrl()), "Failed to navigate to " + itemText + ".", 1000);
     }
 
     @Override

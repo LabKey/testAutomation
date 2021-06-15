@@ -46,7 +46,7 @@ public class ProductListItem extends WebDriverComponent<ProductListItem.ElementC
 
     public boolean isEnabled()
     {
-        return !"labkey-page-nav-disabled".equals(_el.getAttribute("class"));
+        return !_el.getAttribute("class").contains("labkey-page-nav-disabled");
     }
 
     @Override
