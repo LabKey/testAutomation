@@ -707,25 +707,25 @@ public class DataRegionTable extends DataRegion
     }
 
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
-    public void updateRow(String key, Map<String, String> data)
+    public void updateRow(String key, Map<String, ?> data)
     {
         updateRow(key, data, true);
     }
 
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
-    public void updateRow(String key, Map<String, String> data, boolean validateText)
+    public void updateRow(String key, Map<String, ?> data, boolean validateText)
     {
         clickEditRow(key);
 
         setRowData(data, validateText);
     }
 
-    public void updateRow(int rowIndex, Map<String, String> data)
+    public void updateRow(int rowIndex, Map<String, ?> data)
     {
         updateRow(rowIndex, data, true);
     }
 
-    public void updateRow(int rowIndex, Map<String, String> data, boolean validateText)
+    public void updateRow(int rowIndex, Map<String, ?> data, boolean validateText)
     {
         clickEditRow(rowIndex);
 
