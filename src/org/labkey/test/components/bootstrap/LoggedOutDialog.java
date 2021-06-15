@@ -2,6 +2,7 @@ package org.labkey.test.components.bootstrap;
 
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -10,16 +11,21 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 
 public class LoggedOutDialog extends ModalDialog
 {
+    static public List<Locator> LKS_TOP_LEVEL_ELEMENTS = List.of(org.labkey.test.Locators.headerContainer(),
+            org.labkey.test.Locators.bodyPanel(), org.labkey.test.Locators.footerPanel());
+    static public List<Locator> APP_TOP_LEVEL_ELEMENTS = List.of(org.labkey.test.Locators.bodyPanel());
+
     protected LoggedOutDialog(WebDriver driver)
     {
         super(new ModalDialogFinder(driver).withTitle("Logged Out")
@@ -29,18 +35,6 @@ public class LoggedOutDialog extends ModalDialog
     static public LoggedOutDialog waitFor(WebDriver driver)
     {
         return new LoggedOutDialog(driver);
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return _driver;
     }
 
     public void clickReloadPage()
@@ -69,44 +63,49 @@ public class LoggedOutDialog extends ModalDialog
         getWrapper().clickButton("Sign In", 0);
 
         var returnUrl = getWrapper().getCurrentRelativeURL();
-        assertThat("Signing back in did not take us back to the expected page.", returnUrl, is(expectedURL));
+        assertThat("Signing back in did not take us back to the expected page.", returnUrl, startsWith(expectedURL));
     }
 
     /**
      *  Checks the background/masked elements behind the dialog to ensure that the expected content
      *  areas are blurred/styled as expected.
-     *  Because not all of these page sections are present in all situations (notably, in apps like
-     *  SM, FM, Biologics) this checks for the ones present, and if any of them are both present and
-     *  not styled as expected, will return false.
+     *  If any of them are not present or not styled as expected, will return false.
      * @return True if all page sections that are present are styled with 'lk-content-blur', otherwise false
      */
-    public boolean isContentBlurred()
+    public boolean isContentBlurred(List<Locator> elementsToBeBlurred)
     {
-        List<Boolean> factors = new ArrayList<>();
-        var lkHeader = elementCache().lkHeader.findOptionalElement(getDriver());
-        if (lkHeader.isPresent())
-            factors.add(lkHeader.get().getAttribute("class").contains("lk-content-blur"));
-
-        var lkBody = elementCache().lkBody.findOptionalElement(getDriver());
-        if (lkBody.isPresent())
-            factors.add(lkBody.get().getAttribute("class").contains("lk-content-blur"));
-
-        var footerBlock = elementCache().footerBlock.findOptionalElement(getDriver());
-        if (footerBlock.isPresent())
-            factors.add(footerBlock.get().getAttribute("class").contains("lk-content-blur"));
-
         // if any of these bodyParts are present and don't have the lk-content-blur style applied, return false
         // otherwise, true
-        for(Boolean fact : factors)
+        for(Locator loc : elementsToBeBlurred)
         {
-            if(!fact)
+            if(!loc.findElement(getDriver()).getAttribute("class").contains("lk-content-blur"))
                 return false;
         }
         return true;
     }
 
+    /**
+     * Use this to check expected top-level elements' presence in tests before subsequently calling isContentBlurred
+     * to measure whether they are blurred or not
+     * @param test
+     * @param expectedElements  Locators for the top-level elements we expect; either for LKS or for apps
+     */
+    static public void verifyExpectedElements(WebDriverWrapper test, List<Locator> expectedElements)
+    {
+        for(Locator loc : expectedElements)
+        {
+            var elem = loc.findElement(test.getDriver()); // if it's not there, fail and tell us
+            assertThat("expect the element to be present and to not have the content-blur style applied",
+                    elem.getAttribute("class"), not(containsString("lk-content-blur")));
+        }
+    }
 
     protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
@@ -114,13 +113,6 @@ public class LoggedOutDialog extends ModalDialog
     protected class ElementCache extends ModalDialog.ElementCache
     {
         final WebElement reloadPageBtn = Locator.id("lk-websocket-reload").findWhenNeeded(this);
-
-        Locator modalBackdrop = Locator.tagWithClass("div", "modal-backdrop");
-
-        Locator.XPathLocator body = Locator.tag("html").child("body");
-        Locator lkHeader = body.child(Locator.tagWithClass("div", "lk-header-ct"));
-        Locator lkBody = body.child(Locator.tagWithClass("div", "lk-body-ct"));
-        Locator footerBlock = body.child(Locator.tagWithClass("footer", "footer-block"));
     }
 
 }
