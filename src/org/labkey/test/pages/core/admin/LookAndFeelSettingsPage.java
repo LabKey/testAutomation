@@ -58,6 +58,17 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         new RadioButton(elementCache().showNavForAdmin).check();
     }
 
+    public void setShowAppNavAlways()
+    {
+        new RadioButton(elementCache().showAppNavAlways).check();
+    }
+
+    public void setShowAppNavAdmin()
+    {
+        new RadioButton(elementCache().showAppNavForAdmin).check();
+    }
+
+
     public void enableHelp(boolean enable)
     {
         if (enable)
@@ -206,7 +217,9 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         WebElement headerShortName = Locator.name("systemShortName").findWhenNeeded(this);
         WebElement theme = Locator.name("themeName").findWhenNeeded(this);
         WebElement showNavAlways = Locator.xpath("//input[@name='folderDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
-        WebElement showNavForAdmin = Locator.xpath("//input[@name='folderDisplayMode' and @value='ADMIHN']").findWhenNeeded(this);
+        WebElement showNavForAdmin = Locator.xpath("//input[@name='folderDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
+        WebElement showAppNavAlways = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
+        WebElement showAppNavForAdmin = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
         WebElement enableHelpChk = Locator.name("enableHelpMenu").findWhenNeeded(this);
         WebElement enableDiscussionChk = Locator.name("enableDiscussion").findWhenNeeded(this);
         WebElement logoLinkTxt = Locator.inputByNameContaining("logoHref").findWhenNeeded(this);
