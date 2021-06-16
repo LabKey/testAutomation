@@ -140,6 +140,16 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
+    public PipelineTriggerWizard setAction(String action)
+    {
+        if (action.equals("Merge"))
+            elementCache().action.index(0).findElement(this).click();
+        else
+            elementCache().action.index(1).findElement(this).click(); // Append
+        return this;
+    }
+
+
     public PipelineTriggerWizard setFilePattern(String value)
     {
         elementCache().filePatternInput.set(value);
@@ -166,7 +176,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public boolean isMoveEnabled()
     {
-        try {
+        try
+        {
             elementCache().containerMoveInput.getComponentElement();
         }
         catch (NoSuchElementException e)
@@ -210,7 +221,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     public PipelineTriggerWizard removeCustomParameter(@NotNull Integer index)
     {
 
-        WebElement deleteIcon =  Locator.tagWithClass("div", "custom-parameter")
+        WebElement deleteIcon = Locator.tagWithClass("div", "custom-parameter")
                 .append(Locator.tagWithClass("span", "fa-trash"))
                 .findElements(this).get(index);
 
@@ -252,26 +263,27 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 //                Locators.pageSignal("triggerConfigLoaded").waitForElement(getDriver(), 10000);
 //        }
 
+
         //details page elements
         Input nameInput = new Input(Locator.tagWithName("input", "name").findWhenNeeded(this), getDriver());
-        Input descriptionInput =  new Input(Locator.tagWithName("textarea", "description").findWhenNeeded(this), getDriver());
+        Input descriptionInput = new Input(Locator.tagWithName("textarea", "description").findWhenNeeded(this), getDriver());
         OptionSelect typeSelect = new OptionSelect(Locator.tagWithName("select", "type").findWhenNeeded(this));
         OptionSelect taskSelect = new OptionSelect(Locator.tagWithName("select", "pipelineId").findWhenNeeded(this));
-        Input usernameInput =  new Input(Locator.tagWithName("input", "username").findWhenNeeded(this), getDriver());
-        Input assayProviderInput =  new Input(Locator.tagWithName("input", "assay provider").findWhenNeeded(this), getDriver());
+        Input usernameInput = new Input(Locator.tagWithName("input", "username").findWhenNeeded(this), getDriver());
+        Input assayProviderInput = new Input(Locator.tagWithName("input", "assay provider").findWhenNeeded(this), getDriver());
         Checkbox enabledCheckbox = new Checkbox(Locator.tagWithName("input", "enabled").findWhenNeeded(this));
-
         //configuration page elements
-        Input locationInput =  new Input(Locator.tagWithName("input", "location").findWhenNeeded(this), getDriver());
+        Input locationInput = new Input(Locator.tagWithName("input", "location").findWhenNeeded(this), getDriver());
         Checkbox recursiveCheckbox = new Checkbox(Locator.tagWithName("input", "recursive").findWhenNeeded(this));
-        Input filePatternInput =  new Input(Locator.tagWithName("input", "filePattern").findWhenNeeded(this), getDriver());
-        Input quietInput =  new Input(Locator.tagWithName("input", "quiet").findWhenNeeded(this), getDriver());
-        Input containerMoveInput =  new Input(Locator.tagWithName("input", "moveContainer").findWhenNeeded(this), getDriver());
+        Input filePatternInput = new Input(Locator.tagWithName("input", "filePattern").findWhenNeeded(this), getDriver());
+        Input quietInput = new Input(Locator.tagWithName("input", "quiet").findWhenNeeded(this), getDriver());
+        Input containerMoveInput = new Input(Locator.tagWithName("input", "moveContainer").findWhenNeeded(this), getDriver());
         Input subdirectoryMoveInput = new Input(Locator.tagWithName("input", "moveDirectory").findWhenNeeded(this), getDriver());
-        Input copyInput =  new Input(Locator.tagWithName("input", "copy").findWhenNeeded(this), getDriver());
-        Input paramFunctionInput =  new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
+        Input copyInput = new Input(Locator.tagWithName("input", "copy").findWhenNeeded(this), getDriver());
+        Input paramFunctionInput = new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
         WebElement showAdvanced = Locator.tagWithText("div", "Show Advanced Settings").findWhenNeeded(this);
         WebElement addCustomParam = Locator.tagWithText("div", "Add Custom Parameter").findWhenNeeded(this);
+        Locator action = Locator.radioButtonByName("mergeData");
 
         //navgiation elements
         WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
