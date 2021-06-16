@@ -6,6 +6,7 @@ package org.labkey.test.components.react;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -19,7 +20,6 @@ import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.sleep;
-import static org.labkey.test.util.TestLogger.log;
 
 public class ReactSelect extends BaseReactSelect<ReactSelect>
 {
@@ -84,22 +84,22 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
             }
             catch (StaleElementReferenceException sere)
             {
-                log("optionEl went stale, probably while attempting to scroll it into view");
+                TestLogger.debug("optionEl went stale, probably while attempting to scroll it into view");
                 sleep(500);
             }
         }
-        log("Found optionEl after " + tryCount + " tries");
+        TestLogger.debug("Found optionEl after " + tryCount + " tries");
 
         for (int i = 0; i < 5 && !optionEl.isDisplayed(); i++)
         {
             sleep(500);
             _wrapper.scrollIntoView(optionEl);
-            log("scroll optionEl into view, attempt " + i);
+            TestLogger.debug("scroll optionEl into view, attempt " + i);
         }
 
         assertTrue("Expected '" + option + "' to be displayed.", optionEl.isDisplayed());
         sleep(500); // either react or the test is moving to fast/slow for one another
-        log("optionEl is displayed, clicking");
+        TestLogger.debug("optionEl is displayed, clicking");
         optionEl.click();
 
         new FluentWait<>(_wrapper.getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
