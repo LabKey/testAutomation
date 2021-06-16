@@ -1192,6 +1192,11 @@ public abstract class Locator extends By
             return this.withPredicate("normalize-space()="+xq(text));
         }
 
+        public XPathLocator withRawText(String text)
+        {
+            return this.withPredicate("text()="+xq(text));
+        }
+
         public XPathLocator withText()
         {
             return this.withPredicate("string-length() > 0");
