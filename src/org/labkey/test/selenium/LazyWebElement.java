@@ -28,11 +28,10 @@ import java.time.Duration;
 /**
  * WebElement wrapper that waits for an attempt to interact with the WebElement before actually finding it
  */
-public class LazyWebElement<T extends LazyWebElement<T>> extends WebElementWrapper
+public class LazyWebElement<T extends LazyWebElement<T>> extends BaseLazyWebElement
 {
     private final Locator _locator;
     private final SearchContext _searchContext;
-    private WebElement _wrappedElement;
     private Long _waitMs;
 
     public LazyWebElement(@NotNull Locator locator, @NotNull SearchContext searchContext)
@@ -60,11 +59,7 @@ public class LazyWebElement<T extends LazyWebElement<T>> extends WebElementWrapp
         return (T)this;
     }
 
-    protected void setWrappedElement(WebElement el)
-    {
-        _wrappedElement = el;
-    }
-
+    @Override
     protected WebElement findWrappedElement()
     {
         if (_waitMs != null && _waitMs > 0)
@@ -75,15 +70,6 @@ public class LazyWebElement<T extends LazyWebElement<T>> extends WebElementWrapp
         }
         else
             return getLocator().findElement(getSearchContext());
-    }
-
-    @Override
-    public WebElement getWrappedElement()
-    {
-        if (null == _wrappedElement)
-            _wrappedElement = findWrappedElement();
-
-        return _wrappedElement;
     }
 
     protected Locator getLocator()
@@ -97,12 +83,9 @@ public class LazyWebElement<T extends LazyWebElement<T>> extends WebElementWrapp
     }
 
     @Override
-    public String toString()
+    protected String getUnfoundToString()
     {
-        if (_wrappedElement == null)
-            return getSearchContext().toString() + " -> " + getClass().getSimpleName() + "{" + getLocator().toString() + "}";
-        else
-            return _wrappedElement.toString();
+        return getSearchContext().toString() + " -> " + getClass().getSimpleName() + "{" + getLocator().toString() + "}";
     }
 }
 
