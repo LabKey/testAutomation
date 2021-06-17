@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Wraps 'Tab' and 'Tabs' components from 'react-bootstrap'
+ * Controls 'Tabs' and 'Tab' components from 'react-bootstrap'
  *
  * Corresponding application code looks something like:
  * <pre>{@code
