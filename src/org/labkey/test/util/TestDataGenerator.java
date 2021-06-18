@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.labkey.api.collections.CaseInsensitiveLinkedHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -60,7 +61,7 @@ public class TestDataGenerator
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
     private final Map<Integer, PropertyDescriptor> _indices = new HashMap<>();  // used to keep columns and row keys aligned
-    private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveHashMap<>();
+    private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
 

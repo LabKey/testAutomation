@@ -134,6 +134,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Parent", "Jessi");
     }
 
+    // Issue 42857: samples: bulk import with name expression containing lookup fails to convert lookup string value
     @Test
     public void testLookupNameExpression() throws Exception
     {
@@ -144,33 +145,33 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         // begin by creating a lookupList of colors, the sampleType will reference it
         TestDataGenerator colorsGen = new TestDataGenerator(colorsLookup)
                 .withColumns(List.of(new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("Code", FieldDefinition.ColumnType.String)));
-        colorsGen.addCustomRow(Map.of("ColorName", "green", "Code", "gr"));
-        colorsGen.addCustomRow(Map.of("ColorName", "yellow", "Code", "yl"));
-        colorsGen.addCustomRow(Map.of("ColorName", "red", "Code", "rd"));
-        colorsGen.addCustomRow(Map.of("ColorName", "blue", "Code", "bl"));
+                        new FieldDefinition("ColorCode", FieldDefinition.ColumnType.String)));
+        colorsGen.addCustomRow(Map.of("ColorName", "green", "ColorCode", "gr"));
+        colorsGen.addCustomRow(Map.of("ColorName", "yellow", "ColorCode", "yl"));
+        colorsGen.addCustomRow(Map.of("ColorName", "red", "ColorCode", "rd"));
+        colorsGen.addCustomRow(Map.of("ColorName", "blue", "ColorCode", "bl"));
         colorsGen.createList(createDefaultConnection(), "Key");
         colorsGen.insertRows();
 
-        String pasteData = "Color\tNoun\n" +
-                "rd\tryder\n" +
-                "gr\tgiant\n" +
-                "bl\tangel\n" +
-                "yL\tjersey";
+        String pasteData = "ColorLookup\tNoun\n" +
+                "red\tryder\n" +
+                "green\tgiant\n" +
+                "blue\tangel\n" +
+                "yellow\tjersey";
 
         // now create a sampleType with a Color column that looks up to Colors
         var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
-                .setFields(List.of(new FieldDefinition("Color", FieldDefinition.ColumnType.String).setLookup(colorsLookup),
+                .setFields(List.of(new FieldDefinition("ColorLookup", colorsLookup).setRangeURI(FieldDefinition.ColumnType.Integer.getRangeURI()),
                         new FieldDefinition("Noun", FieldDefinition.ColumnType.String)))
-                .setNameExpression("TEST-${Color/Code}");   // hopefully this will resolve the 'Code' column from the list
+                .setNameExpression("TEST-${ColorLookup/ColorCode}");   // hopefully this will resolve the 'ColorCode' column from the list
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDef);
 
         SampleTypeHelper.beginAtSampleTypesList(this, getProjectName());
         clickAndWait(Locator.linkWithText(nameExpSamples));
         var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         var importDataPage = dataRegion.clickImportBulkData();
-        importDataPage.selectCopyPaste().
-            setImportLookupByAlternateKey(true)
+        importDataPage.selectCopyPaste()
+                .setImportLookupByAlternateKey(true)
                 .setFormat(ImportDataPage.Format.TSV)
                 .setText(pasteData)
                 .submit();
