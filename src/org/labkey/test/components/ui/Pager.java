@@ -5,6 +5,7 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.DropdownButtonGroup;
@@ -56,8 +57,12 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager selectPageSize(String pageSize)    // only works on GridPanel
     {
-        _pagedComponent.doAndWaitForUpdate(()->
-                elementCache().pageSizeDropdown.clickSubMenu(pageSize));
+        int currentPageSize = getPageSize();
+        if(currentPageSize != Integer.parseInt(pageSize))
+        {
+            elementCache().pageSizeDropdown.clickSubMenu(pageSize);
+            WebDriverWrapper.waitFor(()-> currentPageSize != getPageSize(), 1_000);
+        }
         return this;
     }
 
