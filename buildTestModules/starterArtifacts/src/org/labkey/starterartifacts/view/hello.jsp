@@ -18,8 +18,12 @@
 <%@ page import="org.labkey.api.data.Container" %>
 <%@ page import="org.labkey.api.security.User" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
+<%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%
     Container c = getContainer();
     User user = getUser();
 %>
+
+<labkey:errors></labkey:errors>
+
 <div name="helloMessage">Hello, and welcome to the StarterArtifacts module.</div>
