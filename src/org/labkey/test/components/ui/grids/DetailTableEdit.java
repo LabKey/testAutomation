@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.grids;
 import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.FilteringReactSelect;
@@ -16,6 +17,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * automates /QueryModel/DetailPanel.tsx in its editable mode
@@ -120,6 +122,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 case "textarea":
                 case "input":
                     editableElement.clear();
+                    WebDriverWrapper.waitFor(()->editableElement.getText().isEmpty(), 500);
                     editableElement.sendKeys(value);
                     break;
                 default:
@@ -270,6 +273,17 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find().clearSelection();
         return this;
+    }
+
+    /**
+     * Get the field names shown on the form.
+     *
+     * @return A list of string with the displayed field names.
+     */
+    public List<String> getFieldNames()
+    {
+        return Locator.tagWithAttribute("td", "data-fieldkey").findElements(this)
+                .stream().map(el -> el.getAttribute("data-caption")).collect(Collectors.toList());
     }
 
     private String getSourceTitle()
