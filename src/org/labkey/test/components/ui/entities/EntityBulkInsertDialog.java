@@ -115,12 +115,12 @@ public class EntityBulkInsertDialog extends ModalDialog
     }
 
     /**
-     * Get a list of the fields that can be set for this entity. Note if a field is marked as required the '*' will be
-     * returned as part of the field name.
+     * Get a list of the displayed fields that can be set for this entity. Note if a field is marked as required
+     * the '*' will be returned as part of the field name.
      *
      * @return A list of the fields for the entity.
      */
-    public List<String> getFieldNames()
+    public List<String> getDisplayedFieldNames()
     {
         // Could be shortened to do something like this, but wanted to clean up the values returned.
         // return elementCache().fieldNames().stream().map(el -> el.getText().trim()).collect(Collectors.toList());

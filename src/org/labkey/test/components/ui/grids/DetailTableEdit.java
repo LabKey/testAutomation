@@ -280,7 +280,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      *
      * @return A list of string with the displayed field names.
      */
-    public List<String> getFieldNames()
+    public List<String> getDisplayedFieldNames()
     {
         return Locator.tagWithAttribute("td", "data-fieldkey").findElements(this)
                 .stream().map(el -> el.getAttribute("data-caption")).collect(Collectors.toList());
