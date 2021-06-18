@@ -21,12 +21,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -128,6 +132,50 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Name\tB\tParent",
                 "${Parent:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 "Parent", "Jessi");
+    }
+
+    @Test
+    public void testLookupNameExpression() throws Exception
+    {
+        String lookupList = "Colors";
+        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList);
+        String nameExpSamples = "NameExpressionSamples";
+
+        // begin by creating a lookupList of colors, the sampleType will reference it
+        TestDataGenerator colorsGen = new TestDataGenerator(colorsLookup)
+                .withColumns(List.of(new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("Code", FieldDefinition.ColumnType.String)));
+        colorsGen.addCustomRow(Map.of("ColorName", "green", "Code", "gr"));
+        colorsGen.addCustomRow(Map.of("ColorName", "yellow", "Code", "yl"));
+        colorsGen.addCustomRow(Map.of("ColorName", "red", "Code", "rd"));
+        colorsGen.addCustomRow(Map.of("ColorName", "blue", "Code", "bl"));
+        colorsGen.createList(createDefaultConnection(), "Key");
+        colorsGen.insertRows();
+
+        String pasteData = "Color\tNoun\n" +
+                "rd\tryder\n" +
+                "gr\tgiant\n" +
+                "bl\tangel\n" +
+                "yL\tjersey";
+
+        // now create a sampleType with a Color column that looks up to Colors
+        var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
+                .setFields(List.of(new FieldDefinition("Color", FieldDefinition.ColumnType.String).setLookup(colorsLookup),
+                        new FieldDefinition("Noun", FieldDefinition.ColumnType.String)))
+                .setNameExpression("TEST-${Color/Code}");   // hopefully this will resolve the 'Code' column from the list
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDef);
+
+        SampleTypeHelper.beginAtSampleTypesList(this, getProjectName());
+        clickAndWait(Locator.linkWithText(nameExpSamples));
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        var importDataPage = dataRegion.clickImportBulkData();
+        importDataPage.selectCopyPaste().
+            setImportLookupByAlternateKey(true)
+                .setFormat(ImportDataPage.Format.TSV)
+                .setText(pasteData)
+                .submit();
+
+        // todo: validate once this is working
     }
 
     @Test
