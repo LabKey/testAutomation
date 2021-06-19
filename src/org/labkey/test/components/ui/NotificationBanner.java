@@ -3,7 +3,6 @@ package org.labkey.test.components.ui;
 import org.labkey.test.BootstrapLocators.BannerType;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -11,15 +10,15 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Arrays;
 import java.util.List;
 
-public class NotificationBanner<P extends LabKeyPage<?>> extends WebDriverComponent<WebDriverComponent<?>.ElementCache>
+public class NotificationBanner extends WebDriverComponent<WebDriverComponent<?>.ElementCache>
 {
     private final WebElement _el;
-    private final P _page;
+    private final WebDriver _driver;
 
-    protected NotificationBanner(WebElement element, P page)
+    protected NotificationBanner(WebElement element, WebDriver driver)
     {
         _el = element;
-        _page = page;
+        _driver = driver;
     }
 
     @Override
@@ -31,7 +30,7 @@ public class NotificationBanner<P extends LabKeyPage<?>> extends WebDriverCompon
     @Override
     public WebDriver getDriver()
     {
-        return _page.getDriver();
+        return _driver;
     }
 
     public String getMessage()
@@ -39,11 +38,10 @@ public class NotificationBanner<P extends LabKeyPage<?>> extends WebDriverCompon
         return getComponentElement().getText();
     }
 
-    public P dismiss()
+    public void dismiss()
     {
         Locator.byClass("fa-times-circle").findElement(getDriver()).click();
-        _page.shortWait().until(ExpectedConditions.invisibilityOf(getComponentElement()));
-        return _page;
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(getComponentElement()));
     }
 
     public BannerType getType()
@@ -59,43 +57,41 @@ public class NotificationBanner<P extends LabKeyPage<?>> extends WebDriverCompon
         return null;
     }
 
-    public static class NotificationBannerFinder<P extends LabKeyPage<?>> extends WebDriverComponentFinder<NotificationBanner<P>, NotificationBannerFinder<P>>
+    public static class NotificationBannerFinder extends WebDriverComponentFinder<NotificationBanner, NotificationBannerFinder>
     {
-        private final P _page;
         private final Locator.XPathLocator _notificationLocator = Locator.tagWithClass("div", "notification-container");
         private Locator _locator = _notificationLocator;
 
-        public NotificationBannerFinder(P page)
+        public NotificationBannerFinder(WebDriver driver)
         {
-            super(page.getDriver());
-            _page = page;
+            super(driver);
         }
 
         @Override
-        protected NotificationBanner<P> construct(WebElement el, WebDriver driver)
+        protected NotificationBanner construct(WebElement el, WebDriver driver)
         {
-            return new NotificationBanner<>(el, _page);
+            return new NotificationBanner(el, driver);
         }
 
-        public NotificationBannerFinder<P> success()
+        public NotificationBannerFinder success()
         {
             _locator = _notificationLocator.withClass(BannerType.SUCCESS.getCss());
             return this;
         }
 
-        public NotificationBannerFinder<P> info()
+        public NotificationBannerFinder info()
         {
             _locator = _notificationLocator.withClass(BannerType.INFO.getCss());
             return this;
         }
 
-        public NotificationBannerFinder<P> warning()
+        public NotificationBannerFinder warning()
         {
             _locator = _notificationLocator.withClass(BannerType.WARNING.getCss());
             return this;
         }
 
-        public NotificationBannerFinder<P> error()
+        public NotificationBannerFinder error()
         {
             _locator = _notificationLocator.withClass(BannerType.ERROR.getCss());
             return this;
