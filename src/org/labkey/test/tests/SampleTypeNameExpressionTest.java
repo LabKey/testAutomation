@@ -36,9 +36,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class})
@@ -176,7 +177,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 .setText(pasteData)
                 .submit();
 
-        // todo: validate once this is working
+        var sampleTypeGrid = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("Material").waitFor();
+        assertThat("Expect lookup to force name-generation that resolves colorCodes from the colorLookup",
+                sampleTypeGrid.getColumnDataAsText("Name"), hasItems("TEST-yl", "TEST-bl", "TEST-gr", "TEST-rd"));
     }
 
     @Test
