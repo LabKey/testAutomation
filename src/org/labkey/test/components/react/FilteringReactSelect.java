@@ -178,17 +178,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return elementCache().getOptions();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return new ElementCache();
-    }
-
-    protected class ElementCache extends BaseReactSelect<?>.ElementCache
-    {
-
-    }
-
     public static class SearchingReactSelectFinder extends BaseReactSelect.BaseReactSelectFinder<FilteringReactSelect>
     {
         private SearchingReactSelectFinder(WebDriver driver)

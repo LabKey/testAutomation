@@ -351,10 +351,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
 
-        checker().verifyEquals("Incorrect Participant ID deduced", "P4", Locator.name("participantId").findElement(getDriver()).getText());
-        checker().verifyEquals("Incorrect Visit ID deduced", now, Locator.name("date").findElement(getDriver()).getText());
+        checker().verifyEquals("Incorrect Participant ID deduced", "P4", Locator.name("participantId").findElement(getDriver()).getAttribute("value"));
+        checker().verifyEquals("Incorrect Visit ID deduced", now, Locator.name("date").findElement(getDriver()).getAttribute("value"));
 
-        new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
+        new DataRegionTable("Data", getDriver()).clickHeaderButtonAndWait("Link to Study");
     }
 
     private void linkToStudy(String targetStudy, String sampleName, int numOfRowsToBeLinked)
