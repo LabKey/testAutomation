@@ -40,17 +40,34 @@ public class FieldDefinition extends PropertyDescriptor
     // Collection of JSON properties not explicitly known by 'PropertyDescriptor'
     private final Map<String, Object> _extraFieldProperties = new HashMap<>();
 
+    /**
+     * Define a non-lookup field of the specified type
+     * @param name field name
+     * @param type field type
+     */
     public FieldDefinition(String name, ColumnType type)
     {
         setName(name);
         setType(type);
     }
 
+    /**
+     * Define a String field
+     * @deprecated Use {@link #FieldDefinition(String, ColumnType)} or {@link #FieldDefinition(String, LookupInfo)}
+     * @param name field name
+     */
+    @Deprecated
     public FieldDefinition(String name)
     {
-        this(name, ColumnType.String);
+        setName(name);
+        setRangeURI(ColumnType.String.getRangeURI());
     }
 
+    /**
+     * Define a lookup field
+     * @param name field name
+     * @param lookup info about the table targeted by the lookup
+     */
     public FieldDefinition(String name, LookupInfo lookup)
     {
         setName(name);
@@ -65,11 +82,21 @@ public class FieldDefinition extends PropertyDescriptor
 
     public ColumnType getType()
     {
-        return _type;
+        return _type == null
+                ? ColumnType.String // null type indicates usage of the deprecated name-only constructor
+                : _type;
     }
 
     public FieldDefinition setType(ColumnType type)
     {
+        if (_type != null)
+        {
+            throw new IllegalStateException(String.format("'%s' already has the type '%s'.", getName(), _type.toString()));
+        }
+        if (_lookup != null)
+        {
+            throw new IllegalStateException("This field is defined as a lookup. Use 'LookupInfo.setTableType' to set the rangeURI of the lookup.");
+        }
         if (type == ColumnType.Lookup)
         {
             throw new IllegalArgumentException("Use 'setLookup' or construct with 'FieldDefinition(String, LookupInfo)' to create lookup fields");
@@ -137,8 +164,18 @@ public class FieldDefinition extends PropertyDescriptor
         return _lookup;
     }
 
-    public FieldDefinition setLookup(LookupInfo lookup)
+    protected FieldDefinition setLookup(LookupInfo lookup)
     {
+        if (_lookup != null)
+        {
+            throw new IllegalStateException(String.format("'%s' is already a lookup to '%s'.", getName(), _lookup.toString()));
+        }
+        if (_type != null)
+        {
+            throw new IllegalStateException(
+                    String.format("'%s' already has the type '%s'. Use 'new FieldDefinition(String, LookupInfo)' to define lookup fields",
+                            getName(), _type.toString()));
+        }
         super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
         setRangeURI(lookup.getTableType().getRangeURI());
         _lookup = lookup;
