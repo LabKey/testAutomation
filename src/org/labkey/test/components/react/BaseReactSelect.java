@@ -11,6 +11,7 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -93,12 +94,12 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         // if either are present, we're loading options
         return Locators.loadingSpinner.existsIn(getComponentElement()) ||
-                getComponentElement().getText().toLowerCase().equals(LOADING_TEXT);
+                getComponentElement().getText().equalsIgnoreCase(LOADING_TEXT);
     }
 
     protected T waitForLoaded()
     {
-        _wrapper.waitFor(()-> !isLoading(),
+        waitFor(()-> !isLoading(),
                 "Took too long for to become loaded", WAIT_FOR_JAVASCRIPT);
         return (T) this;
     }
@@ -108,7 +109,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         waitForLoaded();
 
         String val = getComponentElement().getText();
-        if (val.toLowerCase().equals(LOADING_TEXT))
+        if (val.equalsIgnoreCase(LOADING_TEXT))
             return null;
         else
             return val;
@@ -140,7 +141,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     /* waits until the currently selected 'value' (which can include the placeholder) equals or contains the specified string */
     public T expectValue(String value)
     {
-        _wrapper.waitFor(()-> getValue().contains(value),
+        waitFor(()-> getValue().contains(value),
                 "took too long for the ReactSelect value to contain the expected value:["+value+"]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return (T) this;
     }
@@ -149,9 +150,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         // wait for the down-caret to be clickable/interactive
         long start = System.currentTimeMillis();
-        _wrapper.waitFor(this::isInteractive, "The select-box did not become interactive in time", 2_000);
+        waitFor(this::isInteractive, "The select-box did not become interactive in time", 2_000);
         long elapsed = System.currentTimeMillis() - start;
-        getWrapper().log("waited ["+ elapsed + "] msec for select to become interactive");
+        TestLogger.debug("waited [" + elapsed + "] msec for select to become interactive");
 
         return (T) this;
     }
@@ -186,7 +187,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             _wrapper.fireEvent(elementCache().arrow, WebDriverWrapper.SeleniumEvent.click);
         }
 
-        WebDriverWrapper.waitFor(this::isExpanded, 4_000);
+        waitFor(this::isExpanded, 4_000);
         _wrapper.fireEvent(_componentElement, WebDriverWrapper.SeleniumEvent.blur);
         return (T) this;
     }
@@ -216,7 +217,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         {
             WebElement clear = elementCache().clear;
             clear.click();
-            _wrapper.waitFor(()->{
+            waitFor(()->{
                 try
                 {
                     return ! (clear.isEnabled() && clear.isDisplayed()); // wait for it to no longer be enabled or displayed
@@ -480,6 +481,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public BaseReactSelectFinder<Select> followingLabelWithSpan(String labelText)
         {
             _locator = Locator.tag("label").withChild(Locator.tagWithText("span", labelText)).followingSibling("div").child(Locator.tagWithClass("div", "Select"));
+            return this;
+        }
+
+        /**
+         * Find Select within a &lt;FormGroup&gt; based on the FormGroup's label.
+         * Assumes that the FormGroup has a FormLabel.
+         * @param labelText Text of the FormGroup's FormLabel
+         * @return component finder that will find the specified Select
+         */
+        public BaseReactSelectFinder<Select> withinFormGroup(String labelText)
+        {
+            _locator = Locator.tagWithClass("div", "form-group")
+                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
+                    .descendant(Locators.selectContainer());
             return this;
         }
 

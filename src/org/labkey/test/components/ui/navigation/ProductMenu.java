@@ -7,6 +7,7 @@ package org.labkey.test.components.ui.navigation;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,7 +40,7 @@ public class ProductMenu extends BaseBootstrapMenu
         boolean menuContentDisplayed = elementCache().menuContent.isDisplayed();
         int headerSectionCount =  MENU_SECTION_HEADER_LOC.findElements(this).size();
         int expectedHeaderSecionCount = getExpectedSectionCount();
-        getWrapper().log(String.format("product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b, %d of %d expected header sections are present",
+        TestLogger.debug(String.format("product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b, %d of %d expected header sections are present",
                 ariaExpanded, menuContentDisplayed, headerSectionCount, expectedHeaderSecionCount));
 
         return  ariaExpanded && menuContentDisplayed && headerSectionCount >= expectedHeaderSecionCount;
