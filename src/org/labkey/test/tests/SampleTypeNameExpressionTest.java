@@ -140,7 +140,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testLookupNameExpression() throws Exception
     {
         String lookupList = "Colors";
-        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList);
+        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList)
+                .setTableType(FieldDefinition.ColumnType.Integer);
         String nameExpSamples = "NameExpressionSamples";
 
         // begin by creating a lookupList of colors, the sampleType will reference it
@@ -162,7 +163,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         // now create a sampleType with a Color column that looks up to Colors
         var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
-                .setFields(List.of(new FieldDefinition("ColorLookup", colorsLookup).setRangeURI(FieldDefinition.ColumnType.Integer.getRangeURI()),
+                .setFields(List.of(new FieldDefinition("ColorLookup", colorsLookup),
                         new FieldDefinition("Noun", FieldDefinition.ColumnType.String)))
                 .setNameExpression("TEST-${ColorLookup/ColorCode}");   // hopefully this will resolve the 'ColorCode' column from the list
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDef);
