@@ -112,13 +112,6 @@ public class FieldDefinition extends PropertyDescriptor
     }
 
     @Override
-    public FieldDefinition setRangeURI(String rangeURI)
-    {
-        super.setRangeURI(rangeURI);
-        return this;
-    }
-
-    @Override
     public FieldDefinition setMvEnabled(Boolean mvEnabled)
     {
         super.setMvEnabled(mvEnabled);
