@@ -113,6 +113,15 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
+            resetPremiumPageElements();
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.error("Failed to reset header and footer settings after test", e);
+        }
+
+        try
+        {
             disableFileUploadSetting();
         }
         catch (RuntimeException e)
@@ -124,13 +133,31 @@ public class TestScrubber extends ExtraSiteWrapper
     @LogMethod(quiet = true)
     private void disableLoginAttemptLimit() throws IOException, CommandException
     {
-        Connection connection = getRemoteApiConnection();
         PostCommand<CommandResponse> command = new PostCommand<>("compliance", "complianceSettings");
         Map<String, Object> params = new HashMap<>();
         params.put("tab", "login");
         params.put("attemptEnabled", "false");
         command.setParameters(params);
 
+        executeIgnoring404(command);
+    }
+
+    @LogMethod(quiet = true)
+    private void resetPremiumPageElements() throws IOException, CommandException
+    {
+        PostCommand<CommandResponse> command = new PostCommand<>("premium", "adminConsoleConfigurePageElements");
+        Map<String, Object> params = new HashMap<>();
+        params.put("headerModule", "none");
+        params.put("bannerModule", "none");
+        params.put("footerModule", "Core");
+        command.setParameters(params);
+
+        executeIgnoring404(command);
+    }
+
+    private void executeIgnoring404(PostCommand<CommandResponse> command) throws IOException, CommandException
+    {
+        Connection connection = getRemoteApiConnection();
         try
         {
             command.execute(connection, "/");
