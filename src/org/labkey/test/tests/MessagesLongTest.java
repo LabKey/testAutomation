@@ -621,9 +621,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         String _messageTitle = "Mine Message";
         String _messageBody = "test";
 
-        clickProject(PROJECT_NAME);
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
-        clickButton("Save and Finish");
+        goToProjectHome(PROJECT_NAME);
 
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
