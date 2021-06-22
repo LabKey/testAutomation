@@ -117,9 +117,9 @@ public class ApiPermissionsHelper extends PermissionsHelper
             {
                 inTheseGroups = getUserGroups(container, memberToCheck);
             }
-            catch (CommandException ignore)
+            catch (CommandException ex)
             {
-                // User not found
+                throw new RuntimeException(ex);
             }
         }
         else if (principalType == PrincipalType.GROUP)
