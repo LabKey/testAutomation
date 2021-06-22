@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
@@ -58,6 +59,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -349,9 +351,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         final String SAMPLE_TYPE_NAME = "DeleteIndependentSamples";
         List<String> sampleNames = Arrays.asList("I-1", "I-2", "I-3");
         List<Map<String, String>> sampleData = new ArrayList<>();
-        sampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
+        sampleNames.forEach(name -> sampleData.add(Map.of("Name", name)));
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
@@ -361,9 +361,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Delete all the samples that have been created");
-        sampleNames.forEach(name -> {
-            drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(name, "Name"));
-        });
+        sampleNames.forEach(name -> drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", name)));
         sampleHelper.deleteSamples(drtSamples, "Permanently delete " + sampleNames.size() + " samples");
         assertEquals("Should have removed all the selected samples", 0, sampleHelper.getSamplesDataRegionTable().getDataRowCount());
     }
@@ -393,9 +391,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 "Specimen-03\n";
 
         List<Map<String, String>> sampleData = new ArrayList<>();
-        sampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
+        sampleNames.forEach(name -> sampleData.add(Map.of("Name", name)));
         goToProjectHome();
         portalHelper.addWebPart("Assay List");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
@@ -459,8 +455,8 @@ public class SampleTypeTest extends BaseWebDriverTest
         Window.Window(getDriver()).withTitle("Permanently delete 2 samples").waitFor()
                 .clickButton("Cancel", true);
         log("Uncheck the ones that can be deleted and try to delete again");
-        sampleTable.uncheckCheckbox(sampleTable.getIndexWhereDataAppears(sampleNames.get(2), "Name"));
-        sampleTable.uncheckCheckbox(sampleTable.getIndexWhereDataAppears(sampleNames.get(4), "Name"));
+        sampleTable.uncheckCheckbox(sampleTable.getRowIndex("Name", sampleNames.get(2)));
+        sampleTable.uncheckCheckbox(sampleTable.getRowIndex("Name", sampleNames.get(4)));
         sampleTable.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
                 .clickButton("Dismiss", true);
@@ -489,7 +485,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable = sampleHelper.getSamplesDataRegionTable();
         sampleTable.uncheckAllOnPage();
-        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
+        sampleTable.checkCheckbox(sampleTable.getRowIndex("Name", RUN_SAMPLE_NAME));
 
         sampleTable.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
@@ -513,7 +509,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable.uncheckAllOnPage();
-        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(RUN_SAMPLE_NAME, "Name"));
+        sampleTable.checkCheckbox(sampleTable.getRowIndex("Name", RUN_SAMPLE_NAME));
         sampleHelper.deleteSamples(sampleTable, "Permanently delete 1 sample");
         expectedSampleCount--;
         assertEquals("Number of samples not as expected after deletion", expectedSampleCount, sampleTable.getDataRowCount());
@@ -531,7 +527,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
         sampleTable.uncheckAllOnPage();
-        sampleTable.checkCheckbox(sampleTable.getIndexWhereDataAppears(BATCH_SAMPLE_NAME, "Name"));
+        sampleTable.checkCheckbox(sampleTable.getRowIndex("Name", BATCH_SAMPLE_NAME));
         sampleTable.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
                 .clickButton("Dismiss", true);
@@ -621,12 +617,9 @@ public class SampleTypeTest extends BaseWebDriverTest
         cv.saveCustomView();
 
         log("Delete a record that has a description and a flag/comment");
-        int rowIndex = drtSamples.getIndexWhereDataAppears(SAMPLE_NAME_TO_DELETE, "Name");
+        int rowIndex = drtSamples.getRowIndexStrict("Name", SAMPLE_NAME_TO_DELETE);
         drtSamples.checkCheckbox(rowIndex);
-        drtSamples.clickHeaderButton("Delete");
-        Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor()
-                .clickButton("Yes, Delete", true);
-        _ext4Helper.waitForMaskToDisappear();
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
 
         // Remove the same row from the Sample Type input data.
         int testDataIndex = getSampleIndexFromTestInput(SAMPLE_NAME_TO_DELETE, sampleData);
@@ -790,17 +783,9 @@ public class SampleTypeTest extends BaseWebDriverTest
             return false;
 
         // Order the two lists so compare can be done by index and not by searching the two lists.
-        Collections.sort(list01, (Map<String, String> o1, Map<String, String> o2)->
-                {
-                    return o1.get("Name").compareTo(o2.get("Name"));
-                }
-        );
+        list01.sort(Comparator.comparing((Map<String, String> o) -> o.get("Name")));
 
-        Collections.sort(list02, (Map<String, String> o1, Map<String, String> o2)->
-                {
-                    return o1.get("Name").compareTo(o2.get("Name"));
-                }
-        );
+        list02.sort(Comparator.comparing((Map<String, String> o) -> o.get("Name")));
 
         for(int i = 0; i < list01.size(); i++)
         {
@@ -824,7 +809,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         int index;
         for(index = 0; index < testData.size(); index++)
         {
-            if(testData.get(index).get("Name").toString().equalsIgnoreCase(sampleName))
+            if(testData.get(index).get("Name").equalsIgnoreCase(sampleName))
                 break;
         }
 
@@ -1245,7 +1230,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testIgnoreReservedFieldNames()
+    public void testIgnoreReservedFieldNames() throws Exception
     {
         final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
                 "These fields are already used by LabKey to support this sample type: " +
@@ -1255,8 +1240,8 @@ public class SampleTypeTest extends BaseWebDriverTest
         lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,SampleId,created,createdby,modified,modifiedBy,Container,SampleID");
 
         if (!TestFileUtils.getTestTempDir().exists())
-            TestFileUtils.getTestTempDir().mkdirs();
-        File inferenceFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "InferFieldsForSampleType.csv", String.join(System.lineSeparator(), lines));
+            FileUtils.forceMkdir(TestFileUtils.getTestTempDir());
+        File inferenceFile = TestFileUtils.writeTempFile("InferFieldsForSampleType.csv", String.join(System.lineSeparator(), lines));
 
         log("Create a Sample Type.");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
@@ -1397,9 +1382,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
         List<Map<String, String>> sampleData = new ArrayList<>();
-        sampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name, "intField", "42", "strField", "Sample: " + name));
-        });
+        sampleNames.forEach(name -> sampleData.add(Map.of("Name", name, "intField", "42", "strField", "Sample: " + name)));
 
         log("Refresh the browser so the new sample type is shown.");
         goToHome();
