@@ -149,6 +149,11 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
+    public PipelineTriggerWizard setAssayProtocol(String value)
+    {
+        elementCache().assayProtocolInput.set(value);
+        return this;
+    }
 
     public PipelineTriggerWizard setFilePattern(String value)
     {
@@ -284,7 +289,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         WebElement showAdvanced = Locator.tagWithText("div", "Show Advanced Settings").findWhenNeeded(this);
         WebElement addCustomParam = Locator.tagWithText("div", "Add Custom Parameter").findWhenNeeded(this);
         Locator action = Locator.radioButtonByName("mergeData");
-
+        Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
         //navgiation elements
         WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
         WebElement configurationButton = Locator.buttonContainingText("Configuration").findWhenNeeded(this);
