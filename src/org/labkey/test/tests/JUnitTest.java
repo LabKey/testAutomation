@@ -29,6 +29,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONValue;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
@@ -176,7 +177,7 @@ public class JUnitTest extends TestSuite
         return _suite(accept, 0, 0);
     }
 
-    private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int attempt, final int upgradeAttempts) throws Exception
+    private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int startupAttempts, final int upgradeAttempts) throws Exception
     {
         if (TestProperties.isPrimaryUserAppAdmin())
         {
@@ -187,7 +188,7 @@ public class JUnitTest extends TestSuite
         HttpResponse response = null;
         try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
-            final String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
+            final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view?";
             HttpGet method = new HttpGet(url);
             try
             {
@@ -195,8 +196,11 @@ public class JUnitTest extends TestSuite
             }
             catch (IOException ex)
             {
-                if (attempt < 3 && upgradeAttempts == 0)
-                    return _suite(accept, attempt + 1, upgradeAttempts);
+                if (startupAttempts < 60 && upgradeAttempts == 0)
+                {
+                    Thread.sleep(1000);
+                    return _suite(accept, startupAttempts + 1, upgradeAttempts);
+                }
                 else
                 {
                     TestSuite failsuite = new JUnitTest();
@@ -218,9 +222,19 @@ public class JUnitTest extends TestSuite
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
-                        log("Remote JUnitTest: Server modules starting up (attempt " + attempt + ") ...");
-                        Thread.sleep(1000);
-                        return _suite(accept, attempt + 1, upgradeAttempts);
+                        log("Remote JUnitTest: Server modules starting up (attempt " + startupAttempts + ") ...");
+
+                        if (startupAttempts < 60)
+                        {
+                            Thread.sleep(1000);
+                            return _suite(accept, startupAttempts + 1, upgradeAttempts);
+                        }
+                        else
+                        {
+                            TestSuite failsuite = new JUnitTest();
+                            failsuite.addTest(new Runner.ErrorTest("StartModules", new RuntimeException("Module Startup timed out.")));
+                            return failsuite;
+                        }
                     }
                     else if (responseBody.contains("<title>Upgrade Status</title>") ||
                         responseBody.contains("<title>Install Modules</title>") ||
@@ -246,7 +260,7 @@ public class JUnitTest extends TestSuite
                         TestSuite testSuite;
                         try
                         {
-                            testSuite = _suite(accept, attempt + 1, upgradeAttempts + 1);
+                            testSuite = _suite(accept, startupAttempts + 1, upgradeAttempts + 1);
                         }
                         catch (Exception retryException)
                         {
@@ -378,7 +392,7 @@ public class JUnitTest extends TestSuite
                 WebTestHelper.logToServer(getLogTestString("failed", startTime) + ", " + dump(ce.getResponseText(), false), connection);
                 err(getLogTestString("failed", startTime));
                 err(dump(ce.getResponseText(), false));
-                fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
+                Assert.fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
         }
 
