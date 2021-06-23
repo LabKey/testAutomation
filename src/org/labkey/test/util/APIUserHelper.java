@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -143,7 +144,7 @@ public class APIUserHelper extends AbstractUserHelper
 
     public Map<String, Integer> getUserIds(List<String> userEmails)
     {
-        return getUserIds(userEmails, false);
+        return getUserIds(userEmails, true);
     }
 
     public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeDeactivated)
@@ -158,6 +159,7 @@ public class APIUserHelper extends AbstractUserHelper
         return userIds;
     }
 
+    @Nullable
     public Integer getUserId(String userEmail)
     {
         return getUserIds(Arrays.asList(userEmail)).get(userEmail);

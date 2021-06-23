@@ -107,7 +107,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = TestProperties.getServerStartupTimeout();
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-    public AbstractUserHelper _userHelper = new APIUserHelper(this);
+    public final APIUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()
     {

@@ -77,11 +77,7 @@ public class UserTest extends BaseWebDriverTest
     private static final String SELF_SERVICE_EMAIL_USER = "oldaddress@user.test";
     private static final String SELF_SERVICE_EMAIL_USER_CHANGED = "newaddress@user.test";
 
-    public UserTest()
-    {
-        super();
-        _userHelper = new UIUserHelper(this);
-    }
+    protected final UIUserHelper _userHelper = new UIUserHelper(this);
 
     @Nullable
     @Override

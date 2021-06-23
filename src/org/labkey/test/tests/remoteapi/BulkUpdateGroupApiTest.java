@@ -47,8 +47,8 @@ import static org.junit.Assert.fail;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 {
-    ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
-    APIUserHelper _userHelper = new APIUserHelper(this);
+    final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    final APIUserHelper _userHelper = new APIUserHelper(this);
 
     private static final String EMAIL_SUFFIX = "@bulkupdategroup.test";
     private static final String USER1 = genTestEmail("preexistinguser1");
@@ -434,7 +434,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupName);
         command.setCreateGroup(false);
         command.addMemberUser(user1Id);
-        command.addMemberUser(newUser);
+        command.addMemberUser(newUser); // Shouldn't get created
         Connection connection = createDefaultConnection();
 
         try
@@ -449,7 +449,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         }
 
         _permissionsHelper.assertUserNotInGroup(USER1, groupName, getProjectName(), PrincipalType.USER);
-        _permissionsHelper.assertUserNotInGroup(newUser, groupName, getProjectName(), PrincipalType.USER);
+        assertNull("User was created by failed 'BulkUpdateGroupCommand'", _userHelper.getUserId(newUser));
     }
 
     @Test

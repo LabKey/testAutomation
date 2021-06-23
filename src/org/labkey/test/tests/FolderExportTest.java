@@ -34,6 +34,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ext4.ComboBox;
+import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
@@ -53,6 +54,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -60,7 +62,9 @@ import static org.junit.Assert.fail;
 @BaseWebDriverTest.ClassTimeout(minutes = 17)
 public class FolderExportTest extends BaseWebDriverTest
 {
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    protected final APIUserHelper _userHelper = new APIUserHelper(this);
+
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = TestFileUtils.getSampleData("FolderExport");
     private static final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
@@ -288,9 +292,9 @@ public class FolderExportTest extends BaseWebDriverTest
         else
         {
             log("Verifying absence of users in groups");
-            _permissionsHelper.assertUserNotInGroup(testUser3, parentGroup, projectName, PrincipalType.USER);
-            _permissionsHelper.assertUserNotInGroup(testUser1, submitterGroup, projectName, PrincipalType.USER);
-            _permissionsHelper.assertUserNotInGroup(testUser2, superTesterGroup, projectName, PrincipalType.USER);
+            assertNull("User should not have been created by folder import: " + testUser1, _userHelper.getUserId(testUser1));
+            assertNull("User should not have been created by folder import: " + testUser2, _userHelper.getUserId(testUser2));
+            assertNull("User should not have been created by folder import: " + testUser3, _userHelper.getUserId(testUser3));
         }
         log("Verifying existence of groups in groups");
         _permissionsHelper.assertUserInGroup(submitterGroup, groupGroup, projectName, PrincipalType.GROUP);
