@@ -119,7 +119,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
             }
             catch (CommandException ex)
             {
-                throw new RuntimeException(ex);
+                return false;
             }
         }
         else if (principalType == PrincipalType.GROUP)

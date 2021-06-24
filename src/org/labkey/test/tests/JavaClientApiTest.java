@@ -71,14 +71,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -97,6 +95,8 @@ public class JavaClientApiTest extends BaseWebDriverTest
     public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String USER2_NAME = "user2@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
+
+    public ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     @LogMethod
@@ -183,9 +183,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         log("Setting permissions...");
         clickProject(PROJECT_NAME);
-        _permissionsHelper.enterPermissionsUI();
-        _securityHelper.setSiteGroupPermissions("Guests", "Editor");
-        _permissionsHelper.exitPermissionsUI();
+        _permissionsHelper.setSiteGroupPermissions("Guests", "Editor");
 
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));
@@ -220,7 +218,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         //get new key value
         Number newKey = (Number) saveResp.getRows().get(0).get("Key");
-        assertTrue(null != newKey);
+        assertNotNull(newKey);
         int key = newKey.intValue();
 
         //verify row was inserted and data comes back the same
@@ -303,7 +301,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selCmd.setMaxRows(2);
         selCmd.addFilter(new Filter("FirstName", "Fred", Filter.Operator.STARTS_WITH));
 
-        Connection cn = new Connection(getBaseURL());
+        Connection cn = new Connection(WebTestHelper.getBaseURL());
         SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
 
         //verify that the command we get back from the response object is a copy
@@ -327,7 +325,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     protected void doExtendedFormatTest() throws Exception
     {
         log("Testing the new extended select results format...");
-        Connection cn = new Connection(getBaseURL());
+        Connection cn = new Connection(WebTestHelper.getBaseURL());
 
         InsertRowsCommand insCmd = new InsertRowsCommand("lists", LIST_NAME);
 
@@ -350,7 +348,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertNotNull("null rows array", resp.getRows());
         assertNotEquals("empty rows array", 0, resp.getRows().size());
         assertTrue("FirstName column value was not a map: " + resp.getRows().get(0).get("FirstName").getClass().getName(), resp.getRows().get(0).get("FirstName") instanceof Map);
-        Map firstNameField = (Map)resp.getRows().get(0).get("FirstName");
+        Map<?, ?> firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
         assertEquals("FirstName.value is incorrect", "Fred", firstNameField.get("value"));
 
         log("Completed test of the new extended select results format.");
@@ -371,7 +369,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         String LIST_NAME = "ApiTestList";
 
         log("Testing domain APIs");
-        Connection cn = new Connection(getBaseURL());
+        Connection cn = new Connection(WebTestHelper.getBaseURL());
 
         CreateDomainCommand createCmd = new CreateDomainCommand("IntList", LIST_NAME);
         createCmd.setOptions(Collections.singletonMap("keyName", "key"));
@@ -421,12 +419,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         DropDomainCommand dropCmd = new DropDomainCommand("lists", LIST_NAME);
         CommandResponse cmdResponse = dropCmd.execute(cn, PROJECT_NAME);
-        assertTrue("Drop domain request failed", 200 == cmdResponse.getStatusCode());
+        assertEquals("Drop domain request failed", 200, cmdResponse.getStatusCode());
     }
 
     private void verifyDomain(Domain domain, Set<String> expectedFields)
     {
-        assertTrue("Wrong number of fields created", domain.getFields().size() == expectedFields.size());
+        assertEquals("Wrong number of fields created", expectedFields.size(), domain.getFields().size());
 
         for (PropertyDescriptor descriptor : domain.getFields())
         {
@@ -488,7 +486,10 @@ public class JavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            assertThat(e.getMessage(), containsString("Must specify an email or userId"));
+            if (!e.getMessage().contains("Must specify an email or userId"))
+            {
+                throw e;
+            }
         }
 
         // user doesn't exist
@@ -501,7 +502,10 @@ public class JavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            assertThat(e.getMessage(), containsString("User doesn't exist"));
+            if (!e.getMessage().contains("User doesn't exist"))
+            {
+                throw e;
+            }
         }
 
         // Can't impersonate yourself
@@ -514,7 +518,10 @@ public class JavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            assertThat(e.getMessage(), containsString("Can't impersonate yourself"));
+            if (!e.getMessage().contains("Can't impersonate yourself"))
+            {
+                throw e;
+            }
         }
     }
 
@@ -584,7 +591,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
         permHelper.setUserPermissions(USER2_NAME, "Editor");
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword())
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword())
                 .impersonate(USER2_NAME, PROJECT_NAME);
 
         // check whoami
