@@ -272,18 +272,22 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public QueryGrid clearAllSelections()
     {
-        if (isGridPanel())
+        if(hasItemsSelected())
         {
-            if (elementCache().clearBtnLoc.existsIn(this))
-                doAndWaitForUpdate(() ->
-                        elementCache().clearAllSelectionStatusBtn().click());
+            if (isGridPanel())
+            {
+                if (elementCache().clearBtnLoc.existsIn(this))
+                    doAndWaitForUpdate(() ->
+                            elementCache().clearAllSelectionStatusBtn().click());
+                else
+                    doAndWaitForUpdate(() ->
+                            selectAllOnPage(false));
+            }
             else
-                doAndWaitForUpdate(()->
-                        selectAllOnPage(false));
+                doAndWaitForUpdate(() ->
+                        getGridBar().clearAllSelections());
         }
-        else
-            doAndWaitForUpdate(()->
-                getGridBar().clearAllSelections());
+
         return this;
     }
 
