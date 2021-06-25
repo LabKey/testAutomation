@@ -42,6 +42,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,9 +126,12 @@ public class AssayAPITest extends BaseWebDriverTest
     protected void importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
                                      String runName, String[] textToCheck) throws IOException, CommandException
     {
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
-        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
+        // Issue 42637: Verify that .xar.xml file can be imported through the UI
+        UIAssayHelper _uiAssayHelper = new UIAssayHelper(this);
+        _uiAssayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
+
+        APIAssayHelper _apiAssayHelper = new APIAssayHelper(this);
+        _apiAssayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
 
         log("verify import worked");
         goToProjectHome();
