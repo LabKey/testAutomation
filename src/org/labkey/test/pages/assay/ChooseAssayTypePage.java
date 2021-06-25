@@ -70,6 +70,12 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         return new ReactAssayDesignerPage(getDriver());
     }
 
+    public ChooseAssayTypePage goToImportAssayDesignTab()
+    {
+        elementCache().importAssayTab.click();
+        return this;
+    }
+
     protected void clickSelectButton()
     {
         clickAndWait(elementCache().selectButton);
