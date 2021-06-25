@@ -81,6 +81,18 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
+    public ExportFolderPage includeSampleDatasetData(boolean checked)
+    {
+        elementCache().SampleDatasetData.set(checked);
+        return this;
+    }
+
+    public ExportFolderPage includeSampleDatasetDefinitions(boolean checked)
+    {
+        elementCache().SampleDatasetDefinitions.set(checked);
+        return this;
+    }
+
     public ExportFolderPage includeSecurityGroups(boolean checked)
     {
         elementCache().exportSecurityGroupsCheckbox.set(checked);
@@ -123,6 +135,10 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         public Checkbox exportSecurityGroupsCheckbox = new Checkbox(Locator.tagWithText("label", SECURITY_GROUPS)
                 .precedingSibling("input").findWhenNeeded(getDriver()));
         public Checkbox includeSubfoldersCheckBox = new Checkbox(Locator.tagContainingText("label", "Include Subfolders")
+                .precedingSibling("input").findWhenNeeded(getDriver()));
+        public Checkbox SampleDatasetData = new Checkbox(Locator.tagContainingText("label","Datasets: Sample Dataset Data")
+                .precedingSibling("input").findWhenNeeded(getDriver()));
+        public Checkbox SampleDatasetDefinitions = new Checkbox(Locator.tagContainingText("label","Datasets: Sample Dataset Definitions")
                 .precedingSibling("input").findWhenNeeded(getDriver()));
 
         RadioButton browserAsZipFileToggle = new RadioButton(Locator.tagContainingText("label", "Browser as zip file")
