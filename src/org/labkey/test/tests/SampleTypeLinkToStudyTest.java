@@ -23,6 +23,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,13 +59,14 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createProject(VISIT_BASED_STUDY, "Study");
-        clickButton("Create Study");
-        clickButton("Create Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.VISIT)
+                .createStudy();
 
         _containerHelper.createProject(DATE_BASED_STUDY, "Study");
-        clickButton("Create Study");
-        checkRadioButton(Locator.radioButtonById("dateTimepointType"));
-        clickButton("Create Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.DATE)
+                .createStudy();
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         new PortalHelper(getDriver()).addBodyWebPart("Sample Types");
@@ -472,16 +474,17 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         linkToStudy("Study 2", SAMPLE_TYPE1, 1);
 
+        log("Verifying linked column does not exists because more then 3 studies are linked");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         checker().verifyFalse("Linked column for Visit based study should not be present",
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
-        checker().verifyFalse("Missing linked column for Date based study",
+        checker().verifyFalse("Linked column for Date based study should not be present",
                 samplesTable.getColumnNames().contains("linked_to_Date_Based_Study_Test_Project_Study"));
-        checker().verifyFalse("Missing linked column for Date based study",
+        checker().verifyFalse("Linked column for Study 1 should not be present",
                 samplesTable.getColumnNames().contains("linked_to_Study_1_Study"));
-        checker().verifyFalse("Missing linked column for Date based study",
+        checker().verifyFalse("Linked column for Study 2 should not be present",
                 samplesTable.getColumnNames().contains("linked_to_Study_2_Study"));
     }
 
