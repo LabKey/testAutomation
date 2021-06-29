@@ -39,6 +39,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
@@ -812,9 +813,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new FolderManagementPage(getDriver());
     }
 
-    public void goToFolderPermissions()
+    public PermissionsPage goToFolderPermissions()
     {
         clickAdminMenuItem("Folder", "Permissions");
+        return new PermissionsPage(getDriver());
     }
 
     public ProjectSettingsPage goToProjectSettings()
