@@ -493,7 +493,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
             auditTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
             List<String> samples = new ArrayList<>();
             for (int i = 0; i < numOfRowsLinked; i++)
-                samples.add(auditTable.getDataAsText(i, "samplename"));
+                samples.add(auditTable.getDataAsText(i, "SampleName"));
             checker().verifyEquals("Incorrect sample names in the audit log", linkedSamples, samples);
         }
     }
