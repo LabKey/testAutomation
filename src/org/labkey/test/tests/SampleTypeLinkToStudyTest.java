@@ -23,6 +23,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,13 +59,14 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createProject(VISIT_BASED_STUDY, "Study");
-        clickButton("Create Study");
-        clickButton("Create Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.VISIT)
+                .createStudy();
 
         _containerHelper.createProject(DATE_BASED_STUDY, "Study");
-        clickButton("Create Study");
-        checkRadioButton(Locator.radioButtonById("dateTimepointType"));
-        clickButton("Create Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.DATE)
+                .createStudy();
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         new PortalHelper(getDriver()).addBodyWebPart("Sample Types");
@@ -446,6 +448,54 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("No data should have been imported", 0, table.getDataRowCount());
     }
 
+    /*
+        Test coverage for : Issue 42937: Assay results grid loading performance can degrade with a large number of "copied to study" columns
+     */
+    @Test
+    public void testLinkedColumnNotDisplayedCase()
+    {
+        log("Creating 2 more studies");
+        _containerHelper.createProject(SAMPLE_TYPE_PROJECT + " Study 1", "Study");
+        _studyHelper.startCreateStudy().createStudy();
+
+        _containerHelper.createProject(SAMPLE_TYPE_PROJECT + " Study 2", "Study");
+        _studyHelper.startCreateStudy().createStudy();
+
+        log("Linking one row from sample type to all the studies");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(SAMPLE_TYPE_PROJECT + " Study 1", SAMPLE_TYPE1, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(SAMPLE_TYPE_PROJECT + " Study 2", SAMPLE_TYPE1, 1);
+
+        log("Verifying linked column does not exists because more then 3 studies are linked");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyFalse("Linked column for Visit based study should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyFalse("Linked column for Date based study should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Date_Based_Study_Test_Project_Study"));
+        checker().verifyFalse("Linked column for Study 1 should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Sample_Type_Test_Project_Study_1_Study"));
+        checker().verifyFalse("Linked column for Study 2 should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Sample_Type_Test_Project_Study_2_Study"));
+
+        log("Verifying if columns can be added from customize grid");
+        CustomizeView customizeView = samplesTable.openCustomizeGrid();
+        customizeView.addColumn("linked_to_Sample_Type_Test_Project_Study_1_Study");
+        customizeView.addColumn("linked_to_Sample_Type_Test_Project_Study_2_Study");
+        customizeView.addColumn("linked_to_Visit_Based_Study_Test_Project_Study");
+        customizeView.addColumn("linked_to_Date_Based_Study_Test_Project_Study");
+        customizeView.saveCustomView();
+    }
+
     @Before
     public void preTest() throws Exception
     {
@@ -505,7 +555,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText(sampleType));
             DataRegionTable table = new DataRegionTable("Dataset", getDriver());
-            if(table.getDataRowCount() >0)
+            if (table.getDataRowCount() > 0)
             {
                 table.checkAllOnPage();
                 table.clickHeaderButton("Recall");
@@ -532,5 +582,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, afterTest);
         _containerHelper.deleteProject(VISIT_BASED_STUDY, afterTest);
         _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", afterTest);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", afterTest);
+
     }
 }
