@@ -12,8 +12,10 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,12 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     {
         driver.beginAt(WebTestHelper.buildURL("pipeline-status", driver.getCurrentContainerPath(), "details", Map.of("rowId", String.valueOf(rowId))));
         return new PipelineStatusDetailsPage(driver);
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().statusText));
     }
 
     public PipelineStatusDetailsPage(WebDriver driver)

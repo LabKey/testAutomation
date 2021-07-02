@@ -472,6 +472,27 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         return this;
     }
 
+    public PermissionsPage lockProject()
+    {
+        _ext4Helper.clickTabContainingText("Project Locking & Review");
+        clickButton("Lock This Project");
+        return this;
+    }
+
+    public PermissionsPage unlockProject()
+    {
+        _ext4Helper.clickTabContainingText("Project Locking & Review");
+        clickButton("Unlock This Project");
+        return this;
+    }
+
+    public PermissionsPage resetLockExpiration()
+    {
+        _ext4Helper.clickTabContainingText("Project Locking & Review");
+        clickButton("Reset Expiration");
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
