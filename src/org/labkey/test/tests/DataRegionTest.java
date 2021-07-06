@@ -74,7 +74,8 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Use getBaseFilters", "testGetBaseFilters"),
                     Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
                     Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig"),
-                    Pair.of("Exclude \"skipPrefixes\"", "testRespectExcludingPrefixes")
+                    Pair.of("Exclude \"skipPrefixes\"", "testRespectExcludingPrefixes"),
+                    Pair.of("Get Selected (Regression #41705)", "testGetSelected")
                     );
 
     static
