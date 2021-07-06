@@ -4,7 +4,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -13,13 +12,11 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -94,13 +91,9 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         goToProjectHome();
         waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
 
-        log("Inserting 10,001 row in the sampleset");
-        DataRegionTable table = new DataRegionTable("Material", getDriver());
-        table.clickInsertNewRow();
-
-        setFormElement(Locator.name("quf_Name"), "Sample1");
-        setFormElement(Locator.name("quf_label"), "Sample1");
-        clickButton("Submit");
+        log("Inserting rows to make sample type >10,000 rows");
+        insertSampleTypeRow("Material", "Sample1");
+        insertSampleTypeRow("Material", "Sample2");
 
         log("Creating the list via API");
         ListDefinition listDef = new VarListDefinition(listName);
@@ -116,23 +109,45 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         log("Inserting the new row in the list with the newly created sample as lookup");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
-        table = new DataRegionTable("query", getDriver());
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         table.clickInsertNewRow();
         setFormElement(Locator.name("quf_id"), "1");
         setFormElement(Locator.name("quf_name"), "1");
-        setFormElement(Locator.name("quf_lookUpField"), "Sample2");
+        verifyInvalidLookupSample("Sample3");
+        verifyValidLookupSample("Sample1");
+
+        log("Verifying editing list row with the sample lookup");
+        table.clickEditRow("1");
+        verifyInvalidLookupSample("Sample3");
+        verifyValidLookupSample("Sample2");
+    }
+
+    private void verifyInvalidLookupSample(String sampleValue)
+    {
+        setFormElement(Locator.name("quf_lookUpField"), sampleValue);
         clickButton("Submit");
 
         String errMsg = Locators.labkeyError.findElement(getDriver()).getText();
-        assertEquals("Expected error is different", "Could not convert value: Sample2", errMsg);
+        assertEquals("Expected error is different", "Could not convert value: " + sampleValue, errMsg);
+    }
 
-        setFormElement(Locator.name("quf_lookUpField"), "Sample1");
+    private void verifyValidLookupSample(String sampleValue)
+    {
+        setFormElement(Locator.name("quf_lookUpField"), sampleValue);
         clickButton("Submit");
 
         log("Verifying row is inserted correctly");
-        table = new DataRegionTable("query", getDriver());
-        assertEquals("Lookup field value is incorrect", Arrays.asList("Sample1"), table.getColumnDataAsText("lookUpField"));
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        assertEquals("Lookup field value is incorrect", Arrays.asList(sampleValue), table.getColumnDataAsText("lookUpField"));
+    }
 
+    private void insertSampleTypeRow(String regionName, String rowValue)
+    {
+        DataRegionTable table = new DataRegionTable(regionName, getDriver());
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), rowValue);
+        setFormElement(Locator.name("quf_label"), rowValue);
+        clickButton("Submit");
     }
 
     @Test
