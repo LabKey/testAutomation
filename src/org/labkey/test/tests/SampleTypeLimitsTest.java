@@ -120,7 +120,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         log("Inserting the new row in the list with the newly created sample display name");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
-        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         table.clickInsertNewRow();
         setFormElement(Locator.name("quf_id"), "1");
         setFormElement(Locator.name("quf_name"), "1");
@@ -137,7 +137,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("quf_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1");
+        verifyValidLookupSample("quf_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "query", false);
     }
 
     private void verifyInvalidLookupSample(String fieldName, String sampleValue, @Nullable String expectedErrorMsg)
@@ -151,19 +151,19 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
 
     private void verifyValidLookupSample(String fieldName, String sampleValue)
     {
-        verifyValidLookupSample(fieldName, sampleValue, sampleValue);
+        verifyValidLookupSample(fieldName, sampleValue, sampleValue, "query", false);
     }
 
-    private void verifyValidLookupSample(String fieldName, String sampleValue, String sampleDisplay)
+    private void verifyValidLookupSample(String fieldName, String sampleValue, String sampleDisplay, String dataRegionName, boolean navigateViaBreadcrumb)
     {
         setFormElement(Locator.name(fieldName), sampleValue);
         clickButton("Submit");
 
-        if (!isElementPresent(Locators.bodyTitle().startsWith("Sample Type ")))
+        if (navigateViaBreadcrumb)
             clickAndWait(Locator.tagWithClass("ol", "breadcrumb").childTag("li").index(1).childTag("a"));
 
         log("Verifying row is inserted correctly");
-        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName(dataRegionName).waitFor();
         assertEquals("Lookup field value is incorrect", sampleDisplay, table.getDataAsText(0, "lookUpField"));
     }
 
@@ -201,14 +201,14 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         verifyInvalidLookupSample("outputSample1_lookUpField", "Sample3", "Could not convert value 'Sample3' (String) for Integer field 'lookUpField'.");
 
         log("Insert Derive Samples with valid lookup display value");
-        verifyValidLookupSample("outputSample1_lookUpField", "Sample2");
+        verifyValidLookupSample("outputSample1_lookUpField", "Sample2", "Sample2", "Material", true);
 
         log("Insert Derive Samples with valid lookup to sample RowId");
         initDeriveSamplesForm(sampleTypeName, "Derivative2");
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("outputSample1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1");
+        verifyValidLookupSample("outputSample1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "Material", true);
     }
 
     private void initDeriveSamplesForm(String sampleTypeName, String sampleName)
