@@ -67,17 +67,6 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.enterAdminMode();
         portalHelper.addWebPart("Sample Types");
-
-        Connection cn = createDefaultConnection();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", true);
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-        Connection cn = createDefaultConnection();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "resolve-lookups-by-value", false);
     }
 
     @Test
