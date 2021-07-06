@@ -7,7 +7,9 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
@@ -38,6 +41,7 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KI
 public class SampleTypeLimitsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeLimitsTest";
+    private static final String SAMPLE_TYPE_NAME = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
 
     @Override
     public List<String> getAssociatedModules()
@@ -64,38 +68,43 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.enterAdminMode();
         portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Lists");
+
+        log("Creating the sample type of 10000 samples");
+        try
+        {
+            FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", SAMPLE_TYPE_NAME);
+            TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                    .withColumns(List.of(
+                            TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
+                            TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
+            dgen.addDataSupplier("label", () -> dgen.randomString(10))
+                    .withGeneratedRows(10000);
+            dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
+            SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+            log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
+
+            log("Waiting for the sample data to get generated");
+            goToProjectHome();
+            waitAndClickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
+
+            log("Inserting rows to make sample type >10,000 rows");
+            insertSampleTypeRow("Material", "Sample1");
+            insertSampleTypeRow("Material", "Sample2");
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testStringLookupFields() throws IOException, CommandException
     {
-        String sampleTypeName = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
-        String listName = "MainList";
-
         goToProjectHome();
-        new PortalHelper(this).addWebPart("Lists");
-
-        log("Creating the sample type of 10000 samples");
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleTypeName);
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
-        dgen.addDataSupplier("label", () -> dgen.randomString(10))
-                .withGeneratedRows(10000);
-        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
-        log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
-
-        log("Waiting for the sample data to get generated");
-        goToProjectHome();
-        waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
-
-        log("Inserting rows to make sample type >10,000 rows");
-        insertSampleTypeRow("Material", "Sample1");
-        insertSampleTypeRow("Material", "Sample2");
 
         log("Creating the list via API");
+        String listName = "MainList";
         ListDefinition listDef = new VarListDefinition(listName);
         listDef.setKeyName("id");
         listDef.addField(new FieldDefinition("name", FieldDefinition.ColumnType.String));
@@ -103,10 +112,9 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                 new FieldDefinition.LookupInfo(null, "exp.materials", "10000Samples")
                         .setTableType(FieldDefinition.ColumnType.Integer))
                 .setDescription("LookUp in same container with 10000 samples"));
-
         listDef.getCreateCommand().execute(createDefaultConnection(), getProjectName());
 
-        log("Inserting the new row in the list with the newly created sample as lookup");
+        log("Inserting the new row in the list with the newly created sample display name");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable table = new DataRegionTable("query", getDriver());
@@ -116,10 +124,17 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         verifyInvalidLookupSample("Sample3");
         verifyValidLookupSample("Sample1");
 
-        log("Verifying editing list row with the sample lookup");
+        log("Verifying editing list row with the sample display name");
         table.clickEditRow("1");
         verifyInvalidLookupSample("Sample3");
         verifyValidLookupSample("Sample2");
+
+        log("Verifying editing list row with the sample RowId");
+        table.clickEditRow("1");
+        SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
+        command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
+        SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
+        verifyValidLookupSample(response.getRows().get(0).get("RowId").toString(), "Sample1");
     }
 
     private void verifyInvalidLookupSample(String sampleValue)
@@ -133,12 +148,17 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
 
     private void verifyValidLookupSample(String sampleValue)
     {
+        verifyValidLookupSample(sampleValue, sampleValue);
+    }
+
+    private void verifyValidLookupSample(String sampleValue, String sampleDisplay)
+    {
         setFormElement(Locator.name("quf_lookUpField"), sampleValue);
         clickButton("Submit");
 
         log("Verifying row is inserted correctly");
         DataRegionTable table = new DataRegionTable("query", getDriver());
-        assertEquals("Lookup field value is incorrect", Arrays.asList(sampleValue), table.getColumnDataAsText("lookUpField"));
+        assertEquals("Lookup field value is incorrect", Arrays.asList(sampleDisplay), table.getColumnDataAsText("lookUpField"));
     }
 
     private void insertSampleTypeRow(String regionName, String rowValue)
