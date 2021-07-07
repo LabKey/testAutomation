@@ -181,7 +181,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     {
         goToProjectHome();
 
-        log("Create sample type with lookup field to SAMPLE_TYPE_NAME");
+        log("Create sample type with lookup field to " + SAMPLE_TYPE_NAME);
         String sampleTypeName = "SampleTypeWithLookup";
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName);
