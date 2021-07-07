@@ -1,0 +1,88 @@
+{
+  "survey" : {
+    "layout" : "auto",
+    "showCounts" : false,
+    "sections" : [ {
+      "questions" : [ {
+        "name" : "txtField",
+        "caption" : "Txt Field",
+        "shortCaption" : "Txt Field",
+        "hidden" : false,
+        "jsonType" : "string",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "txtAreaField",
+        "caption" : "Txt Area Field",
+        "shortCaption" : "Txt Area Field",
+        "hidden" : false,
+        "jsonType" : "string",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "boolField",
+        "caption" : "Bool Field",
+        "shortCaption" : "Bool Field",
+        "hidden" : false,
+        "jsonType" : "boolean",
+        "inputType" : "checkbox",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "intField",
+        "caption" : "Int Field",
+        "shortCaption" : "Int Field",
+        "hidden" : false,
+        "jsonType" : "int",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "name" : "dblField",
+        "caption" : "Dbl Field",
+        "shortCaption" : "Dbl Field",
+        "hidden" : false,
+        "jsonType" : "float",
+        "inputType" : "text",
+        "required" : false,
+        "width" : 800
+      }, {
+        "extConfig": {
+          "xtype": "datefield",
+          "name": "dtField",
+          "fieldLabel": "Date Field",
+          "hidden" : false,
+          "required" : false,
+          "altFormats": "j M Y G:i:s O|j M Y H:i:s|c",
+          "format" : "Y-m-d H:i:s",
+          "width" : 800
+        }
+      }, {
+        "extConfig": {
+          "xtype": "datetimefield",
+          "name": "dtTimeField",
+          "fieldLabel": "Date Time Field",
+          "hidden" : false,
+          "required" : false,
+          "width" : 800
+        }
+      }, {
+        "name" : "attField",
+        "caption" : "Att Field",
+        "shortCaption" : "Att Field",
+        "hidden" : false,
+        "jsonType" : "string",
+        "inputType" : "file",
+        "required" : false,
+        "width" : 800
+      }],
+      "description" : null,
+      "header" : true,
+      "title" : "listA",
+      "collapsible" : true,
+      "defaultLabelWidth" : 350
+    } ]
+  }
+}
