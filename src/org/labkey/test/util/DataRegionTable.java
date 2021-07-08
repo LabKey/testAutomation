@@ -1385,9 +1385,20 @@ public class DataRegionTable extends DataRegion
         });
     }
 
+    /** Get the number of items checked within the current page of the grid. */
     public int getCheckedCount()
     {
         return api().executeScript("getChecked().length;", Long.class).intValue();
+    }
+
+    /**
+     * Get the selected item count persisted in the session state.  Includes rows not visible
+     * on the current page of the grid.  Useful for validating the selection is cleared after
+     * deleting a row from the grid.
+     */
+    public int getSelectedCount()
+    {
+        return api().executeScript("selectedCount;", Long.class).intValue();
     }
 
     @Deprecated
