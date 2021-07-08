@@ -9,7 +9,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.PermissionsHelper.MemberType;
 import org.openqa.selenium.UnhandledAlertException;
 
 import java.time.Duration;
@@ -22,6 +24,14 @@ public class CrawlerTest extends BaseWebDriverTest
 {
 
     private static final String MODULE_NAME = "CrawlerTest";
+    private static final String USER = "injectiontester@labkey.injection.test";
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        super.doCleanup(afterTest);
+        _userHelper.deleteUsers(afterTest, USER);
+    }
 
     @BeforeClass
     public static void setupProject()
@@ -34,26 +44,28 @@ public class CrawlerTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
+        _userHelper.createUser(USER);
+        new ApiPermissionsHelper(this).addMemberToRole(USER, "Reader", MemberType.user, getProjectName());
     }
 
     /**
      * Ensure that 'testCrawler' is a valid test
      */
     @Test
-    public void testCrawlerTest()
+    public void testCrawlerTest() throws Exception
     {
         String safeParam = "OK!";
 
-        log("Verify vulnerable page must be enabled");
+        log("Verify vulnerable page requires specific user");
         beginAt(getInjectUrl(safeParam));
         assertElementPresent(Locators.labkeyError);
-        assertElementNotPresent(Locator.tag("div").withText(safeParam));
+        assertElementNotPresent(Locator.id("crawlerTestDiv"));
 
-        _containerHelper.enableModule(MODULE_NAME);
+        createDefaultConnection().impersonate(USER);
 
         log("Verify vulnerable page displays safe parameter");
         beginAt(getInjectUrl(safeParam));
-        assertElementPresent(Locator.tag("div").withText(safeParam));
+        assertElementPresent(Locator.id("crawlerTestDiv").withText(safeParam));
 
         log("Verify that page is vulnerable");
         try
@@ -83,10 +95,11 @@ public class CrawlerTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCrawler()
+    public void testCrawler() throws Exception
     {
         String safeParam = "OK!";
 
+        createDefaultConnection().impersonate(USER);
         log("Test crawler against a vulnerable page");
         Crawler crawler = new Crawler(this, Duration.ofSeconds(30), true);
         try

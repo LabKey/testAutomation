@@ -16,14 +16,12 @@
 
 package org.labkey.crawlertest;
 
-import org.labkey.api.action.LabKeyError;
 import org.labkey.api.action.SimpleErrorView;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
-import org.labkey.api.module.ModuleLoader;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.permissions.ReadPermission;
-import org.labkey.api.util.ErrorView;
+import org.labkey.api.settings.AppProps;
 import org.labkey.api.view.JspView;
 import org.labkey.api.view.NavTree;
 import org.springframework.validation.BindException;
@@ -43,12 +41,23 @@ public class CrawlerTestController extends SpringActionController
     public class InjectJspAction extends SimpleViewAction<InjectForm>
     {
         @Override
+        public void validate(InjectForm form, BindException errors)
+        {
+            if (!AppProps.getInstance().isDevMode())
+            {
+                errors.reject(ERROR_MSG, "This action requires dev mode. Enable with caution. Doing so will expose a script injection vulnerability.");
+            }
+            if (!getViewContext().getUser().getEmail().equals("injectiontester@labkey.injection.test"))
+            {
+                errors.reject(ERROR_MSG, "This action only responds to a specific test user.");
+            }
+        }
+
+        @Override
         public ModelAndView getView(InjectForm form, BindException errors)
         {
-            if (!getViewContext().getContainer().getActiveModules().contains(ModuleLoader.getInstance().getModule(CrawlerTestModule.class)))
+            if (errors.hasErrors())
             {
-                // Add extra barrier to having this action available unless explicitly wanted
-                errors.reject(ERROR_MSG, "CrawlerTest module is not enabled. Enable with caution. Doing so will expose a script injection vulnerability.");
                 return new SimpleErrorView(errors);
             }
             getPageConfig().setTitle("Injection test page");
