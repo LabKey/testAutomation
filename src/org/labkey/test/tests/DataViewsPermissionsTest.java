@@ -60,8 +60,8 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         importStudy();
 
         clickFolder(getFolderName());
-        portalHelper.addWebPart("Data Views");
         portalHelper.enterAdminMode();
+        portalHelper.addWebPart("Data Views");
         BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), "Data Views");
         dataViewsWebPart.moveUp();
         dataViewsWebPart.moveUp();
