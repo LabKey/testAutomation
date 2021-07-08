@@ -129,14 +129,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             return;
         }
 
-        if (!getDriver().getTitle().startsWith("Sign In"))
-        {
-            executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
-            beginAt(WebTestHelper.buildURL("login", "login"));
-            waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
-                    UserMenu.appUserMenu());
-        }
-
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
         {
             log("Already logged in as " +  PasswordUtil.getUsername());
@@ -144,30 +136,28 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         else
         {
+            if (!getDriver().getTitle().startsWith("Sign In"))
+            {
+                executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
+                beginAt(WebTestHelper.buildURL("login", "login"));
+                waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
+                        UserMenu.appUserMenu());
+            }
+
             log("Signing in as " + PasswordUtil.getUsername());
             assertElementPresent(Locator.tagWithName("form", "login"));
             setFormElement(Locator.name("email"), PasswordUtil.getUsername());
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
             acceptTermsOfUse(null, false);
+            WebElement rootEl = Locators.documentRoot.findElement(getDriver());
             clickButton("Sign In", 0);
 
-            // verify we're signed in now
-            if (!waitFor(() ->
-            {
-                if(isElementPresent(UserMenu.appUserMenu()))
-                {
-                    goToHome();
-                }
+            waitFor(() -> ExpectedConditions.stalenessOf(rootEl).apply(getDriver()) ||
+                    Locators.labkeyError.findWhenNeeded(getDriver()).isDisplayed(), "Clicking 'Sign In' did nothing.", defaultWaitForPage);
 
-                if (isElementPresent(SiteNavBar.Locators.userMenu))
-                    return true;
-
-                bypassSecondaryAuthentication();
-                return false;
-            }, defaultWaitForPage))
+            if (Locators.labkeyError.existsIn(getDriver()))
             {
-                bypassSecondaryAuthentication();
-                String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
+                String errors = StringUtils.join(getTexts(Locators.labkeyError.findElements(getDriver())), "\n");
 
                 // If we get redirected here the message is not indicated as an error
                 if (errors.length() == 0 && null != getUrlParam("message", true))
@@ -181,6 +171,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     throw new IllegalStateException("Terms of use not accepted at login");
                 else
                     throw new IllegalStateException("Unexpected error(s) during login." + errors);
+            }
+
+            bypassSecondaryAuthentication();
+
+            // Login might redirect to app page
+            if(isElementPresent(UserMenu.appUserMenu()))
+            {
+                goToHome();
             }
         }
 
@@ -338,6 +336,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         simpleSignOut();
         checkForUpgrade();
         simpleSignIn();
+        waitForModuleStartup();
         assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
     }
 
@@ -715,21 +714,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             }
             else // Just upgrading
             {
-                Optional<WebElement> header = Locator.css(".labkey-nav-page-header").findOptionalElement(getDriver());
-                if (header.isPresent() && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.get().getText().trim()))
-                {
-                    waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
-                    clickAndWait(Locator.lkButton("Next"));
-                    Locator.lkButton("Next")
-                            .findOptionalElement(getDriver())
-                            .ifPresent(button ->
-                                    doAndWaitForPageToLoad(() ->
-                                            shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))));
-                }
-                else
-                {
-                    goToHome();
-                }
+                waitForModuleStartup();
             }
 
             PipelineStatusTable.goToAllJobsPage(this);
@@ -740,6 +725,21 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
             if (redirectCheckError != null)
                 throw redirectCheckError;
+        }
+    }
+
+    private void waitForModuleStartup()
+    {
+        Optional<WebElement> header = Locator.css(".labkey-nav-page-header").findOptionalElement(getDriver());
+        if (header.isPresent() && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.get().getText().trim()))
+        {
+            waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
+            clickAndWait(Locator.lkButton("Next"));
+            Locator.lkButton("Next")
+                    .findOptionalElement(getDriver())
+                    .ifPresent(button ->
+                            doAndWaitForPageToLoad(() ->
+                                    shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))));
         }
     }
 
