@@ -37,6 +37,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -58,7 +59,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -95,6 +96,7 @@ public class Crawler
     private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
     private final long _downloadCutoff;
+    private final Set<String> _urlsVisited = new HashSet<>();
 
     private int _remainingAttemptsToGetProjectLinks = 4;
     private int _maxDepth = 4;
@@ -227,6 +229,7 @@ public class Crawler
 
         // Don't crawl test modules
         controllers.add("chartingapi");
+        controllers.add("crawlerTest");
         controllers.add("editableModule");
         controllers.add("ETLtest");
         controllers.add("footerTest");
@@ -327,6 +330,11 @@ public class Crawler
         Set<String> adminControllers = Collections.newSetFromMap(new CaseInsensitiveMap<>());
         adminControllers.addAll(Arrays.asList("login", "admin", "security", "user"));
         return adminControllers;
+    }
+
+    public Set<String> getUrlsVisited()
+    {
+        return new HashSet<>(_urlsVisited);
     }
 
     protected int getMaxDepth()
@@ -758,39 +766,21 @@ public class Crawler
     {
         // Breadth first crawl
         int linkCount = 0;
-        int currentDepth = 0;
         int maxDepth = 0;
         final Timer crawlTimer = new Timer(_maxCrawlTime);
         PriorityQueue<UrlToCheck> urlsToCheck = new PriorityQueue<>(Comparator.comparingDouble(u -> u.priority));
         urlsToCheck.addAll(_startingUrls);
 
-        TestLogger.log("Crawl depth : " + currentDepth);
-        TestLogger.increaseIndent();
-
         // Loop through links in list until its empty or time runs out
         while (!urlsToCheck.isEmpty() && !crawlTimer.isTimedOut())
         {
             UrlToCheck urlToCheck = urlsToCheck.poll();
-            assert null != urlsToCheck;
-            while (urlToCheck.getDepth() > currentDepth)
+            if (urlToCheck != null && urlToCheck.isVisitableURL())
             {
-                currentDepth++;
-                TestLogger.log("Crawl depth : " + currentDepth);
-                TestLogger.increaseIndent();
-            }
-
-            if (urlToCheck.isVisitableURL())
-            {
-                maxDepth = Math.max(currentDepth, maxDepth);
+                maxDepth = Math.max(urlToCheck.getDepth(), maxDepth);
                 urlsToCheck.addAll(crawlLink(urlToCheck));
                 linkCount++;
             }
-        }
-
-        while (currentDepth > 0)
-        {
-            currentDepth--;
-            TestLogger.decreaseIndent();
         }
 
         return new CrawlStats(maxDepth, linkCount, _actionsVisited.size(), crawlTimer.elapsed(), _warnings);
@@ -802,10 +792,22 @@ public class Crawler
         crawlLink(new UrlToCheck(null, url, -1));
     }
 
-    private void beginAt(String relativeUrl)
+    /**
+     * Open the specified URL in the current browser
+     * @param relativeUrl URL to navigate to
+     * @return 'true' if opening the URL navigated
+     */
+    private boolean beginAt(String relativeUrl)
     {
         deleteCrawlerDownloads();
-        _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true);
+        // Escape brackets to prevent 400 errors
+        relativeUrl = relativeUrl
+                .replace("[", "%5B")
+                .replace("]", "%5D")
+                .replace("{", "%7B")
+                .replace("}", "%7D");
+        _urlsVisited.add(relativeUrl);
+        return _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true) == null;
     }
 
     private void deleteCrawlerDownloads()
@@ -824,7 +826,8 @@ public class Crawler
     {
         String relativeURL = urlToCheck.getRelativeURL();
         ControllerActionId actionId = new ControllerActionId(relativeURL);
-        URL currentPageUrl;
+        URL actualUrl; // URL might redirect
+        boolean navigated = true; // URL might download
         List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
 
         // Keep track of where crawler has been
@@ -838,11 +841,7 @@ public class Crawler
         {
             try
             {
-                beginAt(relativeURL
-                        .replace("[", "%5B")
-                        .replace("]", "%5D")
-                        .replace("{", "%7B")
-                        .replace("}", "%7D")); // Escape brackets to prevent 400 errors
+                navigated = beginAt(relativeURL);
             }
             catch (UnhandledAlertException alert)
             {
@@ -850,78 +849,88 @@ public class Crawler
                     throw alert;
             }
 
-            currentPageUrl = _test.getURL();
-
-            int code = _test.getResponseCode();
-
-            checkForForbiddenWords(relativeURL);
-
-            if (!isIgnoredError(code, urlToCheck, origin))
+            if (navigated) // These checks were already performed if navigation didn't occur
             {
-                // Check that there was no error
-                if (code >= 400)
+                actualUrl = _test.getURL();
+
+                int code = _test.getResponseCode();
+
+                checkForForbiddenWords(relativeURL);
+
+                if (!isIgnoredError(code, urlToCheck, origin))
                 {
-                    String message = relativeURL + "\nproduced response code " + code + originMessage;
-                    if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
+                    // Check that there was no error
+                    if (code >= 400)
                     {
-                        // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
-                        _test.checker().wrapAssertion(() -> fail(message));
+                        String message = relativeURL + "\nproduced response code " + code + originMessage;
+                        if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
+                        {
+                            // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
+                            _test.checker().wrapAssertion(() -> fail(message));
+                        }
+                        else
+                        {
+                            fail(message);
+                        }
+
                     }
-                    else
+                    List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
+                    if (!serverError.isEmpty())
                     {
-                        fail(message);
+                        String[] errorLines = serverError.get(0).split("\n");
+                        fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + originMessage);
                     }
 
-                }
-                List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
-                if (!serverError.isEmpty())
-                {
-                    String[] errorLines = serverError.get(0).split("\n");
-                    fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + originMessage);
-                }
-
-                // Find all the links at the site
-                if (_remainingAttemptsToGetProjectLinks > 0 && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
-                {
-                    _remainingAttemptsToGetProjectLinks--;
-                    try
+                    // Find all the links at the site
+                    if (_remainingAttemptsToGetProjectLinks > 0 && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
                     {
-                        _test.projectMenu().open();
-                        _remainingAttemptsToGetProjectLinks = 0; // Got em
-                    }
-                    catch (WebDriverException ignore) { } // Hiccup with the project menu, try again next time.
-                }
-
-                if (code == 200 && _test.getDriver().getTitle().isEmpty())
-                    _warnings.add("Action does not specify title: " + actionId);
-
-                if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
-                {
-                    List<String> linkAddresses = _test.getLinkAddresses();
-                    List<String> formAddresses = _test.getFormAddresses();
-                    linkAddresses.addAll(formAddresses);
-
-                    for (String url : linkAddresses)
-                    {
+                        _remainingAttemptsToGetProjectLinks--;
                         try
                         {
-                            UrlToCheck candidateUrl = new UrlToCheck(currentPageUrl, url, depth + 1);
-                            if (candidateUrl.isVisitableURL())
-                            {
-                                candidateUrl.setFromForm(formAddresses.contains(url));
-                                newUrlsToCheck.add(candidateUrl);
-                            }
+                            _test.projectMenu().open();
+                            _remainingAttemptsToGetProjectLinks = 0; // Got em
                         }
-                        catch (IllegalArgumentException badUrl)
+                        catch (WebDriverException ignore)
                         {
-                            if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                        } // Hiccup with the project menu, try again next time.
+                    }
+
+                    if (code == 200 && _test.getDriver().getTitle().isEmpty())
+                        _warnings.add("Action does not specify title: " + actionId);
+
+                    if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
+                    {
+                        List<String> linkAddresses = _test.getLinkAddresses();
+                        List<String> formAddresses = _test.getFormAddresses();
+                        linkAddresses.addAll(formAddresses);
+
+                        for (String url : linkAddresses)
+                        {
+                            try
                             {
-                                origin = null; // Don't grab screenshot for origin page
-                                throw new AssertionError("Unable to parse link: " + url, badUrl);
+                                UrlToCheck candidateUrl = new UrlToCheck(actualUrl, url, depth + 1);
+                                if (candidateUrl.isVisitableURL())
+                                {
+                                    candidateUrl.setFromForm(formAddresses.contains(url));
+                                    newUrlsToCheck.add(candidateUrl);
+                                }
+                            }
+                            catch (IllegalArgumentException badUrl)
+                            {
+                                if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
+                                {
+                                    origin = null; // Don't grab screenshot for origin page
+                                    throw new AssertionError("Unable to parse link: " + url, badUrl);
+                                }
                             }
                         }
                     }
                 }
+            }
+            else
+            {
+                // Did not navigate. Test download URL for injection
+                actualUrl = new URL(WebTestHelper.getBaseURL() + urlToCheck.getUrlText());
             }
         }
         catch (RuntimeException | AssertionError rethrow)
@@ -951,13 +960,17 @@ public class Crawler
                     "Target page: " + relativeURL + "\n" +
                     originMessage, rethrow);
         }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException(e);
+        }
 
-        if (currentPageUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+        if (actualUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
         {
             TestLogger.increaseIndent();
             try
             {
-                testInjection(currentPageUrl);
+                testInjection(actualUrl);
             }
             finally
             {
@@ -1011,30 +1024,44 @@ public class Crawler
     }
 
     public static final String injectedAlert = "8(";
-    public static final String maliciousScript = "alert(\"" + injectedAlert + "\")";
-    public static final String injectString = "-->\">'>'\"</script><script>" + maliciousScript + ";</script>";
-    public static final String injectString2 = "-->\">'>'\"</script><img src=\"xss\" onerror=\"" + maliciousScript + ">";
+    public static final String maliciousScript = "alert('" + injectedAlert + "')";
+    public static final String injectScriptBlock = "-->\">'>'\"<script>" + maliciousScript + "</script>";
+    public static final String injectAttributeScript = "-->\">'>'\"</script><img src=\"xss\" onerror=\"" + maliciousScript + "\">";
 
-    public static void tryInject(BaseWebDriverTest test, Runnable r)
+    public static void tryInject(WebDriverWrapper test, Runnable r)
     {
-        tryInject(test, arg -> r.run(), null);
+        tryInject(test, arg -> {r.run(); return true;}, null);
     }
 
-    public static <F> void tryInject(BaseWebDriverTest test, Consumer<F> f, F arg)
+    /**
+     * Apply the provided function and check for script injection.
+     * @param test WebDriverWrapper to provide access to browser state
+     * @param f function to apply. Should attempt to trigger script injection (usually by navigating).
+     *          The return value indicates whether the page should be checked for errors.
+     *          If it returns 'false', only 'UnhandledAlertException' and 'WebDriverException' will trigger validation
+     * @param arg argument to pass in to the provided function. Usually a URL to allow funtion to be reused
+     * @param <F> argument type to pass to function
+     */
+    public static <F> void tryInject(WebDriverWrapper test, Function<F, Boolean> f, F arg)
     {
         try
         {
-            f.accept(arg);
+            Boolean checkDestination = f.apply(arg);
 
-            checkForSqlInjection(test);
+            if (checkDestination)
+            {
+                checkForSqlInjection(test);
 
-            checkForServerError(test); // Don't wait for post-test error check to catch these
+                checkForError(test); // Don't wait for post-test error check to catch these
+            }
         }
         catch (UnhandledAlertException ex)
         {
             String alertText = ex.getAlertText();
             if (alertText == null)
                 alertText = test.cancelAlert();
+            else if (alertText.isBlank())
+                alertText = ex.getMessage();
 
             checkForJavaScriptInjection(alertText);
 
@@ -1059,11 +1086,11 @@ public class Crawler
 
     private static void checkForJavaScriptInjection(String alertText)
     {
-        if (alertText.startsWith(injectedAlert))
+        if (alertText.contains(injectedAlert))
             fail("Crawler: Malicious script executed");
     }
 
-    private static void checkForSqlInjection(BaseWebDriverTest test)
+    private static void checkForSqlInjection(WebDriverWrapper test)
     {
         String html = test.getHtmlSource();
         // see StatementWrapper.java
@@ -1074,7 +1101,7 @@ public class Crawler
         }
     }
 
-    private static void checkForServerError(BaseWebDriverTest test)
+    private static void checkForError(WebDriverWrapper test)
     {
         int responseCode = test.getResponseCode();
         if (responseCode == 200 || responseCode >= 500)
@@ -1084,6 +1111,10 @@ public class Crawler
                 String url = test.getCurrentRelativeURL();
                 fail("Crawler: Server error detected\n" + url);
             }
+        }
+        else if (responseCode == 400) // 400 probably means the crawler generated a bad URL
+        {
+            fail("Crawler: Bad request: " + test.getDriver().getCurrentUrl());
         }
     }
 
@@ -1104,9 +1135,13 @@ public class Crawler
         if (query.startsWith("?"))
             query = query.substring(1);
 
-        Consumer<String> urlTester = urlMalicious -> {
-            beginAt(urlMalicious);
-            _test.executeScript("return;"); // Trigger UnhandledAlertException
+        Function<String, Boolean> urlTester = urlMalicious -> {
+            boolean navigated = beginAt(urlMalicious);
+            if (navigated)
+            {
+                _test.executeScript("return;"); // Trigger UnhandledAlertException
+            }
+            return navigated;
         };
 
         List<Map.Entry<String,String>> params = Collections.unmodifiableList(queryStringToEntries(query));
@@ -1135,9 +1170,10 @@ public class Crawler
                 continue;
             _parametersInjected.put(actionId, key);
             List<Map.Entry<String,String>> injectParams = new ArrayList<>(params);
+            //noinspection SuspiciousListRemoveInLoop
             injectParams.remove(i);
-            String xss = (random.nextInt()%2)==0 ? injectString : injectString2;
-            xss = (random.nextInt()%3)==0 ? URLEncoder.encode(xss) : xss;
+            String xss = (random.nextInt()%2)==0 ? injectScriptBlock : injectAttributeScript;
+            xss = URLEncoder.encode(xss, StandardCharsets.US_ASCII);
             String paramMalicious = key + "=" + xss;
             String queryMalicious = paramMalicious + "&" + queryStringFromEntries(injectParams);
             String urlMalicious = base + "?" + queryMalicious;
