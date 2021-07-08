@@ -5,6 +5,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.BaseReactSelect;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -12,6 +13,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 // Replacing the @see org.labkey.test.pages.samplemanagement.... for now. The javadoc compiler cannot resolve the
 // reference to the module. Don't have time to investigate a fix for this pr.
@@ -79,13 +81,13 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         try
         {
             boolean allThere = true;
-            for(ReactSelect rs : getAllTypeCombo())
+            for (ReactSelect rs : getAllTypeCombo())
             {
                 allThere = (rs.isInteractive() && !rs.isLoading()) && allThere;
             }
             return allThere;
         }
-        catch(StaleElementReferenceException exception)
+        catch (StaleElementReferenceException exception)
         {
             return false;
         }
@@ -175,8 +177,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         // If the 'last' combo in the list contains the text "Select a..." it can be used to add a new type.
         // If it does not contain that then the addButton must be clicked.
-        if(!typeCombo.getSelections().contains("Select a Source Type ...") &&
-                        !typeCombo.getSelections().contains("Select a Parent Type ..."))
+        if (typeCombo.hasSelection())
         {
             // Since there is already a parent need to click the "Add" button to add a new one.
             elementCache().addButton.click();
@@ -227,9 +228,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         ReactSelect theCombo = null;
         List<ReactSelect> allCombos = getAllTypeCombo();
-        for(ReactSelect combo : allCombos)
+        for (ReactSelect combo : allCombos)
         {
-            if(combo.getSelections().contains(selection))
+            if (combo.getSelections().contains(selection))
             {
                 theCombo = combo;
                 break;
@@ -247,8 +248,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected List<ReactSelect> getAllTypeCombo()
     {
         return ReactSelect.finder(getDriver())
-                .locatedBy(Locator.tag("div").withClasses("Select", "Select--single"))
-                .findAll(this);
+                .findAll(this)
+                .stream()
+                .filter(BaseReactSelect::isSingle)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -265,7 +268,6 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return FilteringReactSelect.finder(getDriver())
                 .followingLabelWithSpan(_parentType.getType() + " IDs")
                 .findAll(this).get(numOfTypes - 1);
-
     }
 
     /**
@@ -289,8 +291,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected List<FilteringReactSelect> getAllIdCombo()
     {
         return FilteringReactSelect.finder(getDriver())
-                .locatedBy(Locator.tag("div").withClasses("Select", "Select--multi"))
-                .findAll(this);
+                .findAll(this)
+                .stream()
+                .filter(BaseReactSelect::isMulti)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -326,7 +330,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             // TODO Fix the reactSelect control Issue 40180: ReactSelect needs to deal with control being recreated after a selection is made.
             parentTypeCombo.select(typeName);
         }
-        catch(StaleElementReferenceException stale)
+        catch (StaleElementReferenceException stale)
         {
             // Do nothing.
             // Unfortunately the way the ReactSelect is written is it get the value of the selection after a choice is
@@ -338,7 +342,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         getWrapper().scrollIntoView(parentIdCombo.getComponentElement());
 
-        for(String id : ids)
+        for (String id : ids)
         {
             int selCount = parentIdCombo.getSelections().size();
             parentIdCombo.typeAheadSelect(id);
@@ -363,9 +367,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         int index = 0;
         boolean found = false;
-        for(ReactSelect reactSelect : typeCombos)
+        for (ReactSelect reactSelect : typeCombos)
         {
-            if(reactSelect.getSelections().contains(typeName))
+            if (reactSelect.getSelections().contains(typeName))
             {
                 found = true;
                 break;
@@ -374,12 +378,12 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             index++;
         }
 
-        if(found)
+        if (found)
         {
            elementCache().removeButton(index + 1).click();
 
            // Need to check if this is removing the last/only type.
-           if(typeCombos.size() > 1)
+           if (typeCombos.size() > 1)
            {
                // If it is not removing the last one can simply check that the count of combos is as expected.
                getWrapper().waitFor(() -> getAllTypeCombo().size() < typeCombos.size(),
@@ -403,7 +407,6 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
     protected ParentEntityEditPanel addParentId(int index, String id)
     {
-
         FilteringReactSelect parentIdCombo = getIdCombo(index);
 
         getWrapper().scrollIntoView(parentIdCombo.getComponentElement());
@@ -468,7 +471,6 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                     .tagWithText("span", "Remove " + _parentType.getType() + " Type " + index)
                     .findElement(this);
         }
-
     }
 
     public interface ParentType
@@ -488,5 +490,4 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             };
         }
     }
-
 }
