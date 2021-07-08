@@ -38,15 +38,17 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
      * waits for that value to show in a selectValueLabel (which is usually how a single-select shows)*/
     public FilteringReactSelect typeAheadSelect(String value)
     {
-        return typeAheadSelect(value, ReactSelect.Locators.options.containing(value),
-                ReactSelect.Locators.selectValueLabelContaining(value));
+        return typeAheadSelect(value, value, value);
     }
 
-    public FilteringReactSelect typeAheadSelect(String value, Locator elementToClick, Locator elementToWaitFor)
+    public FilteringReactSelect typeAheadSelect(String value, String optionText, String selectedOptionLabel)
     {
         waitForLoaded();
         scrollIntoView();
         open();
+
+        var elementToClick = ReactSelect.Locators.options.containing(optionText);
+        var elementToWaitFor = isMulti() ? Locators.multiValueLabels.containing(selectedOptionLabel) : Locators.singleValueLabel.containing(selectedOptionLabel);
 
         if (isMulti() || hasValue())
             sleep(500);
@@ -100,11 +102,14 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         {
             _wrapper.fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
+
         _wrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
-                "Expected selection ["+elementToWaitFor.getLoggableDescription()+"] was not found. Selected value(s) are:" + getSelections(),
+                () -> "Expected selection [" + elementToWaitFor.getLoggableDescription() + "] was not found. Selected value(s) are:" + getSelections(),
                 WAIT_FOR_JAVASCRIPT);
+
         if (isMulti() || hasValue() || isClearable())
             sleep(500);
+
         close();
         return this;
     }

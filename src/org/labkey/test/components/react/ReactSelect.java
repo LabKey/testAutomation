@@ -30,12 +30,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         super(element, driver);
     }
 
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _componentElement;
-    }
-
     static public ReactSelectFinder finder(WebDriver driver)
     {
         return new ReactSelectFinder(driver);
@@ -127,7 +121,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
             Locator loc = _optionLocFactory.apply(option);
             return loc.findElement(selectMenu);
         }
-
     }
 
     public static class ReactSelectFinder extends BaseReactSelect.BaseReactSelectFinder<ReactSelect>
