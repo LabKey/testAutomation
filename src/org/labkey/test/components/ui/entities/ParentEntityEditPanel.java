@@ -5,15 +5,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.react.BaseReactSelect;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 // Replacing the @see org.labkey.test.pages.samplemanagement.... for now. The javadoc compiler cannot resolve the
 // reference to the module. Don't have time to investigate a fix for this pr.
@@ -78,19 +75,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public boolean isPanelLoaded()
     {
-        try
-        {
-            boolean allThere = true;
-            for (ReactSelect rs : getAllTypeCombo())
-            {
-                allThere = (rs.isInteractive() && !rs.isLoading()) && allThere;
-            }
-            return allThere;
-        }
-        catch (StaleElementReferenceException exception)
-        {
-            return false;
-        }
+        return getAllTypeCombo().stream().allMatch(rs -> rs.isInteractive() && !rs.isLoading());
     }
 
     /**
@@ -171,9 +156,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     protected ReactSelect getAddNewTypeCombo()
     {
-        int numOfTypes = numberOfTypeFields();
-
-        ReactSelect typeCombo = getTypeCombo(_parentType.getType() + " Type " + numOfTypes);
+        var numOfTypes = getAllTypeCombo().size();
+        var typeCombo = getTypeCombo(numOfTypes);
 
         // If the 'last' combo in the list contains the text "Select a..." it can be used to add a new type.
         // If it does not contain that then the addButton must be clicked.
@@ -183,28 +167,14 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             elementCache().addButton.click();
 
             // Now need to go find the new combo but wait until it shows up.
-            WebDriverWrapper.waitFor(()-> numberOfTypeFields() > numOfTypes,
+            WebDriverWrapper.waitFor(()-> getAllTypeCombo().size() > numOfTypes,
                     "The new type field did not show up in a timely fashion.",
                     1_000);
 
-            typeCombo = ReactSelect.finder(getDriver())
-                    .followingLabelWithSpan(_parentType.getType() + " Type " + (numOfTypes + 1))
-                    .find(this);
-
+            typeCombo = getTypeCombo(numOfTypes + 1);
         }
 
         return typeCombo;
-
-    }
-
-    /**
-     * Get the type combos by it's index (zero based). This would include any 'add new' combos.
-     *
-     * @return A combo at the given position in the collection of combos.
-     */
-    protected ReactSelect getTypeCombo(int index)
-    {
-        return getAllTypeCombo().get(index);
     }
 
     /**
@@ -212,32 +182,11 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      *
      * @return A combo beside a label with the given text.
      */
-    protected ReactSelect getTypeCombo(String labelText)
+    protected ReactSelect getTypeCombo(int index)
     {
         return ReactSelect.finder(getDriver())
-                .followingLabelWithSpan(labelText)
+                .followingLabelWithSpan(_parentType.getType() + " Type " + index)
                 .find(this);
-    }
-
-    /**
-     * Get the type combos with the current selected text.
-     *
-     * @return A combo that has the given selection.
-     */
-    protected ReactSelect getTypeComboWithSelection(String selection)
-    {
-        ReactSelect theCombo = null;
-        List<ReactSelect> allCombos = getAllTypeCombo();
-        for (ReactSelect combo : allCombos)
-        {
-            if (combo.getSelections().contains(selection))
-            {
-                theCombo = combo;
-                break;
-            }
-        }
-
-        return theCombo;
     }
 
     /**
@@ -248,40 +197,20 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected List<ReactSelect> getAllTypeCombo()
     {
         return ReactSelect.finder(getDriver())
-                .findAll(this)
-                .stream()
-                .filter(BaseReactSelect::isSingle)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get the combo that will list the individual elements, either samples or sources, that will become a parent.
-     * This combo will only show up after a type is selected.
-     *
-     * @return A reference to the appropriate combo that will be for the new parent sample or source.
-     */
-    protected FilteringReactSelect getIdCombo()
-    {
-        // Will get the ID Combo for the last field. A new parent is added to the end.
-        int numOfTypes = numberOfTypeFields();
-
-        return FilteringReactSelect.finder(getDriver())
-                .followingLabelWithSpan(_parentType.getType() + " IDs")
-                .findAll(this).get(numOfTypes - 1);
+                .followingLabelWithClass("entity-insert--type-select")
+                .findAll(this);
     }
 
     /**
      * Get the id combos by it's index (zero based). This would include any 'add new' combos. The parent id combo
      * boxes do not have unique labels so there is no get based on the label.
      *
-     * @return A combo at the given position in the colection of combos.
+     * @return A combo at the given position in the collection of combos.
      */
     protected FilteringReactSelect getIdCombo(int index)
     {
         return getAllIdCombo().get(index);
     }
-
-    //TODO: Should add a function to get the ID combo associated with a type name.
 
     /**
      * Get all of the id combos in the panel. This includes those already set and any 'add new' combos as well.
@@ -291,24 +220,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected List<FilteringReactSelect> getAllIdCombo()
     {
         return FilteringReactSelect.finder(getDriver())
-                .findAll(this)
-                .stream()
-                .filter(BaseReactSelect::isMulti)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Count how many type fields have already been added. Because this is an edit panel the count will always be at
-     * least one for the new parent sample/source that is being added.
-     *
-     * @return The count of type fields in the panel.
-     */
-    private int numberOfTypeFields()
-    {
-        Locator loc = Locator.xpath(
-                "//label[contains(@class,'entity-insert--parent-label')]/span[contains(text(),'Type')]");
-
-        return loc.findElements(this).size();
+                .followingLabelWithClass("entity-insert--parent-select")
+                .findAll(this);
     }
 
     /**
@@ -321,26 +234,14 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public ParentEntityEditPanel addType(String typeName, List<String> ids)
     {
-        ReactSelect parentTypeCombo = getAddNewTypeCombo();
+        getAddNewTypeCombo().select(typeName);
 
-        getWrapper().scrollIntoView(parentTypeCombo.getComponentElement());
+        // Will get the ID Combo for the last field. A new parent is added to the end.
+        int numOfTypes = getAllTypeCombo().size();
 
-        try
-        {
-            // TODO Fix the reactSelect control Issue 40180: ReactSelect needs to deal with control being recreated after a selection is made.
-            parentTypeCombo.select(typeName);
-        }
-        catch (StaleElementReferenceException stale)
-        {
-            // Do nothing.
-            // Unfortunately the way the ReactSelect is written is it get the value of the selection after a choice is
-            // made. In this panel however when a source is selected the select goes away, the panel is redrawn and the
-            // select is recreated with the selected value.
-        }
-
-        FilteringReactSelect parentIdCombo = getIdCombo();
-
-        getWrapper().scrollIntoView(parentIdCombo.getComponentElement());
+        var parentIdCombo = FilteringReactSelect.finder(getDriver())
+                .followingLabelWithSpan(_parentType.getType() + " IDs")
+                .findAll(this).get(numOfTypes - 1);
 
         for (String id : ids)
         {
@@ -399,7 +300,6 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);
            }
-
         }
 
         return this;
@@ -428,11 +328,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     protected ParentEntityEditPanel removeParentId(int index, String id)
     {
-        // The FilteringReactSelect doesn't appear to have this functionality so have to implement it here.
-        String xpath = String.format("//span[text()='%s']/preceding-sibling::span", id);
-        WebElement selectIcon = Locator.xpath(xpath).findElement(getIdCombo(index).getComponentElement());
-        selectIcon.click();
-
+        getIdCombo(index).removeMultipleSelection(id);
         return this;
     }
 

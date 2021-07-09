@@ -48,10 +48,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         open();
 
         var elementToClick = ReactSelect.Locators.options.containing(optionText);
-        var elementToWaitFor = isMulti() ? Locators.multiValueLabels.containing(selectedOptionLabel) : Locators.singleValueLabel.containing(selectedOptionLabel);
-
-        if (isMulti() || hasValue())
-            sleep(500);
+        var elementToWaitFor = getValueLabelLocator().containing(selectedOptionLabel);
 
         setFilter(value);
 
@@ -70,9 +67,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
                 {
                     close();
                     open();
-
-                    if (hasValue() || isMulti() || isClearable())
-                        sleep(500);
                     setFilter(value);
                 }
                 else
@@ -87,9 +81,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         {
             _wrapper.scrollIntoView(optionToClick);
             _wrapper.shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
-
-            if (isMulti() || hasValue() || isClearable())
-                sleep(250);
             optionToClick.click();
         }
         catch (StaleElementReferenceException sere)
@@ -106,9 +97,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         _wrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
                 () -> "Expected selection [" + elementToWaitFor.getLoggableDescription() + "] was not found. Selected value(s) are:" + getSelections(),
                 WAIT_FOR_JAVASCRIPT);
-
-        if (isMulti() || hasValue() || isClearable())
-            sleep(500);
 
         close();
         return this;
