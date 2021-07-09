@@ -76,11 +76,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return hasClass("select-input__value-container--is-multi");
     }
 
-    public boolean isSearchable()
-    {
-        return hasClass("is-searchable");
-    }
-
     public boolean isClearable()
     {
         return hasClass("select-input__clear-indicator");
@@ -243,6 +238,17 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return !this.getSelections().isEmpty();
     }
 
+    protected Locator.XPathLocator getValueLabelLocator()
+    {
+        return isMulti() ? Locators.multiValueLabels : Locators.singleValueLabel;
+    }
+
+    /**
+     * Returns a list of currently selected values (by label) in the select. If this is a single-select, then this
+     * will at most contain a single value. If this is a multi-select, then this will contain all selected values.
+     *
+     * @return List<String> of the currently selected values.
+     */
     public List<String> getSelections()
     {
         waitForLoaded();
@@ -250,12 +256,12 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         if (!hasValue())
             return Collections.emptyList();
 
-        Locator.XPathLocator locator = isMulti() ? Locators.multiValueLabels : Locators.singleValueLabel;
+        var labelLocator = getValueLabelLocator();
 
         // Wait for at least one of the elements to be visible.
-        waitFor(()-> locator.findElement(getComponentElement()).isDisplayed(), 1_000);
+        waitFor(()-> labelLocator.findElement(getComponentElement()).isDisplayed(), 1_000);
 
-        List<WebElement> selectedItems = locator.findElements(getComponentElement());
+        List<WebElement> selectedItems = labelLocator.findElements(getComponentElement());
         List<String> rawItems = _wrapper.getTexts(selectedItems);
 
         // trim whitespace characters
@@ -347,8 +353,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public static Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
         public static Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
         public static Locator selectMenu = Locator.tagWithClass("div", "select-input__menu-list");
-        public static Locator.XPathLocator multiValueLabels = Locator.tagWithClass("span", "select-input__multi-value__label");
-        public static Locator.XPathLocator singleValueLabel = Locator.tagWithClass("span", "select-input__single-value");
+        public static Locator.XPathLocator multiValueLabels = Locator.tagWithClass("div", "select-input__multi-value__label");
+        public static Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
         public static Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
         final public static Locator listItems = Locator.tagWithClass("div", "select-input__option");
 
@@ -470,7 +476,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         public BaseReactSelectFinder<Select> followingLabelWithSpan(String labelText)
         {
-            _locator = Locator.tag("label").withChild(Locator.tagWithText("span", labelText)).followingSibling("div").child(Locator.tagWithClass("div", BaseReactSelect.SELECTOR_CLASS));
+            _locator = Locators.containerWithDescendant(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
+            return this;
+        }
+
+        public BaseReactSelectFinder<Select> followingLabelWithClass(String cls)
+        {
+            _locator = Locators.containerWithDescendant(Locator.tagWithClass("label", cls));
             return this;
         }
 
