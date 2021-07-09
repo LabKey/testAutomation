@@ -17,6 +17,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -105,7 +106,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     protected T waitForLoaded()
     {
-        waitFor(()-> !isLoading(),
+        waitFor(() -> !isLoading(),
                 "Took too long for to become loaded", WAIT_FOR_JAVASCRIPT);
         return (T) this;
     }
@@ -143,8 +144,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     /* waits until the currently selected 'value' (which can include the placeholder) equals or contains the specified string */
     public T expectValue(String value)
     {
-        waitFor(()-> getValue().contains(value),
-                "took too long for the ReactSelect value to contain the expected value:["+value+"]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> getValue().contains(value),
+                "took too long for the ReactSelect value to contain the expected value:[" + value + "]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return (T) this;
     }
 
@@ -210,7 +211,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
     protected void waitForClosed()
     {
-        WebDriverWrapper.waitFor(()->!isExpanded(), "Select didn't close", 1_000);
+        WebDriverWrapper.waitFor(() -> !isExpanded(), "Select didn't close", 1_000);
     }
 
     public T clearSelection()
@@ -219,10 +220,10 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         {
             WebElement clear = elementCache().clear;
             clear.click();
-            waitFor(()->{
+            waitFor(() -> {
                 try
                 {
-                    return ! (clear.isEnabled() && clear.isDisplayed()); // wait for it to no longer be enabled or displayed
+                    return !(clear.isEnabled() && clear.isDisplayed()); // wait for it to no longer be enabled or displayed
                 }
                 catch (NoSuchElementException | StaleElementReferenceException nse)
                 {
@@ -230,6 +231,22 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
                 }
             }, 1000);
         }
+        return (T) this;
+    }
+
+    public T removeMultipleSelection(String value)
+    {
+        waitForLoaded();
+
+        if (isSingle())
+            throw new IllegalArgumentException("This is a single value");
+
+        scrollIntoView();
+
+        var removeBtn = Locators.removeMultiSelectValueButton(value).waitForElement(getComponentElement(), 1_500);
+        removeBtn.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
+
         return (T) this;
     }
 
@@ -353,7 +370,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public static Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
         public static Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
         public static Locator selectMenu = Locator.tagWithClass("div", "select-input__menu-list");
+        public static Locator.XPathLocator multiValue = Locator.tagWithClass("div", "select-input__multi-value");
         public static Locator.XPathLocator multiValueLabels = Locator.tagWithClass("div", "select-input__multi-value__label");
+        public static Locator.XPathLocator multiValueRemove = Locator.tagWithClass("div", "select-input__multi-value__remove");
         public static Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
         public static Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
         final public static Locator listItems = Locator.tagWithClass("div", "select-input__option");
@@ -371,6 +390,11 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public static Locator.XPathLocator selectValueLabel(String text)
         {
             return singleValueLabel.withText(text);
+        }
+
+        public static Locator.XPathLocator removeMultiSelectValueButton(String text)
+        {
+            return multiValue.withChild(multiValueLabels.withText(text)).child(Locators.multiValueRemove);
         }
 
         public static Locator.XPathLocator container(String inputId)
@@ -429,6 +453,12 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             _locator = Locators.selectContainer();    // use this to find the only reactSelect in a scope
         }
 
+        public BaseReactSelectFinder<Select> withContainerClass(String containerClass)
+        {
+            _locator = Locators.selectContainer().withClass(containerClass);
+            return this;
+        }
+
         public BaseReactSelectFinder<Select> withIds(List<String> inputNames)
         {
             _locator = Locators.container(inputNames);
@@ -439,6 +469,12 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public BaseReactSelectFinder<Select> withId(String inputName)
         {
             _locator = Locators.container(inputName);
+            return this;
+        }
+
+        public BaseReactSelectFinder<Select> withInputClass(String inputClass)
+        {
+            _locator = Locators.containerWithDescendant(Locator.tagWithClass("div", inputClass));
             return this;
         }
 
