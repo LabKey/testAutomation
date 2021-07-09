@@ -523,6 +523,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public ConceptPickerDialog clickExpectedVocabulary()
+    {
+        expand();
+        elementCache().expectedVocabularyButton().click();;
+        return new ConceptPickerDialog(new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Expected Vocabulary"));
+    }
+
     public ConceptPickerDialog clickSelectConcept()
     {
         expand();
@@ -530,13 +537,30 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new ConceptPickerDialog(new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Select Concept"));
     }
 
+    public Optional<WebElement> optionalExpectedVocabularyLink()
+    {
+        expand();
+        return elementCache().selectedVocabularyLink();
+    }
+
+    public DomainFieldRow clickRemoveExpectedVocabulary()
+    {
+        expand();
+        WebDriverWrapper.waitFor(()-> elementCache().removeSelectedVocabularyLink().isPresent(),
+                "the expected vocabulary link is not present", 2000);
+        elementCache().removeSelectedVocabularyLink().get().click();
+        return this;
+    }
+
     public Optional<WebElement> optionalOntologyConceptLink()
     {
+        expand();
         return elementCache().selectedConceptLink();
     }
 
     public DomainFieldRow clickRemoveOntologyConcept()
     {
+        expand();
         WebDriverWrapper.waitFor(()-> elementCache().selectedConceptLink().isPresent(),
                 "the expected ontology link is not present", 2000);
         elementCache().removeSelectedConceptLink().get().click();
@@ -894,24 +918,53 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return waitForSelectToLoad(select);
         }
 
+        Locator.XPathLocator selectVocabularyBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
+                .withText("Expected Vocabulary");
+        Locator.XPathLocator selectConceptBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
+                .withText("Select Concept");
+
+        public WebElement expectedVocabularyButton()
+        {
+            return selectVocabularyBtnLoc.waitForElement(this, 2000);
+        }
+
         public WebElement selectConceptButton()
         {
-            return Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
-                    .withText("Select Concept")
-                    .waitForElement(this, 2000);
+            return selectConceptBtnLoc.waitForElement(this, 2000);
+        }
+
+        Optional<WebElement> selectedVocabularyLink()
+        {
+            return Locator.tagWithClass("table", "domain-annotation-table")
+                    .withDescendant(selectVocabularyBtnLoc)
+                    .descendant(Locator.tagWithClass("td", "content")
+                            .child(Locator.tagWithClass("a", "domain-annotation-item")))
+                    .findOptionalElement(this);
         }
 
         Optional<WebElement> selectedConceptLink()
         {
             return Locator.tagWithClass("table", "domain-annotation-table")
+                    .withDescendant(selectConceptBtnLoc)
                     .descendant(Locator.tagWithClass("td", "content")
                             .child(Locator.tagWithClass("a", "domain-annotation-item")))
+                    .findOptionalElement(this);
+        }
+
+        Optional<WebElement> removeSelectedVocabularyLink()
+        {
+            return Locator.tagWithClass("table", "domain-annotation-table")
+                    .withDescendant(selectVocabularyBtnLoc)
+                    .descendant(Locator.tagWithClass("td", "content")
+                            .child(Locator.tagWithClass("a", "domain-validator-link")
+                                    .child(Locator.tagWithClass("i", "fa-remove"))))
                     .findOptionalElement(this);
         }
 
         Optional<WebElement> removeSelectedConceptLink()
         {
             return Locator.tagWithClass("table", "domain-annotation-table")
+                    .withDescendant(selectConceptBtnLoc)
                     .descendant(Locator.tagWithClass("td", "content")
                             .child(Locator.tagWithClass("a", "domain-validator-link")
                             .child(Locator.tagWithClass("i", "fa-remove"))))

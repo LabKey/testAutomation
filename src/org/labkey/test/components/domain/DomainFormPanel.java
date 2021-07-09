@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -87,6 +88,14 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setConceptImportField(fieldDefinition.getConceptImportColumn());
         if (fieldDefinition.getConceptLabelColumn() != null)
             fieldRow.setConceptLabelField(fieldDefinition.getConceptLabelColumn());
+        if (fieldDefinition.getConceptSubTree() != null)
+        {
+            var subTreePath = Arrays.asList(fieldDefinition.getConceptSubTree().split("/"));
+            fieldRow.clickExpectedVocabulary()
+                    .selectOntology(fieldDefinition.getPrincipalConceptSearchSourceOntology())
+                    .selectNodeFromPath(subTreePath)
+                    .clickApply();
+        }
         if (fieldDefinition.getPrincipalConceptCode() != null)
             fieldRow.clickSelectConcept()
                     .selectOntology(fieldDefinition.getPrincipalConceptSearchSourceOntology())
