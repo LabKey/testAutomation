@@ -919,8 +919,7 @@ public class Crawler
                             {
                                 if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
                                 {
-                                    origin = null; // Don't grab screenshot for origin page
-                                    throw new AssertionError("Unable to parse link: " + url, badUrl);
+                                    throw new AssertionError("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
                                 }
                             }
                         }
@@ -1112,8 +1111,9 @@ public class Crawler
                 fail("Crawler: Server error detected\n" + url);
             }
         }
-        else if (responseCode == 400) // 400 probably means the crawler generated a bad URL
+        else if (responseCode == 400 && !test.onLabKeyPage())
         {
+            // 400 on a non-LabKey page probably means the crawler generated a bad URL
             fail("Crawler: Bad request: " + test.getDriver().getCurrentUrl());
         }
     }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Category({Daily.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class CrawlerTest extends BaseWebDriverTest
 {
 
@@ -70,7 +71,7 @@ public class CrawlerTest extends BaseWebDriverTest
         log("Verify that page is vulnerable");
         try
         {
-            beginAt(getInjectUrl(Crawler.injectScriptBlock));
+            beginAt(getInjectUrl(Crawler.injectScriptBlock), 10_000, true);
             Assert.fail("Expected an injection alert.");
         }
         catch (UnhandledAlertException alert)
@@ -82,7 +83,7 @@ public class CrawlerTest extends BaseWebDriverTest
         }
         try
         {
-            beginAt(getInjectUrl(Crawler.injectAttributeScript));
+            beginAt(getInjectUrl(Crawler.injectAttributeScript), 10_000, true);
             Assert.fail("Expected an injection alert.");
         }
         catch (UnhandledAlertException alert)
