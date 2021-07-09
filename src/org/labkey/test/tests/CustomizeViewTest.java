@@ -144,7 +144,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Test HTML/JavaScript escaping");
         Crawler.tryInject(this, () -> {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectString);
+            _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectScriptBlock);
             assertTextBefore("Billson", "Johnson");
         });
     }

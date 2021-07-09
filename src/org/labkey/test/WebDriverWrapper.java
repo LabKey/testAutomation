@@ -1043,6 +1043,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param relativeURL URL to navigate to
      * @param millis Max wait for page to load
      * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
+     * @return array of downloaded files or null if navigation occurred
      */
     public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
     {
@@ -1118,7 +1119,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
-            return downloadedFiles.getValue();
+            File[] ret = downloadedFiles.getValue();
+            return ret != null && ret.length > 0 ? ret : null;
         }
         finally
         {
