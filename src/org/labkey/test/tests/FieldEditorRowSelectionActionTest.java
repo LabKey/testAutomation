@@ -161,7 +161,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         downloadedFile = domainFormPanel.clickExportFields();
         checker().verifyEquals("Exported fields are not same UI fields", getFieldsFromExportFile(downloadedFile), domainFormPanel.fieldNames());
 
-        domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
+        domainDesignerPage.clickCancel();
     }
 
 
