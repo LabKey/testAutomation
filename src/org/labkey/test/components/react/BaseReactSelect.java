@@ -12,6 +12,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -320,6 +321,23 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         {
             log("Attempted to scroll reactSelect " + getName() + " into view, but the component element was stale");
         }
+
+        return (T) this;
+    }
+
+    /**
+     * Use this method if the underlying ReactSelect allows for creation of values from user input.
+     * This will input the given value directly into the ReactSelect and invoke the ReactSelect to create the value.
+     */
+    public T createValue(String value)
+    {
+        waitForLoaded();
+        waitForInteractive();
+
+        elementCache().input.sendKeys(value);
+        elementCache().input.sendKeys(Keys.ENTER);
+
+        waitFor(() -> Locators.multiValueLabels.withText(value).existsIn(getComponentElement()), "Failed to create value \"" + value + "\".", 1_000);
 
         return (T) this;
     }
