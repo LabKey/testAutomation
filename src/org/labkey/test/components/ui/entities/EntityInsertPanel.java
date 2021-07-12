@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * This class automates the UI component defined in <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/EntityInsertPanel.tsx">components/entities/EntityInsertPanel.tsx</a>
@@ -65,11 +66,28 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).findWhenNeeded(getDriver());
     }
 
+    /*
+        Occasionally the 'add parent' functionality of the EntityInsertPanel will show the parent select
+        briefly after clicking the 'show parent' button, but then it will disappear.  This occasionally causes
+        test failures; until we can address the product-side issue, adding retry to prevent unwanted false-failure
+     */
     public EntityInsertPanel addParent(String label, String parentType)
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
-        elementCache().addParent.click();
-        getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
+        Locator labelLoc = Locator.tag("label").withChild(Locator.tagWithText("span", label));
+        try
+        {
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
+            elementCache().addParent.click();
+            getWrapper().waitForElement(labelLoc);
+        } catch (NoSuchElementException retry)
+        {
+            sleep(3000);    // penalty sleep, make *sure* it's ready to be clicked now
+            if (!labelLoc.existsIn(this))
+            {
+                elementCache().addParent.click();
+                getWrapper().waitForElement(labelLoc);
+            }
+        }
         getEntityTypeSelect(label).select(parentType);
         return this;
     }
