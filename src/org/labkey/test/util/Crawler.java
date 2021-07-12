@@ -1068,7 +1068,7 @@ public class Crawler
 
             throw ex;
         }
-        catch (WebDriverException ex)
+        catch (Exception ex)
         {
             Alert alert;
             while (null != (alert = test.getAlertIfPresent()))
