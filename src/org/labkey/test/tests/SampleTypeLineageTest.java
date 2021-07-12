@@ -281,8 +281,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Do a simple check that data validation works.");
-        checker().verifyTrue("Expected error message 'must be of type Integer' is not present.",
-                isTextPresent("must be of type Integer"));
+        checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
+                isTextPresent("(String) for Integer field"));
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
         setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
         clickButton("Submit");
@@ -309,8 +309,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Again check that data validation works as expected.");
-        checker().verifyTrue("Expected error message 'must be of type Date and Time' is not present.",
-                isTextPresent("must be of type Date and Time"));
+        checker().verifyTrue("Expected error message '(String) for Date field' is not present.",
+                isTextPresent("(String) for Date field"));
         setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
