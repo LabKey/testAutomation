@@ -12,7 +12,6 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -431,7 +430,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         protected final WebElement modified = Locator.id("modified").findWhenNeeded(this);
         protected final WebElement email = Locator.id("email").findWhenNeeded(this);
         protected final WebElement statusSpinner = Locator.id("status-spinner").findWhenNeeded(this);
-        protected final WebElement statusText = Locator.id("status-text").findWhenNeeded(this);
+        protected final WebElement statusText = Locator.id("status-text").refindWhenNeeded(this);
         protected final WebElement info = Locator.id("info").findWhenNeeded(this);
         protected final WebElement description = Locator.id("description").findWhenNeeded(this);
         protected final WebElement filePath = Locator.id("file-path").findWhenNeeded(this);
