@@ -411,7 +411,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     @LogMethod
     public PipelineStatusDetailsPage clickCancel()
     {
-        elementCache().cancelButton.click();
+        clickAndWait(elementCache().cancelButton);
         waitForLogText("Attempting to cancel");
         waitForCancelled();
         return this;
