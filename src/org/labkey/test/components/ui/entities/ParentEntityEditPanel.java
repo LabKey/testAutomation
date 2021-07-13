@@ -328,7 +328,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     protected ParentEntityEditPanel removeParentId(int index, String id)
     {
-        getIdCombo(index).removeMultipleSelection(id);
+        getIdCombo(index).removeSelection(id);
         return this;
     }
 

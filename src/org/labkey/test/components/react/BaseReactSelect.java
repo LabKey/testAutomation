@@ -5,6 +5,7 @@
 package org.labkey.test.components.react;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
@@ -112,15 +113,35 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return (T) this;
     }
 
-    public String getValue()
+    public @Nullable String getPlaceholderText()
     {
         waitForLoaded();
 
-        String val = getComponentElement().getText();
-        if (LOADING_TEXT.equalsIgnoreCase(val))
-            return null;
-        else
-            return val;
+        if (isPlaceholderVisible())
+            return Locators.placeholder.findElement(getComponentElement()).getText().trim();
+
+        return null;
+    }
+
+    public boolean isPlaceholderVisible()
+    {
+        var placeholder = Locators.placeholder.findElementOrNull(getComponentElement());
+        return placeholder != null && placeholder.isDisplayed();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public @Nullable String getValue()
+    {
+        waitForLoaded();
+
+        var selections = getSelections();
+
+        if (selections.size() == 1)
+            return selections.get(0);
+        return null;
     }
 
     public boolean hasOption(String value)
@@ -142,10 +163,14 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return foundElement != null;
     }
 
-    /* waits until the currently selected 'value' (which can include the placeholder) equals or contains the specified string */
+    /* waits until the currently selected 'value' equals or contains the specified string */
     public T expectValue(String value)
     {
-        waitFor(() -> getValue().contains(value),
+        waitFor(() ->
+                {
+                    var _value = getValue();
+                    return _value != null && _value.contains(value);
+                },
                 "took too long for the ReactSelect value to contain the expected value:[" + value + "]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return (T) this;
     }
@@ -235,7 +260,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return (T) this;
     }
 
-    public T removeMultipleSelection(String value)
+    public T removeSelection(String value)
     {
         waitForLoaded();
 
@@ -384,6 +409,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         final public static Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
         public static Locator options = Locator.tagWithClass("div", "select-input__option");
         public static Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
+        // TODO: Update this locator
         public static Locator createOptionPlaceholder = Locator.tagWithClass("div", "Select-create-option-placeholder");
         public static Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
         public static Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
