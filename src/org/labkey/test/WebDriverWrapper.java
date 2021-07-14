@@ -1043,6 +1043,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param relativeURL URL to navigate to
      * @param millis Max wait for page to load
      * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
+     * @return array of downloaded files or null if navigation occurred
      */
     public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
     {
@@ -1085,7 +1086,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     executeScript("document.location = arguments[0]", fullURL);
                     //noinspection ResultOfMethodCallIgnored
                     WebDriverWrapper.waitFor(() -> {
-                        if (stalenessOf.apply(null))
+                        Boolean stale;
+                        try
+                        {
+                            stale = stalenessOf.apply(null);
+                        }
+                        catch (NullPointerException npe)
+                        {
+                            // Staleness check throws NPE sometimes when there's an alert present
+                            executeScript("return;"); // Try to trigger 'UnhandledAlertException'
+                            return false;
+                        }
+                        if (stale)
                         {
                             // Wait for page to load when element goes stale
                             return true; // Stop waiting
@@ -1118,7 +1130,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
-            return downloadedFiles.getValue();
+            File[] ret = downloadedFiles.getValue();
+            return ret != null && ret.length > 0 ? ret : null;
         }
         finally
         {
