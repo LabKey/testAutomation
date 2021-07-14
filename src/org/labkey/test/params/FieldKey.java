@@ -15,6 +15,7 @@ public class FieldKey
         {
             throw new IllegalArgumentException("No field key parts were provided.");
         }
+        // '/' is used as a separator character in fieldKeys. Slashes in field names are encoded as '$S'
         _parts = Arrays.stream(parts)
                 .map(part -> part.replace("/", "$S"))
                 .collect(Collectors.toList());
