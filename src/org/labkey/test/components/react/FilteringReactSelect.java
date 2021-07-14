@@ -104,7 +104,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     public FilteringReactSelect filterSelect(String value) // adds text for usage in cases where the item isn't in the dropdown and the text is editable
     {
-        return filterSelect(value, BaseReactSelect.Locators.selectValueLabelContaining(value));
+        return filterSelect(value, getValueLabelLocator().containing(value));
     }
 
     /* for use with editable instances of a reactSelect, where the options aren't shown
@@ -149,7 +149,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             success = elementToWaitFor.findElement(getComponentElement());
         }
 
-        if ( success == null)
+        if (success == null)
             log("Expected selection was not found. Selected value(s) are:" + getSelections());
 
         close();
