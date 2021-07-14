@@ -1086,7 +1086,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     executeScript("document.location = arguments[0]", fullURL);
                     //noinspection ResultOfMethodCallIgnored
                     WebDriverWrapper.waitFor(() -> {
-                        if (stalenessOf.apply(null))
+                        Boolean stale;
+                        try
+                        {
+                            stale = stalenessOf.apply(null);
+                        }
+                        catch (NullPointerException npe)
+                        {
+                            // Staleness check throws NPE sometimes when there's an alert present
+                            executeScript("return;"); // Try to trigger 'UnhandledAlertException'
+                            return false;
+                        }
+                        if (stale)
                         {
                             // Wait for page to load when element goes stale
                             return true; // Stop waiting
