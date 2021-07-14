@@ -295,8 +295,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
            {
                // If this is removing the last/only one the count of combos will still be 1, so need a different check.
                ReactSelect rs = getAllTypeCombo().get(0);
-               rs.getSelections();
-               getWrapper().waitFor(() -> rs.getSelections().get(0).toLowerCase().contains("select a "),
+               getWrapper().waitFor(() -> rs.getSelections().isEmpty(),
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);
            }

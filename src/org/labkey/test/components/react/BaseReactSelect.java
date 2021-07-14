@@ -84,9 +84,14 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return hasClass("select-input__clear-indicator");
     }
 
+    public boolean isDisabled()
+    {
+        return hasClass("select-input__control--is-disabled");
+    }
+
     public boolean isEnabled()
     {
-        return !hasClass("select-input__control--is-disabled");
+        return !isDisabled();
     }
 
     public boolean hasValue()
@@ -441,9 +446,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             return multiValue.withChild(multiValueLabels.withText(text)).child(Locators.multiValueRemove);
         }
 
-        public static Locator.XPathLocator container(String inputId)
+        public static Locator.XPathLocator container(String id)
         {
-            return selectContainer().withDescendant(Locator.inputById(inputId));
+            return selectContainer().withAttribute("id", id);
         }
 
         public static Locator.XPathLocator containerWithDescendant(Locator.XPathLocator descendant)
@@ -505,14 +510,15 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         public BaseReactSelectFinder<Select> withIds(List<String> inputNames)
         {
+            // TODO: Fix usages of this method
             _locator = Locators.container(inputNames);
             return this;
         }
 
         /* the ID is for the Select > Select-Control > span > div > input of the ReactSelect */
-        public BaseReactSelectFinder<Select> withId(String inputName)
+        public BaseReactSelectFinder<Select> withId(String id)
         {
-            _locator = Locators.container(inputName);
+            _locator = Locators.containerWithDescendant(Locator.tagWithId("div", id));
             return this;
         }
 
