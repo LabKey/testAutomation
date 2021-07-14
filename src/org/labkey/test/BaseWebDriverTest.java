@@ -182,10 +182,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1\u00E4\u00F6\u00FC\u00C5";
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5";
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5"; // No slash or space
     // TODO using </script> breaks CustomizeViewTest because of the '/'
-    public static final String INJECT_CHARS_1 = "-->\">'>'\"<script>alert('8(');</script>";
-    public static final String INJECT_CHARS_2 = "-->\">'>'\"<img src=\"xss\" onerror=\"alert('8(')\">";
+    public static final String INJECT_CHARS_1 = Crawler.injectScriptBlock;
+    public static final String INJECT_CHARS_2 = Crawler.injectAttributeScript;
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
