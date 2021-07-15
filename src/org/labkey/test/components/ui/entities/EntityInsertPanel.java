@@ -11,6 +11,7 @@ import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * This class automates the UI component defined in <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/EntityInsertPanel.tsx">components/entities/EntityInsertPanel.tsx</a>
@@ -65,13 +67,39 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).findWhenNeeded(getDriver());
     }
 
+
     public EntityInsertPanel addParent(String label, String parentType)
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
-        elementCache().addParent.click();
-        getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
-        getEntityTypeSelect(label).select(parentType);
-        return this;
+        return addParent(label, parentType, true);
+    }
+
+    /*
+        Occasionally the 'add parent' functionality of the EntityInsertPanel will show the parent select
+        briefly after clicking the 'show parent' button, but then it will disappear.  This occasionally causes
+        test failures; until we can address the product-side issue, adding retry to prevent unwanted false-failure
+     */
+    private EntityInsertPanel addParent(String label, String parentType, boolean retry)
+    {
+        try
+        {
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
+            elementCache().addParent.click();
+            getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
+            getEntityTypeSelect(label).select(parentType);
+            return this;
+        }
+        catch (WebDriverException ex)
+        {
+            if (retry)
+            {
+                sleep(3_000);    // penalty sleep, make *sure* it's ready to be clicked now
+                return addParent(label, parentType, false); // false here prevents looping
+            }
+            else
+            {
+                throw ex;
+            }
+        }
     }
 
     public ReactSelect getParentSelect(String label)
