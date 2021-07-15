@@ -303,6 +303,17 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public String getConceptSubTree()
+    {
+        return (String) getFieldProperty("conceptSubtree");
+    }
+
+    public FieldDefinition setConceptSubtree(String subtree)
+    {
+        setFieldProperty("conceptSubtree", subtree);
+        return this;
+    }
+
     public String getPrincipalConceptCode()
     {
         return (String) getFieldProperty("principalConceptCode");
