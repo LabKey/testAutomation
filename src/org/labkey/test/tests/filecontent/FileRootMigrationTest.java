@@ -25,7 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.FileRootsManagementPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.DataRegionTable;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class})
+@Category({Daily.class})
 public class FileRootMigrationTest extends BaseWebDriverTest
 {
     private static final String FOLDER = "subfolder";

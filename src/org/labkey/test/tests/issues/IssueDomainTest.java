@@ -11,7 +11,7 @@ import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.util.IssuesHelper;
@@ -24,7 +24,7 @@ import java.util.ListIterator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-@Category({Issues.class, DailyA.class, Data.class})
+@Category({Issues.class, Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class IssueDomainTest extends BaseWebDriverTest
 {

@@ -9,7 +9,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({Assays.class, DailyB.class})
+@Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatPlateTemplateTest extends BaseWebDriverTest
 {

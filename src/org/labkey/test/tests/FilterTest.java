@@ -24,7 +24,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -50,7 +50,7 @@ import static org.labkey.test.params.FieldDefinition.ColumnType;
 import static org.labkey.test.params.FieldDefinition.LookupInfo;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
-@Category({DailyB.class, Data.class})
+@Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 18)
 public class FilterTest extends BaseWebDriverTest
 {

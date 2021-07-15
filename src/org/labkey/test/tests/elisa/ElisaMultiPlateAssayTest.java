@@ -14,7 +14,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayDataPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
@@ -38,7 +38,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class, Assays.class})
+@Category({Daily.class, Assays.class})
 public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
 {
     public final String EXP_FEATURE = "elisaMultiPlateSupport";

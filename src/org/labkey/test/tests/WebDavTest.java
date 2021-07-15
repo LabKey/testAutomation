@@ -29,7 +29,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.pages.files.WebFilesHtmlViewPage;
@@ -52,7 +52,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category(DailyB.class)
+@Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WebDavTest extends BaseWebDriverTest
 {

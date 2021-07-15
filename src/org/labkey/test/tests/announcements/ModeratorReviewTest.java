@@ -20,7 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.announcements.AdminPage;
 import org.labkey.test.pages.announcements.EmailPrefsPage;
@@ -37,7 +37,7 @@ import java.util.List;
  * User: tgaluhn
  * Date: 4/30/2018
  */
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ModeratorReviewTest extends BaseWebDriverTest
 {

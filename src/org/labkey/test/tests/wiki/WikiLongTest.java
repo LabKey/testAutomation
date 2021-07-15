@@ -23,7 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, Wiki.class})
+@Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class WikiLongTest extends BaseWebDriverTest
 {

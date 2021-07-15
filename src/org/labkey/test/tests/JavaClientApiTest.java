@@ -53,7 +53,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
@@ -86,7 +86,7 @@ import static org.junit.Assert.fail;
  * the API, so this test will setup a list and then use the Java
  * client API library to insert, read, update, and delete from that list
  */
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class JavaClientApiTest extends BaseWebDriverTest
 {
