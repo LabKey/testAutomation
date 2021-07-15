@@ -451,20 +451,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             return selectContainer().withAttribute("id", id);
         }
 
-        public static Locator.XPathLocator containerWithDescendant(Locator.XPathLocator descendant)
+        private static Locator.XPathLocator containerWithDescendant(Locator.XPathLocator descendant)
         {
             return selectContainer().withDescendant(descendant);
-        }
-
-        public static Locator.XPathLocator container(List<String> inputNames)
-        {
-            StringBuilder childXpath = new StringBuilder( "//input[@id="+ Locator.xq(inputNames.get(0)) + "");
-            for (int i = 1; i < inputNames.size(); i++)
-            {
-                childXpath.append(" or @id=" + Locator.xq(inputNames.get(i)) + "");
-            }
-            childXpath.append("]");
-            return selectContainer().withDescendant(Locator.xpath(childXpath.toString()));
         }
 
         public static Locator.XPathLocator containerStartsWith(List<String> inputNames)
@@ -508,14 +497,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             return this;
         }
 
-        public BaseReactSelectFinder<Select> withIds(List<String> inputNames)
-        {
-            // TODO: Fix usages of this method
-            _locator = Locators.container(inputNames);
-            return this;
-        }
-
-        /* the ID is for the Select > Select-Control > span > div > input of the ReactSelect */
         public BaseReactSelectFinder<Select> withId(String id)
         {
             _locator = Locators.containerWithDescendant(Locator.tagWithId("div", id));
@@ -586,19 +567,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             return this;
         }
 
-        public BaseReactSelectFinder<Select> withLabelContaining(String label)
-        {
-            _locator = ReactSelect.Locators.containerWithDescendant(Locator.tag("input")
-                    .withLabelContaining(label));
-            return this;
-        }
-
-        public BaseReactSelectFinder<Select> withIdsStartingWith(List<String> names)
-        {
-            _locator = ReactSelect.Locators.containerStartsWith(names);
-            return this;
-        }
-
         public BaseReactSelectFinder<Select> withIdStartingWith(String name)
         {
             _locator = ReactSelect.Locators.containerStartsWith(Arrays.asList(name));
@@ -608,16 +576,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         public BaseReactSelectFinder<Select> enabled()
         {
             _mustBeEnabled = true;
-            return this;
-        }
-
-        /**
-         * Most React Selects are wrapped by a div that is less prone to going stale. Use this to find the exact Select
-         * div when there is no wrapper div.
-         */
-        public BaseReactSelectFinder<Select> notParent()
-        {
-            _findParent = false;
             return this;
         }
 
