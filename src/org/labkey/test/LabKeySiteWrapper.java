@@ -1295,21 +1295,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return projectMenu().expandProjectFully(getCurrentProject());
     }
 
-    /**
-     * @deprecated Old UX only. Used by {@link #clickFolder(String)} below.
-     */
-    @Deprecated
-    public void expandFolderTree(String folder)
-    {
-        Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
-        Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
-        List<WebElement> els = treeAncestor.findElements(getDriver());
-        for (WebElement el : els)
-        {
-            el.click();
-        }
-    }
-
     public void clickFolder(String folder)
     {
         projectMenu().navigateToFolder(getCurrentProject(), folder);
