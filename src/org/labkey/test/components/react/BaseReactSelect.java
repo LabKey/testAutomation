@@ -367,7 +367,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         elementCache().input.sendKeys(value);
         elementCache().input.sendKeys(Keys.ENTER);
 
-        waitFor(() -> Locators.multiValueLabels.withText(value).existsIn(getComponentElement()), "Failed to create value \"" + value + "\".", 1_000);
+        waitFor(() -> getValueLabelLocator().withText(value).existsIn(getComponentElement()), "Failed to create value \"" + value + "\".", 1_000);
 
         return (T) this;
     }
@@ -454,17 +454,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         private static Locator.XPathLocator containerWithDescendant(Locator.XPathLocator descendant)
         {
             return selectContainer().withDescendant(descendant);
-        }
-
-        public static Locator.XPathLocator containerStartsWith(List<String> inputNames)
-        {
-            StringBuilder childXpath = new StringBuilder( "//input[starts-with(@id, '"+ inputNames.get(0) + "')");
-            for (int i = 1; i < inputNames.size(); i++)
-            {
-                childXpath.append(" or starts-with(@id, '"+inputNames.get(i)+"')");
-            }
-            childXpath.append("]");
-            return selectContainer().withDescendant(Locator.xpath(childXpath.toString()));
         }
 
         public static Locator.XPathLocator containerById(String inputId)
@@ -564,12 +553,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             _locator = Locator.tagWithClass("div", "form-group")
                     .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
                     .descendant(Locators.selectContainer());
-            return this;
-        }
-
-        public BaseReactSelectFinder<Select> withIdStartingWith(String name)
-        {
-            _locator = ReactSelect.Locators.containerStartsWith(Arrays.asList(name));
             return this;
         }
 
