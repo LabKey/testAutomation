@@ -21,7 +21,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -249,18 +248,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         if (hasSelection())
         {
-            WebElement clear = elementCache().clear;
+            var clear = Locators.clear.waitForElement(getComponentElement(), 1_500);
             clear.click();
-            waitFor(() -> {
-                try
-                {
-                    return !(clear.isEnabled() && clear.isDisplayed()); // wait for it to no longer be enabled or displayed
-                }
-                catch (NoSuchElementException | StaleElementReferenceException nse)
-                {
-                    return true;
-                }
-            }, 1000);
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(clear));
         }
         return (T) this;
     }
@@ -393,7 +383,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     protected class ElementCache extends WebDriverComponent<?>.ElementCache
     {
         WebElement input = new EphemeralWebElement(Locator.css(".select-input__input > input"), this);
-        WebElement clear = new EphemeralWebElement(Locators.clear, this);
         WebElement arrow = new EphemeralWebElement(Locators.arrow, this);
         WebElement selectMenu = new EphemeralWebElement(Locators.selectMenu, this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 
@@ -414,8 +403,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         final public static Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
         public static Locator options = Locator.tagWithClass("div", "select-input__option");
         public static Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
-        // TODO: Update this locator
-        public static Locator createOptionPlaceholder = Locator.tagWithClass("div", "Select-create-option-placeholder");
         public static Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
         public static Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
         public static Locator selectMenu = Locator.tagWithClass("div", "select-input__menu-list");

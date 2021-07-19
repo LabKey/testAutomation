@@ -126,7 +126,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
             WebElement elemToClick = Locator.waitForAnyElement(
                     new FluentWait<SearchContext>(getComponentElement()).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
-                    Locators.createOptionPlaceholder.containing(value),
                     Locators.options.containing(value));
 
             log("clicking item with value [" +value+"]");
