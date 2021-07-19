@@ -11,6 +11,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
@@ -301,9 +302,24 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        log("Import samples that have a parent alias column.");
+        log("Verify parent alias display in sample type properties and download template.");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
+        Assert.assertEquals("Unexpected parent import alias display", PARENT_COLUMN_1, sampleHelper.getDetailsFieldValue("Parent Import Alias(es)"));
+        ImportDataPage importDataPage = sampleHelper.getSamplesDataRegionTable().clickImportBulkData();
+        try
+        {
+            List<String> actualHeaderValues = importDataPage.getTemplateColumnHeaders();
+            Assert.assertTrue("Download template file does not contain import alias", actualHeaderValues.contains(PARENT_COLUMN_1));
+        }
+        catch (IOException rethrow)
+        {
+            throw new RuntimeException(rethrow);
+        }
+
+        log("Import samples that have a parent alias column.");
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
+        sampleHelper.bulkImport(sampleText);
 
         log("Go to the detail page for various samples and make sure the precursor and child sample values are correct.");
 

@@ -17,15 +17,20 @@ package org.labkey.test.pages;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.ComboBox;
+import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
@@ -118,6 +123,19 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         clearCache();
     }
 
+    private File downloadTemplate()
+    {
+        return doAndWaitForDownload(()->elementCache().getDownloadTemplateButton().click());
+    }
+
+    public List<String> getTemplateColumnHeaders() throws IOException
+    {
+        File template = downloadTemplate();
+        Workbook workbook = ExcelHelper.create(template);
+        Sheet sheet = workbook.getSheetAt(0);
+        return ExcelHelper.getRowData(sheet, 0);
+    }
+
     public enum Format
     {
         TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
@@ -172,6 +190,11 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         WebElement getCancelButton()
         {
             return Ext4Helper.Locators.ext4Button("Cancel").findElement(getExpandedPanel());
+        }
+
+        WebElement getDownloadTemplateButton()
+        {
+            return Locator.lkButton("Download Template").findElement(this);
         }
 
         Checkbox getAltKeyCheckbox()
