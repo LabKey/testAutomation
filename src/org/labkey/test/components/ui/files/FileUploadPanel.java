@@ -74,6 +74,11 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
         return elementCache().attachedFileContainer(fileName).existsIn(this);
     }
 
+    public File downloadTemplate()
+    {
+        return getWrapper().doAndWaitForDownload(()->elementCache().downloadTemplate.click());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -89,6 +94,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
         Locator.XPathLocator attachedFileContainer = Locator.tagWithClass("div", "attached-file--container")
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
+        WebElement downloadTemplate = Locator.linkWithTitle("Download Template").findWhenNeeded(getDriver());
 
         Locator attachedFileContainer(String fileName)
         {
