@@ -620,7 +620,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 sampleData);
 
         List<String> dbFieldsToCheck = Arrays.asList("Name", "Flag/Comment", "Field01", "Description");
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
 
         checker().fatal().verifyTrue("Newly inserted SampleType data not as expected. Fatal error.",
                 areDataListEqual(resultsFromDB, sampleData));
@@ -642,7 +642,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleData.remove(testDataIndex);
 
         log("Check that the Sample has been removed.");
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after a delete.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Now update a sample's description.");
@@ -652,7 +652,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after a update of Description.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Now delete the sample's description.");
@@ -660,7 +660,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after deleting the Description.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Let's repeat it all again for a sample's flag/comment.");
@@ -669,7 +669,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after a update of Flag/Comment.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Now delete the sample's Flag/Comment.");
@@ -677,7 +677,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after deleting the Flag/Comment.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Finally update and delete both flag and description for a sample.");
@@ -687,7 +687,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after a adding a Description and a Flag/Comment to an existing sample.",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -698,7 +698,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after a updating both a Description and a Flag/Comment.",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -708,7 +708,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("Sample Type data is not as expected after deleting the Description and Flag/Comment.",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -735,7 +735,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         sampleHelper.mergeImport(importFile);
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME,SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
         checker().verifyTrue("SampleType data is not as expected after using a file to update samples..",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -963,7 +963,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         cv.addColumn(INDICATOR_FIELD_NAME);
         cv.saveCustomView();
 
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         // After doing a bulk upload it looks like the value field is stored as an empty field in the DB.
         // Need to update the sample data to reflect what is expected from the DB.
@@ -1016,7 +1016,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
                 expectedMissingCount);
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         checker().verifyTrue("After updating a value the data in the DB is not as expected.",
                 areDataListEqual(resultsFromDB, sampleData));
@@ -1056,7 +1056,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
                 expectedMissingCount);
 
-        resultsFromDB = getSampleDataFromDB("/" + PROJECT_NAME, SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
 
         checker().verifyTrue("After adding a sample with a missing value through the UI the data in the DB is not as expected.",
                 areDataListEqual(resultsFromDB, sampleData));
