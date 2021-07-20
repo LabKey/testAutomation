@@ -118,6 +118,11 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         clearCache();
     }
 
+    public File downloadTemplate()
+    {
+        return doAndWaitForDownload(()->elementCache().getDownloadTemplateButton().click());
+    }
+
     public enum Format
     {
         TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
@@ -172,6 +177,11 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         WebElement getCancelButton()
         {
             return Ext4Helper.Locators.ext4Button("Cancel").findElement(getExpandedPanel());
+        }
+
+        WebElement getDownloadTemplateButton()
+        {
+            return Locator.lkButton("Download Template").findElement(this);
         }
 
         Checkbox getAltKeyCheckbox()

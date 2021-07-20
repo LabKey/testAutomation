@@ -1,5 +1,7 @@
 package org.labkey.test.tests;
 
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -11,16 +13,19 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -284,7 +289,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testValidAliasNames()
+    public void testValidAliasNames() throws IOException
     {
         final String PARENT_COLUMN_1 = "P2 Column";
         final String SAMPLE_TYPE_NAME = "SimpleSampleType02";
@@ -301,9 +306,18 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         SampleTypeAPIHelper.createEmptySampleType(PROJECT_NAME + "/" + SUB_FOLDER_NAME, definition);
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        log("Import samples that have a parent alias column.");
+        log("Verify parent alias display in sample type properties and download template.");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME).bulkImport(sampleText);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
+        Assert.assertEquals("Unexpected parent import alias display", PARENT_COLUMN_1, sampleHelper.getDetailsFieldValue("Parent Import Alias(es)"));
+        ImportDataPage importDataPage = sampleHelper.getSamplesDataRegionTable().clickImportBulkData();
+        File template = importDataPage.downloadTemplate();
+        List<String> actualHeaderValues = getTemplateColumnHeaders(template);
+        Assert.assertTrue("Download template file does not contain import alias", actualHeaderValues.contains(PARENT_COLUMN_1));
+
+        log("Import samples that have a parent alias column.");
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
+        sampleHelper.bulkImport(sampleText);
 
         log("Go to the detail page for various samples and make sure the precursor and child sample values are correct.");
 
@@ -354,6 +368,13 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         checkAllRowsInDataRegion("childMaterials", "Name", List.of("SB_10", "SB_07"));
         checkAllRowsInDataRegion("childMaterials", "Run", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
         checkAllRowsInDataRegion("Runs", "Name", List.of("Derive sample from SB_07", "Derive sample from SB_08"));
+    }
+
+    private List<String> getTemplateColumnHeaders(File template) throws IOException
+    {
+        Workbook workbook = ExcelHelper.create(template);
+        Sheet sheet = workbook.getSheetAt(0);
+        return ExcelHelper.getRowData(sheet, 0);
     }
 
     @Test
