@@ -133,11 +133,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         return placeholder != null && placeholder.isDisplayed();
     }
 
-    /**
-     *
-     * @return
-     */
-    public @Nullable String getValue()
+    public String getValue()
     {
         waitForLoaded();
 
@@ -145,7 +141,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         if (selections.size() == 1)
             return selections.get(0);
-        return null;
+        return "";
     }
 
     public boolean hasOption(String value)
@@ -170,11 +166,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     /* waits until the currently selected 'value' equals or contains the specified string */
     public T expectValue(String value)
     {
-        waitFor(() ->
-                {
-                    var _value = getValue();
-                    return _value != null && _value.contains(value);
-                },
+        waitFor(() -> getValue().contains(value),
                 "took too long for the ReactSelect value to contain the expected value:[" + value + "]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return (T) this;
     }
