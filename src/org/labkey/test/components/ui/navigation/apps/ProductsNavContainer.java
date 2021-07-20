@@ -69,7 +69,7 @@ public class ProductsNavContainer extends BaseNavContainer
     @Override
     protected ElementCache elementCache()
     {
-        return new ElementCache();
+        return (ElementCache) super.elementCache();
     }
 
     @Override
