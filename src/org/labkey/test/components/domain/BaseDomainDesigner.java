@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
  */
 public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCache> extends WebDriverComponent<EC>
 {
+    public static final String RESERVED_FIELDS_WARNING_PREFIX = "Fields with reserved names or prefixes found in your file are not shown below. ";
     private final WebElement el;
     private final WebDriver driver;
 

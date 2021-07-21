@@ -56,7 +56,7 @@ public class LeafNavContainer extends BaseNavContainer
 
     protected class ElementCache extends BaseNavContainer.ElementCache
     {
-        final Locator clickableItem = Locator.tagWithClass("div", "clickable-item");
+        final Locator clickableItem = Locator.tagWithClass("a", "clickable-item");
         final WebElement backLink = Locator.tagWithClass("span", "header-title")
                 .child(Locator.tagWithClass("i", "back-icon")).findWhenNeeded(header).withTimeout(2000);
     }

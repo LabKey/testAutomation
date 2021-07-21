@@ -36,6 +36,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -1006,7 +1007,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testIgnoreReservedFieldNames()
     {
-        final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
+        final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey: " +
                 "Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container.";
 
