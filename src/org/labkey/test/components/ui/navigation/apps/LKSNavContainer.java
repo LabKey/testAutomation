@@ -42,7 +42,7 @@ public class LKSNavContainer extends BaseNavContainer
 
     private List<WebElement> tabLinks()
     {
-        return Locator.tagWithClass("div", "clickable-item").findElements(elementCache().tabContainer);
+        return Locator.tagWithClass("a", "clickable-item").findElements(elementCache().tabContainer);
     }
 
     public List<String> tabTexts()
