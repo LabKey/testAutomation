@@ -456,7 +456,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         protected BaseReactSelectFinder(WebDriver driver)
         {
             super(driver);
-            _locator = Locators.selectContainer();    // use this to find the only reactSelect in a scope
+            _locator = Locators.selectContainer(); // use this to find the only reactSelect in a scope
         }
 
         public BaseReactSelectFinder<Select> withContainerClass(String containerClass)
