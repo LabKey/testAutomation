@@ -808,7 +808,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
-            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badParentLineage' not found];\n" +
+            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badParentLineage'.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
                     successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badParentLineage'."));
         }
