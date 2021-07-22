@@ -141,6 +141,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new LookAndFeelSettingsPage(getDriver());
     }
 
+    public void clickResponseServerConfiguration()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().responseServerConfigurationLink);
+    }
+
     public void clickMasterPatientIndex()
     {
         goToSettingsSection();
@@ -214,6 +220,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
         protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
         protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
+        protected WebElement responseServerConfigurationLink = Locator.linkWithText("Response Server Configuration").findWhenNeeded(this);
         protected WebElement masterPatientIndex = Locator.linkWithText("Master Patient Index").findWhenNeeded(this);
         protected WebElement profilerLink = Locator.linkWithText("profiler").findWhenNeeded(this);
         protected WebElement runningThreadsLink = Locator.linkWithText("running threads").findWhenNeeded(this);

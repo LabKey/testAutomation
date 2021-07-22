@@ -103,6 +103,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1534,6 +1535,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToFolderManagement().goToModulePropertiesTab();
     }
 
+    protected void goToResponseServerConfiguration()
+    {
+        goToAdminConsole().clickResponseServerConfiguration();
+    }
+
     protected Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)  //TODO: refactor this into FolderManagementPage.modulePropertyPane
     {
         Map<String, String> map = new HashMap<>();
@@ -1550,6 +1556,24 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToModuleProperties();
         Ext4FieldRef ref = getModulePropertyFieldRef(property);
         return (String)ref.getValue();
+    }
+
+    public void setResponseServerConfigurations(LinkedHashMap<String, String> props)
+    {
+        log("setting response server configuration");
+        goToResponseServerConfiguration();
+
+        for (String prop: props.keySet())
+        {
+            String val = props.get(prop);
+            log("setting property: " + prop + " to value: " + val);
+
+            if (prop.equals("metadataLoadLocation"))
+                checkRadioButton(Locator.radioButtonByNameAndValue("metadataLoadLocation", val));
+            else
+                setFormElement(Locator.name(prop), val);
+        }
+        clickButton("Save and Finish", 0);
     }
 
     public void setModuleProperties(List<ModulePropertyValue> values)
