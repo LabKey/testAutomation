@@ -781,7 +781,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         {
             assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badLineageTest' not found];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleType 'badLineageTest' not found"));
+                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in in Sample Type 'badLineageTest'."));
         }
     }
 
@@ -810,7 +810,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         {
             assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badParentLineage' not found];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleType 'badParentLineage' not found"));
+                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badParentLineage'."));
         }
 
         // clean up on success
