@@ -588,7 +588,7 @@ public class UserTest extends BaseWebDriverTest
         setFormElementJS(Locator.name(Connection.X_LABKEY_CSRF), "");
 
         clickButton("Add Users");
-        assertElementPresent(Locators.labkeyErrorSubHeading.containing("You do not have the permissions required to access this page."));
+        assertElementPresent(Locators.labkeyErrorSubHeading.containing("This request has an invalid security context. You may have signed in or signed out of this session. Try again by using the 'back' and 'refresh' button in your browser."));
     }
 
     @Override
