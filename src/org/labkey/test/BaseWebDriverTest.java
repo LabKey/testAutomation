@@ -1574,6 +1574,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 setFormElement(Locator.name(prop), val);
         }
         clickButton("Save and Finish", 0);
+
+        assertTextNotPresent("WCP Base URL must begin with 'http://' or 'https://'");
+        assertTextNotPresent("WCP Base URL must end with '/StudyMetaData'");
+        assertTextNotPresent("WCP username must not be blank");
+        assertTextNotPresent("WCP password must not be blank");
+        assertTextNotPresent("Metadata Directory path is invalid");
     }
 
     public void setModuleProperties(List<ModulePropertyValue> values)
