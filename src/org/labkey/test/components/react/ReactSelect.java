@@ -35,6 +35,12 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         return new ReactSelectFinder(driver);
     }
 
+    @Override
+    protected ReactSelect getThis()
+    {
+        return this;
+    }
+
     public ReactSelect setOptionLocator(Function<String, Locator> optionLocFactory)
     {
         _optionLocFactory = optionLocFactory;
@@ -61,7 +67,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
             try
             {
                 optionEl = elementCache().findOption(option);
-                _wrapper.scrollIntoView(optionEl);
+                getWrapper().scrollIntoView(optionEl);
             }
             catch (NoSuchElementException nse)
             {
@@ -87,7 +93,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         for (int i = 0; i < 5 && !optionEl.isDisplayed(); i++)
         {
             sleep(500);
-            _wrapper.scrollIntoView(optionEl);
+            getWrapper().scrollIntoView(optionEl);
             TestLogger.debug("scroll optionEl into view, attempt " + i);
         }
 
@@ -96,7 +102,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         TestLogger.debug("optionEl is displayed, clicking");
         optionEl.click();
 
-        new FluentWait<>(_wrapper.getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
+        new FluentWait<>(getWrapper().getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
     }
 
     @Override
