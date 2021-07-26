@@ -33,7 +33,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.admin.ExportFolderPage;
@@ -70,7 +70,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeExportFolderTest";

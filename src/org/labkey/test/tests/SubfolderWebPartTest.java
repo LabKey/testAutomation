@@ -22,7 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.FilesWebPart;
 import org.labkey.test.components.SubfoldersWebPart;
 import org.labkey.test.util.PortalHelper;
@@ -33,7 +33,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class SubfolderWebPartTest extends BaseWebDriverTest
 {

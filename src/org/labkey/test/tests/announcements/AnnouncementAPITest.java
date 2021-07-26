@@ -15,7 +15,7 @@ import org.labkey.remoteapi.announcements.MessageThreadResponse;
 import org.labkey.remoteapi.announcements.AnnouncementModel;
 import org.labkey.remoteapi.announcements.UpdateMessageThreadCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 public class AnnouncementAPITest extends BaseWebDriverTest
 {
     @BeforeClass

@@ -22,7 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
@@ -42,7 +42,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({Issues.class, DailyA.class})
+@Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class IssueDomainSharingTest extends BaseWebDriverTest
 {

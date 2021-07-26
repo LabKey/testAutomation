@@ -26,7 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.RReportHelper;
 
@@ -38,7 +38,7 @@ import java.nio.file.StandardCopyOption;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, Reports.class})
+@Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class KnitrReportTest extends AbstractKnitrReportTest
 {

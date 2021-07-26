@@ -22,7 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -39,7 +39,7 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyB.class, FileBrowser.class})
+@Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ExpTest extends BaseWebDriverTest
 {

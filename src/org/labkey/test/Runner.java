@@ -872,7 +872,7 @@ public class Runner extends TestSuite
         }
 
         Set<String> nightlySuites = Collections.newSetFromMap(new CaseInsensitiveMap<>());
-        nightlySuites.addAll(Arrays.asList("BVT", "DailyA", "DailyB", "DailyC", "Git", "CustomModules", "EHR"));
+        nightlySuites.addAll(Arrays.asList("BVT", "Daily", "Git", "CustomModules", "EHR"));
         File dumpFile = new File(fileName);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile)))

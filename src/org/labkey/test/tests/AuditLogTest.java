@@ -38,7 +38,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -73,7 +73,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
-@Category({DailyA.class, Hosting.class})
+@Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class AuditLogTest extends BaseWebDriverTest
 {

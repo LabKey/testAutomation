@@ -25,7 +25,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
  * It then runs a query 'Comparison' to ensure than the difference between LabKey's results and FlowJo's is not greater
  * than 25 for any statistic.
  */
-@Category({DailyA.class, Flow.class})
+@Category({Daily.class, Flow.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class FlowJoQueryTest extends BaseFlowTest
 {

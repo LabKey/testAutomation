@@ -38,7 +38,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyC.class, Charting.class})
+@Category({Daily.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class ChartingAPITest extends BaseWebDriverTest
 {

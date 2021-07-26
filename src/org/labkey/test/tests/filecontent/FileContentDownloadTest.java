@@ -23,7 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
@@ -38,7 +38,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, FileBrowser.class})
+@Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class FileContentDownloadTest extends BaseWebDriverTest
 {

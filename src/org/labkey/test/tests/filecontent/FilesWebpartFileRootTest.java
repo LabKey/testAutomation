@@ -25,7 +25,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.files.CustomizeFilesWebPartPage;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
@@ -33,7 +33,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.Arrays;
 import java.util.List;
 
-@Category(DailyC.class)
+@Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class FilesWebpartFileRootTest extends BaseWebDriverTest
 {

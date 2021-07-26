@@ -33,7 +33,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.domain.BaseDomainDesigner;
@@ -79,7 +79,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
-@Category({DailyA.class, Data.class, Hosting.class})
+@Category({Daily.class, Data.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
 public class ListTest extends BaseWebDriverTest
 {

@@ -6,14 +6,14 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.reports.ManageViewsPage;
 
 import java.util.Collections;
 import java.util.List;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
 {

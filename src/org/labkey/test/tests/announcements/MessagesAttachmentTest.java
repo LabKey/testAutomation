@@ -22,7 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.RespondPage;
 import org.labkey.test.util.NonWindowsTest;
@@ -34,7 +34,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
 {

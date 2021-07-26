@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 // Issue 41224: flow: support duplicate sample names in FlowJo workspace
 // Issue 41225: flow: import failure for duplicate aliased statistics
-@Category({DailyC.class, Flow.class, FileBrowser.class})
+@Category({Daily.class, Flow.class, FileBrowser.class})
 public class FlowDuplicateSamplesTest extends BaseFlowTest
 {
 

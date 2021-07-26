@@ -41,7 +41,7 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
@@ -85,7 +85,7 @@ import static org.labkey.test.TestFileUtils.getLabKeyRoot;
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
 */
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class SimpleModuleTest extends BaseWebDriverTest
 {

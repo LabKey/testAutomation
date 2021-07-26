@@ -25,7 +25,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locator.XPathLocator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
@@ -38,7 +38,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 public class RConfigTest extends BaseWebDriverTest
 {
     private static final String DEFAULT_ENGINE_NAME = "R Scripting Engine";

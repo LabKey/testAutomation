@@ -31,7 +31,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
@@ -63,7 +63,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
+@Category({Daily.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class ScatterPlotTest extends GenericChartsTest
 {

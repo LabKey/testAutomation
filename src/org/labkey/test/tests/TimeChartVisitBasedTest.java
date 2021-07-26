@@ -19,7 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.pages.TimeChartWizard;
@@ -36,7 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyC.class, Reports.class, Charting.class})
+@Category({Daily.class, Reports.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class TimeChartVisitBasedTest extends TimeChartTest
 {
