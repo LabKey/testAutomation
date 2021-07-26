@@ -67,15 +67,6 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
     protected abstract Locator getNoResultsLocator();
 
     /**
-     * @deprecated We have no immediate plans to implement search result crawling
-     */
-    @Deprecated (forRemoval = true)
-    public void verifySearchResults(String container, boolean crawlResults)
-    {
-        verifySearchResults(container);
-    }
-
-    /**
      * @see #verifySearchResults(String, String)
      */
     public void verifySearchResults(@LoggedParam String expectedResultsContainer)

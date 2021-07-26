@@ -1032,15 +1032,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         goToProjectSettings();
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.LabKeySiteWrapper#goToAdminConsole}
-     */
-    @Deprecated (forRemoval = true)
-    public void goToAdmin()
-    {
-        goToAdminConsole();
-    }
-
     public UserDetailsPage goToMyAccount()
     {
         clickUserMenuItem("My Account");
