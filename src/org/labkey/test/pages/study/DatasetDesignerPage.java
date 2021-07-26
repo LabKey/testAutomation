@@ -91,7 +91,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
     public DatasetDesignerPage setCategory(String category)
     {
         expandPropertiesPanel();
-        elementCache().categorySelect.filterSelect(category);
+        elementCache().categorySelect.createValue(category);
         return this;
     }
 

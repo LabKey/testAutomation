@@ -29,7 +29,6 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.ElementCache>
 {
-
     private final WebDriver _driver;
     private final WebElement _editingDiv;
 
@@ -51,22 +50,15 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return _driver;
     }
 
-    public ReactSelect entityTypeSelect()
+    public ReactSelect targetEntityTypeSelect()
     {
-        return ReactSelect.finder(getDriver()).withIdStartingWith("targetEntityType").waitFor();
+        return ReactSelect.finder(getDriver()).withName("targetEntityType").waitFor();
     }
 
-    /**
-     * use parameterless entityTypeSelect(), above
-     * @param labelText
-     * @return
-     */
-    @Deprecated
-    public ReactSelect getEntityTypeSelect(String labelText)
+    private ReactSelect parentEntityTypeSelect(String label)
     {
-        return ReactSelect.finder(getDriver()).followingLabelWithSpan(labelText).findWhenNeeded(getDriver());
+        return ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findWhenNeeded(getDriver());
     }
-
 
     public EntityInsertPanel addParent(String label, String parentType)
     {
@@ -85,7 +77,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
             elementCache().addParent.click();
             getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
-            getEntityTypeSelect(label).select(parentType);
+            parentEntityTypeSelect(label).select(parentType);
             return this;
         }
         catch (WebDriverException ex)
@@ -104,9 +96,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public ReactSelect getParentSelect(String label)
     {
-        if (!ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findOptional(this).isPresent())
+        if (ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findOptional(this).isEmpty())
             elementCache().addParent.click();
-        return getEntityTypeSelect(label);
+        return parentEntityTypeSelect(label);
     }
 
     public EntityInsertPanel clearParents()
@@ -336,7 +328,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             {
                 return  isGridVisible() ||          // when uploading assay data there is no target select
                         isFileUploadVisible() ||
-                        entityTypeSelect().isInteractive();
+                        targetEntityTypeSelect().isInteractive();
             }catch (NoSuchElementException nse)
             {
                 return false;
@@ -410,7 +402,5 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         {
             return _locator;
         }
-
     }
-
 }

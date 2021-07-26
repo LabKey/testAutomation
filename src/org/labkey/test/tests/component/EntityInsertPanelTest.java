@@ -61,7 +61,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         TestDataGenerator dgen = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
-        testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
+        testPanel.targetEntityTypeSelect().select(sampleTypeName);
 
         String pasteText = "ed\tbrother\tthe quiet one\t\t2\tstringfellow\t11/11/2020\ttrue\n" +
                 "jed\tother brother\tthe squinty one\t\t3\tstrongfellow\t11/11/2020\tfalse\n" +
@@ -102,7 +102,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         File testFile = dgen.writeData("fileUploadTest.tsv");
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
-        testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
+        testPanel.targetEntityTypeSelect().select(sampleTypeName);
         var previewGrid = testPanel.uploadFileExpectingPreview(testFile, true);
 
         clickFileImport();  // the file import submit button is different from the grid submit button
