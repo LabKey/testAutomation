@@ -38,18 +38,17 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
      * waits for that value to show in a selectValueLabel (which is usually how a single-select shows)*/
     public FilteringReactSelect typeAheadSelect(String value)
     {
-        return typeAheadSelect(value, ReactSelect.Locators.options.containing(value),
-                ReactSelect.Locators.selectValueLabelContaining(value));
+        return typeAheadSelect(value, value, value);
     }
 
-    public FilteringReactSelect typeAheadSelect(String value, Locator elementToClick, Locator elementToWaitFor)
+    public FilteringReactSelect typeAheadSelect(String value, String optionText, String selectedOptionLabel)
     {
         waitForLoaded();
         scrollIntoView();
         open();
 
-        if (isMulti() || hasValue())
-            sleep(500);
+        var elementToClick = ReactSelect.Locators.options.containing(optionText);
+        var elementToWaitFor = getValueLabelLocator().containing(selectedOptionLabel);
 
         setFilter(value);
 
@@ -68,9 +67,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
                 {
                     close();
                     open();
-
-                    if (hasValue() || isMulti() || isClearable())
-                        sleep(500);
                     setFilter(value);
                 }
                 else
@@ -85,9 +81,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         {
             _wrapper.scrollIntoView(optionToClick);
             _wrapper.shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
-
-            if (isMulti() || hasValue() || isClearable())
-                sleep(250);
             optionToClick.click();
         }
         catch (StaleElementReferenceException sere)
@@ -96,23 +89,22 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             throw sere;
         }
 
-        if (! _wrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
+        if (!_wrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
         {
             _wrapper.fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
+
         _wrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
-                "Expected selection ["+elementToWaitFor.getLoggableDescription()+"] was not found. Selected value(s) are:" + getSelections(),
+                () -> "Expected selection [" + elementToWaitFor.getLoggableDescription() + "] was not found. Selected value(s) are:" + getSelections(),
                 WAIT_FOR_JAVASCRIPT);
-        if (isMulti() || hasValue() || isClearable())
-            sleep(500);
+
         close();
         return this;
     }
 
-
     public FilteringReactSelect filterSelect(String value) // adds text for usage in cases where the item isn't in the dropdown and the text is editable
     {
-        return filterSelect(value, Locator.tagWithClass("span", "Select-value-label").containing(value));
+        return filterSelect(value, getValueLabelLocator().containing(value));
     }
 
     /* for use with editable instances of a reactSelect, where the options aren't shown
@@ -134,7 +126,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
             WebElement elemToClick = Locator.waitForAnyElement(
                     new FluentWait<SearchContext>(getComponentElement()).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
-                    Locators.createOptionPlaceholder.containing(value),
                     Locators.options.containing(value));
 
             log("clicking item with value [" +value+"]");
@@ -157,7 +148,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             success = elementToWaitFor.findElement(getComponentElement());
         }
 
-        if ( success == null)
+        if (success == null)
             log("Expected selection was not found. Selected value(s) are:" + getSelections());
 
         close();

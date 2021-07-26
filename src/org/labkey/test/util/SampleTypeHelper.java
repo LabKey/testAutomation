@@ -299,4 +299,10 @@ public class SampleTypeHelper extends WebDriverWrapper
             verifyDataRow(expectedRow, index, drt);
         }
     }
+
+    public String getDetailsFieldValue(String label)
+    {
+        Locator loc = Locator.tag("td").withClass("lk-form-label").withText(label + ":").followingSibling("td");
+        return loc.findElement(getDriver()).getText();
+    }
 }

@@ -148,7 +148,8 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
 
         ReactSelect parentAliasSelect(int index)
         {
-            return ReactSelect.finder(getDriver()).locatedBy(Locator.byClass("sampleset-insert--parent-select"))
+            return ReactSelect.finder(getDriver())
+                    .withInputClass("sampleset-insert--parent-select")
                     .index(index).find(propertiesPanel);
         }
 

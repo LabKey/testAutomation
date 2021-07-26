@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
@@ -134,7 +135,7 @@ public class DataClassTest extends BaseWebDriverTest
     @Test
     public void testIgnoreReservedFieldNames()
     {
-        final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
+        final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey to support this data class: " +
                 "Name, Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container.";
 

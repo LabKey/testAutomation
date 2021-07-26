@@ -42,7 +42,7 @@ public class LKSNavContainer extends BaseNavContainer
 
     private List<WebElement> tabLinks()
     {
-        return Locator.tagWithClass("div", "clickable-item").findElements(elementCache().tabContainer);
+        return elementCache().tabLink.findElements(elementCache().tabContainer);
     }
 
     public List<String> tabTexts()
@@ -52,7 +52,7 @@ public class LKSNavContainer extends BaseNavContainer
 
     public void clickTab(String tabText)
     {
-        WebElement link = Locator.tagWithClass("div", "clickable-item").withText(tabText)
+        WebElement link = elementCache().tabLink.withText(tabText)
                 .waitForElement(elementCache().tabContainer, 2000);
         getWrapper().clickAndWait(link);
     }
@@ -60,7 +60,7 @@ public class LKSNavContainer extends BaseNavContainer
     @Override
     protected ElementCache elementCache()
     {
-        return new ElementCache();
+        return (ElementCache) super.elementCache();
     }
 
     @Override
@@ -71,10 +71,11 @@ public class LKSNavContainer extends BaseNavContainer
 
     protected class ElementCache extends BaseNavContainer.ElementCache
     {
+        final Locator tabLink = Locator.tagWithClass("a", "clickable-item");
         final WebElement backLink = Locator.tagWithClass("span", "header-title")
                 .withChild(Locator.tagWithClass("i", "back-icon"))
                 .findWhenNeeded(this).withTimeout(2000);
-        final WebElement homeLink = Locator.tagWithClass("div", "container-item").withText("LabKey Home")
+        final WebElement homeLink = Locator.tagWithClass("a", "container-item").withText("LabKey Home")
                 .findWhenNeeded(navList).withTimeout(2000);
         final WebElement tabContainer = Locator.tagWithClass("div", "container-tabs")
                 .findWhenNeeded(navList).withTimeout(2000);
@@ -85,7 +86,7 @@ public class LKSNavContainer extends BaseNavContainer
 
         WebElement projectLink(String project)
         {
-            return Locator.tagWithClass("div", "container-item").withText(project)
+            return Locator.tagWithClass("a", "container-item").withText(project)
                     .waitForElement(navList, 2000);
         }
     }
