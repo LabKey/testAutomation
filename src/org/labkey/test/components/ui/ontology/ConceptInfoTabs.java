@@ -62,7 +62,7 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
         if (isOverviewDisplayed())
         {
             elementCache().pathInformationTab.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(elementCache().overviewPane));
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(elementCache().pathInformationPane));
             WebDriverWrapper.waitFor(() -> !isOverviewDisplayed(),
                     "the path information pane did not become enabled", 2000);
         }

@@ -38,8 +38,8 @@ public class LabKeyExpectedConditions
     /**
      * An expectation for checking that an element has stopped moving
      *
-     * @param loc the container element which should have css style, "position: static"
-     * @return element when animation is complete
+     * @param loc Locates an element which should animate into place
+     * @return the element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final By loc) {
         return new ExpectedCondition<>() {
@@ -66,9 +66,9 @@ public class LabKeyExpectedConditions
     }
 
     /**
-     * Another expectation for checking that an element has stopped moving
+     * An expectation for checking that a found element is visible and has stopped moving
      *
-     * @param el the element who's position changes
+     * @param el an element which should animate into place
      * @return the element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final WebElement el) {
@@ -76,6 +76,11 @@ public class LabKeyExpectedConditions
             @Override
             public WebElement apply(WebDriver driver)
             {
+                if (!el.isDisplayed())
+                {
+                    return null;
+                }
+
                 Point firstPosition;
                 Point secondPosition;
                 Dimension firstDimension;
