@@ -89,7 +89,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             throw sere;
         }
 
-        if (! _wrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
+        if (!_wrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
         {
             _wrapper.fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
