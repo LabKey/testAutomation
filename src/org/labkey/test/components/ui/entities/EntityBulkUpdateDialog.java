@@ -52,7 +52,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         FilteringReactSelect reactSelect = elementCache().getSelect(columnTitle);
         WebDriverWrapper.waitFor(reactSelect::isEnabled,
                 "the ["+columnTitle+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
-        selectValues.forEach(s -> {reactSelect.filterSelect(s);});
+        selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
@@ -215,7 +215,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         public FilteringReactSelect getSelect(String fieldKey)
         {
-            return FilteringReactSelect.finder(getDriver()).waitFor(formRow(fieldKey));
+            return FilteringReactSelect.finder(getDriver()).withNamedInput(fieldKey).findWhenNeeded(this);
         }
 
         public Input textInput(String fieldKey)

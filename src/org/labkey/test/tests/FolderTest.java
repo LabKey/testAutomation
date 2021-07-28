@@ -31,7 +31,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.FolderManagementFolderTree;
@@ -58,7 +58,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class, Hosting.class})
+@Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 25 )
 public class FolderTest extends BaseWebDriverTest
 {

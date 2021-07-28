@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
@@ -34,7 +34,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyB.class, Wiki.class})
+@Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WikiTest extends BaseWebDriverTest
 {

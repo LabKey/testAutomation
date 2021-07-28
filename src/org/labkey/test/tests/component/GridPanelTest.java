@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.OmniBox.FilterOperator;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
@@ -21,7 +21,7 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 public class GridPanelTest extends BaseWebDriverTest
 {
     @Override

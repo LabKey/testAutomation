@@ -3110,9 +3110,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * Wait for a button to appear, click it, then waits for the text to appear.
+     * @deprecated This method provides minimal convenience and behaves inconsistently with other 'clickButton' methods
      */
+    @Deprecated(since = "21.8")
     public void clickButton(String text, String waitForText)
     {
+        if (isTextPresent(waitForText))
+        {
+            throw new IllegalStateException("'" + waitForText + "' is already present on the page. Pick a better indicator that the page state has changed.");
+        }
         clickButton(text, 0);
         waitForText(waitForText);
     }

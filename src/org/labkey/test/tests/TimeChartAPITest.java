@@ -22,7 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.tests.visualization.TimeChartTest;
 import org.labkey.test.util.DataRegionTable;
@@ -39,7 +39,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyC.class, Reports.class, Charting.class})
+@Category({Daily.class, Reports.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class TimeChartAPITest extends TimeChartTest
 {

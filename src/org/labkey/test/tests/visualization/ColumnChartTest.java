@@ -23,7 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ColumnChartComponent;
 import org.labkey.test.components.ColumnChartRegion;
@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Category({DailyB.class, Hosting.class})
+@Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class ColumnChartTest extends BaseWebDriverTest
 {

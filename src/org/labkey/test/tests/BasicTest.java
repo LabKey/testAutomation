@@ -28,7 +28,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.BodyWebPart;
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({Base.class, DRT.class, DailyA.class, Git.class, Hosting.class})
+@Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class BasicTest extends BaseWebDriverTest
 {

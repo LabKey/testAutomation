@@ -15,7 +15,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -39,7 +39,7 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KI
  * Test cases that use large amounts of data or in other ways stress the system. If they fail they can interfere with
  * other tests, and can be very troublesome when running locally.
  */
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class SampleTypeLimitsTest extends BaseWebDriverTest
 {

@@ -24,7 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -48,7 +48,7 @@ import java.util.List;
  * // TODO: add verification for plots with aggregate lines that have error bars
  * // TODO: add verification for plot line with and whether or not the data points are shown
  */
-@Category({DailyC.class, Reports.class, Charting.class})
+@Category({Daily.class, Reports.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class TimeChartImportTest extends StudyBaseTest
 {

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 
@@ -18,7 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 public class EditableGridTest extends BaseWebDriverTest
 {
     @Override

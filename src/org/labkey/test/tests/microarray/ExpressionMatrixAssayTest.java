@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PipelineAnalysisHelper;
@@ -37,7 +37,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, Assays.class})
+@Category({Daily.class, Assays.class})
 public class ExpressionMatrixAssayTest extends BaseExpressionMatrixTest
 {
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);

@@ -22,7 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.DataRegionTable;
@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyB.class, Hosting.class})
+@Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class ListArchiveImportTest extends BaseWebDriverTest
 {

@@ -7,7 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.entities.EntityInsertPanel;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
@@ -25,7 +25,7 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 public class EntityInsertPanelTest extends BaseWebDriverTest
 {
     @Override
@@ -61,7 +61,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         TestDataGenerator dgen = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
-        testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
+        testPanel.targetEntityTypeSelect().select(sampleTypeName);
 
         String pasteText = "ed\tbrother\tthe quiet one\t\t2\tstringfellow\t11/11/2020\ttrue\n" +
                 "jed\tother brother\tthe squinty one\t\t3\tstrongfellow\t11/11/2020\tfalse\n" +
@@ -102,7 +102,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         File testFile = dgen.writeData("fileUploadTest.tsv");
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
-        testPanel.getEntityTypeSelect("Sample Type").select(sampleTypeName);
+        testPanel.targetEntityTypeSelect().select(sampleTypeName);
         var previewGrid = testPanel.uploadFileExpectingPreview(testFile, true);
 
         clickFileImport();  // the file import submit button is different from the grid submit button
