@@ -1573,7 +1573,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             else
                 setFormElement(Locator.name(prop), val);
         }
-        clickButton("Save and Finish", 0);
+        clickButton("Save and Finish");
 
         assertTextNotPresent("WCP Base URL must begin with 'http://' or 'https://'");
         assertTextNotPresent("WCP Base URL must end with '/StudyMetaData'");
