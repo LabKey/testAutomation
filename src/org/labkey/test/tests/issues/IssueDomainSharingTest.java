@@ -229,11 +229,6 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     {
     }
 
-    //@Test @Ignore //TODO
-    public void testProtectedFields()
-    {
-    }
-
     @Override
     protected WebDriverWrapper.BrowserType bestBrowser()
     {
