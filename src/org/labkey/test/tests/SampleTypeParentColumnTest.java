@@ -639,6 +639,26 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testSampleTypeParentAliasOptions()
+    {
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+
+        goToProjectHome();
+        projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
+        CreateSampleTypePage createPage = sampleHelper.goToCreateNewSampleType();
+        List<String> options = createPage.addParentAlias("test").getParentAliasOptions(0);
+
+        log("Verify that parent alias options include both data classes and sample types.");
+        checker().verifyTrue("Missing expected parent alias option", options.contains("(Current Sample Type)"));
+        checker().verifyTrue("Missing expected parent alias option", options.contains("Data Class: " + PARENT_CONTAINER_DATA_CLASS_NAME + " (" + PROJECT_NAME + ")"));
+        checker().verifyTrue("Missing expected parent alias option", options.contains("Data Class: " + SIBLING_DATA_CLASS_NAME + " (" + SUB_FOLDER_NAME + ")"));
+        checker().verifyTrue("Missing expected parent alias option", options.contains("Sample Type: " + PARENT_CONTAINER_SAMPLE_TYPE_NAME + " (" + PROJECT_NAME + ")"));
+        checker().verifyTrue("Missing expected parent alias option", options.contains("Sample Type: " + SIBLING_SAMPLE_TYPE_NAME + " (" + SUB_FOLDER_NAME + ")"));
+
+        createPage.clickCancel();
+    }
+
+    @Test
     public void testAliasNameConflictsWithFieldName()
     {
         final String ALIAS_NAME_CONFLICT = "ConflictName";
@@ -683,6 +703,8 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         clickFolder(SUB_FOLDER_NAME);
         updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
+        Assert.assertEquals("Expected parent alias name not found.", GOOD_PARENT_NAME, updatePage.getParentAlias(0));
+        Assert.assertEquals("Expected parent alias value not found.", SampleTypeDesigner.CURRENT_SAMPLE_TYPE, updatePage.getParentAliasSelectText(0));
         updatePage.getFieldsPanel().addField(GOOD_PARENT_NAME);
         errors = updatePage.clickSaveExpectingErrors();
 
