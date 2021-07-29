@@ -145,7 +145,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
     public boolean isInPageAdminMode()
     {
-        return Locators.exitAdminBtn.findElementOrNull(getDriver()) != null;
+        return getWrapper().executeScript("return LABKEY.pageAdminMode;", Boolean.class);
     }
 
     public SearchResultsPage search(String searchTerm)
