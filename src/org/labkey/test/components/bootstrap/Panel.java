@@ -65,7 +65,7 @@ public abstract class Panel<EC extends ElementCache> extends WebDriverComponent<
     @Override
     protected abstract EC newElementCache();
 
-    protected class ElementCache extends Component<?>.ElementCache
+    public class ElementCache extends Component<?>.ElementCache
     {
         protected final WebElement panelHeading = Locator.byClass("panel-heading").findWhenNeeded(this);
         protected final WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
