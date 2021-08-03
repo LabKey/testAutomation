@@ -75,8 +75,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
     {
         for (int i=0; i < 3 && isOpen(); i++)
         {
-            getWrapper().mouseOver(elementCache().inputGroupAddOn());
-            elementCache().inputGroupAddOn().click();
+            getWrapper().fireEvent(elementCache().findInput(), WebDriverWrapper.SeleniumEvent.blur);
 
             WebDriverWrapper.waitFor(() -> !isOpen(), 1500);
         }
@@ -108,10 +107,6 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         WebElement toggle()
         {
             return toggleLoc.waitForElement(this, 1_000);
-        }
-        WebElement inputGroupAddOn()
-        {
-            return Locator.tagWithClass("span", "input-group-addon").findElement(this);
         }
     }
 
