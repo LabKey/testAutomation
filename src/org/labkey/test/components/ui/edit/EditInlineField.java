@@ -6,6 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -75,7 +76,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
     {
         for (int i=0; i < 3 && isOpen(); i++)
         {
-            getWrapper().fireEvent(elementCache().findInput(), WebDriverWrapper.SeleniumEvent.blur);
+            elementCache().findInput().sendKeys(Keys.ENTER);
 
             WebDriverWrapper.waitFor(() -> !isOpen(), 1500);
         }
