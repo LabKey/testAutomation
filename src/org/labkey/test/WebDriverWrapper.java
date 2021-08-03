@@ -1874,6 +1874,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         new WebDriverWait(getDriver(), millis / 1000)
                 .withMessage("waiting for browser to navigate")
                 .until(ExpectedConditions.stalenessOf(toBeStale));
+        // WebDriver usually does this automatically, but not always.
+        new WebDriverWait(getDriver(), millis / 1000)
+                .withMessage("waiting for document to be ready")
+                .until(wd -> executeScript("return document.readyState;").equals("complete"));
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
