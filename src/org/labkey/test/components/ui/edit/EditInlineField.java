@@ -4,8 +4,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -34,13 +32,14 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         return _driver;
     }
 
-    public EditInlineField setValue(String value)
+    public void setValue(String value)
     {
         open();
+        WebElement input = elementCache().input;
         // 'setFormElement' calls 'WebElement.clear()' which can close the edit-in-place input
-        getWrapper().setFormElementJS(elementCache().findInput(), value);
-        close();
-        return this;
+        getWrapper().setFormElementJS(input, "");
+        input.sendKeys(value, Keys.ENTER);
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(input));
     }
 
     public String getLabel()
@@ -50,14 +49,13 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
 
     public String getValue()
     {
-        close();
         return elementCache().toggle().getText();
     }
 
-    public boolean isOpen()
+    private boolean isOpen()
     {
         return !elementCache().toggleLoc.existsIn(this) &&
-                elementCache().findInput().isDisplayed();
+                elementCache().input.isDisplayed();
     }
 
     private void open()
@@ -69,16 +67,6 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
             toggle.click();
             WebDriverWrapper.waitFor(this::isOpen,
                     "the edit inline field did not open", 2000);
-        }
-    }
-
-    private void close()
-    {
-        for (int i=0; i < 3 && isOpen(); i++)
-        {
-            elementCache().findInput().sendKeys(Keys.ENTER);
-
-            WebDriverWrapper.waitFor(() -> !isOpen(), 1500);
         }
     }
 
@@ -94,10 +82,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
                 .refindWhenNeeded(this);
         final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle")
                 .withChild(Locator.tagWithClass("i", "fa-pencil"));
-        final WebElement findInput()
-        {
-            return Locator.css("input.form-control, textarea.form-control").findWhenNeeded(this);
-        }
+        final WebElement input = Locator.css("input.form-control, textarea.form-control").refindWhenNeeded(this);
 
         WebElement placeholderElement()
         {
