@@ -164,6 +164,11 @@ public class IssuesAdminTest extends BaseWebDriverTest
     {
     }
 
+    // @Test @Ignore //TODO
+    public void testCommentSortDirection() throws Exception
+    {
+    }
+
     @Override
     protected BrowserType bestBrowser()
     {
