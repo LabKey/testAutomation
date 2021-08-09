@@ -147,7 +147,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public static class Locators
     {
-        static public Locator.XPathLocator dialog = Locator.tagWithClassContaining("div", "modal-dialog");
+        static public Locator.XPathLocator dialog = Locator.tagWithClass("div", "modal-dialog");
         static public Locator.XPathLocator title = Locator.tagWithClass("*", "modal-title");
         static public Locator.XPathLocator body = Locator.tagWithClass("div","modal-body");
         static public Locator.XPathLocator dismissButton(String text)
