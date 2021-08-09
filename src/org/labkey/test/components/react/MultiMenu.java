@@ -180,12 +180,6 @@ public class MultiMenu extends BootstrapMenu
         return getComponentElement().getText();
     }
 
-    @Override
-    protected Locator getToggleLocator()
-    {
-        return Locators.dropdownToggle();
-    }
-
     public static abstract class Locators
     {
         static public Locator.XPathLocator menuContainer()
@@ -195,12 +189,7 @@ public class MultiMenu extends BootstrapMenu
 
         static public Locator.XPathLocator menuContainer(String text)
         {
-            return menuContainer().withChild(dropdownToggle().withText(text));
-        }
-
-        private static Locator.XPathLocator dropdownToggle()
-        {
-            return Locator.byClass("dropdown-toggle");
+            return menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withText(text));
         }
     }
 
@@ -232,7 +221,7 @@ public class MultiMenu extends BootstrapMenu
          */
         public MultiMenuFinder exportButton()
         {
-            _locator = Locators.menuContainer().withChild(Locators.dropdownToggle().withChild(Locator.byClass("fa-download")));
+            _locator = Locators.menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withChild(Locator.byClass("fa-download")));
             return this;
         }
 
