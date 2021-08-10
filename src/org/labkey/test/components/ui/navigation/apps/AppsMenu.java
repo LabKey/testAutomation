@@ -3,7 +3,7 @@ package org.labkey.test.components.ui.navigation.apps;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BaseBootstrapMenu;
-import org.openqa.selenium.NoSuchElementException;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -54,10 +54,7 @@ public class AppsMenu extends BaseBootstrapMenu
     @Override
     protected Locator getToggleLocator()
     {
-        // the toggle appears differently in-app (LKSM, Biologics) than it does in LKS.
-        return Locator.XPathLocator.union(
-                Locator.tagWithAttribute("button", "id", "product-navigation-button"),  // lksm/bio
-                Locator.tagWithAttribute("a", "data-toggle", "dropdown"));              // lks
+        return BootstrapMenu.Locators.dropdownToggle();
     }
 
 
