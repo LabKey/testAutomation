@@ -380,7 +380,7 @@ public class FieldDefinition extends PropertyDescriptor
         Boolean("Boolean", "boolean"),
         Double("Number (Double)", "float"),
         Decimal("Decimal (floating point)", "double"),
-        File("File", "fileLink"),
+        File("File", "http://cpas.fhcrc.org/exp/xml#fileLink"),
         Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
         Attachment("Attachment", "attachment"),
         User("User", "int", null, new LookupInfo(null, "core", "users")),
