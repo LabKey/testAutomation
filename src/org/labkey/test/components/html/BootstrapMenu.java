@@ -17,6 +17,7 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
@@ -29,7 +30,7 @@ public class BootstrapMenu extends BaseBootstrapMenu
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
-        super(driver, componentElement);
+        super(componentElement, driver);
     }
 
     static public BootstrapMenuFinder finder(WebDriver driver)
