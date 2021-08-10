@@ -5,6 +5,7 @@
 package org.labkey.test.components.ui.grids;
 
 import com.sun.istack.Nullable;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -18,6 +19,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -314,6 +316,98 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         throw new NoSuchElementException("Couldn't find menu button with caption '" + buttonText + "'.");
     }
 
+    /**
+     * Private helper function tha will get the text of the aliquot view button. This can be used to determine the
+     * current view. Asserts that the button is present.
+     *
+     * @return Text of the aliquot view button.
+     */
+    private String currentAliquotViewText()
+    {
+        Assert.assertTrue("There is no 'Aliquot View' button on this grid.",
+                elementCache().aliquotViewButton().isDisplayed());
+
+        return elementCache().aliquotViewButton().getText();
+    }
+
+    /**
+     * Get the current view selected in the aliquot view button. This asserts that the button is present.
+     *
+     * @return A {@link AliquotViewOptions} item.
+     */
+    public AliquotViewOptions currentAliquotView()
+    {
+        String text = currentAliquotViewText().toLowerCase();
+
+        if(text.contains("all samples"))
+            return AliquotViewOptions.ALL;
+
+        // If the current page is the sources page the text would be 'Derived Samples Only', so this should still work.
+        if(text.contains("samples only"))
+            return AliquotViewOptions.SAMPLES;
+
+        if(text.contains("aliquots only"))
+            return AliquotViewOptions.ALIQUOTS;
+
+        return null;
+    }
+
+    /**
+     * Set the aliquot view.
+     *
+     * @param view A {@link AliquotViewOptions} enum value.
+     */
+    public void setAliquotView(AliquotViewOptions view)
+    {
+        String url = getDriver().getCurrentUrl().toLowerCase();
+        boolean onSourcesPage = url.contains("/sources/");
+
+        String currentButtonText = currentAliquotViewText();
+        String menuChoice = "";
+
+        switch (view)
+        {
+            case ALL:
+                if(onSourcesPage)
+                {
+                    if(url.endsWith("assays"))
+                    {
+                        menuChoice = "Derived Samples or Aliquots";
+                    }
+                    else if(url.endsWith("jobs"))
+                    {
+                        menuChoice = "Samples or Aliquots";
+                    }
+                    else
+                    {
+                        // This is the 'Samples' page for a source.
+                        menuChoice = "Samples and Aliquots";
+                    }
+                }
+                else
+                {
+                    menuChoice = "Samples and Aliquots";
+                }
+                break;
+            case SAMPLES:
+                if(onSourcesPage && url.endsWith("assays"))
+                {
+                    menuChoice = "Derived Samples Only";
+                }
+                else
+                {
+                    menuChoice = "Samples Only";
+                }
+                break;
+            case ALIQUOTS:
+                menuChoice = "Aliquots Only";
+                break;
+        }
+
+        doMenuAction(currentButtonText, Arrays.asList(menuChoice));
+
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -330,6 +424,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                 menus.put(buttonText, new MultiMenu.MultiMenuFinder(_driver).withText(buttonText).find(this));
 
             return menus.get(buttonText);
+        }
+
+        protected final WebElement aliquotViewButton()
+        {
+            return Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").findWhenNeeded(this);
         }
     }
 
@@ -407,5 +506,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         {
             return _separator;
         }
+    }
+
+    public enum AliquotViewOptions
+    {
+        ALL,
+        SAMPLES,
+        ALIQUOTS;
     }
 }
