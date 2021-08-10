@@ -44,6 +44,7 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
         if (test instanceof BaseWebDriverTest)
             _test = (BaseWebDriverTest)test;
         _wrapsDriver = test;
+        waitForPage();
     }
 
     public LabKeyPage(WebDriver driver)
@@ -81,14 +82,7 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
     protected EC elementCache()
     {
         if (null == _elementCache)
-        {
             _elementCache = newElementCache();
-            if (_elementCache == null)
-            {
-                throw new IllegalStateException("Element cache is null.");
-            }
-            waitForPage();
-        }
         return _elementCache;
     }
 
