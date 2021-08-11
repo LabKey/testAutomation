@@ -24,7 +24,7 @@ import org.labkey.remoteapi.reports.GetCategoriesResponse;
 import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.study.DatasetDesignerPage;
@@ -39,7 +39,7 @@ import org.openqa.selenium.WebElement;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class DataViewsTest extends ParticipantListTest
 {

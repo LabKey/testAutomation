@@ -70,6 +70,12 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         throw new NotFoundException("No such parent alias: " + parentAlias);
     }
 
+    public List<String> getParentAliasOptions(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAliasSelect(index).getOptions();
+    }
+
     public T removeParentAlias(String parentAlias)
     {
         expandPropertiesPanel();

@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.util.Ext4Helper;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 13)
 public class TabTest extends SimpleModuleTest
 {

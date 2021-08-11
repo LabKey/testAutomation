@@ -26,7 +26,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
@@ -52,7 +52,7 @@ import static org.labkey.test.components.PlateSummary.Row.C;
 import static org.labkey.test.components.PlateSummary.Row.E;
 import static org.labkey.test.components.PlateSummary.Row.G;
 
-@Category({DailyB.class, Assays.class})
+@Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
 public class ElispotAssayTest extends AbstractAssayTest
 {

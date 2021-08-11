@@ -10,7 +10,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.RelativeUrl;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({Assays.class, DailyC.class})
+@Category({Assays.class, Daily.class})
 public class FlagColumnTest extends BaseWebDriverTest
 {
     private static final String ASSAY_NAME = "FlagAssay";

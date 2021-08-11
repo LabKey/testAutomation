@@ -1874,6 +1874,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         new WebDriverWait(getDriver(), millis / 1000)
                 .withMessage("waiting for browser to navigate")
                 .until(ExpectedConditions.stalenessOf(toBeStale));
+        // WebDriver usually does this automatically, but not always.
+        new WebDriverWait(getDriver(), millis / 1000)
+                .withMessage("waiting for document to be ready")
+                .until(wd -> executeScript("return document.readyState;").equals("complete"));
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
@@ -3110,9 +3114,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * Wait for a button to appear, click it, then waits for the text to appear.
+     * @deprecated This method provides minimal convenience and behaves inconsistently with other 'clickButton' methods
      */
+    @Deprecated(since = "21.8")
     public void clickButton(String text, String waitForText)
     {
+        if (isTextPresent(waitForText))
+        {
+            throw new IllegalStateException("'" + waitForText + "' is already present on the page. Pick a better indicator that the page state has changed.");
+        }
         clickButton(text, 0);
         waitForText(waitForText);
     }

@@ -22,7 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.pages.list.BeginPage;
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class CustomizeGridPermissionsTest extends BaseWebDriverTest
 {

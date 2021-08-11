@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.util.PortalHelper;
@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class DiscussionLinkTest extends BaseWebDriverTest
 {

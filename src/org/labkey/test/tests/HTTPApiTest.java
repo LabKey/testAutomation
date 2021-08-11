@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ListHelper;
@@ -30,7 +30,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class HTTPApiTest extends BaseWebDriverTest
 {

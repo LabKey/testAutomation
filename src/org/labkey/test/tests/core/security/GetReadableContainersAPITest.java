@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper.MemberType;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 public class GetReadableContainersAPITest extends BaseWebDriverTest
 {
     private static final String PROJECT_PREFIX = "/GetReadableContainersAPITest";

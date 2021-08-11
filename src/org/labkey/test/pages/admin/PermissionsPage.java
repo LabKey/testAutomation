@@ -489,7 +489,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
     public PermissionsPage resetLockExpiration()
     {
         _ext4Helper.clickTabContainingText("Project Locking & Review");
-        clickButton("Reset Expiration");
+        clickButton("Reset Expiration Date");
         return this;
     }
 

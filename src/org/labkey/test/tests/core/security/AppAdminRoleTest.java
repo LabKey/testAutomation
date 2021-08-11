@@ -23,7 +23,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
@@ -34,7 +34,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 public class AppAdminRoleTest extends BaseWebDriverTest
 {
     private static final String APP_ADMIN = "appadmin@appadmin.test";

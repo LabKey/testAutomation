@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.QueryMetadataEditorPage;
@@ -95,7 +95,7 @@ import static org.junit.Assert.assertTrue;
  * - Database metadata xml
  *   (overrides title and URL for P)
  */
-@Category({DailyA.class, Data.class})
+@Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class LinkedSchemaTest extends BaseWebDriverTest
 {

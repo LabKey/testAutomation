@@ -21,13 +21,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
 {

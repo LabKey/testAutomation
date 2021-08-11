@@ -78,14 +78,20 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return getAllTypeCombo().stream().allMatch(rs -> rs.isInteractive() && !rs.isLoading());
     }
 
+    private void clickButtonWaitForPanel(WebElement button)
+    {
+        clickButtonWaitForPanel(button, 1_000);
+    }
+
     /**
      * Clicking either the 'Save' or 'Cancel' button will remove this edit panel. This helper function will click the
      * button sent to it and then wait until it has some indication the edit panel is gone and the default panel is
      * shown.
      *
-     * @param button
+     * @param button Button to click.
+     * @param wait How long to wait for the panel.
      */
-    private void clickButtonWaitForPanel(WebElement button)
+    private void clickButtonWaitForPanel(WebElement button, int wait)
     {
         int count = Locator.tagWithClass("div", "panel-default").findElements(getDriver()).size();
 
@@ -93,8 +99,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         WebDriverWrapper.waitFor(()->
                         Locator.tagWithClass("div", "panel-default").findElements(getDriver()).size() > count,
-                "Panel did not exit edit mode", 1_000
-        );
+                "Panel did not exit edit mode", wait);
     }
 
     /** Click the 'Cancel' button. This will make the edit panel go away. */
@@ -109,6 +114,17 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         clickButtonWaitForPanel(elementCache()
                 .button("Save", "Editing " + _parentType.getType() + " Details"));
+    }
+
+    /** Click the 'Save' button.
+     *
+     * @param waitTime Amount of time to wait for the panel.
+     */
+    public void clickSave(int waitTime)
+    {
+        clickButtonWaitForPanel(elementCache()
+                .button("Save", "Editing " + _parentType.getType() + " Details"),
+                waitTime);
     }
 
     /**

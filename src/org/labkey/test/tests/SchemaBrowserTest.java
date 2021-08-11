@@ -20,14 +20,14 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class SchemaBrowserTest extends BaseWebDriverTest
 {

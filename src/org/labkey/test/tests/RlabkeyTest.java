@@ -26,7 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.study.CreateStudyPage;
@@ -53,7 +53,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class RlabkeyTest extends BaseWebDriverTest
 {

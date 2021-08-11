@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.domain.BaseDomainDesigner;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
@@ -37,7 +37,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class DataClassTest extends BaseWebDriverTest
 {

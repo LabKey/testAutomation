@@ -19,13 +19,13 @@ import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class DatasetExportTest extends AssayResultsExportTest
 {

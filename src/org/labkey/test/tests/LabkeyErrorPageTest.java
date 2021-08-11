@@ -8,12 +8,12 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.LabkeyErrorPage;
 
 import java.util.List;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class LabkeyErrorPageTest extends BaseWebDriverTest
 {
@@ -75,7 +75,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
 
         checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "You do not have the permissions required to access this page.",
+        checker().verifyEquals("Incorrect error sub-heading message", "User does not have permission to perform this operation.",
                 errorPage.getSubErrorHeading());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 

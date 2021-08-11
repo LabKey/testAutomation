@@ -21,7 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
@@ -39,7 +39,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({Issues.class, DailyA.class})
+@Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class IssuesAdminTest extends BaseWebDriverTest
 {
@@ -161,6 +161,11 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
     // @Test @Ignore //TODO
     public void testRelatedIssuesComments() throws Exception
+    {
+    }
+
+    // @Test @Ignore //TODO
+    public void testCommentSortDirection() throws Exception
     {
     }
 

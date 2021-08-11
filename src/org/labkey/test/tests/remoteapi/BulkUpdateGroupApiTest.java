@@ -24,7 +24,7 @@ import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
 import org.labkey.remoteapi.security.BulkUpdateGroupResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 {
