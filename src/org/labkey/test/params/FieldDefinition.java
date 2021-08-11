@@ -389,7 +389,7 @@ public class FieldDefinition extends PropertyDescriptor
         VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
         VisitDate("Visit Date","dateTime","http://cpas.labkey.com/Study#VisitId",null),
         Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials")),
-        Barcode("Barcode", "string", "http://www.labkey.org/types#storageUniqueId", null);
+        Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _rangeURI;     // the key used inside the API
