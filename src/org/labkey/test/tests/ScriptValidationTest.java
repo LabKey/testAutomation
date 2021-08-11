@@ -31,7 +31,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.JSONHelper;
 import org.labkey.test.util.ListHelper;
@@ -50,7 +50,7 @@ import static org.junit.Assert.fail;
 /**
  * Test JavaScript validation in file-based modules.
  */
-@Category({DailyB.class, Data.class})
+@Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ScriptValidationTest extends BaseWebDriverTest
 {

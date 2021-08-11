@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,43 +23,44 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.list.GridPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SummaryStatisticsHelper;
+import org.labkey.test.util.TestDataGenerator;
 
 import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class CustomizeViewTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";
     public static final String LIST_NAME = "People" + INJECT_CHARS_1;
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_COLUMN = "Key";
     private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
     private final static String FIRST_NAME_COLUMN = "FirstName";
     private final static String AGE_COLUMN = "Age";
     private final static String TEST_DATE_COLUMN = "TestDate";
-    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
-            {
-                    new ListHelper.ListColumn(FIRST_NAME_COLUMN, FIRST_NAME_COLUMN + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
-                    new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
-                    new ListHelper.ListColumn(AGE_COLUMN, "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1),
-                    new ListHelper.ListColumn(TEST_DATE_COLUMN, "Test Date", ListHelper.ListColumnType.DateAndTime, "The test date")
-            };
-
-    static
-    {
-        LIST_COLUMNS[0].setRequired(true);
-        LIST_COLUMNS[1].setRequired(true);
-    }
+    private final static List<FieldDefinition> LIST_COLUMNS = List.of(
+            new FieldDefinition(FIRST_NAME_COLUMN, ColumnType.String).setLabel(FIRST_NAME_COLUMN + INJECT_CHARS_1).setDescription("The first name").setRequired(true),
+            new FieldDefinition(LAST_NAME_COLUMN, ColumnType.String).setLabel("Last Name").setDescription("The last name").setRequired(true),
+            new FieldDefinition(AGE_COLUMN, ColumnType.Integer).setLabel("Age").setDescription("The age" + INJECT_CHARS_1),
+            new FieldDefinition(TEST_DATE_COLUMN, ColumnType.DateAndTime).setLabel("Test Date").setDescription("The test date")
+    );
 
     private final static String[][] TEST_DATA =
             {
@@ -80,13 +82,13 @@ public class CustomizeViewTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws Exception
     {
         CustomizeViewTest init = (CustomizeViewTest) getCurrentTest();
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws Exception
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createList();
@@ -97,8 +99,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     {
         _summaryStatisticsHelper = new SummaryStatisticsHelper(this);
 
-        goToProjectHome();
-        clickAndWait(Locator.linkContainingText(LIST_NAME));
+        GridPage.beginAt(this, PROJECT_NAME, 1);
     }
 
     @Test
@@ -144,7 +145,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Test HTML/JavaScript escaping");
         Crawler.tryInject(this, () -> {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectString);
+            _customizeViewsHelper.saveCustomView("BAD" + Crawler.injectScriptBlock);
             assertTextBefore("Billson", "Johnson");
         });
     }
@@ -221,14 +222,14 @@ public class CustomizeViewTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable("query", getDriver());
 
         // remove the first column and verify that it is gone
-        assertTrue(drt.getColumnNames().contains(FIRST_NAME_COLUMN));
+        assertThat(drt.getColumnNames(), hasItem(FIRST_NAME_COLUMN));
         drt.removeColumn(FIRST_NAME_COLUMN);
-        assertTrue(!drt.getColumnNames().contains(FIRST_NAME_COLUMN));
+        assertThat(drt.getColumnNames(), CoreMatchers.not(hasItem(FIRST_NAME_COLUMN)));
 
         // shouldn't be allowed to remove last column
-        assertTrue(drt.getColumnNames().contains(LAST_NAME_COLUMN));
-        drt.removeColumn(LAST_NAME_COLUMN, true);
-        assertTrue(drt.getColumnNames().contains(LAST_NAME_COLUMN));
+        assertThat(drt.getColumnLabels(), hasItem("Last Name"));
+        drt.removeColumn(FieldKey.fromParts(LAST_NAME_COLUMN).toString(), true);
+        assertThat(drt.getColumnLabels(), hasItem("Last Name"));
     }
 
     @Test
@@ -298,7 +299,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @Test
     public void saveFilterTest()
     {
-        String fieldKey = LAST_NAME_COLUMN;
+        String fieldKey = FieldKey.fromParts(LAST_NAME_COLUMN).toString();
         String op = "Starts With";
         String value = "J";
         String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
@@ -317,81 +318,66 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("Default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 
-    private void createList()
+    private void createList() throws Exception
     {
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_COLUMN, LIST_COLUMNS);
+        ListDefinition listDefinition = new IntListDefinition(LIST_NAME, LIST_KEY_COLUMN).setFields(LIST_COLUMNS);
+        TestDataGenerator testDataGenerator = listDefinition.create(createDefaultConnection(), PROJECT_NAME);
 
-        StringBuilder data = new StringBuilder();
-        data.append(LIST_KEY_COLUMN).append("\t");
-        for (int i = 0; i < LIST_COLUMNS.length; i++)
-        {
-            data.append(LIST_COLUMNS[i].getName());
-            data.append(i < LIST_COLUMNS.length - 1 ? "\t" : "\n");
-        }
         for (String[] rowData : TEST_DATA)
         {
-            for (int col = 0; col < rowData.length; col++)
-            {
-                data.append(rowData[col]);
-                data.append(col < rowData.length - 1 ? "\t" : "\n");
-            }
+            testDataGenerator.addCustomRow(Map.of(
+                    LIST_KEY_COLUMN, rowData[0],
+                    LIST_COLUMNS.get(0).getName(), rowData[1],
+                    LIST_COLUMNS.get(1).getName(), rowData[2],
+                    LIST_COLUMNS.get(2).getName(), rowData[3],
+                    LIST_COLUMNS.get(3).getName(), rowData[4]));
         }
 
-        _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(data.toString());
-        for (String[] rowData : TEST_DATA)
-        {
-            // check that all the data is in the grid (skipping the key column at index 0)
-            for (int col = 1; col < rowData.length; col++)
-            {
-                waitForText(rowData[col]);
-            }
-        }
+        testDataGenerator.insertRows(createDefaultConnection());
     }
 
-    private void setColumns(String... fieldKeys)
+    private void setColumns(String... columnNames)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.clearColumns();
-        for (String fieldKey : fieldKeys)
-            _customizeViewsHelper.addColumn(fieldKey);
+        for (String columnName : columnNames)
+            _customizeViewsHelper.addColumn(FieldKey.fromParts(columnName).toString());
         _customizeViewsHelper.applyCustomView();
     }
 
-    private void addFilter(String fieldKey, String op, String value)
+    private void addFilter(String columnName, String op, String value)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addFilter(fieldKey, fieldKey, op, value);
+        _customizeViewsHelper.addFilter(FieldKey.fromParts(columnName).toString(), columnName, op, value);
         _customizeViewsHelper.applyCustomView();
     }
 
-    private void addSort(String fieldKey, SortDirection order)
+    private void addSort(String columnName, SortDirection order)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addSort(fieldKey, order);
+        _customizeViewsHelper.addSort(FieldKey.fromParts(columnName).toString(), order);
         _customizeViewsHelper.applyCustomView();
     }
 
-    private void removeFilter(String fieldKey)
+    private void removeFilter(String columnName)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeFilter(fieldKey);
+        _customizeViewsHelper.removeFilter(FieldKey.fromParts(columnName).toString());
         _customizeViewsHelper.applyCustomView();
     }
 
-    private void removeSort(String fieldKey)
+    private void removeSort(String columnName)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeSort(fieldKey);
+        _customizeViewsHelper.removeSort(FieldKey.fromParts(columnName).toString());
         _customizeViewsHelper.applyCustomView();
     }
 
-    private void setColumnTitle(String fieldKey, String columnTitle)
+    private void setColumnTitle(String columnName, String columnTitle)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.setColumnTitle(fieldKey, columnTitle);
+        _customizeViewsHelper.setColumnTitle(FieldKey.fromParts(columnName).toString(), columnTitle);
         _customizeViewsHelper.applyCustomView();
     }
 

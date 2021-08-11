@@ -76,6 +76,7 @@ public class DataRegionTable extends DataRegion
     private PagingWidget _pagingWidget;
     private final List<String> _columnLabels = new ArrayList<>();
     private final List<String> _columnNames = new ArrayList<>();
+    private final Map<String, Integer> _columnIndexMap = new CaseInsensitiveHashMap<>();
     private final Map<String, Integer> _mapRows = new HashMap<>();
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
@@ -119,6 +120,7 @@ public class DataRegionTable extends DataRegion
         _exportHelper = null;
         _columnLabels.clear();
         _columnNames.clear();
+        _columnIndexMap.clear();
         _mapRows.clear();
         _dataCache.clear();
     }
@@ -309,7 +311,7 @@ public class DataRegionTable extends DataRegion
         return -1;
     }
 
-    protected int getRowIndexStrict(String columnLabel, String value)
+    public int getRowIndexStrict(String columnLabel, String value)
     {
         int rowIndex = getRowIndex(columnLabel, value);
         if (rowIndex < 0)
@@ -317,7 +319,7 @@ public class DataRegionTable extends DataRegion
         return rowIndex;
     }
 
-    protected int getRowIndexStrict(int columnIndex, String value)
+    public int getRowIndexStrict(int columnIndex, String value)
     {
         int rowIndex = getRowIndex(columnIndex, value);
         if (rowIndex < 0)
@@ -372,11 +374,13 @@ public class DataRegionTable extends DataRegion
 
     /**
      * returns index of the row of the first appearance of the specified data, in the specified column
+     *
+     * @deprecated Use {@link #getRowIndex(String, String)} or {@link #getRowIndexStrict(String, String)}
      */
+    @Deprecated
     public int getIndexWhereDataAppears(String data, String column)
     {
-        List<String> allData = getColumnDataAsText(column);
-        return allData.indexOf(data);
+        return getRowIndex(column, data);
     }
 
     public static Locator.XPathLocator detailsLinkLocator()
@@ -441,20 +445,40 @@ public class DataRegionTable extends DataRegion
      */
     public int getColumnIndex(String name)
     {
-        int i = getColumnNames().indexOf(name);
+        if (_columnIndexMap.isEmpty())
+        {
+            final var columnNames = getColumnNames();
+            for (int j = 0; j < columnNames.size(); j++)
+            {
+                _columnIndexMap.put(columnNames.get(j), j);
+            }
+        }
+        int i = _columnIndexMap.getOrDefault(name, -1);
 
+        // Try removing spaces from column name
         if (i < 0)
-            i = getColumnNames().indexOf(name.replaceAll(" ", ""));
+        {
+            i = _columnIndexMap.getOrDefault(name.replace(" ", ""), -1);
+            if (i >= 0)
+            {
+                TestLogger.warn(String.format("Unnecessary space in requested column name. " +
+                        "Requested: \"%s\" Found: \"%s\"", name, getColumnNames().get(i)));
+            }
+        }
 
+        // Try matching column label
         if (i < 0)
         {
             List<String> columnLabelsWithoutSpaces = new ArrayList<>(getColumnLabels().size());
-            getColumnLabels().stream().forEachOrdered(s -> columnLabelsWithoutSpaces.add(s.replaceAll(" ", "")));
-            i = columnLabelsWithoutSpaces.indexOf(name.replaceAll(" ", ""));
+            getColumnLabels().stream().forEach(s -> columnLabelsWithoutSpaces.add(s.replace(" ", "")));
+            i = columnLabelsWithoutSpaces.indexOf(name.replace(" ", ""));
+            if (i >= 0)
+            {
+                TestLogger.warn(String.format("Please reference columns by name instead of label. " +
+                        "Requested column with label: \"%s\" Found column with name: \"%s\"", name, getColumnNames().get(i)));
+            }
         }
 
-        if (i < 0)
-            TestLogger.log("Column '" + name + "' not found");
         return i;
     }
 
@@ -715,9 +739,9 @@ public class DataRegionTable extends DataRegion
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
     public void updateRow(String key, Map<String, ?> data, boolean validateText)
     {
-        clickEditRow(key);
+        UpdateQueryRowPage updatePage = clickEditRow(key);
 
-        setRowData(data, validateText);
+        setRowData(updatePage, data, validateText);
     }
 
     public void updateRow(int rowIndex, Map<String, ?> data)
@@ -727,9 +751,9 @@ public class DataRegionTable extends DataRegion
 
     public void updateRow(int rowIndex, Map<String, ?> data, boolean validateText)
     {
-        clickEditRow(rowIndex);
+        UpdateQueryRowPage updatePage = clickEditRow(rowIndex);
 
-        setRowData(data, validateText);
+        setRowData(updatePage, data, validateText);
     }
 
     public UpdateQueryRowPage clickEditRow(int rowIndex)
@@ -757,9 +781,9 @@ public class DataRegionTable extends DataRegion
         clickRowDetails(getRowIndexStrict(key));
     }
 
-    protected void setRowData(Map<String, ?> data, boolean validateText)
+    protected void setRowData(UpdateQueryRowPage updatePage, Map<String, ?> data, boolean validateText)
     {
-        new UpdateQueryRowPage(getDriver()).update(data);
+        updatePage.update(data);
         if (validateText)
         {
             getWrapper().assertTextPresent(String.valueOf(data.values().iterator().next()));  //make sure some text from the map is present
@@ -1383,9 +1407,20 @@ public class DataRegionTable extends DataRegion
         });
     }
 
+    /** Get the number of items checked within the current page of the grid. */
     public int getCheckedCount()
     {
         return api().executeScript("getChecked().length;", Long.class).intValue();
+    }
+
+    /**
+     * Get the selected item count persisted in the session state.  Includes rows not visible
+     * on the current page of the grid.  Useful for validating the selection is cleared after
+     * deleting a row from the grid.
+     */
+    public int getSelectedCount()
+    {
+        return api().executeScript("selectedCount;", Long.class).intValue();
     }
 
     @Deprecated

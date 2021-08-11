@@ -27,7 +27,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.PermissionsPage;
@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, Assays.class})
+@Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class NabAssayTest extends AbstractAssayTest
 {
@@ -285,7 +285,7 @@ public class NabAssayTest extends AbstractAssayTest
                         runFile(TEST_ASSAY_NAB_FILE2).
                         build()).doImport();
 
-        assertElementPresent(Locators.labkeyError.containing("Date must be of type Date and Time. Value \"bad-date\" could not be converted."), 1);
+        assertElementPresent(Locators.labkeyError.containing("Could not convert value 'bad-date' (String) for Date field 'Date'."), 1);
 //        These dates are SQL Server specific
 //        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
         assertElementPresent(Locators.labkeyError.containing("Only dates between "), 1);

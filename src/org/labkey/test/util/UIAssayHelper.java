@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.pages.assay.ChooseAssayTypePage;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,7 +134,9 @@ public class UIAssayHelper extends AbstractAssayHelper
     {
         _test.goToManageAssays();
         _test.clickButton("New Assay Design");
-        _test.clickAndWait(Locator.linkWithText("upload"));
+
+        ChooseAssayTypePage chooseAssayTypePage = new ChooseAssayTypePage(_test.getDriver());
+        chooseAssayTypePage.goToImportAssayDesignTab();
     }
 
     /**
@@ -158,7 +161,7 @@ public class UIAssayHelper extends AbstractAssayHelper
     public void uploadXarFileAsAssayDesign(@LoggedParam File file)
     {
         goToUploadXarPage();
-        _test.setFormElement(Locator.name("uploadFile"), file);
-        _test.clickAndWait(Locator.lkButton("Upload"));
+        _test.setFormElement(Locator.name("fileUpload"), file);
+        _test.clickAndWait(Locator.button("Import"));
     }
 }

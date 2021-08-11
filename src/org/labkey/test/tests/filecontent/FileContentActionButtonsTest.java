@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper.BrowserAction;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, FileBrowser.class})
+@Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class FileContentActionButtonsTest extends BaseWebDriverTest
 {

@@ -24,7 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
@@ -40,7 +40,7 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, Reports.class, Charting.class})
+@Category({Daily.class, Reports.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class GenericMeasurePickerTest extends BaseWebDriverTest
 {

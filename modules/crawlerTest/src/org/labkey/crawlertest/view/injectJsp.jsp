@@ -1,5 +1,6 @@
+<%
 /*
- * Copyright (c) 2013-2019 LabKey Corporation
+ * Copyright (c) 2020 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.categories;
+%>
+<%@ page import="org.labkey.api.view.HttpView" %>
+<%@ page extends="org.labkey.api.jsp.JspBase" %>
 
-public abstract class DailyA extends Daily
-{
-}
+<%
+    String inject = ((HttpView<String>) HttpView.currentView()).getModelBean();
+%>
+<span>Param:</span>
+<div id="crawlerTestDiv"><%=unsafe(inject)%></div>

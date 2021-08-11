@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -29,7 +29,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.util.List;
 
-@Category(DailyA.class)
+@Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class FacetedFilterCutoffTest extends BaseWebDriverTest
 {

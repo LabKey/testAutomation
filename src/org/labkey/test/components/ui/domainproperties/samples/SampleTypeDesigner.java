@@ -70,6 +70,12 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         throw new NotFoundException("No such parent alias: " + parentAlias);
     }
 
+    public List<String> getParentAliasOptions(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAliasSelect(index).getOptions();
+    }
+
     public T removeParentAlias(String parentAlias)
     {
         expandPropertiesPanel();
@@ -148,7 +154,8 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
 
         ReactSelect parentAliasSelect(int index)
         {
-            return ReactSelect.finder(getDriver()).locatedBy(Locator.byClass("sampleset-insert--parent-select"))
+            return ReactSelect.finder(getDriver())
+                    .withInputClass("sampleset-insert--parent-select")
                     .index(index).find(propertiesPanel);
         }
 

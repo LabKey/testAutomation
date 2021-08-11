@@ -33,9 +33,10 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -78,7 +79,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
-@Category({DailyA.class, Data.class, Hosting.class})
+@Category({Daily.class, Data.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
 public class ListTest extends BaseWebDriverTest
 {
@@ -531,7 +532,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         assertTextPresent(":History");
         assertTextPresent("record was modified", 2);    // An existing list record was modified
-        assertTextPresent("were modified", 8);          // The column(s) of domain ></% 1äöüColors were modified
+        assertTextPresent("were modified", 6);          // The column(s) of domain ></% 1äöüColors were modified
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("was created", 2);                // Once for the list, once for the domain
@@ -1006,7 +1007,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testIgnoreReservedFieldNames()
     {
-        final String expectedInfoMsg = "Reserved fields found in your file are not shown below. " +
+        final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey: " +
                 "Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container.";
 

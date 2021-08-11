@@ -37,7 +37,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.query.InsertExternalSchemaPage;
 import org.labkey.test.util.DataRegionTable;
@@ -60,7 +60,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyA.class, Data.class})
+@Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class ExternalSchemaTest extends BaseWebDriverTest
 {

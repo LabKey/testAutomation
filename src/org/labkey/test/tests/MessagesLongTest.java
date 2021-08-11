@@ -26,7 +26,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
@@ -50,7 +50,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
 
-@Category({DailyA.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class MessagesLongTest extends BaseWebDriverTest
 {
@@ -621,9 +621,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         String _messageTitle = "Mine Message";
         String _messageBody = "test";
 
-        clickProject(PROJECT_NAME);
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
-        clickButton("Save and Finish");
+        goToProjectHome(PROJECT_NAME);
 
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));

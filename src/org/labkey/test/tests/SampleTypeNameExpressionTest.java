@@ -21,23 +21,28 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.Locator;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
@@ -128,6 +133,55 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Name\tB\tParent",
                 "${Parent:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 "Parent", "Jessi");
+    }
+
+    // Issue 42857: samples: bulk import with name expression containing lookup fails to convert lookup string value
+    @Test
+    public void testLookupNameExpression() throws Exception
+    {
+        String lookupList = "Colors";
+        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList)
+                .setTableType(FieldDefinition.ColumnType.Integer);
+        String nameExpSamples = "NameExpressionSamples";
+
+        // begin by creating a lookupList of colors, the sampleType will reference it
+        TestDataGenerator colorsGen = new TestDataGenerator(colorsLookup)
+                .withColumns(List.of(new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("ColorCode", FieldDefinition.ColumnType.String)));
+        colorsGen.addCustomRow(Map.of("ColorName", "green", "ColorCode", "gr"));
+        colorsGen.addCustomRow(Map.of("ColorName", "yellow", "ColorCode", "yl"));
+        colorsGen.addCustomRow(Map.of("ColorName", "red", "ColorCode", "rd"));
+        colorsGen.addCustomRow(Map.of("ColorName", "blue", "ColorCode", "bl"));
+        colorsGen.createList(createDefaultConnection(), "Key");
+        colorsGen.insertRows();
+
+        String pasteData = "ColorLookup\tNoun\n" +
+                "red\tryder\n" +
+                "green\tgiant\n" +
+                "blue\tangel\n" +
+                "yellow\tjersey";
+
+        // now create a sampleType with a Color column that looks up to Colors
+        var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
+                .setFields(List.of(new FieldDefinition("ColorLookup", colorsLookup),
+                        new FieldDefinition("Noun", FieldDefinition.ColumnType.String)))
+                .setNameExpression("TEST-${ColorLookup/ColorCode}");   // hopefully this will resolve the 'ColorCode' column from the list
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDef);
+
+        SampleTypeHelper.beginAtSampleTypesList(this, getProjectName());
+        clickAndWait(Locator.linkWithText(nameExpSamples));
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        var importDataPage = dataRegion.clickImportBulkData();
+        importDataPage.selectCopyPaste()
+                .setImportLookupByAlternateKey(true)
+                .setFormat(ImportDataPage.Format.TSV)
+                .setText(pasteData)
+                .submit();
+
+        var sampleTypeGrid = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("Material").waitFor();
+        assertThat("Expect lookup to force name-generation that resolves colorCodes from the colorLookup",
+                sampleTypeGrid.getColumnDataAsText("Name"), hasItems("TEST-yl", "TEST-bl", "TEST-gr", "TEST-rd"));
     }
 
     @Test

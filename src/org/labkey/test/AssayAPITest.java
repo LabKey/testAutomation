@@ -35,13 +35,14 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +59,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-@Category({DailyA.class, Assays.class})
+@Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AssayAPITest extends BaseWebDriverTest
 {
@@ -125,9 +126,12 @@ public class AssayAPITest extends BaseWebDriverTest
     protected void importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
                                      String runName, String[] textToCheck) throws IOException, CommandException
     {
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
-        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
+        // Issue 42637: Verify that .xar.xml file can be imported through the UI
+        UIAssayHelper _uiAssayHelper = new UIAssayHelper(this);
+        _uiAssayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
+
+        APIAssayHelper _apiAssayHelper = new APIAssayHelper(this);
+        _apiAssayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
 
         log("verify import worked");
         goToProjectHome();

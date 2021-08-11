@@ -28,7 +28,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class, Reports.class})
+@Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class DataReportsTest extends ReportTest
 {

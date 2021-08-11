@@ -21,7 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import static org.junit.Assert.fail;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class WebpartPermissionsTest extends BaseWebDriverTest
 {

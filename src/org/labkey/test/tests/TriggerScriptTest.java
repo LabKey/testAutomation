@@ -33,7 +33,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
@@ -54,7 +54,7 @@ import java.util.Map;
 /**
  * Test trigger script matrix, expands on ScriptValidationTest which covers custom schemas (Vehicles)
  */
-@Category({DailyC.class, Data.class})
+@Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class TriggerScriptTest extends BaseWebDriverTest
 {

@@ -39,6 +39,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
@@ -812,9 +813,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new FolderManagementPage(getDriver());
     }
 
-    public void goToFolderPermissions()
+    public PermissionsPage goToFolderPermissions()
     {
         clickAdminMenuItem("Folder", "Permissions");
+        return new PermissionsPage(getDriver());
     }
 
     public ProjectSettingsPage goToProjectSettings()
@@ -1041,6 +1043,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param relativeURL URL to navigate to
      * @param millis Max wait for page to load
      * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
+     * @return array of downloaded files or null if navigation occurred
      */
     public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
     {
@@ -1083,7 +1086,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     executeScript("document.location = arguments[0]", fullURL);
                     //noinspection ResultOfMethodCallIgnored
                     WebDriverWrapper.waitFor(() -> {
-                        if (stalenessOf.apply(null))
+                        Boolean stale;
+                        try
+                        {
+                            stale = stalenessOf.apply(null);
+                        }
+                        catch (NullPointerException npe)
+                        {
+                            // Staleness check throws NPE sometimes when there's an alert present
+                            executeScript("return;"); // Try to trigger 'UnhandledAlertException'
+                            return false;
+                        }
+                        if (stale)
                         {
                             // Wait for page to load when element goes stale
                             return true; // Stop waiting
@@ -1116,7 +1130,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
-            return downloadedFiles.getValue();
+            File[] ret = downloadedFiles.getValue();
+            return ret != null && ret.length > 0 ? ret : null;
         }
         finally
         {
@@ -1859,6 +1874,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         new WebDriverWait(getDriver(), millis / 1000)
                 .withMessage("waiting for browser to navigate")
                 .until(ExpectedConditions.stalenessOf(toBeStale));
+        // WebDriver usually does this automatically, but not always.
+        new WebDriverWait(getDriver(), millis / 1000)
+                .withMessage("waiting for document to be ready")
+                .until(wd -> executeScript("return document.readyState;").equals("complete"));
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
@@ -3095,9 +3114,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * Wait for a button to appear, click it, then waits for the text to appear.
+     * @deprecated This method provides minimal convenience and behaves inconsistently with other 'clickButton' methods
      */
+    @Deprecated(since = "21.8")
     public void clickButton(String text, String waitForText)
     {
+        if (isTextPresent(waitForText))
+        {
+            throw new IllegalStateException("'" + waitForText + "' is already present on the page. Pick a better indicator that the page state has changed.");
+        }
         clickButton(text, 0);
         waitForText(waitForText);
     }

@@ -30,12 +30,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         super(element, driver);
     }
 
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _componentElement;
-    }
-
     static public ReactSelectFinder finder(WebDriver driver)
     {
         return new ReactSelectFinder(driver);
@@ -105,13 +99,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         new FluentWait<>(_wrapper.getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
     }
 
-    public boolean noResultsFound()  // asks whether or not the select has loaded its options
-    {
-        return Locator.tagWithClass("div", "Select-menu")
-                .child(Locator.tagWithClass("div", "Select-noresults"))
-                .findElementOrNull(getComponentElement()) != null;
-    }
-
     @Override
     protected ElementCache newElementCache()
     {
@@ -127,7 +114,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
             Locator loc = _optionLocFactory.apply(option);
             return loc.findElement(selectMenu);
         }
-
     }
 
     public static class ReactSelectFinder extends BaseReactSelect.BaseReactSelectFinder<ReactSelect>

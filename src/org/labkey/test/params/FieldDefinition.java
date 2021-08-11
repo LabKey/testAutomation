@@ -340,6 +340,17 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public String getConceptSubTree()
+    {
+        return (String) getFieldProperty("conceptSubtree");
+    }
+
+    public FieldDefinition setConceptSubtree(String subtree)
+    {
+        setFieldProperty("conceptSubtree", subtree);
+        return this;
+    }
+
     public String getPrincipalConceptCode()
     {
         return (String) getFieldProperty("principalConceptCode");
@@ -414,7 +425,8 @@ public class FieldDefinition extends PropertyDescriptor
         OntologyLookup("Ontology Lookup", "string", "http://www.labkey.org/types#conceptCode", null),
         VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
         VisitDate("Visit Date","dateTime","http://cpas.labkey.com/Study#VisitId",null),
-        Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials"));
+        Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials")),
+        Barcode("Barcode", "string", "http://www.labkey.org/types#storageUniqueId", null);
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _rangeURI;     // the key used inside the API

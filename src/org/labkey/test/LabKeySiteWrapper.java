@@ -107,7 +107,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = TestProperties.getServerStartupTimeout();
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-    public AbstractUserHelper _userHelper = new APIUserHelper(this);
+    public final APIUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()
     {
@@ -1032,15 +1032,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         goToProjectSettings();
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.LabKeySiteWrapper#goToAdminConsole}
-     */
-    @Deprecated (forRemoval = true)
-    public void goToAdmin()
-    {
-        goToAdminConsole();
-    }
-
     public UserDetailsPage goToMyAccount()
     {
         clickUserMenuItem("My Account");
@@ -1293,21 +1284,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public WebElement openFolderMenu()
     {
         return projectMenu().expandProjectFully(getCurrentProject());
-    }
-
-    /**
-     * @deprecated Old UX only. Used by {@link #clickFolder(String)} below.
-     */
-    @Deprecated
-    public void expandFolderTree(String folder)
-    {
-        Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
-        Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
-        List<WebElement> els = treeAncestor.findElements(getDriver());
-        for (WebElement el : els)
-        {
-            el.click();
-        }
     }
 
     public void clickFolder(String folder)

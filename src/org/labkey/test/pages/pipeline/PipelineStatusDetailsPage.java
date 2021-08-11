@@ -14,6 +14,7 @@ import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +35,12 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     {
         driver.beginAt(WebTestHelper.buildURL("pipeline-status", driver.getCurrentContainerPath(), "details", Map.of("rowId", String.valueOf(rowId))));
         return new PipelineStatusDetailsPage(driver);
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().statusText));
     }
 
     public PipelineStatusDetailsPage(WebDriver driver)
@@ -404,7 +411,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     @LogMethod
     public PipelineStatusDetailsPage clickCancel()
     {
-        elementCache().cancelButton.click();
+        clickAndWait(elementCache().cancelButton);
         waitForLogText("Attempting to cancel");
         waitForCancelled();
         return this;
@@ -423,7 +430,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         protected final WebElement modified = Locator.id("modified").findWhenNeeded(this);
         protected final WebElement email = Locator.id("email").findWhenNeeded(this);
         protected final WebElement statusSpinner = Locator.id("status-spinner").findWhenNeeded(this);
-        protected final WebElement statusText = Locator.id("status-text").findWhenNeeded(this);
+        protected final WebElement statusText = Locator.id("status-text").refindWhenNeeded(this);
         protected final WebElement info = Locator.id("info").findWhenNeeded(this);
         protected final WebElement description = Locator.id("description").findWhenNeeded(this);
         protected final WebElement filePath = Locator.id("file-path").findWhenNeeded(this);

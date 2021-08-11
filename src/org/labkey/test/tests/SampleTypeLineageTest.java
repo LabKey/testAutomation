@@ -15,7 +15,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
-@Category({DailyC.class})
+@Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class SampleTypeLineageTest extends BaseWebDriverTest
 {
@@ -281,8 +281,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Do a simple check that data validation works.");
-        checker().verifyTrue("Expected error message 'must be of type Integer' is not present.",
-                isTextPresent("must be of type Integer"));
+        checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
+                isTextPresent("(String) for Integer field"));
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
         setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
         clickButton("Submit");
@@ -309,8 +309,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Again check that data validation works as expected.");
-        checker().verifyTrue("Expected error message 'must be of type Date and Time' is not present.",
-                isTextPresent("must be of type Date and Time"));
+        checker().verifyTrue("Expected error message '(String) for Date field' is not present.",
+                isTextPresent("(String) for Date field"));
         setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
@@ -779,9 +779,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)
         {
-            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badLineageTest' not found];\n" +
+            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badLineageTest'.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleType 'badLineageTest' not found"));
+                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badLineageTest'."));
         }
     }
 
@@ -808,9 +808,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
-            assertTrue("expect bad lineage to produce error containing [Sample input 'BOGUS' in SampleType 'badParentLineage' not found];\n" +
+            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badParentLineage'.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample input 'BOGUS' in SampleType 'badParentLineage' not found"));
+                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badParentLineage'."));
         }
 
         // clean up on success
@@ -1058,19 +1058,27 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         drtSamples.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
                 .clickButton("Dismiss", true);
+        drtSamples.uncheckAllOnPage();
+        assertEquals("No selection should remain", 0, drtSamples.getCheckedCount());
+        assertEquals("No selection should remain", 0, drtSamples.getSelectedCount());
 
         log("Try to delete parent and child");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
+        assertEquals("Parent and child should be checked", 2, drtSamples.getCheckedCount());
+        assertEquals("Parent and child should be checked", 2, drtSamples.getSelectedCount());
 
+        sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
         assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
         assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
+        assertEquals("Only parent sample should be checked", 1, drtSamples.getCheckedCount());
+        assertEquals("Only parent sample should be checked", 1, drtSamples.getSelectedCount());
 
         log("Now that the child is gone, try to delete the parent");
         sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
 
         assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        assertEquals("No selection should remain", 0, drtSamples.getCheckedCount());
 
         log("Now try to delete what's left, in several hitches");
         drtSamples.checkAllOnPage();

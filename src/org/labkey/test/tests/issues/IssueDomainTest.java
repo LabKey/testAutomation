@@ -11,7 +11,7 @@ import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.util.IssuesHelper;
@@ -24,14 +24,13 @@ import java.util.ListIterator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-@Category({Issues.class, DailyA.class, Data.class})
+@Category({Issues.class, Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class IssueDomainTest extends BaseWebDriverTest
 {
     private IssuesHelper _issuesHelper = new IssuesHelper(this);
     private final String DOMAIN_NAME = "issues";//schemaName
     private final String ISSUES_NAME = "testdomainissue";
-    private final String MISSING_MANDATORY_FIELD_ERROR_MSG = "Mandatory field 'notifylist' not found, it may have been removed or renamed. Unable to update domain.";
 
     @Override
     protected BrowserType bestBrowser()
@@ -85,31 +84,36 @@ public class IssueDomainTest extends BaseWebDriverTest
     @Test
     public void mandatoryFieldTest() throws Exception
     {
-        log("Remove mandatory field 'notifylist'");
-        GetDomainCommand getCmd = new GetDomainCommand(DOMAIN_NAME, ISSUES_NAME);
-        DomainResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(), getContainerPath());
-        List<PropertyDescriptor> getDomainCols = getDomainResponse.getDomain().getFields();
-        ListIterator<PropertyDescriptor> getDomainColsIterator = getDomainCols.listIterator();
-
-        while(getDomainColsIterator.hasNext())
+        log("Attempt to remove mandatory fields (title, notifylist, assignedto, resolution)");
+        List<String> mandatoryFields = Arrays.asList("title", "notifylist", "assignedto", "resolution");
+        for (String mandatoryField : mandatoryFields)
         {
-            String colName = getDomainColsIterator.next().getName();
-            if ("notifylist".equalsIgnoreCase(colName))
+            GetDomainCommand getCmd = new GetDomainCommand(DOMAIN_NAME, ISSUES_NAME);
+            DomainResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(), getContainerPath());
+            List<PropertyDescriptor> getDomainCols = getDomainResponse.getDomain().getFields();
+            ListIterator<PropertyDescriptor> getDomainColsIterator = getDomainCols.listIterator();
+
+            while (getDomainColsIterator.hasNext())
             {
-                getDomainColsIterator.remove();
-                break;
+                String colName = getDomainColsIterator.next().getName();
+                if (mandatoryField.equalsIgnoreCase(colName))
+                {
+                    getDomainColsIterator.remove();
+                    break;
+                }
             }
+
+            log("Attempt saving updated domain without mandatory field");
+            SaveDomainCommand saveCmd = new SaveDomainCommand(DOMAIN_NAME, ISSUES_NAME);
+            Domain existingDomain = getDomainResponse.getDomain();
+            Domain updatedDomain = saveCmd.getDomainDesign();
+
+            updatedDomain.setDomainId(existingDomain.getDomainId());
+            updatedDomain.setDomainURI(existingDomain.getDomainURI());
+            updatedDomain.setFields(getDomainCols);
+            String expectedStr = "Mandatory field '" + mandatoryField + "' not found, it may have been removed or renamed. Unable to update domain.";
+            testForExpectedErrorMessage(saveCmd, expectedStr, "SaveDomain");
         }
-
-        log("Attempt saving updated domain without mandatory field 'notifylist'");
-        SaveDomainCommand saveCmd = new SaveDomainCommand(DOMAIN_NAME, ISSUES_NAME);
-        Domain existingDomain = getDomainResponse.getDomain();
-        Domain updatedDomain = saveCmd.getDomainDesign();
-
-        updatedDomain.setDomainId(existingDomain.getDomainId());
-        updatedDomain.setDomainURI(existingDomain.getDomainURI());
-        updatedDomain.setFields(getDomainCols);
-        testForExpectedErrorMessage(saveCmd, MISSING_MANDATORY_FIELD_ERROR_MSG, "SaveDomain");
     }
 
     private void testForExpectedErrorMessage(SaveDomainCommand cmd, String expectedErrorMsg, String domainApiType) throws IOException

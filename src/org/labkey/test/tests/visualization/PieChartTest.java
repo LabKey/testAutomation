@@ -23,7 +23,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
@@ -40,7 +40,7 @@ import java.net.URL;
 
 import static org.junit.Assert.assertThat;
 
-@Category({DailyC.class, Reports.class, Charting.class, Hosting.class})
+@Category({Daily.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class PieChartTest extends GenericChartsTest
 {

@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -9,25 +10,32 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.admin.ExportFolderPage;
+import org.labkey.test.pages.admin.ImportFolderPage;
+import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.StudyHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Category({DailyC.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 5)
+@Category({Daily.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 {
     final static String SAMPLE_TYPE_PROJECT = "Sample Type Test Project";
@@ -51,13 +59,14 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createProject(VISIT_BASED_STUDY, "Study");
-        clickButton("Create Study");
-        clickButton("Create Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.VISIT)
+                .createStudy();
 
         _containerHelper.createProject(DATE_BASED_STUDY, "Study");
-        clickButton("Create Study");
-        checkRadioButton(Locator.radioButtonById("dateTimepointType"));
-        clickButton("Create Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.DATE)
+                .createStudy();
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         new PortalHelper(getDriver()).addBodyWebPart("Sample Types");
@@ -105,9 +114,9 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void testLinkToStudy()
     {
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-
-        log("Linking sample types one row to study");
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 2);
+        int numOfRowsLinked = 2;
+        log("Linking sample types two rows to study");
+        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, numOfRowsLinked);
 
         log("Verifying the linked sample type in study");
         goToProjectHome(VISIT_BASED_STUDY);
@@ -122,9 +131,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
         String expectedComment = "2 row(s) were linked to a study from the sample type: " + SAMPLE_TYPE1;
         verifyLinkToHistory(expectedComment);
-        verifyAuditLogEvents(expectedComment);
-
-        recallDataset(VISIT_BASED_STUDY, SAMPLE_TYPE1, 2);
+        verifyAuditLogEvents(expectedComment, numOfRowsLinked, Arrays.asList("stool", "plasma"));
     }
 
     @Test
@@ -133,14 +140,14 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1);
 
-        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE2, 1);
+        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE2);
 
         log("Verifying log entries");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE2));
         String expectedComment = "1 row(s) were recalled from a study to the sample type: " + SAMPLE_TYPE2;
         verifyLinkToHistory(expectedComment);
-        verifyAuditLogEvents(expectedComment);
+        verifyAuditLogEvents(expectedComment, null, null);
     }
 
     @Test
@@ -173,9 +180,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
         checker().verifyTrue("Missing linked column for Date based study",
                 samplesTable.getColumnNames().contains("linked_to_Date_Based_Study_Test_Project_Study"));
-
-        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE1, 1);
-        recallDataset(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1);
     }
 
     @Test
@@ -209,7 +213,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
         checker().verifyEquals("Missing auto link for the inserted row", "linked",
                 samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
-
     }
 
     @Test
@@ -249,7 +252,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 DATE_BASED_STUDY + " Study\n" + VISIT_BASED_STUDY + " Study\n" + "Deletion cannot be undone. Do you want to proceed?";
         checker().verifyEquals("Incorrect delete message", expectedErrorMsg, error.getBody());
         error.clickButton("Yes, Delete", true);
-
     }
 
     @Test
@@ -310,7 +312,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect Name linked", derivedSampleName, rowData.get("Name"));
         checker().verifyEquals("Incorrect Participant ID linked", "P1", rowData.get("ParticipantId"));
         checker().verifyEquals("Incorrect Date linked", now, rowData.get("date"));
-
     }
 
     @Test
@@ -357,6 +358,154 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         new DataRegionTable("Data", getDriver()).clickHeaderButtonAndWait("Link to Study");
     }
 
+    @Test
+    public void testQCState()
+    {
+        goToProjectHome(DATE_BASED_STUDY);
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        ManageStudyPage studyPage = new ManageStudyPage(getDriver());
+        studyPage.manageDatasetQCStates()
+                .addStateRow("Approved", "We all like approval", true)
+                .addStateRow("Pending Review", "Still deciding", true)
+                .addStateRow("Rejected", "No one likes to be reviewed.", true)
+                .clickSave()                    // have to save the form here; default entry qc state needs a page cycle to be selectable below
+                .manageDatasetQCStates()
+                .setDefaultPublishDataQCState("Pending Review")
+                .clickSave();
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 2);
+
+        goToProjectHome(DATE_BASED_STUDY);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+        CustomizeView customizeView = table.openCustomizeGrid();
+        customizeView.addColumn("QCState");
+        customizeView.saveCustomView();
+        checker().verifyEquals("Incorrect value for QC state", Arrays.asList("Pending Review?", "Pending Review?"), table.getColumnDataAsText("QCState"));
+
+        log("Changing the QC state of one row");
+        table.checkCheckbox(0);
+        new BootstrapMenu.BootstrapMenuFinder(getDriver()).withButtonTextContaining("QC State").find().clickSubMenu(true, "Update state of selected rows");
+        selectOptionByText(Locator.name("newState"), "Approved");
+        setFormElement(Locator.name("comments"), "Approved");
+        clickButton("Update Status");
+
+        new BootstrapMenu.BootstrapMenuFinder(getDriver()).withButtonTextContaining("QC State").find().clickSubMenu(true, "All data");
+        checker().verifyEquals("Incorrect value for QC state after update", Arrays.asList("Approved?", "Pending Review?"), table.getColumnDataAsText("QCState"));
+    }
+
+    @Test
+    public void testFolderImportExport()
+    {
+        log("Creating the subfolder to import the exported studies for verification");
+        String IMPORT_FOLDER_1 = "Imported folder 1";
+        String IMPORT_FOLDER_2 = "Imported folder 2";
+        goToProjectHome(VISIT_BASED_STUDY);
+        _containerHelper.createSubfolder(VISIT_BASED_STUDY, IMPORT_FOLDER_1);
+        _containerHelper.createSubfolder(VISIT_BASED_STUDY, IMPORT_FOLDER_2);
+
+        log("Linking sample types two rows to study");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        int numOfRowsLinked = 2;
+        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, numOfRowsLinked);
+
+        log("Exporting both Dataset Data and Dataset Definitions");
+        goToProjectHome(VISIT_BASED_STUDY);
+        goToFolderManagement().goToExportTab();
+        File exportArchive = new ExportFolderPage(getDriver())
+                .exportToBrowserAsZipFile();
+
+        ImportFolderPage.beginAt(this, VISIT_BASED_STUDY + "/" + IMPORT_FOLDER_1)
+                .selectLocalZipArchive()
+                .chooseFile(exportArchive)
+                .clickImportFolder();
+        waitForPipelineJobsToFinish(1);
+
+        navigateToFolder(VISIT_BASED_STUDY, IMPORT_FOLDER_1);
+        clickAndWait(Locator.linkContainingText("dataset"));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+        checker().verifyEquals("Incorrect number of rows imported", 2, table.getDataRowCount());
+
+        log("Exporting only Dataset Definitions");
+        goToProjectHome(VISIT_BASED_STUDY);
+        goToFolderManagement().goToExportTab();
+        exportArchive = new ExportFolderPage(getDriver())
+                .includeSampleDatasetData(false)
+                .exportToBrowserAsZipFile();
+
+        ImportFolderPage.beginAt(this, VISIT_BASED_STUDY + "/" + IMPORT_FOLDER_2)
+                .selectLocalZipArchive()
+                .chooseFile(exportArchive)
+                .clickImportFolder();
+        waitForPipelineJobsToFinish(1);
+
+        navigateToFolder(VISIT_BASED_STUDY, IMPORT_FOLDER_2);
+        clickAndWait(Locator.linkContainingText("dataset"));
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        table = new DataRegionTable("Dataset", getDriver());
+        checker().verifyEquals("No data should have been imported", 0, table.getDataRowCount());
+    }
+
+    /*
+        Test coverage for : Issue 42937: Assay results grid loading performance can degrade with a large number of "copied to study" columns
+     */
+    @Test
+    public void testLinkedColumnNotDisplayedCase()
+    {
+        log("Creating 2 more studies");
+        _containerHelper.createProject(SAMPLE_TYPE_PROJECT + " Study 1", "Study");
+        _studyHelper.startCreateStudy().createStudy();
+
+        _containerHelper.createProject(SAMPLE_TYPE_PROJECT + " Study 2", "Study");
+        _studyHelper.startCreateStudy().createStudy();
+
+        log("Linking one row from sample type to all the studies");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(SAMPLE_TYPE_PROJECT + " Study 1", SAMPLE_TYPE1, 1);
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        linkToStudy(SAMPLE_TYPE_PROJECT + " Study 2", SAMPLE_TYPE1, 1);
+
+        log("Verifying linked column does not exists because more then 3 studies are linked");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyFalse("Linked column for Visit based study should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyFalse("Linked column for Date based study should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Date_Based_Study_Test_Project_Study"));
+        checker().verifyFalse("Linked column for Study 1 should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Sample_Type_Test_Project_Study_1_Study"));
+        checker().verifyFalse("Linked column for Study 2 should not be present",
+                samplesTable.getColumnNames().contains("linked_to_Sample_Type_Test_Project_Study_2_Study"));
+
+        log("Verifying if columns can be added from customize grid");
+        CustomizeView customizeView = samplesTable.openCustomizeGrid();
+        customizeView.addColumn("linked_to_Sample_Type_Test_Project_Study_1_Study");
+        customizeView.addColumn("linked_to_Sample_Type_Test_Project_Study_2_Study");
+        customizeView.addColumn("linked_to_Visit_Based_Study_Test_Project_Study");
+        customizeView.addColumn("linked_to_Date_Based_Study_Test_Project_Study");
+        customizeView.saveCustomView();
+    }
+
+    @Before
+    public void preTest() throws Exception
+    {
+        //Cleaning up the links.
+        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE1);
+        recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE2);
+        recallDataset(VISIT_BASED_STUDY, SAMPLE_TYPE1);
+        recallDataset(VISIT_BASED_STUDY, SAMPLE_TYPE2);
+    }
+
     private void linkToStudy(String targetStudy, String sampleName, int numOfRowsToBeLinked)
     {
         clickAndWait(Locator.linkWithText(sampleName));
@@ -380,7 +529,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Mismatch in the comment", expectedComments, table.getDataAsText(0, "Comment"));
     }
 
-    private void verifyAuditLogEvents(String Comment)
+    private void verifyAuditLogEvents(String Comment, @Nullable Integer numOfRowsLinked, @Nullable List<String> linkedSamples)
     {
         goToAdminConsole().clickAuditLog();
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Link to Study events"));
@@ -388,17 +537,31 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable auditTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
         checker().verifyEquals("Incorrect audit log entry for Link to Study events", Comment,
                 auditTable.getDataAsText(0, "Comment"));
+        if (linkedSamples != null)
+        {
+            doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Sample timeline events"));
+            auditTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
+            List<String> samples = new ArrayList<>();
+            for (int i = 0; i < numOfRowsLinked; i++)
+                samples.add(auditTable.getDataAsText(i, "SampleName"));
+            checker().verifyEquals("Incorrect sample names in the audit log", linkedSamples, samples);
+        }
     }
 
-    private void recallDataset(String study, String sampleType, int numOfRows)
+    private void recallDataset(String study, String sampleType)
     {
         goToProjectHome(study);
-        clickAndWait(Locator.linkWithText(sampleType));
-        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
-        for (int i = 0; i < numOfRows; i++)
-            table.checkCheckbox(i);
-        table.clickHeaderButton("Recall");
-        acceptAlert();
+        if (isElementPresent(Locator.linkWithText(sampleType)))
+        {
+            clickAndWait(Locator.linkWithText(sampleType));
+            DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+            if (table.getDataRowCount() > 0)
+            {
+                table.checkAllOnPage();
+                table.clickHeaderButton("Recall");
+                acceptAlert();
+            }
+        }
     }
 
     @Override
@@ -419,5 +582,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, afterTest);
         _containerHelper.deleteProject(VISIT_BASED_STUDY, afterTest);
         _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", afterTest);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", afterTest);
+
     }
 }

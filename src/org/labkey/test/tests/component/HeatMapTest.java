@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.heatmap.HeatMap;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
@@ -25,7 +25,7 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-@Category({DailyB.class})
+@Category({Daily.class})
 public class HeatMapTest extends BaseWebDriverTest
 {
     private static Map<String, Integer> TEST_SAMPLE_TYPES = new HashMap<>();

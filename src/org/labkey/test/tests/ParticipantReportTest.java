@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyC.class, Reports.class})
+@Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class ParticipantReportTest extends ReportTest
 {

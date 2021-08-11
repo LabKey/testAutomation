@@ -38,7 +38,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -46,11 +46,13 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIUserHelper;
 
@@ -71,7 +73,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
-@Category({DailyA.class, Hosting.class})
+@Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
 public class AuditLogTest extends BaseWebDriverTest
 {
@@ -96,6 +98,8 @@ public class AuditLogTest extends BaseWebDriverTest
     private static final String AUDIT_PROPERTY_EVENTS_PROJECT = "AuditDomainPropertyEvents";
 
     public static final String COMMENT_COLUMN = "Comment";
+
+    private final ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -140,14 +144,10 @@ public class AuditLogTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        // Needed for pre-clean only. User & project are deleted during test.
-        if (!afterTest)
-        {
-            _userHelper.deleteUsers(false, AUDIT_TEST_USER);
-            _containerHelper.deleteProject(getProjectName(), false);
-            _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
-            _containerHelper.deleteProject(AUDIT_PROPERTY_EVENTS_PROJECT, false);
-        }
+        _userHelper.deleteUsers(false, AUDIT_TEST_USER);
+        _containerHelper.deleteProject(getProjectName(), false);
+        _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
+        _containerHelper.deleteProject(AUDIT_PROPERTY_EVENTS_PROJECT, false);
         Log4jUtils.resetAllLogLevels();
     }
 
@@ -193,7 +193,7 @@ public class AuditLogTest extends BaseWebDriverTest
         return auditLog;
     }
 
-    protected void compareAuditLogFileEntries(ArrayList<String> auditLogBefore, ArrayList<String> auditLogAfter, ArrayList<String> expectedValues)
+    protected void compareAuditLogFileEntries(ArrayList<String> auditLogBefore, ArrayList<String> auditLogAfter, ArrayList<String> expectedValues) throws IOException
     {
         boolean pass = true;
         StringBuilder stringBuilder = new StringBuilder();
@@ -253,8 +253,8 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             File dumpDir = new File(getArtifactCollector().ensureDumpDir(), "audit_logs");
             dumpDir.mkdir();
-            TestFileUtils.saveFile(dumpDir, "audit_log_before.log", String.join("\n", auditLogBefore));
-            TestFileUtils.saveFile(dumpDir, "audit_log_after.log", String.join("\n", auditLogAfter));
+            TestFileUtils.writeFile(new File(dumpDir, "audit_log_before.log"), String.join("\n", auditLogBefore));
+            TestFileUtils.writeFile(new File(dumpDir, "audit_log_after.log"), String.join("\n", auditLogAfter));
             fail(stringBuilder.toString());
         }
     }
@@ -331,14 +331,10 @@ public class AuditLogTest extends BaseWebDriverTest
         log("testing group audit events");
 
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
-        _permissionsHelper.createPermissionsGroup(AUDIT_SECURITY_GROUP);
-        _permissionsHelper.assertPermissionSetting(AUDIT_SECURITY_GROUP, "No Permissions");
-        _permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, "Editor");
-
-        _permissionsHelper.clickManageGroup(AUDIT_SECURITY_GROUP);
-        setFormElement(Locator.name("names"), AUDIT_TEST_USER);
-        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
-        clickButton("Update Group Membership");
+        permissionsHelper.createPermissionsGroup(AUDIT_SECURITY_GROUP);
+        permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, "Editor");
+        _userHelper.createUser(AUDIT_TEST_USER, false, true);
+        permissionsHelper.addUserToProjGroup(AUDIT_TEST_USER, getProjectName(), AUDIT_SECURITY_GROUP);
         _userHelper.deleteUsers(true, AUDIT_TEST_USER);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
@@ -377,9 +373,7 @@ public class AuditLogTest extends BaseWebDriverTest
         createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"));
 
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
-        clickButton("Save and Finish");
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, "Project Administrator");
-        clickButton("Save and Finish");
 
         // signed in as an admin so we should see rows here
         verifyAuditQueries(true);
@@ -391,7 +385,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // now grant CanSeeAuditLog permission to our audit user and verify
         // we see audit information
-        _permissionsHelper.setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        permissionsHelper.setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true);
 
@@ -415,9 +409,7 @@ public class AuditLogTest extends BaseWebDriverTest
         // verify issue 19832 - opposite of above.  Ensure that user who has access to child folder but not parent folder can still see
         // audit log events from the child forder if using a CurrentAndSubFolders container filter
         createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, "Editor");
-        clickButton("Save and Finish");
-        navigateToFolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
-        _securityHelper.setProjectPerm(AUDIT_TEST_USER3, "Folder Administrator");
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER3, "Folder Administrator", PermissionsHelper.MemberType.user, AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER);
         impersonate(AUDIT_TEST_USER3);
         verifyListAuditLogQueries(Visibility.ChildFolder);
         stopImpersonating();
