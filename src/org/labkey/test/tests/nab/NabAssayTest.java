@@ -39,7 +39,6 @@ import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
-import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -47,6 +46,7 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -806,8 +806,8 @@ public class NabAssayTest extends AbstractAssayTest
 
     private WebElement waitForNabGraph()
     {
-        WebElement nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph").waitForElement(getDriver(), 10000);
-        return shortWait().until(LabKeyExpectedConditions.animationIsDone(nabGraph));
+        return shortWait().until(ExpectedConditions
+                .visibilityOfElementLocated(Locator.tagWithAttribute("img", "alt", "Neutralization Graph")));
     }
 
     private static final List<String> expectedRow11 = Arrays.asList("ptid + visit", "Specimen 5", "Specimen 5", "1", "12",
