@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -28,7 +27,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 public class LabKeyExpectedConditions
 {
@@ -40,7 +38,7 @@ public class LabKeyExpectedConditions
     /**
      * An expectation for checking that an element has stopped moving
      *
-     * @param loc locator for the element
+     * @param loc the container element which should have css style, "position: static"
      * @return element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final By loc) {
@@ -68,42 +66,9 @@ public class LabKeyExpectedConditions
     }
 
     /**
-     * An expectation for checking that an element has stopped moving.
-     * For elements that might disappear and appear during animation.
-     *
-     * @param elementFinder supplies an element that should be checked for animation
-     * @return element when animation is complete
-     */
-    public static ExpectedCondition<WebElement> animationIsDone(final Supplier<WebElement> elementFinder) {
-        return new ExpectedCondition<>() {
-            private final MutableObject<WebElement> lastElement = new MutableObject<>();
-
-            @Override
-            public WebElement apply(WebDriver driver)
-            {
-                try
-                {
-                    lastElement.setValue(elementFinder.get());
-                    return animationIsDone(lastElement.getValue()).apply(driver);
-                }
-                catch (StaleElementReferenceException recheck)
-                {
-                    return null;
-                }
-            }
-
-            @Override
-            public String toString()
-            {
-                return "animation of element" + (lastElement.getValue() != null ? ": " + lastElement.getValue().toString() : "");
-            }
-        };
-    }
-
-    /**
      * Another expectation for checking that an element has stopped moving
      *
-     * @param el the element who's size or position changes
+     * @param el the element who's position changes
      * @return the element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final WebElement el) {
@@ -111,11 +76,6 @@ public class LabKeyExpectedConditions
             @Override
             public WebElement apply(WebDriver driver)
             {
-                if (!el.isDisplayed())
-                {
-                    return null; // Element should be visible
-                }
-
                 Point firstPosition;
                 Point secondPosition;
                 Dimension firstDimension;
@@ -124,11 +84,9 @@ public class LabKeyExpectedConditions
                 {
                     firstDimension = el.getSize();
                     firstPosition = el.getLocation();
-                    TestLogger.debug(firstPosition + " : " + firstDimension);
                     Thread.sleep(100);
                     secondDimension = el.getSize();
                     secondPosition = el.getLocation();
-                    TestLogger.debug(secondPosition + " : " + secondDimension);
                 }
                 catch (InterruptedException fail)
                 {
@@ -144,7 +102,7 @@ public class LabKeyExpectedConditions
             @Override
             public String toString()
             {
-                return "animation of element";
+                return "movement of element";
             }
         };
     }
