@@ -6,11 +6,15 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 
@@ -87,6 +91,51 @@ public class SampleTypeUniqueIdTest extends BaseWebDriverTest
         checker().verifyTrue("Grid does not contain expected unique ID field", actualNames.contains(secondUniqueIdName));
     }
 
+    @Test
+    public void testSampleTypeUpdateWithUniqueId()
+    {
+        String sampleTypeName = "SampleTypeUpdateWithUniqueId";
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        log("Create a sample type without a UniqueId field and add a few data rows");
+        goToProjectHome();
+        sampleTypeHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)
+            .setNameExpression("S-${TxtField}")
+            .setFields(List.of(new FieldDefinition("TxtField"))),
+            "TxtField\nA\nB\nC\n"
+        );
+
+        log("Verify that update sample type shows barcode related messaging/alert");
+        goToProjectHome();
+        UpdateSampleTypePage updatePage = sampleTypeHelper.goToEditSampleType(sampleTypeName);
+        checker().verifyFalse("Barcodes initial message should not have check icon", updatePage.hasUniqueIdCheckIcon());
+        checker().verifyTrue("Barcodes properties panel alert not shown", updatePage.hasUniqueIdAlert());
+
+        log("Add unique id field via alert button and verify confirmation message");
+        updatePage.clickUniqueIdAlertAddButton();
+        checker().verifyTrue("Barcodes updated message should have check icon", updatePage.hasUniqueIdCheckIcon());
+        checker().verifyEquals("Barcode updated message text not as expected", "A Unique ID field for barcodes is defined: Barcode", updatePage.getUniqueIdMsg());
+        ModalDialog confirmModal = updatePage.clickSaveExpectingAlert();
+        checker().verifyEquals("Confirm modal title not as expected", "Updating Sample Type with Unique ID field", confirmModal.getTitle());
+        checker().verifyEquals("Confirm modal body text not as expected",
+                "You have added 1 Unique ID field to this Sample Type. Values for this field will be created for all existing samples.",
+                confirmModal.getBodyText());
+        clickAndWait(Locator.button("Finish Updating Sample Type").findElement(confirmModal));
+
+        log("Verify that the existing rows have Barcode values populated");
+        List<String> barcodeValues = sampleTypeHelper.getSamplesDataRegionTable().getColumnDataAsText("Barcode");
+        checker().verifyEquals("Barcode values for existing rows were not populated as expected", 3, barcodeValues.size());
+        checker().verifyEquals("Barcode values for existing rows were not populated as expected", Long.valueOf(0), barcodeValues.stream().filter(val -> val.equals(" ")).count());
+
+        log("Add a non-Unique ID field and verify no confirm dialog shows on save");
+        goToProjectHome();
+        sampleTypeHelper.goToEditSampleType(sampleTypeName)
+            .addField(new FieldDefinition("IntField", FieldDefinition.ColumnType.Integer))
+            .clickSave();
+        List<String> intFieldValues = sampleTypeHelper.getSamplesDataRegionTable().getColumnDataAsText("IntField");
+        checker().verifyEquals("IntField values for existing rows should not be populated", Long.valueOf(3), intFieldValues.stream().filter(val -> val.equals(" ")).count());
+    }
+
     @Override
     protected @Nullable String getProjectName()
     {
@@ -103,6 +152,5 @@ public class SampleTypeUniqueIdTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-
     }
 }
