@@ -60,7 +60,7 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition(String name)
     {
         setName(name);
-        setRangeURI(ColumnType.String.getRangeURI());
+        super.setRangeURI(ColumnType.String.getRangeURI());
     }
 
     /**
@@ -113,6 +113,12 @@ public class FieldDefinition extends PropertyDescriptor
         super.setRangeURI(type.getRangeURI());
         setFieldProperty("conceptURI", type.getConceptURI());
         return this;
+    }
+
+    @Override
+    public PropertyDescriptor setRangeURI(String rangeURI)
+    {
+        throw new UnsupportedOperationException("Field type should be set at instantiation time.");
     }
 
     // Override return type of PropertyDescriptor setters
@@ -177,7 +183,7 @@ public class FieldDefinition extends PropertyDescriptor
                             getName(), _type.toString()));
         }
         super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
-        setRangeURI(lookup.getTableType().getRangeURI());
+        super.setRangeURI(lookup.getTableType().getRangeURI());
         _lookup = lookup;
         return this;
     }
@@ -185,8 +191,7 @@ public class FieldDefinition extends PropertyDescriptor
     @Override
     public FieldDefinition setLookup(String schema, String query, String container)
     {
-        setLookup(new LookupInfo(container, schema, query));
-        return this;
+        throw new UnsupportedOperationException("Lookup info should be set at instantiation time.");
     }
 
     // Additional field properties, not currently supported by 'PropertyDescriptor'
@@ -612,6 +617,25 @@ public class FieldDefinition extends PropertyDescriptor
         {
             _tableType = tableType;
             return this;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (_folder != null)
+            {
+                sb.append("(Current container)");
+            }
+            else
+            {
+                sb.append(_folder);
+            }
+            sb.append(" : ");
+            sb.append(getSchema());
+            sb.append(".");
+            sb.append(getTable());
+            return sb.toString();
         }
     }
 
