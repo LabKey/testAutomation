@@ -217,8 +217,12 @@ public class DataRegionTable extends DataRegion
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
             boolean lazy = el instanceof LazyWebElement;
-            if (buildLocator() != null && getContext() != null) // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+            if (buildLocator() != null && getContext() != null // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+                    && ! (el instanceof RefindingWebElement)) // 'RefindingWebElement' prohibits nesting
+            {
+                // Numerous tests expect to be able to reuse 'DataRegionTable' instances between page loads
                 el = new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout());
+            }
             DataRegionTable constructed = new DataRegionTable(el, driver);
             constructed.setUpdateTimeout(getTimeout());
             if (!lazy)
