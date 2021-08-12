@@ -18,10 +18,12 @@ package org.labkey.test.tests;
 import junit.framework.TestSuite;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.Base;
+import org.labkey.test.categories.DRT;
+import org.labkey.test.categories.Smoke;
 
 import java.util.Map;
 
-@Category({Base.class})
+@Category({Base.class, DRT.class, Smoke.class})
 public class JUnitDRTTest
 {
     public static boolean accept(Map<String, Object> test)

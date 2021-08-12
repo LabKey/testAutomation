@@ -24,8 +24,11 @@ import org.labkey.test.categories.NoSuite;
 
 import java.util.List;
 
+/**
+ * This test is intended to be run manually to verify the output of the 'createModule' Gradle task
+ */
 @Category({NoSuite.class})
-public class ModuleTest extends BaseWebDriverTest
+public class ModuleTemplateTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ModuleVerifyProject";
     private static final String TEST_MODULE_TEMPLATE_FOLDER_NAME = "testmodule";
