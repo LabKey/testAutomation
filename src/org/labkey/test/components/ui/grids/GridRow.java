@@ -5,10 +5,12 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.ui.files.ImageFileViewDialog;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +128,38 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     }
 
     /**
+     * finds a AttachmentCard specified filename, clicks it, and waits for the image to display in a modal
+     * @param filename
+     */
+    public ImageFileViewDialog clickImgFile(String filename)
+    {
+        clickOnFile(filename);
+        log("waiting for image to display");
+        return new ImageFileViewDialog(getDriver(), filename);
+    }
+
+    public void clickOnFile(String filename)
+    {
+        log("seeking cell with filename [" + filename + "]");
+        WebElement filenameEl = elementCache().filenameLoc.containing(filename).waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+        log("found element with filename [" + filename + "]");
+        filenameEl.click();
+    }
+
+    /**
+     * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
+     * @param filename
+     */
+    public File clickNonImgFile(String filename)
+    {
+        return getWrapper()
+                .doAndWaitForDownload(() -> {
+                    log("waiting for file to download");
+                    clickOnFile(filename);
+                }, 1)[0];
+    }
+
+    /**
      * Returns the text in the row for the specified column
      * @param columnText
      * @return
@@ -191,6 +225,8 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
                 .findOptionalElement(getComponentElement());
         public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
+
+        public Locator filenameLoc = Locator.tagWithClass("div", "attachment-card__name");
     }
 
     public static class GridRowFinder extends WebDriverComponentFinder<GridRow, GridRowFinder>
