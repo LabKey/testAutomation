@@ -360,7 +360,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     public void setAliquotView(AliquotViewOptions view)
     {
         String url = getDriver().getCurrentUrl().toLowerCase();
-        boolean onSourcesPage = url.contains("/sources/");
+        boolean onSourcesPage = url.contains("#/sources/");
+        boolean onSamplePage = url.contains("#/samples/");
 
         String currentButtonText = currentAliquotViewText();
         String menuChoice = "";
@@ -384,6 +385,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                         menuChoice = "Samples and Aliquots";
                     }
                 }
+                else if (onSamplePage)
+                {
+                    menuChoice = "Sample or Aliquots";
+                }
                 else
                 {
                     menuChoice = "Samples and Aliquots";
@@ -393,6 +398,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                 if(onSourcesPage && url.endsWith("assays"))
                 {
                     menuChoice = "Derived Samples Only";
+                }
+                else if(onSamplePage)
+                {
+                    menuChoice = "Sample Only";
                 }
                 else
                 {
