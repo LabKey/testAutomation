@@ -13,6 +13,7 @@ import java.util.List;
 
 /*
  * Test wrapper for AttachmentCard in '@labkey/components'
+ * TODO: reconcile with AttachmentCard.java
  */
 public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCache>
 {

@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 
 // AttachmentCard.tsx
+// TODO: reconcile with AttachmentCard.java
 public class FileUploadField extends WebDriverComponent<FileUploadField.ElementCache>
 {
     final WebElement _el;
