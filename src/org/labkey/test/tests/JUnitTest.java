@@ -48,6 +48,7 @@ import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.QuickBootstrapPseudoTest;
 import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite() throws Exception
     {
-        return JUnitTest._suite((p) -> true);
+        return JUnitTest._suite((p) -> true, false);
     }
 
     private static String getWhen(Map<String,Object> test)
@@ -120,10 +121,18 @@ public class JUnitTest extends TestSuite
 
     // Use WebDriver to ensure we're upgraded
     @LogMethod
-    private static void upgradeHelper()
+    private static void upgradeHelper(boolean skipInitialUserChecks)
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
-        JUnitSeleniumHelper helper = new JUnitSeleniumHelper();
+        BaseWebDriverTest helper;
+        if (skipInitialUserChecks)
+        {
+            helper = new QuickBootstrapPseudoTest();
+        }
+        else
+        {
+            helper = new JUnitSeleniumHelper();
+        }
         try
         {
             helper.setUp();
@@ -160,7 +169,7 @@ public class JUnitTest extends TestSuite
                         return true;
                 }
                 return false;
-            });
+            }, categories.contains("smoke"));
         }
         catch (Throwable t)
         {
@@ -172,12 +181,12 @@ public class JUnitTest extends TestSuite
         }
     }
 
-    public static TestSuite _suite(Predicate<Map<String,Object>> accept) throws Exception
+    public static TestSuite _suite(Predicate<Map<String,Object>> accept, boolean skipInitialUserChecks) throws Exception
     {
-        return _suite(accept, 0, 0);
+        return _suite(accept, skipInitialUserChecks, 0, 0);
     }
 
-    private static TestSuite _suite(Predicate<Map<String,Object>> accept, final int startupAttempts, final int upgradeAttempts) throws Exception
+    private static TestSuite _suite(Predicate<Map<String,Object>> accept, boolean skipInitialUserChecks, final int startupAttempts, final int upgradeAttempts) throws Exception
     {
         if (TestProperties.isPrimaryUserAppAdmin())
         {
@@ -199,7 +208,7 @@ public class JUnitTest extends TestSuite
                 if (startupAttempts < 60 && upgradeAttempts == 0)
                 {
                     Thread.sleep(1000);
-                    return _suite(accept, startupAttempts + 1, upgradeAttempts);
+                    return _suite(accept, skipInitialUserChecks, startupAttempts + 1, upgradeAttempts);
                 }
                 else
                 {
@@ -227,7 +236,7 @@ public class JUnitTest extends TestSuite
                         if (startupAttempts < 60)
                         {
                             Thread.sleep(1000);
-                            return _suite(accept, startupAttempts + 1, upgradeAttempts);
+                            return _suite(accept, skipInitialUserChecks, startupAttempts + 1, upgradeAttempts);
                         }
                         else
                         {
@@ -250,7 +259,7 @@ public class JUnitTest extends TestSuite
                         Throwable upgradeError = null;
                         try
                         {
-                            upgradeHelper();
+                            upgradeHelper(skipInitialUserChecks);
                         }
                         catch (Throwable t)
                         {
@@ -260,7 +269,7 @@ public class JUnitTest extends TestSuite
                         TestSuite testSuite;
                         try
                         {
-                            testSuite = _suite(accept, startupAttempts + 1, upgradeAttempts + 1);
+                            testSuite = _suite(accept, skipInitialUserChecks, startupAttempts + 1, upgradeAttempts + 1);
                         }
                         catch (Exception retryException)
                         {
