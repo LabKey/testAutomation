@@ -247,6 +247,21 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
                 isElementVisible(elementCache().bulkInsertBtn);
     }
 
+    public EntityBulkUpdateDialog clickBulkUpdate()
+    {
+        showGrid();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkUpdateBtn));
+        elementCache().bulkUpdateBtn.click();
+        return new EntityBulkUpdateDialog(getDriver(), "Update ");
+    }
+
+    public boolean isBulkUpdateVisible()
+    {
+        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+                elementCache().bulkUpdateBtnLoc.existsIn(this) &&
+                isElementVisible(elementCache().bulkUpdateBtn);
+    }
+
     public boolean isDeleteRowsVisible()
     {
         return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
@@ -363,9 +378,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
                 Locator.button("Delete rows"),
                 Locator.buttonContainingText("Remove"));
         Locator bulkInsertBtnLoc = Locator.button("Bulk Insert");
+        Locator bulkUpdateBtnLoc = Locator.button("Bulk Update");
 
         WebElement bulkInsertBtn = bulkInsertBtnLoc.findWhenNeeded(this).withTimeout(2000);
-        WebElement bulkUpdateBtn = Locator.button("Bulk update").findWhenNeeded(this).withTimeout(2000);
+        WebElement bulkUpdateBtn = bulkUpdateBtnLoc.findWhenNeeded(this).withTimeout(2000);
         WebElement deleteRowsBtn = deleteRowsBtnLoc.findWhenNeeded(this).withTimeout(2000);
 
         WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(this);
