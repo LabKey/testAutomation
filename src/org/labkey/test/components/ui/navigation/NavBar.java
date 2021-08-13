@@ -14,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 {
@@ -51,6 +52,7 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
     public FindByIdsDialog findByIds()
     {
         elementCache().findAndSearchMenuButton.click();
+        waitFor(()->elementCache().findSamplesOption.isDisplayed(), "Find samples menu did not show up.", 500);
         elementCache().findSamplesOption.click();
         return new FindByIdsDialog(getDriver());
     }

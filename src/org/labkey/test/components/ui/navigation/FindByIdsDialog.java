@@ -70,13 +70,13 @@ public class FindByIdsDialog  extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        RadioButton barcodeRadio = RadioButton.RadioButton(Locator.radioButtonByName("uniqueIds")).findWhenNeeded(getComponentElement());
-        RadioButton sampleIDsRadio = RadioButton.RadioButton(Locator.radioButtonByName("sampleIds")).findWhenNeeded(getComponentElement());
-        WebElement idTextArea = Locator.tag("textarea").findWhenNeeded(getComponentElement());
+        final RadioButton barcodeRadio = RadioButton.RadioButton(Locator.radioButtonByName("uniqueIds")).findWhenNeeded(getComponentElement());
+        final RadioButton sampleIDsRadio = RadioButton.RadioButton(Locator.radioButtonByName("sampleIds")).findWhenNeeded(getComponentElement());
+        final WebElement idTextArea = Locator.tag("textarea").findWhenNeeded(getComponentElement());
 
-        WebElement cancelButton = Locator.tagWithText("button", "Cancel")
+        final WebElement cancelButton = Locator.tagWithText("button", "Cancel")
                 .findWhenNeeded(getComponentElement());
-        WebElement findSamplesButton = Locator.tagWithText("button", "Find Samples")
+        final WebElement findSamplesButton = Locator.tagWithText("button", "Find Samples")
                 .findWhenNeeded(getComponentElement());
     }
 }
