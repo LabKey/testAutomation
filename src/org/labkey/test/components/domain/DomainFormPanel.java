@@ -8,6 +8,7 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -337,7 +338,11 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public String getPanelAlertText()
     {
-        return getPanelAlertWebElement().getText();
+        WebElement alertEl = getPanelAlertWebElement();
+        if (alertEl != null)
+            return alertEl.getText();
+
+        return "";
     }
 
     public String getPanelAlertText(int index)
@@ -357,12 +362,19 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public WebElement getPanelAlertWebElement(int index)
     {
-        getWrapper().waitFor(()-> BootstrapLocators.infoBanner.existsIn(getDriver()),
-                "the info alert did not appear as expected", 1000);
+        try
+        {
+            getWrapper().waitFor(() -> BootstrapLocators.infoBanner.existsIn(getDriver()),
+                    "the info alert did not appear as expected", 1000);
+        }
+        catch (TimeoutException e)
+        {
+            return null;
+        }
 
         // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
         // may show different controls.
-        return BootstrapLocators.infoBanner.index(index).findOptionalElement(this).orElse(null);
+        return BootstrapLocators.infoBanner.index(index).findElement(this);
     }
 
     @Override

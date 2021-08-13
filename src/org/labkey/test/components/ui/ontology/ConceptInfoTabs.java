@@ -4,8 +4,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.components.html.Input.Input;
 
 public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementCache>
 {
