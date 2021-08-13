@@ -18,24 +18,11 @@ package org.labkey.test.util;
 
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
-
-import java.util.List;
+import org.labkey.test.tests.JUnitTest;
 
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
-public class JUnitFooter extends BaseWebDriverTest
+public class JUnitFooter extends JUnitTest.BaseJUnitTestWrapper
 {
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return List.of();
-    }
-
-    @Override
-    protected String getProjectName()
-    {
-        return null;
-    }
-
     @Test
     public void afterJUnit()
     {
@@ -43,20 +30,18 @@ public class JUnitFooter extends BaseWebDriverTest
         log("** This should follow JUnitTest.");
         log("** It will check for memory leaks and clean up the 'Shared/_junit' project.");
 
-        PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-        pipelineToolsHelper.resetPipelineToolsDirectory();
-
         if (_containerHelper.doesContainerExist("Shared/_junit"))
             _containerHelper.deleteFolder("Shared", "_junit");
 
-        waitForSystemMaintenanceCompletion();
-        super.checkErrors();
-    }
+        if (extraSetup)
+        {
+            PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+            pipelineToolsHelper.resetPipelineToolsDirectory();
 
-    @Override
-    protected void checkLinks()
-    {
-        // skip
+            waitForSystemMaintenanceCompletion();
+        }
+
+        super.checkErrors(); // Explicitly perform post-test error check (standard check is blocked by override below)
     }
 
     @Override
@@ -68,11 +53,6 @@ public class JUnitFooter extends BaseWebDriverTest
     @Override
     protected void checkLeaks(Long leakCutoffTime)
     {
-        super.checkLeaks(JUnitHeader.startTime);
-    }
-
-    @Override public BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
+        super.checkLeaks(startTime);
     }
 }

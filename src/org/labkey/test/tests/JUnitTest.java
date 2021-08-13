@@ -169,7 +169,7 @@ public class JUnitTest extends TestSuite
                         return true;
                 }
                 return testCategories.contains("smoke"); // Always run smoke tests
-            }, false);
+            }, true);
         }
         catch (Throwable t)
         {
@@ -315,7 +315,7 @@ public class JUnitTest extends TestSuite
                     }
                     if (!addedHeader && testsuite.countTestCases() > 0)
                     {
-                        JUnitHeader.enableExtraSetup(!skipInitialUserChecks);
+                        BaseJUnitTestWrapper.extraSetup = !skipInitialUserChecks;
                         remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
                         addedHeader = true;
                     }
@@ -466,5 +466,36 @@ public class JUnitTest extends TestSuite
             return;
         String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date());      // Include time with log entry.  Use format that matches labkey log.
         printStream.println(d + " " + str);
+    }
+
+    public static class BaseJUnitTestWrapper extends BaseWebDriverTest
+    {
+        // Used by 'JUnitFooter' to check for leaks from server-side tests
+        protected static Long startTime = null;
+        // Don't configure pipeline tools or R for smoke suite
+        protected static boolean extraSetup = false;
+
+        @Override
+        public List<String> getAssociatedModules()
+        {
+            return List.of();
+        }
+
+        @Override
+        protected String getProjectName()
+        {
+            return null;
+        }
+
+        @Override
+        protected void checkLinks()
+        {
+            // skip
+        }
+
+        @Override public BrowserType bestBrowser()
+        {
+            return BrowserType.CHROME;
+        }
     }
 }
