@@ -42,6 +42,7 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -316,12 +317,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "sampleLookups", getCurrentContainerPath())
                 .withColumns(List.of(
                         new FieldDefinition("name", ColumnType.String),
-                        new FieldDefinition("strLookup", ColumnType.String)
-                                .setLookup("exp.materials", "sampleData", lookupContainer),
-                        new FieldDefinition("intLookup", ColumnType.Integer)
-                                .setLookup("exp.materials", "sampleData", lookupContainer),
-                        new FieldDefinition("floatLooky", ColumnType.Decimal)
-                                .setLookup("exp.materials", "sampleData", lookupContainer)
+                        new FieldDefinition("strLookup", new LookupInfo(lookupContainer, "exp.materials", "sampleData")
+                                .setTableType(ColumnType.String)),
+                        new FieldDefinition("intLookup", new LookupInfo(lookupContainer, "exp.materials", "sampleData")
+                                .setTableType(ColumnType.Integer)),
+                        new FieldDefinition("floatLooky", new LookupInfo(lookupContainer, "exp.materials", "sampleData")
+                                .setTableType(ColumnType.Decimal))
                 ));
         lookupDgen.createDomain(createDefaultConnection(), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
         lookupDgen.addCustomRow(Map.of("name", "B"));
@@ -1264,7 +1265,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE);
         definition.addField(new FieldDefinition("Key",
-                new FieldDefinition.LookupInfo(null, "lists", listName)
+                new LookupInfo(null, "lists", listName)
                         .setTableType(ColumnType.Integer)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
         sampleHelper.createSampleType(definition);
 

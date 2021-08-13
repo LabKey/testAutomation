@@ -40,17 +40,34 @@ public class FieldDefinition extends PropertyDescriptor
     // Collection of JSON properties not explicitly known by 'PropertyDescriptor'
     private final Map<String, Object> _extraFieldProperties = new HashMap<>();
 
+    /**
+     * Define a non-lookup field of the specified type
+     * @param name field name
+     * @param type field type
+     */
     public FieldDefinition(String name, ColumnType type)
     {
         setName(name);
         setType(type);
     }
 
+    /**
+     * Define a String field
+     * @deprecated Use {@link #FieldDefinition(String, ColumnType)} or {@link #FieldDefinition(String, LookupInfo)}
+     * @param name field name
+     */
+    @Deprecated
     public FieldDefinition(String name)
     {
-        this(name, ColumnType.String);
+        setName(name);
+        super.setRangeURI(ColumnType.String.getRangeURI());
     }
 
+    /**
+     * Define a lookup field
+     * @param name field name
+     * @param lookup info about the table targeted by the lookup
+     */
     public FieldDefinition(String name, LookupInfo lookup)
     {
         setName(name);
@@ -65,11 +82,21 @@ public class FieldDefinition extends PropertyDescriptor
 
     public ColumnType getType()
     {
-        return _type;
+        return _type == null
+                ? ColumnType.String // null type indicates usage of the deprecated name-only constructor
+                : _type;
     }
 
     public FieldDefinition setType(ColumnType type)
     {
+        if (_type != null)
+        {
+            throw new IllegalStateException(String.format("'%s' already has the type '%s'.", getName(), _type.toString()));
+        }
+        if (_lookup != null)
+        {
+            throw new IllegalStateException("This field is defined as a lookup. Use 'LookupInfo.setTableType' to set the rangeURI of the lookup.");
+        }
         if (type == ColumnType.Lookup)
         {
             throw new IllegalArgumentException("Use 'setLookup' or construct with 'FieldDefinition(String, LookupInfo)' to create lookup fields");
@@ -86,6 +113,12 @@ public class FieldDefinition extends PropertyDescriptor
         super.setRangeURI(type.getRangeURI());
         setFieldProperty("conceptURI", type.getConceptURI());
         return this;
+    }
+
+    @Override
+    public PropertyDescriptor setRangeURI(String rangeURI)
+    {
+        throw new UnsupportedOperationException("Field type should be set at instantiation time.");
     }
 
     // Override return type of PropertyDescriptor setters
@@ -137,10 +170,20 @@ public class FieldDefinition extends PropertyDescriptor
         return _lookup;
     }
 
-    public FieldDefinition setLookup(LookupInfo lookup)
+    protected FieldDefinition setLookup(LookupInfo lookup)
     {
+        if (_lookup != null)
+        {
+            throw new IllegalStateException(String.format("'%s' is already a lookup to '%s'.", getName(), _lookup.toString()));
+        }
+        if (_type != null)
+        {
+            throw new IllegalStateException(
+                    String.format("'%s' already has the type '%s'. Use 'new FieldDefinition(String, LookupInfo)' to define lookup fields",
+                            getName(), _type.toString()));
+        }
         super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
-        setRangeURI(lookup.getTableType().getRangeURI());
+        super.setRangeURI(lookup.getTableType().getRangeURI());
         _lookup = lookup;
         return this;
     }
@@ -148,8 +191,7 @@ public class FieldDefinition extends PropertyDescriptor
     @Override
     public FieldDefinition setLookup(String schema, String query, String container)
     {
-        setLookup(new LookupInfo(container, schema, query));
-        return this;
+        throw new UnsupportedOperationException("Lookup info should be set at instantiation time.");
     }
 
     // Additional field properties, not currently supported by 'PropertyDescriptor'
@@ -575,6 +617,25 @@ public class FieldDefinition extends PropertyDescriptor
         {
             _tableType = tableType;
             return this;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (_folder != null)
+            {
+                sb.append("(Current container)");
+            }
+            else
+            {
+                sb.append(_folder);
+            }
+            sb.append(" : ");
+            sb.append(getSchema());
+            sb.append(".");
+            sb.append(getTable());
+            return sb.toString();
         }
     }
 

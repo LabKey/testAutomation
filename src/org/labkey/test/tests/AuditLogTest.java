@@ -686,9 +686,10 @@ public class AuditLogTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_CHECK_LOG));
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
         listDefinitionPage.getFieldsPanel()
-                .addField(new FieldDefinition(FIELD03_NAME).setLabel(FIELD03_LABEL)
-                        .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
-                                .setTableType(FieldDefinition.ColumnType.Integer)));
+                .addField(new FieldDefinition(FIELD03_NAME,
+                        new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
+                                .setTableType(FieldDefinition.ColumnType.Integer))
+                        .setLabel(FIELD03_LABEL));
         listDefinitionPage.clickSave();
 
         log("Validate that a 'Create' event was logged for the new filed.");
