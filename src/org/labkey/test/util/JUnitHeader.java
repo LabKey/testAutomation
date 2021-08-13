@@ -30,6 +30,13 @@ public class JUnitHeader extends BaseWebDriverTest
     // Used by 'JUnitFooter' to check for leaks from server-side tests
     static Long startTime = null;
 
+    private static boolean _extraSetup = false;
+
+    public static void enableExtraSetup(boolean runSetup)
+    {
+        JUnitHeader._extraSetup = runSetup;
+    }
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -51,15 +58,21 @@ public class JUnitHeader extends BaseWebDriverTest
     @Test
     public void configureR()
     {
-        RReportHelper reportHelper = new RReportHelper(this);
-        reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+        if (_extraSetup)
+        {
+            RReportHelper reportHelper = new RReportHelper(this);
+            reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+        }
     }
 
     @Test
     public void configurePipeline()
     {
-        PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-        pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+        if (_extraSetup)
+        {
+            PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+            pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+        }
     }
 
     @Test
@@ -73,7 +86,10 @@ public class JUnitHeader extends BaseWebDriverTest
     @Test
     public void startSystemMaintenance()
     {
-        super.startSystemMaintenance();
+        if (_extraSetup)
+        {
+            super.startSystemMaintenance();
+        }
     }
 
     @AfterClass

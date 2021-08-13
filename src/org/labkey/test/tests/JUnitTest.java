@@ -168,8 +168,8 @@ public class JUnitTest extends TestSuite
                     if (testCategories.contains(suite))
                         return true;
                 }
-                return false;
-            }, categories.contains("smoke"));
+                return testCategories.contains("smoke"); // Always run smoke tests
+            }, false);
         }
         catch (Throwable t)
         {
@@ -315,6 +315,7 @@ public class JUnitTest extends TestSuite
                     }
                     if (!addedHeader && testsuite.countTestCases() > 0)
                     {
+                        JUnitHeader.enableExtraSetup(!skipInitialUserChecks);
                         remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
                         addedHeader = true;
                     }
