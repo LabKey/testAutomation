@@ -17,6 +17,7 @@ package org.labkey.test.components;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.labkey.test.Locator;
+import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -218,18 +219,25 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return construct(buildLocator().findWhenNeeded(context).withTimeout(timeout));
         }
 
+        public C refindWhenNeeded(S context)
+        {
+            _context = context;
+            RefindingWebElement componentElement = buildLocator().refindWhenNeeded(context).withTimeout(timeout);
+            C component = construct(componentElement);
+            if (component instanceof Component)
+            {
+                componentElement.withRefindListener(el -> ((Component<?>) component).clearElementCache());
+            }
+            return component;
+        }
+
         /**
          * @deprecated Use {@link #findOptional(SearchContext)}
          */
         @Deprecated
         public C findOrNull(S context)
         {
-            _context = context;
-            WebElement elementOrNull = buildLocator().findElementOrNull(context);
-            if (elementOrNull == null)
-                return null;
-            else
-                return construct(elementOrNull);
+            return findOptional(context).orElse(null);
         }
 
         public Optional<C> findOptional(S context)
