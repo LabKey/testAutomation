@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -1395,36 +1394,9 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     private Sheet exportGridVerifyRowCountAndHeader(int numRows, Set<String> expectedHeaders)
     {
-        DataRegionTable list;
-        DataRegionExportHelper exportHelper;
-        File exportedFile;
-        Workbook workbook;
-        Sheet sheet;
-
-        log("Export the grid to excel.");
-        list = new DataRegionTable("Material", this.getDriver());
-        exportHelper = new DataRegionExportHelper(list);
-        exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
-
-        try
-        {
-            workbook = ExcelHelper.create(exportedFile);
-            sheet = workbook.getSheetAt(0);
-
-            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), numRows, sheet.getLastRowNum());
-            if (expectedHeaders != null)
-            {
-                Set<String> actualHeaders = new HashSet<>(ExcelHelper.getRowData(sheet, 0));
-                assertEquals("Column headers not as expected", expectedHeaders, actualHeaders);
-            }
-
-            return sheet;
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-
+        DataRegionTable list = new DataRegionTable("Material", this.getDriver());
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(list);
+        return exportHelper.exportXLSAndVerifyRowCountAndHeader(numRows, expectedHeaders);
     }
 
     private void exportGridWithAttachment(int numOfRows, Set<String> expectedHeaders, int exportColumn, String... expectedFilePaths)

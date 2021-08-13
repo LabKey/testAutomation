@@ -15,12 +15,19 @@
  */
 package org.labkey.test.util;
 
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
+
+import static org.junit.Assert.assertEquals;
 
 public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 {
@@ -83,6 +90,29 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         getWrapper().switchToMainWindow();
 
         return scriptText.toString();
+    }
+
+    public Sheet exportXLSAndVerifyRowCountAndHeader(int numRows, Set<String> expectedHeaders)
+    {
+        try
+        {
+            File exportedFile = exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
+            Workbook workbook = ExcelHelper.create(exportedFile);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), numRows, sheet.getLastRowNum());
+            if (expectedHeaders != null)
+            {
+                Set<String> actualHeaders = new HashSet<>(ExcelHelper.getRowData(sheet, 0));
+                assertEquals("Column headers not as expected", expectedHeaders, actualHeaders);
+            }
+
+            return sheet;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public AbstractDataRegionExportOrSignHelper expandExportPanel()

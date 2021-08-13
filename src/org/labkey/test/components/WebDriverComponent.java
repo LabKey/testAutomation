@@ -65,6 +65,11 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             return super.findWhenNeeded(getDriver());
         }
 
+        public C refindWhenNeeded()
+        {
+            return super.refindWhenNeeded(getDriver());
+        }
+
         public C find()
         {
             return super.find(getDriver());

@@ -138,8 +138,48 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
 
     }
 
+    public boolean hasUniqueIdAlert()
+    {
+        return elementCache().uniqueIdAlert.isDisplayed();
+    }
+
+    public T clickUniqueIdAlertAddButton()
+    {
+        if (hasUniqueIdAlert())
+            elementCache().uniqueIdAlertAddButton.click();
+        else
+            throw new NotFoundException("Unique Id alert is not displayed.");
+
+        return getThis();
+    }
+
+    public boolean hasUniqueIdMsg()
+    {
+        expandPropertiesPanel();
+        return elementCache().uniqueIdMsg.isDisplayed();
+    }
+
+    public boolean hasUniqueIdCheckIcon()
+    {
+        expandPropertiesPanel();
+        return hasUniqueIdMsg() && elementCache().uniqueIdMsgCheckIcon.isDisplayed();
+    }
+
+    public String getUniqueIdMsg()
+    {
+        expandPropertiesPanel();
+        return elementCache().uniqueIdMsg.getText();
+    }
+
     protected class ElementCache extends EntityTypeDesigner<T>.ElementCache
     {
+        protected final WebElement uniqueIdAlert = Locator.tagWithClassContaining("div","uniqueid-alert").refindWhenNeeded(this);
+        protected final WebElement uniqueIdAlertAddButton = Locator.tagWithClassContaining("div","uniqueid-alert")
+                .append(Locator.tag("button")).refindWhenNeeded(this);
+        protected final WebElement uniqueIdMsg = Locator.tagWithClass("div","uniqueid-msg").refindWhenNeeded(this);
+        protected final WebElement uniqueIdMsgCheckIcon = Locator.tagWithClass("div","uniqueid-msg")
+                .append(Locator.tagWithClassContaining("i", "domain-panel-status-icon-green")).refindWhenNeeded(this);
+
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
 
         public List<Input> parentAliases()
