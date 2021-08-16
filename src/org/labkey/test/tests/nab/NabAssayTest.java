@@ -45,6 +45,8 @@ import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -765,21 +767,20 @@ public class NabAssayTest extends AbstractAssayTest
         assertFalse(nabData.contains("0.043"));    // 4PL AUC/PosAUC
 
         log("Verify different graph sizes");
-        Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
         // Defaults to Small sized graphs
-        Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
+        Number graphHeight = waitForNabGraph().getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Default)", 300, graphHeight);
 
         assayHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Large");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+        graphHeight = waitForNabGraph().getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Large)", 600, graphHeight);
 
         assayHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Medium");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        graphHeight = waitForNabGraph().getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
 
         assayHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Small");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        graphHeight = waitForNabGraph().getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisitDate, "B");
@@ -801,6 +802,12 @@ public class NabAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("ptid + visit + specimenid"));
         clickAndWait(DataRegionTable.detailsLinkLocator());
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
+    }
+
+    private WebElement waitForNabGraph()
+    {
+        return shortWait().until(ExpectedConditions
+                .visibilityOfElementLocated(Locator.tagWithAttribute("img", "alt", "Neutralization Graph")));
     }
 
     private static final List<String> expectedRow11 = Arrays.asList("ptid + visit", "Specimen 5", "Specimen 5", "1", "12",

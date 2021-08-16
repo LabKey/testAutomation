@@ -60,7 +60,7 @@ public class LoggedOutDialog extends ModalDialog
         getWrapper().assertElementPresent(Locator.tagWithName("form", "login"));
         getWrapper().setFormElement(Locator.name("email"), PasswordUtil.getUsername());
         getWrapper().setFormElement(Locator.name("password"), PasswordUtil.getPassword());
-        getWrapper().clickButton("Sign In", 0);
+        getWrapper().clickButton("Sign In");
 
         var returnUrl = getWrapper().getCurrentRelativeURL();
         assertThat("Signing back in did not take us back to the expected page.", returnUrl, startsWith(expectedURL));

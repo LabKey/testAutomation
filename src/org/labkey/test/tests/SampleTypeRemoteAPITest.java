@@ -125,9 +125,8 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         // create another with a lookup to it
         TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "expFileSampleLookups", getCurrentContainerPath())
                 .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("strLookup", FieldDefinition.ColumnType.String)    // type of a lookup field is what it points to
-                                .setLookup("exp", "Files", lookupContainer)
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("strLookup", new FieldDefinition.LookupInfo(lookupContainer, "exp", "Files"))
                 ));
         lookupDgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         lookupDgen.addCustomRow(Map.of("name", "B"));

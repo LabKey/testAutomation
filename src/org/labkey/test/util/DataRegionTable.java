@@ -37,10 +37,10 @@ import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
+import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -194,7 +194,6 @@ public class DataRegionTable extends DataRegion
     public static class DataRegionFinder extends WebDriverComponentFinder<DataRegionTable, DataRegionFinder>
     {
         private Locator _loc = Locators.dataRegion();
-        private boolean _lazy = false;
 
         public DataRegionFinder(WebDriver driver)
         {
@@ -209,20 +208,6 @@ public class DataRegionTable extends DataRegion
         }
 
         @Override
-        public DataRegionTable findWhenNeeded(SearchContext context)
-        {
-            try
-            {
-                _lazy = true;
-                return super.findWhenNeeded(context);
-            }
-            finally
-            {
-                _lazy = false;
-            }
-        }
-
-        @Override
         protected Locator locator()
         {
             return _loc;
@@ -231,12 +216,19 @@ public class DataRegionTable extends DataRegion
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            if (buildLocator() != null && getContext() != null) // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+            boolean lazy = el instanceof LazyWebElement;
+            if (buildLocator() != null && getContext() != null // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+                    && ! (el instanceof RefindingWebElement)) // 'RefindingWebElement' prohibits nesting
+            {
+                // Numerous tests expect to be able to reuse 'DataRegionTable' instances between page loads
                 el = new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout());
+            }
             DataRegionTable constructed = new DataRegionTable(el, driver);
             constructed.setUpdateTimeout(getTimeout());
-            if (!_lazy)
+            if (!lazy)
+            {
                 constructed.elementCache();
+            }
             return constructed;
         }
     }

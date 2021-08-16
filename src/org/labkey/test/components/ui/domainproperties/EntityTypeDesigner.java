@@ -83,6 +83,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     }
     public String getNameExpression()
     {
+        expandPropertiesPanel();
         return elementCache().nameExpressionInput.get();
     }
 
@@ -95,6 +96,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public String getAutoLinkDataToStudy()
     {
+        expandPropertiesPanel();
         return elementCache().autoLinkDataToStudy.toString();
     }
 
@@ -107,6 +109,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public String getDescription()
     {
+        expandPropertiesPanel();
         return elementCache().descriptionInput.get();
     }
 

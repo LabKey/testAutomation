@@ -33,6 +33,12 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return new SearchingReactSelectFinder(driver);
     }
 
+    @Override
+    protected FilteringReactSelect getThis()
+    {
+        return this;
+    }
+
     /* types the value into the input as a filter,
      * then clicks the option containing that value, and
      * waits for that value to show in a selectValueLabel (which is usually how a single-select shows)*/
@@ -50,7 +56,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         var elementToClick = ReactSelect.Locators.options.containing(optionText);
         var elementToWaitFor = getValueLabelLocator().containing(selectedOptionLabel);
 
-        setFilter(value);
+        List<WebElement> options = setFilter(value);
 
         WebElement optionToClick = null;
         int tryCount = 0;
@@ -67,34 +73,34 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
                 {
                     close();
                     open();
-                    setFilter(value);
+                    options = setFilter(value);
                 }
                 else
                 {
-                    List<String> optionsTexts = _wrapper.getTexts(elementCache().getOptions());
-                    throw new RuntimeException("Failed to find option '" + elementToClick.toString() + "' element. Found:" + optionsTexts.toString(), nse);
+                    List<String> optionsTexts = getWrapper().getTexts(options);
+                    throw new NoSuchElementException("Failed to find option '" + elementToClick + "' element. Found:" + optionsTexts.toString(), nse);
                 }
             }
         }
 
         try
         {
-            _wrapper.scrollIntoView(optionToClick);
-            _wrapper.shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
+            getWrapper().scrollIntoView(optionToClick);
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
             optionToClick.click();
         }
         catch (StaleElementReferenceException sere)
         {
-            log("Expected option was found, but disappeared. Available options are:" + _wrapper.getTexts(elementCache().getOptions()));
+            log("Expected option was found, but disappeared. Available options are:" + getWrapper().getTexts(elementCache().getOptions()));
             throw sere;
         }
 
-        if (!_wrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
+        if (!WebDriverWrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
         {
-            _wrapper.fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
+            getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
 
-        _wrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
+        WebDriverWrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
                 () -> "Expected selection [" + elementToWaitFor.getLoggableDescription() + "] was not found. Selected value(s) are:" + getSelections(),
                 WAIT_FOR_JAVASCRIPT);
 
@@ -129,9 +135,9 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
                     Locators.options.containing(value));
 
             log("clicking item with value [" +value+"]");
-            _wrapper.scrollIntoView(elemToClick);
+            getWrapper().scrollIntoView(elemToClick);
 
-            _wrapper.waitFor(()-> {
+            WebDriverWrapper.waitFor(()-> {
                 try
                 {
                     if (isExpanded())
@@ -155,11 +161,11 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return this;
     }
 
-    public List<WebElement> setFilter(String value)
+    private List<WebElement> setFilter(String value)
     {
         elementCache().input.sendKeys(value);
         long filterStart = System.currentTimeMillis();
-        getWrapper().waitFor(()-> {
+        WebDriverWrapper.waitFor(()-> {
             List<WebElement> options = elementCache().getOptions();
             return options.size() > 0 &&
                     !isLoading() || options.stream().anyMatch((a)-> a.getText().contains(value));

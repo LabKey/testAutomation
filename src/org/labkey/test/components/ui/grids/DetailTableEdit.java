@@ -10,11 +10,13 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -213,6 +215,41 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return setTextField(fieldCaption, Integer.toString(value));
     }
 
+    public FileUploadField getFileField(String fieldCaption)
+    {
+        return elementCache()
+                .fileField(fieldCaption)
+                .timeout(4000)
+                .find(getComponentElement());
+    }
+
+    public DetailTableEdit setFileField(String fieldCaption, File file)
+    {
+        getFileField(fieldCaption)
+                .setFile(file);
+
+        return this;
+    }
+
+    public DetailTableEdit removeFileField(String fieldCaption)
+    {
+        return removeFileField(fieldCaption, "file");
+    }
+
+    public DetailTableEdit removeFileField(String fieldCaption, String fileNoun)
+    {
+        getFileField(fieldCaption)
+                .removeFile(fileNoun);
+
+        return this;
+    }
+
+    public boolean isFileFieldBlank(String fieldCaption)
+    {
+        return !getFileField(fieldCaption)
+                .hasAttachedFile();
+    }
+
     /**
      * Get the value of an select field. This could be one or many values, because of this the result is returned as a list.
      *
@@ -353,6 +390,13 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         {
             return Locator.tagWithAttribute("td", "data-caption", caption);
         }
+
+        public FileUploadField.FileUploadFieldFinder fileField(String caption)
+        {
+            return new FileUploadField.FileUploadFieldFinder(getDriver())
+                    .withLabel(caption);
+        }
+
         public Locator validationMsg = Locator.tagWithClass("span", "validation-message");
 
         public WebElement saveButton = Locator.tagWithAttribute("button", "type", "submit")

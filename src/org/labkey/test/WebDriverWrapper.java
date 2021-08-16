@@ -322,6 +322,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "application/xml," +
                                     "application/json" +
                                     "image/png," +
+                                    "image/jpeg," +
                                     "image/tiff," +
                                     "text/html," +
                                     "text/plain," +
@@ -1871,13 +1872,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
     private void waitForPageToLoad(WebElement toBeStale, int millis)
     {
         _testTimeout = true;
-        new WebDriverWait(getDriver(), millis / 1000)
-                .withMessage("waiting for browser to navigate")
-                .until(ExpectedConditions.stalenessOf(toBeStale));
+        try
+        {
+            new WebDriverWait(getDriver(), millis / 1000)
+                    .withMessage("waiting for browser to navigate")
+                    .until(ExpectedConditions.stalenessOf(toBeStale));
+        }
+        catch (NullPointerException ignore)
+        {
+            // Staleness check sometimes throws an NPE if the element goes stale too quickly. Carry on.
+        }
+
         // WebDriver usually does this automatically, but not always.
         new WebDriverWait(getDriver(), millis / 1000)
                 .withMessage("waiting for document to be ready")
-                .until(wd -> executeScript("return document.readyState;").equals("complete"));
+                .until(wd -> "complete".equals(executeScript("return document.readyState;")));
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
