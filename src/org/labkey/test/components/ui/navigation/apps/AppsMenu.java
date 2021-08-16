@@ -2,8 +2,8 @@ package org.labkey.test.components.ui.navigation.apps;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.BaseBootstrapMenu;
-import org.openqa.selenium.NoSuchElementException;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -16,7 +16,7 @@ public class AppsMenu extends BaseBootstrapMenu
 
     protected AppsMenu(WebElement element, WebDriver driver)
     {
-        super(driver, element);
+        super(element, driver);
     }
 
     /**
@@ -54,20 +54,15 @@ public class AppsMenu extends BaseBootstrapMenu
     @Override
     protected Locator getToggleLocator()
     {
-        // the toggle appears differently in-app (LKSM, Biologics) than it does in LKS.
-        return Locator.XPathLocator.union(
-                Locator.tagWithAttribute("button", "id", "product-navigation-button"),  // lksm/bio
-                Locator.tagWithAttribute("a", "data-toggle", "dropdown"));              // lks
+        return BootstrapMenu.Locators.dropdownToggle();
     }
 
 
     public static class AppsMenuFinder extends WebDriverComponent.WebDriverComponentFinder<AppsMenu, AppsMenuFinder>
     {
         private Locator _locator = Locator.XPathLocator.union(
-                Locator.tagWithClass("div", "navbar-item-product-navigation")   //lksm/bio
-                .child(Locator.tagWithClass("div", "dropdown"))
-                .withChild(Locator.id("product-navigation-button")),
-                Locator.id("headerProductDropdown"));                                       //lks
+                Locator.id("product-navigation-button").parent(),   //lksm/bio
+                Locator.id("headerProductDropdown"));               //lks
 
         public AppsMenuFinder(WebDriver driver)
         {

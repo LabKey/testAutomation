@@ -88,8 +88,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         final WebElement fileSize = Locator.byClass("attachment-card__size").findWhenNeeded(this);
         BootstrapMenu menu = BootstrapMenu.finder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "attachment-card__menu"))
-                .findWhenNeeded(this)
-                .setToggleLocator(Locator.byClass("dropdown-toggle"));
+                .findWhenNeeded(this);
     }
 
 

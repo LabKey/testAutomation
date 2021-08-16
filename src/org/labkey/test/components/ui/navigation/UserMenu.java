@@ -1,8 +1,8 @@
 package org.labkey.test.components.ui.navigation;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -38,12 +38,6 @@ public abstract class UserMenu extends BootstrapMenu
     {
         clickSubMenu(true, "Sign Out");
         return new LabKeyPage<>(getDriver());
-    }
-
-    @Override
-    protected Locator getToggleLocator()
-    {
-        return appUserMenu();
     }
 
     /**

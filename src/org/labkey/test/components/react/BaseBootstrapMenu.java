@@ -1,4 +1,4 @@
-package org.labkey.test.components.html;
+package org.labkey.test.components.react;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -8,14 +8,17 @@ import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+/**
+ * Wraps basic open/close functionality of 'Dropdown' and 'DropdownButton' components from '@types/react-bootstrap'
+ */
 public abstract class BaseBootstrapMenu extends WebDriverComponent<BaseBootstrapMenu.ElementCache>
 {
-    protected final WebDriver _driver;
-    protected final WebElement _componentElement;
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
     private int _expandRetryCount = 1;
 
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
-    public BaseBootstrapMenu(WebDriver driver, WebElement componentElement)
+    public BaseBootstrapMenu(WebElement componentElement, WebDriver driver)
     {
         _componentElement = componentElement;
         _driver = driver;
@@ -82,7 +85,7 @@ public abstract class BaseBootstrapMenu extends WebDriverComponent<BaseBootstrap
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         public final WebElement toggleAnchor = getToggleLocator().findWhenNeeded(getComponentElement());
 
