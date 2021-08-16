@@ -37,10 +37,10 @@ import org.labkey.test.components.study.ViewPreferencesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
+import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementDecorator;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -76,6 +76,7 @@ public class DataRegionTable extends DataRegion
     private PagingWidget _pagingWidget;
     private final List<String> _columnLabels = new ArrayList<>();
     private final List<String> _columnNames = new ArrayList<>();
+    private final Map<String, Integer> _columnIndexMap = new CaseInsensitiveHashMap<>();
     private final Map<String, Integer> _mapRows = new HashMap<>();
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
@@ -119,6 +120,7 @@ public class DataRegionTable extends DataRegion
         _exportHelper = null;
         _columnLabels.clear();
         _columnNames.clear();
+        _columnIndexMap.clear();
         _mapRows.clear();
         _dataCache.clear();
     }
@@ -192,7 +194,6 @@ public class DataRegionTable extends DataRegion
     public static class DataRegionFinder extends WebDriverComponentFinder<DataRegionTable, DataRegionFinder>
     {
         private Locator _loc = Locators.dataRegion();
-        private boolean _lazy = false;
 
         public DataRegionFinder(WebDriver driver)
         {
@@ -207,20 +208,6 @@ public class DataRegionTable extends DataRegion
         }
 
         @Override
-        public DataRegionTable findWhenNeeded(SearchContext context)
-        {
-            try
-            {
-                _lazy = true;
-                return super.findWhenNeeded(context);
-            }
-            finally
-            {
-                _lazy = false;
-            }
-        }
-
-        @Override
         protected Locator locator()
         {
             return _loc;
@@ -229,12 +216,19 @@ public class DataRegionTable extends DataRegion
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            if (buildLocator() != null && getContext() != null) // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+            boolean lazy = el instanceof LazyWebElement;
+            if (buildLocator() != null && getContext() != null // Prevent NPE after using `DataRegionFinder.locatedBy(..)`
+                    && ! (el instanceof RefindingWebElement)) // 'RefindingWebElement' prohibits nesting
+            {
+                // Numerous tests expect to be able to reuse 'DataRegionTable' instances between page loads
                 el = new RefindingWebElement(el, buildLocator(), getContext()).withTimeout(getTimeout());
+            }
             DataRegionTable constructed = new DataRegionTable(el, driver);
             constructed.setUpdateTimeout(getTimeout());
-            if (!_lazy)
+            if (!lazy)
+            {
                 constructed.elementCache();
+            }
             return constructed;
         }
     }
@@ -443,20 +437,40 @@ public class DataRegionTable extends DataRegion
      */
     public int getColumnIndex(String name)
     {
-        int i = getColumnNames().indexOf(name);
+        if (_columnIndexMap.isEmpty())
+        {
+            final var columnNames = getColumnNames();
+            for (int j = 0; j < columnNames.size(); j++)
+            {
+                _columnIndexMap.put(columnNames.get(j), j);
+            }
+        }
+        int i = _columnIndexMap.getOrDefault(name, -1);
 
+        // Try removing spaces from column name
         if (i < 0)
-            i = getColumnNames().indexOf(name.replaceAll(" ", ""));
+        {
+            i = _columnIndexMap.getOrDefault(name.replace(" ", ""), -1);
+            if (i >= 0)
+            {
+                TestLogger.warn(String.format("Unnecessary space in requested column name. " +
+                        "Requested: \"%s\" Found: \"%s\"", name, getColumnNames().get(i)));
+            }
+        }
 
+        // Try matching column label
         if (i < 0)
         {
             List<String> columnLabelsWithoutSpaces = new ArrayList<>(getColumnLabels().size());
-            getColumnLabels().stream().forEachOrdered(s -> columnLabelsWithoutSpaces.add(s.replaceAll(" ", "")));
-            i = columnLabelsWithoutSpaces.indexOf(name.replaceAll(" ", ""));
+            getColumnLabels().stream().forEach(s -> columnLabelsWithoutSpaces.add(s.replace(" ", "")));
+            i = columnLabelsWithoutSpaces.indexOf(name.replace(" ", ""));
+            if (i >= 0)
+            {
+                TestLogger.warn(String.format("Please reference columns by name instead of label. " +
+                        "Requested column with label: \"%s\" Found column with name: \"%s\"", name, getColumnNames().get(i)));
+            }
         }
 
-        if (i < 0)
-            TestLogger.log("Column '" + name + "' not found");
         return i;
     }
 

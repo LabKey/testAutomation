@@ -23,7 +23,12 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog(WebDriver driver)
     {
-        this(new ModalDialogFinder(driver).withTitle(" selected from "));
+        this(driver, " selected from ");
+    }
+
+    public EntityBulkUpdateDialog(WebDriver driver, String title)
+    {
+        this(new ModalDialogFinder(driver).withTitle(title));
     }
 
     private EntityBulkUpdateDialog(ModalDialogFinder finder)
