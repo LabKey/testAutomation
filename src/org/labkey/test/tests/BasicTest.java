@@ -16,9 +16,7 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -31,10 +29,9 @@ import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.categories.Smoke;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
-import org.labkey.test.pages.core.admin.CustomizeSitePage;
-import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -47,74 +44,23 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class})
+/**
+ * Short test to verify installed modules are well formed
+ */
+@Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class, Smoke.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class BasicTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "BasicVerifyProject";
-    private static final String FOLDER_NAME = "childfolder";
-    private static final String FOLDER_RENAME = "renamedfolder";
-
-    public BasicTest()
-    {
-        super();
-        _containerHelper = new UIContainerHelper(this);
-    }
-
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return null;
     }
 
     @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    @Test
-    public void testSystemSettings()
-    {
-        Assume.assumeFalse("Testing system settings require site admin.", TestProperties.isPrimaryUserAppAdmin());
-
-        // Disable scheduled system maintenance
-        setSystemMaintenance(false);
-
-        goToAdminConsole().goToServerInformationSection();
-        WebElement modeElement = Locator.tagWithText("td", "Mode").append("/../td[2]").findElement(getDriver());
-        String mode = modeElement.getText();
-        if (TestProperties.isDevModeEnabled())
-            checker().verifyEquals("Wrong server mode",
-                    TestProperties.isDevModeEnabled() ? "Development" : "Production", mode); // Verify whether we're running in dev mode
-
-        // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
-        if (TestProperties.isDevModeEnabled() && !TestProperties.isPrimaryUserAppAdmin())
-        {
-            goToAdminConsole().clickRunningThreads();
-            assertTextNotPresent("SystemMaintenance");
-        }
-    }
-
-    @Test
-    public void testFolderAndRole()
-    {
-        _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"FileContent"});
-        _permissionsHelper.createPermissionsGroup("testers");
-        _ext4Helper.clickTabContainingText("Permissions");
-        _permissionsHelper.assertPermissionSetting("testers", "No Permissions");
-        _permissionsHelper.setPermissions("testers", "Editor");
-
-        clickButton("Save and Finish");
-        log("Test folder aliasing");
-        pushLocation();
-        _containerHelper.renameFolder(PROJECT_NAME, FOLDER_NAME, FOLDER_RENAME, true);
-        popLocation();
-        assertTextPresent(FOLDER_RENAME);
-
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.assertPermissionSetting("testers", "Editor");
     }
 
     @Test
@@ -168,19 +114,9 @@ public class BasicTest extends BaseWebDriverTest
         assertTextNotPresent("WARNING:");
     }
 
-    @Test @Ignore
-    public void testRedirects()
-    {
-        goToHome();
-        final String expectedTitle = getDriver().getTitle();
-
-        beginAt("/login/initialUser.view");
-        Assert.assertEquals("Initial user action did not redirect properly when logged in", expectedTitle, getDriver().getTitle());
-    }
-
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("core");
+        return null;
     }
 }

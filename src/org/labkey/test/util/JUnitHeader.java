@@ -19,29 +19,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
-
-import java.util.List;
+import org.labkey.test.tests.JUnitTest;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
-public class JUnitHeader extends BaseWebDriverTest
+public class JUnitHeader extends JUnitTest.BaseJUnitTestWrapper
 {
-    // Used by 'JUnitFooter' to check for leaks from server-side tests
-    static Long startTime = null;
-
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return null;
-    }
-
-    @Override
-    protected String getProjectName()
-    {
-        return null;
-    }
-
     @BeforeClass
     public static void beforeClass()
     {
@@ -51,15 +35,21 @@ public class JUnitHeader extends BaseWebDriverTest
     @Test
     public void configureR()
     {
-        RReportHelper reportHelper = new RReportHelper(this);
-        reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+        if (extraSetup)
+        {
+            RReportHelper reportHelper = new RReportHelper(this);
+            reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+        }
     }
 
     @Test
     public void configurePipeline()
     {
-        PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-        pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+        if (extraSetup)
+        {
+            PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+            pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+        }
     }
 
     @Test
@@ -73,7 +63,10 @@ public class JUnitHeader extends BaseWebDriverTest
     @Test
     public void startSystemMaintenance()
     {
-        super.startSystemMaintenance();
+        if (extraSetup)
+        {
+            super.startSystemMaintenance();
+        }
     }
 
     @AfterClass
@@ -81,16 +74,5 @@ public class JUnitHeader extends BaseWebDriverTest
     {
         startTime = System.currentTimeMillis();
         logToServer("=== Starting Server-side JUnit Tests ===");
-    }
-
-    @Override
-    protected void checkLinks()
-    {
-        // skip
-    }
-
-    @Override public BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
     }
 }
