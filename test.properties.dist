@@ -1,0 +1,121 @@
+# -----------------------------
+# LabKey Selenium Test Properties
+# -----------------------------
+#
+# These properties are used to control runtime behavior of the Selenium tests.
+#
+# You can override the values in this file on the command line with Gradle properties
+#   ex: './gradlew uiTests -Psuite=DRT'
+#
+# You can override the values in this file on TeamCity with system properties
+#   ex: 'system.suite'='DRT'
+#
+#  see: https://www.jetbrains.com/help/teamcity/configuring-build-parameters.html
+#  see: https://www.jetbrains.com/help/teamcity/running-custom-build.html#Parameters
+#
+# Note: When running tests on TeamCity, not all system properties will be passed though to the tests.
+# Only properties defined in this file and properties starting with 'webtest.' or 'webdriver.' will be propagated
+# to the test runner by Gradle.
+
+
+# -----------------------------
+# Test suite construction properties
+# -----------------------------
+# Properties used to specify which tests to run and where to find them
+suite=
+test=
+addToSuite=
+removeFromSuite=
+shuffleTests=false
+##
+test.packages=org.labkey.test
+extra.test.packages=
+
+# -----------------------------
+# Test runner properties
+# -----------------------------
+haltOnError=true
+cleanOnly=false
+clean=false
+webtest.timeout.multiplier=1.0
+close.on.fail=false
+failure.output.dir=build/modules/test/test/logs
+test.credentials.file=
+
+# -----------------------------
+# WebDriver properties
+# -----------------------------
+selenium.browser=firefox
+webdriver.gecko.driver=
+webdriver.chrome.driver=
+selenium.firefox.binary=
+selenium.reuseWebDriver=true
+webtest.webdriver.logging=false
+webtest.webdriver.headless=false
+
+# -----------------------------
+# Test debug properties
+# -----------------------------
+## When running from the command line, this will cause the
+#debugSuspendSelenium=n
+#selenium.debug.port=5005
+
+# -----------------------------
+# Server properties
+# -----------------------------
+## These properties define how we will connect to the server under test
+labkey.port=8080
+labkey.server=http://localhost
+labkey.contextpath=/labkey
+
+# -----------------------------
+# Remote server properties
+# -----------------------------
+## These properties allow tests to alter their behavior based on the type of server being tested
+#webtest.without.test.modules=
+#webtest.primary.app.admin=
+#webtest.server.remote=
+#webtest.server.trial=
+
+# -----------------------------
+# Server configuration properties
+# -----------------------------
+# These define certain Tomcat startup properties. Mostly only used by TeamCity
+disableAssertions=false
+devMode=true
+
+# -----------------------------
+# Test suite construction properties
+# -----------------------------
+## Properties used to specify which tests to run and where to find them
+suite=
+test=
+addToSuite=
+removeFromSuite=
+shuffleTests=false
+test.packages=org.labkey.test
+extra.test.packages=
+## 'dumpTsv' defines a file name. If it is set, a list of all Selenium tests will be written to the specified file.
+dumpTsv=
+
+# -----------------------------
+# Runtime test properties - additional checks
+# -----------------------------
+linkCheck=false
+injectCheck=false
+crawlerTimeout=120
+memCheck=false
+scriptCheck=true
+queryCheck=false
+viewCheck=true
+
+# -----------------------------
+# Runtime server configuration properties
+# -----------------------------
+additional.pipeline.tools=
+use.cloud.pipeline=false
+cloud.pipeline.bucket=
+webtest.ignoreMissingModules=false
+webtest.debug.server.packages=
+# Enable/Disable experimental features
+#webtest.experimental.legacy-lineage=false
