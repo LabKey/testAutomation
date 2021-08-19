@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.tests.JUnitTest;
 
+import static org.labkey.test.TestProperties.isTestCleanupSkipped;
+
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class JUnitFooter extends JUnitTest.BaseJUnitTestWrapper
 {
@@ -30,7 +32,7 @@ public class JUnitFooter extends JUnitTest.BaseJUnitTestWrapper
         log("** This should follow JUnitTest.");
         log("** It will check for memory leaks and clean up the 'Shared/_junit' project.");
 
-        if (_containerHelper.doesContainerExist("Shared/_junit"))
+        if (!isTestCleanupSkipped() && _containerHelper.doesContainerExist("Shared/_junit"))
             _containerHelper.deleteFolder("Shared", "_junit");
 
         if (extraSetup)
