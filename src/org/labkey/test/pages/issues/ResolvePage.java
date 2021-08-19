@@ -65,7 +65,7 @@ public class ResolvePage extends BaseUpdatePage<ResolvePage.ElementCache>
     }
 
     @Override
-    protected ElementCache newElementCache()
+    public ElementCache newElementCache()
     {
         return new ElementCache();
     }

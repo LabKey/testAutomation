@@ -23,34 +23,48 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Issues;
-import org.labkey.test.components.issues.IssueListDefDataRegion;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.pages.issues.IssuesAdminPage;
+import org.labkey.test.components.issues.IssueListDefDataRegion;
+import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class IssuesAdminTest extends BaseWebDriverTest
 {
-    private static final String USER = "admin_user@issuesadmin.test";
+    private static final String ADMIN_USER = "admin_user@issuesadmin.test";
+    private static final String TEST_USER = "testuser_issuetest@issues.test";
     private static final String DEFAULT_NAME = "issues";
-    private static final String LIST_NAME = "otherIssues";
+    private static final String TEST_GROUP = "testers";
+    private static final String ISSUE_LIST_NAME = "otherIssues";
     private static final String PROJECT2 = "IssuesAdminWithoutModule";
     private static final String PROJECT3 = "CustomIssueName Project";
 
     private IssuesHelper _issuesHelper = new IssuesHelper(this);
     private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        IssuesAdminTest init = (IssuesAdminTest) getCurrentTest();
+        init.doSetup();
+    }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -58,23 +72,22 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
         _containerHelper.deleteProject(PROJECT2, afterTest);
         _containerHelper.deleteProject(PROJECT3, afterTest);
-        _userHelper.deleteUsers(afterTest, USER);
-    }
-
-    @BeforeClass
-    public static void setupProject()
-    {
-        IssuesAdminTest init = (IssuesAdminTest) getCurrentTest();
-
-        init.doSetup();
+        _userHelper.deleteUsers(afterTest, ADMIN_USER, TEST_USER);
     }
 
     private void doSetup()
     {
-        _userHelper.createUser(USER);
         _containerHelper.createProject(getProjectName(), null);
-        _issuesHelper.createNewIssuesList(LIST_NAME, _containerHelper);
-        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), LIST_NAME);
+        _userHelper.createUser(ADMIN_USER);
+        _userHelper.createUser(TEST_USER);
+        _permissionsHelper.createPermissionsGroup(TEST_GROUP);
+        _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
+        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+        _permissionsHelper.addUserToProjGroup(getUsername(), getProjectName(), TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(TEST_USER, getProjectName(), TEST_GROUP);
+
+        _issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);
         adminPage.setAssignedTo(null); // All Project Users
         adminPage.clickSave();
     }
@@ -84,7 +97,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
     {
         goToProjectHome();
         final String group = "AssignedToGroup";
-        _permissionsHelper.setUserPermissions(USER, "FolderAdmin");
+        _permissionsHelper.setUserPermissions(ADMIN_USER, "FolderAdmin");
         _permissionsHelper.createProjectGroup(group, getProjectName());
         goToModule("Issues");
         OptionSelect assignedTo = new ListPage(getDriver())
@@ -92,11 +105,11 @@ public class IssuesAdminTest extends BaseWebDriverTest
                 .assignedTo();
         assertEquals("", assignedTo.get());
         assertEquals(Collections.singletonList(""), getTexts(assignedTo.getOptions()));
-        _permissionsHelper.addUserToProjGroup(USER, getProjectName(), group);
+        _permissionsHelper.addUserToProjGroup(ADMIN_USER, getProjectName(), group);
         refresh();
         assignedTo = new InsertPage(getDriver()).assignedTo();
         assertEquals("", assignedTo.get());
-        assertEquals(Arrays.asList("", _userHelper.getDisplayNameForEmail(USER)), getTexts(assignedTo.getOptions()));
+        assertEquals(Arrays.asList("", _userHelper.getDisplayNameForEmail(ADMIN_USER)), getTexts(assignedTo.getOptions()));
     }
 
     @Test
@@ -154,19 +167,102 @@ public class IssuesAdminTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.lkButton("New " + defaultSingular));
     }
 
-    // @Test @Ignore //TODO
+    @Test
     public void testProtectedFields() throws Exception
     {
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(ISSUE_LIST_NAME));
+        IssuesAdminPage issuesAdminPage = _issuesHelper.goToAdmin();
+
+        log("Checking for the protected field");
+        DomainFormPanel domainFormPanel = issuesAdminPage.getFieldsPanel();
+        checker().verifyTrue("Title should be disabled", domainFormPanel.getField("Title").isFieldProtected());
+        checker().verifyTrue("NotifyList should be disabled", domainFormPanel.getField("NotifyList").isFieldProtected());
+        checker().verifyTrue("AssignedTo should be disabled", domainFormPanel.getField("AssignedTo").isFieldProtected());
+        checker().verifyTrue("Resolution should be disabled", domainFormPanel.getField("Resolution").isFieldProtected());
     }
 
-    // @Test @Ignore //TODO
+    @Test
     public void testRelatedIssuesComments() throws Exception
     {
+        goToProjectHome();
+        String mainTitle = "Main Issue Title";
+        String relatedIssueTitle = "Related issue Title";
+        clickAndWait(Locator.linkWithText(ISSUE_LIST_NAME));
+
+        DetailsPage detailsPage = _issuesHelper.addIssue(
+                Maps.of("title", mainTitle,
+                        "assignedTo", getCurrentUserName(),
+                        "comment", "Main issue Comment"));
+
+        Map<String, String> relatedIssueData = Maps.of("title", relatedIssueTitle,
+                "assignedTo", getCurrentUserName(),
+                "comment", "Related issue Comment");
+        InsertPage relatedIssuePage = detailsPage.clickCreateRelatedIssue(getProjectName(), ISSUE_LIST_NAME.toLowerCase());
+        for (Map.Entry<String, String> field : relatedIssueData.entrySet())
+            relatedIssuePage.fieldWithName(field.getKey()).set(field.getValue());
+        relatedIssuePage.save();
+
+        detailsPage = new DetailsPage(getDriver());
+        checker().verifyEquals("Incorrect number of related issue rows", 1, detailsPage.getRelatedIssueTable().getDataRowCount());
+        checker().verifyEquals("Incorrect title of related issue", mainTitle, detailsPage.getRelatedIssueTable().getDataAsText(0, "Title"));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(ISSUE_LIST_NAME));
+        clickAndWait(Locator.linkWithText(mainTitle));
+        detailsPage = new DetailsPage(getDriver());
+        checker().verifyEquals("Incorrect number of related issue rows", 1, detailsPage.getRelatedIssueTable().getDataRowCount());
+        checker().verifyEquals("Incorrect title of related issue", relatedIssueTitle, detailsPage.getRelatedIssueTable().getDataAsText(0, "Title"));
+
+        log("Verifying show related comments");
+        detailsPage.clickShowRelatedIssueComment();
+        checker().verifyEquals("Incorrect comment display with show related comments", 2, detailsPage.getComments().size());
+
+        log("Verifying hide related comments");
+        detailsPage.clickHideRelatedIssueComment();
+        checker().verifyEquals("Incorrect comment display with hide related comments", 1, detailsPage.getComments().size());
     }
 
-    // @Test @Ignore //TODO
-    public void testCommentSortDirection() throws Exception
+    @Test
+    public void testCommentSortDirection()
     {
+        log("Creating new Issue Definition list");
+        String title = "Testing comment sort direction";
+
+        goToProjectHome();
+        String issueDefinitionName = "commentSortDirection";
+        _issuesHelper.createNewIssuesList(issueDefinitionName, _containerHelper);
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), issueDefinitionName);
+        adminPage.setCommentSortDirection(IssuesAdminPage.SortDirection.OldestFirst)
+                .setDefaultUser(getCurrentUserName())
+                .clickSave();
+
+        DetailsPage detailsPage = _issuesHelper.addIssue(
+                Maps.of("title", title,
+                        "comment", "First Comment"));
+
+        log("Updating the issue with first comment");
+        detailsPage = detailsPage.clickUpdate()
+                .addComment("Second Comment")
+                .save();
+
+        log("Updating the issue with second comment");
+        detailsPage = detailsPage.clickUpdate()
+                .addComment("Third Comment")
+                .save();
+
+        log("Verifying the first comment");
+        checker().verifyEquals("Incorrect comment order for Oldest first", "First Comment", detailsPage.getComments().get(0).getComment());
+
+        log("Changing the comment direction in admin page");
+        adminPage = IssuesAdminPage.beginAt(this, getProjectName(), issueDefinitionName);
+        adminPage.setCommentSortDirection(IssuesAdminPage.SortDirection.NewestFirst)
+                .clickSave();
+
+        clickAndWait(Locator.linkWithText(title));
+        detailsPage = new DetailsPage(getDriver());
+        checker().verifyEquals("Incorrect comment order for Newest first", "Third Comment",
+                detailsPage.getComments().get(0).getComment());
     }
 
     @Override

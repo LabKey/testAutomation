@@ -46,7 +46,7 @@ public class ClosePage extends BaseUpdatePage<ClosePage.ElementCache>
     }
 
     @Override
-    protected ElementCache newElementCache()
+    public ElementCache newElementCache()
     {
         return new ElementCache();
     }

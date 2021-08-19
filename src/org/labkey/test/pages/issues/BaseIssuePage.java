@@ -117,9 +117,9 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
     }
 
     @Override
-    protected abstract EC newElementCache();
+    public abstract EC newElementCache();
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    public class ElementCache extends LabKeyPage.ElementCache
     {
         protected final Map<String, FormItem> formItems = new CaseInsensitiveHashMap<>();
 
@@ -134,6 +134,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         protected FormItem<String> changedDate = formItemWithLabel("Changed");
         protected FormItem<String> resolvedDate = formItemWithLabel("Resolved");
         protected FormItem<String> closedDate = formItemWithLabel("Closed");
+        private List<IssueComment> issueComments;
 
         private FormItem replaceIfNewer(String nameOrLabel, FormItem candidate)
         {
@@ -177,7 +178,6 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
             return Locator.css(String.format("*[name=%s], *[name=%s]", name, name.toLowerCase()));
         }
 
-        private List<IssueComment> issueComments;
         protected List<IssueComment> getComments()
         {
             if (issueComments == null)
