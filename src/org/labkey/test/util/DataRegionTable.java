@@ -1517,7 +1517,7 @@ public class DataRegionTable extends DataRegion
         private List<WebElement> summaryStatCells;
         private final WebElement toggleHeaderCell = Locator.tag("th").withClasses("labkey-column-header", "labkey-selectors").findWhenNeeded(columnHeaderRow);
         private final WebElement toggleAllOnPage = Locator.input(".toggle").findWhenNeeded(toggleHeaderCell); // tri-state checkbox
-        private SelectorMenu selectionMenu = new SelectorMenu(new BootstrapMenu.BootstrapMenuFinder(getDriver()).findWhenNeeded(columnHeaderRow));
+        private SelectorMenu selectionMenu = new SelectorMenu(toggleHeaderCell);
 
         protected List<WebElement> getDataRows()
         {
@@ -1629,9 +1629,9 @@ public class DataRegionTable extends DataRegion
 
     public class SelectorMenu extends BootstrapMenu
     {
-        private SelectorMenu(BootstrapMenu menu)
+        private SelectorMenu(WebElement menu)
         {
-            super(DataRegionTable.this.getDriver(), menu.getComponentElement());
+            super(DataRegionTable.this.getDriver(), menu);
         }
 
         private void clickSubMenu(String... subMenuLabels)

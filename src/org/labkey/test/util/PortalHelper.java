@@ -83,9 +83,7 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     private void clickTabMenuItem(@LoggedParam String tabText, boolean wait, @LoggedParam String... items)
     {
-        BootstrapMenu tabMenu = new BootstrapMenu(getDriver(),
-                BootstrapMenu.Locators.dropdownMenu()
-                        .withChild(Locator.linkWithText(tabText)).findElement(getDriver()));
+        BootstrapMenu tabMenu = PortalTab.find(tabText, getDriver()).getMenu();
         tabMenu.clickSubMenu(wait,  items);
     }
 
