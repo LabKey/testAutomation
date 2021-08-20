@@ -17,6 +17,7 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
@@ -26,12 +27,10 @@ import java.util.List;
 
 public class BootstrapMenu extends BaseBootstrapMenu
 {
-    private Locator _toggleLocator;
-
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
-        super(driver, componentElement);
+        super(componentElement, driver);
     }
 
     static public BootstrapMenuFinder finder(WebDriver driver)
@@ -112,16 +111,7 @@ public class BootstrapMenu extends BaseBootstrapMenu
     @Override
     protected Locator getToggleLocator()
     {
-        if (_toggleLocator != null)
-            return _toggleLocator;
-        else
-            return Locators.toggleAnchor();
-    }
-
-    public BootstrapMenu setToggleLocator(Locator toggleLocator)
-    {
-        _toggleLocator = toggleLocator;
-        return this;
+        return Locators.dropdownToggle();
     }
 
     @Override
@@ -165,9 +155,9 @@ public class BootstrapMenu extends BaseBootstrapMenu
 
     static public class Locators
     {
-        public static Locator.XPathLocator toggleAnchor()
+        public static Locator.XPathLocator dropdownToggle()
         {
-            return Locator.tagWithAttribute("*", "data-toggle", "dropdown");
+            return Locator.byClass("dropdown-toggle");
         }
 
         public static Locator.XPathLocator menuItem(String text)
@@ -180,32 +170,43 @@ public class BootstrapMenu extends BaseBootstrapMenu
             return Locator.tagWithClass("li", "disabled").childTag("a").withText(text).notHidden();
         }
 
-        public static Locator.XPathLocator bootstrapMenuContainer()
+        public static Locator.XPathLocator dropdownMenu()
         {
-            return Locator.tag("*")
-                    .withPredicate(toggleAnchor()
-                    .followingSibling("ul"));
+            return dropdownMenu(dropdownToggle());
+        }
+
+        private static Locator.XPathLocator dropdownMenu(Locator.XPathLocator toggleLoc)
+        {
+            return Locator.byClass("dropdown")
+                    .withChild(toggleLoc)
+                    .withChild(Locator.tag("ul"));
         }
     }
 
     public static class BootstrapMenuFinder extends WebDriverComponentFinder<BootstrapMenu, BootstrapMenu.BootstrapMenuFinder>
     {
-        private Locator _locator = Locators.bootstrapMenuContainer().withChild(Locators.toggleAnchor());
+        private Locator _locator = Locators.dropdownMenu();
 
         public BootstrapMenuFinder(WebDriver driver)
         {
             super(driver);
         }
 
+        public BootstrapMenuFinder withToggleId(String id)
+        {
+            _locator = Locators.dropdownMenu(Locators.dropdownToggle().withAttribute("id", id));
+            return this;
+        }
+
         public BootstrapMenuFinder withButtonText(String text)
         {
-            _locator = Locators.bootstrapMenuContainer().withChild(Locators.toggleAnchor().withText(text));
+            _locator = Locators.dropdownMenu(Locators.dropdownToggle().withText(text));
             return this;
         }
 
         public BootstrapMenuFinder withButtonTextContaining(String text)
         {
-            _locator = Locators.bootstrapMenuContainer().withChild(Locators.toggleAnchor().containing(text));
+            _locator = Locators.dropdownMenu(Locators.dropdownToggle().containing(text));
             return this;
         }
 

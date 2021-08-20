@@ -5,7 +5,7 @@
 package org.labkey.test.components.ui.navigation;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.html.BaseBootstrapMenu;
+import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.NoSuchElementException;
@@ -25,7 +25,7 @@ public class ProductMenu extends BaseBootstrapMenu
 
     protected ProductMenu(WebElement element, WebDriver driver)
     {
-        super(driver, element);
+        super(element, driver);
     }
 
     public static SimpleWebDriverComponentFinder<ProductMenu> finder(WebDriver driver)

@@ -3,10 +3,13 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.ui.files.FileUploadField;
+import org.labkey.test.components.ui.files.ImageFileViewDialog;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,6 +124,42 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         return tables.get(1);
     }
 
+    public FileUploadField getFileField(String fieldCaption)
+    {
+        return elementCache()
+                .fileField(fieldCaption)
+                .timeout(4000)
+                .find(getComponentElement());
+    }
+
+    public String getFileName(String fieldCaption)
+    {
+        return getFileField(fieldCaption)
+                .getAttachedFileName();
+    }
+
+    public boolean isFileFieldBlank(String fieldCaption)
+    {
+        return !getFileField(fieldCaption)
+                .hasAttachedFile();
+    }
+
+    public File downloadFileField(String fieldCaption)
+    {
+        return getFileField(fieldCaption)
+                .download();
+    }
+
+    public ImageFileViewDialog viewImgFile(String fieldCaption)
+    {
+        return getFileField(fieldCaption).viewImgFile();
+    }
+
+    public File clickNonImgFile(String fieldCaption)
+    {
+        return getFileField(fieldCaption).clickOnNonImgFile();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -143,6 +182,11 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             return new DetailTable.DetailTableFinder(getDriver()).findAll(this);
         }
 
+        public FileUploadField.FileUploadFieldFinder fileField(String caption)
+        {
+            return new FileUploadField.FileUploadFieldFinder(getDriver())
+                    .withLabel(caption);
+        }
     }
 
     public static class DetailDataPanelFinder extends WebDriverComponentFinder<DetailDataPanel, DetailDataPanelFinder>

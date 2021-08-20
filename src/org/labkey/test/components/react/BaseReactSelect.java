@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
@@ -29,12 +28,11 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 
-public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriverComponent<BaseReactSelect.ElementCache>
+public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebDriverComponent<BaseReactSelect<?>.ElementCache>
 {
     final WebElement _componentElement;
     final WebDriver _driver;
-    final WebDriverWrapper _wrapper;
-    private final String LOADING_TEXT = "loading...";
+    private static final String LOADING_TEXT = "loading...";
     protected static final String SELECTOR_CLASS = "select-input-container";
 
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
@@ -42,8 +40,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         // Component needs to be refinding because Select may go stale after loading initial selections
         _componentElement = new RefindingWebElement(Locator.xpath("(.|./div)").withClass(SELECTOR_CLASS), selectOrParent);
         _driver = driver;
-        _wrapper = new WebDriverWrapperImpl(driver);
     }
+
+    protected abstract T getThis();
 
     public boolean isExpanded()
     {
@@ -114,7 +113,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         waitFor(() -> !isLoading(),
                 "Took too long for to become loaded", WAIT_FOR_JAVASCRIPT);
-        return (T) this;
+        return getThis();
     }
 
     public @Nullable String getPlaceholderText()
@@ -148,7 +147,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         scrollIntoView();
         open();
-        _wrapper.setFormElement(elementCache().input, value);
+        getWrapper().setFormElement(elementCache().input, value);
         WebElement foundElement;
         try
         {
@@ -168,7 +167,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     {
         waitFor(() -> getValue().contains(value),
                 "took too long for the ReactSelect value to contain the expected value:[" + value + "]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        return (T) this;
+        return getThis();
     }
 
     protected T waitForInteractive()
@@ -179,7 +178,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         long elapsed = System.currentTimeMillis() - start;
         TestLogger.debug("waited [" + elapsed + "] msec for select to become interactive");
 
-        return (T) this;
+        return getThis();
     }
 
     public boolean isInteractive()
@@ -198,7 +197,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
     public T open()
     {
         if (isExpanded())
-            return (T) this;
+            return getThis();
 
         waitForInteractive();
 
@@ -208,19 +207,19 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         }
         catch (WebDriverException wde) // handle the 'other element would receive the click' situation
         {
-            _wrapper.scrollIntoView(elementCache().input);
-            _wrapper.fireEvent(elementCache().arrow, WebDriverWrapper.SeleniumEvent.click);
+            getWrapper().scrollIntoView(elementCache().input);
+            getWrapper().fireEvent(elementCache().arrow, WebDriverWrapper.SeleniumEvent.click);
         }
 
-        waitFor(this::isExpanded, 4_000);
-        _wrapper.fireEvent(_componentElement, WebDriverWrapper.SeleniumEvent.blur);
-        return (T) this;
+        waitFor(this::isExpanded, "Select didn't expand.", 4_000);
+        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
+        return getThis();
     }
 
     public T close()
     {
         if (!isExpanded())
-            return (T) this;
+            return getThis();
 
         waitForInteractive();
 
@@ -228,7 +227,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         waitForClosed();
 
-        return (T) this;
+        return getThis();
     }
 
     protected void waitForClosed()
@@ -244,7 +243,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             clear.click();
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(clear));
         }
-        return (T) this;
+        return getThis();
     }
 
     public T removeSelection(String value)
@@ -260,7 +259,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         removeBtn.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
 
-        return (T) this;
+        return getThis();
     }
 
     public boolean hasSelection()
@@ -289,10 +288,10 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         var labelLocator = getValueLabelLocator();
 
         // Wait for at least one of the elements to be visible.
-        waitFor(()-> labelLocator.findElement(getComponentElement()).isDisplayed(), 1_000);
+        waitFor(()-> labelLocator.findElement(getComponentElement()).isDisplayed(), "Selection not visible.", 1_000);
 
         List<WebElement> selectedItems = labelLocator.findElements(getComponentElement());
-        List<String> rawItems = _wrapper.getTexts(selectedItems);
+            List<String> rawItems = getWrapper().getTexts(selectedItems);
 
         // trim whitespace characters
         return rawItems.stream().map(String::trim).collect(Collectors.toList());
@@ -325,8 +324,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         {
             if (!getComponentElement().isDisplayed())
             {
-                _wrapper.scrollIntoView(getComponentElement());
-                _wrapper.scrollBy(0, 200); // room for options
+                getWrapper().scrollIntoView(getComponentElement());
+                getWrapper().scrollBy(0, 200); // room for options
             }
         }
         catch (StaleElementReferenceException ignore)
@@ -334,7 +333,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
             log("Attempted to scroll reactSelect " + getName() + " into view, but the component element was stale");
         }
 
-        return (T) this;
+        return getThis();
     }
 
     /**
@@ -351,7 +350,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
 
         waitFor(() -> getValueLabelLocator().withText(value).existsIn(getComponentElement()), "Failed to create value \"" + value + "\".", 1_000);
 
-        return (T) this;
+        return getThis();
     }
 
     @Override
@@ -446,7 +445,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect> extends WebDriv
         }
     }
 
-    public static abstract class BaseReactSelectFinder<Select extends BaseReactSelect> extends WebDriverComponent.WebDriverComponentFinder<Select, BaseReactSelectFinder<Select>>
+    public static abstract class BaseReactSelectFinder<Select extends BaseReactSelect<Select>> extends WebDriverComponent.WebDriverComponentFinder<Select, BaseReactSelectFinder<Select>>
     {
         private Locator.XPathLocator _locator;
         private boolean _mustBeEnabled = false;

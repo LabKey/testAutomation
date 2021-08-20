@@ -14,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 {
@@ -46,6 +47,14 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         elementCache().searchBox.set(searchString);
         elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
         return null;
+    }
+
+    public FindByIdsDialog findByIds()
+    {
+        elementCache().findAndSearchMenuButton.click();
+        waitFor(()->elementCache().findSamplesOption.isDisplayed(), "Find samples menu did not show up.", 500);
+        elementCache().findSamplesOption.click();
+        return new FindByIdsDialog(getDriver());
     }
 
     public String getDisplayedProjectName()
@@ -85,5 +94,8 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").findWhenNeeded(this);
         public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").findWhenNeeded(this);
         public Input searchBox = Input.Input(Locator.tagWithClass("input", "navbar__search-input"), getDriver()).findWhenNeeded(this);
+        public WebElement searchForm = Locator.tagWithClass("form", "navbar__search-form").findWhenNeeded(this);
+        public WebElement findAndSearchMenuButton = Locator.tagWithId("button", "find-and-search-menu").findWhenNeeded(searchForm);
+        public WebElement findSamplesOption = Locator.linkContainingText("Find Samples").findWhenNeeded(searchForm);
     }
 }

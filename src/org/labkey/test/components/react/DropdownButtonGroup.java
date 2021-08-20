@@ -3,7 +3,6 @@ package org.labkey.test.components.react;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -14,22 +13,20 @@ import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
-
+/**
+ * This component is redundant (I think)
+ * @deprecated Use {@link org.labkey.test.components.html.BootstrapMenu} or {@link MultiMenu}
+ */
+@Deprecated
 public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
 
-    /* componentElement should contain the toggle anchor *and* the UL containing list items */
-    public DropdownButtonGroup(WebDriver driver, WebElement componentElement)
+    public DropdownButtonGroup(WebElement el, WebDriver driver)
     {
-        this(componentElement, new WebDriverWrapperImpl(driver));
-    }
-
-    public DropdownButtonGroup(WebElement element, WebDriverWrapper wrapper)
-    {
-        _el = element;
-        _driver = wrapper.getDriver();
+        _el = el;
+        _driver = driver;
     }
 
     @Override
@@ -295,7 +292,7 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
         @Override
         protected DropdownButtonGroup construct(WebElement el, WebDriver driver)
         {
-            return new DropdownButtonGroup(driver, el);
+            return new DropdownButtonGroup(el, driver);
         }
 
         @Override

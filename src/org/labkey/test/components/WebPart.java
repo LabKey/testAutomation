@@ -21,7 +21,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
-import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriver;
@@ -120,7 +119,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
 
     public BootstrapMenu getWebParMenu()
     {
-        return new BootstrapMenu(getDriver(), elementCache().UX_MENU);
+        return getTitleMenu();
     }
 
     public void clickMenuItem(String... items)
@@ -130,22 +129,22 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
 
     public void clickMenuItem(boolean wait, String... items)
     {
-        new BootstrapMenu(getDriver(), elementCache().UX_MENU).clickSubMenu(wait, items);
+        getTitleMenu().clickSubMenu(wait, items);
     }
 
     public BootstrapMenu getTitleMenu()
     {
-        return  new BootstrapMenu(getDriver(), elementCache().UX_MENU);
+        return elementCache().webPartMenu;
     }
 
     public void openTitleMenu()
     {
-        new BootstrapMenu(getDriver(), elementCache().UX_MENU).expand();
+        getTitleMenu().expand();
     }
 
     public void closeTitleMenu()
     {
-        new BootstrapMenu(getDriver(), elementCache().UX_MENU).collapse();
+        getTitleMenu().collapse();
     }
 
     @Override
@@ -153,7 +152,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
 
     public class ElementCache extends WebPartPanel.ElementCache
     {
-        public WebElement UX_MENU = new LazyWebElement(
-                Locator.xpath("//span[contains(@class,'dropdown') and ./a[@data-toggle='dropdown']]"), this);
+        protected final BootstrapMenu webPartMenu = BootstrapMenu.finder(getDriver()).findWhenNeeded(this);
     }
 }
