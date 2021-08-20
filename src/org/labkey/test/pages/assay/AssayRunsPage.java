@@ -56,8 +56,8 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     public AssayDataPage clickAssayIdLink(String assayId)
     {
-        int rowIndex = getTable().getRowIndex("Assay Id", assayId);
-        WebElement cell =  getTable().findCell(rowIndex, "Assay Id");
+        int rowIndex = getTable().getRowIndex("Assay ID", assayId);
+        WebElement cell =  getTable().findCell(rowIndex, "Assay ID");
         WebElement link = Locator.linkWithText(assayId).waitForElement(cell, WAIT_FOR_JAVASCRIPT);
         clickAndWait(link);
         return new AssayDataPage(getDriver());
