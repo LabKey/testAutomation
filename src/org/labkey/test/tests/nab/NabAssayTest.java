@@ -357,7 +357,7 @@ public class NabAssayTest extends AbstractAssayTest
         // Edit the first run
         doAndWaitForPageToLoad(() ->
         {
-            table.updateLink(table.getRowIndex("Assay Id", "ptid + visit + specimenid")).click();
+            table.updateLink(table.getRowIndex("Assay ID", "ptid + visit + specimenid")).click();
         });
 
         // Make sure that the properties that affect calculations aren't shown
