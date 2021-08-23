@@ -93,13 +93,20 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     private void clickButtonWaitForPanel(WebElement button, int wait)
     {
-        int count = Locator.tagWithClass("div", "panel-default").findElements(getDriver()).size();
+        // The count of panels not in edit mode.
+        Locator defaultPanel = Locator.tagWithClass("div", "panel-default");
+        int defaultCount = defaultPanel.findElements(getDriver()).size();
+
+        // The count of panels in edit mode.
+        Locator infoPanel = Locator.tagWithClass("div", "panel-info");
+        int infoCount = infoPanel.findElements(getDriver()).size();
 
         button.click();
 
         WebDriverWrapper.waitFor(()->
-                        Locator.tagWithClass("div", "panel-default").findElements(getDriver()).size() > count,
-                "Panel did not exit edit mode", wait);
+                        (defaultPanel.findElements(getDriver()).size() > defaultCount) &&
+                                (infoPanel.findElements(getDriver()).size() < infoCount),
+                "Panel did not change state.", wait);
     }
 
     /** Click the 'Cancel' button. This will make the edit panel go away. */
@@ -112,8 +119,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     /** Click the 'Save' button. */
     public void clickSave()
     {
-        clickButtonWaitForPanel(elementCache()
-                .button("Save", "Editing " + _parentType.getType() + " Details"));
+        clickSave(2_000);
     }
 
     /** Click the 'Save' button.
@@ -122,9 +128,17 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public void clickSave(int waitTime)
     {
+        // The wait time is used here to validate the panel exits edit mode.
         clickButtonWaitForPanel(elementCache()
                 .button("Save", "Editing " + _parentType.getType() + " Details"),
                 waitTime);
+
+        // After the panel exits edit mode the page might still be updating, wait for that to happen.
+        Locator progressbar = Locator.tagWithClass("div", "progress-bar");
+        if (getWrapper().isElementPresent(progressbar))
+            WebDriverWrapper.waitFor(()->!getWrapper().isElementVisible(progressbar),
+                    "It looks like an update took too long.", waitTime);
+
     }
 
     /**
