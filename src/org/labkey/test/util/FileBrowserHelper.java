@@ -540,10 +540,12 @@ public class FileBrowserHelper extends WebDriverWrapper
     }
 
     /**
+     *
      * @param file
      */
+    @Override
     @LogMethod
-    protected void dragAndDropFileInDropZone(@LoggedParam File file)
+    public void dragAndDropFileInDropZone(@LoggedParam File file)
     {
         waitForFileGridReady();
 
