@@ -17,6 +17,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
@@ -102,10 +103,7 @@ public class StartImportPage extends LabKeyPage
 
     private void setInitialCheckBox(Locator checkBox, boolean check)
     {
-        if (check)
-            checkCheckbox(checkBox);
-        else
-            uncheckCheckbox(checkBox);
+        Checkbox.Checkbox(checkBox).timeout(10_000).waitFor(getDriver()).set(check);
     }
 
     public void clickStartImport()
