@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.pages.LabKeyPage;
@@ -11,17 +12,17 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     private final SourcePage _sourcePage;
     private final Supplier<ConfirmPage> _confirmPageSupplier;
 
-    public DeleteConfirmationDialog(SourcePage sourcePage)
+    public DeleteConfirmationDialog(@NotNull SourcePage sourcePage)
     {
         this(sourcePage, () -> null);
     }
 
-    public DeleteConfirmationDialog(SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public DeleteConfirmationDialog(@NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
         this("delete", sourcePage, confirmPageSupplier);
     }
 
-    protected DeleteConfirmationDialog(String partialTitle, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    protected DeleteConfirmationDialog(String partialTitle, @NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
         this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
     }
