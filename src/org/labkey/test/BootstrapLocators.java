@@ -2,6 +2,11 @@ package org.labkey.test;
 
 public abstract class BootstrapLocators
 {
+
+    // '@labkey/components/base/LoadingSpinner.tsx'
+    public static final Locator.XPathLocator loadingSpinner = Locator.tag("span").withChild(Locator.tagWithClass("i", "fa-spinner"));
+
+    // '@labkey/components/base/Alert.tsx'
     public static final Locator infoBanner = Locator.tagWithClass("div", BannerType.INFO.getCss());
     public static final Locator successBanner = Locator.tagWithClass("div", BannerType.SUCCESS.getCss());
     public static final Locator errorBanner = Locator.tagWithClass("div", BannerType.ERROR.getCss());
