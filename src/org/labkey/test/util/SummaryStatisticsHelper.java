@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.SummaryStatisticsDialog;
 
@@ -44,6 +43,8 @@ public class SummaryStatisticsHelper
     public final static String PREMIUM_STAT_QUARTILE = "Quartiles";
     public final static String PREMIUM_STAT_Q1 = "Lower Quartile (Q1)";
     public final static String PREMIUM_STAT_Q3 = "Upper Quartile (Q3)";
+    public final static String PREMIUM_STAT_CV = "Coefficient of Variation";
+    public final static String PREMIUM_STAT_RSD = "Relative Standard Deviation";
 
     public final static List<String> ALL_STATS;
     static {
@@ -55,7 +56,8 @@ public class SummaryStatisticsHelper
         // include all premium stats
         ALL_STATS.addAll(Arrays.asList(
             PREMIUM_STAT_COUNT_BLANK, PREMIUM_STAT_COUNT_DISTINCT, PREMIUM_STAT_STDDEV, PREMIUM_STAT_STDERR,
-            PREMIUM_STAT_MEDIAN,PREMIUM_STAT_QUARTILE,PREMIUM_STAT_INTERQUARTILE, PREMIUM_STAT_MEDIAN_ABS_DEV
+            PREMIUM_STAT_MEDIAN,PREMIUM_STAT_QUARTILE,PREMIUM_STAT_INTERQUARTILE, PREMIUM_STAT_MEDIAN_ABS_DEV,
+            PREMIUM_STAT_CV, PREMIUM_STAT_RSD
         ));
     }
 
@@ -93,6 +95,8 @@ public class SummaryStatisticsHelper
                 stats.add(PREMIUM_STAT_QUARTILE);
                 stats.add(PREMIUM_STAT_INTERQUARTILE);
                 stats.add(PREMIUM_STAT_MEDIAN_ABS_DEV);
+                stats.add(PREMIUM_STAT_CV);
+                stats.add(PREMIUM_STAT_RSD);
             }
         }
 
