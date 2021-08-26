@@ -15,11 +15,11 @@
  */
 package org.labkey.test.pages.assay;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -27,9 +27,9 @@ import java.io.File;
 
 public class DataImportPage extends LabKeyPage<DataImportPage.Elements>
 {
-    public DataImportPage(BaseWebDriverTest test)
+    public DataImportPage(WebDriver driver)
     {
-        super(test);
+        super(driver);
     }
 
     public void insertTsvData(String data)
