@@ -537,7 +537,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         elementCache().expectedVocabularyButton().click();
-        ;
         return new ConceptPickerDialog(new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Expected Vocabulary"));
     }
 
