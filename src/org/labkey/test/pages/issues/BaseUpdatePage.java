@@ -101,7 +101,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
     }
 
     @Override
-    public EC newElementCache()
+    protected EC newElementCache()
     {
         return (EC) new ElementCache();
     }

@@ -176,10 +176,12 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         log("Checking for the protected field");
         DomainFormPanel domainFormPanel = issuesAdminPage.getFieldsPanel();
-        checker().verifyTrue("Title should be disabled", domainFormPanel.getField("Title").isFieldProtected());
-        checker().verifyTrue("NotifyList should be disabled", domainFormPanel.getField("NotifyList").isFieldProtected());
-        checker().verifyTrue("AssignedTo should be disabled", domainFormPanel.getField("AssignedTo").isFieldProtected());
-        checker().verifyTrue("Resolution should be disabled", domainFormPanel.getField("Resolution").isFieldProtected());
+        checker().verifyTrue("Title should be protected", domainFormPanel.getField("Title").isFieldProtected());
+        checker().verifyTrue("NotifyList should be protected", domainFormPanel.getField("NotifyList").isFieldProtected());
+        checker().verifyTrue("AssignedTo should be protected", domainFormPanel.getField("AssignedTo").isFieldProtected());
+        checker().verifyTrue("Resolution should be protected", domainFormPanel.getField("Resolution").isFieldProtected());
+        checker().verifyFalse("Type should not be protected", domainFormPanel.getField("Type").isFieldProtected());
+        checker().verifyFalse("Priority should not be protected", domainFormPanel.getField("Priority").isFieldProtected());
     }
 
     @Test

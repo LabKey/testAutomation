@@ -119,12 +119,12 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
     }
 
     @Override
-    public ElementCache newElementCache()
+    protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    public class ElementCache extends BaseIssuePage.ElementCache
+    protected class ElementCache extends BaseIssuePage.ElementCache
     {
         protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
         protected WebElement newIssueLink = Locator.lkButton("New Issue").findWhenNeeded(this);
