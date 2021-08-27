@@ -36,12 +36,13 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
 
     public static LookAndFeelSettingsPage beginAt(WebDriverWrapper wrapper)
     {
-        return beginAt(wrapper, null);
+        wrapper.beginAt(WebTestHelper.buildURL("admin", "lookAndFeelSettings"));
+        return new LookAndFeelSettingsPage(wrapper.getDriver());
     }
 
     public static LookAndFeelSettingsPage beginAt(WebDriverWrapper wrapper, String containerPath)
     {
-        wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath, "lookAndFeelSettings"));
+        wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath, "projectSettings"));
         return new LookAndFeelSettingsPage(wrapper.getDriver());
     }
 
