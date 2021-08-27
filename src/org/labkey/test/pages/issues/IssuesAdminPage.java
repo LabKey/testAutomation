@@ -19,12 +19,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainDesigner;
-import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.WebDriverWrapper.waitFor;
@@ -54,8 +56,13 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
 
     public void waitForPage()
     {
-        waitFor(()-> getFieldsPanel().getComponentElement().isDisplayed(),
+        waitFor(() -> getFieldsPanel().getComponentElement().isDisplayed(),
                 "The page did not render in time", WAIT_FOR_PAGE);
+    }
+
+    public String getSingularName()
+    {
+        return elementCache().singularNameInput.get();
     }
 
     public IssuesAdminPage setSingularName(String value)
@@ -65,9 +72,9 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         return this;
     }
 
-    public String getSingularName()
+    public String getPluralName()
     {
-        return elementCache().singularNameInput.get();
+        return elementCache().pluralNameInput.get();
     }
 
     public IssuesAdminPage setPluralName(String value)
@@ -77,9 +84,9 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         return this;
     }
 
-    public String getPluralName()
+    public SortDirection getCommentSortDirection()
     {
-        return elementCache().pluralNameInput.get();
+        return SortDirection.valueOf(elementCache().commentSortDirSelect.getValue());
     }
 
     public IssuesAdminPage setCommentSortDirection(SortDirection value)
@@ -88,9 +95,9 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         return this;
     }
 
-    public SortDirection getCommentSortDirection()
+    public String getAssignedTo()
     {
-        return SortDirection.valueOf(elementCache().commentSortDirSelect.getValue());
+        return elementCache().assignedToSelect.getValue();
     }
 
     public IssuesAdminPage setAssignedTo(String value)
@@ -102,9 +109,14 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         return this;
     }
 
-    public String getAssignedTo()
+    public List<String> getAllDefaultUserOptions()
     {
-        return elementCache().assignedToSelect.getValue();
+        return elementCache().defaultUserSelect.getOptions();
+    }
+
+    public String getDefaultUser()
+    {
+        return elementCache().defaultUserSelect.getValue();
     }
 
     public IssuesAdminPage setDefaultUser(String value)
@@ -114,11 +126,6 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         else
             elementCache().defaultUserSelect.select(value);
         return this;
-    }
-
-    public String getDefaultUser()
-    {
-        return elementCache().defaultUserSelect.getValue();
     }
 
     @Override
@@ -135,10 +142,16 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         return new ListPage(getDriver());
     }
 
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
     public enum SortDirection implements OptionSelect.SelectOption
     {
-        OldestFirst("ASC", "Oldest First"),
-        NewestFirst("DESC", "Newest First");
+        OldestFirst("ASC", "Oldest first"),
+        NewestFirst("DESC", "Newest first");
 
         private String _value;
         private String _text;
@@ -160,12 +173,6 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         {
             return _text;
         }
-    }
-
-    @Override
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
     }
 
     protected class ElementCache extends DomainDesigner.ElementCache
