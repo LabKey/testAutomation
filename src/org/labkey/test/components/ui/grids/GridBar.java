@@ -359,6 +359,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void setAliquotView(AliquotViewOptions view)
     {
+        // Need to identify where we are. The menu text is contextual to the page.
         String url = getDriver().getCurrentUrl().toLowerCase();
         boolean onSourcesPage = url.contains("#/sources/");
         boolean onSamplePage = url.contains("#/samples/");
