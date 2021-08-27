@@ -86,6 +86,19 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public ReactAssayDesignerPage setAutoLinkCategory(String categoryName)
+    {
+        expandPropertiesPanel();
+        elementCache().autoLinkDatasetCategory.set(categoryName);
+        return this;
+    }
+
+    public String getAutoLinkCategory()
+    {
+        expandPropertiesPanel();
+        return elementCache().autoLinkDatasetCategory.get();
+    }
+
     public ReactAssayDesignerPage setPlateTemplate(String template)
     {
         expandPropertiesPanel();
@@ -258,6 +271,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         protected final DomainPanel<?, ?> propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0).timeout(5000).findWhenNeeded(this);
         final Input nameInput = Input(Locator.id("assay-design-name"), getDriver()).findWhenNeeded(propertiesPanel);
         final Input descriptionInput = Input(Locator.id("assay-design-description"), getDriver()).findWhenNeeded(propertiesPanel);
+        final Input autoLinkDatasetCategory = Input(Locator.id("assay-design-autoLinkCategory"), getDriver()).findWhenNeeded(propertiesPanel);
         final Select autoLinkTargetSelect = Select(Locator.id("assay-design-autoCopyTargetContainerId")).findWhenNeeded(propertiesPanel);
         final Select plateTemplateSelect = Select(Locator.id("assay-design-selectedPlateTemplate")).findWhenNeeded(propertiesPanel);
         final WebElement configureTemplatesLink = Locator.linkContainingText("Configure Templates").findWhenNeeded(propertiesPanel);
