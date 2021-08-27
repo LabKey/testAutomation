@@ -223,8 +223,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
     private OmniBox setText(String inputValue)
     {
         new WebDriverWait(getWrapper().getDriver(), 1).until(ExpectedConditions.elementToBeClickable(elementCache().input));
-        elementCache().input.sendKeys(inputValue);
-        elementCache().input.sendKeys(Keys.ENTER);
+        elementCache().input.sendKeys(inputValue + Keys.ENTER);
 
         return this;
     }
