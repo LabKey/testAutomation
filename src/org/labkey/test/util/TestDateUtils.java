@@ -46,6 +46,6 @@ public class TestDateUtils
      */
     public static Date buildDate(int year, int month, int dayOfMonth)
     {
-        return new Calendar.Builder().setDate(year, month + 1, dayOfMonth).build().getTime();
+        return new Calendar.Builder().setDate(year, month - 1, dayOfMonth).build().getTime();
     }
 }
