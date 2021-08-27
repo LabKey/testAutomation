@@ -38,10 +38,14 @@ public class TestDateUtils
     }
 
     /**
-     * Build a date object.
+     * Build a date object
+     * @param year Year value.
+     * @param month Month value. (1 = January, 2 = February, etc.)
+     * @param dayOfMonth Day of the month value.
+     * @return Date object
      */
     public static Date buildDate(int year, int month, int dayOfMonth)
     {
-        return new Calendar.Builder().setDate(year, month, dayOfMonth).build().getTime();
+        return new Calendar.Builder().setDate(year, month + 1, dayOfMonth).build().getTime();
     }
 }
