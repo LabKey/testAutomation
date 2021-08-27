@@ -317,7 +317,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     }
 
     /**
-     * Private helper function tha will get the text of the aliquot view button. This can be used to determine the
+     * Private helper function that will get the text of the aliquot view button. This can be used to determine the
      * current view. Asserts that the button is present.
      *
      * @return Text of the aliquot view button.
@@ -335,7 +335,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      *
      * @return A {@link AliquotViewOptions} item.
      */
-    public AliquotViewOptions currentAliquotView()
+    public AliquotViewOptions getCurrentAliquotView()
     {
         String text = currentAliquotViewText().toLowerCase();
 
