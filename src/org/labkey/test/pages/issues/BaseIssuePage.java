@@ -134,6 +134,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         protected FormItem<String> changedDate = formItemWithLabel("Changed");
         protected FormItem<String> resolvedDate = formItemWithLabel("Resolved");
         protected FormItem<String> closedDate = formItemWithLabel("Closed");
+        protected List<IssueComment> issueComments;
 
         private FormItem replaceIfNewer(String nameOrLabel, FormItem candidate)
         {
@@ -177,7 +178,6 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
             return Locator.css(String.format("*[name=%s], *[name=%s]", name, name.toLowerCase()));
         }
 
-        private List<IssueComment> issueComments;
         protected List<IssueComment> getComments()
         {
             if (issueComments == null)
