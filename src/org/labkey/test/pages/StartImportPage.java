@@ -152,6 +152,12 @@ public class StartImportPage extends LabKeyPage<StartImportPage.ElementCache>
                 .forEach(cb -> cb.set(checked));
     }
 
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         protected final Checkbox validateQueriesCheckbox = initialCheckbox("validateQueries");
