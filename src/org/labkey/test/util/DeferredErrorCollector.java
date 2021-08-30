@@ -172,7 +172,7 @@ public class DeferredErrorCollector
     {
         for (Class<? extends Throwable> errorType : errorTypes)
         {
-            if (errorType.isInstance(err))
+            if (errorType.isAssignableFrom(err.getClass()))
             {
                 return true;
             }
