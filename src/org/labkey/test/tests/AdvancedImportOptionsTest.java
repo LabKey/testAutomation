@@ -52,7 +52,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
     private static final String LIMITED_USER = "limited@advancedimport.test";
 
-    private static final File IMPORT_STUDY_FILE = TestFileUtils.getSampleData("AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip");
+    protected static final File IMPORT_STUDY_FILE = TestFileUtils.getSampleData("AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip");
     private static final String IMPORT_PROJECT_FILE01 = "Advanced Import By File";
     private static final String IMPORT_PROJECT_FILE02 = "Advanced Import By File With Filters";
     private static final String IMPORT_PROJECT_FILE03 = "Advanced Import By Pipeline With Filters";
@@ -76,7 +76,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "AdvancedImportOptions";
+        return null;
     }
 
     @Override
@@ -344,10 +344,11 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Import into multiple folders from the same template");
         importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
         importPage.setSelectSpecificImportOptions(true);
-        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.DatasetData, false);
-        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.DatasetDefinitions, false);
-        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.Specimens, false);
-        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.SpecimenSettings, false);
+        importPage.setAdvancedOptionCheckBoxes(Map.of(
+                StartImportPage.AdvancedOptionsCheckBoxes.DatasetData, false,
+                StartImportPage.AdvancedOptionsCheckBoxes.DatasetDefinitions, false,
+                StartImportPage.AdvancedOptionsCheckBoxes.Specimens, false,
+                StartImportPage.AdvancedOptionsCheckBoxes.SpecimenSettings, false));
         importPage.setApplyToMultipleFoldersCheckBox(true);
 
         assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
