@@ -77,7 +77,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         Locator.XPathLocator plotLocator = Locator.xpath("//div[@class='labkey-knitr']//img");
         Locator[] reportContains = {Locator.tag("h1").withText("A Minimal Example for Markdown"),
                                     Locator.tag("h2").withText("R code chunks"),
-                                    Locator.tagWithClass("code", "r").containing("set.seed(123)"),       // Echoed R code
+                                    Locator.tagWithClass("code", "hljs").containing("set.seed(123)"),       // Echoed R code
                                     Locator.css("p").containing("2 x pi = 6.283"),
                                     Locator.tag("sup").withText("write") //should contain the hat markdown v2 closing tag
         };
