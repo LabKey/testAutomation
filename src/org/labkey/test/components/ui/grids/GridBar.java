@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
@@ -325,9 +326,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     private String currentAliquotViewText()
     {
         Assert.assertTrue("There is no 'Aliquot View' button on this grid.",
-                elementCache().aliquotViewButton().isDisplayed());
+                elementCache().aliquotView.getComponentElement().isDisplayed());
 
-        return elementCache().aliquotViewButton().getText();
+        return elementCache().aliquotView.getComponentElement().getText();
     }
 
     /**
@@ -436,10 +437,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return menus.get(buttonText);
         }
 
-        protected final WebElement aliquotViewButton()
-        {
-            return Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").findWhenNeeded(this);
-        }
+        protected final BootstrapMenu aliquotView = BootstrapMenu.finder(getDriver()).locatedBy(
+                Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
     }
 
     protected static abstract class Locators
