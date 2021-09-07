@@ -57,7 +57,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     private static final String IMPORT_PROJECT_FILE02 = "Advanced Import By File With Filters";
     private static final String IMPORT_PROJECT_FILE03 = "Advanced Import By Pipeline With Filters";
 
-    private static final String IMPORT_PROJECT_MULTI = "Advanced Import to Multiple Folders";
+    protected static final String IMPORT_PROJECT_MULTI = "Advanced Import to Multiple Folders";
     private static final String IMPORT_FOLDER_MULTI01 = "Advance Import Folder 01";
     private static final String IMPORT_FOLDER_MULTI02 = "Advance Import Folder 02";
     private static final String IMPORT_FOLDER_MULTI03 = "Advance Import Folder 03";
@@ -109,7 +109,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
 
         log("Get to the import page and validate that is looks as expected.");
-        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true, true);
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true);
         importPage.setSelectSpecificImportOptions(true);
         assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
@@ -162,10 +162,10 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         File zipFile = IMPORT_STUDY_FILE;
 
         log("Create a new project to import the existing data.");
-        _containerHelper.createProject(IMPORT_PROJECT_FILE02, "Study");
+        _containerHelper.createProject(IMPORT_PROJECT_FILE02);
 
         log("Get to the import page and validate that is looks as expected.");
-        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true, true);
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true);
         importPage.setSelectSpecificImportOptions(true);
         assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
@@ -228,7 +228,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         File zipFile = IMPORT_STUDY_FILE;
 
         log("Create a new project to import the existing data.");
-        _containerHelper.createProject(IMPORT_PROJECT_FILE03, "Study");
+        _containerHelper.createProject(IMPORT_PROJECT_FILE03);
 
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
@@ -297,7 +297,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _userHelper.createUser(LIMITED_USER);
 
         log("Create a new project to import the existing data into multiple folders.");
-        _containerHelper.createProject(IMPORT_PROJECT_MULTI, "Study");
+        _containerHelper.createProject(IMPORT_PROJECT_MULTI);
         _containerHelper.enableModule(IMPORT_PROJECT_MULTI, "Specimen");
 
         log("Create subfolders and setup permissions.");
@@ -319,7 +319,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         impersonate(LIMITED_USER);
         clickFolder(IMPORT_FOLDER_MULTI01);
         log("Get to the import page and validate that is looks as expected.");
-        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, false, true);
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, false);
         importPage.setSelectSpecificImportOptions(true);
         importPage.setApplyToMultipleFoldersCheckBox(true);
 

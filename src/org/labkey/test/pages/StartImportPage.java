@@ -39,7 +39,7 @@ public class StartImportPage extends LabKeyPage<StartImportPage.ElementCache>
         super(test);
     }
 
-    public static StartImportPage startImportFromFile(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean showAdvancedImportOptions)
+    public static StartImportPage startImportFromFile(BaseWebDriverTest test, File zipFile, boolean validateQueries)
     {
         test.goToFolderManagement();
         test.clickAndWait(Locator.linkWithText("Import"));
@@ -48,7 +48,7 @@ public class StartImportPage extends LabKeyPage<StartImportPage.ElementCache>
 
         StartImportPage sip = new StartImportPage(test.getDriver());
         sip.setValidateQueriesCheckBox(validateQueries);
-        sip.setAdvancedImportOptionsCheckBox(showAdvancedImportOptions);
+        sip.setAdvancedImportOptionsCheckBox(true);
 
         test.clickButtonContainingText("Import Folder");
         test.waitForText("Select specific objects to import");
