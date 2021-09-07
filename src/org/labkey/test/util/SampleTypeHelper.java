@@ -78,6 +78,10 @@ public class SampleTypeHelper extends WebDriverWrapper
         {
             createPage.setAutoLinkDataToStudy(props.getAutoLinkDataToStudy());
         }
+        if(props.getLinkedDatasetCategory() != null)
+        {
+            createPage.setLinkedDatasetCategory(props.getLinkedDatasetCategory());
+        }
         if (props.getNameExpression() != null)
         {
             createPage.setNameExpression(props.getNameExpression());

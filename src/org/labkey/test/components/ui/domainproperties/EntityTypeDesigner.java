@@ -62,6 +62,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return getThis();
     }
 
+    public String getName()
+    {
+        expandPropertiesPanel();
+        return elementCache().nameInput.get();
+    }
+
     public T setName(String name)
     {
         expandPropertiesPanel();
@@ -69,10 +75,10 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return getThis();
     }
 
-    public String getName()
+    public String getNameExpression()
     {
         expandPropertiesPanel();
-        return elementCache().nameInput.get();
+        return elementCache().nameExpressionInput.get();
     }
 
     public T setNameExpression(String nameExpression)
@@ -81,18 +87,6 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         elementCache().nameExpressionInput.set(nameExpression);
         return getThis();
     }
-    public String getNameExpression()
-    {
-        expandPropertiesPanel();
-        return elementCache().nameExpressionInput.get();
-    }
-
-    public  T setAutoLinkDataToStudy(String value)
-    {
-        expandPropertiesPanel();
-        elementCache().autoLinkDataToStudy.selectByVisibleText(value);
-        return  getThis();
-    }
 
     public String getAutoLinkDataToStudy()
     {
@@ -100,10 +94,23 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().autoLinkDataToStudy.toString();
     }
 
-    public T setDescription(String description)
+    public T setAutoLinkDataToStudy(String value)
     {
         expandPropertiesPanel();
-        elementCache().descriptionInput.set(description);
+        elementCache().autoLinkDataToStudy.selectByVisibleText(value);
+        return getThis();
+    }
+
+    public String getLinkedDatasetCategory()
+    {
+        expandPropertiesPanel();
+        return elementCache().linkedDatasetCategory.get();
+    }
+
+    public T setLinkedDatasetCategory(String value)
+    {
+        expandPropertiesPanel();
+        elementCache().linkedDatasetCategory.set(value);
         return getThis();
     }
 
@@ -111,6 +118,13 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         expandPropertiesPanel();
         return elementCache().descriptionInput.get();
+    }
+
+    public T setDescription(String description)
+    {
+        expandPropertiesPanel();
+        elementCache().descriptionInput.set(description);
+        return getThis();
     }
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache
@@ -121,5 +135,6 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         protected final Select autoLinkDataToStudy = SelectWrapper.Select(Locator.id("entity-autoLinkTargetContainerId"))
                 .findWhenNeeded(this);
+        protected final Input linkedDatasetCategory = Input.Input(Locator.id("entity-autoLinkCategory"), getDriver()).findWhenNeeded(this);
     }
 }
