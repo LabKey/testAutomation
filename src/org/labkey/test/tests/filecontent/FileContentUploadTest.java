@@ -58,8 +58,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
@@ -261,6 +261,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @Test
     public void testFolderNameCharacters()
     {
+        goToProjectHome();
         goToModule("FileContent");
         List<String> stringsToCheck = folderSubstringsToVerify();
         Set<String> expectedFolders = new HashSet<>();
