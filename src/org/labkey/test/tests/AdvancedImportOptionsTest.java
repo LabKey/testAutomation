@@ -57,6 +57,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     private static final String IMPORT_PROJECT_FILE02 = "Advanced Import By File With Filters";
     private static final String IMPORT_PROJECT_FILE03 = "Advanced Import By Pipeline With Filters";
 
+    private static final String IMPORT_PROJECT_MULTI = "Advanced Import to Multiple Folders";
     private static final String IMPORT_FOLDER_MULTI01 = "Advance Import Folder 01";
     private static final String IMPORT_FOLDER_MULTI02 = "Advance Import Folder 02";
     private static final String IMPORT_FOLDER_MULTI03 = "Advance Import Folder 03";
@@ -92,6 +93,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE02, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03, false);
+        _containerHelper.deleteProject(IMPORT_PROJECT_MULTI, false);
 
         _userHelper.deleteUser(LIMITED_USER);
     }
@@ -104,7 +106,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         File zipFile = IMPORT_STUDY_FILE;
 
         log("Create a new project to import the existing data.");
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
 
         log("Get to the import page and validate that is looks as expected.");
@@ -219,8 +220,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         assertTextPresent("WikiPage01", "This folder does not currently contain any wiki pages to display.");
         assertElementNotPresent(Locator.xpath("//div[@class='labkey-wiki']//p[text() = 'This is a very basic wiki page.']"));
 
-        log("Cleanup and remove the project.");
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE02);
     }
 
     @Test
@@ -286,8 +285,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         assertTextPresent("WikiPage01", "This folder does not currently contain any wiki pages to display.");
         assertElementNotPresent(Locator.xpath("//div[@class='labkey-wiki']//p[text() = 'This is a very basic wiki page.']"));
 
-        log("Cleanup and remove the project.");
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE03);
     }
 
     @Test
@@ -300,14 +297,13 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _userHelper.createUser(LIMITED_USER);
 
         log("Create a new project to import the existing data into multiple folders.");
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
-        _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
-        _containerHelper.enableModule(IMPORT_PROJECT_FILE01, "Specimen");
+        _containerHelper.createProject(IMPORT_PROJECT_MULTI, "Study");
+        _containerHelper.enableModule(IMPORT_PROJECT_MULTI, "Specimen");
 
         log("Create subfolders and setup permissions.");
-        _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI01);
-        _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI02);
-        _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI03);
+        _containerHelper.createSubfolder(IMPORT_PROJECT_MULTI, IMPORT_FOLDER_MULTI01);
+        _containerHelper.createSubfolder(IMPORT_PROJECT_MULTI, IMPORT_FOLDER_MULTI02);
+        _containerHelper.createSubfolder(IMPORT_PROJECT_MULTI, IMPORT_FOLDER_MULTI03);
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
 
@@ -331,7 +327,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Verify user can import only into folders they have admin access to");
         waitForElement(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).notHidden(), 5000);
-        assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_PROJECT_FILE01));
+        assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_PROJECT_MULTI));
         assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI02));
 
         Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
