@@ -63,11 +63,22 @@ public class ProductMenu extends BaseBootstrapMenu
         return expectedSectionCount;
     }
 
-    public List<String> getColumnHeaders()
+    public List<String> getMenuSectionHeaders()
     {
         expand();
         List<WebElement> headersElements = Locator.tagWithClass("span", "menu-section-header").findElements(this);
         return getWrapper().getTexts(headersElements).stream().map(String::trim).collect(Collectors.toList());
+    }
+
+    public Map<String, String> getMenuSectionHeaderLinks()
+    {
+        expand();
+        List<WebElement> headerElements = Locator.tagWithClass("span", "menu-section-header").findElements(this);
+        Map<String, String> links = new HashMap<>();
+        headerElements.forEach((header) -> {
+            links.put(header.getText().trim(),Locator.tag("a").findElement(header).getAttribute("href"));
+        });
+        return links;
     }
 
     public void clickMenuColumnHeader(String headerText)
@@ -83,6 +94,16 @@ public class ProductMenu extends BaseBootstrapMenu
 
         return Arrays.asList(rawMenuText.split("\n"));
     }
+
+    public List<String> getMenuSectionLinks(String headerText)
+    {
+        expand();
+        return Locator.tag("li").childTag("a").findElements(elementCache().menuSectionBody(headerText))
+                .stream()
+                .map(element -> element.getAttribute("href"))
+                .collect(Collectors.toList());
+    }
+
 
     public void clickMenuItem(String headerText, String menuText)
     {
