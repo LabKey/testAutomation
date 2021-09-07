@@ -53,7 +53,9 @@ public class FileBrowserHelper extends WebDriverWrapper
 {
     private static final String IMPORT_SIGNAL_NAME = "import-actions-updated";
     private static final String FILE_LIST_SIGNAL_NAME = "file-list-updated";
-    public static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
+
+    public static final String ABSOLUTE_FILE_PATH_COLUMN_ID = "10";
+    private static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
 
     private final WrapsDriver _driver;
 

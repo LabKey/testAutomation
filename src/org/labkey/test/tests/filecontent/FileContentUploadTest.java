@@ -218,7 +218,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
     {
         log("Check Absolute File Path in File Browser");
 
-        final String ABSOLUTE_FILE_PATH_BUTTON_ID = "10";
         final String s = File.separator;
 
         new ApiPermissionsHelper(this)
@@ -231,7 +230,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         _fileBrowserHelper.goToAdminMenu();
         _fileBrowserHelper.goToConfigureButtonsTab();
-        _fileBrowserHelper.unhideGridColumn(ABSOLUTE_FILE_PATH_BUTTON_ID);
+        _fileBrowserHelper.unhideGridColumn(FileBrowserHelper.ABSOLUTE_FILE_PATH_COLUMN_ID);
         click(Ext4Helper.Locators.ext4Button("submit"));
         WebElement columnHeader = waitForElement(Locator.byClass("x4-column-header").withText("Absolute File Path").notHidden());
 
