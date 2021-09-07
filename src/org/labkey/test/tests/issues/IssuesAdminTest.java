@@ -34,6 +34,7 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
@@ -50,6 +51,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
 {
     private static final String ADMIN_USER = "admin_user@issuesadmin.test";
     private static final String TEST_USER = "testuser_issuetest@issues.test";
+    private static final String TEST_USER_DISPLAY_NAME = "testuser issuetest";
     private static final String DEFAULT_NAME = "issues";
     private static final String TEST_GROUP = "testers";
     private static final String ISSUE_LIST_NAME = "otherIssues";
@@ -83,8 +85,6 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
         _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
-        _permissionsHelper.addUserToProjGroup(getUsername(), getProjectName(), TEST_GROUP);
-        _permissionsHelper.addUserToProjGroup(TEST_USER, getProjectName(), TEST_GROUP);
 
         _issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);
@@ -98,6 +98,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         goToProjectHome();
         final String group = "AssignedToGroup";
         _permissionsHelper.setUserPermissions(ADMIN_USER, "FolderAdmin");
+        _permissionsHelper.setUserPermissions(TEST_USER, "FolderAdmin");
         _permissionsHelper.createProjectGroup(group, getProjectName());
         goToModule("Issues");
         OptionSelect assignedTo = new ListPage(getDriver())
@@ -187,6 +188,10 @@ public class IssuesAdminTest extends BaseWebDriverTest
     @Test
     public void testRelatedIssuesComments() throws Exception
     {
+        log("Adding the test user to test group to appear in assigned to drop down");
+        if (!_permissionsHelper.isUserInGroup(TEST_USER, TEST_GROUP,getProjectName(), PermissionsHelper.PrincipalType.USER))
+            _permissionsHelper.addUserToProjGroup(TEST_USER,getProjectName(), TEST_GROUP);
+
         goToProjectHome();
         String mainTitle = "Main Issue Title";
         String relatedIssueTitle = "Related issue Title";
@@ -194,11 +199,11 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         DetailsPage detailsPage = _issuesHelper.addIssue(
                 Maps.of("title", mainTitle,
-                        "assignedTo", getCurrentUserName(),
+                        "assignedTo", TEST_USER_DISPLAY_NAME,
                         "comment", "Main issue Comment"));
 
         Map<String, String> relatedIssueData = Maps.of("title", relatedIssueTitle,
-                "assignedTo", getCurrentUserName(),
+                "assignedTo", TEST_USER_DISPLAY_NAME,
                 "comment", "Related issue Comment");
         InsertPage relatedIssuePage = detailsPage.clickCreateRelatedIssue(getProjectName(), ISSUE_LIST_NAME.toLowerCase());
         for (Map.Entry<String, String> field : relatedIssueData.entrySet())
@@ -222,12 +227,17 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         log("Verifying hide related comments");
         detailsPage.clickHideRelatedIssueComment();
-        checker().verifyEquals("Incorrect comment display with hide related comments", 1, detailsPage.getComments().size());
+        checker().verifyEquals("Incorrect comment display with hide related comments", 2, detailsPage.getComments().size());
     }
 
     @Test
     public void testCommentSortDirection()
     {
+        log("Adding the test user to test group to appear in assigned to drop down");
+        if (!_permissionsHelper.isUserInGroup(TEST_USER, TEST_GROUP,getProjectName(), PermissionsHelper.PrincipalType.USER))
+            _permissionsHelper.addUserToProjGroup(TEST_USER,getProjectName(), TEST_GROUP);
+
+
         log("Creating new Issue Definition list");
         String title = "Testing comment sort direction";
 
