@@ -18,46 +18,47 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class StartImportPage extends LabKeyPage
+public class StartImportPage extends LabKeyPage<StartImportPage.ElementCache>
 {
     public StartImportPage(WebDriver test)
     {
         super(test);
     }
 
-    public static StartImportPage startImportFromFile(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean showAdvancedImportOptions)
+    public static StartImportPage startImportFromFile(BaseWebDriverTest test, File zipFile, boolean validateQueries)
     {
-        StartImportPage sip = new StartImportPage(test.getDriver());
-
         test.goToFolderManagement();
         test.clickAndWait(Locator.linkWithText("Import"));
         test.waitForElement(Locator.name("folderZip"));
         test.setFormElement(Locator.name("folderZip"), zipFile);
 
+        StartImportPage sip = new StartImportPage(test.getDriver());
         sip.setValidateQueriesCheckBox(validateQueries);
-        sip.setAdvancedImportOptionsCheckBox(showAdvancedImportOptions);
+        sip.setAdvancedImportOptionsCheckBox(true);
 
         test.clickButtonContainingText("Import Folder");
         test.waitForText("Select specific objects to import");
 
+        sip.clearCache();
         return sip;
     }
 
     public static StartImportPage startImportFromPipeline(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean selectSpecificImportOptions)
     {
-        StartImportPage sip = new StartImportPage(test.getDriver());
         FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(test);
 
         test.goToFolderManagement();
@@ -69,6 +70,7 @@ public class StartImportPage extends LabKeyPage
         fileBrowserHelper.importFile(zipFile.getName(), "Import Folder");
         test.waitForText("Import Folder from Pipeline");
 
+        StartImportPage sip = new StartImportPage(test.getDriver());
         sip.setValidateQueriesCheckBox(validateQueries);
         sip.setSelectSpecificImportOptions(selectSpecificImportOptions);
 
@@ -77,35 +79,34 @@ public class StartImportPage extends LabKeyPage
 
     public void setValidateQueriesCheckBox(boolean check)
     {
-        setInitialCheckBox(Locator.css("input[name='validateQueries']"), check);
-    }
-
-    public void setAdvancedImportOptionsCheckBox(boolean check)
-    {
-        setInitialCheckBox(Locator.css("input[name='advancedImportOptions']"), check);
-    }
-
-    public void setSelectSpecificImportOptions(boolean check)
-    {
-        setInitialCheckBox(Locator.css("input[name='specificImportOptions']"), check);
-    }
-
-    public void setApplyToMultipleFoldersCheckBox(boolean check)
-    {
-        setInitialCheckBox(Locator.css("input[name='applyToMultipleFolders']"), check);
+        elementCache().validateQueriesCheckbox.set(check);
     }
 
     public void setFailForUndefinedVisitsCheckBox(boolean check)
     {
-        setInitialCheckBox(Locator.css("input[name='failForUndefinedVisits']"), check);
+        elementCache().failForUndefinedVisitsCheckbox.set(check);
     }
 
-    private void setInitialCheckBox(Locator checkBox, boolean check)
+    public void setAdvancedImportOptionsCheckBox(boolean check)
     {
-        if (check)
-            checkCheckbox(checkBox);
-        else
-            uncheckCheckbox(checkBox);
+        elementCache().advancedImportOptionsCheckbox.set(check);
+    }
+
+    public void setSelectSpecificImportOptions(boolean check)
+    {
+        elementCache().specificImportOptionsCheckbox.set(check);
+        shortWait().until(LabKeyExpectedConditions.visibilityOf(elementCache().advancedOptionsPanel, check));
+    }
+
+    public void setApplyToMultipleFoldersCheckBox(boolean check)
+    {
+        elementCache().applyToMultipleFoldersCheckbox.set(check);
+        shortWait().until(LabKeyExpectedConditions.visibilityOf(elementCache().applyMultiplePanel, check));
+    }
+
+    public boolean isMultipleFolderImportAvailable()
+    {
+        return elementCache().applyToMultipleFoldersCheckbox.isDisplayed();
     }
 
     public void clickStartImport()
@@ -135,42 +136,54 @@ public class StartImportPage extends LabKeyPage
     }
 
     @LogMethod()
-    public void setAdvancedOptionCheckBoxes(Map<AdvancedOptionsCheckBoxes, Boolean> checkBoxes)
+    public void setAdvancedOptionCheckBoxes(Map<AdvancedOptionsCheckBoxes, Boolean> options)
     {
-        for(Map.Entry<AdvancedOptionsCheckBoxes, Boolean> checkBox : checkBoxes.entrySet())
+        for(Map.Entry<AdvancedOptionsCheckBoxes, Boolean> entry : options.entrySet())
         {
-            log("Setting value for checkbox: " + checkBox.getKey().toString());
-            if(checkBox.getValue())
-                checkCheckbox(getCheckBoxLocatorCss(checkBox.getKey()));
-            else
-                uncheckCheckbox(getCheckBoxLocatorCss(checkBox.getKey()));
+            log("Setting value for checkbox: " + entry.toString());
+            elementCache().dataTypesCheckbox(entry.getKey()).set(entry.getValue());
         }
     }
 
     public void setAllAdvancedOptionCheckBoxes(boolean checked)
     {
-        List<WebElement> chkBoxes = Locator.css("div.advanced-options-panel div.x4-column-layout-ct div.x4-panel-body input").findElements(getDriver());
-        chkBoxes
-                .stream()
-                .forEach(chkBox -> {
-                    if (!chkBox.getAttribute("value").toLowerCase().equals("study"))
-                    {
-                        if (checked)
-                            checkCheckbox(chkBox);
-                        else
-                            uncheckCheckbox(chkBox);
-                    }
-                });
+        Checkbox.Checkbox(Locator.checkbox())
+                .findAll(elementCache().advancedOptionsPanel)
+                .forEach(cb -> cb.set(checked));
     }
 
-    public Locator getCheckBoxLocatorCss(AdvancedOptionsCheckBoxes chkBox)
+    @Override
+    protected ElementCache newElementCache()
     {
-        return Locator.css("input[value='" + chkBox.getValue() + "']");
+        return new ElementCache();
     }
 
-    public Locator getCheckBoxLocatorXpath(AdvancedOptionsCheckBoxes chkBox)
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        return Locator.xpath("input[value='" + chkBox.getValue() + "']");
+        protected final Checkbox validateQueriesCheckbox = initialCheckbox("validateQueries");
+        protected final Checkbox advancedImportOptionsCheckbox = initialCheckbox("advancedImportOptions");
+        protected final Checkbox specificImportOptionsCheckbox = initialCheckbox("specificImportOptions");
+        protected final Checkbox applyToMultipleFoldersCheckbox = initialCheckbox("applyToMultipleFolders");
+        protected final Checkbox failForUndefinedVisitsCheckbox = initialCheckbox("failForUndefinedVisits");
+
+        protected final WebElement advancedOptionsPanel = Locator.byClass("advanced-options-panel").findWhenNeeded(this);
+        protected final WebElement applyMultiplePanel = Locator.byClass("apply-multiple-panel").findWhenNeeded(this);
+
+        public ElementCache()
+        {
+            shortWait().until(ExpectedConditions.visibilityOf(validateQueriesCheckbox.getComponentElement()));
+        }
+
+        public Checkbox initialCheckbox(String name)
+        {
+            return Checkbox.Checkbox(Locator.input(name)).findWhenNeeded(this);
+        }
+
+        public Checkbox dataTypesCheckbox(AdvancedOptionsCheckBoxes value)
+        {
+            return Checkbox.Checkbox(Locator.tagWithAttribute("input", "value", value.getValue()))
+                    .findWhenNeeded(advancedOptionsPanel);
+        }
     }
 
     public enum AdvancedOptionsCheckBoxes
@@ -215,6 +228,12 @@ public class StartImportPage extends LabKeyPage
         }
 
         public String getValue()
+        {
+            return value;
+        }
+
+        @Override
+        public String toString()
         {
             return value;
         }

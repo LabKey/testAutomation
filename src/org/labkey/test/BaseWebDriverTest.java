@@ -412,7 +412,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
-                getCurrentTest().checker().recordResults();
+                getCurrentTest().checker().reportResults();
                 if (!_anyTestFailed)
                     getCurrentTest().doPostamble();
                 else
@@ -717,7 +717,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 closeExtraWindows();
                 checker().wrapAssertion(() -> checkErrors());
-                checker().recordResults();
+                checker().reportResults();
             }
         };
 

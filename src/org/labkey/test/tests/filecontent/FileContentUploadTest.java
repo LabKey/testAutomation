@@ -58,8 +58,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
@@ -218,7 +218,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
     {
         log("Check Absolute File Path in File Browser");
 
-        final String ABSOLUTE_FILE_PATH_BUTTON_ID = "10";
         final String s = File.separator;
 
         new ApiPermissionsHelper(this)
@@ -231,7 +230,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         _fileBrowserHelper.goToAdminMenu();
         _fileBrowserHelper.goToConfigureButtonsTab();
-        _fileBrowserHelper.unhideGridColumn(ABSOLUTE_FILE_PATH_BUTTON_ID);
+        _fileBrowserHelper.unhideGridColumn(FileBrowserHelper.ABSOLUTE_FILE_PATH_COLUMN_ID);
         click(Ext4Helper.Locators.ext4Button("submit"));
         WebElement columnHeader = waitForElement(Locator.byClass("x4-column-header").withText("Absolute File Path").notHidden());
 
@@ -262,6 +261,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @Test
     public void testFolderNameCharacters()
     {
+        goToProjectHome();
         goToModule("FileContent");
         List<String> stringsToCheck = folderSubstringsToVerify();
         Set<String> expectedFolders = new HashSet<>();
