@@ -237,4 +237,17 @@ public class LabKeyExpectedConditions
         };
     }
 
+    /**
+     * Wraps {@link ExpectedConditions#visibilityOf(WebElement)} and {@link ExpectedConditions#invisibilityOf(WebElement)}
+     *
+     * @param element WebElement that should become visible or invisible.
+     * @param visible 'true' if the element is expected to become visible, 'false' if it not
+     */
+    public static ExpectedCondition<?> visibilityOf(WebElement element, boolean visible)
+    {
+        return visible
+                ? ExpectedConditions.visibilityOf(element)
+                : ExpectedConditions.invisibilityOf(element);
+    }
+
 }
