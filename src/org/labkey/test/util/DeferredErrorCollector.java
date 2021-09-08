@@ -2,6 +2,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,6 +25,14 @@ public class DeferredErrorCollector
     private final List<Class<? extends Throwable>> errorTypes = new ArrayList<>();
 
     private FatalErrorCollector _fatalErrorCollector;
+
+    /**
+     * For wrapper classes. Avoids resetting error types in wrapped collector.
+     */
+    protected DeferredErrorCollector()
+    {
+        artifactCollector = null;
+    }
 
     /**
      * @param artifactCollector An {@link ArtifactCollector} to be used for screenshots
@@ -73,7 +82,7 @@ public class DeferredErrorCollector
     {
         if (_fatalErrorCollector == null)
         {
-            _fatalErrorCollector = new FatalErrorCollector();
+            _fatalErrorCollector = new FatalErrorCollector(this);
         }
         return _fatalErrorCollector;
     }
@@ -86,7 +95,17 @@ public class DeferredErrorCollector
      */
     public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        return new DeferredErrorCollectorWithScreenshot(screenshotName);
+        return new DeferredErrorCollectorWithScreenshot(this, screenshotName);
+    }
+
+    /**
+     * Create temporary error collector that takes a screenshot for any recorded errors.
+     *
+     * @return Wrapped error collector. Intended to be used only once.
+     */
+    public final DeferredErrorCollector withScreenshot()
+    {
+        return withScreenshot("recordedError");
     }
 
     /**
@@ -134,7 +153,7 @@ public class DeferredErrorCollector
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
      * @see #takeScreenShot(String)
      */
-    public void screenShotIfNewError(String screenshotName)
+    public void screenShotIfNewError(@NotNull String screenshotName)
     {
         if (errorsSinceMark() > 0)
             takeScreenShot(screenshotName);
@@ -150,29 +169,29 @@ public class DeferredErrorCollector
      * @return <code>true</code> if <code>wrappedAssertion</code> does not throw, <code>false</code> if an error was recorded,
      * otherwise rethrow exception thrown by <code>wrappedAssertion</code>
      */
-    public boolean wrapAssertion(Runnable wrappedAssertion)
+    public final boolean wrapAssertion(Runnable wrappedAssertion)
     {
         try
         {
             wrappedAssertion.run();
             return true;
         }
-        catch (Exception | AssertionError err)
+        catch (Throwable err)
         {
-            if (isErrorRecordable(err))
+            if (isErrorDeferrable(err))
             {
-                recordError(err.getMessage());
+                recordError(err);
                 return false;
             }
             throw err; // Not a recordable error
         }
     }
 
-    protected boolean isErrorRecordable(Throwable err)
+    protected boolean isErrorDeferrable(Throwable err)
     {
         for (Class<? extends Throwable> errorType : errorTypes)
         {
-            if (errorType.isInstance(err))
+            if (errorType.isAssignableFrom(err.getClass()))
             {
                 return true;
             }
@@ -267,12 +286,12 @@ public class DeferredErrorCollector
      * @param actual the computed value being compared
      * @param matcher an expression, built of {@link Matcher}s, specifying allowed
      * values
-     * @see Assert#assertThat(String, Object, Matcher)
+     * @see MatcherAssert#assertThat(String, Object, Matcher)
      * @return <code>true</code> if the object satisfies the specified condition
      */
     public final <T> boolean verifyThat(String reason, T actual, Matcher<? super T> matcher)
     {
-        return wrapAssertion(() -> Assert.assertThat(reason, actual, matcher));
+        return wrapAssertion(() -> MatcherAssert.assertThat(reason, actual, matcher));
     }
 
     /**
@@ -288,37 +307,39 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Log an error message, take a screen shot and record the call stack.
+     * Record an arbitrary Throwable.
      *
-     * @param errorMessage Message to log.
+     * @param error Throwable to record.
      */
-    protected void recordError(String errorMessage)
+    public final void recordError(Throwable error)
     {
-        StringBuilder messageForLog = new StringBuilder();
+        recordError(error.getMessage(), error);
+    }
+
+    /**
+     * Record an error, take a screen shot if requested, and records the call stack.
+     * Allows subclasses to customize the error message.
+     *
+     * @param errorMessage Message for error
+     * @param error Throwable to record
+     */
+    protected void recordError(String errorMessage, Throwable error)
+    {
         StringBuilder messageForFailure = new StringBuilder();
 
-        StackTraceElement[] cause = Thread.currentThread().getStackTrace();
-
-        messageForLog.append("\n*******************************\n");
-        messageForLog.append("\n");
-        messageForLog.append(errorMessage);
-        messageForLog.append("\n");
+        StackTraceElement[] cause = error.getStackTrace();
 
         // Don't repeat everything in the list of all error messages, only some parts of this detailed error.
         messageForFailure.append(errorMessage);
 
-        StringBuilder deepCallStack = new StringBuilder(); // Keep deep stack for possible DEBUG logging in the future
         StringBuilder shallowCallStack = new StringBuilder();
         int shallowStackDepth = 0;
 
-        deepCallStack.append("\n");
         shallowCallStack.append("\n");
 
+        // Filter out library methods from stack trace
         for(StackTraceElement ste : cause)
         {
-            deepCallStack.append(ste);
-            deepCallStack.append("\n");
-
             if(ste.getClassName().toLowerCase().contains("org.labkey.test") && 
                     !ste.getClassName().startsWith(this.getClass().getName()) &&
                     shallowStackDepth < 6)
@@ -331,23 +352,31 @@ public class DeferredErrorCollector
         }
         
         // Record the call stack.
-        messageForLog.append(shallowCallStack);
         messageForFailure.append(shallowCallStack);
-        
-        messageForLog.append("\n*******************************\n");
-        
+
         allErrorMessages.add(messageForFailure.toString());
 
-        TestLogger.log(messageForLog.toString());
+        TestLogger.error("\n*******************************\n" + errorMessage + "\n*******************************\n", error);
+    }
+
+    /**
+     * Use {@link #reportResults()}
+     */
+    @Deprecated (since = "21.9")
+    public void recordResults()
+    {
+        reportResults();
     }
 
     /**
      * Throws an {@link AssertionError} if any errors have been recorded. Should be called when done performing checks.
      */
-    public void recordResults()
+    public void reportResults()
     {
         if(hasErrorBeenRecorded())
+        {
             Assert.fail(getFailureMessage());
+        }
     }
 
     /**
@@ -391,7 +420,7 @@ public class DeferredErrorCollector
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
      * @return The name of the file used. Basically the screenshotName parameter with a counter added to the end.
      */
-    public String takeScreenShot(String screenshotName)
+    public String takeScreenShot(@NotNull String screenshotName)
     {
         String snapShotNumberedName = screenshotName + "_" + screenShotCount++;
 
@@ -399,128 +428,135 @@ public class DeferredErrorCollector
 
         return snapShotNumberedName;
     }
+}
 
-    private abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
+/**
+ * Wraps an existing error collector. Any errors will be recorded within the wrapped collector.
+ */
+abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
+{
+    private final DeferredErrorCollector wrappedCollector;
+
+    protected DeferredErrorCollectorWrapper(DeferredErrorCollector collector)
     {
-        protected DeferredErrorCollectorWrapper()
-        {
-            super((ArtifactCollector) null);
-        }
-
-        protected DeferredErrorCollector getWrappedErrorColloctor()
-        {
-            return DeferredErrorCollector.this;
-        }
-
-        @Override
-        public final DeferredErrorCollector fatal()
-        {
-            return getWrappedErrorColloctor().fatal();
-        }
-
-        @Override
-        public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
-        {
-            return new DeferredErrorCollectorWithScreenshot(screenshotName);
-        }
-
-        @Override
-        public boolean hasErrorBeenRecorded()
-        {
-            return getWrappedErrorColloctor().hasErrorBeenRecorded();
-        }
-
-        @Override
-        public int getErrorCount()
-        {
-            return getWrappedErrorColloctor().getErrorCount();
-        }
-
-        @Override
-        public String takeScreenShot(String screenshotName)
-        {
-            return getWrappedErrorColloctor().takeScreenShot(screenshotName);
-        }
-
-        @Override
-        public void resetErrorTypes()
-        {
-            getWrappedErrorColloctor().resetErrorTypes();
-        }
-
-        @Override
-        public void addRecordableErrorType(Class<? extends Exception> errorType)
-        {
-            getWrappedErrorColloctor().addRecordableErrorType(errorType);
-        }
-
-        @Override
-        public void setErrorMark()
-        {
-            getWrappedErrorColloctor().setErrorMark();
-        }
-
-        @Override
-        public int errorsSinceMark()
-        {
-            return getWrappedErrorColloctor().errorsSinceMark();
-        }
-
-        @Override
-        public void screenShotIfNewError(String screenshotName)
-        {
-            getWrappedErrorColloctor().screenShotIfNewError(screenshotName);
-        }
-
-        @Override
-        protected boolean isErrorRecordable(Throwable err)
-        {
-            return getWrappedErrorColloctor().isErrorRecordable(err);
-        }
-
-        @Override
-        protected void recordError(String errorMessage)
-        {
-            getWrappedErrorColloctor().recordError(errorMessage);
-        }
-
-        @Override
-        public void recordResults()
-        {
-            getWrappedErrorColloctor().recordResults();
-        }
+        super();
+        wrappedCollector = collector;
     }
 
-    private class FatalErrorCollector extends DeferredErrorCollectorWrapper
+    @Override
+    public final DeferredErrorCollector fatal()
     {
-        protected FatalErrorCollector()
-        {
-            super();
-        }
-
-        @Override
-        public boolean wrapAssertion(Runnable wrappedAssertion)
-        {
-            wrappedAssertion.run();
-            return true;
-        }
+        return wrappedCollector.fatal();
     }
 
-    private class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
+    @Override
+    public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        private final String _screenshotName;
+        return wrappedCollector.withScreenshot(screenshotName);
+    }
 
-        protected DeferredErrorCollectorWithScreenshot(String screenshotName)
-        {
-            _screenshotName = screenshotName;
-        }
+    @Override
+    public boolean hasErrorBeenRecorded()
+    {
+        return wrappedCollector.hasErrorBeenRecorded();
+    }
 
-        @Override
-        protected void recordError(String errorMessage)
-        {
-            String shotName = super.takeScreenShot(_screenshotName);
-            errorMessage = errorMessage + "\nScreen shot name: " + shotName + "\n";
-            super.recordError(errorMessage);
-        }
+    @Override
+    public int getErrorCount()
+    {
+        return wrappedCollector.getErrorCount();
+    }
+
+    @Override
+    public String takeScreenShot(@NotNull String screenshotName)
+    {
+        return wrappedCollector.takeScreenShot(screenshotName);
+    }
+
+    @Override
+    public void resetErrorTypes()
+    {
+        wrappedCollector.resetErrorTypes();
+    }
+
+    @Override
+    public void addRecordableErrorType(Class<? extends Exception> errorType)
+    {
+        wrappedCollector.addRecordableErrorType(errorType);
+    }
+
+    @Override
+    public void setErrorMark()
+    {
+        wrappedCollector.setErrorMark();
+    }
+
+    @Override
+    public int errorsSinceMark()
+    {
+        return wrappedCollector.errorsSinceMark();
+    }
+
+    @Override
+    public void screenShotIfNewError(@NotNull String screenshotName)
+    {
+        wrappedCollector.screenShotIfNewError(screenshotName);
+    }
+
+    @Override
+    protected boolean isErrorDeferrable(Throwable err)
+    {
+        return wrappedCollector.isErrorDeferrable(err);
+    }
+
+    @Override
+    protected void recordError(String errorMessage, Throwable cause)
+    {
+        wrappedCollector.recordError(errorMessage, cause);
+    }
+
+    @Override
+    public void reportResults()
+    {
+        wrappedCollector.reportResults();
+    }
+}
+
+/**
+ * Will never defer any errors.
+ */
+class FatalErrorCollector extends DeferredErrorCollectorWrapper
+{
+    protected FatalErrorCollector(DeferredErrorCollector collector)
+    {
+        super(collector);
+    }
+
+    @Override
+    protected boolean isErrorDeferrable(Throwable err)
+    {
+        return false;
+    }
+}
+
+/**
+ * Wraps an error collector and takes a screenshot if any errors are recorded.
+ */
+class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
+{
+    private final String _screenshotName;
+
+    protected DeferredErrorCollectorWithScreenshot(DeferredErrorCollector collector, String screenshotName)
+    {
+        super(collector);
+        _screenshotName = screenshotName;
+    }
+
+    @Override
+    protected void recordError(String errorMessage, Throwable error)
+    {
+        String shotName = super.takeScreenShot(_screenshotName);
+        errorMessage = errorMessage + "\nScreen shot name: " + shotName + "\n";
+        super.recordError(errorMessage, error);
     }
 }
