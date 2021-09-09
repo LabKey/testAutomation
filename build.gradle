@@ -29,6 +29,7 @@ project.dependencies {
     api("org.seleniumhq.selenium:selenium-support:${seleniumVersion}")
     implementation("org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}")
+    implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:jetty-repacked:${jettyRepackagedVersion}")
 
     api("org.apache.httpcomponents:httpcore:${httpcoreVersion}")
@@ -83,9 +84,6 @@ project.dependencies {
         )
     }
 
-    // Issue 36184: Tests can't find selenium-ie-driver library when running on Windows on TeamCity
-    // Workaround to ensure that the class-loader finds InternetExplorerDriver
-    implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 }
 
 BuildUtils.addLabKeyDependency(
