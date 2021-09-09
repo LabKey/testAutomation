@@ -73,6 +73,7 @@ public class SampleTypeDefinition extends DomainProps
         _description = description;
         return this;
     }
+
     public String getAutoLinkDataToStudy()
     {
         return _autoLinkDataToStudy;
@@ -219,11 +220,12 @@ public class SampleTypeDefinition extends DomainProps
             }
             options.put("importAliases", importAliases);
         }
-        if(getAutoLinkDataToStudy() != null)
+        if (getAutoLinkDataToStudy() != null)
         {
-           options.put("autoLinkTargetContainerId", getAutoLinkDataToStudy());
+            options.put("autoLinkTargetContainerId", getAutoLinkDataToStudy());
         }
-        if(getLinkedDatasetCategory() != null){
+        if (getLinkedDatasetCategory() != null)
+        {
 
             options.put("autoLinkCategory", getLinkedDatasetCategory());
         }

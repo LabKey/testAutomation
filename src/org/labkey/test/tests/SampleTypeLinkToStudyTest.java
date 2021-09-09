@@ -26,6 +26,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -510,20 +511,21 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     @Test
     public void testManualDatasetCategoryLink()
     {
-        String categoryName = "CAT1";
-        createDatasetCategory(VISIT_BASED_STUDY, categoryName);
+        String categoryName1 = "CAT1";
+        String categoryName2 = "CAT2";
+        createDatasetCategory(VISIT_BASED_STUDY, categoryName1);
         goToProjectHome();
 
         log("Linking the sample type to preexisting dataset category");
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, categoryName);
+        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, categoryName1);
 
         log("Linking the sample type to new dataset category");
         goToProjectHome();
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, "CAT2");
+        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, categoryName2);
 
-        checker().verifyEquals("Incorrect category for the dataset(Category exists case)", categoryName,
+        checker().verifyEquals("Incorrect category for the dataset(Category exists case)", categoryName1,
                 getCategory(VISIT_BASED_STUDY, SAMPLE_TYPE1));
-        checker().verifyEquals("Incorrect category for the dataset(New category case)", "CAT2",
+        checker().verifyEquals("Incorrect category for the dataset(New category case)", categoryName2,
                 getCategory(DATE_BASED_STUDY, SAMPLE_TYPE2));
     }
 
@@ -548,8 +550,14 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void preTest() throws Exception
     {
         //deleting the datasets from study folders.
-        deleteDatasets(DATE_BASED_STUDY);
-        deleteDatasets(VISIT_BASED_STUDY);
+        if(TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 1"))
+            TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 1");
+        if(TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 2"))
+            TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 2");
+        if(TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 1"))
+            TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
+        if(TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
+            TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
         cnt = 0; //Resetting the counter between the tests.
     }
 
@@ -595,19 +603,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable table = executeQueryPage.getDataRegion();
         table.setFilter("Label", "Equals", datasetName);
         return table.getDataAsText(0, "categoryid");
-    }
-
-    private void deleteDatasets(String projectName)
-    {
-        goToProjectHome(projectName);
-        _studyHelper.goToManageDatasets().clickDeleteMultipleDatasets();
-        if (Locator.xpath("//table/tbody/tr").findElements(getDriver()).size() > 1)
-        {
-            checkCheckbox(Locator.xpath("//table/tbody/tr[1]/td[1]/input"));
-            clickButton("Delete Selected", 0);
-            acceptAlert().contains("Are you sure you want to delete the selected datasets? This action cannot be undone.");
-        }
-        waitFor(() -> 1 == Locator.xpath("//table/tbody/tr").findElements(getDriver()).size(), WAIT_FOR_JAVASCRIPT);
     }
 
     private void verifyLinkToHistory(String expectedComments)
