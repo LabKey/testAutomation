@@ -26,6 +26,7 @@ public class SampleTypeDefinition extends DomainProps
     private String _nameExpression;
     private String _description;
     private String _autoLinkDataToStudy;
+    private String _autoLinkedDatasetCategory;
     private List<FieldDefinition> _fields = new ArrayList<>();
     private Map<String, String> _parentAliases = new HashMap<>();
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
@@ -72,6 +73,7 @@ public class SampleTypeDefinition extends DomainProps
         _description = description;
         return this;
     }
+
     public String getAutoLinkDataToStudy()
     {
         return _autoLinkDataToStudy;
@@ -80,6 +82,17 @@ public class SampleTypeDefinition extends DomainProps
     public SampleTypeDefinition setAutoLinkDataToStudy(String value)
     {
         _autoLinkDataToStudy = value;
+        return this;
+    }
+
+    public String getLinkedDatasetCategory()
+    {
+        return _autoLinkedDatasetCategory;
+    }
+
+    public SampleTypeDefinition setLinkedDatasetCategory(String value)
+    {
+        _autoLinkedDatasetCategory = value;
         return this;
     }
 
@@ -207,9 +220,14 @@ public class SampleTypeDefinition extends DomainProps
             }
             options.put("importAliases", importAliases);
         }
-        if(getAutoLinkDataToStudy() != null)
+        if (getAutoLinkDataToStudy() != null)
         {
-           options.put("autoLinkTargetContainerId", getAutoLinkDataToStudy());
+            options.put("autoLinkTargetContainerId", getAutoLinkDataToStudy());
+        }
+        if (getLinkedDatasetCategory() != null)
+        {
+
+            options.put("autoLinkCategory", getLinkedDatasetCategory());
         }
         if (getInventoryMetricUnit() != null)
         {

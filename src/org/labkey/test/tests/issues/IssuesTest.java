@@ -832,7 +832,7 @@ public class IssuesTest extends BaseWebDriverTest
         List<WebElement> assignedToUserOptionWebElement = new Select(Locator.name("assignedTo").findElement(getDriver())).getOptions();
         List<String> assignedToUserOptions = new ArrayList<>();
         for (WebElement e : assignedToUserOptionWebElement)
-            if (e.getText() != "")
+            if (!e.getText().isBlank())
                 assignedToUserOptions.add(e.getText());
 
         goToProjectHome();

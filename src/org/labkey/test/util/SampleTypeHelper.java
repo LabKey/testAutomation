@@ -43,9 +43,9 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGI
  */
 public class SampleTypeHelper extends WebDriverWrapper
 {
-    private final WebDriver _driver;
     public static final String IMPORT_DATA_LABEL = "Insert";
     public static final String MERGE_DATA_LABEL = "Insert and Replace";
+    private final WebDriver _driver;
 
     public SampleTypeHelper(WebDriverWrapper driverWrapper)
     {
@@ -63,6 +63,23 @@ public class SampleTypeHelper extends WebDriverWrapper
         return new SampleTypeHelper(dWrapper.getDriver());
     }
 
+    @NotNull
+    private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
+    {
+        // first the header
+        List<String> rows = new ArrayList<>();
+        rows.add(String.join("\t", data.get(0).keySet()));
+        data.forEach(dataMap -> {
+            StringBuilder row = new StringBuilder();
+            data.get(0).keySet().forEach(key -> {
+                row.append(dataMap.get(key));
+                row.append("\t");
+            });
+            rows.add(row.substring(0, row.lastIndexOf("\t")));
+        });
+        return String.join("\n", rows);
+    }
+
     @Override
     public WebDriver getWrappedDriver()
     {
@@ -74,9 +91,13 @@ public class SampleTypeHelper extends WebDriverWrapper
         CreateSampleTypePage createPage = goToCreateNewSampleType();
 
         createPage.setName(props.getName());
-        if(props.getAutoLinkDataToStudy() != null)
+        if (props.getAutoLinkDataToStudy() != null)
         {
             createPage.setAutoLinkDataToStudy(props.getAutoLinkDataToStudy());
+        }
+        if (props.getLinkedDatasetCategory() != null)
+        {
+            createPage.setLinkedDatasetCategory(props.getLinkedDatasetCategory());
         }
         if (props.getNameExpression() != null)
         {
@@ -125,7 +146,7 @@ public class SampleTypeHelper extends WebDriverWrapper
         waitForText("Import Lookups by Alternate Key");
         boolean merge = MERGE_DATA_LABEL.equals(label);
         String componentId = "insertOption" + index;
-        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge?"1":"0") + ")";
+        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge ? "1" : "0") + ")";
         executeScript(script);
     }
 
@@ -179,7 +200,7 @@ public class SampleTypeHelper extends WebDriverWrapper
                 .clickInsertNewRow();
         for (Map.Entry<String, String> fieldValue : fieldValues.entrySet())
         {
-            setFormElement(Locator.name("quf_"+ fieldValue.getKey()), fieldValue.getValue());
+            setFormElement(Locator.name("quf_" + fieldValue.getKey()), fieldValue.getValue());
         }
         clickButton("Submit");
     }
@@ -250,23 +271,6 @@ public class SampleTypeHelper extends WebDriverWrapper
             throw new IllegalArgumentException("No data provided");
         }
         return startTsvImport(convertMapToTsv(data), importOption);
-    }
-
-    @NotNull
-    private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
-    {
-        // first the header
-        List<String> rows = new ArrayList<>();
-        rows.add(String.join("\t", data.get(0).keySet()));
-        data.forEach(dataMap -> {
-            StringBuilder row = new StringBuilder();
-            data.get(0).keySet().forEach(key -> {
-                row.append(dataMap.get(key));
-                row.append("\t");
-            });
-            rows.add(row.substring(0, row.lastIndexOf("\t")));
-        });
-        return String.join("\n", rows);
     }
 
     public void deleteSamples(DataRegionTable samplesTable, String expectedTitle)
