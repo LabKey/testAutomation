@@ -1,6 +1,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.query.AliasFieldDialog;
 import org.openqa.selenium.WebDriver;
@@ -45,6 +46,15 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
     public QueryMetadataEditorPage clickSave()
     {
         elementCache().saveButton.click();
+        return this;
+    }
+
+    public QueryMetadataEditorPage clickSaveAndWaitForSuccess()
+    {
+        clickSave();
+        WebDriverWrapper.waitFor(()->  Locator.tagWithClass("div", "alert-success")
+                        .containingIgnoreCase("Save Successful").existsIn(this),
+                "Expected success message did not appear in time", WAIT_FOR_JAVASCRIPT);
         return this;
     }
 
