@@ -117,7 +117,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     {
         List<DetailTable> tables = elementCache().detailTables();
 
-        if(tables.size() == 2)
+        if(tables.size() != 2)
             throw new NoSuchElementException("This does not appear to be a sub-aliquot.");
 
         return tables.get(0);
