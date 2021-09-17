@@ -47,6 +47,12 @@ public class UpdatePage extends BaseUpdatePage<BaseUpdatePage.ElementCache>
         return new DetailsPage(getDriver());
     }
 
+    public UpdatePage addComment(String comment)
+    {
+        super.comment().set(comment);
+        return this;
+    }
+
     @Override
     public OptionSelect assignedTo()
     {

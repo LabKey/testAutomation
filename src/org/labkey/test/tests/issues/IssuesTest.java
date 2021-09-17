@@ -32,10 +32,10 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.issues.ResolvePage;
 import org.labkey.test.pages.issues.UpdatePage;
@@ -47,6 +47,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -74,12 +76,10 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
     private static final String user = "reader@issues.test";
-    private static String NAME;
     private static final Map<String, String> ISSUE_0 = new HashMap<>(Maps.of("title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
     private static final Map<String, String> ISSUE_1 = new HashMap<>(Maps.of("title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
     private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
     private static final String ISSUE_LIST_REGION_NAME = "issues-issues";
-
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
             "You can review this issue here: ^detailsURL^\n" +
@@ -89,12 +89,42 @@ public class IssuesTest extends BaseWebDriverTest
                     "^string3|This line shouldn't appear: %s^\n" +
                     "^string5|Customized template line: %s^\n" +
                     "^comment^";
-
     private static final String TEST_EMAIL_TEMPLATE_BAD = TEST_EMAIL_TEMPLATE +
-            "\n\'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
+            "\n'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
+    private static String NAME;
+    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
-    private IssuesHelper _issuesHelper = new IssuesHelper(this);
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    @BeforeClass
+    public static void doSetup()
+    {
+        IssuesTest initTest = (IssuesTest) getCurrentTest();
+        initTest.doInit();
+    }
+
+    private static String getLookupTableName(String issueDefName, String field)
+    {
+        return issueDefName + "-" + field.toLowerCase() + "-lookup";
+    }
+
+    @LogMethod
+    public static void addLookupValues(BaseWebDriverTest test, String issueDefName, String fieldName, Collection<String> values)
+    {
+        if (!test.isElementPresent(Locator.tagWithText("h3", getLookupTableName(issueDefName, fieldName))))
+        {
+            test.goToSchemaBrowser();
+            test.viewQueryData("lists", getLookupTableName(issueDefName, fieldName));
+        }
+
+        StringBuilder tsv = new StringBuilder();
+        tsv.append("value");
+        for (String value : values)
+        {
+            tsv.append("\n");
+            tsv.append(value);
+        }
+        test._listHelper.uploadData(tsv.toString());
+    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -119,13 +149,6 @@ public class IssuesTest extends BaseWebDriverTest
     {
         _userHelper.deleteUsers(false, USER1, USER2);
         _containerHelper.deleteProject(getProjectName(), afterTest);
-    }
-
-    @BeforeClass
-    public static void doSetup()
-    {
-        IssuesTest initTest = (IssuesTest)getCurrentTest();
-        initTest.doInit();
     }
 
     public void doInit()
@@ -340,33 +363,9 @@ public class IssuesTest extends BaseWebDriverTest
         }
     }
 
-    private static String getLookupTableName(String issueDefName, String field)
-    {
-        return issueDefName + "-" + field.toLowerCase() + "-lookup";
-    }
-
     private void addLookupValues(String issueDefName, String fieldName, Collection<String> values)
     {
         addLookupValues(this, issueDefName, fieldName, values);
-    }
-
-    @LogMethod
-    public static void addLookupValues(BaseWebDriverTest test, String issueDefName, String fieldName, Collection<String> values)
-    {
-        if (!test.isElementPresent(Locator.tagWithText("h3", getLookupTableName(issueDefName, fieldName))))
-        {
-            test.goToSchemaBrowser();
-            test.viewQueryData("lists", getLookupTableName(issueDefName, fieldName));
-        }
-
-        StringBuilder tsv = new StringBuilder();
-        tsv.append("value");
-        for (String value : values)
-        {
-            tsv.append("\n");
-            tsv.append(value);
-        }
-        test._listHelper.uploadData(tsv.toString());
     }
 
     private void createLookupList(String issueDefName, String fieldName, Collection<String> values)
@@ -472,7 +471,7 @@ public class IssuesTest extends BaseWebDriverTest
     public void requiredFieldsTest()
     {
         final String subFolder = "Required Fields";
-        final int[] requiredFieldPos = {0,1,2,3,4,5,6,8,9};
+        final int[] requiredFieldPos = {0, 1, 2, 3, 4, 5, 6, 8, 9};
         final String[] requiredFieldLabels = {"title", "assignedto", "type", "area", "milestone",
                 "notifylist", "customername", "contractnumber"};
         Set<String> expectedErrors = new HashSet<>();
@@ -820,14 +819,28 @@ public class IssuesTest extends BaseWebDriverTest
         // taking care of some clean-up while here for the test.
         _userHelper.deleteUsers(true, deletedUser, user);
 
+        //No NPE when the default user is selected.
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         clickButton("New Issue");
-        // NPE
-        //clickButton("Cancel");
+        clickButton("Cancel");
 
-        // TODO: extend test to check validate full user selection list based on group selection...
         // TODO: compare user dropdown list between admin and new issues page
+        goToProjectHome();
+        waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
+        clickButton("New Issue");
+        List<WebElement> assignedToUserOptionWebElement = new Select(Locator.name("assignedTo").findElement(getDriver())).getOptions();
+        List<String> assignedToUserOptions = new ArrayList<>();
+        for (WebElement e : assignedToUserOptionWebElement)
+            if (!e.getText().isBlank())
+                assignedToUserOptions.add(e.getText());
+
+        goToProjectHome();
+        waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
+        IssuesAdminPage issuesAdminPage = _issuesHelper.goToAdmin();
+        List<String> defaultUserOptions = issuesAdminPage.getAllDefaultUserOptions();
+
+        checker().verifyEquals("Assigned too and Default user assignment options dont match", defaultUserOptions, assignedToUserOptions);
     }
 
     @Test

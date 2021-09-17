@@ -53,7 +53,9 @@ public class FileBrowserHelper extends WebDriverWrapper
 {
     private static final String IMPORT_SIGNAL_NAME = "import-actions-updated";
     private static final String FILE_LIST_SIGNAL_NAME = "file-list-updated";
-    public static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
+
+    public static final String ABSOLUTE_FILE_PATH_COLUMN_ID = "10";
+    private static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
 
     private final WrapsDriver _driver;
 
@@ -200,6 +202,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     private String doAndWaitForFileListRefresh(Runnable func, WebDriverWait wait)
     {
+        waitForFileGridReady();
         Mutable<String> signal = new MutableObject<>();
         doAndWaitForElementToRefresh(() -> signal.setValue(doAndWaitForPageSignal(func, FILE_LIST_SIGNAL_NAME, wait)), this::waitForGrid, wait);
         return signal.getValue();
@@ -576,7 +579,6 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         doAndWaitForFileListRefresh(() -> dragAndDropFileInDropZone(file));
         waitForElement(fileGridCell.withText(expectedFileName));
-        waitForGrid();
     }
 
     public void importFile(String filePath, String importAction)
@@ -719,6 +721,7 @@ public class FileBrowserHelper extends WebDriverWrapper
      */
     public int waitForFileGridReady()
     {
+        waitForElement(org.labkey.test.Locators.pageSignal(IMPORT_SIGNAL_NAME));
         String signalValue = waitForElement(org.labkey.test.Locators.pageSignal(FILE_LIST_SIGNAL_NAME)).getAttribute("value");
         waitForGrid();
         return Integer.parseInt(signalValue);

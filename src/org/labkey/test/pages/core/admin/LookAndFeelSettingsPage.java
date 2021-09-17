@@ -16,6 +16,8 @@
 package org.labkey.test.pages.core.admin;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -30,6 +32,18 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
     {
         super(driver);
         waitForPage();
+    }
+
+    public static LookAndFeelSettingsPage beginAt(WebDriverWrapper wrapper)
+    {
+        wrapper.beginAt(WebTestHelper.buildURL("admin", "lookAndFeelSettings"));
+        return new LookAndFeelSettingsPage(wrapper.getDriver());
+    }
+
+    public static LookAndFeelSettingsPage beginAt(WebDriverWrapper wrapper, String containerPath)
+    {
+        wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath, "projectSettings"));
+        return new LookAndFeelSettingsPage(wrapper.getDriver());
     }
 
     @Override

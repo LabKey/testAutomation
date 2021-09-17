@@ -600,16 +600,6 @@ public abstract class Locator extends By
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").withText(text);
     }
 
-    public static XPathLocator bootstrapButton()
-    {
-        return tagWithClass("a", "btn");
-    }
-
-    public static XPathLocator bootstrapButton(String text)
-    {
-        return bootstrapButton().withText(text);
-    }
-
     public static XPathLocator buttonContainingText(String text)
     {
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").containing(text);

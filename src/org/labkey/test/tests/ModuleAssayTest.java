@@ -239,11 +239,11 @@ public class ModuleAssayTest extends AbstractAssayTest
         runsDt.goToView("AssayDesignRuns");
         runsDt.goToView("AssayDesignChildSchemaRuns");
         assertTextPresent("Created By", "Modified");
-        assertTextNotPresent("Assay Id", "MetaOverride Double Run", "Run Count", "run01.tsv", "run02.tsv");
+        assertTextNotPresent("Assay ID", "MetaOverride Double Run", "Run Count", "run01.tsv", "run02.tsv");
 
         // Verify file-based view associated with assay type shows up, with expected columns
         runsDt.goToView("AssayTypeRuns");
-        assertTextPresent("Assay Id", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
+        assertTextPresent("Assay ID", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
         assertTextNotPresent("Modified", "Run Count");
 
         runsDt.goToView("Default");
@@ -270,7 +270,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         // Verify file-based view associated with assay type shows up, with expected columns
         dataTable.goToView(  "AssayTypeData");
-        assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay Id", "run01.tsv");
+        assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay ID", "run01.tsv");
         assertTextNotPresent("MetaOverride Double Run", "Run Count", "Target Study");
 
         dataTable.goToView(  "Default");

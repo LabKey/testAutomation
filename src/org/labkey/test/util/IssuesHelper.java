@@ -29,9 +29,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.issues.IssueListDefDataRegion;
-import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
+import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -156,7 +156,7 @@ public class IssuesHelper extends WebDriverWrapper
                 return 0;
             return (Integer) response.getRows().get(0).get("IssueId");
         }
-        catch (IOException |CommandException e)
+        catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
         }
@@ -194,15 +194,12 @@ public class IssuesHelper extends WebDriverWrapper
 
         for (File file : attachments)
         {
-           insertPage.addAttachment(file);
+            insertPage.addAttachment(file);
         }
 
         insertPage.save();
-
         List<String> errors = getTexts(Locators.labkeyError.findElements(getDriver()));
-
         Assert.assertEquals("Unexpected errors", Collections.<String>emptyList(), errors);
-
         return new DetailsPage(getDriver());
     }
 
