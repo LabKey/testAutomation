@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
@@ -131,8 +132,11 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
 
     private WebElement getRootMenu()
     {
-        return Locator.tagWithClass("ul", "dropdown-menu")
+        WebElement rootMenu = Locator.tagWithClass("ul", "dropdown-menu")
                 .withAttribute("aria-labelledby", componentId()).findElement(getComponentElement());
+        WebDriverWrapper.waitFor(()-> Locators.menuItem().findElements(rootMenu).size() > 0,
+                "the root menu did not have items in time", WAIT_FOR_JAVASCRIPT);
+        return rootMenu;
     }
 
     // returns the item to be clicked.
