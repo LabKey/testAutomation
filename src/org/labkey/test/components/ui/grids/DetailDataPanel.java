@@ -107,21 +107,20 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     }
 
     /**
-     * If this an aliquot sample there will be multiple tables in the panel, the second table is under the 'Original
-     * Sample Data' header, but is a separate table from the other original data displayed and may only be one or two
-     * lines. The fields 'Original sample' and 'Sample description' will show up here.
+     * If this a sub-aliquot sample there will be multiple tables in the "Original Sample Details".
+     * The first contains just the "Original Sample" field.
+     * The second contains the rest oof the original sample metadata.
      *
      * @return A {@link DetailTable}.
      */
-    public DetailTable getAliquotDetailMetaTable()
+    public DetailTable getSubAliquotRootSampleFieldTable()
     {
         List<DetailTable> tables = elementCache().detailTables();
 
-        if(tables.size() == 1)
-            throw new NoSuchElementException("There does not appear to be an 'Aliquot (details meta)' table in this panel.");
+        if(tables.size() != 2)
+            throw new NoSuchElementException("This does not appear to be a sub-aliquot.");
 
-        // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
-        return tables.get(1);
+        return tables.get(0);
     }
 
     public FileUploadField getFileField(String fieldCaption)
