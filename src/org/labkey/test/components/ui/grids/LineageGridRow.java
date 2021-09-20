@@ -14,6 +14,7 @@ public class LineageGridRow extends GridRow
     private Locator dupeLocator = Locator.tagWithClass("span", "label-warning").withText("Duplicate");
     private Locator firstParentLoc = Locator.tagWithClass("span", "label-info").withText("1st parent");
     private Locator secondParentLoc = Locator.tagWithClass("span", "label-primary").withText("2nd parent");
+    private String _lineageName;
 
     protected LineageGridRow(ResponsiveGrid grid, WebElement el, WebDriver driver)
     {
@@ -34,7 +35,9 @@ public class LineageGridRow extends GridRow
 
     public String getLineageName()
     {
-        return Locator.tag("a").findElement(elementCache().lineageNameElement).getText();
+        if (null == _lineageName)
+            _lineageName = Locator.tag("a").findElement(elementCache().lineageNameElement).getText();
+        return _lineageName;
     }
 
     public String getLineageNameTitle()

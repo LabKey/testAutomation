@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 
 import static org.labkey.test.components.html.Input.Input;
 
+/**
+ * Wraps the component described in ui-components internal\components\lineage\grid\LineageGridDisplay.tsx
+ */
 public class LineageGrid extends WebDriverComponent<LineageGrid.ElementCache>
 {
     private final WebElement _el;
