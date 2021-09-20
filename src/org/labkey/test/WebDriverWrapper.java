@@ -342,7 +342,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setAssumeUntrustedCertificateIssuer(false);
 
                     FirefoxOptions capabilities = new FirefoxOptions();
-                    capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+                    capabilities.setCapability(FirefoxDriver.Capability.PROFILE, profile);
                     capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
                     capabilities.addPreference("--log", "WARN");
 
@@ -2557,7 +2557,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getFormElement(WebElement el)
     {
-        return (String) executeScript("return arguments[0].value;", el);
+        return el.getDomProperty("value");
     }
 
     /**
