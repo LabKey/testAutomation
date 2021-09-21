@@ -229,11 +229,6 @@ public abstract class AbstractContainerHelper
             }
             catch (NoSuchElementException missingModule)
             {
-                if (TestProperties.isIgnoreMissingModules())
-                {
-                    throw new AssumptionViolatedException("Module not installed [" + moduleName + "]. Skipping test.");
-                }
-
                 String supportedDbMessage = "";
                 if (_test instanceof PostgresOnlyTest)
                 {

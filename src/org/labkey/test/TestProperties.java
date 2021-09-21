@@ -94,11 +94,6 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.server.remote", "false"));
     }
 
-    public static boolean isIgnoreMissingModules()
-    {
-        return "true".equals(System.getProperty("webtest.ignoreMissingModules", "false"));
-    }
-
     public static boolean isLeakCheckSkipped()
     {
         return "false".equals(System.getProperty("memCheck", "true"));
