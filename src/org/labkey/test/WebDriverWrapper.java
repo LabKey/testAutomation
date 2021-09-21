@@ -246,7 +246,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 }
                 if (oldWebDriver == null)
                 {
-                    log("Using chromedriver: " + TestProperties.ensureChromedriverExeProperty());
                     configureChromeDriverLogging(downloadDir);
                     ChromeOptions options = new ChromeOptions();
                     Map<String, Object> prefs = new HashMap<>();
@@ -287,7 +286,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 }
                 if (oldWebDriver == null)
                 {
-                    log("Using geckodriver: " + TestProperties.ensureGeckodriverExeProperty());
                     configureGeckoDriverLogging(downloadDir);
                     final FirefoxProfile profile = new FirefoxProfile();
                     profile.setPreference("app.update.auto", false);
