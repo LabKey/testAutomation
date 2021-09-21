@@ -1,5 +1,5 @@
 # -----------------------------
-# LabKey Selenium Test Properties
+# | LabKey Selenium Test Properties
 # -----------------------------
 #
 # These properties are used to control runtime behavior of the Selenium tests.
@@ -16,106 +16,115 @@
 # Note: When running tests on TeamCity, not all system properties will be passed though to the tests.
 # Only properties defined in this file and properties starting with 'webtest.' or 'webdriver.' will be propagated
 # to the test runner by Gradle.
+#
+# See `org.labkey.test.TestProperties` for more information on many of these properties.
 
 
 # -----------------------------
-# Test suite construction properties
+# | Test suite construction properties
+# |
+# | Properties used to specify which tests to run and where to find them
 # -----------------------------
-# Properties used to specify which tests to run and where to find them
 suite=
 test=
 addToSuite=
 removeFromSuite=
 shuffleTests=false
-##
-test.packages=org.labkey.test
-extra.test.packages=
+# | The test harness uses reflection to search the specified package(s) for test classes
+#test.packages=org.labkey.test
+
 
 # -----------------------------
-# Test runner properties
+# | Test runner properties
 # -----------------------------
 haltOnError=true
 cleanOnly=false
 clean=false
-webtest.timeout.multiplier=1.0
 close.on.fail=false
 failure.output.dir=build/modules/test/test/logs
 test.credentials.file=
+webtest.timeout.multiplier=1.0
+
 
 # -----------------------------
-# WebDriver properties
+# | WebDriver properties
 # -----------------------------
+# | Select browser to run tests through. Usually 'firefox' or 'chrome'.
+# | See 'org.labkey.test.WebDriverWrapper.BrowserType'
 selenium.browser=firefox
-webdriver.gecko.driver=
-webdriver.chrome.driver=
+# | Path to geckodriver executable. Required to run tests on firefox.
+#webdriver.gecko.driver=
+# | Path to chromedriver executable
+#webdriver.chrome.driver=
 selenium.firefox.binary=
 selenium.reuseWebDriver=true
-webtest.webdriver.logging=false
-webtest.webdriver.headless=false
+# | Enable debug logging for geckodriver/chromedriver. Log files end up in browser download dir
+#webtest.webdriver.logging=false
+# | Run test browser in headless mode (experimental)
+#webtest.webdriver.headless=false
+
 
 # -----------------------------
-# Test debug properties
+# | Test debug properties
+#
+# | Set `debugSuspendSelenium=y` to have the test JVM wait for a debugger to connect on the specified port
+# | Command line only.
 # -----------------------------
-## When running from the command line, this will cause the
 #debugSuspendSelenium=n
 #selenium.debug.port=5005
 
+
 # -----------------------------
-# Server properties
+# | Server properties
+# |
+# | These properties define how we will connect to the server under test.
 # -----------------------------
-## These properties define how we will connect to the server under test
 labkey.port=8080
 labkey.server=http://localhost
 labkey.contextpath=/labkey
 
+
 # -----------------------------
-# Remote server properties
+# | Remote server properties
+# |
+# | These properties allow tests to alter their behavior based on the type of server being tested.
+# | Precise effects vary from test to test.
 # -----------------------------
-## These properties allow tests to alter their behavior based on the type of server being tested
+#
 #webtest.without.test.modules=
 #webtest.primary.app.admin=
 #webtest.server.remote=
 #webtest.server.trial=
 
+
 # -----------------------------
-# Server configuration properties
+# | Server configuration properties
 # -----------------------------
-# These define certain Tomcat startup properties. Mostly only used by TeamCity
+# | These define certain Tomcat startup properties. Mostly only used by TeamCity
 disableAssertions=false
 devMode=true
 
-# -----------------------------
-# Test suite construction properties
-# -----------------------------
-## Properties used to specify which tests to run and where to find them
-suite=
-test=
-addToSuite=
-removeFromSuite=
-shuffleTests=false
-test.packages=org.labkey.test
-extra.test.packages=
-## 'dumpTsv' defines a file name. If it is set, a list of all Selenium tests will be written to the specified file.
-dumpTsv=
 
 # -----------------------------
-# Runtime test properties - additional checks
+# | Runtime test properties - additional checks
 # -----------------------------
 linkCheck=false
 injectCheck=false
-crawlerTimeout=120
+#crawlerTimeout=120
 memCheck=false
 scriptCheck=true
 queryCheck=false
-viewCheck=true
+viewCheck=false
+
 
 # -----------------------------
-# Runtime server configuration properties
+# | Runtime server configuration properties
+# |
+# | Used by tests to configure the server at runtime
 # -----------------------------
 additional.pipeline.tools=
 use.cloud.pipeline=false
 cloud.pipeline.bucket=
-webtest.ignoreMissingModules=false
 webtest.debug.server.packages=
-# Enable/Disable experimental features
+# | Enable/Disable experimental features
 #webtest.experimental.legacy-lineage=false

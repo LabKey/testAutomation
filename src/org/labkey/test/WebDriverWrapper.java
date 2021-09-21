@@ -376,7 +376,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         }
                         catch (WebDriverException rethrow)
                         {
-                            throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. Ensure that you are using Firefox 62 or newer.", rethrow);
+                            throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. " +
+                                    "Ensure that you are using Firefox 62+ and a compatible version of geckodriver.", rethrow);
                         }
                     }
                 }
