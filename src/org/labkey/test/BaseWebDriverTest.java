@@ -48,7 +48,6 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.components.CustomizeView;
@@ -64,6 +63,7 @@ import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
+import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -2128,11 +2128,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         validateQueries(validateSubfolders, 120000);
     }
 
+    @Deprecated
     public void deleteAllRows(String projectName, String schema, String table) throws IOException, CommandException
     {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        TruncateTableCommand cmd = new TruncateTableCommand(schema, table);
-        cmd.execute(cn, projectName);
+        QueryUtils.truncateTable(projectName, schema, table);
     }
 
     // This class makes it easier to start a specimen import early in a test and wait for completion later.

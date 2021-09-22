@@ -29,6 +29,7 @@ import org.labkey.test.pages.announcements.ModeratorReviewPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.query.QueryUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -94,7 +95,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     public void preTest() throws Exception
     {
         log("Delete all existing messages in project");
-        deleteAllRows(getProjectName(), "announcement", "Announcement");
+        QueryUtils.selectAndDeleteRows(getProjectName(), "announcement", "Announcement");
     }
 
     @Test
