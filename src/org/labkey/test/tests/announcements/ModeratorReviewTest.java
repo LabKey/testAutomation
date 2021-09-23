@@ -95,7 +95,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     public void preTest() throws Exception
     {
         log("Delete all existing messages in project");
-        QueryUtils.selectAndDeleteRows(getProjectName(), "announcement", "Announcement");
+        QueryUtils.selectAndDeleteAllRows(getProjectName(), "announcement", "Announcement");
     }
 
     @Test
