@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.io.FileUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
 
@@ -33,7 +34,18 @@ public abstract class TestProperties
 {
     static
     {
-        try (Reader propReader = Readers.getReader(new File(TestFileUtils.getTestRoot(), "test.properties")))
+        final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
+        final File distPropFile = new File(TestFileUtils.getTestRoot(), "test.properties.dist");
+        if (!propFile.exists())
+        {
+            try
+            {
+                TestLogger.log("'test.properties' does not exist. Creating default from 'test.properties.dist'");
+                FileUtils.copyFile(distPropFile, propFile);
+            }
+            catch (IOException ignore) { }
+        }
+        try (Reader propReader = Readers.getReader(propFile))
         {
             TestLogger.log("Loading properties from test.properties");
             Properties properties = new Properties();
