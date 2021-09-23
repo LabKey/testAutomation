@@ -123,14 +123,23 @@ devMode=true
 
 
 #==============================================================================
-# Runtime test properties - additional checks
+# Additional checks
+#
+# Enable additional, generic validation steps.
 #==============================================================================
+## Run link crawler after each test class
 linkCheck=false
+## Attempt script injection during link crawl
 injectCheck=false
+## Override default crawler time limit. Maximum number of seconds to allow the crawler to run after each test class.
 #crawlerTimeout=120
+## Check for memory leaks after each test. Server under test must be running with assertions enabled.
 memCheck=false
+## Log JavaScript errors to server error log
 scriptCheck=true
+## Run "Validate Queries" after each test class
 queryCheck=false
+## Verify all custom views after each test class
 viewCheck=false
 
 
@@ -148,4 +157,4 @@ cloud.pipeline.bucket=
 ## List of loggers to enable DEBUG logging for.
 webtest.debug.server.packages=
 ## Enable/Disable experimental features.
-#webtest.experimental.legacy-lineage=false
+#webtest.experimental.<feature-id>=[true|false]
