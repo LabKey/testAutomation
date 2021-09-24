@@ -84,7 +84,7 @@ selenium.reuseWebDriver=true
 # Command line only.
 #==============================================================================
 #debugSuspendSelenium=n
-#selenium.debug.port=5005
+selenium.debug.port=5005
 
 
 #==============================================================================

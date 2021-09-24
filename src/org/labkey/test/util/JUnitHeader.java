@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.junit.AfterClass;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,10 +23,6 @@ import org.labkey.test.tests.JUnitTest;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
-/**
- * This test is inserted before server-side tests are run. It cleans up the default test container ('Shared/_junit') and
- * sets up some configurations that server-side tests might need.
- */
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class JUnitHeader extends JUnitTest.BaseJUnitTestWrapper
 {
@@ -40,17 +35,21 @@ public class JUnitHeader extends JUnitTest.BaseJUnitTestWrapper
     @Test
     public void configureR()
     {
-        Assume.assumeTrue(extraSetup);
-        RReportHelper reportHelper = new RReportHelper(this);
-        reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+        if (extraSetup)
+        {
+            RReportHelper reportHelper = new RReportHelper(this);
+            reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+        }
     }
 
     @Test
     public void configurePipeline()
     {
-        Assume.assumeTrue(extraSetup);
-        PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-        pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+        if (extraSetup)
+        {
+            PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+            pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
+        }
     }
 
     @Test
@@ -64,8 +63,10 @@ public class JUnitHeader extends JUnitTest.BaseJUnitTestWrapper
     @Test
     public void startSystemMaintenance()
     {
-        Assume.assumeTrue(extraSetup);
-        super.startSystemMaintenance();
+        if (extraSetup)
+        {
+            super.startSystemMaintenance();
+        }
     }
 
     @AfterClass
