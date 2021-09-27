@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -308,5 +309,35 @@ public class SampleTypeHelper extends WebDriverWrapper
     {
         Locator loc = Locator.tag("td").withClass("lk-form-label").withText(label + ":").followingSibling("td");
         return loc.findElement(getDriver()).getText();
+    }
+
+    public static Boolean setSampleStatusEnabled(boolean enabled)
+    {
+        return ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
+    }
+    
+    public void addSampleStates(Map<String, String> states)
+    {
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable drt = new DataRegionTable("query", this);
+        for (Map.Entry<String, String> statePair : states.entrySet())
+        {
+            if (drt.getRowIndex("Label", statePair.getKey()) < 0)
+            {
+                drt.clickInsertNewRow();
+                addSampleState(statePair.getKey(), statePair.getValue());
+            }
+        }
+    }
+
+    public void addSampleState(String label, @Nullable String stateType)
+    {
+        setFormElement(Locator.name("quf_Label"), label);
+        if (stateType != null)
+        {
+            setFormElement(Locator.name("quf_stateType"), stateType);
+        }
+        clickButton("Submit");
     }
 }

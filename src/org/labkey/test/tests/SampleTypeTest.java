@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hamcrest.CoreMatchers;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -48,7 +47,6 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -128,7 +126,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
         if (previousSampleStatusFlag != null)
-            ExperimentalFeaturesHelper.setExperimentalFeature(getCurrentTest().createDefaultConnection(), "experimental-sample-status", previousSampleStatusFlag);
+            SampleTypeHelper.setSampleStatusEnabled(previousSampleStatusFlag);
         // If you are debugging tests change this function to do nothing.
         // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
@@ -137,16 +135,19 @@ public class SampleTypeTest extends BaseWebDriverTest
     @Test
     public void testDeleteSampleTypeWithLockedSamples()
     {
-        previousSampleStatusFlag = ExperimentalFeaturesHelper.enableExperimentalFeature(getCurrentTest().createDefaultConnection(), "experimental-sample-status");
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        previousSampleStatusFlag = SampleTypeHelper.setSampleStatusEnabled(true);
 
         log("Add a locked sample status.");
-        addDataStates();
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        goToSchemaBrowser();
+        selectQuery("core", "DataStates");
+        sampleTypeHelper.addSampleStates(Map.of("TestLocked", "Locked"));
 
         log("Add a sample type so we can lock some samples");
         final String sampleTypeName = "SamplesWithLocks";
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
         sampleTypeHelper.createSampleType(sampleTypeDefinition);
         sampleTypeHelper.goToSampleType(sampleTypeName);
         log("Add a single unlocked sample");
@@ -163,28 +164,6 @@ public class SampleTypeTest extends BaseWebDriverTest
         waitForText(WAIT_FOR_JAVASCRIPT, "Confirm Deletion");
         clickButton("Confirm Delete");
         waitForText(WAIT_FOR_JAVASCRIPT, "Sample Types");
-    }
-
-    private void addDataStates()
-    {
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        goToSchemaBrowser();
-        selectQuery("core", "DataStates");
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
-        DataRegionTable drt = new DataRegionTable("query", this);
-        drt.clickInsertNewRow();
-        addDataState("TestLocked", "Locked");
-    }
-
-    private void addDataState(String label, @Nullable String stateType)
-    {
-        setFormElement(Locator.name("quf_Label"), label);
-        if (stateType != null)
-        {
-            setFormElement(Locator.name("quf_stateType"), stateType);
-        }
-        clickButton("Submit");
     }
 
     @Test
