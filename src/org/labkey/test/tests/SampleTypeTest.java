@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hamcrest.CoreMatchers;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -47,6 +48,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -82,6 +84,8 @@ public class SampleTypeTest extends BaseWebDriverTest
     private static final String LOOKUP_FOLDER = "LookupSampleTypeFolder";
     private static final String CASE_INSENSITIVE_SAMPLE_TYPE = "CaseInsensitiveSampleType";
     private static final String LOWER_CASE_SAMPLE_TYPE = "caseinsensitivesampletype";
+
+    private Boolean previousSampleStatusFlag = null;
 
     @Override
     public List<String> getAssociatedModules()
@@ -123,10 +127,64 @@ public class SampleTypeTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-
+        if (previousSampleStatusFlag != null)
+            ExperimentalFeaturesHelper.setExperimentalFeature(getCurrentTest().createDefaultConnection(), "experimental-sample-status", previousSampleStatusFlag);
         // If you are debugging tests change this function to do nothing.
         // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
+    }
+
+    @Test
+    public void testDeleteSampleTypeWithLockedSamples()
+    {
+        previousSampleStatusFlag = ExperimentalFeaturesHelper.enableExperimentalFeature(getCurrentTest().createDefaultConnection(), "experimental-sample-status");
+
+        log("Add a locked sample status.");
+        addDataStates();
+
+        log("Add a sample type so we can lock some samples");
+        final String sampleTypeName = "SamplesWithLocks";
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.createSampleType(sampleTypeDefinition);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+        log("Add a single unlocked sample");
+        Map<String, String> fieldMap = Map.of("Name", "U-1");
+        sampleTypeHelper.insertRow(fieldMap);
+        log("Add a single locked sample");
+        fieldMap = Map.of("Name", "L-1", "SampleState", "TestLocked");
+        sampleTypeHelper.insertRow(fieldMap);
+        log("Delete the sample type, which should produce no errors.");
+        Locator.linkWithText("Sample Types").findElement(this.getDriver()).click();
+        DataRegionTable drt = sampleTypeHelper.getSampleTypesList();
+        drt.checkCheckbox(drt.getRowIndex("Name", sampleTypeName));
+        drt.clickHeaderButton("Delete");
+        waitForText(WAIT_FOR_JAVASCRIPT, "Confirm Deletion");
+        clickButton("Confirm Delete");
+        waitForText(WAIT_FOR_JAVASCRIPT, "Sample Types");
+    }
+
+    private void addDataStates()
+    {
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        goToSchemaBrowser();
+        selectQuery("core", "DataStates");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable drt = new DataRegionTable("query", this);
+        drt.clickInsertNewRow();
+        addDataState("TestLocked", "Locked");
+    }
+
+    private void addDataState(String label, @Nullable String stateType)
+    {
+        setFormElement(Locator.name("quf_Label"), label);
+        if (stateType != null)
+        {
+            setFormElement(Locator.name("quf_stateType"), stateType);
+        }
+        clickButton("Submit");
     }
 
     @Test
