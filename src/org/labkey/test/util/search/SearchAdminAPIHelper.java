@@ -118,6 +118,7 @@ public abstract class SearchAdminAPIHelper
     @LogMethod(quiet = true)
     public static void setDirectoryType(@LoggedParam DirectoryType type, WebDriver driver)
     {
+        pauseCrawler(driver);
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin",
                 Maps.of("directory", "true", "directoryType", type.toString())));
         request.copySession(driver);
@@ -131,6 +132,7 @@ public abstract class SearchAdminAPIHelper
         {
             throw new RuntimeException("Failed to set search directoryType", e);
         }
+        startCrawler(driver);
     }
 
     @LogMethod(quiet = true)

@@ -29,6 +29,7 @@ import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.AbstractUserHelper;
+import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -228,6 +229,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             super(driver, componentElement);
         }
 
+        @LogMethod (quiet = true)
         public void goToModule(String moduleName)
         {
             WebElement moreModulesElement = openMenuTo("Go To Module", "More Modules");
