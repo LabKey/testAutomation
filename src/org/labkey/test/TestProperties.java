@@ -35,19 +35,22 @@ public abstract class TestProperties
     static
     {
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
-        final File distPropFile = new File(TestFileUtils.getTestRoot(), "test.properties.dist");
+        final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
         {
             try
             {
-                TestLogger.log("'test.properties' does not exist. Creating default from 'test.properties.dist'");
-                FileUtils.copyFile(distPropFile, propFile);
+                TestLogger.log(String.format("'%s' does not exist. Creating default from '%s'", propFile.getName(), propFileTemplate.getName()));
+                FileUtils.copyFile(propFileTemplate, propFile);
             }
-            catch (IOException ignore) { }
+            catch (IOException e)
+            {
+                TestLogger.error(e.getMessage());
+            }
         }
         try (Reader propReader = Readers.getReader(propFile))
         {
-            TestLogger.log("Loading properties from test.properties");
+            TestLogger.log("Loading properties from " + propFile.getName());
             Properties properties = new Properties();
             properties.load(propReader);
             properties.putAll(System.getProperties());
@@ -55,7 +58,7 @@ public abstract class TestProperties
         }
         catch (IOException ioe)
         {
-            TestLogger.log("Failed to load test.properties file. Running with hard-coded defaults");
+            TestLogger.log("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
             ioe.printStackTrace(System.out);
         }
     }
