@@ -46,9 +46,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.serverapi.writer.PrintWriters;
@@ -65,6 +63,7 @@ import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
+import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -2129,21 +2128,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         validateQueries(validateSubfolders, 120000);
     }
 
+    @Deprecated
     public void deleteAllRows(String projectName, String schema, String table) throws IOException, CommandException
     {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand(schema, table);
-        SelectRowsResponse resp = cmd.execute(cn, projectName);
-        if (resp.getRowCount().intValue() > 0)
-        {
-            log("Deleting rows from " + schema + "." + table);
-            DeleteRowsCommand delete = new DeleteRowsCommand(schema, table);
-            for (Map<String, Object> row : resp.getRows())
-            {
-                delete.addRow(row);
-            }
-            delete.execute(cn, projectName);
-        }
+        QueryUtils.truncateTable(projectName, schema, table);
     }
 
     // This class makes it easier to start a specimen import early in a test and wait for completion later.

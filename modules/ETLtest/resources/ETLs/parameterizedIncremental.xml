@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Parameterized Query with Incremental</name>
+    <description>Merge rows from parameterized source</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target</description>
+            <source schemaName="study" queryName="parameterizedWithoutDefault">
+                <sourceColumns>
+                    <column>ParticipantId</column>
+                    <column>date</column>
+                    <column>name</column>
+                </sourceColumns>
+            </source>
+            <destination schemaName="study" queryName="etl target" targetOption="merge"/>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="Modified" />
+    <parameters>
+        <parameter name="myParam" value="etlOverride2" type="VARCHAR"/>
+    </parameters>
+</etl>
