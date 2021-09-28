@@ -602,6 +602,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         table.checkCheckbox(table.getRowIndex("Name", "S3-1"));
         table.clickHeaderButton("Recall");
         acceptAlert();
+        waitForElement(Locators.labkeyError);
         checker().verifyEquals("Error message text after linking locked sample not as expected",
                 "Sample S3-1 has status TestLocked, which prevents recalling from a study.",
                 Locators.labkeyError.findElement(this.getDriver()).getText());
