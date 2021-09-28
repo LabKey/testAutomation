@@ -638,7 +638,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToSchemaBrowser();
         selectQuery("core", "DataStates");
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
-        sampleTypeHelper.addSampleStates(Map.of("TestLocked", "Locked", "TestAvailable", "Available"));
+        sampleTypeHelper.addSampleStates(Map.of("TestLocked", SampleTypeHelper.StatusType.Locked, "TestAvailable", SampleTypeHelper.StatusType.Available));
     }
 
     private DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, List<String> sampleIds, @Nullable String categoryName)

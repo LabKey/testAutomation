@@ -48,6 +48,12 @@ public class SampleTypeHelper extends WebDriverWrapper
     public static final String MERGE_DATA_LABEL = "Insert and Replace";
     private final WebDriver _driver;
 
+    public enum StatusType {
+        Available,
+        Consumed,
+        Locked
+    }
+
     public SampleTypeHelper(WebDriverWrapper driverWrapper)
     {
         this(driverWrapper.getDriver());
@@ -316,21 +322,22 @@ public class SampleTypeHelper extends WebDriverWrapper
         return ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
     }
     
-    public void addSampleStates(Map<String, String> states)
+    public void addSampleStates(Map<String, StatusType> states)
     {
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable drt = new DataRegionTable("query", this);
-        for (Map.Entry<String, String> statePair : states.entrySet())
+        for (Map.Entry<String, StatusType> statePair : states.entrySet())
         {
             if (drt.getRowIndex("Label", statePair.getKey()) < 0)
             {
                 drt.clickInsertNewRow();
-                addSampleState(statePair.getKey(), statePair.getValue());
+                addSampleState(statePair.getKey(), statePair.getValue().name());
             }
         }
     }
 
+    // we use the string here for stateType instead of the enum to allow for setting values outside the enum (error conditions)
     public void addSampleState(String label, @Nullable String stateType)
     {
         setFormElement(Locator.name("quf_Label"), label);

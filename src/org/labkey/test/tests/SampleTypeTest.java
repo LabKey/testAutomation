@@ -83,8 +83,6 @@ public class SampleTypeTest extends BaseWebDriverTest
     private static final String CASE_INSENSITIVE_SAMPLE_TYPE = "CaseInsensitiveSampleType";
     private static final String LOWER_CASE_SAMPLE_TYPE = "caseinsensitivesampletype";
 
-    private Boolean previousSampleStatusFlag = null;
-
     @Override
     public List<String> getAssociatedModules()
     {
@@ -125,45 +123,9 @@ public class SampleTypeTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        if (previousSampleStatusFlag != null)
-            SampleTypeHelper.setSampleStatusEnabled(previousSampleStatusFlag);
         // If you are debugging tests change this function to do nothing.
         // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
-    }
-
-    @Test
-    public void testDeleteSampleTypeWithLockedSamples()
-    {
-        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
-        previousSampleStatusFlag = SampleTypeHelper.setSampleStatusEnabled(true);
-
-        log("Add a locked sample status.");
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        goToSchemaBrowser();
-        selectQuery("core", "DataStates");
-        sampleTypeHelper.addSampleStates(Map.of("TestLocked", "Locked"));
-
-        log("Add a sample type so we can lock some samples");
-        final String sampleTypeName = "SamplesWithLocks";
-        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        sampleTypeHelper.createSampleType(sampleTypeDefinition);
-        sampleTypeHelper.goToSampleType(sampleTypeName);
-        log("Add a single unlocked sample");
-        Map<String, String> fieldMap = Map.of("Name", "U-1");
-        sampleTypeHelper.insertRow(fieldMap);
-        log("Add a single locked sample");
-        fieldMap = Map.of("Name", "L-1", "SampleState", "TestLocked");
-        sampleTypeHelper.insertRow(fieldMap);
-        log("Delete the sample type, which should produce no errors.");
-        Locator.linkWithText("Sample Types").findElement(this.getDriver()).click();
-        DataRegionTable drt = sampleTypeHelper.getSampleTypesList();
-        drt.checkCheckbox(drt.getRowIndex("Name", sampleTypeName));
-        drt.clickHeaderButton("Delete");
-        waitForText(WAIT_FOR_JAVASCRIPT, "Confirm Deletion");
-        clickButton("Confirm Delete");
-        waitForText(WAIT_FOR_JAVASCRIPT, "Sample Types");
     }
 
     @Test

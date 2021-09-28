@@ -61,6 +61,7 @@ public class SampleStatusTest extends BaseWebDriverTest
 
     private void doSetup()
     {
+        previousSampleStatusFlag = SampleTypeHelper.setSampleStatusEnabled(true);
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
         portalHelper.enterAdminMode();
@@ -84,13 +85,12 @@ public class SampleStatusTest extends BaseWebDriverTest
     public void testDeleteSampleTypeWithLockedSamples()
     {
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
-        previousSampleStatusFlag = SampleTypeHelper.setSampleStatusEnabled(true);
 
         log("Add a locked sample status.");
         goToProjectHome();
         goToSchemaBrowser();
         selectQuery("core", "DataStates");
-        sampleTypeHelper.addSampleStates(Map.of("TestLocked", "Locked"));
+        sampleTypeHelper.addSampleStates(Map.of("TestLocked", SampleTypeHelper.StatusType.Locked));
 
         log("Add a sample type so we can lock some samples");
         final String sampleTypeName = "SamplesWithLocks";
