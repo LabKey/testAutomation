@@ -8,6 +8,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
@@ -18,6 +19,7 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.admin.ImportFolderPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -48,8 +50,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String ASSAY_NAME = "Test assay";
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
-
-    private static int cnt = 0; // to keep count of rows which are already linked.
+    final static String SAMPLE_TYPE3 = "Sample type 3";
+    private Boolean previousSampleStatusFlag = null;
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
@@ -546,6 +548,67 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Category should not have overridden", categoryName, getCategory(DATE_BASED_STUDY, SAMPLE_TYPE2));
     }
 
+    @Test
+    public void testLinkAndRecallLockedSampleFromStudy()
+    {
+        enableSampleStatus();
+        addSampleStates();
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        log("Create a sample type to hold some samples with status");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        String data3 = "Name\tVisitId\tParticipantId\tStatus\n" +
+                "S3-1\t3.1\tP1\t\n" +
+                "S3-2\t3.2\tP2\tTestAvailable\n" +
+                "S3-3\t3.3\tP3\tTestAvailable\n" +
+                "S3-4\t3.4\tP4\tTestLocked\n";
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE3)
+                .setFields(List.of(
+                        new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))));
+        sampleHelper.goToSampleType(SAMPLE_TYPE3);
+        sampleHelper.getSamplesDataRegionTable()
+                .clickImportBulkData()
+                .setImportLookupByAlternateKey(true)
+                .setText(data3)
+                .submit();
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+
+        log("Attempt to linking all samples");
+        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE3, List.of("S3-1", "S3-2", "S3-3", "S3-4"), null);
+        checker().verifyEquals("Error message text after linking locked sample not as expected",
+                "Sample S3-4 has status TestLocked, which prevents linking to study.",
+                Locators.labkeyError.findElement(this.getDriver()).getText());
+
+        log("Uncheck the locked sample and link the rest");
+        DataRegionTable table =  new DataRegionTable("query", getDriver());
+        table.uncheckCheckbox(table.getRowIndex("Name", "S3-4"));
+        table.clickHeaderButtonAndWait("Link to Study");
+
+        log("Change the status of one of the linked samples to locked.");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        sampleHelper.goToSampleType(SAMPLE_TYPE3);
+        DataRegionTable samples = sampleHelper.getSamplesDataRegionTable();
+        int rowIndex = samples.getRowIndex("Name", "S3-1");
+        UpdateQueryRowPage updatePage = samples.clickEditRow(rowIndex);
+        updatePage.setField("SampleState", "TestLocked");
+        updatePage.submit();
+
+        log("Go back to the linked sample dataset");
+        samples = sampleHelper.getSamplesDataRegionTable();
+        clickAndWait(Locator.linkWithText("linked").findElement(samples));
+
+        log("Attempt to recall the linked sample that was locked.");
+        table = new DataRegionTable("Dataset", getDriver());
+        table.checkCheckbox(table.getRowIndex("Name", "S3-1"));
+        table.clickHeaderButton("Recall");
+        acceptAlert();
+        waitForElement(Locators.labkeyError);
+        checker().verifyEquals("Error message text after linking locked sample not as expected",
+                "Sample S3-1 has status TestLocked, which prevents recalling from a study.",
+                Locators.labkeyError.findElement(this.getDriver()).getText());
+    }
+
+
     @Before
     public void preTest() throws Exception
     {
@@ -558,12 +621,54 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
         if(TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
-        cnt = 0; //Resetting the counter between the tests.
     }
 
-    private void linkToStudy(String targetStudy, String sampleName, int numOfRowsToBeLinked, @Nullable String categoryName)
+    private void enableSampleStatus()
     {
-        clickAndWait(Locator.linkWithText(sampleName));
+        log("Enabling sample status feature");
+        Boolean previousSetting = SampleTypeHelper.setSampleStatusEnabled(true);
+        if (previousSampleStatusFlag == null)
+            previousSampleStatusFlag = previousSetting;
+    }
+
+    private void addSampleStates()
+    {
+        log("Adding sample states");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        goToSchemaBrowser();
+        selectQuery("core", "DataStates");
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.addSampleStates(Map.of("TestLocked", SampleTypeHelper.StatusType.Locked, "TestAvailable", SampleTypeHelper.StatusType.Available));
+    }
+
+    private DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, List<String> sampleIds, @Nullable String categoryName)
+    {
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        for (String sampleId : sampleIds)
+        {
+            int rowNum = samplesTable.getRowIndex("Name", sampleId);
+            if (rowNum >= 0)
+                samplesTable.checkCheckbox(rowNum);
+            else
+                checker().fatal().error(String.format("Could not find sample %s in table to link", sampleId));
+        }
+        samplesTable.clickHeaderButtonAndWait("Link to Study");
+
+        log("Link to study: Choose target");
+        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
+        if (categoryName != null)
+            setFormElement(Locator.name("autoLinkCategory"), categoryName);
+        clickButton("Next");
+
+        DataRegionTable table =  new DataRegionTable("query", getDriver());
+        table.clickHeaderButtonAndWait("Link to Study");
+        return table;
+    }
+
+    private void linkToStudy(String targetStudy, String sampleTypeName, int numOfRowsToBeLinked, @Nullable String categoryName)
+    {
+        clickAndWait(Locator.linkWithText(sampleTypeName));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         for (int i = 0; i < numOfRowsToBeLinked; i++)
             samplesTable.checkCheckbox(i);
@@ -667,6 +772,9 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", afterTest);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", afterTest);
+
+        if (previousSampleStatusFlag != null)
+            SampleTypeHelper.setSampleStatusEnabled(previousSampleStatusFlag);
 
     }
 }

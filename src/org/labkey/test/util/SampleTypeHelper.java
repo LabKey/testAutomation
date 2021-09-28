@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -46,6 +47,12 @@ public class SampleTypeHelper extends WebDriverWrapper
     public static final String IMPORT_DATA_LABEL = "Insert";
     public static final String MERGE_DATA_LABEL = "Insert and Replace";
     private final WebDriver _driver;
+
+    public enum StatusType {
+        Available,
+        Consumed,
+        Locked
+    }
 
     public SampleTypeHelper(WebDriverWrapper driverWrapper)
     {
@@ -308,5 +315,36 @@ public class SampleTypeHelper extends WebDriverWrapper
     {
         Locator loc = Locator.tag("td").withClass("lk-form-label").withText(label + ":").followingSibling("td");
         return loc.findElement(getDriver()).getText();
+    }
+
+    public static Boolean setSampleStatusEnabled(boolean enabled)
+    {
+        return ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
+    }
+    
+    public void addSampleStates(Map<String, StatusType> states)
+    {
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable drt = new DataRegionTable("query", this);
+        for (Map.Entry<String, StatusType> statePair : states.entrySet())
+        {
+            if (drt.getRowIndex("Label", statePair.getKey()) < 0)
+            {
+                drt.clickInsertNewRow();
+                addSampleState(statePair.getKey(), statePair.getValue().name());
+            }
+        }
+    }
+
+    // we use the string here for stateType instead of the enum to allow for setting values outside the enum (error conditions)
+    public void addSampleState(String label, @Nullable String stateType)
+    {
+        setFormElement(Locator.name("quf_Label"), label);
+        if (stateType != null)
+        {
+            setFormElement(Locator.name("quf_stateType"), stateType);
+        }
+        clickButton("Submit");
     }
 }
