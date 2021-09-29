@@ -76,6 +76,8 @@ public class SampleStatusTest extends BaseWebDriverTest
         super.doCleanup(afterTest);
         if (previousSampleStatusFlag != null)
             SampleTypeHelper.setSampleStatusEnabled(previousSampleStatusFlag);
+        else
+            SampleTypeHelper.setSampleStatusEnabled(false);
         // If you are debugging tests change this function to do nothing.
         // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
