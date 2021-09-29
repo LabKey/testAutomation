@@ -775,6 +775,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         if (previousSampleStatusFlag != null)
             SampleTypeHelper.setSampleStatusEnabled(previousSampleStatusFlag);
+        else
+            SampleTypeHelper.setSampleStatusEnabled(false);
 
     }
 }
