@@ -26,7 +26,7 @@
 # Properties used to specify which tests to run and where to find them
 # Command line only
 #==============================================================================
-## Comma-separated list of suites to run. Errors if any specified suite is empty.
+## Comma-separated list of suites to run. Errors if any specified suite is empty
 suite=
 ## Comma-separated list of tests to run. Suite parameter will be ignored if this is used
 test=
@@ -47,11 +47,11 @@ shuffleTests=false
 haltOnError=true
 ## Specifies whether tests should clean up after succeeding
 clean=true
-## Close test browsers after failed tests.
+## Close browser after each failed test
 close.on.fail=false
 ## Test failure screenshots will be saved to this directory
 failure.output.dir=build/modules/test/test/logs
-## Points to a JSON file containing
+## Points to a JSON file containing credentials to be used by tests
 test.credentials.file=
 ## Adjust the test timeouts for lower spec systems
 webtest.timeout.multiplier=1.0
@@ -62,11 +62,11 @@ cleanOnly=false
 #==============================================================================
 # WebDriver properties
 #==============================================================================
-## Select browser to run tests through. Usually 'firefox' or 'chrome'.
+## Select browser to run tests through. Usually 'firefox' or 'chrome'
 selenium.browser=firefox
-## Path to geckodriver executable. Required to run tests on Firefox.
+## Path to geckodriver executable. Required to run tests on Firefox
 #webdriver.gecko.driver=
-## Path to chromedriver executable. Required to run tests on Google Chrome.
+## Path to chromedriver executable. Required to run tests on Google Chrome
 #webdriver.chrome.driver=
 selenium.firefox.binary=
 ## Set to 'false' to have each test use a fresh browser instance
@@ -131,13 +131,13 @@ devMode=true
 linkCheck=false
 ## Attempt script injection during link crawl
 injectCheck=false
-## Override default crawler time limit. Maximum number of seconds to allow the crawler to run after each test class.
+## Maximum number of seconds to allow the crawler to run after each test class
 #crawlerTimeout=120
-## Check for memory leaks after each test. Server under test must be running with assertions enabled.
+## Check for memory leaks after each test. Server under test must be running with assertions enabled
 memCheck=false
 ## Log JavaScript errors to server error log
 scriptCheck=true
-## Run "Validate Queries" after each test class
+## Run schema browser's "Validate Queries" after each test class
 queryCheck=false
 ## Verify all custom views after each test class
 viewCheck=false
