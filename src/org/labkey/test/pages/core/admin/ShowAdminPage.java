@@ -48,7 +48,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     public ShowAdminPage goToSettingsSection()
     {
-        elementCache().sectionAdminConsoleLinks.click();
+        elementCache().sectionSettingsLinks.click();
         return this;
     }
 
@@ -86,7 +86,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     {
         goToSettingsSection();
         clickAndWait(elementCache().externalRedirectHostLink);
-        Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span","Done"), Locator.tagWithText("span","Save"));
+        Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
     public ShowAuditLogPage clickAuditLog()
@@ -107,7 +107,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     {
         goToSettingsSection();
         clickAndWait(elementCache().configurePageElements);
-        Locator.waitForAnyElement(shortWait(),Locator.tagWithText("span","Done"), Locator.tagWithText("span","Save"));
+        Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
     public void clickEmailCustomization()
@@ -132,6 +132,13 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     {
         goToSettingsSection();
         clickAndWait(elementCache().fullTextSearchLink);
+    }
+
+    public FolderTypePage clickFolderType()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().folderTypeLink);
+        return new FolderTypePage(getDriver());
     }
 
     public LookAndFeelSettingsPage clickLookAndFeelSettings()
@@ -200,7 +207,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected WebElement sectionServerInfo = Locator.linkWithText("Server Information").findWhenNeeded(this);
-        protected WebElement sectionAdminConsoleLinks = Locator.linkWithText("Settings").findWhenNeeded(this);
+        protected WebElement sectionSettingsLinks = Locator.linkWithText("Settings").findWhenNeeded(this);
         protected WebElement sectionModuleInfo = Locator.linkWithText("Module Information").findWhenNeeded(this);
         protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
 
@@ -213,6 +220,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
         protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
+        protected WebElement folderTypeLink = Locator.linkWithText("folder types").findWhenNeeded(this);
         protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
         protected WebElement masterPatientIndex = Locator.linkWithText("Master Patient Index").findWhenNeeded(this);
         protected WebElement profilerLink = Locator.linkWithText("profiler").findWhenNeeded(this);
