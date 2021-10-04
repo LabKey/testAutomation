@@ -15,8 +15,7 @@ This repository contains base test classes and helpers for LabKey's functional S
     - Other Browsers
         - Edge, Safari, Opera, etc. are not currently supported.
 
-1. Run `./gradlew :server:testAutomation:initProperties` to generate the `test.properties` file. \
-    - _Note: If setting up a fresh development environment, this will run automatically with the root `ijConfigure` task_
+1. Run `./gradlew :server:testAutomation:initProperties` to generate the `test.properties` file. If setting up a fresh development environment, this will run automatically with the root `ijConfigure` task.
     - Update `selenium.browser` to specify the browser you want to run against ("chrome" or "firefox")
 
 1. Verify test setup
