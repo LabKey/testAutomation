@@ -86,6 +86,7 @@ public class Crawler
     private final List<ControllerActionId> _terminalActions;
     private final List<ControllerActionId> _actionsExcludedFromInjection;
     private final List<ControllerActionId> _actionsMayLinkTo404;
+    private final List<Function<UrlToCheck, Boolean>> _specialCrawlExclusions;
     private final Collection<String> _adminControllers;
     private final Collection<String> _forbiddenWords;
     private final boolean _prioritizeAdminPages;
@@ -122,6 +123,7 @@ public class Crawler
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
         _actionsMayLinkTo404 = getAllowed404Sources();
         _injectionCheckEnabled = injectionTest;
+        _specialCrawlExclusions = getSpecialCrawlExclusions();
         _downloadCutoff = BaseWebDriverTest.getDownloadDir().lastModified();
         for (String project : projects)
         {
@@ -218,7 +220,7 @@ public class Crawler
 
         return list;
     }
-    
+
     protected Set<String> getExcludedControllers()
     {
         Set<String> controllers = Collections.newSetFromMap(new CaseInsensitiveMap<>());
@@ -248,6 +250,17 @@ public class Crawler
         controllers.add("fake");
 
         return controllers;
+    }
+
+    public List<Function<UrlToCheck, Boolean>> getSpecialCrawlExclusions()
+    {
+        final List<Function<UrlToCheck, Boolean>> urlVisitableChecks = new ArrayList<>();
+
+        // Don't crawl pipeline status if it will redirect.
+        final ControllerActionId pipelineStatusAction = new ControllerActionId("pipeline", "status-details");
+        urlVisitableChecks.add(url -> pipelineStatusAction.equals(url.getActionId()) && url.getRelativeURL().contains("redirect=1"));
+
+        return urlVisitableChecks;
     }
 
     protected List<ControllerActionId> getAllowed404Sources()
@@ -588,6 +601,15 @@ public class Crawler
             // (otherwise this never gets covered).
             if (_adminControllers.contains(getActionId().getController()) && !"/home".equals(getActionId().getFolder()))
                 return true;
+
+            for (Function<UrlToCheck, Boolean> check : _specialCrawlExclusions)
+            {
+                // Exclude particular URLs based on other conditions
+                if (check.apply(this))
+                {
+                    return false;
+                }
+            }
 
             // always visit all links under projects created by the tests:
             return underCreatedProject();
