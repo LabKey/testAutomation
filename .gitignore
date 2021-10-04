@@ -9,3 +9,6 @@ remainingTests.txt
 
 # Contains server credentials
 test.credentials.json
+
+# Local test properties
+test.properties

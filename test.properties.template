@@ -1,0 +1,164 @@
+#==============================================================================
+# LabKey Selenium Test Properties
+#==============================================================================
+#
+# These properties are used to control runtime behavior of the Selenium tests.
+#
+# You can override the values in this file on the command line with Gradle properties
+#   ex: './gradlew uiTests -Psuite=DRT'
+#
+# You can override the values in this file on TeamCity with system properties
+#   ex: 'system.suite'='DRT'
+#
+#  see: https://www.jetbrains.com/help/teamcity/configuring-build-parameters.html
+#  see: https://www.jetbrains.com/help/teamcity/running-custom-build.html#Parameters
+#
+# Note: When running tests on TeamCity, not all system properties will be passed though to the tests.
+# Only properties defined in this file and properties starting with 'webtest.' or 'webdriver.' will be propagated
+# to the test runner by Gradle.
+#
+# See `org.labkey.test.TestProperties` to see how most of these properties are used.
+
+
+#==============================================================================
+# Test suite construction properties
+#
+# Properties used to specify which tests to run and where to find them
+# Command line only
+#==============================================================================
+## Comma-separated list of suites to run. Errors if any specified suite is empty
+suite=
+## Comma-separated list of tests to run. Suite parameter will be ignored if this is used
+test=
+## Add tests to the specified suite(s)
+addToSuite=
+## Remove tests from the specified suite(s)
+removeFromSuite=
+## Shuffle the selected tests. Note: even unshuffled, test order can be unpredictable
+shuffleTests=false
+## The test harness uses reflection to search the specified package(s) for test classes
+#test.packages=org.labkey.test
+
+
+#==============================================================================
+# Test runner properties
+#==============================================================================
+## Stop running tests as soon as the first failure is encountered (CLI only)
+haltOnError=true
+## Specifies whether tests should clean up after succeeding
+clean=true
+## Close browser after each failed test
+close.on.fail=false
+## Test failure screenshots will be saved to this directory
+failure.output.dir=build/modules/test/test/logs
+## Points to a JSON file containing credentials to be used by tests
+test.credentials.file=
+## Adjust the test timeouts for lower spec systems
+webtest.timeout.multiplier=1.0
+## Runs just the cleanup steps of the specified tests/suites
+cleanOnly=false
+
+
+#==============================================================================
+# WebDriver properties
+#
+# Note: 'webdriver.*.driver' properties are not needed if drivers are installed
+# somewhere visible to your system PATH.
+#==============================================================================
+## Specify browser to run tests through. Usually 'firefox' or 'chrome'
+selenium.browser=firefox
+## Absolute location of chromedriver executable. Used to run tests on Google Chrome
+#webdriver.chrome.driver=
+## Absolute location of geckodriver executable. Used to run tests on Firefox
+#webdriver.gecko.driver=
+## Absolute location of Firefox executable
+#selenium.firefox.binary=
+## Set to 'false' to have each test use a fresh browser instance
+selenium.reuseWebDriver=true
+## Enable debug logging for geckodriver/chromedriver. Log files end up in browser download dir
+#webtest.webdriver.logging=false
+## Run test browser in headless mode (experimental)
+#webtest.webdriver.headless=false
+
+
+#==============================================================================
+# Test debug properties
+#
+# Set `debugSuspendSelenium=y` to have the test JVM wait for a debugger to connect on the specified port
+# Command line only.
+#==============================================================================
+#debugSuspendSelenium=n
+selenium.debug.port=5005
+
+
+#==============================================================================
+# Server properties
+#
+# These properties define how we will connect to the server under test.
+#==============================================================================
+labkey.port=8080
+labkey.server=http://localhost
+labkey.contextpath=/labkey
+
+
+#==============================================================================
+# Remote server properties
+#
+# [true/false] properties allow tests to alter their behavior based on the type of server being tested.
+# Precise effects vary from test to test.
+#==============================================================================
+## Server under test doesn't have test modules (e.g. 'dumbster' and 'simpletest')
+#webtest.without.test.modules=
+## Primary test user is an "Application Admin" instead of a "Site Admin"
+#webtest.primary.app.admin=
+## Server is running remotely. (Many tests assume a locally running server)
+#webtest.server.remote=
+## Server is a trial instance.
+#webtest.server.trial=
+
+
+#==============================================================================
+# Server configuration properties
+#
+# These define certain Tomcat startup properties. Mostly only used by TeamCity
+#==============================================================================
+disableAssertions=false
+devMode=true
+
+
+#==============================================================================
+# Additional checks
+#
+# Enable additional, generic validation steps.
+#==============================================================================
+## Run link crawler after each test class
+linkCheck=false
+## Attempt script injection during link crawl
+injectCheck=false
+## Maximum number of seconds to allow the crawler to run after each test class
+#crawlerTimeout=120
+## Check for memory leaks after each test. Server under test must be running with assertions enabled
+memCheck=false
+## Log JavaScript errors to server error log
+scriptCheck=true
+## Run schema browser's "Validate Queries" after each test class
+queryCheck=false
+## Verify all custom views after each test class
+viewCheck=false
+
+
+#==============================================================================
+# Runtime server configuration properties
+#
+# Used by tests to configure the server at runtime
+#==============================================================================
+## Directory to add to server's pipeline tools path
+additional.pipeline.tools=
+## Some tests will alter their setup to configure an S3 file root. Requires 'cloud.pipeline.bucket' to be defined.
+use.cloud.pipeline=false
+## S3 bucket name for tests to use. The file specified by 'test.credentials.file' should contain credentials.
+cloud.pipeline.bucket=
+## List of loggers to enable DEBUG logging for.
+webtest.debug.server.packages=
+## Enable/Disable experimental features.
+#webtest.experimental.<feature-id>=[true|false]

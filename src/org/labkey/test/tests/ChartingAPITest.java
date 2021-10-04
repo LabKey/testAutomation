@@ -94,12 +94,6 @@ public class ChartingAPITest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
 
-        Set<String> installedModules = _containerHelper.getActiveModules(getProjectName());
-        if (TestProperties.isIgnoreMissingModules() && !installedModules.contains("chartingapi") )
-        {
-            throw new AssumptionViolatedException("Module not installed [chartingapi].  Skipping test.");
-        }
-
         createPeopleList();
     }
 
