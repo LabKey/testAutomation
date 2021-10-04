@@ -65,13 +65,14 @@ cleanOnly=false
 # Note: 'webdriver.*.driver' properties are not needed if drivers are installed
 # somewhere visible to your system PATH.
 #==============================================================================
-## Select browser to run tests through. Usually 'firefox' or 'chrome'
+## Specify browser to run tests through. Usually 'firefox' or 'chrome'
 selenium.browser=firefox
-## Path to geckodriver executable. Used to run tests on Firefox
-#webdriver.gecko.driver=
-## Path to chromedriver executable. Used to run tests on Google Chrome
+## Absolute location of chromedriver executable. Used to run tests on Google Chrome
 #webdriver.chrome.driver=
-selenium.firefox.binary=
+## Absolute location of geckodriver executable. Used to run tests on Firefox
+#webdriver.gecko.driver=
+## Absolute location of Firefox executable
+#selenium.firefox.binary=
 ## Set to 'false' to have each test use a fresh browser instance
 selenium.reuseWebDriver=true
 ## Enable debug logging for geckodriver/chromedriver. Log files end up in browser download dir
