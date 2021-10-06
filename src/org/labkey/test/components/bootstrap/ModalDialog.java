@@ -121,7 +121,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         {
             List<WebElement> elements = new ArrayList<>();
             elements.add(getComponentElement());
-            WebElement modalBackdrop = Locator.byClass("modal-backdrop").findElementOrNull(getDriver());
+            WebElement modalBackdrop = Locator.byClass("modal").findElementOrNull(getDriver());
             if (modalBackdrop != null)
                 elements.add(modalBackdrop);
             new WebDriverWait(getDriver(), waitSeconds)
