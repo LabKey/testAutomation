@@ -76,13 +76,20 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return this;
     }
 
-    public ProjectMenu close()
+    /**
+     * close project menu
+     * @return true if project menu was open
+     */
+    public boolean close()
     {
         if (isOpen())
+        {
             elementCache().menuToggle.click();
-        WebDriverWrapper.waitFor(()-> !isOpen(), "Menu didn't close", 1000);
-        clearElementCache();
-        return this;
+            WebDriverWrapper.waitFor(() -> !isOpen(), "Menu didn't close", 1000);
+            clearElementCache();
+            return true;
+        }
+        return false;
     }
 
     public void navigateToProject(String projectName)
