@@ -193,25 +193,21 @@ public class ReclickingWebElement extends WebElementDecorator
     {
         try
         {
-            if (new ProjectMenu(getDriver()).close()) // Project menu often gets in the way after scrolling
-            {
-                return; // closed project menu
-            }
+            new ProjectMenu(getDriver()).close(); // Project menu often gets in the way after scrolling
         }
         catch (WebDriverException ignore) {}
 
         WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
-        if (!scrollUtil.scrollUnderFloatingHeader(el))
+        scrollUtil.scrollUnderFloatingHeader(el);
+
+        Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
+        if (interceptingElLoc != null)
         {
-            Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
-            if (interceptingElLoc != null)
+            List<WebElement> interceptingElement = interceptingElLoc.findElements(getDriver());
+            if (interceptingElement.size() == 1) // If multiple elements match, don't wait for them to disappear
             {
-                List<WebElement> interceptingElement = interceptingElLoc.findElements(getDriver());
-                if (interceptingElement.size() == 1) // If multiple elements match, don't wait for them to disappear
-                {
-                    new WebDriverWait(getDriver(), 5)
-                            .until(ExpectedConditions.invisibilityOf(interceptingElement.get(0)));
-                }
+                new WebDriverWait(getDriver(), 5)
+                        .until(ExpectedConditions.invisibilityOf(interceptingElement.get(0)));
             }
         }
     }
@@ -247,7 +243,7 @@ public class ReclickingWebElement extends WebElementDecorator
         return _webDriver.getValue();
     }
 
-    public static class TempTest
+    public static class TempEceptionParser
     {
         @Test
         public void testInterceptinElLoc()
