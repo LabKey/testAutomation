@@ -193,7 +193,7 @@ public class ReclickingWebElement extends WebElementDecorator
     {
         try
         {
-            new ProjectMenu(getDriver()).close(); // Project menu often gets in the way after scrolling
+            ProjectMenu.finder(getDriver()).findOptional().ifPresent(ProjectMenu::close); // Project menu often gets in the way after scrolling
         }
         catch (WebDriverException ignore) {}
 
