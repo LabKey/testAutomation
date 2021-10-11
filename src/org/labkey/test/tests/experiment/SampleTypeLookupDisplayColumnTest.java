@@ -1,4 +1,4 @@
-package org.labkey.test.tests;
+package org.labkey.test.tests.experiment;
 
 import org.junit.BeforeClass;
 import org.junit.Before;
@@ -7,9 +7,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
-import org.labkey.test.pages.InsertPage;
 import org.labkey.test.pages.query.SourceQueryPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
 
 @Category({})
 public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
@@ -131,15 +129,15 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
 
     }
 
-    // it would be nice if our
     private void setFieldValues(String name, String comment, String amount, String ingredient)
     {
+        var insertPage = new UpdateQueryRowPage(getDriver());
         if (name != null)   // for update, name field is disabled
-            setFormElement(Locator.name("quf_Name"), name);
-        setFormElement(Locator.name("quf_comment"), comment);
-        setFormElement(Locator.name("quf_amount"), amount);
-        setFormElement(Locator.name("quf_ingredient"), ingredient);
-        clickAndWait(Locator.lkButton("Submit"));
+            insertPage.setField("Name", name);
+        insertPage.setField("comment", comment);
+        insertPage.setField("amount", amount);
+        insertPage.setField("ingredient", ingredient);
+        insertPage.submit();
     }
 
     private void setFKDisplayColumnName(String lookupColumn, String fkDisplayColumnName)
