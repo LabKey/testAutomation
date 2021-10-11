@@ -72,7 +72,7 @@ selenium.browser=firefox
 ## Absolute location of geckodriver executable. Used to run tests on Firefox
 #webdriver.gecko.driver=
 ## Absolute location of Firefox executable
-#selenium.firefox.binary=
+selenium.firefox.binary=
 ## Set to 'false' to have each test use a fresh browser instance
 selenium.reuseWebDriver=true
 ## Enable debug logging for geckodriver/chromedriver. Log files end up in browser download dir
