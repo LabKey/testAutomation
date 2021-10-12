@@ -18,6 +18,9 @@ package org.labkey.test.selenium;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+import org.junit.Test;
+import org.labkey.test.Locator;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -38,10 +41,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ReclickingWebElement extends WebElementDecorator
 {
+    // Extract the element info from ElementClickInterceptedException message.
+    private static final Pattern interceptingElPattern = Pattern.compile("Element .* is not clickable .*<(?<tag>[a-zA-Z]+) (?<attributes>.+)> obscures it");
+    private static final Pattern elAttributePattern = Pattern.compile("(?<name>[a-zA-Z-]+)=\"(?<value>[^\"]+)\"");
+
     public ReclickingWebElement(@NotNull WebElement decoratedElement)
     {
         super(decoratedElement);
@@ -54,17 +63,18 @@ public class ReclickingWebElement extends WebElementDecorator
         {
             super.click();
         }
-        catch (ElementClickInterceptedException tryAgain)
+        catch (ElementClickInterceptedException ex)
         {
             if (getDriver() != null)
             {
-                TestLogger.debug("Retry click: " + tryAgain.getMessage().split("\n")[0]);
-                revealElement(getWrappedElement());
+                final String shortMessage = ex.getMessage().split("\n")[0];
+                TestLogger.debug("Retry click: " + shortMessage);
+                revealElement(getWrappedElement(), shortMessage);
                 super.click();
             }
             else
             {
-                throw tryAgain;
+                throw ex;
             }
         }
         catch (ElementNotInteractableException e)
@@ -179,16 +189,48 @@ public class ReclickingWebElement extends WebElementDecorator
     }
 
     // Allows interaction with elements that have been obscured by floating headers or tooltips
-    private void revealElement(WebElement el)
+    private void revealElement(WebElement el, String shortMessage)
     {
-        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
-        scrollUtil.scrollUnderFloatingHeader(el);
         try
         {
-            new ProjectMenu(getDriver()).close(); // Project menu often gets in the way after scrolling
+            ProjectMenu.finder(getDriver()).findOptional().ifPresent(ProjectMenu::close); // Project menu often gets in the way after scrolling
         }
         catch (WebDriverException ignore) {}
-        new WebDriverWait(getDriver(), 10).until(ExpectedConditions.elementToBeClickable(el));
+
+        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
+        scrollUtil.scrollUnderFloatingHeader(el);
+
+        Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
+        if (interceptingElLoc != null)
+        {
+            List<WebElement> interceptingElement = interceptingElLoc.findElements(getDriver());
+            if (interceptingElement.size() == 1) // If multiple elements match, don't wait for them to disappear
+            {
+                new WebDriverWait(getDriver(), 5)
+                        .until(ExpectedConditions.invisibilityOf(interceptingElement.get(0)));
+            }
+        }
+    }
+
+    private static Locator.XPathLocator parseInterceptingElementLoc(String shortMessage)
+    {
+        Locator.XPathLocator interceptingElLoc = null;
+        Matcher matcher = interceptingElPattern.matcher(shortMessage);
+        if (matcher.matches())
+        {
+            // Try to parse exception message to learn about intercepting element.
+            String tag = matcher.group("tag");
+            String attributes = matcher.group("attributes");
+            Matcher attributeMatcher = elAttributePattern.matcher(attributes);
+            interceptingElLoc = Locator.tag(tag);
+            while (attributeMatcher.find())
+            {
+                String name = attributeMatcher.group("name");
+                String value = attributeMatcher.group("value");
+                interceptingElLoc = interceptingElLoc.withAttribute(name, value);
+            }
+        }
+        return interceptingElLoc;
     }
 
     private Mutable<WebDriver> _webDriver = null;
@@ -199,5 +241,16 @@ public class ReclickingWebElement extends WebElementDecorator
             _webDriver = new MutableObject<>(WebDriverUtils.extractWrappedDriver(getWrappedElement()));
         }
         return _webDriver.getValue();
+    }
+
+    public static class TempEceptionParser
+    {
+        @Test
+        public void testInterceptinElLoc()
+        {
+            final Locator.XPathLocator xPathLocator = parseInterceptingElementLoc("Element <a href=\"something\"> is not clickable at point (732,301) because another element " +
+                    "<div id=\"elId\" class=\"cls1 cls2\"> obscures it");
+            Assert.assertEquals(Locator.tag("div").withAttribute("id", "elId").withAttribute("class", "cls1 cls2"), xPathLocator);
+        }
     }
 }

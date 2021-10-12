@@ -1366,12 +1366,13 @@ public class DataRegionTable extends DataRegion
 
     /* sometimes 'insert new row' is a top-level button, other times it's a dropdown
     *  under an 'insert data' top-level button. This handles either case. */
-    public void clickInsertNewRow()
+    public UpdateQueryRowPage clickInsertNewRow()
     {
         if (hasHeaderMenu("Insert data"))
             clickHeaderMenu("Insert data", getInsertNewButtonText());
         else
             clickHeaderButtonAndWait(getInsertNewButtonText());
+        return new UpdateQueryRowPage(getDriver());
     }
 
     public ImportDataPage clickImportBulkData()
