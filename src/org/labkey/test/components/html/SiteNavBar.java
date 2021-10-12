@@ -145,6 +145,18 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         getWrapper().assertSignedInNotImpersonating();
     }
 
+    public void stopImpersonatingWithAlert()
+    {
+        if (!getWrapper().isImpersonating())
+            throw new IllegalStateException("Not currently impersonating");
+
+        getWrapper().doAndAcceptUnloadAlert(() -> getWrapper().click(
+                Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']")
+                        .findWhenNeeded(getDriver())
+        ));
+        getWrapper().assertSignedInNotImpersonating();
+    }
+
     public boolean isInPageAdminMode()
     {
         return getWrapper().executeScript("return LABKEY.pageAdminMode;", Boolean.class);
