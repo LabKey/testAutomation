@@ -209,7 +209,10 @@ public class ReclickingWebElement extends WebElementDecorator
             if (!interceptingElements.isEmpty())
             {
                 final ExpectedCondition<?>[] expectations = (ExpectedCondition<?>[]) interceptingElements.stream()
-                        .map(LabKeyExpectedConditions::animationIsDone).toArray();
+                        .map(interceptingElement -> ExpectedConditions.or(
+                                LabKeyExpectedConditions.animationIsDone(interceptingElement),
+                                ExpectedConditions.invisibilityOf(interceptingElement)
+                        )).toArray();
                 new WebDriverWait(getDriver(), 5)
                         .until(ExpectedConditions.and(expectations));
             }
