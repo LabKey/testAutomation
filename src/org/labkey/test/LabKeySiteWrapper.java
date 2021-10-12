@@ -1350,6 +1350,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
+     * Stop impersonating user and close/accept resultant form dirty alert
+     * @param goHome go to Server Home or return to page where impersonation started
+     */
+    public void stopImpersonatingWithLeaveAlert(boolean goHome)
+    {
+        navBar().stopImpersonatingWithAlert();
+        if (goHome)
+            goToHome();
+    }
+
+    /**
      * Impersonate a user and perform some action.
      * Stops impersonating and returns to initial page when complete.
      * @param email User to impersonate
