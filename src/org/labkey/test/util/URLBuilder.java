@@ -1,7 +1,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.WebTestHelper;
 import org.seleniumhq.jetty9.util.URIUtil;
@@ -107,18 +106,7 @@ public class URLBuilder
         {
             if (!_containerPath.startsWith("/"))
                 url.append("/");
-            final String encodedPath = URIUtil.encodePath(_containerPath);
-
-            // See if we can get rid of dependency that provides URIUtil ('org.seleniumhq.selenium:jetty-repacked')
-            final String apacheFormattedPath = StringUtils.strip(URLEncodedUtils.formatSegments(_containerPath.split("/")), "/");
-            if (!StringUtils.strip(encodedPath, "/").equals(apacheFormattedPath))
-            {
-                TestLogger.error(String.format("Container path encoding methods did not match.\n" +
-                        "URIUtil: '%s'\n" +
-                        "URLEncodedUtils: '%s'", encodedPath, apacheFormattedPath));
-            }
-
-            url.append(encodedPath
+            url.append(URIUtil.encodePath(_containerPath)
                     .replace("+", "%2B")
                     .replace("[", "%5B")
                     .replace("]", "%5D"));
