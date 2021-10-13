@@ -15,7 +15,7 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.io.FileUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
 
@@ -30,16 +30,27 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
-import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY;
-
 public abstract class TestProperties
 {
     static
     {
-        try (Reader propReader = Readers.getReader(new File(TestFileUtils.getTestRoot(), "test.properties")))
+        final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
+        final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
+        if (!propFile.exists())
         {
-            TestLogger.log("Loading properties from test.properties");
+            try
+            {
+                TestLogger.log(String.format("'%s' does not exist. Creating default from '%s'", propFile.getName(), propFileTemplate.getName()));
+                FileUtils.copyFile(propFileTemplate, propFile);
+            }
+            catch (IOException e)
+            {
+                TestLogger.error(e.getMessage());
+            }
+        }
+        try (Reader propReader = Readers.getReader(propFile))
+        {
+            TestLogger.log("Loading properties from " + propFile.getName());
             Properties properties = new Properties();
             properties.load(propReader);
             properties.putAll(System.getProperties());
@@ -47,7 +58,7 @@ public abstract class TestProperties
         }
         catch (IOException ioe)
         {
-            TestLogger.log("Failed to load test.properties file. Running with hard-coded defaults");
+            TestLogger.log("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
             ioe.printStackTrace(System.out);
         }
     }
@@ -92,11 +103,6 @@ public abstract class TestProperties
     public static boolean isServerRemote()
     {
         return "true".equals(System.getProperty("webtest.server.remote", "false"));
-    }
-
-    public static boolean isIgnoreMissingModules()
-    {
-        return "true".equals(System.getProperty("webtest.ignoreMissingModules", "false"));
     }
 
     public static boolean isLeakCheckSkipped()
@@ -214,78 +220,6 @@ public abstract class TestProperties
         {
             return 60;
         }
-    }
-
-    public static String ensureGeckodriverExeProperty()
-    {
-        final String key = GECKO_DRIVER_EXE_PROPERTY;
-        String currentProperty = System.getProperty(key);
-        if (currentProperty == null)
-        {
-            String executable = null;
-            if(SystemUtils.IS_OS_MAC)
-            {
-                executable = "mac/geckodriver";
-            }
-            else if (SystemUtils.IS_OS_WINDOWS)
-            {
-                executable = "windows/geckodriver.exe";
-            }
-            else if (SystemUtils.IS_OS_LINUX)
-            {
-                switch (SystemUtils.OS_ARCH)
-                {
-                    case "amd64":
-                        executable = "linux/amd64/geckodriver";
-                        break;
-                    case "i386":
-                        executable = "linux/i386/geckodriver";
-                        break;
-                }
-            }
-
-            File testBin = new File(TestFileUtils.getTestRoot(), "bin");
-            File driverPath = new File(testBin, executable);
-            System.setProperty(key, driverPath.getAbsolutePath());
-        }
-
-        return System.getProperty(key);
-    }
-
-    public static String ensureChromedriverExeProperty()
-    {
-        final String key = CHROME_DRIVER_EXE_PROPERTY;
-        String currentProperty = System.getProperty(key);
-        if (currentProperty == null)
-        {
-            String chromeExe = null;
-            if(SystemUtils.IS_OS_MAC)
-            {
-                chromeExe = "mac/chromedriver";
-            }
-            else if (SystemUtils.IS_OS_WINDOWS)
-            {
-                chromeExe = "windows/chromedriver.exe";
-            }
-            else if (SystemUtils.IS_OS_LINUX)
-            {
-                switch (SystemUtils.OS_ARCH)
-                {
-                    case "amd64":
-                        chromeExe = "linux/amd64/chromedriver";
-                        break;
-                    case "i386":
-                        chromeExe = "linux/i386/chromedriver";
-                        break;
-                }
-            }
-
-            File testBin = new File(TestFileUtils.getTestRoot(), "bin");
-            File chromePath = new File(testBin, chromeExe);
-            System.setProperty(key, chromePath.getAbsolutePath());
-        }
-
-        return System.getProperty(key);
     }
 
     public static File getTomcatHome()

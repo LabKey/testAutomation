@@ -39,10 +39,20 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     final WebElement _el;
     final WebDriver _driver;
 
+    private ProjectMenu(WebElement el, WebDriver driver)
+    {
+        _el = el;
+        _driver = driver;
+    }
+
     public ProjectMenu(WebDriver driver)
     {
-        _driver = driver;
-        _el = Locators.labkeyPageNavbar.refindWhenNeeded(driver).withTimeout(WAIT_FOR_JAVASCRIPT);
+        this(Locators.labkeyPageNavbar.refindWhenNeeded(driver).withTimeout(WAIT_FOR_JAVASCRIPT), driver);
+    }
+
+    public static SimpleWebDriverComponentFinder<ProjectMenu> finder(WebDriver driver)
+    {
+        return new SimpleWebDriverComponentFinder<>(driver, Locators.labkeyPageNavbar, ProjectMenu::new);
     }
 
     @Override

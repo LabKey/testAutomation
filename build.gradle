@@ -6,6 +6,7 @@ plugins {
 }
 
 import org.labkey.gradle.util.BuildUtils
+import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.PomFileHelper
 
 project.group = "org.labkey.api"
@@ -123,6 +124,27 @@ if (!BuildUtils.isIntellij())  {
     }
 }
 
+def initPropertiesTask = project.tasks.register("initProperties", Task) {
+    Task task ->
+        task.group = GroupNames.TEST
+        task.description = "Create test.properties if missing"
+        task.doLast({
+            File testProperties = project.file('test.properties')
+            File testPropertiesTemplate = project.file('test.properties.template')
+
+            if (!testProperties.exists())
+            {
+                project.copy {
+                    CopySpec copy ->
+                        copy.from(testPropertiesTemplate)
+                        copy.into(project.file("."))
+                        copy.rename(testPropertiesTemplate.getName(), testProperties.getName())
+                }
+            }
+        })
+}
+
+project.parent.parent.tasks.ijConfigure.dependsOn(initPropertiesTask)
 
 if (project.hasProperty('doPublishing'))
 {
