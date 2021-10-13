@@ -240,10 +240,11 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard removeCustomParameter(@NotNull Integer index)
     {
+        showAdvanced();
 
         WebElement deleteIcon = Locator.tagWithClass("div", "custom-parameter")
-                .append(Locator.tagWithClass("span", "fa-trash"))
-                .findElements(this).get(index);
+                .append(Locator.tagWithClass("span", "fa-trash")).index(index)
+                .findElement(this);
 
         deleteIcon.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(deleteIcon));
