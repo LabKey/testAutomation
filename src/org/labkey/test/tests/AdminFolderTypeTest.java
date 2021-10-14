@@ -6,7 +6,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.RadioButton;
-import org.labkey.test.pages.core.admin.FolderTypePage;
+import org.labkey.test.pages.core.admin.FolderTypePages;
 
 import java.util.List;
 
@@ -17,16 +17,15 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
     @Test
     public void testDefaultFolderTypeSetting()
     {
-        goToProjectHome();
         String newDefaultFolder = "Targeted MS";
 
         log("Setting a new default folder type");
-        FolderTypePage folderTypePage = goToAdminConsole().clickFolderType();
-        String oldDefaultFolder = folderTypePage.getDefaultFolder();
-        folderTypePage.setDefaultFolder(newDefaultFolder).clickSave();
+        FolderTypePages folderTypePage = goToAdminConsole().clickFolderType();
+        String oldDefaultFolder = folderTypePage.getDefaultFolderType();
+        folderTypePage.setDefaultFolderType(newDefaultFolder).clickSave();
 
         folderTypePage = goToAdminConsole().clickFolderType();
-        checker().verifyEquals("Incorrect default Folder type selected", newDefaultFolder, folderTypePage.getDefaultFolder());
+        checker().verifyEquals("Incorrect default Folder type selected", newDefaultFolder, folderTypePage.getDefaultFolderType());
 
         log("Verifying the default folder type while project creation");
         goToCreateProject();
@@ -35,36 +34,39 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
 
         log("Rollback to the old default folder type");
         folderTypePage = goToAdminConsole().clickFolderType();
-        folderTypePage.setDefaultFolder(oldDefaultFolder).clickSave();
+        folderTypePage.setDefaultFolderType(oldDefaultFolder).clickSave();
     }
 
     @Test
-    public void testEnableAndDisableFolderSetting()
+    public void testEnableAndDisableFolderTypeSetting()
     {
-        goToProjectHome();
-        String folderName = "Empty custom folder";
+        String folderTypeName = "Empty custom folder";
 
         log("Verifying by default folder is enabled");
-        FolderTypePage folderTypePage = goToAdminConsole().clickFolderType();
-        checker().verifyTrue(folderName + " should have been enabled", folderTypePage.isEnabled(folderName));
+        FolderTypePages folderTypePage = goToAdminConsole().clickFolderType();
+        checker().verifyTrue(folderTypeName + " should have been enabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
-        checker().verifyTrue(folderName + " project is not enabled", isElementPresent(Locator.tagWithText("label",folderName)));
+        checker().verifyTrue(folderTypeName + " project is not enabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
         log("Disabling the folder");
         folderTypePage = goToAdminConsole().clickFolderType();
-        folderTypePage.disableFolder(folderName).clickSave();
+        folderTypePage.disableFolderType(folderTypeName).clickSave();
 
         log("Verifying folder is disabled");
         folderTypePage = goToAdminConsole().clickFolderType();
-        checker().verifyFalse(folderName + " should have been disabled", folderTypePage.isEnabled(folderName));
+        checker().verifyFalse(folderTypeName + " should have been disabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
-        checker().verifyFalse(folderName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderName)));
+        checker().verifyFalse(folderTypeName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
+
+        log("Enabling the folder");
+        folderTypePage = goToAdminConsole().clickFolderType();
+        folderTypePage.enableFolderType(folderTypeName).clickSave();
     }
 
     @Override
-    protected String getProjectName() { return "Admin Folder Type Test Project"; }
+    protected String getProjectName() { return null; }
 
     @Override
     public List<String> getAssociatedModules()

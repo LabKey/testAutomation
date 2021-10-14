@@ -134,11 +134,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().fullTextSearchLink);
     }
 
-    public FolderTypePage clickFolderType()
+    public FolderTypePages clickFolderType()
     {
         goToSettingsSection();
         clickAndWait(elementCache().folderTypeLink);
-        return new FolderTypePage(getDriver());
+        return new FolderTypePages(getDriver());
     }
 
     public LookAndFeelSettingsPage clickLookAndFeelSettings()
