@@ -19,6 +19,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.TestProperties;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
 
@@ -90,5 +91,19 @@ public abstract class Log4jUtils
                 e.printStackTrace();
             }
         }
+    }
+
+    @LogMethod(quiet = true)
+    public static void resetLogMark() throws IOException, CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        PostCommand<?> command = new PostCommand<>("admin", "resetPrimaryLogMark");
+        command.execute(connection, "/");
+    }
+
+    @LogMethod(quiet = true)
+    public static void showLogSinceMark(WebDriverWrapper driver) throws IOException, CommandException
+    {
+        driver.beginAt(WebTestHelper.buildURL("admin", "showPrimaryLogSinceMark"));
     }
 }
