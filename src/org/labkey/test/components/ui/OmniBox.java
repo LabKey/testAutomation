@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 
@@ -47,17 +48,18 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     public OmniBox clearAll()
     {
-        for (WebElement e : getValues())
+        List<OmniBoxValue> valueItems = getValues();
+        for (int i=getValues().size()-1 ; i >= 0; i--)
         {
-            sendClearValue();
+            valueItems.get(i).dismiss();        // dismiss from the right first;
         }
 
         // dismiss any filter/search/sort dropdown prompts
         if (isOpen())
             close();
 
-        new WebDriverWait(_driver, 1).until(
-                ExpectedConditions.numberOfElementsToBe(Locators.values, 0));
+        getWrapper().waitFor(()-> getValues().size() == 0,
+                "not all of the omnibox values were cleared", 1000);
 
         return this;
     }
@@ -69,7 +71,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         {
             sendClearValue();
             new WebDriverWait(_driver, 1).until(
-                    wd -> Locators.values.findElements(this).size() == numValues - 1);
+                    wd -> getValues().size() == numValues - 1);
         }
 
         return this;
@@ -95,18 +97,19 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return this;
     }
 
-    public List<WebElement> getValues()
+    public List<OmniBoxValue> getValues()
     {
-        return Locators.values.findElements(this);
+        return new OmniBoxValue.OmniBoxValueFinder(getDriver()).findAll(this);
     }
 
-    // TODO Consider making these getValue* methods private. Knowing what to do with the returned elements
-    //  would be very unclear outside this class. I would also expect them to return Strings so maybe create public
-    //  getters that return the selected values as Strings and rename the existing methods something
-    //  like getSelectedValueElement.
-    public WebElement getValue(String expected)
+    public OmniBoxValue getValue(String expected)
     {
-        return Locators.values.containingIgnoreCase(expected).findElementOrNull(this);
+        return new OmniBoxValue.OmniBoxValueFinder(getDriver()).withText(expected).find(this);
+    }
+
+    public Optional<OmniBoxValue> getOptionalValue(String expected)
+    {
+        return new OmniBoxValue.OmniBoxValueFinder(getDriver()).withText(expected).findOptional(this);
     }
 
     private WebElement editingValueElement()
@@ -116,9 +119,9 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     public OmniBox editValue(String expectedValue, String newValue)
     {
-        getValue(expectedValue).click();
+        var input = getValue(expectedValue).openEdit();
         WebDriverWrapper.waitFor(()-> isEditing(), "did not begin editing", 1500);
-        getWrapper().setFormElement(editingValueElement(), newValue);
+        input.set(newValue);
         stopEditing();
         return this;
     }
@@ -198,7 +201,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         }
 
         this.setText(commandExpression.toString());
-        if (WebDriverWrapper.waitFor(()->  getValue(expectedFilterText.toString()) != null, 2500))
+        if (WebDriverWrapper.waitFor(()->  getOptionalValue(expectedFilterText.toString()).isEmpty(), 2500))
             return this;
 
         // try again if necessary and fail if it doesn't work
