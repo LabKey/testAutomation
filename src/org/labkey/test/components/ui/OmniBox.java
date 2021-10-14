@@ -18,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -56,7 +57,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         if (isOpen())
             close();
 
-        new WebDriverWait(_driver, 1).until(
+        new WebDriverWait(_driver, Duration.ofSeconds(1)).until(
                 ExpectedConditions.numberOfElementsToBe(Locators.values, 0));
 
         return this;
@@ -68,7 +69,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         if (numValues > 0)
         {
             sendClearValue();
-            new WebDriverWait(_driver, 1).until(
+            new WebDriverWait(_driver, Duration.ofSeconds(1)).until(
                     wd -> Locators.values.findElements(this).size() == numValues - 1);
         }
 
@@ -78,7 +79,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
     public OmniBox focus()
     {
         elementCache().control.click();
-        new WebDriverWait(_driver, 2)
+        new WebDriverWait(_driver, Duration.ofSeconds(2))
                 .until(ExpectedConditions.attributeContains(this.getComponentElement(), "class", "is-open"));
         return this;
     }
@@ -160,7 +161,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     private void sendClearValue()
     {
-        new WebDriverWait(_driver, 1).until(ExpectedConditions.elementToBeClickable(elementCache().input));
+        new WebDriverWait(_driver, Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
         elementCache().input.sendKeys(Keys.BACK_SPACE);
     }
 
@@ -222,7 +223,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     private OmniBox setText(String inputValue)
     {
-        new WebDriverWait(getWrapper().getDriver(), 1).until(ExpectedConditions.elementToBeClickable(elementCache().input));
+        new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
         elementCache().input.sendKeys(inputValue);
         elementCache().input.sendKeys(Keys.ENTER);
 

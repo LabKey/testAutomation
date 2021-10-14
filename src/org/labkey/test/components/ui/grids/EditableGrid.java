@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -567,7 +568,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         if (selection.isEmpty())
         {
             log("initial attempt to copy current selection came up empty.  re-trying after 3000 msec");
-            new WebDriverWait(getDriver(), 3);
+            new WebDriverWait(getDriver(), Duration.ofSeconds(3));
             return copyCurrentSelection();
         }
         return selection;
