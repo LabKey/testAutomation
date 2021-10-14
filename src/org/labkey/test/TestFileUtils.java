@@ -52,12 +52,16 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -257,6 +261,35 @@ public abstract class TestFileUtils
             else
             {
                 _sampledataDirs.add(new File(getTestRoot(), "data"));
+                Path modulesDir = new File(getLabKeyRoot(), "server/modules").toPath();
+                try
+                {
+                    // We know where the modules live; no reason to insist that sampledata.dirs exists.
+                    Files.walkFileTree(modulesDir, Collections.emptySet(), 2, new SimpleFileVisitor<>(){
+                        @Override
+                        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
+                        {
+                            if (dir.equals(modulesDir))
+                            {
+                                return FileVisitResult.CONTINUE;
+                            }
+                            if (dir.resolve("module.properties").toFile().exists()) // In a module directory?
+                            {
+                                final File sampledataDir = dir.resolve("test/sampledata").toFile();
+                                if (sampledataDir.exists())
+                                {
+                                    _sampledataDirs.add(sampledataDir);
+                                }
+                                return FileVisitResult.SKIP_SUBTREE; // No nested modules, stop digging.
+                            }
+                            return FileVisitResult.CONTINUE; // In a module container, walk the modules.
+                        }
+                    });
+                }
+                catch (IOException e)
+                {
+                    TestLogger.error(e.getMessage(), e);
+                }
             }
         }
 
