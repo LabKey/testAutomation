@@ -103,9 +103,9 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         clickAndWait(elementCache().importFolderButton);
     }
 
-    public PipelineTriggerWizard createPipelineTrigger(String pipelineTask)
+    public PipelineTriggerWizard clickCreatePipelineTrigger(String pipelineTask)
     {
-        clickAndWait(Locator.tag("a").withAttributeContaining("href", "pipelineTask=" + pipelineTask));
+        clickAndWait(elementCache().findCreateFileWatcherLink(pipelineTask));
         return new PipelineTriggerWizard(getDriver());
     }
 
@@ -129,5 +129,9 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         WebElement manageFileWatcherTriggersButton = Locator.lkButton("Manage File Watcher Triggers").findWhenNeeded(this);
 
         Panel<?> fileWatchersPanel = new Panel.PanelFinder(getDriver()).withTitle("File Watchers").findWhenNeeded();
+        WebElement findCreateFileWatcherLink(String pipelineTask)
+        {
+            return Locator.tag("a").withAttributeContaining("href", "pipelineTask=" + pipelineTask).findElement(fileWatchersPanel);
+        }
     }
 }
