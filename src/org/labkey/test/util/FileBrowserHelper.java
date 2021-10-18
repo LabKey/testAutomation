@@ -38,6 +38,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         if (TestProperties.isCloudPipelineEnabled())
             uploadTimeout = uploadTimeout * 3; // Triple time to upload to a cloud file root
 
-        return new WebDriverWait(getDriver(), uploadTimeout);
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(uploadTimeout));
     }
 
     @LogMethod(quiet = true)

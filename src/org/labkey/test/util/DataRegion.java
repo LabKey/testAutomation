@@ -33,6 +33,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -172,7 +173,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public String doAndWaitForUpdate(Runnable run)
     {
-        return getWrapper().doAndWaitForPageSignal(run, getUpdateSignal(), new WebDriverWait(getDriver(), getUpdateTimeout() / 1000));
+        return getWrapper().doAndWaitForPageSignal(run, getUpdateSignal(), new WebDriverWait(getDriver(), Duration.ofMillis(getUpdateTimeout())));
     }
 
     public String getDataRegionName()
