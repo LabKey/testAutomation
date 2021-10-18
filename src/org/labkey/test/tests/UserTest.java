@@ -42,6 +42,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -473,7 +474,7 @@ public class UserTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Edit"));
         for (String field : REQUIRED_FIELDS)
         {
-            WebElement el = Locator.name("quf_" + field).waitForElement(new WebDriverWait(getDriver(), 5));
+            WebElement el = Locator.name("quf_" + field).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
             if (getFormElement(el).isEmpty())
                 setFormElement(el, getDisplayName());
         }

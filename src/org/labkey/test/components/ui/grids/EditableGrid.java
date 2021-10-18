@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -375,6 +376,41 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Search for a row and then clear the given cell (columnNameToClear) on the row.
+     *
+     * @param columnNameToSearch Column to search.
+     * @param valueToSearch Value in the column to search for.
+     * @param columnNameToClear Column to clear.
+     */
+    public void clearCellValue(String columnNameToSearch, String valueToSearch, String columnNameToClear)
+    {
+        List<Map<String, String>> gridData = getGridData();
+        int index = 0;
+
+        for (Map<String, String> rowData : gridData)
+        {
+            if (rowData.get(columnNameToSearch).equals(valueToSearch))
+            {
+                clearCellValue(index, columnNameToClear);
+                break;
+            }
+            index++;
+        }
+    }
+
+
+    /**
+     * Clear the cell (columnName) in the row.
+     *
+     * @param row Row of the cell to clear.
+     * @param columnName Column of the cell to clear.
+     */
+    public void clearCellValue(int row, String columnName)
+    {
+        pasteFromCell(row, columnName, "");
+    }
+
+    /**
      * For a given row get the value in the given column.
      *
      * @param row The row index (0 based).
@@ -567,7 +603,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         if (selection.isEmpty())
         {
             log("initial attempt to copy current selection came up empty.  re-trying after 3000 msec");
-            new WebDriverWait(getDriver(), 3);
+            new WebDriverWait(getDriver(), Duration.ofSeconds(3));
             return copyCurrentSelection();
         }
         return selection;

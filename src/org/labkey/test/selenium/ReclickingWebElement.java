@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.labkey.test.Locator;
 import org.labkey.test.components.core.ProjectMenu;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
@@ -34,6 +35,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -203,11 +205,16 @@ public class ReclickingWebElement extends WebElementDecorator
         Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
         if (interceptingElLoc != null)
         {
-            List<WebElement> interceptingElement = interceptingElLoc.findElements(getDriver());
-            if (interceptingElement.size() == 1) // If multiple elements match, don't wait for them to disappear
+            List<WebElement> interceptingElements = interceptingElLoc.findElements(getDriver());
+            if (!interceptingElements.isEmpty())
             {
-                new WebDriverWait(getDriver(), 5)
-                        .until(ExpectedConditions.invisibilityOf(interceptingElement.get(0)));
+                final ExpectedCondition<?>[] expectations = (ExpectedCondition<?>[]) interceptingElements.stream()
+                        .map(interceptingElement -> ExpectedConditions.or(
+                                LabKeyExpectedConditions.animationIsDone(interceptingElement),
+                                ExpectedConditions.invisibilityOf(interceptingElement)
+                        )).toArray(ExpectedCondition[]::new);
+                new WebDriverWait(getDriver(), Duration.ofSeconds(5))
+                        .until(ExpectedConditions.and(expectations));
             }
         }
     }
