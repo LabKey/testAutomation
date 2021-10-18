@@ -340,7 +340,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setAssumeUntrustedCertificateIssuer(false);
 
                     FirefoxOptions capabilities = new FirefoxOptions();
-                    capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+                    capabilities.setCapability(FirefoxDriver.Capability.PROFILE, profile);
                     capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
                     capabilities.addPreference("--log", "WARN");
 
@@ -800,10 +800,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void goToSchemaBrowser(int waitMilSec)
     {
-        int waitSeconds = waitMilSec / 1000;
-
         goToModule("Query");
-        new WebDriverWait(getDriver(), waitSeconds).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.lk-sb-instructions")));
+        new WebDriverWait(getDriver(), Duration.ofMillis(waitMilSec)).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.lk-sb-instructions")));
         waitForElement(Locators.pageSignal("queryTreeRendered"), waitMilSec);
     }
 
@@ -987,13 +985,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @Contract(pure = true)
     public WebDriverWait shortWait()
     {
-        return new WebDriverWait(getDriver(), 10);
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(10));
     }
 
     @Contract(pure = true)
     public WebDriverWait longWait()
     {
-        return new WebDriverWait(getDriver(), 30);
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(30));
     }
 
     /**
@@ -1873,7 +1871,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         _testTimeout = true;
         try
         {
-            new WebDriverWait(getDriver(), millis / 1000)
+            new WebDriverWait(getDriver(), Duration.ofMillis(millis))
                     .withMessage("waiting for browser to navigate")
                     .until(ExpectedConditions.stalenessOf(toBeStale));
         }
@@ -1883,7 +1881,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         // WebDriver usually does this automatically, but not always.
-        new WebDriverWait(getDriver(), millis / 1000)
+        new WebDriverWait(getDriver(), Duration.ofMillis(millis))
                 .withMessage("waiting for document to be ready")
                 .until(wd -> Objects.equals(executeScript("return document.readyState;"), "complete"));
         waitForOnReady("jQuery");
@@ -2556,7 +2554,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getFormElement(WebElement el)
     {
-        return (String) executeScript("return arguments[0].value;", el);
+        return el.getDomProperty("value");
     }
 
     /**
@@ -3247,7 +3245,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(Locator l, String text)
     {
-        WebElement el = l.waitForElement(new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT / 1000));
+        WebElement el = l.waitForElement(new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_FOR_JAVASCRIPT)));
         setFormElement(el, text);
     }
 
@@ -3494,7 +3492,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setInput(Locator loc, List<File> files)
     {
-        WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), 5));
+        WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
         setInput(el, files);
     }
 
@@ -3548,7 +3546,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(Locator loc, File file)
     {
-        WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), 5));
+        WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
         setFormElement(el, file);
     }
 

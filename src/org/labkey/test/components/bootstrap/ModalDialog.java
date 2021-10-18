@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     public void dismiss()
     {
         WebElement button = Locator.tagWithClass("button", "close").findElement(getComponentElement());
-        new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT)
+        new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_FOR_JAVASCRIPT))
                 .until(ExpectedConditions.elementToBeClickable(button));
         button.click();
         waitForClose();
@@ -122,7 +123,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
             List<WebElement> elements = new ArrayList<>();
             elements.add(getComponentElement());
             elements.addAll(Locator.byClass("modal").findElements(getDriver()));
-            new WebDriverWait(getDriver(), waitSeconds)
+            new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds))
                     .until(ExpectedConditions.invisibilityOfAllElements(elements));
         }
     }

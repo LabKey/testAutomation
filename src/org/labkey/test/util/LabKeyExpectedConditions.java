@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -80,23 +81,32 @@ public class LabKeyExpectedConditions
                 Point secondPosition;
                 Dimension firstDimension;
                 Dimension secondDimension;
+                String firstOpacity;
+                String secondOpacity;
                 try
                 {
                     firstDimension = el.getSize();
                     firstPosition = el.getLocation();
+                    firstOpacity = getOpacity(driver);
                     Thread.sleep(100);
                     secondDimension = el.getSize();
                     secondPosition = el.getLocation();
+                    secondOpacity = getOpacity(driver);
                 }
                 catch (InterruptedException fail)
                 {
                     throw new IllegalStateException(fail);
                 }
 
-                if (secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension))
+                if (secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension) && secondOpacity.equals(firstOpacity))
                     return el;
                 else
                     return null;
+            }
+
+            private String getOpacity(WebDriver driver)
+            {
+                return (String) ((JavascriptExecutor)driver).executeScript("return getComputedStyle(arguments[0]).getPropertyValue(\"opacity\");", el);
             }
 
             @Override

@@ -30,6 +30,7 @@ import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -230,7 +231,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         }
 
         @LogMethod (quiet = true)
-        public void goToModule(String moduleName)
+        public void goToModule(@LoggedParam String moduleName)
         {
             WebElement moreModulesElement = openMenuTo("Go To Module", "More Modules");
         /* at this point, we want to know if the module link is visible above the 'more modules' break.

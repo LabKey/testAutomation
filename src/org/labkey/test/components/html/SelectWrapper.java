@@ -42,7 +42,7 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
             }
 
             @Override
-            public String getAttribute(String name)
+            public String getDomAttribute(String name)
             {
                 return null;
             }

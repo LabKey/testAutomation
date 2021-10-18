@@ -23,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -44,7 +45,7 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
 
     public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, int timeoutSeconds)
     {
-        return getWrapper().doAndWaitForElementToRefresh(func, loc, this, new WebDriverWait(getDriver(), timeoutSeconds));
+        return getWrapper().doAndWaitForElementToRefresh(func, loc, this, new WebDriverWait(getDriver(), Duration.ofSeconds(timeoutSeconds)));
     }
 
     public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>

@@ -20,6 +20,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Coordinates;
@@ -130,6 +131,36 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement, Loc
     public Rectangle getRect()
     {
         return getWrappedElement().getRect();
+    }
+
+    @Override
+    public String getDomProperty(String name)
+    {
+        return getWrappedElement().getDomProperty(name);
+    }
+
+    @Override
+    public String getDomAttribute(String name)
+    {
+        return getWrappedElement().getDomAttribute(name);
+    }
+
+    @Override
+    public String getAriaRole()
+    {
+        return getWrappedElement().getAriaRole();
+    }
+
+    @Override
+    public String getAccessibleName()
+    {
+        return getWrappedElement().getAccessibleName();
+    }
+
+    @Override
+    public SearchContext getShadowRoot()
+    {
+        return getWrappedElement().getShadowRoot();
     }
 
     @Override
