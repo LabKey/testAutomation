@@ -1,4 +1,4 @@
-package org.labkey.test.components.ui.navigation.apps;
+package org.labkey.test.components.ui.notifications;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -176,7 +176,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
     }
 
 
-    public static class AppNotificationEntryFinder extends WebDriverComponentFinder<ServerNotificationItem, AppNotificationEntryFinder>
+    static class AppNotificationEntryFinder extends WebDriverComponentFinder<ServerNotificationItem, AppNotificationEntryFinder>
     {
 
         private final Locator.XPathLocator locator = Locator.tag("li");

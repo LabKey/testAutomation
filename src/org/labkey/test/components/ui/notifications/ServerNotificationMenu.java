@@ -1,4 +1,4 @@
-package org.labkey.test.components.ui.navigation.apps;
+package org.labkey.test.components.ui.notifications;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.react.BaseBootstrapMenu;
@@ -173,7 +173,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         public final WebElement statusIcon()
         {
-            return Locator.tagWithClass("i", "fa").findWhenNeeded(this);
+            return Locator.byClass("navbar-header-icon").findWhenNeeded(this);
         }
 
         public final WebElement noNotificationsElement()
@@ -184,7 +184,8 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
-                    .child("div[contains(@class,'server-notifications-link')]").findWhenNeeded(this);
+                    .child(Locator.tagWithClass("div", "server-notifications-link"))
+                    .findWhenNeeded(this);
         }
 
     }

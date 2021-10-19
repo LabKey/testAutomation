@@ -8,7 +8,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.ui.navigation.apps.ServerNotificationMenu;
+import org.labkey.test.components.ui.notifications.ServerNotificationMenu;
 import org.labkey.test.util.search.HasSearchResults;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
