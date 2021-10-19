@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.domainproperties;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -7,9 +8,11 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
@@ -127,6 +130,11 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return getThis();
     }
 
+    public Optional<WebElement> optionalWarningAlert()
+    {
+        return elementCache().optionalWarningAlert();
+    }
+
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
@@ -136,5 +144,10 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         protected final Select autoLinkDataToStudy = SelectWrapper.Select(Locator.id("entity-autoLinkTargetContainerId"))
                 .findWhenNeeded(this);
         protected final Input linkedDatasetCategory = Input.Input(Locator.id("entity-autoLinkCategory"), getDriver()).findWhenNeeded(this);
+
+        Optional<WebElement> optionalWarningAlert()
+        {
+            return BootstrapLocators.warningBanner.findOptionalElement(this);
+        }
     }
 }
