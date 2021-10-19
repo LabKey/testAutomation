@@ -75,6 +75,28 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     }
 
     /**
+     * Is the 'Mark all as read' link visible?
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isMarkAllVisible()
+    {
+        return elementCache().markAll().isDisplayed();
+    }
+
+    /**
+     * Click the 'Mark all as read' link. This will cause the list to refresh, so return a new reference to the
+     * notification list.
+     *
+     * @return A new list of {@link ServerNotificationItem}.
+     */
+    public List<ServerNotificationItem> clickMarkAll()
+    {
+        elementCache().markAll().click();
+        return getNotifications();
+    }
+
+    /**
      * Expand the menu and return the notification.
      *
      * @return A list of {@link ServerNotificationItem}, empty if there are none.
@@ -157,6 +179,12 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         public final WebElement noNotificationsElement()
         {
             return Locator.tagWithClass("div", "server-notifications-footer").findWhenNeeded(this);
+        }
+
+        public final WebElement markAll()
+        {
+            return Locator.tagWithClass("h3", "navbar-menu-header")
+                    .child("div[contains(@class,'server-notifications-link')]").findWhenNeeded(this);
         }
 
     }
