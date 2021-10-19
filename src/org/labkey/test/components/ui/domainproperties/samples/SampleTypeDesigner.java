@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
@@ -171,6 +172,11 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return elementCache().uniqueIdMsg.getText();
     }
 
+    public Optional<WebElement> optionalWarningAlert()
+    {
+        return elementCache().optionalWarningAlert();
+    }
+
     protected class ElementCache extends EntityTypeDesigner<T>.ElementCache
     {
         protected final WebElement uniqueIdAlert = Locator.tagWithClassContaining("div","uniqueid-alert").refindWhenNeeded(this);
@@ -202,6 +208,11 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         WebElement removeParentAliasIcon(int index)
         {
             return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
+        }
+
+        Optional<WebElement> optionalWarningAlert()
+        {
+            return Locator.tagWithClass("div", "alert-warning").findOptionalElement(this);
         }
     }
 }
