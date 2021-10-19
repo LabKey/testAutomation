@@ -212,8 +212,8 @@ public class ReclickingWebElement extends WebElementDecorator
                         .map(interceptingElement -> ExpectedConditions.or(
                                 LabKeyExpectedConditions.animationIsDone(interceptingElement),
                                 ExpectedConditions.invisibilityOf(interceptingElement)
-                        )).toArray();
-                new WebDriverWait(getDriver(), 5)
+                        )).toArray(ExpectedCondition[]::new);
+                new WebDriverWait(getDriver(), Duration.ofSeconds(5))
                         .until(ExpectedConditions.and(expectations));
             }
         }

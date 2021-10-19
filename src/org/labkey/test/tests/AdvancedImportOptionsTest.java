@@ -36,6 +36,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -330,8 +331,8 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_PROJECT_MULTI));
         assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI02));
 
-        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
-        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5))).click();
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5))).click();
 
         stopImpersonating();
         popLocation();
@@ -356,12 +357,12 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
          * set(true) unchecks the box.  Todo: salvage this logic into a component someplace.
           * Todo: wonder if being already-selected here is a problem.*/
         WebElement checkbox01 = Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01)
-                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), 5));
+                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
         if (checkbox01.getAttribute("aria-checked") == null || !checkbox01.getAttribute("aria-checked").equals("true"))
             checkbox01.click();
         sleep(250);
         WebElement checkBox03 = Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03)
-                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), 5));
+                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
         if (checkBox03.getAttribute("aria-checked") == null || !checkBox03.getAttribute("aria-checked").equals("true"))
             checkBox03.click();
         sleep(250);

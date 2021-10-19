@@ -25,6 +25,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extends ChartWizardDialog<EC>
@@ -409,7 +410,7 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
 
     public TimeChartWizard clickApply(int waitTime)
     {
-        WebDriverWait webDriverWait = new WebDriverWait(getDriver(), waitTime / 1000);
+        WebDriverWait webDriverWait = new WebDriverWait(getDriver(), Duration.ofMillis(waitTime));
         return new TimeChartWizard(getWrapper()).doAndWaitForUpdate(() -> clickButton("Apply", true), webDriverWait);
     }
 
