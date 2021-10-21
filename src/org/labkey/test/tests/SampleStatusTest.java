@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
@@ -27,6 +28,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +86,7 @@ public class SampleStatusTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testDeleteSampleTypeWithLockedSamples()
+    public void testDeleteSampleTypeWithLockedSamples() throws IOException, CommandException
     {
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
 
@@ -92,7 +94,7 @@ public class SampleStatusTest extends BaseWebDriverTest
         goToProjectHome();
         goToSchemaBrowser();
         selectQuery("core", "DataStates");
-        sampleTypeHelper.addSampleStates(Map.of("TestLocked", SampleTypeHelper.StatusType.Locked));
+        sampleTypeHelper.addSampleStates(getProjectName(), Map.of("TestLocked", SampleTypeHelper.StatusType.Locked));
 
         log("Add a sample type so we can lock some samples");
         final String sampleTypeName = "SamplesWithLocks";

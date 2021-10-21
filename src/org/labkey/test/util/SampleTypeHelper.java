@@ -17,6 +17,9 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -29,7 +32,9 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -322,29 +327,31 @@ public class SampleTypeHelper extends WebDriverWrapper
         return ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
     }
     
-    public void addSampleStates(Map<String, StatusType> states)
+    public void addSampleStates(String folderPath, Map<String, StatusType> states) throws IOException, CommandException
     {
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
-        DataRegionTable drt = new DataRegionTable("query", this);
         for (Map.Entry<String, StatusType> statePair : states.entrySet())
         {
+            DataRegionTable drt = new DataRegionTable("query", this);
             if (drt.getRowIndex("Label", statePair.getKey()) < 0)
             {
-                drt.clickInsertNewRow();
-                addSampleState(statePair.getKey(), statePair.getValue().name());
+                insertSampleState(folderPath, statePair.getKey(), statePair.getValue().name());
+                refresh();
             }
         }
     }
 
     // we use the string here for stateType instead of the enum to allow for setting values outside the enum (error conditions)
-    public void addSampleState(String label, @Nullable String stateType)
+    private void insertSampleState(String folderPath, String label, @Nullable String stateType) throws IOException, CommandException
     {
-        setFormElement(Locator.name("quf_Label"), label);
-        if (stateType != null)
-        {
-            setFormElement(Locator.name("quf_stateType"), stateType);
-        }
-        clickButton("Submit");
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        InsertRowsCommand insertCmd = new InsertRowsCommand("core", "DataStates");
+        Map<String,Object> rowMap = new HashMap<>();
+        rowMap.put("label", label);
+        rowMap.put("stateType", stateType);
+        rowMap.put("publicData", false);
+        insertCmd.addRow(rowMap);
+        insertCmd.execute(cn, folderPath);
     }
 }
