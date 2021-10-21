@@ -52,6 +52,11 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
     {
         if (!validatedType)
         {
+            if (!_el.isDisplayed())
+            {
+                // Don't validate type if element isn't visible
+                return _el;
+            }
             assertElementType(_el);
             validatedType = true;
         }

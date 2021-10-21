@@ -111,11 +111,11 @@ public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.
         // Wait for auto-complete text areas to render
         if (elementCache().newRequestNotifyCheckbox.isChecked())
         {
-            shortWait().until(ExpectedConditions.presenceOfElementLocated(elementCache().newRequestNotifyInputLocator));
+            shortWait().until(ExpectedConditions.visibilityOf(elementCache().newRequestNotifyInput.getComponentElement()));
         }
         if (elementCache().ccCheckbox.isChecked())
         {
-            shortWait().until(ExpectedConditions.presenceOfElementLocated(elementCache().ccInputLocator));
+            shortWait().until(ExpectedConditions.visibilityOf(elementCache().ccInput.getComponentElement()));
         }
 
         clickAndWait(elementCache().saveButton);
@@ -135,13 +135,11 @@ public class ManageNotificationsPage extends LabKeyPage<ManageNotificationsPage.
 
         private final Input subjectSuffixInput = Input.Input(Locator.name("subjectSuffix"), getDriver()).findWhenNeeded(this);
 
-        private final Locator newRequestNotifyInputLocator = Locator.name("newRequestNotify");
         private final Checkbox newRequestNotifyCheckbox = Checkbox.Checkbox(Locator.id("newRequestNotifyCheckbox")).findWhenNeeded(this);
-        private final Input newRequestNotifyInput = Input.Input(newRequestNotifyInputLocator, getDriver()).timeout(1000).findWhenNeeded(this);
+        private final Input newRequestNotifyInput = Input.Input(Locator.name("newRequestNotify"), getDriver()).timeout(1000).findWhenNeeded(this);
 
-        private final Locator ccInputLocator = Locator.name("cc");
         private final Checkbox ccCheckbox = Checkbox.Checkbox(Locator.id("ccCheckbox")).findWhenNeeded(this);
-        private final Input ccInput = Input.Input(ccInputLocator, getDriver()).timeout(1000).findWhenNeeded(this);
+        private final Input ccInput = Input.Input(Locator.name("cc"), getDriver()).timeout(1000).findWhenNeeded(this);
 
         RadioButton defaultEmailNotifyRadio(DefaultEmailNotify option)
         {
