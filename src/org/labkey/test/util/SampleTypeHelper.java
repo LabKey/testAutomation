@@ -282,7 +282,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void deleteSamples(DataRegionTable samplesTable, String expectedTitle)
     {
-        samplesTable.doAndWaitForUpdate(() -> {
+        doAndWaitForPageToLoad(() -> {
             samplesTable.clickHeaderButton("Delete");
             Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
                     .clickButton("Yes, Delete", false);
