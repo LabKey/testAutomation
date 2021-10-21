@@ -173,7 +173,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     public String doAndWaitForUpdate(Runnable run)
     {
-        return getWrapper().doAndWaitForPageSignal(run, getUpdateSignal(), new WebDriverWait(getDriver(), Duration.ofMillis(getUpdateTimeout())));
+        return getWrapper().doAndWaitForRepeatedPageSignal(run, getUpdateSignal(), Duration.ofMillis(getUpdateTimeout()));
     }
 
     public String getDataRegionName()
