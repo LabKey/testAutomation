@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
 
 /**
@@ -346,5 +347,44 @@ public class SampleTypeHelper extends WebDriverWrapper
         rowMap.put("publicData", false);
         insertCmd.addRow(rowMap);
         insertCmd.execute(cn, folderPath);
+    }
+
+    public DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, List<String> sampleIds, @Nullable String categoryName)
+    {
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        for (String sampleId : sampleIds)
+        {
+            int rowNum = samplesTable.getRowIndex("Name", sampleId);
+            if (rowNum >= 0)
+                samplesTable.checkCheckbox(rowNum);
+            else
+                fail(String.format("Could not find sample %s in table to link", sampleId));
+        }
+        return _linkToStudy(samplesTable, targetStudy, categoryName);
+    }
+
+    public DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, int numOfRowsToBeLinked, @Nullable String categoryName)
+    {
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        for (int i = 0; i < numOfRowsToBeLinked; i++)
+            samplesTable.checkCheckbox(i);
+        return _linkToStudy(samplesTable, targetStudy, categoryName);
+    }
+
+    private DataRegionTable _linkToStudy(DataRegionTable samplesTable, String targetStudy, String categoryName)
+    {
+        samplesTable.clickHeaderButtonAndWait("Link to Study");
+
+        log("Link to study: Choose target");
+        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
+        if (categoryName != null)
+            setFormElement(Locator.name("autoLinkCategory"), categoryName);
+        clickButton("Next");
+
+        DataRegionTable table =  new DataRegionTable("query", getDriver());
+        table.clickHeaderButtonAndWait("Link to Study");
+        return table;
     }
 }
