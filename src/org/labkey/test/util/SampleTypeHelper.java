@@ -324,7 +324,9 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public static Boolean setSampleStatusEnabled(boolean enabled)
     {
-        return ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
+        Boolean previousSetting = ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
+        TestLogger.log("Setting sample status experimental feature: " + enabled + " (previous setting was " + previousSetting + ").");
+        return previousSetting;
     }
     
     public void addSampleStates(String folderPath, Map<String, StatusType> states) throws IOException, CommandException
