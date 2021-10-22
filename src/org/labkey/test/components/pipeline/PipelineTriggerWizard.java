@@ -192,14 +192,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     {
         try
         {
-            elementCache().containerMoveInput.getComponentElement();
+            return elementCache().containerMoveInput.getComponentElement().isEnabled();
         }
         catch (NoSuchElementException e)
         {
             return false;
         }
-
-        return true;
     }
 
     public PipelineTriggerWizard setCopy(String value)
