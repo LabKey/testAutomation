@@ -1,8 +1,10 @@
 package org.labkey.test.components.ui.notifications;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -106,8 +108,23 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         if(!isExpanded())
             expand();
 
+        if(elementCache().noNotificationsElement().isDisplayed())
+            return new ArrayList<>();
+
         if(getWrapper().isElementPresent(elementCache().notificationsContainerLocator))
         {
+            // Because a query is used to populate the dropdown, it may be a moment before any notifications show up.
+            WebDriverWrapper.waitFor(()->
+                    {
+                        try {
+                            return !elementCache().notifications().isEmpty();
+                        }
+                        catch (StaleElementReferenceException exp)
+                        {
+                            return false;
+                        }
+                    },
+                    "There are no notifications in the drop down.", 1_000);
             return elementCache().notifications();
         }
         else
@@ -163,7 +180,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         public final WebElement notificationsContainer()
         {
-            return notificationsContainerLocator.findWhenNeeded(this);
+            return notificationsContainerLocator.refindWhenNeeded(this);
         }
 
         public final List<ServerNotificationItem> notifications()
@@ -173,19 +190,19 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         public final WebElement statusIcon()
         {
-            return Locator.byClass("navbar-header-icon").findWhenNeeded(this);
+            return Locator.byClass("navbar-header-icon").refindWhenNeeded(this);
         }
 
         public final WebElement noNotificationsElement()
         {
-            return Locator.tagWithClass("div", "server-notifications-footer").findWhenNeeded(this);
+            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(this);
         }
 
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
                     .child(Locator.tagWithClass("div", "server-notifications-link"))
-                    .findWhenNeeded(this);
+                    .refindWhenNeeded(this);
         }
 
     }
