@@ -552,8 +552,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void testLinkAndRecallLockedSampleFromStudy() throws IOException, CommandException
     {
         enableSampleStatus();
-        addSampleStates();
+
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.addSampleStates(SAMPLE_TYPE_PROJECT, Map.of("TestLocked", SampleTypeHelper.StatusType.Locked, "TestAvailable", SampleTypeHelper.StatusType.Available));
+
         log("Create a sample type to hold some samples with status");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         String data3 = "Name\tVisitId\tParticipantId\tStatus\n" +
@@ -629,16 +631,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         Boolean previousSetting = SampleTypeHelper.setSampleStatusEnabled(true);
         if (previousSampleStatusFlag == null)
             previousSampleStatusFlag = previousSetting;
-    }
-
-    private void addSampleStates() throws IOException, CommandException
-    {
-        log("Adding sample states");
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-        goToSchemaBrowser();
-        selectQuery("core", "DataStates");
-        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
-        sampleTypeHelper.addSampleStates(SAMPLE_TYPE_PROJECT, Map.of("TestLocked", SampleTypeHelper.StatusType.Locked, "TestAvailable", SampleTypeHelper.StatusType.Available));
     }
 
     private DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, List<String> sampleIds, @Nullable String categoryName)

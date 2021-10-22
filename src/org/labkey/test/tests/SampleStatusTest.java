@@ -88,12 +88,10 @@ public class SampleStatusTest extends BaseWebDriverTest
     @Test
     public void testDeleteSampleTypeWithLockedSamples() throws IOException, CommandException
     {
-        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        goToProjectHome();
 
         log("Add a locked sample status.");
-        goToProjectHome();
-        goToSchemaBrowser();
-        selectQuery("core", "DataStates");
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
         sampleTypeHelper.addSampleStates(getProjectName(), Map.of("TestLocked", SampleTypeHelper.StatusType.Locked));
 
         log("Add a sample type so we can lock some samples");

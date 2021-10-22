@@ -331,17 +331,8 @@ public class SampleTypeHelper extends WebDriverWrapper
     
     public void addSampleStates(String folderPath, Map<String, StatusType> states) throws IOException, CommandException
     {
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
         for (Map.Entry<String, StatusType> statePair : states.entrySet())
-        {
-            DataRegionTable drt = new DataRegionTable("query", this);
-            if (drt.getRowIndex("Label", statePair.getKey()) < 0)
-            {
-                insertSampleState(folderPath, statePair.getKey(), statePair.getValue().name());
-                refresh();
-            }
-        }
+            insertSampleState(folderPath, statePair.getKey(), statePair.getValue().name());
     }
 
     // we use the string here for stateType instead of the enum to allow for setting values outside the enum (error conditions)
