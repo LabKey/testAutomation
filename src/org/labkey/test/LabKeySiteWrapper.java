@@ -53,7 +53,6 @@ import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
-import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -699,9 +698,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
                 // Tests hit Home portal a lot. Make it load as fast as possible
                 new PortalHelper(this).removeAllWebParts();
-                String displayName = AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername())
-                        + (WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2);
-                _userHelper.setDisplayName(PasswordUtil.getUsername(), displayName);
+                _userHelper.setInjectionDisplayName(PasswordUtil.getUsername());
 
                 if (!TestProperties.isDevModeEnabled())
                 {
