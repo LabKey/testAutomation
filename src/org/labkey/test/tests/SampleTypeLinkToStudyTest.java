@@ -8,7 +8,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
@@ -19,7 +18,6 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.admin.ImportFolderPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
-import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -50,7 +48,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String ASSAY_NAME = "Test assay";
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
-    final static String SAMPLE_TYPE3 = "Sample type 3";
+
     private Boolean previousSampleStatusFlag = null;
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -90,6 +88,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
     private void createSampleTypes()
     {
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         log("Creating sample types");
         String data1 = "Name\tVisitId\tVisitDate\tParticipantId\n" +
@@ -97,7 +97,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 "urine\t2\t" + now + "\tP2\n" +
                 "plasma\t3\t" + now + "\tP3\n" +
                 "stool\t4\t" + now + "\tP4\n";
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE1)
                 .setFields(List.of(
                         new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
@@ -111,7 +110,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 "Third\t" + now + "\tP3\n" +
                 "Fourth\t" + now + "\tP4\n";
 
-        sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE2)
                 .setFields(List.of(
                         new FieldDefinition("VisitDate", FieldDefinition.ColumnType.VisitDate),
@@ -124,7 +122,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         int numOfRowsLinked = 2;
         log("Linking sample types two rows to study");
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, numOfRowsLinked, null);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, numOfRowsLinked, null);
 
         log("Verifying the linked sample type in study");
         goToProjectHome(VISIT_BASED_STUDY);
@@ -147,7 +146,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void testDatasetRecall()
     {
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, null);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, null);
 
         recallDataset(DATE_BASED_STUDY, SAMPLE_TYPE2);
 
@@ -164,11 +164,12 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     {
         log("Linking the Sample type to " + VISIT_BASED_STUDY);
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, null);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, null);
 
         log("Linking the Sample type to " + DATE_BASED_STUDY);
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 1, null);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 1, null);
 
         log("Verifying link to " + VISIT_BASED_STUDY);
         goToProjectHome(VISIT_BASED_STUDY);
@@ -235,10 +236,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         String sampleName = "SampleTypeDelete";
         log("Creating sample types for deletion");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         String data = "Name\tVisitId\tVisitDate\tParticipantId\n" +
                 "blood\t1\t" + now + "\tP1\n" +
                 "urine\t2\t" + now + "\tP2\n";
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(sampleName)
                 .setFields(List.of(
                         new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
@@ -247,10 +248,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         log("Linking sample types to studies");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(VISIT_BASED_STUDY, sampleName, 1, null);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, sampleName, 1, null);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(DATE_BASED_STUDY, sampleName, 2, null);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, sampleName, 2, null);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(sampleName));
@@ -273,10 +274,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     {
         String derivedSampleName = "Derived Plasma";
         goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         String data = "Name\tVisitId\tVisitDate\tParticipantId\n" +
                 "BL-1\t1\t" + now + "\tP1\n" +
                 "BL-2\t2\t" + now + "\tP2\n";
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition("Blood")
                 .setFields(List.of(
                         new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
@@ -286,7 +287,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         data = "Name\tVolume\n" +
                 "PL-1\t10\n";
-        sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition("Plasma")
                 .setFields(List.of(
                         new FieldDefinition("Volume", FieldDefinition.ColumnType.Integer))), data);
@@ -388,7 +388,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 .clickSave();
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 2, null);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 2, null);
 
         goToProjectHome(DATE_BASED_STUDY);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
@@ -420,9 +421,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(VISIT_BASED_STUDY, IMPORT_FOLDER_2);
 
         log("Linking sample types two rows to study");
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         int numOfRowsLinked = 2;
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, numOfRowsLinked, null);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, numOfRowsLinked, null);
 
         log("Exporting both Dataset Data and Dataset Definitions");
         goToProjectHome(VISIT_BASED_STUDY);
@@ -477,16 +479,17 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         log("Linking one row from sample type to all the studies");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 1, null);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE1, 1, null);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, null);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, null);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(SAMPLE_TYPE_PROJECT + " Study 1", SAMPLE_TYPE1, 1, null);
+        sampleHelper.linkToStudy(SAMPLE_TYPE_PROJECT + " Study 1", SAMPLE_TYPE1, 1, null);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        linkToStudy(SAMPLE_TYPE_PROJECT + " Study 2", SAMPLE_TYPE1, 1, null);
+        sampleHelper.linkToStudy(SAMPLE_TYPE_PROJECT + " Study 2", SAMPLE_TYPE1, 1, null);
 
         log("Verifying linked column does not exists because more then 3 studies are linked");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -519,11 +522,12 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome();
 
         log("Linking the sample type to preexisting dataset category");
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, categoryName1);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE1, 1, categoryName1);
 
         log("Linking the sample type to new dataset category");
         goToProjectHome();
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, categoryName2);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, categoryName2);
 
         checker().verifyEquals("Incorrect category for the dataset(Category exists case)", categoryName1,
                 getCategory(VISIT_BASED_STUDY, SAMPLE_TYPE1));
@@ -539,75 +543,15 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome();
 
         log("Linking the sample type to preexisting dataset category");
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, categoryName);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 1, categoryName);
 
         log("Linking more rows same dataset and trying to over write the dataset category");
         goToProjectHome();
-        linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 2, "CAT2");
+        sampleHelper.linkToStudy(DATE_BASED_STUDY, SAMPLE_TYPE2, 2, "CAT2");
 
         checker().verifyEquals("Category should not have overridden", categoryName, getCategory(DATE_BASED_STUDY, SAMPLE_TYPE2));
     }
-
-    @Test
-    public void testLinkAndRecallLockedSampleFromStudy()
-    {
-        enableSampleStatus();
-        addSampleStates();
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        log("Create a sample type to hold some samples with status");
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-        String data3 = "Name\tVisitId\tParticipantId\tStatus\n" +
-                "S3-1\t3.1\tP1\t\n" +
-                "S3-2\t3.2\tP2\tTestAvailable\n" +
-                "S3-3\t3.3\tP3\tTestAvailable\n" +
-                "S3-4\t3.4\tP4\tTestLocked\n";
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE3)
-                .setFields(List.of(
-                        new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
-                        new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))));
-        sampleHelper.goToSampleType(SAMPLE_TYPE3);
-        sampleHelper.getSamplesDataRegionTable()
-                .clickImportBulkData()
-                .setImportLookupByAlternateKey(true)
-                .setText(data3)
-                .submit();
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-
-        log("Attempt to linking all samples");
-        linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE3, List.of("S3-1", "S3-2", "S3-3", "S3-4"), null);
-        checker().verifyEquals("Error message text after linking locked sample not as expected",
-                "Sample S3-4 has status TestLocked, which prevents linking to study.",
-                Locators.labkeyError.findElement(this.getDriver()).getText());
-
-        log("Uncheck the locked sample and link the rest");
-        DataRegionTable table =  new DataRegionTable("query", getDriver());
-        table.uncheckCheckbox(table.getRowIndex("Name", "S3-4"));
-        table.clickHeaderButtonAndWait("Link to Study");
-
-        log("Change the status of one of the linked samples to locked.");
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-        sampleHelper.goToSampleType(SAMPLE_TYPE3);
-        DataRegionTable samples = sampleHelper.getSamplesDataRegionTable();
-        int rowIndex = samples.getRowIndex("Name", "S3-1");
-        UpdateQueryRowPage updatePage = samples.clickEditRow(rowIndex);
-        updatePage.setField("SampleState", "TestLocked");
-        updatePage.submit();
-
-        log("Go back to the linked sample dataset");
-        samples = sampleHelper.getSamplesDataRegionTable();
-        clickAndWait(Locator.linkWithText("linked").findElement(samples));
-
-        log("Attempt to recall the linked sample that was locked.");
-        table = new DataRegionTable("Dataset", getDriver());
-        table.checkCheckbox(table.getRowIndex("Name", "S3-1"));
-        table.clickHeaderButton("Recall");
-        acceptAlert();
-        waitForElement(Locators.labkeyError);
-        checker().verifyEquals("Error message text after linking locked sample not as expected",
-                "Sample S3-1 has status TestLocked, which prevents recalling from a study.",
-                Locators.labkeyError.findElement(this.getDriver()).getText());
-    }
-
 
     @Before
     public void preTest() throws Exception
@@ -621,67 +565,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
         if(TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
-    }
-
-    private void enableSampleStatus()
-    {
-        log("Enabling sample status feature");
-        Boolean previousSetting = SampleTypeHelper.setSampleStatusEnabled(true);
-        if (previousSampleStatusFlag == null)
-            previousSampleStatusFlag = previousSetting;
-    }
-
-    private void addSampleStates()
-    {
-        log("Adding sample states");
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-        goToSchemaBrowser();
-        selectQuery("core", "DataStates");
-        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
-        sampleTypeHelper.addSampleStates(Map.of("TestLocked", SampleTypeHelper.StatusType.Locked, "TestAvailable", SampleTypeHelper.StatusType.Available));
-    }
-
-    private DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, List<String> sampleIds, @Nullable String categoryName)
-    {
-        clickAndWait(Locator.linkWithText(sampleTypeName));
-        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        for (String sampleId : sampleIds)
-        {
-            int rowNum = samplesTable.getRowIndex("Name", sampleId);
-            if (rowNum >= 0)
-                samplesTable.checkCheckbox(rowNum);
-            else
-                checker().fatal().error(String.format("Could not find sample %s in table to link", sampleId));
-        }
-        samplesTable.clickHeaderButtonAndWait("Link to Study");
-
-        log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
-        if (categoryName != null)
-            setFormElement(Locator.name("autoLinkCategory"), categoryName);
-        clickButton("Next");
-
-        DataRegionTable table =  new DataRegionTable("query", getDriver());
-        table.clickHeaderButtonAndWait("Link to Study");
-        return table;
-    }
-
-    private void linkToStudy(String targetStudy, String sampleTypeName, int numOfRowsToBeLinked, @Nullable String categoryName)
-    {
-        clickAndWait(Locator.linkWithText(sampleTypeName));
-        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        for (int i = 0; i < numOfRowsToBeLinked; i++)
-            samplesTable.checkCheckbox(i);
-
-        samplesTable.clickHeaderButtonAndWait("Link to Study");
-
-        log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
-        if (categoryName != null)
-            setFormElement(Locator.name("autoLinkCategory"), categoryName);
-        clickButton("Next");
-
-        new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
     }
 
     private void createDatasetCategory(String projectName, String name)
