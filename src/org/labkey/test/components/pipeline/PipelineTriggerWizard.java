@@ -24,7 +24,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -190,14 +189,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public boolean isMoveEnabled()
     {
-        try
-        {
-            return elementCache().containerMoveInput.getComponentElement().isEnabled();
-        }
-        catch (NoSuchElementException e)
-        {
-            return false;
-        }
+        return elementCache().containerMoveInput.getComponentElement().isDisplayed() &&
+                elementCache().containerMoveInput.getComponentElement().isEnabled();
     }
 
     public PipelineTriggerWizard setCopy(String value)
