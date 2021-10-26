@@ -18,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +81,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
     public OmniBox focus()
     {
         elementCache().control.click();
-        new WebDriverWait(_driver, 2)
+        new WebDriverWait(_driver, Duration.ofSeconds(2))
                 .until(ExpectedConditions.attributeContains(this.getComponentElement(), "class", "is-open"));
         return this;
     }
@@ -163,7 +164,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     private void sendClearValue()
     {
-        new WebDriverWait(_driver, 1).until(ExpectedConditions.elementToBeClickable(elementCache().input));
+        new WebDriverWait(_driver, Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
         elementCache().input.sendKeys(Keys.BACK_SPACE);
     }
 
@@ -225,7 +226,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     private OmniBox setText(String inputValue)
     {
-        new WebDriverWait(getWrapper().getDriver(), 1).until(ExpectedConditions.elementToBeClickable(elementCache().input));
+        new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
         elementCache().input.sendKeys(inputValue);
         elementCache().input.sendKeys(Keys.ENTER);
 

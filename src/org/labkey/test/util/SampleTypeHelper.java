@@ -17,6 +17,9 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -29,7 +32,9 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
 
 /**
@@ -282,7 +288,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void deleteSamples(DataRegionTable samplesTable, String expectedTitle)
     {
-        samplesTable.doAndWaitForUpdate(() -> {
+        doAndWaitForPageToLoad(() -> {
             samplesTable.clickHeaderButton("Delete");
             Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
                     .clickButton("Yes, Delete", false);
@@ -319,32 +325,66 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public static Boolean setSampleStatusEnabled(boolean enabled)
     {
-        return ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
+        Boolean previousSetting = ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
+        TestLogger.log("Setting sample status experimental feature: " + enabled + " (previous setting was " + previousSetting + ").");
+        return previousSetting;
     }
     
-    public void addSampleStates(Map<String, StatusType> states)
+    public void addSampleStates(String folderPath, Map<String, StatusType> states) throws IOException, CommandException
     {
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
-        DataRegionTable drt = new DataRegionTable("query", this);
         for (Map.Entry<String, StatusType> statePair : states.entrySet())
-        {
-            if (drt.getRowIndex("Label", statePair.getKey()) < 0)
-            {
-                drt.clickInsertNewRow();
-                addSampleState(statePair.getKey(), statePair.getValue().name());
-            }
-        }
+            insertSampleState(folderPath, statePair.getKey(), statePair.getValue().name());
     }
 
     // we use the string here for stateType instead of the enum to allow for setting values outside the enum (error conditions)
-    public void addSampleState(String label, @Nullable String stateType)
+    private void insertSampleState(String folderPath, String label, @Nullable String stateType) throws IOException, CommandException
     {
-        setFormElement(Locator.name("quf_Label"), label);
-        if (stateType != null)
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        InsertRowsCommand insertCmd = new InsertRowsCommand("core", "DataStates");
+        Map<String,Object> rowMap = new HashMap<>();
+        rowMap.put("label", label);
+        rowMap.put("stateType", stateType);
+        rowMap.put("publicData", false);
+        insertCmd.addRow(rowMap);
+        insertCmd.execute(cn, folderPath);
+    }
+
+    public DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, List<String> sampleIds, @Nullable String categoryName)
+    {
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        for (String sampleId : sampleIds)
         {
-            setFormElement(Locator.name("quf_stateType"), stateType);
+            int rowNum = samplesTable.getRowIndex("Name", sampleId);
+            if (rowNum >= 0)
+                samplesTable.checkCheckbox(rowNum);
+            else
+                fail(String.format("Could not find sample %s in table to link", sampleId));
         }
-        clickButton("Submit");
+        return _linkToStudy(samplesTable, targetStudy, categoryName);
+    }
+
+    public DataRegionTable linkToStudy(String targetStudy, String sampleTypeName, int numOfRowsToBeLinked, @Nullable String categoryName)
+    {
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        for (int i = 0; i < numOfRowsToBeLinked; i++)
+            samplesTable.checkCheckbox(i);
+        return _linkToStudy(samplesTable, targetStudy, categoryName);
+    }
+
+    private DataRegionTable _linkToStudy(DataRegionTable samplesTable, String targetStudy, String categoryName)
+    {
+        samplesTable.clickHeaderButtonAndWait("Link to Study");
+
+        log("Link to study: Choose target");
+        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
+        if (categoryName != null)
+            setFormElement(Locator.name("autoLinkCategory"), categoryName);
+        clickButton("Next");
+
+        DataRegionTable table =  new DataRegionTable("query", getDriver());
+        table.clickHeaderButtonAndWait("Link to Study");
+        return table;
     }
 }
