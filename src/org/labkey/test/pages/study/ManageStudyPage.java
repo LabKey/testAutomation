@@ -21,6 +21,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ManageDatasetsPage;
+import org.labkey.test.pages.admin.ImportFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -72,16 +73,23 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
         return new ConfigureImporterPage(getDriver());
     }
 
+    public ImportFolderPage clickManageFileWatchers()
+    {
+        clickAndWait(elementCache().manageFileWatchers);
+        return new ImportFolderPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         WebElement manageDatasets = Locator.linkWithText("Manage Datasets").findWhenNeeded(this);
         WebElement manageSecurity = Locator.linkWithText("Manage Security").findWhenNeeded(this);
         WebElement manageQCStates = Locator.linkWithText("Manage Dataset QC States").findWhenNeeded(this);
+        WebElement manageFileWatchers = Locator.linkWithText("Manage file watchers").findWhenNeeded(this);
     }
 }
