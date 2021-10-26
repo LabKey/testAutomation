@@ -263,6 +263,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Submit", "duplicate key");
 
         log ("Switch to 'Insert and Replace'");
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
         clickButton("Submit");
         log ("Validate data was updated and new data added");
