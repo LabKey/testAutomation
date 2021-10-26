@@ -24,9 +24,11 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -49,6 +51,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     public static PipelineTriggerWizard beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("pipeline", containerPath, "createPipelineTrigger"));
+        return new PipelineTriggerWizard(driver.getDriver());
+    }
+
+    public static PipelineTriggerWizard beginAt(WebDriverWrapper driver, String containerPath, String pipelineTask)
+    {
+        driver.beginAt(WebTestHelper.buildURL("pipeline", containerPath, "createPipelineTrigger", Map.of("pipelineTask", pipelineTask)));
         return new PipelineTriggerWizard(driver.getDriver());
     }
 
@@ -181,16 +189,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public boolean isMoveEnabled()
     {
-        try
-        {
-            elementCache().containerMoveInput.getComponentElement();
-        }
-        catch (NoSuchElementException e)
-        {
-            return false;
-        }
-
-        return true;
+        return elementCache().containerMoveInput.getComponentElement().isDisplayed() &&
+                elementCache().containerMoveInput.getComponentElement().isEnabled();
     }
 
     public PipelineTriggerWizard setCopy(String value)
@@ -201,21 +201,27 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard setParameterFunction(String function)
     {
+        showAdvanced();
+
         elementCache().paramFunctionInput.set(function);
         return this;
     }
 
-    public PipelineTriggerWizard showAdvanced()
+    private void showAdvanced()
     {
-        elementCache().showAdvanced.click();
-        return this;
+        if (!Locator.byClass("advanced-settings").findWhenNeeded(this).isDisplayed())
+        {
+            elementCache().showAdvanced.click();
+        }
     }
 
-    public PipelineTriggerWizard addCustomParameter(String key, String value, @NotNull Integer index)
+    public PipelineTriggerWizard addCustomParameter(String key, String value)
     {
+        showAdvanced();
+        int initialCount = Locator.byClass("custom-parameter").findElements(this).size();
         elementCache().addCustomParam.click();
-        Input keyInput = new Input(Locator.tagWithAttribute("input", "name", "custom-param-key-" + index).findElement(this), getDriver());
-        Input valueInput = new Input(Locator.tagWithAttribute("input", "name", "custom-param-value-" + index).findElement(this), getDriver());
+        Input keyInput = new Input(Locator.tagWithAttribute("input", "name", "custom-param-key-" + initialCount).findElement(this), getDriver());
+        Input valueInput = new Input(Locator.tagWithAttribute("input", "name", "custom-param-value-" + initialCount).findElement(this), getDriver());
 
         keyInput.setValue(key);
         valueInput.setValue(value);
@@ -225,12 +231,14 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard removeCustomParameter(@NotNull Integer index)
     {
+        showAdvanced();
 
         WebElement deleteIcon = Locator.tagWithClass("div", "custom-parameter")
-                .append(Locator.tagWithClass("span", "fa-trash"))
-                .findElements(this).get(index);
+                .append(Locator.tagWithClass("span", "fa-trash")).index(index)
+                .findElement(this);
 
         deleteIcon.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(deleteIcon));
         return this;
     }
 
@@ -259,15 +267,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
-//        public ElementCache()
-//        {
-//            if (getWrapper().getUrlParameters().containsKey("rowId"))
-//                // Wait for saved config to populate form
-//                Locators.pageSignal("triggerConfigLoaded").waitForElement(getDriver(), 10000);
-//        }
-
 
         //details page elements
         Input nameInput = new Input(Locator.tagWithName("input", "name").findWhenNeeded(this), getDriver());
@@ -286,8 +287,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input subdirectoryMoveInput = new Input(Locator.tagWithName("input", "moveDirectory").findWhenNeeded(this), getDriver());
         Input copyInput = new Input(Locator.tagWithName("input", "copy").findWhenNeeded(this), getDriver());
         Input paramFunctionInput = new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
-        WebElement showAdvanced = Locator.tagWithText("div", "Show Advanced Settings").findWhenNeeded(this);
-        WebElement addCustomParam = Locator.tagWithText("div", "Add Custom Parameter").findWhenNeeded(this);
+        WebElement showAdvanced = Locator.byClass("custom-config__button").withText("Show Advanced Settings").findWhenNeeded(this);
+        WebElement addCustomParam = Locator.byClass("custom-config__button").withText("Add Custom Parameter").findWhenNeeded(this);
         Locator action = Locator.radioButtonByName("mergeData");
         Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
         //navgiation elements

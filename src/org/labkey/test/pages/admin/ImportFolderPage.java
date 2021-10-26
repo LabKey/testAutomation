@@ -19,11 +19,12 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.pipeline.PipelineTriggerWizard;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -102,13 +103,19 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         clickAndWait(elementCache().importFolderButton);
     }
 
+    public PipelineTriggerWizard clickCreatePipelineTrigger(String pipelineTask)
+    {
+        clickAndWait(elementCache().findCreateFileWatcherLink(pipelineTask));
+        return new PipelineTriggerWizard(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         RadioButton localZipRadio = new RadioButton.RadioButtonFinder().withLabel("Local zip archive").findWhenNeeded(this);
         RadioButton existingFolderRadio = new RadioButton.RadioButtonFinder().withLabel("Existing folder").findWhenNeeded(this);
@@ -120,5 +127,11 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         WebElement importFolderButton = Locator.lkButton("Import Folder").findWhenNeeded(this);
         WebElement usePipelineButton = Locator.lkButton("Use Pipeline").findWhenNeeded(this);
         WebElement manageFileWatcherTriggersButton = Locator.lkButton("Manage File Watcher Triggers").findWhenNeeded(this);
+
+        Panel<?> fileWatchersPanel = new Panel.PanelFinder(getDriver()).withTitle("File Watchers").findWhenNeeded();
+        WebElement findCreateFileWatcherLink(String pipelineTask)
+        {
+            return Locator.tag("a").withAttributeContaining("href", "pipelineTask=" + pipelineTask).findElement(fileWatchersPanel);
+        }
     }
 }
