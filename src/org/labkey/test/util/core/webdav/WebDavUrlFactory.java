@@ -39,7 +39,7 @@ public class WebDavUrlFactory
     public String getPath(String relativeParent, String fileName)
     {
         String encodedParent = EscapeUtil.encode(relativeParent).replace("%2F", "/");
-        return getPath(StringUtils.stripEnd(encodedParent, "/") + "/" + fileName);
+        return getPath(StringUtils.stripEnd(encodedParent, "/") + "/" + EscapeUtil.encode(fileName));
     }
 
     public static WebDavUrlFactory pipelineUrlFactory(String containerPath)
