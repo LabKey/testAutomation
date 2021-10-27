@@ -264,6 +264,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log ("Switch to 'Insert and Replace'");
         sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         clickButton("Submit");
         log ("Validate data was updated and new data added");
         assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
