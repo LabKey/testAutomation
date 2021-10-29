@@ -30,7 +30,6 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -38,6 +37,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
@@ -258,19 +258,19 @@ public class SampleTypeTest extends BaseWebDriverTest
         assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "See", rowData.get(fieldNames.get(0)));
 
         log("Try to import overlapping data from file");
-        drt.clickImportBulkData();
-        click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
-        clickButton("Submit", 0);
-        final String errorText = Locators.labkeyError.waitForElement(getDriver(), 5_000).getText();
+        final File sampleData = TestFileUtils.getSampleData("simpleSampleType.xls");
+        final ImportDataPage importDataPage = drt.clickImportBulkData();
+        importDataPage.setFile(sampleData);
+        final String errorText = importDataPage.submitExpectingError();
         Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.contains("duplicate key"));
         // TODO: Regression check for Issue 44202: Ugly error when data import fails due to duplicate key
         // Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.length() < 100);
 
         log ("Switch to 'Insert and Replace'");
         sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
-        clickButton("Submit");
+        importDataPage
+                .setFile(sampleData)
+                .submit();
         log ("Validate data was updated and new data added");
         assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());
 
