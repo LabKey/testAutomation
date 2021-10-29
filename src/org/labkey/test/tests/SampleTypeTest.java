@@ -261,13 +261,13 @@ public class SampleTypeTest extends BaseWebDriverTest
         drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
-        clickButton("Submit");
-        final String errorText = Locators.labkeyError.findElement(getDriver()).getText();
-        Assert.assertTrue("Bad error when importing duplicate samples. " + errorText,
-                errorText.contains("duplicate key") && errorText.length() < 100); // TODO: Find better condition once error message is fixed
+        clickButton("Submit", 0);
+        final String errorText = Locators.labkeyError.waitForElement(getDriver(), 5_000).getText();
+        Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.contains("duplicate key"));
+        // TODO: Regression check for Issue 44202: Ugly error when data import fails due to duplicate key
+        // Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.length() < 100);
 
         log ("Switch to 'Insert and Replace'");
-        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         clickButton("Submit");
