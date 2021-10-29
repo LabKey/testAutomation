@@ -139,6 +139,14 @@ def initPropertiesTask = project.tasks.register("initProperties", Task) {
                         copy.from(testPropertiesTemplate)
                         copy.into(project.file("."))
                         copy.rename(testPropertiesTemplate.getName(), testProperties.getName())
+                        copy.filter { String line ->
+                            if (line.startsWith("#!!")) {
+                                return null
+                            }
+                            else {
+                                return line
+                            }
+                        }
                 }
             }
         })

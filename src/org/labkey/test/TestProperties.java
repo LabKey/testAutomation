@@ -15,16 +15,18 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.io.FileUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,7 +43,8 @@ public abstract class TestProperties
             try
             {
                 TestLogger.log(String.format("'%s' does not exist. Creating default from '%s'", propFile.getName(), propFileTemplate.getName()));
-                FileUtils.copyFile(propFileTemplate, propFile);
+                final Iterator<String> iterator = Files.lines(propFileTemplate.toPath()).filter(line -> !line.startsWith("#!!")).iterator();
+                Files.write(propFile.toPath(), (Iterable<String>) () -> iterator, StandardOpenOption.CREATE_NEW);
             }
             catch (IOException e)
             {
