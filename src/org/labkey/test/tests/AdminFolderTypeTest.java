@@ -49,18 +49,18 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
         goToCreateProject();
         checker().verifyTrue(folderTypeName + " project is not enabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
-        log("Disabling the folder");
+        log("Disabling the folder type " + folderTypeName);
         folderTypePage = goToAdminConsole().clickFolderType();
         folderTypePage.disableFolderType(folderTypeName).clickSave();
 
-        log("Verifying folder is disabled");
+        log("Verifying folder type " + folderTypeName + " is disabled");
         folderTypePage = goToAdminConsole().clickFolderType();
         checker().verifyFalse(folderTypeName + " should have been disabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
         checker().verifyFalse(folderTypeName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
-        log("Enabling the folder");
+        log("Enabling the folder type " + folderTypeName);
         folderTypePage = goToAdminConsole().clickFolderType();
         folderTypePage.enableFolderType(folderTypeName).clickSave();
     }
