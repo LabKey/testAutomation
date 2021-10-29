@@ -30,6 +30,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -260,10 +261,15 @@ public class SampleTypeTest extends BaseWebDriverTest
         drt.clickImportBulkData();
         click(Locator.tagWithText("h3", "Upload file (.xlsx, .xls, .csv, .txt)"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
-        clickButton("Submit", "duplicate key");
+        clickButton("Submit");
+        final String errorText = Locators.labkeyError.findElement(getDriver()).getText();
+        Assert.assertTrue("Bad error when importing duplicate samples. " + errorText,
+                errorText.contains("duplicate key") && errorText.length() < 100); // TODO: Find better condition once error message is fixed
 
         log ("Switch to 'Insert and Replace'");
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("simpleSampleType.xls"));
         clickButton("Submit");
         log ("Validate data was updated and new data added");
         assertEquals("Number of samples not as expected", 3, drt.getDataRowCount());

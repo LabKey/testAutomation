@@ -322,13 +322,6 @@ public class SampleTypeHelper extends WebDriverWrapper
         Locator loc = Locator.tag("td").withClass("lk-form-label").withText(label + ":").followingSibling("td");
         return loc.findElement(getDriver()).getText();
     }
-
-    public static Boolean setSampleStatusEnabled(boolean enabled)
-    {
-        Boolean previousSetting = ExperimentalFeaturesHelper.setExperimentalFeature(WebTestHelper.getRemoteApiConnection(false), "experimental-sample-status", enabled);
-        TestLogger.log("Setting sample status experimental feature: " + enabled + " (previous setting was " + previousSetting + ").");
-        return previousSetting;
-    }
     
     public void addSampleStates(String folderPath, Map<String, StatusType> states) throws IOException, CommandException
     {

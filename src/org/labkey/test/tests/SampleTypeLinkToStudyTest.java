@@ -49,8 +49,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
 
-    private Boolean previousSampleStatusFlag = null;
-
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
 
@@ -655,11 +653,5 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", afterTest);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", afterTest);
-
-        if (previousSampleStatusFlag != null)
-            SampleTypeHelper.setSampleStatusEnabled(previousSampleStatusFlag);
-        else
-            SampleTypeHelper.setSampleStatusEnabled(false);
-
     }
 }
