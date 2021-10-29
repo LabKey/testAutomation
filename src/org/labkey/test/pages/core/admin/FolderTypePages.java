@@ -3,6 +3,7 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -50,18 +51,23 @@ public class FolderTypePages extends LabKeyPage<FolderTypePages.ElementCache>
         return this;
     }
 
-    public FolderTypePages enableFolderType(String value)
+    public FolderTypePages enableFolderType(String name)
     {
-        elementCache().enableTypeCheckbox.withAttribute("name", value).findElement(getDriver()).click();
+        findFolderTypeCheckbox(name).check();
         return this;
     }
 
-    public FolderTypePages disableFolderType(String value)
+    public FolderTypePages disableFolderType(String name)
     {
-        if (isEnabled(value))
-            elementCache().enableTypeCheckbox.withAttribute("name", value).findElement(getDriver()).click();
+        findFolderTypeCheckbox(name).uncheck();
         return this;
     }
+
+    private Checkbox findFolderTypeCheckbox(String name)
+    {
+        return Checkbox.Checkbox(Locator.checkboxByName(name)).find(getDriver());
+    }
+
     public boolean isEnabled(String value)
     {
         return elementCache().enableTypeCheckbox.withAttribute("name", value).withAttribute("checked").findElements(getDriver()).size() > 0;
