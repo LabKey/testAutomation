@@ -98,6 +98,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     public String submitExpectingError()
     {
         elementCache().getSubmitButton().click();
+        clearCache();
         return waitForErrors();
     }
 
