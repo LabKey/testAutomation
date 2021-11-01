@@ -43,6 +43,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
         {
             createInitialUser();
             waitForBootstrap();
+            new APIUserHelper(this).setInjectionDisplayName(PasswordUtil.getUsername());
         }
         else
         {

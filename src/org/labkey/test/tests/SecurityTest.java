@@ -485,14 +485,16 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void displayNameTest()
     {
+        final UIUserHelper uiUserHelper = new UIUserHelper(this);
+
         String newDisplayName = "changeDisplayTest";
 
-        _userHelper.setDisplayName(NORMAL_USER, newDisplayName);
+        uiUserHelper.setDisplayName(NORMAL_USER, newDisplayName);
         assertTextPresent(newDisplayName);
 
         String injectDisplayName = "displayName" + INJECT_CHARS_1;
 
-        _userHelper.setDisplayName(NORMAL_USER, injectDisplayName);
+        uiUserHelper.setDisplayName(NORMAL_USER, injectDisplayName);
         assertTextPresent(injectDisplayName);
         assertTextNotPresent(newDisplayName);
     }
