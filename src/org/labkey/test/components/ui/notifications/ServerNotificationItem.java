@@ -2,6 +2,7 @@ package org.labkey.test.components.ui.notifications;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -166,7 +167,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         private final WebElement status = Locator.tagWithClass("i", "fa").findWhenNeeded(this);
         private final WebElement message = Locator.tagWithClass("span", "server-notification-message").findWhenNeeded(this);

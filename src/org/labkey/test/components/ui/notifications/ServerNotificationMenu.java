@@ -34,17 +34,37 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
      */
     public int getUnreadCount()
     {
-        WebElement badge = Locator.tagWithClass("span", "badge").findElementOrNull(this);
+        String text = "0";
+        boolean stale = true;
 
-        if(badge != null)
+        // Bit of a challenge to get the count. The element can update (because, you know it's async) if it does then a
+        // StaleElementException will happen. Try to protect against that by getting the element again f stale.
+        // If it is not there at all it will return null and exit the loop gracefully.
+        while(stale)
         {
-            String text = badge.getText().trim();
-            return Integer.parseInt(text);
+            WebElement badge = Locator.tagWithClass("span", "badge").findElementOrNull(this);
+
+            if (badge != null)
+            {
+                try
+                {
+                    text = badge.getText().trim();
+                    stale = false;
+                }
+                catch (StaleElementReferenceException exception)
+                {
+                    // If the element went stale it may have been updated.
+                    stale = true;
+                }
+            }
+            else
+            {
+                stale = false;
+            }
         }
-        else
-        {
-            return 0;
-        }
+
+        return Integer.parseInt(text);
+
     }
 
     /**
@@ -94,6 +114,11 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
      */
     public List<ServerNotificationItem> clickMarkAll()
     {
+        if(!isExpanded())
+        {
+            expand();
+        }
+
         elementCache().markAll().click();
         return getNotifications();
     }
@@ -129,6 +154,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         }
         else
         {
+            // This is the path if the menu is expanded and there are no messages.
             return new ArrayList<>();
         }
 
