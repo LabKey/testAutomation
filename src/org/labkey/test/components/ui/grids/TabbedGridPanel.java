@@ -66,7 +66,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
 
     public QueryGrid getSelectedGrid()
     {
-        return new QueryGrid.QueryGridFinder(getDriver()).waitFor(this);
+        return new QueryGrid(elementCache().body, getDriver());
     }
 
     @Override
