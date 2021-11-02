@@ -83,6 +83,24 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
     }
 
     /**
+     * Click the message. Should mark it as read.
+     */
+    public void clickMessage()
+    {
+        elementCache().message.click();
+    }
+
+    /**
+     * See if the message is marked as unread.
+     *
+     * @return True if unread class attribute is present, false otherwise.
+     */
+    public boolean isUnread()
+    {
+        return elementCache().message.getAttribute("class").toLowerCase().contains("is-unread");
+    }
+
+    /**
      * The date of the import.
      *
      * @return Date, empty if not present.
