@@ -13,30 +13,35 @@ import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
-public class ParsingPatternForDateAndDateTimeTest extends BaseWebDriverTest
+public class ParsingPatternForDateTest extends BaseWebDriverTest
 {
     private String dateList = "Sample List with Date column";
 
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        ParsingPatternForDateAndDateTimeTest init = (ParsingPatternForDateAndDateTimeTest) getCurrentTest();
+        ParsingPatternForDateTest init = (ParsingPatternForDateTest) getCurrentTest();
         init.doSetup();
     }
 
     private void doSetup() throws IOException, CommandException
     {
-        _containerHelper.createProject(getProjectName(), null);
-        goToProjectHome();
+        _containerHelper.createProject(getProjectName(), "Study");
+        _studyHelper.startCreateStudy()
+                .setTimepointType(StudyHelper.TimepointType.DATE)
+                .createStudy();
 
+        goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
 
@@ -104,6 +109,22 @@ public class ParsingPatternForDateAndDateTimeTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(dateList));
         listTable = new DataRegionTable("query", getDriver());
         checker().verifyEquals("Incorrect number of ros after bulk import", 6, listTable.getDataRowCount());
+    }
+
+    @Test
+    public void testAdditionalParsingPatternForPipelineJobs()
+    {
+        log("Importing a study where a dataset has some dates in the non-standard format");
+        goToProjectHome();
+        importFolderFromZip(TestFileUtils.getSampleData("DateParsing/StudyForDateParsing.zip"), false, 1);
+
+        goToProjectHome();
+        clickAndWait(Locator.linkContainingText("dataset"));
+        clickAndWait(Locator.linkContainingText("Dataset1")); // dataset with non standard date format.
+
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+        checker().verifyEquals("Incorrect date parsed while importing", Arrays.asList("2020-11-29 00:23", "2020-11-28 00:23")
+                , table.getColumnDataAsText("dateCol"));
     }
 
 }
