@@ -181,12 +181,12 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         setFormElement(elementCache().additionalParsingPatternDates, pattern);
     }
 
-    public String getAdditionalParingPatternDateAndTime()
+    public String getAdditionalParsingPatternDateAndTime()
     {
         return elementCache().additionalParsingPatternDateAndTime.getText();
     }
 
-    public void setAdditionalParingPatternDateAndTime(String pattern)
+    public void setAdditionalParsingPatternDateAndTime(String pattern)
     {
         setFormElement(elementCache().additionalParsingPatternDateAndTime, pattern);
     }

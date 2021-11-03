@@ -76,7 +76,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         goToAdminConsole().clickLookAndFeelSettings();
         LookAndFeelSettingsPage lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
         lookAndFeelSettingsPage.setAdditionalParsingPatternDates(pattern);
-        lookAndFeelSettingsPage.setAdditionalParingPatternDateAndTime(pattern);
+        lookAndFeelSettingsPage.setAdditionalParsingPatternDateAndTime(pattern);
         lookAndFeelSettingsPage.save();
 
         log("Update a row with a date in a non-standard format");
@@ -108,7 +108,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(dateList));
         listTable = new DataRegionTable("query", getDriver());
-        checker().verifyEquals("Incorrect number of ros after bulk import", 6, listTable.getDataRowCount());
+        checker().verifyEquals("Incorrect number of rows after bulk import", 6, listTable.getDataRowCount());
     }
 
     @Test
