@@ -27,6 +27,7 @@ import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.user.UpdateUserDetailsPage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -61,6 +62,22 @@ public class APIUserHelper extends AbstractUserHelper
         {
             return super.getDisplayNameForEmail(email);
         }
+    }
+
+    @Override
+    public void _setDisplayName(String email, String newDisplayName)
+    {
+        final Integer userId = getUserId(email);
+
+        if (userId == null)
+        {
+            throw new IllegalArgumentException("No such user: " + email);
+        }
+
+        // TODO: Update via API
+        final UpdateUserDetailsPage updateUserDetailsPage = UpdateUserDetailsPage.beginAt(getWrapper(), userId);
+        updateUserDetailsPage.setDisplayName(newDisplayName);
+        updateUserDetailsPage.clickSubmit();
     }
 
     @Override
