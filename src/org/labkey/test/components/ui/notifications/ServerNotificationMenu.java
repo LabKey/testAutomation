@@ -4,12 +4,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This covers a couple of components under component/notifications. Mostly ServerNotifications.tsx and ServerActivityList.tsx
@@ -28,9 +27,9 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     }
 
     /**
-     * Get the number of unread messages. If no number is shown the implication is that there are no (0) unread messages.
+     * Get the number of unread notifications. If no number is shown the implication is that there are no (0) unread notifications.
      *
-     * @return The number of unread messages.
+     * @return The number of unread notifications.
      */
     public int getUnreadCount()
     {
@@ -74,25 +73,25 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
      */
     public boolean isLoading()
     {
-        return getStatus().equals(LoadingStatus.RUNNING);
+        return getStatus().equals(MenuStatus.RUNNING);
     }
 
     /**
      * Get the status as indicated by the icon shown.
      *
-     * @return A {@link LoadingStatus} enum.
+     * @return A {@link MenuStatus} enum.
      */
-    public LoadingStatus getStatus()
+    public MenuStatus getStatus()
     {
         String status = elementCache().statusIcon().getAttribute("class").toLowerCase();
 
         if(status.contains("fa-bell"))
         {
-            return LoadingStatus.COMPLETE;
+            return MenuStatus.COMPLETE;
         }
         else
         {
-            return LoadingStatus.RUNNING;
+            return MenuStatus.RUNNING;
         }
     }
 
@@ -107,12 +106,10 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     }
 
     /**
-     * Click the 'Mark all as read' link. This will cause the list to refresh, so return a new reference to the
-     * notification list.
-     *
-     * @return A new list of {@link ServerNotificationItem}.
+     * Click the 'Mark all as read' link. This will cause the list to refresh, any references you have to a
+     * {@link ServerNotificationItem} will need to be reacquired.
      */
-    public List<ServerNotificationItem> clickMarkAll()
+    public void clickMarkAll()
     {
         if(!isExpanded())
         {
@@ -120,43 +117,77 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         }
 
         elementCache().markAll().click();
-        return getNotifications();
     }
 
     /**
-     * Expand the menu and return the notification.
+     * Private helper to make sure that the list of notifications has been populated.
      *
-     * @return A list of {@link ServerNotificationItem}, empty if there are none.
+     * @return The web element containing the list.
      */
-    public List<ServerNotificationItem> getNotifications()
+    private WebElement waitForNotificationList()
     {
+
         if(!isExpanded())
             expand();
 
-        if(elementCache().noNotificationsElement().isDisplayed())
-            return new ArrayList<>();
+        // Wait for the listing container to show up.
+        Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
+        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(this).isDisplayed(),
+                "List container did not render.", 500);
 
-        if(getWrapper().isElementPresent(elementCache().notificationsContainerLocator))
-        {
-            // Because a query is used to populate the dropdown, it may be a moment before any notifications show up.
-            WebDriverWrapper.waitFor(()->
+        WebElement listContainer = notificationsContainerLocator.findElement(this);
+        Locator notificationListLocator = Locator.tagWithClass("ul", "server-notifications-listing");
+
+        // It may be a moment before any notifications show up.
+        WebDriverWrapper.waitFor(()->
+
+                {
+                    try
                     {
-                        try {
-                            return !elementCache().notifications().isEmpty();
-                        }
-                        catch (StaleElementReferenceException exp)
-                        {
-                            return false;
-                        }
-                    },
-                    "There are no notifications in the drop down.", 1_000);
-            return elementCache().notifications();
-        }
-        else
-        {
-            // This is the path if the menu is expanded and there are no messages.
-            return new ArrayList<>();
-        }
+                        return notificationListLocator.findElement(listContainer).isDisplayed();
+                    }
+                    catch (NoSuchElementException | StaleElementReferenceException exception)
+                    {
+                        return false;
+                    }
+                },
+                "There are no notifications in the drop down.", 1_000);
+
+        // Just wait for a moment in case the list is slow to update with the most recent notification.
+        WebDriverWrapper.sleep(500);
+
+        // If we are here there is confidence that the menu dropdown contains some notification elements. However, there
+        // is no guarantee that it contains the most recent message. For example if an import is in progress a message
+        // will appear in the list saying as much. When the import is done the 'in progress' message will go away and
+        // be replaced with a new 'complete' message.
+
+        // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
+        // update with the most recent notification the old reference will be stale.
+        return notificationsContainerLocator.findElement(this);
+    }
+
+    /**
+     * Expand the menu and return the notification at the given index.
+     *
+     * @param notificationIndex Zero based index of the notification. The newest notification is at index 0.
+     * @return A {@link ServerNotificationItem} object.
+     */
+    public ServerNotificationItem getNotification(int notificationIndex)
+    {
+        WebElement listContainer = waitForNotificationList();
+        return new ServerNotificationItem.ServerNotificationItemFinder(getDriver()).atIndex(notificationIndex).refindWhenNeeded(listContainer);
+    }
+
+    /**
+     * Expand the menu and return that has the given message content (must match completely).
+     *
+     * @param msgText Text of the message.
+     * @return A {@link ServerNotificationItem} object.
+     */
+    public ServerNotificationItem getNotification(String msgText)
+    {
+        WebElement listContainer = waitForNotificationList();
+        return new ServerNotificationItem.ServerNotificationItemFinder(getDriver()).withMessageContaining(msgText).refindWhenNeeded(listContainer);
 
     }
 
@@ -202,17 +233,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
     protected class ElementCache extends BaseBootstrapMenu.ElementCache
     {
-        private final Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
-
-        public final WebElement notificationsContainer()
-        {
-            return notificationsContainerLocator.refindWhenNeeded(this);
-        }
-
-        public final List<ServerNotificationItem> notifications()
-        {
-            return new ServerNotificationItem.AppNotificationEntryFinder(getDriver()).findAll(notificationsContainer());
-        }
+        public final Locator notificationList = Locator.tagWithClass("ul", "server-notifications-listing");
 
         public final WebElement statusIcon()
         {
@@ -236,7 +257,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     /**
      * The two status the menu can display with the icon.
      */
-    public enum LoadingStatus
+    public enum MenuStatus
     {
         COMPLETE,
         RUNNING

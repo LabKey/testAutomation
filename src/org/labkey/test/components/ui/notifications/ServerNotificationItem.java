@@ -43,25 +43,25 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
     }
 
     /**
-     * Get the message status as indicated by the icon.
+     * Get the status as indicated by the icon.
      *
-     * @return A {@link MessageStatus} enum value.
+     * @return A {@link ItemStatus} enum value.
      */
-    public MessageStatus getStatus()
+    public ItemStatus getStatus()
     {
         String status = elementCache().status.getAttribute("class").toLowerCase();
 
         if(status.contains("has-error"))
         {
-            return MessageStatus.ERROR;
+            return ItemStatus.ERROR;
         }
         else if (status.contains("is-complete"))
         {
-            return MessageStatus.COMPLETE;
+            return ItemStatus.COMPLETE;
         }
         else
         {
-            return MessageStatus.RUNNING;
+            return ItemStatus.RUNNING;
         }
     }
 
@@ -83,7 +83,8 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
     }
 
     /**
-     * Click the message. Should mark it as read.
+     * Click the message. Should mark it as read. Note, if the message is unread this will change the state and make
+     * the current reference to this notification item stale. You will need to get a new reference to the item.
      */
     public void clickMessage()
     {
@@ -91,7 +92,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
     }
 
     /**
-     * See if the message is marked as unread.
+     * See if the notification is marked as unread.
      *
      * @return True if unread class attribute is present, false otherwise.
      */
@@ -153,7 +154,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
 
     /**
      * <p>
-     *     Click the 'View' link in the message entry.
+     *     Click the 'View' link.
      * </p>
      * <p>
      *     This may cause a navigation to occur. For example if the import failed this will take you to the error
@@ -187,26 +188,39 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        private final WebElement status = Locator.tagWithClass("i", "fa").findWhenNeeded(this);
-        private final WebElement message = Locator.tagWithClass("span", "server-notification-message").findWhenNeeded(this);
-        private final WebElement date = Locator.tagWithClass("div", "server-notification-data").findWhenNeeded(this);
-        private final WebElement userName = Locator.tagWithClass("span", "server-notification-data").findWhenNeeded(this);
-        private final WebElement link = Locator.tagWithClass("span", "server-notifications-link").childTag("a").findWhenNeeded(this);
+        private final WebElement status = Locator.tagWithClass("i", "fa").refindWhenNeeded(this);
+        private final WebElement message = Locator.tagWithClass("span", "server-notification-message").refindWhenNeeded(this);
+        private final WebElement date = Locator.tagWithClass("div", "server-notification-data").refindWhenNeeded(this);
+        private final WebElement userName = Locator.tagWithClass("span", "server-notification-data").refindWhenNeeded(this);
+        private final WebElement link = Locator.tagWithClass("span", "server-notifications-link").childTag("a").refindWhenNeeded(this);
     }
 
 
-    static class AppNotificationEntryFinder extends WebDriverComponentFinder<ServerNotificationItem, AppNotificationEntryFinder>
+    static class ServerNotificationItemFinder extends WebDriverComponentFinder<ServerNotificationItem, ServerNotificationItemFinder>
     {
 
-        private final Locator.XPathLocator locator = Locator.tag("li");
+        private int index = 0;
+        private String msgText = null;
 
-        public AppNotificationEntryFinder(WebDriver driver)
+        public ServerNotificationItemFinder(WebDriver driver)
         {
             super(driver);
         }
 
+        public ServerNotificationItemFinder atIndex(int index)
+        {
+            this.index = index;
+            return this;
+        }
+
+        public ServerNotificationItemFinder withMessageContaining(String msgText)
+        {
+            this.msgText = msgText;
+            return this;
+        }
+
         @Override
-        protected AppNotificationEntryFinder getThis()
+        protected ServerNotificationItemFinder getThis()
         {
             return this;
         }
@@ -220,14 +234,25 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
         @Override
         protected Locator locator()
         {
-            return locator;
+            if(msgText != null)
+            {
+                return Locator.tagWithClass("ul", "server-notifications-listing").childTag("li")
+                        .withDescendant(Locator.tagWithClass("span", "server-notifications-item-subject")
+                                .withText(msgText));
+            }
+            else
+            {
+                return Locator.tagWithClass("ul", "server-notifications-listing").childTag("li")
+                        .index(index);
+            }
         }
+
     }
 
     /**
      * The various states of the notification item.
      */
-    public enum MessageStatus
+    public enum ItemStatus
     {
         COMPLETE,
         ERROR,
