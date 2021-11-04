@@ -22,6 +22,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.security.AddUsersPage;
 import org.labkey.test.pages.user.ShowUsersPage;
+import org.labkey.test.pages.user.UpdateUserDetailsPage;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UIUserHelper extends AbstractUserHelper
@@ -122,6 +125,25 @@ public class UIUserHelper extends AbstractUserHelper
     public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
     {
         return cloneUser(userName, null, sendEmail, verifySuccess);
+    }
+
+    @Override
+    protected void _setDisplayName(String email, String newDisplayName)
+    {
+        DataRegionTable users = getWrapper().goToSiteUsers().getUsersTable();
+
+        users.setFilter("Email", "Equals", email);
+        int userRow = users.getRowIndex("Email", email);
+        assertFalse("No such user: " + email, userRow == -1);
+        getWrapper().clickAndWait(users.detailsLink(userRow));
+
+        getWrapper().clickButton("Edit");
+        assertEquals("Editing details for wrong user.",
+                email, Locator.tagWithClass("ol", "breadcrumb").parent().childTag("h3").findElement(getWrapper().getDriver()).getText());
+
+        final UpdateUserDetailsPage updateUserDetailsPage = new UpdateUserDetailsPage(getWrapper().getDriver());
+        updateUserDetailsPage.setDisplayName(newDisplayName);
+        updateUserDetailsPage.clickSubmit();
     }
 
     @Override
