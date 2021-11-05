@@ -14,7 +14,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -40,7 +39,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public boolean hasSelectColumn()
     {
-        return elementCache().selectColumn.isPresent();
+        return _grid.hasSelectColumn();
     }
 
     /**
@@ -74,10 +73,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      * gets the cell at the specified index
      * use columnHeader, which computes the appropriate index
      * This method is intended for short-term use, until we can offload usages in the heatmap to its own component
-     * @param colIndex
-     * @return
      */
-    @Deprecated
     public WebElement getCell(int colIndex)
     {
         return Locator.tag("td").index(colIndex).findElement(this);
@@ -85,8 +81,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * gets the cell corresponding to the specified column
-     * @param columnHeader
-     * @return
      */
     public WebElement getCell(String columnHeader)
     {
@@ -96,7 +90,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * Returns true if the row contains all of the specified column/value pairs
      * @param partialMap Map of key (column) value (text)
-     * @return
      */
     protected boolean hasMatchingValues(Map<String, String> partialMap)
     {
@@ -113,7 +106,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      * finds a link with the specified text, clicks it, and waits for the URL to match
      * the HREF of the link.  (this is different from clickAndWait by virtue of not requiring
      * a page load event)
-     * @param text
      */
     public void clickLink(String text)
     {
@@ -129,7 +121,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the image to display in a modal
-     * @param filename
      */
     public ImageFileViewDialog clickImgFile(String filename)
     {
@@ -148,7 +139,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
-     * @param filename
      */
     public File clickNonImgFile(String filename)
     {
@@ -161,17 +151,14 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * Returns the text in the row for the specified column
-     * @param columnText
-     * @return
      */
     public String getText(String columnText)
     {
-        return getRowMap().get(columnText);
+        return getCell(columnText).getText();
     }
 
     /**
      * Returns a list of the row values as text
-     * @return
      */
     public List<String> getTexts()
     {
@@ -184,7 +171,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * gets a map of the row's values, keyed by column name
-     * @return
      */
     public Map<String, String> getRowMap()
     {
@@ -221,8 +207,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public Optional<WebElement> selectColumn = Locator.xpath("//td/input[@type='checkbox']")
-                .findOptionalElement(getComponentElement());
         public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
 
@@ -232,9 +216,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     public static class GridRowFinder extends WebDriverComponentFinder<GridRow, GridRowFinder>
     {
         private Locator.XPathLocator _locator = Locator.tag("tbody").child("tr").withoutClass("grid-empty").withoutClass("grid-loading");
-        private ResponsiveGrid _grid;
+        private final ResponsiveGrid<?> _grid;
 
-        public GridRowFinder(ResponsiveGrid grid)
+        public GridRowFinder(ResponsiveGrid<?> grid)
         {
             super(grid.getDriver());
             _grid = grid;
@@ -248,8 +232,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
         /**
          * Matches rows with a descendant described by the supplied locator
-         * @param descendant
-         * @return
          */
         public GridRowFinder withDescendant(Locator.XPathLocator descendant)
         {
@@ -259,8 +241,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
         /**
          * Matches rows with a cell matching the full text supplied
-         * @param text
-         * @return
          */
         public GridRowFinder withCellWithText(String text)
         {
@@ -270,9 +250,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
         /**
          * Returns the first row with matching text in the specified column
-         * @param value
-         * @param columnIndex
-         * @return
          */
         protected GridRowFinder withTextAtColumn(String value, int columnIndex)
         {
