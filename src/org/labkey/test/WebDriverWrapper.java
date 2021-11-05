@@ -3286,9 +3286,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             input.clear();
-            waitFor(()-> {return input.getText().length() == 0;}, 500);
+            if (!waitFor(()-> input.getDomProperty("value").length() == 0, 500))
+            {
+                TestLogger.warn("Failed to clear input: " + input);
+            }
             input.sendKeys(text);
-            waitFor(()-> {return input.getText().equals(text);}, 500);
+            if (!waitFor(()-> input.getDomProperty("value").equals(text), 500))
+            {
+                TestLogger.warn("Failed to set input: " + input);
+            }
         }
         else
         {
