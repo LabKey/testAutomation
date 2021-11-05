@@ -111,11 +111,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
      */
     public void clickMarkAll()
     {
-        if(!isExpanded())
-        {
-            expand();
-        }
-
+        expand();
         elementCache().markAll().click();
     }
 
@@ -127,8 +123,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     private WebElement waitForNotificationList()
     {
 
-        if(!isExpanded())
-            expand();
+        expand();
 
         // Wait for the listing container to show up.
         Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
@@ -199,8 +194,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     public String getNoNotificationsMessage()
     {
 
-        if(!isExpanded())
-            expand();
+        expand();
 
         if(elementCache().noNotificationsElement().isDisplayed())
         {
