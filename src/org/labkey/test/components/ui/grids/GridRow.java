@@ -23,10 +23,10 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
-    final ResponsiveGrid _grid;
+    final ResponsiveGrid<?> _grid;
     private Map<String, String> _rowMap = null;
 
-    protected GridRow(ResponsiveGrid grid, WebElement element, WebDriver driver)
+    protected GridRow(ResponsiveGrid<?> grid, WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
