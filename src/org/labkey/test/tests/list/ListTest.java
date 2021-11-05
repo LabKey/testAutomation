@@ -36,6 +36,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.components.domain.AdvancedFieldSetting;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -305,10 +306,11 @@ public class ListTest extends BaseWebDriverTest
         // Create "Hidden Field" and remove from all views.
         fieldsPanel.addField(_listCol5);
         fieldsPanel.getField(_listCol5.getName())
-            .showFieldOnDefaultView(false)
-            .showFieldOnInsertView(false)
-            .showFieldOnUpdateView(false)
-            .showFieldOnDetailsView(false);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.showInDefault, false,
+                        AdvancedFieldSetting.shownInInsertView, false,
+                        AdvancedFieldSetting.shownInUpdateView, false,
+                        AdvancedFieldSetting.shownInDetailsView, false));
 
         fieldsPanel.addField(_listCol6);
         fieldsPanel.getField(_listCol6.getName())
@@ -408,8 +410,9 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
-            .showFieldOnDefaultView(false)
-            .showFieldOnInsertView(true);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.showInDefault, false,
+                        AdvancedFieldSetting.shownInInsertView, true));
         listDefinitionPage.clickSave();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -426,8 +429,9 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
-            .showFieldOnInsertView(false)
-            .showFieldOnUpdateView(true);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.shownInInsertView, false,
+                        AdvancedFieldSetting.shownInUpdateView, true));
         listDefinitionPage.clickSave();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -444,8 +448,9 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(5) // Select Hidden field.
-            .showFieldOnUpdateView(false)
-            .showFieldOnDetailsView(true);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.shownInUpdateView, false,
+                        AdvancedFieldSetting.shownInDetailsView, true));
         listDefinitionPage.clickSave();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.

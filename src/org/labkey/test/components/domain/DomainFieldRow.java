@@ -35,6 +35,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     final WebElement _el;
     final WebDriver _driver;
     final DomainFormPanel _formPanel;
+    private boolean _advanceSettingsSet = false;
 
     public DomainFieldRow(DomainFormPanel panel, WebElement element, WebDriver driver)
     {
@@ -164,6 +165,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    private AdvancedSettingsDialog _clickAdvancedSettings()
+    {
+        if (_advanceSettingsSet)
+        {
+            throw new IllegalStateException("Use 'clickAdvancedSettings' or 'setAdvancedSettings' to set multiple advanced settings.");
+        }
+        _advanceSettingsSet = true;
+        return clickAdvancedSettings();
+    }
+
     public AdvancedSettingsDialog clickAdvancedSettings()
     {
         expand();
@@ -172,7 +183,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         int trycount = 0;
         do
         {
-            getWrapper().log("clicking advanced settings button try=[" + trycount + "]");
+            if (trycount > 0)
+            {
+                getWrapper().log("clicking advanced settings button retry=[" + trycount + "]");
+            }
             elementCache().advancedSettingsBtn.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
             trycount++;
@@ -581,7 +595,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .showInDefaultView(checked)
                 .apply();
         return this;
@@ -589,7 +603,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow showFieldOnInsertView(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .showInInsertView(checked)
                 .apply();
         return this;
@@ -597,7 +611,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow showFieldOnUpdateView(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .showInUpdateView(checked)
                 .apply();
         return this;
@@ -605,7 +619,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow showFieldOnDetailsView(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .showInDetailsView(checked)
                 .apply();
         return this;
@@ -613,7 +627,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setPHILevel(FieldDefinition.PhiSelectType phiLevel)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .setPHILevel(phiLevel)
                 .apply();
         return this;
@@ -621,7 +635,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setExcludeFromDateShifting(boolean shift)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .excludeFromDateShifting(shift)
                 .apply();
         return this;
@@ -629,7 +643,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setMeasure(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .setMeasure(checked)
                 .apply();
         return this;
@@ -637,7 +651,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDimension(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .setDimension(checked)
                 .apply();
         return this;
@@ -645,7 +659,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setRecommendedVariable(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .setRecommendedVariable(checked)
                 .apply();
         return this;
@@ -653,7 +667,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setMissingValuesEnabled(boolean checked)
     {
-        clickAdvancedSettings()
+        _clickAdvancedSettings()
                 .setMissingValuesEnabled(checked)
                 .apply();
         return this;

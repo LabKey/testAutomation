@@ -28,6 +28,7 @@ import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ColumnChartComponent;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.domain.AdvancedFieldSetting;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
@@ -87,37 +88,43 @@ public class ColumnChartTest extends BaseWebDriverTest
         DatasetDesignerPage datasetDesignerPage = new DatasetDesignerPage(getDriver());
         DomainFormPanel domainFormPanel = datasetDesignerPage.getFieldsPanel();
         domainFormPanel.getField(PREGNANCY_COLUMN_NAME)
-                .setDimension(true)
-                .setMeasure(false);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.dimension, true,
+                        AdvancedFieldSetting.measure, false));
         DATA_SOURCE_1_DIMENSIONS.add(PREGNANCY_COLUMN_NAME);
 
         domainFormPanel.getField(LANGUAGE_COLUMN_NAME)
-            .setDimension(true)
-            .setMeasure(false);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.dimension, true,
+                        AdvancedFieldSetting.measure, false));
         DATA_SOURCE_1_DIMENSIONS.add(LANGUAGE_COLUMN_NAME);
 
         domainFormPanel.getField(SIGNATURE_COLUMN_NAME)
-            .setDimension(true)
-            .setMeasure(false);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.dimension, true,
+                        AdvancedFieldSetting.measure, false));
         DATA_SOURCE_1_DIMENSIONS.add(SIGNATURE_COLUMN_NAME);
 
         log("Set the '" + RESPIRATIONS_COLUMN_NAME + "' and '" + WEIGHT_COLUMN_NAME + "' fields to be both dimensions and measures.");
         domainFormPanel.getField(RESPIRATIONS_COLUMN_NAME)
-            .setDimension(true)
-            .setMeasure(true);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.dimension, true,
+                        AdvancedFieldSetting.measure, true));
         DATA_SOURCE_1_DIMENSIONS.add(RESPIRATIONS_COLUMN_NAME);
         DATA_SOURCE_1_MEASURES.add(RESPIRATIONS_COLUMN_NAME);
 
         domainFormPanel.getField(WEIGHT_COLUMN_NAME)
-            .setDimension(true)
-            .setMeasure(true);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.dimension, true,
+                        AdvancedFieldSetting.measure, true));
         DATA_SOURCE_1_DIMENSIONS.add(WEIGHT_COLUMN_NAME);
         DATA_SOURCE_1_MEASURES.add(WEIGHT_COLUMN_NAME);
 
         log("Set '" + PULSE_COLUMN_NAME + "' to not be a measure or dimensions");
         domainFormPanel.getField(PULSE_COLUMN_NAME)
-            .setDimension(false)
-            .setMeasure(false);
+                .setAdvancedSettings(Map.of(
+                        AdvancedFieldSetting.dimension, false,
+                        AdvancedFieldSetting.measure, false));
 
         log("Add the default measures to the ArrayList");
         DATA_SOURCE_1_MEASURES.add("Temp_C");
