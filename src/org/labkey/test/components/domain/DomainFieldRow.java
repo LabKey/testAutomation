@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCache>
@@ -136,7 +135,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public boolean isExpanded()
     {
-        return elementCache().collapseToggleLoc.existsIn(this);
+        return elementCache().expandedContainer.isDisplayed();
     }
 
     /**
@@ -180,19 +179,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         WebDriverWrapper.waitFor(() -> elementCache().advancedSettingsBtn.isEnabled(),
                 "the Advanced Settings button did not become enabled", 5000);
-        int trycount = 0;
-        do
-        {
-            if (trycount > 0)
-            {
-                getWrapper().log("clicking advanced settings button retry=[" + trycount + "]");
-            }
-            elementCache().advancedSettingsBtn.click();
-            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
-            trycount++;
-            assertTrue("advanced settings dialog did not appear in time", trycount < 4);
-        }
-        while (!Locator.tagWithClass("div", "modal-backdrop").existsIn(getDriver()));
+        elementCache().advancedSettingsBtn.click();
 
         return new AdvancedSettingsDialog(this);
     }
@@ -202,16 +189,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         if (!isExpanded())
         {
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().expandToggle));
-
-            for (int i = 0; i < 3; i++)
-            {
-                elementCache().expandToggle.click();
-                getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-                if (WebDriverWrapper.waitFor(this::isExpanded, 1000))
-                    break;
-            }
+            elementCache().expandToggle.click();
             WebDriverWrapper.waitFor(this::isExpanded,
                     "the field row did not become expanded", 1500);
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
         }
         return this;
     }
@@ -220,9 +201,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            elementCache().collapseToggle.click();
+            elementCache().expandToggle.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
-            WebDriverWrapper.waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
+            WebDriverWrapper.waitFor(() -> !isExpanded(),
                     "the field row did not collapse", 1500);
         }
         return this;
@@ -800,8 +781,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row").withoutClass("domain-floating-hdr");
+        private final DomainFormPanel _domainFormPanel;
         private String _title = null;
-        private DomainFormPanel _domainFormPanel;
 
         public DomainFieldRowFinder(DomainFormPanel panel, WebDriver driver)
         {
@@ -831,7 +812,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends WebDriverComponent<?>.ElementCache
     {
         // base row controls
         public final Input fieldNameInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-name-")
@@ -847,22 +828,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public final WebElement fieldDetailsMessage = Locator.css(".domain-field-details, .domain-field-details-expanded")
                 .findWhenNeeded(this);
 
-
-        public final Locator expandToggleLoc = Locator.tagWithClass("div", "field-icon")
-                .child(Locator.tagWithClassContaining("svg", "fa-plus-square"));
-        public final Locator collapseToggleLoc = Locator.tagWithClass("div", "field-icon")
-                .child(Locator.tagWithClassContaining("svg", "fa-minus-square"));
-        public final WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
+        public final WebElement expandToggle = Locator.byClass("domain-field-expand-icon").findWhenNeeded(this);
+        public final WebElement expandedContainer = Locator.byClass("domain-row-container-expanded").findWhenNeeded(this);
 
         public final Locator removeFieldLoc = Locator.tagWithClass("span", "field-icon")
-                .child(Locator.tagWithClassContaining("svg", "domain-field-delete-icon"));
+                .child(Locator.tagWithClass("svg", "domain-field-delete-icon"));
         public final WebElement removeField = removeFieldLoc.findWhenNeeded(this);
 
         // controls revealed when expanded
         public final WebElement advancedSettingsBtn = Locator.button("Advanced Settings")      // not enabled for now, placeholder
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public final WebElement collapseToggle = collapseToggleLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-
 
         // common field options
         public final WebElement descriptionTextArea = Locator.tagWithAttributeContaining("textarea", "id", "domainpropertiesrow-description-")
