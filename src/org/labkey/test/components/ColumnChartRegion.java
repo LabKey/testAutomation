@@ -18,20 +18,20 @@ package org.labkey.test.components;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.TestLogger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class ColumnChartRegion extends WebDriverComponent
+public class ColumnChartRegion extends WebDriverComponent<Component<?>.ElementCache>
 {
     private final DataRegionTable _dataRegionTable;
+    private final WebElement _el;
 
     public ColumnChartRegion(DataRegionTable dataRegionTable)
     {
         _dataRegionTable = dataRegionTable;
+        _el = Locator.css("div.lk-region-section.north").refindWhenNeeded(_dataRegionTable);
     }
 
     @Override
@@ -49,16 +49,12 @@ public class ColumnChartRegion extends WebDriverComponent
     @Override
     public WebElement getComponentElement()
     {
-        WebElement webElement = Locator.css("div.lk-region-bar").findElementOrNull(_dataRegionTable);
-        if (webElement == null)
-            TestLogger.log("*** Couldn't find the column plot region. ***");
-
-        return webElement;
+        return _el;
     }
 
     public List<WebElement> getPlots()
     {
-        return _dataRegionTable.findElements(By.cssSelector(" div.labkey-dataregion-msg-plot-analytic"));
+        return Locator.tagWithClass("div", "labkey-dataregion-msg-plot-analytic").waitForElements(this, 10_000);
     }
 
     // Use getPlots to get the list of plot element, then pass one of those to this function.
@@ -69,12 +65,7 @@ public class ColumnChartRegion extends WebDriverComponent
 
     public boolean isRegionVisible()
     {
-        return null != getComponentElement() && getComponentElement().isDisplayed();
-    }
-
-    public boolean isViewModified()
-    {
-        return _dataRegionTable.findElements(Locator.tagWithText("span", "This grid view has been modified.")).size() > 0;
+        return getComponentElement().isDisplayed();
     }
 
     public void revertView()
