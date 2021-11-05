@@ -258,13 +258,13 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.checkCheckbox(0);
         samplesTable.clickHeaderButton("Delete");
 
-        Window error = Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor();
+        Window<?> error = Window.Window(getDriver()).withTitle("Permanently delete 1 sample").waitFor();
         String expectedErrorMsg = "The selected sample will be permanently deleted.\n" +
                 "\n" +
                 "The selected row(s) will also be deleted from the linked dataset(s) in the following studies:\n" +
                 DATE_BASED_STUDY + " Study\n" + VISIT_BASED_STUDY + " Study\n" + "Deletion cannot be undone. Do you want to proceed?";
         checker().verifyEquals("Incorrect delete message", expectedErrorMsg, error.getBody());
-        error.clickButton("Yes, Delete", true);
+        doAndWaitForPageToLoad(() -> error.clickButton("Yes, Delete", true));
     }
 
     @Test
@@ -571,7 +571,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToManageViews();
         Locator.linkWithText("Manage Categories").findElement(getDriver()).click();
         _extHelper.waitForExtDialog("Manage Categories");
-        Window categoryWindow = new Window.WindowFinder(getDriver()).withTitle("Manage Categories").waitFor();
+        Window<?> categoryWindow = new Window.WindowFinder(getDriver()).withTitle("Manage Categories").waitFor();
         categoryWindow.clickButton("New Category", 0);
         WebElement newCategoryField = Locator.input("label").withAttributeContaining("id", "textfield").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         setFormElementJS(newCategoryField, name);
