@@ -700,7 +700,7 @@ public class Runner extends TestSuite
             System.out.println("  Action : Times tests lingered longer than 30 seconds.");
             for (Map.Entry<Crawler.ControllerActionId, Integer> problem : problemActions)
             {
-                System.out.println("  " + problem.getKey().toString() + " : ");
+                System.out.println("  " + problem.getKey().toString() + " : " + problem.getValue());
             }
         }
         final List<Pair<String, Duration>> slowUrls = LingeringPageWatcher.get().getSlowUrls(20);
