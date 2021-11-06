@@ -63,9 +63,9 @@ import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
-import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.query.QueryUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -269,9 +269,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         SingletonWebDriver.getInstance().setUp(this);
+        addPageLoadListener(LingeringPageWatcher.get());
 
-        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-        getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+        getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
+        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
         try
         {
             getDriver().manage().window().setSize(new Dimension(1280, 1024));
@@ -2554,9 +2555,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 test.addPageLoadListener(new PageLoadListener(){
                     @Override
-                    public void afterPageLoad()
+                    public void afterPageLoad(WebDriverWrapper wrapper)
                     {
-                        urlsSeen.add(test.getCurrentRelativeURL());
+                        urlsSeen.add(wrapper.getCurrentRelativeURL());
                     }
                 });
             }

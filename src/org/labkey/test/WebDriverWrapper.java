@@ -111,6 +111,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1953,37 +1954,42 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public long doAndMaybeWaitForPageToLoad(int msWait, Supplier<Boolean> action)
     {
-        long startTime = System.currentTimeMillis();
+        Instant startTime = Instant.now();
         WebElement toBeStale = null;
 
         if (msWait > 0)
         {
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
-                    listener.beforePageLoad();
+                    listener.beforePageLoad(this);
             });
-            getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
+            getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(msWait));
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
         }
 
         Boolean shouldWait = action.get();
 
-        if (msWait > 0 && shouldWait)
+        if (msWait > 0)
         {
-            waitForPageToLoad(toBeStale, msWait);
-            getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
-            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
-                if (null != listener)
-                    listener.afterPageLoad();
-            });
-            if (getDriver().getTitle().isEmpty() && onLabKeyPage())
+            if (shouldWait)
             {
-                String warning = "Action doesn't define a page title";
-                addActionWarning(warning, getDriver().getCurrentUrl());
+                waitForPageToLoad(toBeStale, msWait);
+                _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
+                    if (null != listener)
+                        listener.afterPageLoad(this);
+                });
+                if (getDriver().getTitle().isEmpty() && onLabKeyPage())
+                {
+                    String warning = "Action doesn't define a page title";
+                    addActionWarning(warning, getDriver().getCurrentUrl());
+                }
             }
+
+            // Reset pageLoadTimeout regardless of whether a navigation happened
+            getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
         }
 
-        return System.currentTimeMillis() - startTime;
+        return Duration.between(startTime, Instant.now()).toMillis();
     }
 
     public long doAndAcceptUnloadAlert(Runnable func, String partialAlertText)
@@ -2031,8 +2037,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public interface PageLoadListener
     {
+        @Deprecated
         default void beforePageLoad(){}
+
+        @Deprecated
         default void afterPageLoad(){}
+
+        default void beforePageLoad(WebDriverWrapper wrapper){}
+
+        default void afterPageLoad(WebDriverWrapper wrapper){}
     }
 
     /**

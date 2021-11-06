@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Ignore;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
@@ -690,6 +691,26 @@ public class Runner extends TestSuite
                 {
                     System.out.println("    " + action);
                 }
+            }
+        }
+        final List<Map.Entry<Crawler.ControllerActionId, Integer>> problemActions = LingeringPageWatcher.get().getProblemActions(20);
+        if (!problemActions.isEmpty())
+        {
+            System.out.println("---------------------- Loitering Report - Actions -----------------------");
+            System.out.println("  Action : Times tests lingered longer than 30 seconds.");
+            for (Map.Entry<Crawler.ControllerActionId, Integer> problem : problemActions)
+            {
+                System.out.println("  " + problem.getKey().toString() + " : ");
+            }
+        }
+        final List<Pair<String, Duration>> slowUrls = LingeringPageWatcher.get().getSlowUrls(20);
+        if (!slowUrls.isEmpty())
+        {
+            System.out.println("---------------------- Loitering Report - URLs -----------------------");
+            System.out.println("  URL : Times lingered longer than 30 seconds.");
+            for (Pair<String, Duration> problem : slowUrls)
+            {
+                System.out.println("  " + problem.getKey() + " : " + problem.getRight());
             }
         }
         System.out.println("------------------------------------------------------------");
