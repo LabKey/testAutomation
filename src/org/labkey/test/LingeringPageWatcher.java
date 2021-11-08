@@ -2,16 +2,19 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.util.Crawler.ControllerActionId;
+import org.labkey.test.util.TestLogger;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.reverseOrder;
+import static java.util.Comparator.comparing;
 
 class LingeringPageWatcher implements WebDriverWrapper.PageLoadListener
 {
@@ -21,7 +24,7 @@ class LingeringPageWatcher implements WebDriverWrapper.PageLoadListener
     private final Set<ControllerActionId> ignoredActions = Set.of(new ControllerActionId("*", "app"));
 
     // Remember which pages we lingered on the longest
-    private final Set<Pair<String, Duration>> slowUrls = new TreeSet<>(Comparator.comparing(Pair::getRight));
+    private final Set<Pair<String, Duration>> slowUrls = new TreeSet<>(reverseOrder(comparing(Pair::getRight)));
     // Remember how many times we linger on particular actions
     private final Map<ControllerActionId, Integer> slowActions = new HashMap<>();
 
@@ -54,7 +57,7 @@ class LingeringPageWatcher implements WebDriverWrapper.PageLoadListener
     public List<Map.Entry<ControllerActionId, Integer>> getProblemActions(int maxSize)
     {
         return slowActions.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
+                .sorted(reverseOrder(Map.Entry.comparingByValue()))
                 .limit(maxSize)
                 .collect(Collectors.toList());
     }
@@ -64,8 +67,8 @@ class LingeringPageWatcher implements WebDriverWrapper.PageLoadListener
     {
         if (lastNavigation != null)
         {
-            Duration timeSinceLastNavigation = Duration.between(lastNavigation, Instant.now());
-            if (timeSinceLastNavigation.compareTo(MAX_DURATION) > 0)
+            Duration lingeredOnPage = Duration.between(lastNavigation, Instant.now());
+            if (lingeredOnPage.compareTo(MAX_DURATION) > 0)
             {
                 final String relativeUrl = wrapper.getCurrentRelativeURL();
                 final ControllerActionId actionId = new ControllerActionId(relativeUrl);
@@ -73,7 +76,8 @@ class LingeringPageWatcher implements WebDriverWrapper.PageLoadListener
                 {
                     int previousCount = slowActions.getOrDefault(actionId, 0);
                     slowActions.put(actionId, previousCount + 1);
-                    slowUrls.add(Pair.of(relativeUrl, timeSinceLastNavigation));
+                    slowUrls.add(Pair.of(relativeUrl, lingeredOnPage));
+                    TestLogger.warn("Test lingered on " + relativeUrl + " for " + lingeredOnPage);
                 }
             }
         }
