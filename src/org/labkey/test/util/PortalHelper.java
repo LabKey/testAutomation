@@ -25,6 +25,7 @@ import org.labkey.test.components.WebPart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.labkey.PortalTab;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
@@ -289,12 +290,15 @@ public class PortalHelper extends WebDriverWrapper
     {
         doInAdminMode(() -> {
             waitForElement(Locator.xpath("//option").withText(webPartName));
-            Locator.XPathLocator formLocator = Locator.tag("form").withAttributeContaining("action", "addWebPart.view");
+            Locator.XPathLocator formLocatorBase = Locator.tag("form").withAttributeContaining("action", "addWebPart.view");
+            final Locator.XPathLocator formLocator;
             if (formLocation == null)
-                formLocator = formLocator.withDescendant(Locator.tagWithText("option", webPartName));
+                formLocator = formLocatorBase.withDescendant(Locator.tagWithText("option", webPartName));
             else
-                formLocator = formLocator.withChild(Locator.input("location").withAttribute("value", formLocation));
-            WebElement form = formLocator.findElement(getDriver());
+                formLocator = formLocatorBase.withChild(Locator.input("location").withAttribute("value", formLocation));
+            List<WebElement> forms = formLocator.findElements(getDriver());
+            WebElement form = forms.stream().filter(WebElement::isDisplayed).findFirst()
+                    .orElseThrow(() -> new NoSuchElementException("No visible webpart form: " + formLocator));
             selectOptionByText(Locator.tag("select").findElement(form), webPartName);
             doAndWaitForPageToLoad(form::submit);
         });
