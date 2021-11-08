@@ -93,6 +93,7 @@ class LingeringPageWatcher implements WebDriverWrapper.PageLoadListener
     {
         return ignoredActions.contains(actionId) ||
                 ignoredActions.contains(new ControllerActionId(actionId.getController(), "*")) ||
-                ignoredActions.contains(new ControllerActionId("*", actionId.getAction()));
+                ignoredActions.contains(new ControllerActionId("*", actionId.getAction())) ||
+                "home".equalsIgnoreCase(actionId.getFolder());
     }
 }
