@@ -73,11 +73,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     {
         log("Setting the parsing pattern");
         String pattern = "ddMMMyyyy:HH:mm:ss";
-        goToAdminConsole().clickLookAndFeelSettings();
-        LookAndFeelSettingsPage lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
-        lookAndFeelSettingsPage.setAdditionalParsingPatternDates(pattern);
-        lookAndFeelSettingsPage.setAdditionalParsingPatternDateAndTime(pattern);
-        lookAndFeelSettingsPage.save();
+        setUpDataParsing(pattern);
 
         log("Update a row with a date in a non-standard format");
         goToProjectHome();
@@ -114,6 +110,10 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     @Test
     public void testAdditionalParsingPatternForPipelineJobs()
     {
+        log("Setting the parsing pattern");
+        String pattern = "ddMMMyyyy:HH:mm:ss";
+        setUpDataParsing(pattern);
+
         log("Importing a study where a dataset has some dates in the non-standard format");
         goToProjectHome();
         importFolderFromZip(TestFileUtils.getSampleData("DateParsing/StudyForDateParsing.zip"), false, 1);
@@ -127,4 +127,12 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
                 , table.getColumnDataAsText("dateCol"));
     }
 
+    private void setUpDataParsing(String pattern)
+    {
+        goToAdminConsole().clickLookAndFeelSettings();
+        LookAndFeelSettingsPage lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
+        lookAndFeelSettingsPage.setAdditionalParsingPatternDates(pattern);
+        lookAndFeelSettingsPage.setAdditionalParsingPatternDateAndTime(pattern);
+        lookAndFeelSettingsPage.save();
+    }
 }
