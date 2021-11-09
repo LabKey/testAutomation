@@ -270,7 +270,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         SingletonWebDriver.getInstance().setUp(this);
         addPageLoadListener(LingeringPageWatcher.get());
-        addPageLoadListener(UnexpectedNavigationWatcher.get());
+        //addPageLoadListener(UnexpectedNavigationWatcher.get());
 
         getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
