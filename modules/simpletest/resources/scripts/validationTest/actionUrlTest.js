@@ -12,7 +12,9 @@ var Ext = require("Ext").Ext;
 function doTest()
 {
     var errors = [];
-    
+
+    // Force a consistent contextPath for testing
+    LABKEY.contextPath = '/labkey';
     var controller = "wiki";
     var action = "editWiki";
     var containerPath = "Shared/_junit";
