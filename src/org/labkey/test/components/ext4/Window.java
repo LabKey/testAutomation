@@ -25,6 +25,10 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Window<EC extends Window.ElementCache> extends WebDriverComponent<EC>
 {
     private WebElement _window;
@@ -37,7 +41,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
 
     protected Window(WindowFinder finder)
     {
-        this(finder.waitFor().getComponentElement(), finder.getDriver());
+        this(frontmostWindow(finder), finder.getDriver());
     }
 
     public Window(WebElement window, WebDriver driver)
@@ -49,6 +53,25 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
     public static WindowFinder Window(WebDriver driver)
     {
         return new WindowFinder(driver);
+    }
+
+    /**
+     * Sometimes multiple windows are present (impersonation).
+     * Return only the frontmost window.
+     */
+    private static WebElement frontmostWindow(WindowFinder finder)
+    {
+        finder.waitFor().getComponentElement();
+        final List<WebElement> allWindows = finder.findAll().stream()
+                .map(Window::getComponentElement).collect(Collectors.toList());
+        if (allWindows.size() > 1)
+        {
+            return allWindows.stream().max(Comparator.comparingInt(e -> Integer.parseInt(e.getCssValue("z-index")))).get();
+        }
+        else
+        {
+            return allWindows.get(0);
+        }
     }
 
     @Override

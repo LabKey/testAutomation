@@ -274,6 +274,14 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             super(driver, componentElement);
         }
 
+        @Override
+        public void expand()
+        {
+            getWrapper().scrollToTop();
+
+            super.expand();
+        }
+
         public void impersonate(String fakeUser)
         {
             ImpersonateUserWindow window;
