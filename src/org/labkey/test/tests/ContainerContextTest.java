@@ -51,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -374,7 +375,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         }
 
         log("** Checking default case, which includes the container column...");
-        verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, true, vehicleId);
+        final String emissionTestQuery = "EmissionTest";
+        verifySimpleModuleTables(emissionTestQuery, "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, true, vehicleId);
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
         log("** Removing container column and rechecking lookup URLs...");
@@ -384,16 +386,16 @@ public class ContainerContextTest extends BaseWebDriverTest
         _customizeViewsHelper.removeColumn("Container");
         _customizeViewsHelper.applyCustomView();
 
-        verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
+        verifySimpleModuleTables(emissionTestQuery, "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.revertUnsavedView();
 
 
         log("** Override detailsURL in metadata...");
-        String customMetadata =
+        Function<String, String> customMetadata = tableName -> String.format(
                 "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-                "  <table tableName=\"EmissionTest\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
+                "  <table tableName=\"%s\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
                 "    <tableTitle>Custom Query</tableTitle>\n" +
                 "    <!--<javaCustomizer class=\"org.labkey.ldk.query.BuiltInColumnsCustomizer\" />-->\n" +
                 "    <titleColumn>rowid</titleColumn>\n" +
@@ -402,11 +404,11 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "    <insertUrl></insertUrl>\n" +
                 "    <importUrl>/query/importData.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}&amp;query.columns=*</importUrl>\n" +
                 "  </table>\n" +
-                "</tables>";
+                "</tables>", tableName);
 
-        overrideMetadata(getProjectName(), "vehicle", "EmissionTest", customMetadata);
-        verifySimpleModuleTables("EmissionTest", "XXX.view", "XXX.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
-        removeMetadata(getProjectName(), "vehicle", "EmissionTest");
+        overrideMetadata(getProjectName(), "vehicle", emissionTestQuery, customMetadata.apply(emissionTestQuery));
+        verifySimpleModuleTables(emissionTestQuery, "XXX.view", "XXX.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
+        removeMetadata(getProjectName(), "vehicle", emissionTestQuery);
         
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container");
         String customQueryWithContainer =
@@ -418,8 +420,9 @@ public class ContainerContextTest extends BaseWebDriverTest
                     "emissiontest.Container\n" +
                 "FROM emissiontest";
 
-        createQuery(getProjectName(), "EmissionTests With Container", "vehicle", customQueryWithContainer, customMetadata, false);
-        verifySimpleModuleTables("EmissionTests With Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, false, vehicleId);
+        final String customQueryName1 = "EmissionTests With Container";
+        createQuery(getProjectName(), customQueryName1, "vehicle", customQueryWithContainer, customMetadata.apply(customQueryName1), false);
+        verifySimpleModuleTables(customQueryName1, "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, false, vehicleId);
 
 
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container AS folder");
@@ -432,8 +435,9 @@ public class ContainerContextTest extends BaseWebDriverTest
                     "emissiontest.Container AS Folder\n" +
                 "FROM emissiontest";
 
-        createQuery(getProjectName(), "EmissionTests With Folder", "vehicle", customQueryFolderContainer, customMetadata, false);
-        verifySimpleModuleTables("EmissionTests With Folder", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
+        final String customQueryName2 = "EmissionTests With Folder";
+        createQuery(getProjectName(), customQueryName2, "vehicle", customQueryFolderContainer, customMetadata.apply(customQueryName2), false);
+        verifySimpleModuleTables(customQueryName2, "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
 
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITHOUT container.");
         log("** The container column should be added as a suggested column.");
@@ -446,8 +450,9 @@ public class ContainerContextTest extends BaseWebDriverTest
                     "--emissiontest.Container\n" +
                 "FROM emissiontest";
 
-        createQuery(getProjectName(), "EmissionTests Without Container", "vehicle", customQueryWithoutContainer, customMetadata, false);
-        verifySimpleModuleTables("EmissionTests Without Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
+        final String customQueryName3 = "EmissionTests Without Container";
+        createQuery(getProjectName(), customQueryName3, "vehicle", customQueryWithoutContainer, customMetadata.apply(customQueryName3), false);
+        verifySimpleModuleTables(customQueryName3, "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
     }
 
     @Test

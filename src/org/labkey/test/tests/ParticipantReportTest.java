@@ -323,7 +323,7 @@ public class ParticipantReportTest extends ReportTest
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         Window chooseMeasureWindow = new Window.WindowFinder(getDriver()).withTitle(ADD_MEASURE_TITLE).waitFor();
-        Locator.tagWithClass("tr", "x4-grid-row").waitForElement(chooseMeasureWindow, 1000);
+        Locator.tagWithClass("tr", "x4-grid-row").waitForElement(chooseMeasureWindow, 10_000);
 
         String columnHeader = "17a. Preg. test result";
         _ext4Helper.selectGridItem("label", columnHeader, -1, "measuresGridPanel", true);
