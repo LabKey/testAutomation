@@ -13,24 +13,25 @@ function doTest()
 {
     var errors = [];
 
-    // Force a consistent contextPath for testing
-    LABKEY.contextPath = '/labkey';
+    var contextPath = LABKEY.contextPath;
     var controller = "wiki";
     var action = "editWiki";
     var containerPath = "Shared/_junit";
     var urlParameters = {x:'fred', y: 'barney'};
 
-    var baseUrl = LABKEY.ActionURL.getBaseURL();
-    if( baseUrl.indexOf("labkey/") != baseUrl.length - 7)
-        errors[errors.length] = new Error("ActionURL.getBaseURL() = " + baseUrl);
+    if (contextPath.length > 0) {
+        var baseUrl = LABKEY.ActionURL.getBaseURL();
+        if (baseUrl.indexOf("labkey/") != baseUrl.length - 7)
+            errors[errors.length] = new Error("ActionURL.getBaseURL() = " + baseUrl);
+    }
 
     var queryString = LABKEY.ActionURL.queryString(urlParameters);
     if( queryString != 'x=fred&y=barney' )
         errors[errors.length] = new Error("ActionURL.queryString = " + queryString);
 
     var url = LABKEY.ActionURL.buildURL(controller, action, containerPath, urlParameters);
-    if( url != "/labkey/" + controller + "/" + containerPath + "/" + action + ".view?" + queryString  &&
-        url != "/labkey/" + containerPath + "/" + controller + "-" + action + ".view?" + queryString)
+    if( url != contextPath + "/" + controller + "/" + containerPath + "/" + action + ".view?" + queryString  &&
+        url != contextPath + "/" + containerPath + "/" + controller + "-" + action + ".view?" + queryString)
         errors[errors.length] = new Error("ActionURL.buildUrl() = " + url);
 
     var parameters = LABKEY.ActionURL.getParameters(url);
