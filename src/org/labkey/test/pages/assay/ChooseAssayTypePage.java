@@ -3,10 +3,14 @@ package org.labkey.test.pages.assay;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.io.File;
 
 public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementCache>
 {
@@ -74,6 +78,14 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     {
         elementCache().importAssayTab.click();
         return this;
+    }
+
+    public void uploadXarFile(File xar)
+    {
+        goToImportAssayDesignTab();
+        var uploadPanel = new FileUploadPanel.FileUploadPanelFinder(getDriver()).waitFor();
+        uploadPanel.uploadFile(xar);
+        clickButton("Import");
     }
 
     protected void clickSelectButton()

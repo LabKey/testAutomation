@@ -171,6 +171,26 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         return (elementCache().defaultDateFormatTxt).getText();
     }
 
+    public String getAdditionalParsingPatternDates()
+    {
+        return elementCache().additionalParsingPatternDates.getText();
+    }
+
+    public void setAdditionalParsingPatternDates(String pattern)
+    {
+        setFormElement(elementCache().additionalParsingPatternDates, pattern);
+    }
+
+    public String getAdditionalParsingPatternDateAndTime()
+    {
+        return elementCache().additionalParsingPatternDateAndTime.getText();
+    }
+
+    public void setAdditionalParsingPatternDateAndTime(String pattern)
+    {
+        setFormElement(elementCache().additionalParsingPatternDateAndTime, pattern);
+    }
+
     public void setDefaultDateTimeDisplay(String displayFormat)
     {
         setFormElement(elementCache().defaultDateTimeFormatTxt,displayFormat);
@@ -246,6 +266,8 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         WebElement defaultDateFormatTxt = Locator.inputByNameContaining("defaultDateFormat").findWhenNeeded(this);
         WebElement defaultDateTimeFormatTxt = Locator.inputByNameContaining("defaultDateTimeFormat").findWhenNeeded(this);
         WebElement defaultNumberFormatTxt = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
+        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElement(this);
+        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
         WebElement altLoginPageTxt = Locator.inputByNameContaining("customLogin").findWhenNeeded(this);
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);

@@ -72,12 +72,13 @@ public class GroupTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _permissionsHelper.deleteGroup(COMPOUND_GROUP);
-        _permissionsHelper.deleteGroup(SIMPLE_GROUP);
-        _permissionsHelper.deleteGroup(BAD_GROUP);
-        _permissionsHelper.deleteGroup(CHILD_GROUP);
-        _permissionsHelper.deleteGroup(SITE_USER_GROUP);
-        _permissionsHelper.deleteGroup(API_SITE_GROUP);
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.deleteGroup(COMPOUND_GROUP);
+        permissionsHelper.deleteGroup(SIMPLE_GROUP);
+        permissionsHelper.deleteGroup(BAD_GROUP);
+        permissionsHelper.deleteGroup(CHILD_GROUP);
+        permissionsHelper.deleteGroup(SITE_USER_GROUP);
+        permissionsHelper.deleteGroup(API_SITE_GROUP);
         _userHelper.deleteUsers(false, TEST_USERS_FOR_GROUP);
         _userHelper.deleteUsers(false, SITE_USER_EMAILS);
         _containerHelper.deleteProject(getProjectName(), afterTest);
