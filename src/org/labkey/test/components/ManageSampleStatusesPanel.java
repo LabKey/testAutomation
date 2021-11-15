@@ -128,6 +128,13 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return this;
     }
 
+    public String clickSaveExpectError()
+    {
+        elementCache().saveButton.click();
+        return BootstrapLocators.errorBanner.waitForElement(getWrapper().shortWait()).getText();
+    }
+
+
     public ManageSampleStatusesPanel addStatus(String label, String description, SampleTypeHelper.StatusType statusType)
     {
         clickAddStatus()
@@ -155,15 +162,15 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
                 return Locator.tagWithClass("button", "list-group-item").containing(name +  statusType).findElement(getComponentElement());
         }
 
-        Locator statusItems = Locator.tagWithClass("button", "list-group-item");
+        final Locator statusItems = Locator.tagWithClass("button", "list-group-item");
 
-        WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
+        final WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
                 .findWhenNeeded(getComponentElement());
-        Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).findWhenNeeded(this);
-        WebElement descriptionField = Locator.textarea("description").findWhenNeeded(this);
-        ReactSelect statusTypeSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
-        WebElement saveButton = Locator.tagWithText("button", "Save").findWhenNeeded(this);
-        WebElement deleteButton = Locator.tagContainingText("button", "Delete").findWhenNeeded(this);
+        final Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).findWhenNeeded(this);
+        final WebElement descriptionField = Locator.textarea("description").findWhenNeeded(this);
+        final ReactSelect statusTypeSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
+        final WebElement saveButton = Locator.tagWithText("button", "Save").findWhenNeeded(this);
+        final WebElement deleteButton = Locator.tagContainingText("button", "Delete").findWhenNeeded(this);
     }
 
     public static class ManageSampleStatusesPanelFinder extends WebDriverComponentFinder<ManageSampleStatusesPanel, ManageSampleStatusesPanelFinder>
