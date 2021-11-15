@@ -1430,6 +1430,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 throw new AssertionError("Crawler triggered some server-side errors.");
             }
+            goToHome(); // Make sure crawler doesn't leave browser on a bad page
         }
     }
 
