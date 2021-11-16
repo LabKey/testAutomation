@@ -121,7 +121,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     {
         public Checkbox experimentsAndRunsCheckbox = new Checkbox(Locator.tagWithText("label", EXPERIMENTS_AND_RUNS)
                 .precedingSibling("input").findWhenNeeded(getDriver()));
-        public Checkbox qcStateSettingsCheckbox = new Checkbox(Locator.tagWithText("label", QC_STATE_SETTINGS)
+        public Checkbox qcStateSettingsCheckbox = new Checkbox(Locator.tagContainingText("label", QC_STATE_SETTINGS)
                 .precedingSibling("input").findWhenNeeded(getDriver()));
 
         public Checkbox roleAssighmentsCheckbox = new Checkbox(Locator.tagWithText("label", ROLE_ASSIGNMENTS)
