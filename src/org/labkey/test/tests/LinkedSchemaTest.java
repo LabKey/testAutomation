@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -37,6 +39,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -530,8 +533,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
 
         beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-begin.view?schemaName=CommonData&queryName=Demographics");
-        assertElementContains(Locator.tagWithClass("div", "lk-qd-error"),
-                "Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map.");
+        final WebElement error = Locator.tagWithClass("div", "lk-qd-error").waitForElement(shortWait());
+        MatcherAssert.assertThat("Schema browser error.", error.getText(),
+                CoreMatchers.containsString("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map."));
 
         beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-executeQuery.view?schemaName=CommonData&queryName=Demographics");
         assertTextPresent("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map.");
