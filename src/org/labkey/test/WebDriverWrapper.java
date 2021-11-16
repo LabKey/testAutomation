@@ -2056,19 +2056,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public String doAndWaitForPageSignal(Runnable func, String signalName, WebDriverWait wait)
     {
-        try
-        {
-            return doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), wait).getAttribute("value");
-        }
-        catch (StaleElementReferenceException multiSignaled)
-        {
-            throw new RuntimeException("Signal went stale. Use 'doAndWaitForRepeatedPageSignal' for page signals that repeat", multiSignaled);
-        }
+        return doAndWaitForRepeatedPageSignal(func, signalName, Duration.ZERO, wait);
     }
 
     public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName)
     {
         return doAndWaitForRepeatedPageSignal(func, signalName, Duration.ofSeconds(2));
+    }
+
+    public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName, Duration quietPeriod)
+    {
+        return doAndWaitForRepeatedPageSignal(func, signalName, quietPeriod, shortWait());
     }
 
     /**
@@ -2079,17 +2077,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param quietPeriod Wait this long for signal to stop firing
      * @return The 'value' of the signal
      */
-    public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName, Duration quietPeriod)
+    public String doAndWaitForRepeatedPageSignal(Runnable func, String signalName, Duration quietPeriod, WebDriverWait wait)
     {
         String signalId = null;
-        WebElement signalEl = doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), shortWait());
+        WebElement signalEl = doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), wait);
         Timer timer = new Timer(Duration.ofMillis(WAIT_FOR_JAVASCRIPT));
+        String value = null;
         while (!timer.isTimedOut())
         {
             try
             {
                 String nextSignalId = signalEl.getAttribute("id");
-                if (nextSignalId.equals(signalId))
+                value = signalEl.getAttribute("value");
+
+                if (quietPeriod.isZero() || nextSignalId.equals(signalId))
                 {
                     timer.cancel();
                 }
@@ -2105,8 +2106,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 signalEl = Locators.pageSignal(signalName).findElement(getDriver());
             }
         }
-
-        return signalEl.getAttribute("value");
+        return value;
     }
 
     /**
