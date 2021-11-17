@@ -519,10 +519,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Get the input, will also make the dropdown show up.
             getWrapper().doubleClick(td);
+            final WebElement lookupMenu = Locators.lookupMenu.waitForElement(td, 5_000);
+            final String initialText = lookupMenu.getText();
 
             // Type the filter into the cell.
             WebElement lookupInputCell = elementCache().lookupInputCell();
-            getWrapper().setFormElement(lookupInputCell, filterText);
+            lookupInputCell.sendKeys(filterText);
+
+            // Available options should change due to text entry. Elements don't go stale.
+            WebDriverWrapper.waitFor(() -> !initialText.equals(lookupMenu.getText()), 5_000);
 
             listText = getDropdownList(td);
         }
