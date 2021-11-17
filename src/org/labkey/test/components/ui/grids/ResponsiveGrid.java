@@ -12,6 +12,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -618,7 +619,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         protected int getColumnIndex(String columnLabel)
         {
-            return initColumnsAndIndices().get(columnLabel).getRawIndex();
+            final ColumnIndex columnIndex = initColumnsAndIndices().get(columnLabel);
+            if (columnIndex == null)
+            {
+                throw new NoSuchElementException(String.format("Column not found: '%s'.\nKnown columns: %s",
+                        columnLabel, String.join(", ", initColumnsAndIndices().keySet())));
+            }
+            return columnIndex.getRawIndex();
         }
 
         protected List<String> getColumnNames()
