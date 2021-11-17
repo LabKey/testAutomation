@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -104,7 +103,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private boolean hasSelectColumn()
     {
-        return elementCache().selectColumn.isPresent();
+        return elementCache().selectColumn.isDisplayed();
     }
 
     public EditableGrid selectRow(int index, boolean checked)
@@ -125,7 +124,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         if (hasSelectColumn())
         {
-            getWrapper().setCheckbox(elementCache().selectColumn.get(), checked);
+            getWrapper().setCheckbox(elementCache().selectColumn, checked);
         }
         else
         {
@@ -339,12 +338,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             for (String _value : values)
             {
-                getWrapper().setFormElement(lookupInputCell, _value);
+                lookupInputCell.sendKeys(_value);
+
+                // Wait for specified value to be the first option
+                final WebElement lookupItem = Locators.lookupMenu.append(Locators
+                        .lookupItem.position(1).withText(_value))
+                        .waitForElement(this, 5_000);
 
                 // was previously using elementCache().listGroupItem(_value).click() but the click would attempt to
                 // scroll the list item into view which would result in the menu being reattached to the input element,
                 // see changes in labkey-ui-components for issue 43051
                 lookupInputCell.sendKeys(Keys.DOWN, Keys.ENTER);
+
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(lookupItem));
 
                 // If after selecting a value the grid text is equal to the item list then it was a single select
                 // list box and we are done, otherwise we need to wait for the appropriate element.
@@ -772,7 +778,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
+        public WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
         public WebElement inputCell()
         {
             return Locators.inputCell.findElement(getComponentElement());
@@ -781,21 +787,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         public WebElement lookupInputCell()
         {
             return Locators.lookupInputCell.findElement(getComponentElement());
-        }
-
-        public WebElement lookupMenu()
-        {
-            return Locators.lookupMenu.findElement(getComponentElement());
-        }
-
-        public WebElement listGroupItem(String text)
-        {
-            return Locators.listGroupItem(text).findElement(getComponentElement());
-        }
-
-        public WebElement itemElement(String text)
-        {
-            return Locators.itemElement(text).findElement(getComponentElement());
         }
 
     }
@@ -814,15 +805,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator headerCells = Locator.xpath("//thead/tr/th");
         static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
         static final Locator lookupInputCell = Locator.tagWithClass("input", "cell-lookup-input");
-        static final Locator lookupMenu = Locator.tagWithClass("div", "cell-lookup-menu");
-        static final Locator lookupItem = Locator.tagWithClass("a", "list-group-item");
+        static final Locator.XPathLocator lookupMenu = Locator.tagWithClass("div", "cell-lookup-menu");
+        static final Locator.XPathLocator lookupItem = Locator.tagWithClass("a", "list-group-item");
 
-        static final Locator listGroupItem(String text)
-        {
-            return Locators.lookupItem.withText(text);
-        }
-
-        static final Locator itemElement(String text)
+        static Locator.XPathLocator itemElement(String text)
         {
             return Locator.tagContainingText("span", text).withClass("btn-primary");
         }
@@ -831,12 +817,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public static class EditableGridFinder extends WebDriverComponent.WebDriverComponentFinder<EditableGrid, EditableGridFinder>
     {
-        private Locator _locator;
+        private final Locator _locator = Locators.editableGrid();
 
         public EditableGridFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locators.editableGrid();
         }
 
         @Override
