@@ -451,7 +451,7 @@ public abstract class Locator extends By
     {
         try
         {
-            return wait.ignoring(NoSuchElementException.class).until(new Function<SearchContext, WebElement>()
+            return wait.ignoring(NoSuchElementException.class).pollingEvery(Duration.ofMillis(100)).until(new Function<SearchContext, WebElement>()
             {
                 @Override
                 public WebElement apply(SearchContext context)
