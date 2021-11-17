@@ -489,12 +489,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public DomainFieldRow setOntologyLookup()
-    {
-        setType(FieldDefinition.ColumnType.OntologyLookup);
-        return this;
-    }
-
     public String getSelectedOntology()
     {
         expand();
@@ -515,6 +509,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public String getConceptImportField()
+    {
+        expand();
+        return elementCache().getConceptImportFieldSelect().getFirstSelectedOption().getText();
+    }
+
     /**
      * Allows test code to get which ontologies are available for selection
      *
@@ -531,6 +531,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         elementCache().getConceptLabelFieldSelect().selectByVisibleText(labelField);
         return this;
+    }
+
+    public String getConceptLabelField()
+    {
+        expand();
+        return elementCache().getConceptLabelFieldSelect().getFirstSelectedOption().getText();
     }
 
     public ConceptPickerDialog clickExpectedVocabulary()
