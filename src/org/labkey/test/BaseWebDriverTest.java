@@ -1415,13 +1415,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isLinkCheckEnabled())
         {
             checkErrors(); // Check for errors that happened before crawler
-            pauseJsErrorChecker();
 
             Crawler crawler = new Crawler(this, TestProperties.getCrawlerTimeout(), isInjectionCheckEnabled());
             crawler.addExcludedActions(getUncrawlableActions());
             crawler.addProject(getProjectName());
             crawler.crawlAllLinks();
-            resumeJsErrorChecker();
             try
             {
                 checkErrors();
