@@ -5,12 +5,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -350,15 +352,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // see changes in labkey-ui-components for issue 43051
                 lookupInputCell.sendKeys(Keys.DOWN, Keys.ENTER);
 
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(lookupItem));
+                // Result varies by field type
+                final ExpectedCondition<WebElement> multiSelectCondition =
+                        LabKeyExpectedConditions.presenceOfNestedElementLocatedBy(this, Locators.itemElement(_value));
+                final ExpectedCondition<Boolean> singleSelectCondition =
+                        ExpectedConditions.and(ExpectedConditions.stalenessOf(lookupItem), wd -> getCellValue(gridCell).equalsIgnoreCase(_value));
 
-                // If after selecting a value the grid text is equal to the item list then it was a single select
-                // list box and we are done, otherwise we need to wait for the appropriate element.
+                getWrapper().shortWait().until(ExpectedConditions.or(
+                        singleSelectCondition, // pop-up closes for single-select
+                        multiSelectCondition // Selection appears for multi-select
+                ));
 
-                if (!getCellValue(gridCell).equalsIgnoreCase(_value))
-                {
-                    getWrapper().waitForElementToBeVisible(Locators.itemElement(_value));
-                }
             }
         }
         else
