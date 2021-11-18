@@ -35,7 +35,6 @@ import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -60,6 +59,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestDataUtils;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.query.QueryUtils;
@@ -275,8 +275,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static void refreshPeopleList(String listName, Connection connection, String containerPath) throws Exception
     {
         QueryUtils.truncateTable(containerPath, "lists", listName);
-        final File tsv = TestFileUtils.writeTempFile("temp.tsv", TEST_DATA);
-        final List<Map<String, Object>> rowData = new TabLoader.TsvFactory().createLoader(tsv, true).load();
+        final List<Map<String, Object>> rowData = TestDataUtils.rowMapsFromTsv(TEST_DATA);
         final InsertRowsCommand insertCommand = new InsertRowsCommand("lists", listName);
         insertCommand.setRows(rowData);
         insertCommand.execute(connection, containerPath);
