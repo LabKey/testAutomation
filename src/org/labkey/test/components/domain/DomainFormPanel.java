@@ -175,7 +175,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     public DomainFieldRow manuallyDefineFields(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = manuallyDefineFields(fieldDefinition.getName());
-        setField(fieldDefinition);
+        editField(fieldRow, fieldDefinition);
         return fieldRow;
     }
 

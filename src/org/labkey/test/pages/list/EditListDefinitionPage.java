@@ -15,17 +15,16 @@
  */
 package org.labkey.test.pages.list;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainDesigner;
-import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
+import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -100,24 +99,24 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
     // List Fields
 
-    public DomainFormPanel setKeyField(ListHelper.ListColumnType listKeyType, String listKeyName)
+    public DomainFormPanel manuallyDefineFieldsWithKey(FieldDefinition keyField)
     {
         DomainFormPanel fieldsPanel = getFieldsPanel();
-        if (listKeyType == ListHelper.ListColumnType.AutoInteger)
-        {
-            fieldsPanel.manuallyDefineFields("REMOVE_ME");
-            selectAutoIntegerKeyField();
-            sleep(500); // wait just a bit for the auto integer key field to be added
-            fieldsPanel.getField(0).setName(listKeyName);
-            fieldsPanel.removeField("REMOVE_ME");
-        }
-        else
-        {
-            DomainFieldRow keyField = fieldsPanel.manuallyDefineFields(listKeyName);
-            keyField.setType(FieldDefinition.ColumnType.valueOf(listKeyType.name()));
-            selectKeyField(listKeyName);
-        }
+        fieldsPanel.manuallyDefineFields(keyField);
+        selectKeyField(keyField.getName());
 
+        return fieldsPanel;
+    }
+
+    @NotNull
+    public DomainFormPanel manuallyDefineFieldsWithAutoIncrementingKey(String listKeyName)
+    {
+        DomainFormPanel fieldsPanel = getFieldsPanel();
+        fieldsPanel.manuallyDefineFields("REMOVE_ME");
+        selectAutoIntegerKeyField();
+        sleep(500); // wait just a bit for the auto integer key field to be added
+        fieldsPanel.getField(0).setName(listKeyName);
+        fieldsPanel.removeField("REMOVE_ME");
         return fieldsPanel;
     }
 
@@ -180,7 +179,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
         return new ElementCache();
     }
 
-    protected class ElementCache extends DomainDesigner.ElementCache
+    protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
         protected final Input nameInput = Input.Input(Locator.id("name"), getDriver()).findWhenNeeded(propertiesPanel);
         protected final Input descriptionInput = Input.Input(Locator.id("description"), getDriver()).findWhenNeeded(propertiesPanel);
