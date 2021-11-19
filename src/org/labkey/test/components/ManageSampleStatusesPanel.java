@@ -2,6 +2,7 @@ package org.labkey.test.components;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.util.SampleTypeHelper;
@@ -43,12 +44,6 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     }
 
     @Override
-    protected ElementCache elementCache()
-    {
-        return super.elementCache();
-    }
-
-    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -63,6 +58,12 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     {
         elementCache().statusItem(name, statusType).click();
         SampleStatus status = new SampleStatus();
+
+        WebDriverWrapper.waitFor(()-> elementCache().statusTypeSelect.isInteractive() &&
+                                elementCache().labelField.getComponentElement().isDisplayed() &&
+                                elementCache().descriptionField.isDisplayed(),
+                "Edit part of the panel did not become active in time.", 1_000);
+
         status.statusType = getStatusType();
         status.label = getLabel();
         status.description = getDescription();
@@ -137,22 +138,31 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public ManageSampleStatusesPanel addStatus(String label, String description, SampleTypeHelper.StatusType statusType)
     {
-        clickAddStatus()
-                .setLabel(label)
-                .setDescription(description)
-                .setStatusType(statusType);
+        clickAddStatus();
+
+        WebDriverWrapper.waitFor(()-> elementCache().statusTypeSelect.isInteractive() &&
+                        elementCache().labelField.getComponentElement().isDisplayed() &&
+                        elementCache().descriptionField.isDisplayed(),
+                "Edit part of the panel for a new status did not become active in time.", 1_000);
+
+        setLabel(label).setDescription(description).setStatusType(statusType);
+
         elementCache().saveButton.click();
         return this;
     }
 
     public ManageSampleStatusesPanel deleteStatus(String label)
     {
+        selectStatus(label);
+
+        WebDriverWrapper.waitFor(()->elementCache().deleteButton.isDisplayed(),
+                "Delete button is not visible.", 1_000);
 
         elementCache().deleteButton.click();
         return this;
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         WebElement statusItem(String name, SampleTypeHelper.StatusType statusType)
         {
