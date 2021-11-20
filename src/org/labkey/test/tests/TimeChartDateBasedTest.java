@@ -727,8 +727,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         timeChartWizard.saveReport("Aggregate", REPORT_DESCRIPTION);
 
-        clickTab("Clinical and Assay Data");
-        waitAndClickAndWait(Locator.linkWithText("Aggregate"));
+        goToManageViews().viewReport("Aggregate");
         waitForCharts(1);
         assertElementPresent(Locator.css("svg text").withText("Lab Results"), 1); // main title
         assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 2); // subtitle + y-axis label

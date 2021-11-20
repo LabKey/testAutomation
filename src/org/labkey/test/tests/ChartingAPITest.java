@@ -26,7 +26,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
-import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -34,7 +33,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
@@ -49,7 +47,6 @@ import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -90,11 +87,11 @@ public class ChartingAPITest extends BaseWebDriverTest
         initTest.initProject();
     }
 
-    public void initProject()
+    public void initProject() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
 
-        createPeopleList();
+        ClientAPITest.createPeopleList(ClientAPITest.LIST_NAME, createDefaultConnection(), getProjectName());
     }
 
     @Before
@@ -109,17 +106,6 @@ public class ChartingAPITest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(linkText));
         clickAndWait(Locator.linkWithText(linkText));
         return waitForWikiDivPopulation("testDiv", 30);
-    }
-
-    private void createPeopleList()
-    {
-        String data = ClientAPITest.getListData(ClientAPITest.LIST_KEY_NAME, ClientAPITest.LIST_COLUMNS, ClientAPITest.TEST_DATA);
-
-        _listHelper.createList(getProjectName(), ClientAPITest.LIST_NAME, ClientAPITest.LIST_KEY_TYPE, ClientAPITest.LIST_KEY_NAME, ClientAPITest.LIST_COLUMNS);
-        _listHelper.goToList(ClientAPITest.LIST_NAME);
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data);
-        _listHelper.submitImportTsv_success();
     }
 
     @Test

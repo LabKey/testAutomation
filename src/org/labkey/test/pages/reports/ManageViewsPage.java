@@ -21,6 +21,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.ext4.Window.Window;
 
@@ -77,5 +78,15 @@ public class ManageViewsPage extends LabKeyPage
         final Locator report = Locator.tag("tr").withClass("x4-grid-row").containing(reportName).childTag("td").position(3);
         waitForElement(report, 10000);
         click(report);
+    }
+
+    @LogMethod
+    public void viewReport(String reportName)
+    {
+        final WebElement reportLink = waitForElement(
+                Locator.tag("tr").withClass("x4-grid-row").childTag("td").position(2)
+                        .append(Locator.tag("a").withText(reportName)), 10000);
+        mouseOver(reportLink);
+        clickAndWait(reportLink);
     }
 }

@@ -118,7 +118,7 @@ public class IssuesHelper extends WebDriverWrapper
 
     public void deleteIssueLists(String projectName, LabKeySiteWrapper test)
     {
-        test.clickProject(projectName);
+        test.goToProjectHome(projectName);
         PortalHelper portalHelper = new PortalHelper(getDriver());
 
         if (isElementPresent(PortalHelper.Locators.webPartTitle("Issue Definitions")))

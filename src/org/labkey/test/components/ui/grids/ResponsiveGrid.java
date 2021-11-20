@@ -12,6 +12,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -89,7 +90,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     public Boolean hasData()
     {
-        return elementCache().emptyGrid.isEmpty();
+        return !Locators.emptyGrid.existsIn(this);
     }
 
     /**
@@ -313,7 +314,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public List<GridRow> getSelectedRows()
     {
-        elementCache().initColumnsAndIndices();     // force-initialize the element cache, wait for loaded
+        elementCache().getColumnNames();     // force-initialize the element cache, wait for loaded
         return new GridRow.GridRowFinder(this).findAll(this)
                 .stream().filter(GridRow::isSelected).collect(Collectors.toList());
     }
@@ -410,7 +411,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public boolean hasSelectColumn()
     {
-        return elementCache().selectColumn.isPresent();
+        return elementCache().hasSelectColumn();
     }
 
     /**
@@ -420,33 +421,23 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     protected Integer getColumnIndex(String columnLabel)
     {
-        if (elementCache().indexes == null)
-        {
-            getColumnNames();
-        }
-
-        if (elementCache().indexes.containsKey(columnLabel))
-            return ((ColumnIndex)elementCache().indexes.get(columnLabel)).getRawIndex();
-        else
-            return -1;
+        return elementCache().getColumnIndex(columnLabel);
     }
 
     /**
      *
      * @return a List&#60;String&#62; containing the text of each column header
      */
-    public List getColumnNames()
+    public List<String> getColumnNames()
     {
-        elementCache().initColumnsAndIndices();
-        return elementCache().columnNames;
+        return elementCache().getColumnNames();
     }
 
     /**
-     * there are ways to get rowMaps without exposing indexes to outside use
+     * Get data from a row
      * @param rowIndex  the index of the desired row
      * @return  a list of the text values in the row
      */
-    @Deprecated
     public List<String> getRowTexts(int rowIndex)
     {
         // preserves the ordering of the values as they appear in the row.
@@ -457,21 +448,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * we should avoid having test code rely on row indexes; find the row by text/column where possible
+     * Get data from a row in map form
      * @param rowIndex  the index of the desired row
      * @return  A Map containing column/value pairs for the specified row
      */
-    @Deprecated
     public Map<String, String> getRowMap(int rowIndex)
     {
         return getRow(rowIndex).getRowMap();
     }
 
     /**
-     * Where possible, avoid using row index in test code; use text/column or other means to get a GridRow
-     * @param rowIndex  the
-     * @param columnLabel
-     * @return
+     * Get text from the specified column in the specified row
      */
     public String getCellText(int rowIndex, String columnLabel)
     {
@@ -582,11 +569,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             waitForLoaded();
         }
 
-        protected Optional<WebElement> emptyGrid = Locators.emptyGrid.findOptionalElement(this);
+        private Boolean hasSelectColumn = null;
+        protected boolean hasSelectColumn()
+        {
+            if (hasSelectColumn == null)
+            {
+                hasSelectColumn = selectAllCheckbox.isDisplayed();
+            }
+            return hasSelectColumn;
+        }
 
-        public WebElement button = Locator.xpath("//button[contains(@class,'dropdown-toggle')]").findWhenNeeded(this);
-
-        public Optional<WebElement> selectColumn = Locator.xpath("//th/input[@type='checkbox']").findOptionalElement(getComponentElement());
         ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this));
 
         private final Map<String, WebElement> headerCells = new HashMap<>();
@@ -603,7 +595,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         protected List<String> columnNames;
         protected Map<String, ColumnIndex> indexes;
-        protected void initColumnsAndIndices()
+        protected Map<String, ColumnIndex> initColumnsAndIndices()
         {
             if (columnNames == null || indexes == null)
             {
@@ -622,6 +614,24 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                     indexes.put(columnNames.get(i), new ColumnIndex(columnNames.get(i), i+offset, i));
                 }
             }
+            return indexes;
+        }
+
+        protected int getColumnIndex(String columnLabel)
+        {
+            final ColumnIndex columnIndex = initColumnsAndIndices().get(columnLabel);
+            if (columnIndex == null)
+            {
+                throw new NoSuchElementException(String.format("Column not found: '%s'.\nKnown columns: %s",
+                        columnLabel, String.join(", ", initColumnsAndIndices().keySet())));
+            }
+            return columnIndex.getRawIndex();
+        }
+
+        protected List<String> getColumnNames()
+        {
+            initColumnsAndIndices();
+            return columnNames;
         }
 
         protected List<Map<String, String>> mapList;
@@ -706,7 +716,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
-        static final Locator headerCells = Locator.xpath("//thead/tr/th");
+        static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
 
     }
 
@@ -754,9 +764,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     class ColumnIndex
     {
-        private Integer _rawIndex;
-        private Integer _normalizedIndex;
-        private String _columnText;
+        private final Integer _rawIndex;
+        private final Integer _normalizedIndex;
+        private final String _columnText;
 
         /**
          * Helper to
