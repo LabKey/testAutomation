@@ -294,8 +294,8 @@ public class IssuesTest extends BaseWebDriverTest
 
         // DetailsAction
         assertTextPresent("Issue " + issueId + ": " + issueTitle,
-                "Milestone", "MyInteger", "MySecondInteger", "MyFirstString", "MyThirdString", "MyFourthString", "MyFifthString");
-        assertTextNotPresent("MySecondString");
+                "Milestone", "My Integer", "My Second Integer", "My First String", "My Third String", "My Fourth String", "My Fifth String");
+        assertTextNotPresent("MySecondString", "My Second String");
         assertElementPresent(Locator.linkWithText("http://www.issues.test"));
 
         // ListAction
@@ -331,7 +331,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("issueId"), "" + issueId);
         clickAndWait(Locator.tagWithAttribute("a", "data-original-title", "Search"));
         assertTextPresent(issueTitle);
-        assertTextNotPresent("Invalid");
+        assertElementNotPresent(Locators.labkeyError);
 
         // SearchAction
         clickAndWait(Locator.linkWithText("Issues List"));
