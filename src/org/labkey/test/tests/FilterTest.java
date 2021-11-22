@@ -271,7 +271,7 @@ public class FilterTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testContainerFilterFacet()
+    public void testContainerFilterFacet() throws Exception
     {
         IssuesHelper issuesHelper = new IssuesHelper(this);
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
@@ -279,7 +279,7 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.goToAdmin()
                 .setAssignedTo("Site: Administrators")
                 .clickSave();
-        IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typea", "typeb"));
+        IssuesTest.addLookupValues(getProjectName(), "issues", "Type", Arrays.asList("typea", "typeb"));
 
         HashMap<String, String> projectIssue = new HashMap<>();
         projectIssue.put("title", "project issue1");
@@ -303,8 +303,7 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.setIssueAssignmentList("Site: Administrators");
         clickButton("Save");
 
-        clickProject(getProjectName());
-        IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typed", "typee"));
+        IssuesTest.addLookupValues(getProjectName(), "issues", "Type", Arrays.asList("typed", "typee"));
 
         navigateToFolder(getProjectName(), "subfolder");
 

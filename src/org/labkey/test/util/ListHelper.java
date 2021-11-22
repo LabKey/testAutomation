@@ -16,7 +16,6 @@
 
 package org.labkey.test.util;
 
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -27,6 +26,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
@@ -42,7 +42,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 public class ListHelper extends LabKeySiteWrapper
 {
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
-    private WrapsDriver _wrapsDriver;
+    private final WrapsDriver _wrapsDriver;
 
     public ListHelper(WrapsDriver wrapsDriver)
     {
@@ -188,7 +188,7 @@ public class ListHelper extends LabKeySiteWrapper
                         setFormElement(field, new File(strVal));
                         break;
                     case "checkbox":
-                        setCheckbox(field, strVal.toLowerCase().equals("true"));
+                        setCheckbox(field, strVal.equalsIgnoreCase("true"));
                         break;
                     default:
                         setFormElement(field, strVal);
@@ -249,34 +249,29 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     @LogMethod
-    public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
-    {
-        beginCreateListFromTab(tabName, listName);
-        createListHelper(listKeyType, listKeyName, cols);
-    }
-
-    @LogMethod
-    public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, FieldDefinition... cols)
     {
         beginCreateList(containerPath, listName);
         createListHelper(listKeyType, listKeyName, cols);
     }
 
-    private void createListHelper(ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    private void createListHelper(ListColumnType listKeyType, String listKeyName, FieldDefinition... cols)
     {
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
-        DomainFormPanel fieldsPanel = listDefinitionPage.setKeyField(listKeyType, listKeyName);
-        for (ListColumn col : cols)
+        DomainFormPanel fieldsPanel;
+        if (listKeyType == ListColumnType.AutoInteger)
+        {
+            fieldsPanel = listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey(listKeyName);
+        }
+        else
+        {
+            fieldsPanel = listDefinitionPage.manuallyDefineFieldsWithKey(new FieldDefinition(listKeyName, listKeyType.toNew()));
+        }
+        for (FieldDefinition col : cols)
         {
             fieldsPanel.addField(col);
         }
         listDefinitionPage.clickSave();
-    }
-
-    private void beginCreateListFromTab(String tabName, String listName)
-    {
-        clickTab(tabName.replace(" ", ""));
-        beginCreateListHelper(listName);
     }
 
     public void clickTab(String tabname)
@@ -413,7 +408,7 @@ public class ListHelper extends LabKeySiteWrapper
         beginAt("/query/" + EscapeUtil.encode(projectName) + "/executeQuery.view?schemaName=lists&query.queryName=" + listName);
     }
 
-    public void verifyListData(List<ListColumn> columns, String[][] data, DeferredErrorCollector checker)
+    public void verifyListData(List<FieldDefinition> columns, String[][] data, DeferredErrorCollector checker)
     {
         final DataRegionTable dataRegion = DataRegion(getDriver()).withName("query").find();
         for (int r = 0; r < data.length; r++)
@@ -421,44 +416,14 @@ public class ListHelper extends LabKeySiteWrapper
             Map<String, String> row = dataRegion.getRowDataAsMap(r);
             for (int c = 0; c < columns.size(); c++)
             {
-                ListColumn column = columns.get(c);
+                FieldDefinition column = columns.get(c);
                 checker.verifyEquals(String.format("Value for column %s in row %d not as expected", column.getName(), r), data[r][c], row.get(column.getName()));
             }
         }
     }
 
     /**
-     * @deprecated Use {@link FieldDefinition.RangeType}
-     */
-    @Deprecated
-    public enum RangeType
-    {
-        Equals("Equals"), NE("Does Not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
-        private final String _description;
-
-        RangeType(String description)
-        {
-            _description = description;
-        }
-
-        public String toString()
-        {
-            return _description;
-        }
-
-        private FieldDefinition.RangeType toNew()
-        {
-            for (FieldDefinition.RangeType thisType : FieldDefinition.RangeType.values())
-            {
-                if (name().equals(thisType.name()))
-                    return thisType;
-            }
-            throw new IllegalArgumentException("Type mismatch: " + this);
-        }
-    }
-
-    /**
-     * @deprecated Use {@link FieldDefinition.ColumnType}
+     * @deprecated Use {@link ColumnType}
      */
     @Deprecated
     public enum ListColumnType
@@ -488,9 +453,9 @@ public class ListHelper extends LabKeySiteWrapper
             return _description;
         }
 
-        public FieldDefinition.ColumnType toNew()
+        public ColumnType toNew()
         {
-            for (FieldDefinition.ColumnType thisType : FieldDefinition.ColumnType.values())
+            for (ColumnType thisType : ColumnType.values())
             {
                 if (name().equals(thisType.name()))
                     return thisType;
@@ -498,7 +463,7 @@ public class ListHelper extends LabKeySiteWrapper
             throw new IllegalArgumentException("Type mismatch: " + this);
         }
 
-        public static ListColumnType fromNew(FieldDefinition.ColumnType newType)
+        public static ListColumnType fromNew(ColumnType newType)
         {
             for (ListColumnType thisType : values())
             {
@@ -510,95 +475,22 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     /**
-     * @deprecated Use {@link FieldDefinition.LookupInfo}
-     */
-    @Deprecated
-    public static class LookupInfo extends FieldDefinition.LookupInfo
-    {
-        public LookupInfo(@Nullable String folder, String schema, String table)
-        {
-            super(folder, schema, table);
-        }
-    }
-
-    /**
-     * @deprecated Use {@link FieldDefinition.RegExValidator}
-     */
-    @Deprecated
-    public static class RegExValidator extends FieldDefinition.RegExValidator
-    {
-        public RegExValidator(String name, String description, String message, String expression)
-        {
-            super(name, description, message, expression);
-        }
-    }
-
-    /**
-     * @deprecated Use {@link FieldDefinition.RangeValidator}
-     */
-    @Deprecated
-    public static class RangeValidator extends FieldDefinition.RangeValidator
-    {
-        public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
-        {
-            super(name, description, message, firstType.toNew(), firstRange);
-        }
-    }
-
-    /**
      * @deprecated Use {@link FieldDefinition}
      */
     @Deprecated
     public static class ListColumn extends FieldDefinition
     {
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator<?> validator, String url, Integer scale)
+        public ListColumn(String name, String label, ListColumnType type, String description)
         {
             super(name);
             setLabel(label);
             setDescription(description);
-            setFormat(format);
-            if (lookup != null)
-            {
-                setLookup(lookup);
-            }
-            else
-            {
-                setType(type.toNew());
-            }
-            if (validator != null)
-                setValidators(List.of(validator));
-            setURL(url);
-            setScale(scale);
-        }
-
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url)
-        {
-            this(name, label, type, description, format, lookup, validator, url, null);
-        }
-
-        public ListColumn(String name, String label, ListColumnType type, String description, LookupInfo lookup)
-        {
-            this(name, label, type, description, null, lookup, null, null);
-        }
-
-        public ListColumn(String name, String label, ListColumnType type, String description, String format)
-        {
-            this(name, label, type, description, format, null, null, null);
-        }
-
-        public ListColumn(String name, String label, ListColumnType type, String description)
-        {
-            this(name, label, type, description, null, null, null, null);
-        }
-
-        public ListColumn(String name, String label, ListColumnType type, String description, FieldValidator validator)
-        {
-            this(name, label, type, description, null, null, validator, null);
+            setType(type.toNew());
         }
 
         public ListColumn(String name, String label, ListColumnType type)
         {
-            this(name, label, type, null, null, null, null, null);
+            this(name, label, type, null);
         }
 
         public ListColumn(String name, ListColumnType type)
