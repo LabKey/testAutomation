@@ -1140,10 +1140,13 @@ public class Crawler
         }
     }
 
-    /** Ignore GWT deferredjs loading issue when navigating away from designer pages */
+    /** Ignore GWT alerts from designer pages */
     private boolean isRealFailure(Exception e)
     {
-        return !(e instanceof UnhandledAlertException && e.getMessage().contains("Script Tag Failure - no status available"));
+        return !(e instanceof UnhandledAlertException && (
+                e.getMessage().contains("Script Tag Failure - no status available") || // alert when navigating away quickly
+                e.getMessage().contains("Service_Proxy") // Alert from various GWT services (e.g. "from StudyDefinitionService_Proxy.getBlank")
+        ));
     }
 
     private void testInjection(URL start)

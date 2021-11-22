@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,6 +34,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
+import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -47,17 +49,20 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestDataUtils;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
+import org.labkey.test.util.query.QueryUtils;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -73,10 +78,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
@@ -101,34 +106,25 @@ public class ClientAPITest extends BaseWebDriverTest
     private final static File TEST_XLS_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/ClientAPITestList.xls");
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
-    public final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
-    public final static String LIST_KEY_NAME = "Key";
     // Add tricky characters to assay name to check for regressions
-    // 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
+    // Issue 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
     protected static final String TEST_ASSAY = "TestAssay1" + TRICKY_CHARACTERS;
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
-    public final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
-    {
-        new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
-        new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
-        new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age")
-    };
-    static
-    {
-        LIST_COLUMNS[0].setRequired(true);
-        LIST_COLUMNS[1].setRequired(true);
-    }
+    private static final List<FieldDefinition> LIST_COLUMNS = List.of(
+        new FieldDefinition("FirstName", FieldDefinition.ColumnType.String).setLabel("First Name").setDescription("The first name").setRequired(true),
+        new FieldDefinition("LastName", FieldDefinition.ColumnType.String).setLabel("Last Name").setDescription("The last name").setRequired(true),
+        new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setLabel("Age").setDescription("The age")
+    );
 
-    public final static String[][] TEST_DATA =
-    {
-        { "1", "Bill", "Billson", "34" },
-        { "2", "Jane", "Janeson", "42" },
-        { "3", "John", "Johnson", "17" },
-        { "4", "Mandy", "Mandy;son", "32" },
-        { "5", "Norbert", "Norbertson", "28" },
-        { "6", "Penny", "Pennyson", "38" },
-        { "7", "Yak", "Yakson", "88" },
-    };
+    public final static String TEST_DATA =
+        "Key\tFirstName\tLastName\tAge\n" +
+        "1\tBill\tBillson\t34\n" +
+        "2\tJane\tJaneson\t42\n" +
+        "3\tJohn\tJohnson\t17\n" +
+        "4\tMandy\tMandy;son\t32\n" +
+        "5\tNorbert\tNorbertson\t28\n" +
+        "6\tPenny\tPennyson\t38\n" +
+        "7\tYak\tYakson\t88\n";
 
     private static final String WIKIPAGE_NAME = "ClientAPITestPage";
 
@@ -203,7 +199,7 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws Exception
     {
         ClientAPITest init = (ClientAPITest)getCurrentTest();
         init._containerHelper.createProject(OTHER_PROJECT, null);
@@ -230,15 +226,22 @@ public class ClientAPITest extends BaseWebDriverTest
     private static boolean dirtyList = false;
 
     @Before
-    public void preTest()
+    public void preTest() throws Exception
     {
-        navigateToFolder(getProjectName(), FOLDER_NAME);
-
         if (dirtyList)
         {
-            refreshPeopleList();
-            navigateToFolder(getProjectName(), FOLDER_NAME);
+            refreshPeopleList(LIST_NAME, createDefaultConnection(), getProjectName() + "/" + FOLDER_NAME);
+            dirtyList = false;
         }
+        navigateToFolder(getProjectName(), FOLDER_NAME);
+    }
+
+    @NotNull
+    public static ListDefinition getPeopleListDefinition(String listName)
+    {
+        ListDefinition listDef = new IntListDefinition(listName, "Key");
+        listDef.setFields(LIST_COLUMNS);
+        return listDef;
     }
 
     @Override
@@ -249,65 +252,33 @@ public class ClientAPITest extends BaseWebDriverTest
         super.checkLinks();
     }
 
-    public static String getListData(String listKeyName, ListHelper.ListColumn[] listColumns, String[][] listData)
+    @LogMethod
+    private void createLists() throws Exception
     {
-        StringBuilder data = new StringBuilder();
-        data.append(listKeyName).append("\t");
-        for (int i = 0; i < listColumns.length; i++)
-        {
-            data.append(listColumns[i].getName());
-            data.append(i < listColumns.length - 1 ? "\t" : "\n");
-        }
-        for (String[] rowData : listData)
-        {
-            for (int col = 0; col < rowData.length; col++)
-            {
-                data.append(rowData[col]);
-                data.append(col < rowData.length - 1 ? "\t" : "\n");
-            }
-        }
+        Connection connection = createDefaultConnection();
+        createPeopleList(LIST_NAME, connection, PROJECT_NAME + "/" + FOLDER_NAME);
+        createLargePeopleList();
 
-        return data.toString();
+        // Create lists for cross-folder query test.
+        createPeopleList(SUBFOLDER_LIST, connection, PROJECT_NAME + "/" + FOLDER_NAME + "/" + SUBFOLDER_NAME);
+        createPeopleList(OTHER_PROJECT_LIST, connection, OTHER_PROJECT);
     }
 
     @LogMethod
-    private void createLists()
+    public static void createPeopleList(String listName, Connection connection, @LoggedParam String containerPath) throws Exception
     {
-        createPeopleList();
-        createLargePeopleList();
-        createCrossFolderLists();
+        ListDefinition listDef = getPeopleListDefinition(listName);
+        listDef.create(connection, containerPath);
+        refreshPeopleList(listName, connection, containerPath);
     }
 
-    private void createPeopleList()
+    private static void refreshPeopleList(String listName, Connection connection, String containerPath) throws Exception
     {
-        String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
-
-        _listHelper.createList(PROJECT_NAME + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
-        _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data);
-        _listHelper.submitImportTsv_success();
-    }
-
-    private void refreshPeopleList()
-    {
-        String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
-
-        goToModule("List");
-        waitForElement(Locator.linkWithText(LIST_NAME));
-        clickAndWait(Locator.linkWithText(LIST_NAME));
-        final DataRegionTable list = new DataRegionTable("query", this);
-        list.checkAll();
-
-        doAndWaitForPageToLoad(() ->
-        {
-            list.clickHeaderButton("Delete");
-            assertAlertContains("Are you sure you want to delete the selected rows?");
-        });
-
-        list.clickImportBulkData();
-        setFormElement(Locator.name("text"), data);
-        _listHelper.submitImportTsv_success();
+        QueryUtils.truncateTable(containerPath, "lists", listName);
+        final List<Map<String, Object>> rowData = TestDataUtils.rowMapsFromTsv(TEST_DATA);
+        final InsertRowsCommand insertCommand = new InsertRowsCommand("lists", listName);
+        insertCommand.setRows(rowData);
+        insertCommand.execute(connection, containerPath);
     }
 
     private void createLargePeopleList()
@@ -316,26 +287,6 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.createListFromFile(getProjectName() + "/" + FOLDER_NAME, QUERY_LIST_NAME, TEST_XLS_DATA_FILE);
         _listHelper.goToList(QUERY_LIST_NAME);
         waitForElement(Locator.linkWithText("Norbert"));
-    }
-
-    private void createCrossFolderLists()
-    {
-        String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
-
-        // Create lists for cross-folder query test.
-        _listHelper.createList(PROJECT_NAME + "/" + FOLDER_NAME + "/" + SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
-        _listHelper.goToList(SUBFOLDER_LIST);
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data);
-        _listHelper.submitImportTsv_success();
-
-        // Create lists for cross-folder query test.
-        clickProject(OTHER_PROJECT);
-        _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
-        _listHelper.goToList(OTHER_PROJECT_LIST);
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data);
-        _listHelper.submitImportTsv_success();
     }
 
     private void createUsers()
@@ -1013,7 +964,7 @@ public class ClientAPITest extends BaseWebDriverTest
         setSourceFromFile("webPartTest.js");
 
         assertTextPresent("Webpart Title");
-        for (ListHelper.ListColumn column : LIST_COLUMNS)
+        for (FieldDefinition column : LIST_COLUMNS)
             assertTextPresent(column.getLabel());
     }
 
