@@ -161,6 +161,13 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return getThis().findElements(elementCache().manuallyDefineFieldsLoc).size() > 0;
     }
 
+    /**
+     * Switch from "Import or infer fields from file" mode to "Manually define fields" mode.
+     * The designer adds a field automatically.
+     * This is only valid for a domain with no fields defined (usually a newly created domain)
+     * @param name Name will be applied to the automatically added field.
+     * @return row for the initially added field
+     */
     public DomainFieldRow manuallyDefineFields(String name)
     {
         getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);

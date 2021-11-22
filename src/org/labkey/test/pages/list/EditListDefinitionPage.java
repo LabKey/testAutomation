@@ -112,11 +112,11 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
     public DomainFormPanel manuallyDefineFieldsWithAutoIncrementingKey(String listKeyName)
     {
         DomainFormPanel fieldsPanel = getFieldsPanel();
-        fieldsPanel.manuallyDefineFields("REMOVE_ME");
+        fieldsPanel.manuallyDefineFields("REMOVE_ME"); // Switching to manual field definition mode adds a field
         selectAutoIntegerKeyField();
         sleep(500); // wait just a bit for the auto integer key field to be added
         fieldsPanel.getField(0).setName(listKeyName);
-        fieldsPanel.removeField("REMOVE_ME");
+        fieldsPanel.removeField("REMOVE_ME"); // Remove automatically added field
         return fieldsPanel;
     }
 
