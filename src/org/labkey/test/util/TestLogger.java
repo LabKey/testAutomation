@@ -66,6 +66,16 @@ public class TestLogger
             log("DEBUG: " + msg, System.out);
     }
 
+    public static void info(String str, Throwable t)
+    {
+        log(str, System.out, t);
+    }
+
+    public static void info(String str)
+    {
+        log(str, System.out);
+    }
+
     public static void warn(String str, Throwable t)
     {
         log("WARNING: " + str, System.out, t);

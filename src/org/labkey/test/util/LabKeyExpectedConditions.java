@@ -21,6 +21,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -34,6 +35,29 @@ public class LabKeyExpectedConditions
     private LabKeyExpectedConditions()
     {
         // Utility class
+    }
+
+    /**
+     * An expectation for checking child WebElement as a part of parent element to be present
+     *
+     * @param context SearchContext to find element within
+     * @param childLocator used to find child element. For example Locator.xpath("./tr/td")
+     * @return subelement
+     */
+    public static ExpectedCondition<WebElement> presenceOfNestedElementLocatedBy(final SearchContext context, final By childLocator)
+    {
+        return new ExpectedCondition<WebElement>() {
+
+            @Override
+            public WebElement apply(WebDriver webDriver) {
+                return context.findElement(childLocator);
+            }
+
+            @Override
+            public String toString() {
+                return String.format("visibility of element located by %s", childLocator);
+            }
+        };
     }
 
     /**
