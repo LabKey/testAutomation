@@ -6,6 +6,8 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.util.SampleTypeHelper;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -49,6 +51,24 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return new ElementCache();
     }
 
+    private void waitForEditRead()
+    {
+        WebDriverWrapper.waitFor(()->
+                {
+                    try
+                    {
+                        return elementCache().statusTypeSelect.isInteractive() &&
+                                elementCache().labelField.getComponentElement().isEnabled() &&
+                                elementCache().descriptionField.isEnabled();
+                    }
+                    catch (NoSuchElementException | StaleElementReferenceException exp)
+                    {
+                        return false;
+                    }
+                },
+                "Edit part of the panel for a new status did not become active in time.", 1_000);
+    }
+
     public SampleStatus selectStatus(String name)
     {
         return selectStatus(name, null);
@@ -59,10 +79,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         elementCache().statusItem(name, statusType).click();
         SampleStatus status = new SampleStatus();
 
-        WebDriverWrapper.waitFor(()-> elementCache().statusTypeSelect.isInteractive() &&
-                                elementCache().labelField.getComponentElement().isDisplayed() &&
-                                elementCache().descriptionField.isDisplayed(),
-                "Edit part of the panel did not become active in time.", 1_000);
+        waitForEditRead();
 
         status.statusType = getStatusType();
         status.label = getLabel();
@@ -140,10 +157,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     {
         clickAddStatus();
 
-        WebDriverWrapper.waitFor(()-> elementCache().statusTypeSelect.isInteractive() &&
-                        elementCache().labelField.getComponentElement().isDisplayed() &&
-                        elementCache().descriptionField.isDisplayed(),
-                "Edit part of the panel for a new status did not become active in time.", 1_000);
+        waitForEditRead();
 
         setLabel(label).setDescription(description).setStatusType(statusType);
 
