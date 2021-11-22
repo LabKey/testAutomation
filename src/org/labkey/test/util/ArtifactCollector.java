@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
@@ -122,7 +123,11 @@ public class ArtifactCollector
     public void publishDumpedArtifacts()
     {
         File dumpDir = ensureDumpDir();
-        publishArtifact(dumpDir, dumpDir.getName() + ".tar.gz");
+        final String artifactName = dumpDir.getName() + ".tar.gz";
+        publishArtifact(dumpDir, artifactName);
+
+        // https://www.jetbrains.com/help/teamcity/reporting-test-metadata.html#Links+to+build+artifacts
+        TeamCityUtils.serviceMessage("testMetadata", Map.of("type", "artifact", "value", artifactName));
     }
 
     public static void dumpThreads()
