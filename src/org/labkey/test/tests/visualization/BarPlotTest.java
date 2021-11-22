@@ -241,11 +241,6 @@ public class BarPlotTest extends GenericChartsTest
         waitAndClickAndWait(Locator.linkWithText(DATA_SOURCE_1));
 
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
-        plotRegion = dataRegionTable.getColumnPlotRegion();
-
-        log("If the plot view is visible, revert it.");
-        if(plotRegion.isViewModified())
-            plotRegion.revertView();
 
         log("Create a bar plot.");
         dataRegionTable.createBarChart(COL_NAME_BAR);

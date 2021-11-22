@@ -63,9 +63,9 @@ import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.*;
-import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.query.QueryUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -1069,7 +1069,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         MutableLong pendingRequestCount = new MutableLong(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));
-            return pendingRequestCount.getValue() == 0;
+            if (pendingRequestCount.getValue() == 0)
+            {
+                return true;
+            }
+            else
+            {
+                sleep(1000); // Don't hammer the server quite so aggressively
+                return false;
+            }
         }, msWait);
         if (pendingRequestCount.getValue() > 0)
             TestLogger.log(pendingRequestCount.getValue() + " requests still pending after " + msWait + "ms");
@@ -1079,11 +1087,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private long getPendingRequestCount(Connection connection)
     {
-        Command getPendingRequestCount = new Command("admin", "getPendingRequestCount");
+        Command<?> getPendingRequestCount = new Command<>("admin", "getPendingRequestCount");
         try
         {
             CommandResponse response = getPendingRequestCount.execute(connection, null);
-            return (Long)response.getProperty("pendingRequestCount");
+            return response.getProperty("pendingRequestCount");
         }
         catch (IOException | CommandException e)
         {
@@ -1407,13 +1415,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isLinkCheckEnabled())
         {
             checkErrors(); // Check for errors that happened before crawler
-            pauseJsErrorChecker();
 
             Crawler crawler = new Crawler(this, TestProperties.getCrawlerTimeout(), isInjectionCheckEnabled());
             crawler.addExcludedActions(getUncrawlableActions());
             crawler.addProject(getProjectName());
             crawler.crawlAllLinks();
-            resumeJsErrorChecker();
             try
             {
                 checkErrors();
@@ -1422,6 +1428,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 throw new AssertionError("Crawler triggered some server-side errors.");
             }
+            goToHome(); // Make sure crawler doesn't leave browser on a bad page
         }
     }
 

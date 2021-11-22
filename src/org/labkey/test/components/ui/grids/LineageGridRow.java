@@ -10,13 +10,13 @@ import org.openqa.selenium.WebElement;
 
 public class LineageGridRow extends GridRow
 {
-    private Locator seedLocator = Locator.tagWithClass("span", "show-on-hover").withText("Seed");
-    private Locator dupeLocator = Locator.tagWithClass("span", "label-warning").withText("Duplicate");
-    private Locator firstParentLoc = Locator.tagWithClass("span", "label-info").withText("1st parent");
-    private Locator secondParentLoc = Locator.tagWithClass("span", "label-primary").withText("2nd parent");
+    private static final Locator seedLocator = Locator.tagWithClass("span", "show-on-hover").withText("Seed");
+    private static final Locator dupeLocator = Locator.tagWithClass("span", "label-warning").withText("Duplicate");
+    private static final Locator firstParentLoc = Locator.tagWithClass("span", "label-info").withText("1st parent");
+    private static final Locator secondParentLoc = Locator.tagWithClass("span", "label-primary").withText("2nd parent");
     private String _lineageName;
 
-    protected LineageGridRow(ResponsiveGrid grid, WebElement el, WebDriver driver)
+    protected LineageGridRow(ResponsiveGrid<?> grid, WebElement el, WebDriver driver)
     {
         super(grid, el, driver);
     }

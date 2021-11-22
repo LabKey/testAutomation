@@ -27,7 +27,6 @@ import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -44,11 +43,6 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
-    }
-
-    public EmbeddedWebPartTest()
-    {
-        setContainerHelper(new UIContainerHelper(this));
     }
 
     public void configure()
