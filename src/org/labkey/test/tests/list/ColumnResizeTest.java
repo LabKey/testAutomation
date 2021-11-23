@@ -28,7 +28,6 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.ListHelper.ListColumn;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -93,12 +92,12 @@ public class ColumnResizeTest extends BaseWebDriverTest
     private void setUpList(String listName)
     {
         ListHelper listHelper = new ListHelper(this);
-        ListColumn maxCol = new ListColumn(MAX_COLUMN_NAME, MAX_COLUMN_NAME, ListHelper.ListColumnType.String,null,null,null,null,null,Integer.MAX_VALUE);
-        ListColumn gtCol = new ListColumn(GT_COLUMN_NAME, GT_COLUMN_NAME, ListHelper.ListColumnType.String,null,null,null,null,null,GT_SCALE);
-        ListColumn ltCol = new ListColumn(LT_COLUMN_NAME, LT_COLUMN_NAME, ListHelper.ListColumnType.String,null,null,null,null,null, LT_SCALE);
-        ListColumn fourCol = new ListColumn(FOUR_K_COLUMN_NAME, FOUR_K_COLUMN_NAME, ListHelper.ListColumnType.String,null,null,null,null,null,DEFAULT_SCALE);
-        ListColumn textAreaCol = new ListColumn(MULTI_COLUMN_NAME, MULTI_COLUMN_NAME, ListHelper.ListColumnType.MultiLine,null);
-        ListColumn numberCol = new ListColumn(NUMBER_COLUMN_NAME, NUMBER_COLUMN_NAME, ListHelper.ListColumnType.Integer,null);
+        FieldDefinition maxCol = new FieldDefinition(MAX_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(Integer.MAX_VALUE);
+        FieldDefinition gtCol = new FieldDefinition(GT_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(GT_SCALE);
+        FieldDefinition ltCol = new FieldDefinition(LT_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(LT_SCALE);
+        FieldDefinition fourCol = new FieldDefinition(FOUR_K_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(DEFAULT_SCALE);
+        FieldDefinition textAreaCol = new FieldDefinition(MULTI_COLUMN_NAME, FieldDefinition.ColumnType.MultiLine);
+        FieldDefinition numberCol = new FieldDefinition(NUMBER_COLUMN_NAME, FieldDefinition.ColumnType.Integer);
 
         listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.String, LIST_KEY_NAME,
                 maxCol, gtCol, ltCol, fourCol, textAreaCol, numberCol);

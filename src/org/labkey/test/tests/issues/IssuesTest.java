@@ -21,6 +21,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -39,17 +41,20 @@ import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.issues.ResolvePage;
 import org.labkey.test.pages.issues.UpdatePage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,22 +113,17 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    public static void addLookupValues(BaseWebDriverTest test, String issueDefName, String fieldName, Collection<String> values)
+    public static void addLookupValues(String containerPath, String issueDefName, String fieldName, Collection<String> values) throws IOException, CommandException
     {
-        if (!test.isElementPresent(Locator.tagWithText("h3", getLookupTableName(issueDefName, fieldName))))
-        {
-            test.goToSchemaBrowser();
-            test.viewQueryData("lists", getLookupTableName(issueDefName, fieldName));
-        }
-
-        StringBuilder tsv = new StringBuilder();
-        tsv.append("value");
+        List<Map<String, Object>> rows = new ArrayList<>();
         for (String value : values)
         {
-            tsv.append("\n");
-            tsv.append(value);
+            rows.add(Map.of("value", value));
         }
-        test._listHelper.uploadData(tsv.toString());
+        final String listName = getLookupTableName(issueDefName, fieldName);
+        final InsertRowsCommand insertRowsCommand = new InsertRowsCommand("lists", listName);
+        insertRowsCommand.setRows(rows);
+        insertRowsCommand.execute(WebTestHelper.getRemoteApiConnection(), containerPath);
     }
 
     @Override
@@ -204,7 +204,7 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @Test
-    public void generalTest()
+    public void generalTest() throws Exception
     {
         final String issueTitle = "A general issue";
 
@@ -237,28 +237,28 @@ public class IssuesTest extends BaseWebDriverTest
         createLookupList("issues", "module", Arrays.asList("Unity", "Zvezda", "Kibo", "Columbus"));
 
         // SetCustomColumnConfigurationAction
-        List<ListHelper.ListColumn> fields = new ArrayList<>();
+        List<FieldDefinition> fields = new ArrayList<>();
 
-        fields.add(new ListHelper.ListColumn("MyInteger", "MyInteger", ListHelper.ListColumnType.Integer, ""));
-        fields.add(new ListHelper.ListColumn("MySecondInteger", "MySecondInteger", ListHelper.ListColumnType.Integer, ""));
-        fields.add(new ListHelper.ListColumn("MyFirstString", "MyFirstString", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "MyFirstString"))));
-        fields.add(new ListHelper.ListColumn("MyThirdString", "MyThirdString", ListHelper.ListColumnType.String, ""));
-        fields.add(new ListHelper.ListColumn("MyFourthString", "MyFourthString", ListHelper.ListColumnType.String, ""));
-        fields.add(new ListHelper.ListColumn("MyFifthString", "MyFifthString", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "MyFifthString"))));
+        fields.add(new FieldDefinition("MyInteger", FieldDefinition.ColumnType.Integer));
+        fields.add(new FieldDefinition("MySecondInteger", FieldDefinition.ColumnType.Integer));
+        fields.add(new FieldDefinition("MyFirstString", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "MyFirstString"))));
+        fields.add(new FieldDefinition("MyThirdString", FieldDefinition.ColumnType.String));
+        fields.add(new FieldDefinition("MyFourthString", FieldDefinition.ColumnType.String));
+        fields.add(new FieldDefinition("MyFifthString", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "MyFifthString"))));
 
-        fields.add(new ListHelper.ListColumn("Client", "Client", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Client"))));
-        fields.add(new ListHelper.ListColumn("UserStory", "User Story", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "UserStory"))));
-        fields.add(new ListHelper.ListColumn("SupportTicket", "Support Ticket", ListHelper.ListColumnType.Integer, ""));
-        fields.add(new ListHelper.ListColumn("TeamCity", "TeamCity Note", ListHelper.ListColumnType.String, ""));
-        fields.add(new ListHelper.ListColumn("Triage", "Triage", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Triage"))));
-        fields.add(new ListHelper.ListColumn("Note", "Note", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Note"))));
-        fields.add(new ListHelper.ListColumn("Module", "Module", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Module"))));
+        fields.add(new FieldDefinition("Client", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Client"))));
+        fields.add(new FieldDefinition("UserStory", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "UserStory"))));
+        fields.add(new FieldDefinition("SupportTicket", FieldDefinition.ColumnType.Integer));
+        fields.add(new FieldDefinition("TeamCity", FieldDefinition.ColumnType.String).setLabel("TeamCity Note"));
+        fields.add(new FieldDefinition("Triage", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Triage"))));
+        fields.add(new FieldDefinition("Note", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Note"))));
+        fields.add(new FieldDefinition("Module", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Module"))));
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
 
-        for (ListHelper.ListColumn col : fields)
+        for (FieldDefinition col : fields)
         {
             adminPage.getFieldsPanel().addField(col);
         }
@@ -294,8 +294,8 @@ public class IssuesTest extends BaseWebDriverTest
 
         // DetailsAction
         assertTextPresent("Issue " + issueId + ": " + issueTitle,
-                "Milestone", "MyInteger", "MySecondInteger", "MyFirstString", "MyThirdString", "MyFourthString", "MyFifthString");
-        assertTextNotPresent("MySecondString");
+                "Milestone", "My Integer", "My Second Integer", "My First String", "My Third String", "My Fourth String", "My Fifth String");
+        assertTextNotPresent("MySecondString", "My Second String");
         assertElementPresent(Locator.linkWithText("http://www.issues.test"));
 
         // ListAction
@@ -331,7 +331,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("issueId"), "" + issueId);
         clickAndWait(Locator.tagWithAttribute("a", "data-original-title", "Search"));
         assertTextPresent(issueTitle);
-        assertTextNotPresent("Invalid");
+        assertElementNotPresent(Locators.labkeyError);
 
         // SearchAction
         clickAndWait(Locator.linkWithText("Issues List"));
@@ -363,14 +363,17 @@ public class IssuesTest extends BaseWebDriverTest
         }
     }
 
-    private void addLookupValues(String issueDefName, String fieldName, Collection<String> values)
+    private void addLookupValues(String issueDefName, String fieldName, Collection<String> values) throws IOException, CommandException
     {
-        addLookupValues(this, issueDefName, fieldName, values);
+        addLookupValues(getProjectName(), issueDefName, fieldName, values);
     }
 
-    private void createLookupList(String issueDefName, String fieldName, Collection<String> values)
+    private void createLookupList(String issueDefName, String fieldName, Collection<String> values) throws IOException, CommandException
     {
-        _listHelper.createList(getProjectName(), getLookupTableName(issueDefName, fieldName), ListHelper.ListColumnType.String, "value");
+        final ListDefinition listDef = new VarListDefinition(getLookupTableName(issueDefName, fieldName))
+                .addField(new FieldDefinition("value", FieldDefinition.ColumnType.String));
+        listDef.create(createDefaultConnection(), getProjectName());
+
         addLookupValues(issueDefName, fieldName, values);
     }
 
@@ -479,16 +482,16 @@ public class IssuesTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subFolder);
         _issuesHelper.createNewIssuesList("required-fields", _containerHelper);
 
-        List<ListHelper.ListColumn> fields = new ArrayList<>();
+        List<FieldDefinition> fields = new ArrayList<>();
 
-        fields.add(new ListHelper.ListColumn("ContractNumber", "Contract Number", ListHelper.ListColumnType.Integer, ""));
-        fields.add(new ListHelper.ListColumn("CustomerName", "Customer Name", ListHelper.ListColumnType.String, ""));
+        fields.add(new FieldDefinition("ContractNumber", FieldDefinition.ColumnType.Integer));
+        fields.add(new FieldDefinition("CustomerName", FieldDefinition.ColumnType.String));
 
         clickFolder(subFolder);
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
 
-        for (ListHelper.ListColumn col : fields)
+        for (FieldDefinition col : fields)
         {
             adminPage.getFieldsPanel().addField(col);
         }
