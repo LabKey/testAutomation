@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -36,9 +37,9 @@ public class HTTPApiTest extends BaseWebDriverTest
 {
     private static final String LIST_NAME = "Test List";
 
-    private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");
-    private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateAndTime, "When to wear the color", "M");
-    private static final ListHelper.ListColumn COL3 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
+    private static final FieldDefinition COL1 = new FieldDefinition("Like", FieldDefinition.ColumnType.String).setLabel("Like").setDescription("What the color is like");
+    private static final FieldDefinition COL2 = new FieldDefinition("Month", FieldDefinition.ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
+    private static final FieldDefinition COL3 = new FieldDefinition("Good", FieldDefinition.ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
     private final static String[][] TEST_DATA = { { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
             { "1", "4", "3", "2" },

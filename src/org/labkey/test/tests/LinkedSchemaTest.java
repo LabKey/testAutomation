@@ -445,7 +445,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Linked schemas disallow lookups to other folders outside of the current folder.
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
-                new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
+                new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
                         .setTableType(FieldDefinition.ColumnType.Integer));
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
