@@ -51,7 +51,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return new ElementCache();
     }
 
-    private void waitForEditRead()
+    private void waitForEditReady()
     {
         WebDriverWrapper.waitFor(()->
                 {
@@ -79,7 +79,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         elementCache().statusItem(name, statusType).click();
         SampleStatus status = new SampleStatus();
 
-        waitForEditRead();
+        waitForEditReady();
 
         status.statusType = getStatusType();
         status.label = getLabel();
@@ -157,7 +157,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     {
         clickAddStatus();
 
-        waitForEditRead();
+        waitForEditReady();
 
         setLabel(label).setDescription(description).setStatusType(statusType);
 
