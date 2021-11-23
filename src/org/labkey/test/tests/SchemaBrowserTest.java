@@ -117,21 +117,21 @@ public class SchemaBrowserTest extends BaseWebDriverTest
     {
         _listHelper.createList(PROJECT_NAME, AUTHORS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "AuthorId",
-                new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, TEST_DESC_AUTHORS),
-                new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "")
+                new FieldDefinition("FirstName", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_AUTHORS),
+                new FieldDefinition("LastName", FieldDefinition.ColumnType.String)
         );
 
         _listHelper.createList(PROJECT_NAME, PUBLISHERS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "PublisherId",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, TEST_DESC_PUBLISHERS)
+                new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_PUBLISHERS)
         );
 
         _listHelper.createList(PROJECT_NAME, BOOKS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "TitleId",
-                new ListHelper.ListColumn("Title", "Title", ListHelper.ListColumnType.String, TEST_DESC_BOOKS),
-                new ListHelper.ListColumn("Subtitle", "Subtitle", ListHelper.ListColumnType.String, ""),
-                new ListHelper.ListColumn("AuthorId", "AuthorId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", AUTHORS_LIST).setTableType(FieldDefinition.ColumnType.Integer)),
-                new ListHelper.ListColumn("PublisherId", "PublisherId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", PUBLISHERS_LIST).setTableType(FieldDefinition.ColumnType.Integer))
+                new FieldDefinition("Title", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_BOOKS),
+                new FieldDefinition("Subtitle", FieldDefinition.ColumnType.String),
+                new FieldDefinition("AuthorId", new FieldDefinition.LookupInfo("", "lists", AUTHORS_LIST).setTableType(FieldDefinition.ColumnType.Integer)),
+                new FieldDefinition("PublisherId", new FieldDefinition.LookupInfo("", "lists", PUBLISHERS_LIST).setTableType(FieldDefinition.ColumnType.Integer))
         );
     }
 }
