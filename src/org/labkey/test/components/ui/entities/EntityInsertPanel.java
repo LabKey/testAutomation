@@ -257,21 +257,24 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public boolean isBulkUpdateVisible()
     {
-        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+        // for sample upload, text is 'Create Samples from Grid', for assay it is 'Enter Data into Grid'
+        return modeSelectListItem(" Grid").withClass("active").findOptionalElement(this).isPresent() &&
                 elementCache().bulkUpdateBtnLoc.existsIn(this) &&
                 isElementVisible(elementCache().bulkUpdateBtn);
     }
 
     public boolean isDeleteRowsVisible()
     {
-        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
+        // text for this is sometimes 'Create Samples from Grid', sometimes 'Enter Data into Grid'
+        return modeSelectListItem(" Grid").withClass("active").findOptionalElement(this).isPresent() &&
                 elementCache().deleteRowsBtnLoc.existsIn(this) &&
                 isElementVisible(elementCache().deleteRowsBtn);
     }
 
     public boolean isFileUploadVisible()
     {
-        return modeSelectListItem("from File").withClass("active").findOptionalElement(this).isPresent() &&
+        // for sample upload, text is 'Import Samples from File', for assay: 'Upload Files'
+        return modeSelectListItem(" File").withClass("active").findOptionalElement(this).isPresent() &&
                 optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
     }
@@ -399,7 +402,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public static class EntityInsertPanelFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, EntityInsertPanelFinder>
     {
-        private Locator _locator;
+        private final Locator _locator;
 
         public EntityInsertPanelFinder(WebDriver driver)
         {
