@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
@@ -58,10 +59,16 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
             var tab = elementCache().navTab(tabText);
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(tab));
             tab.click();
-            getWrapper().waitFor(()-> isSelected(tabText), "tab did not become selected in time", 2000);
+            WebDriverWrapper.waitFor(()-> isSelected(tabText), "tab did not become selected in time", 2000);
         }
 
-        return getSelectedGrid();
+        QueryGrid grid = getSelectedGrid();
+
+        WebDriverWrapper.waitFor(grid::isLoaded,
+                String.format("The grid under tab '%s' did not become active in time.", tabText),
+                2_500);
+
+        return grid;
     }
 
     public QueryGrid getSelectedGrid()
