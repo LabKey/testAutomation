@@ -55,8 +55,7 @@ public class JUnitHeader extends JUnitTest.BaseJUnitTestWrapper
     @Test
     public void cleanTestContainer()
     {
-        if (_containerHelper.doesContainerExist("Shared/_junit"))
-            _containerHelper.deleteFolder("Shared", "_junit");
+        new APIContainerHelper(this).deleteContainer("Shared/_junit", false, 60_000);
     }
 
     @Override

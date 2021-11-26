@@ -30,7 +30,10 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Pdf;
+import org.openqa.selenium.PrintsPage;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.print.PrintOptions;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -40,12 +43,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -158,6 +163,7 @@ public class ArtifactCollector
             dumpFullScreen(dumpDir, baseName);
         dumpScreen(dumpDir, baseName);
         dumpHtml(dumpDir, baseName);
+        dumpPdf(dumpDir, baseName);
     }
 
     public void dumpHeap()
@@ -220,6 +226,32 @@ public class ArtifactCollector
         catch (IOException ioe)
         {
             TestLogger.log("Failed to copy screenshot file: " + ioe.getMessage());
+        }
+
+        return null;
+    }
+
+    public File dumpPdf(File dir, String baseName)
+    {
+        if (_test.getBrowserType() == WebDriverWrapper.BrowserType.CHROME && !TestProperties.isRunWebDriverHeadless())
+        {
+            // Avoid error: "PrintToPDF is only supported in headless mode"
+            return null;
+        }
+
+        File pdfFile = new File(dir, baseName + ".pdf");
+        try
+        {
+            Pdf pdf = ((PrintsPage) _driver.getDriver()).print(new PrintOptions());
+            byte[] pdfData = Base64.getDecoder().decode(pdf.getContent());
+            try (OutputStream stream = new FileOutputStream(pdfFile)) {
+                stream.write(pdfData);
+            }
+            return pdfFile;
+        }
+        catch (IOException ioe)
+        {
+            TestLogger.log("Failed dump page pdf: " + ioe.getMessage());
         }
 
         return null;

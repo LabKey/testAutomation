@@ -44,6 +44,7 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -51,7 +52,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
-import org.labkey.test.util.ListHelper.LookupInfo;
+import org.labkey.test.util.ListHelper.ListColumnType;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
@@ -76,8 +77,8 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.params.FieldDefinition.ColumnType;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
-import static org.labkey.test.util.ListHelper.ListColumnType;
 
 @Category({Daily.class, Data.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
@@ -94,13 +95,13 @@ public class ListTest extends BaseWebDriverTest
     protected final static String ALIASED_KEY_NAME = "Material";
     protected final static String HIDDEN_TEXT = "CantSeeMe";
 
-    protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListColumnType.String, "What the color is like");
-    protected final ListColumn _listCol1 = new ListColumn("Desc", "Description", ListColumnType.String, "What the color is like");
-    protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListColumnType.DateAndTime, "When to wear the color", "M");
-    protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListColumnType.Boolean, "Am I a jewel tone?");
-    protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListColumnType.Integer, "How nice the color is");
-    protected final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListColumnType.String, "I should be hidden!");
-    protected final ListColumn _listCol6 = new ListColumn("Aliased,Column", "Element", ListColumnType.String, "I show aliased data.");
+    protected final FieldDefinition _listCol1Fake = new FieldDefinition(FAKE_COL1_NAME, ColumnType.String).setDescription("What the color is like");
+    protected final FieldDefinition _listCol1 = new FieldDefinition("Desc", ColumnType.String).setLabel("Description").setDescription("What the color is like");
+    protected final FieldDefinition _listCol2 = new FieldDefinition("Month", ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
+    protected final FieldDefinition _listCol3 = new FieldDefinition("JewelTone", ColumnType.Boolean).setLabel("Jewel Tone").setDescription("Am I a jewel tone?");
+    protected final FieldDefinition _listCol4 = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
+    protected final FieldDefinition _listCol5 = new FieldDefinition("HiddenColumn", ColumnType.String).setLabel(HIDDEN_TEXT).setDescription("I should be hidden!");
+    protected final FieldDefinition _listCol6 = new FieldDefinition("Aliased,Column", ColumnType.String).setLabel("Element").setDescription("I show aliased data.");
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
@@ -131,7 +132,7 @@ public class ListTest extends BaseWebDriverTest
     protected final static ListColumnType LIST2_KEY_TYPE = ListColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
-    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.String));
+    protected final FieldDefinition _list2Col1 = new FieldDefinition(LIST_KEY_NAME2, new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(FieldDefinition.ColumnType.String)).setDescription("The color of the car");
     private final static String LIST2_KEY = "Car1";
     private final static String LIST2_FOREIGN_KEY = "Blue";
     private final static String LIST2_KEY2 = "Car2";
@@ -144,8 +145,8 @@ public class ListTest extends BaseWebDriverTest
     private final static String LIST3_NAME_OWNERS = "Owners";
     private final static ListColumnType LIST3_KEY_TYPE = ListColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
-    private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListColumnType.String, "");
-    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(FieldDefinition.ColumnType.String));
+    private final FieldDefinition _list3Col2 = new FieldDefinition("Wealth", ColumnType.String);
+    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(FieldDefinition.ColumnType.String)).setDescription("Who owns the car");
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
             LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME + "\n" +
@@ -730,7 +731,7 @@ public class ListTest extends BaseWebDriverTest
     {
         String mergeListName = "autoIncrementIdList";
 
-        _listHelper.createList(PROJECT_VERIFY, mergeListName, ListColumnType.AutoInteger, "Key", col("Name", ListColumnType.String));
+        _listHelper.createList(PROJECT_VERIFY, mergeListName, ListColumnType.AutoInteger, "Key", col("Name", ColumnType.String));
 
         _listHelper.clickImportData();
         checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", _listHelper.isMergeOptionPresent());
@@ -844,11 +845,11 @@ public class ListTest extends BaseWebDriverTest
 
         log("Issue 6883: test list self join");
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
-                new ListHelper.ListColumn(dummyCol, dummyCol, ListColumnType.String, "")
+        FieldDefinition[] columns = new FieldDefinition[] {
+                new FieldDefinition(dummyCol, ColumnType.String)
         };
-        ListHelper.ListColumn lookupCol = new ListHelper.ListColumn(lookupField, lookupField, ListColumnType.Integer, "",
-                new ListHelper.LookupInfo(null, lookupSchema, lookupTable).setTableType(FieldDefinition.ColumnType.Integer));
+        FieldDefinition lookupCol = new FieldDefinition(lookupField,
+                new FieldDefinition.LookupInfo(null, lookupSchema, lookupTable).setTableType(FieldDefinition.ColumnType.Integer));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, keyCol, columns);
         // now add the lookup column (which references the new table)
@@ -881,7 +882,7 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome(PROJECT_OTHER);
         //create list with look up A
         String lookupColumn = "lookup";
-        _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, ListColumnType.Integer, "A" ));
+        _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, ColumnType.Integer, "A" ));
         _listHelper.goToList(crossContainerLookupList);
         _listHelper.clickImportData();
         setListImportAsTestDataField(lookupColumn + "\n1");
@@ -1148,12 +1149,12 @@ public class ListTest extends BaseWebDriverTest
         String phiColumn = "PhiColumn";
         String restrictedPhiColumn = "RestrictedPhiColumn";
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
-                new ListColumn("FileName", "FileName", ListColumnType.String, "name of the file"),
-                new ListColumn("FileExtension", "ext", ListColumnType.String, "the file extension"),
-                new ListColumn(notPhiColumn, "NotPhiFile", ListColumnType.Attachment, "the file itself"),
-                new ListColumn(limitedPhiColumn, "LimitedPhiFile", ListColumnType.Attachment, "the file itself"),
-                new ListColumn(phiColumn, "PhiFile", ListColumnType.Attachment, "the file itself"),
-                new ListColumn(restrictedPhiColumn, "RestrictedFile", ListColumnType.Attachment, "the file itself"));
+                new FieldDefinition("FileName", ColumnType.String).setLabel("FileName").setDescription("name of the file"),
+                new FieldDefinition("FileExtension", ColumnType.String).setLabel("ext").setDescription("the file extension"),
+                new FieldDefinition(notPhiColumn, ColumnType.Attachment).setLabel("NotPhiFile").setDescription("the file itself"),
+                new FieldDefinition(limitedPhiColumn, ColumnType.Attachment).setLabel("LimitedPhiFile").setDescription("the file itself"),
+                new FieldDefinition(phiColumn, ColumnType.Attachment).setLabel("PhiFile").setDescription("the file itself"),
+                new FieldDefinition(restrictedPhiColumn, ColumnType.Attachment).setLabel("RestrictedFile").setDescription("the file itself"));
 
 
         // set phi levels
@@ -1222,8 +1223,8 @@ public class ListTest extends BaseWebDriverTest
 
         // create list with an attachment column
         _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
-                col(descriptionCol, ListColumnType.String),
-                col(attachmentCol, ListColumnType.Attachment));
+                col(descriptionCol, ColumnType.String),
+                col(attachmentCol, ColumnType.Attachment));
         // index for entire list as single document and index on attachment column
         _listHelper.goToEditDesign(listName)
                 .openAdvancedListSettings()
@@ -1263,8 +1264,8 @@ public class ListTest extends BaseWebDriverTest
 
         // create list with an attachment column
         _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
-                               col(descriptionCol, ListColumnType.String),
-                               col(attachmentCol, ListColumnType.Attachment));
+                               col(descriptionCol, ColumnType.String),
+                               col(attachmentCol, ColumnType.Attachment));
         // index on attachment column
         EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign(listName);
         editListDefinitionPage.openAdvancedListSettings()
@@ -1290,66 +1291,64 @@ public class ListTest extends BaseWebDriverTest
     // CUSTOMIZE URL tests
     //
 
-    ListHelper.ListColumn col(String name, ListColumnType type)
+    FieldDefinition col(String name, ColumnType type)
     {
-        return new ListHelper.ListColumn(name, "", type, "");
+        return new FieldDefinition(name, type);
     }
 
-    ListHelper.ListColumn col(String name, ListColumnType type, String table)
+    FieldDefinition col(String name, ColumnType type, String table)
     {
         return col(null, name, type, table);
     }
 
-    ListHelper.ListColumn col(String folder, String name, ListColumnType type, String table)
+    FieldDefinition col(String folder, String name, ColumnType type, String table)
     {
-        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(folder, "lists", table).setTableType(type.toNew()));
+        return new FieldDefinition(name, new FieldDefinition.LookupInfo(folder, "lists", table).setTableType(type));
     }
 
-    ListHelper.ListColumn colURL(String name, ListColumnType type, String url)
+    FieldDefinition colURL(String name, ColumnType type, String url)
     {
-        ListColumn c  = new ListHelper.ListColumn(name, "", type, "");
-        c.setURL(url);
-        return c;
+        return new FieldDefinition(name, type).setURL(url);
     }
 
-    List<ListColumn> Acolumns = Arrays.asList(
-            col("A", ListColumnType.Integer),
-            colURL("title", ListColumnType.String, "/junit/echoForm.view?key=${A}&title=${title}&table=A"),
-            col("Bfk", ListColumnType.Integer, "B")
+    List<FieldDefinition> Acolumns = Arrays.asList(
+            col("A", ColumnType.Integer),
+            colURL("title", ColumnType.String, "/junit/echoForm.view?key=${A}&title=${title}&table=A"),
+            col("Bfk", ColumnType.Integer, "B")
     );
     String[][] Adata = new String[][]
     {
         {"1", "one A", "1"},
     };
 
-    List<ListHelper.ListColumn> Bcolumns = Arrays.asList(
-            col("B", ListColumnType.Integer),
-            colURL("title", ListColumnType.String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
-            col("Cfk", ListColumnType.Integer, "C")
+    List<FieldDefinition> Bcolumns = Arrays.asList(
+            col("B", ColumnType.Integer),
+            colURL("title", ColumnType.String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
+            col("Cfk", ColumnType.Integer, "C")
     );
     String[][] Bdata = new String[][]
     {
         {"1", "one B", "1"},
     };
 
-    List<ListHelper.ListColumn> Ccolumns = Arrays.asList(
-            col("C", ListColumnType.Integer),
-            colURL("title", ListColumnType.String, "/junit/echoForm.view?key=${C}&title=${title}&table=C")
+    List<FieldDefinition> Ccolumns = Arrays.asList(
+            col("C", ColumnType.Integer),
+            colURL("title", ColumnType.String, "/junit/echoForm.view?key=${C}&title=${title}&table=C")
     );
     String[][] Cdata = new String[][]
     {
             {"1", "one C"},
     };
 
-    List<ListHelper.ListColumn> BatchListColumns = Arrays.asList(
-            col("Id", ListColumnType.Integer),
-            col("FirstName", ListColumnType.String),
-            col("LastName", ListColumnType.String),
-            col("IceCreamFlavor", ListColumnType.String),
-            col("ShouldInsertCorrectly", ListColumnType.Boolean)
+    List<FieldDefinition> BatchListColumns = Arrays.asList(
+            col("Id", ColumnType.Integer),
+            col("FirstName", ColumnType.String),
+            col("LastName", ColumnType.String),
+            col("IceCreamFlavor", ColumnType.String),
+            col("ShouldInsertCorrectly", ColumnType.Boolean)
     );
 
-    List<ListHelper.ListColumn> BatchListMergeColumns = Arrays.asList(
+    List<FieldDefinition> BatchListMergeColumns = Arrays.asList(
             BatchListColumns.get(0),
             BatchListColumns.get(1),
             BatchListColumns.get(3)
@@ -1381,11 +1380,11 @@ public class ListTest extends BaseWebDriverTest
                     {"8", "Jamie", " ", "Salted Caramel", " "},
             };
 
-    String toTSV(List<ListHelper.ListColumn> cols, String[][] data)
+    String toTSV(List<FieldDefinition> cols, String[][] data)
     {
         StringBuilder sb = new StringBuilder();
         String tab = "";
-        for (ListHelper.ListColumn c : cols)
+        for (FieldDefinition c : cols)
         {
             sb.append(tab);
             sb.append(c.getName());
@@ -1418,11 +1417,11 @@ public class ListTest extends BaseWebDriverTest
     }
 
 
-    void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
+    void createList(String name, List<FieldDefinition> cols, String[][] data)
     {
         log("Add List -- " + name);
-        _listHelper.createList(PROJECT_VERIFY, name, ListColumnType.fromNew(cols.get(0).getType()), cols.get(0).getName(),
-                cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
+        _listHelper.createList(PROJECT_VERIFY, name, ListHelper.ListColumnType.fromNew(cols.get(0).getType()), cols.get(0).getName(),
+                cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
         _listHelper.goToList(name);
         _listHelper.clickImportData();
         setListImportAsTestDataField(toTSV(cols,data));

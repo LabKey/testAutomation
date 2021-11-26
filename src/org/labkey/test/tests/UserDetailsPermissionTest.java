@@ -245,8 +245,8 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     {
         // Create list
         impersonate(ADMIN_USER);
-        ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "",
-                new ListHelper.LookupInfo(getProjectName(), "core", "Users").setTableType(FieldDefinition.ColumnType.Integer));
+        FieldDefinition userColumn = new FieldDefinition("user",
+                new FieldDefinition.LookupInfo(getProjectName(), "core", "Users").setTableType(FieldDefinition.ColumnType.Integer));
 
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         goToManageLists();
