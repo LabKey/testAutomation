@@ -29,6 +29,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Collections;
@@ -146,7 +147,9 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name(DATETIME_DATE_FIELD_NAME), dateTimeFieldDateValue);
 
         var dateTimeFieldTimeValue = "12:45";
-        setFormElement(Locator.name(DATETIME_TIME_FIELD_NAME), dateTimeFieldTimeValue);
+        final WebElement timeInput = Locator.name(DATETIME_TIME_FIELD_NAME).findElement(getDriver());
+        timeInput.clear();
+        timeInput.sendKeys(dateTimeFieldTimeValue);
 
         log("Save the survey.");
         clickSaveButton();
@@ -190,7 +193,9 @@ public class SurveyTest extends BaseWebDriverTest
 
     private void clickSaveButton()
     {
-        clickButton("Save", 0);
+        final WebElement saveButton = Ext4Helper.Locators.ext4Button("Save").findElement(getDriver());
+        shortWait().withMessage("Save button not enabled").until(wd -> !saveButton.getAttribute("class").contains("disabled"));
+        saveButton.click();
         _extHelper.waitForExtDialog(SUCCESS_DIALOG_TITLE);
         _extHelper.waitForExtDialogToDisappear(SUCCESS_DIALOG_TITLE);
     }
