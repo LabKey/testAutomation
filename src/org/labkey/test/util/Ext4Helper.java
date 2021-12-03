@@ -985,7 +985,7 @@ public class Ext4Helper
      */
     public static WebElement elementIfEnabled(WebElement el)
     {
-        if (!el.isEnabled() || Locator.xpath("*::ancestor-or-self").withAttributeContaining("class", "disabled").existsIn(el))
+        if (!el.isEnabled() || Locator.xpath("ancestor-or-self::*").withAttributeContaining("class", "disabled").existsIn(el))
         {
             return null;
         }
