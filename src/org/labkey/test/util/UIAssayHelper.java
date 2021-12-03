@@ -55,7 +55,7 @@ public class UIAssayHelper extends AbstractAssayHelper
         if (projectPath != null)
             goToProjectPath(projectPath);
 
-        _test.clickAndWait(Locator.linkWithText(assayName));
+        _test.waitAndClickAndWait(Locator.linkWithText(assayName));
         _test.clickButton("Import Data");
 
         if(null != batchProperties)
