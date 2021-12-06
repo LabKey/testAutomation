@@ -7,7 +7,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -93,7 +95,9 @@ public class StudySurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("date"), getDate(0));
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Submit completed form", 0);
+            final WebElement submitButton = Ext4Helper.Locators.ext4Button("Submit completed form").findElement(getDriver());
+            shortWait().withMessage("Submit button not enabled").until(wd -> !submitButton.getAttribute("class").contains("disabled"));
+            submitButton.click();
             _extHelper.waitForExtDialog("Success");
         });
 
