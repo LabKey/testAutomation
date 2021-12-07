@@ -295,8 +295,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit setSelectValue(String fieldCaption, List<String> selectValues)
     {
-        WebElement container = Locator.tag("td").withAttribute("data-caption", fieldCaption).findElement(this);
-        FilteringReactSelect reactSelect =  FilteringReactSelect.finder(_driver).find(container);
+        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
         selectValues.forEach(s -> {reactSelect.typeAheadSelect(s);});
         return this;
     }
@@ -309,8 +308,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        WebElement container = Locator.tag("td").withAttribute("data-caption", fieldCaption).findElement(this);
-        ReactSelect.finder(_driver).find(container).clearSelection();
+        elementCache().findSelect(fieldCaption).clearSelection();
         return this;
     }
 
@@ -405,6 +403,12 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 .findWhenNeeded(this);
         public WebElement cancelButton = Locator.tagWithAttribute("button", "type", "button")
                 .findWhenNeeded(this);
+
+        public FilteringReactSelect findSelect(String fieldCaption)
+        {
+            WebElement container = Locator.tag("td").withAttribute("data-caption", fieldCaption).findElement(this);
+            return FilteringReactSelect.finder(_driver).find(container);
+        }
     }
 
     public static class DetailTableEditFinder extends WebDriverComponent.WebDriverComponentFinder<DetailTableEdit, DetailTableEditFinder>
