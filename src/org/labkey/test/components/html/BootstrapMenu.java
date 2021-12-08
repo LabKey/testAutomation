@@ -198,6 +198,23 @@ public class BootstrapMenu extends BaseBootstrapMenu
             return this;
         }
 
+        /**
+         * Some menu controls have IDs prepended with dynamic numbers, like 123-special-menu
+         * @param substring the part of the ID that isn't dynamic
+         * @return
+         */
+        public BootstrapMenuFinder withToggleIdContaining(String substring)
+        {
+            _locator = Locators.dropdownMenu(Locators.dropdownToggle().withAttributeContaining("id", substring));
+            return this;
+        }
+
+        public BootstrapMenuFinder withTitle(String title)
+        {
+            _locator = Locators.dropdownMenu().withAttribute("title", title);
+            return this;
+        }
+
         public BootstrapMenuFinder withButtonText(String text)
         {
             _locator = Locators.dropdownMenu(Locators.dropdownToggle().withText(text));
