@@ -448,7 +448,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         WebElement divLookup = Locators.lookupMenu.findWhenNeeded(gridCell);
 
         // Wait for the dropdown list to show.
-        WebDriverWrapper.waitFor(divLookup::isDisplayed,
+        WebDriverWrapper.waitFor(()->divLookup.isDisplayed() && !divLookup.getText().toLowerCase().contains("Loading..."),
                 "The dropdown list for the cell did not appear in time.", 5_000);
 
         List<WebElement> items = Locators.lookupItem.findElements(divLookup);

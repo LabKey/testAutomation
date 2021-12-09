@@ -356,7 +356,10 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public String clickSaveExpectingError()
     {
         elementCache().saveButton.click();
-        return BootstrapLocators.errorBanner.findElement(getDriver()).getText();
+        WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
+        WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
+                "No error message was shown.", 750);
+        return errorBanner.getText();
     }
 
     public DetailDataPanel clickCancel()
@@ -369,7 +372,10 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public String clickCancelExpectingError()
     {
         elementCache().cancelButton.click();
-        return BootstrapLocators.errorBanner.findElement(getDriver()).getText();
+        WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
+        WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
+                "No error message was shown.", 750);
+        return errorBanner.getText();
     }
 
 
