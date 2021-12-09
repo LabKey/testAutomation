@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Allows tests to record non-fatal errors without failing the test immediately.
- * Once all such checks have been made (likely at the end of a test), you should invoke {@link #recordResults()}, which
+ * Once all such checks have been made (likely at the end of a test), you should invoke {@link #reportResults()}, which
  * will throw an {@link AssertionError} if any errors were recorded.
  */
 public class DeferredErrorCollector
