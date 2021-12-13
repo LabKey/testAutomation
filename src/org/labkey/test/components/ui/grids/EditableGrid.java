@@ -5,15 +5,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.util.LabKeyExpectedConditions;
+import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
@@ -334,35 +332,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         if (value instanceof List)
         {
             // If this is a list assume that it will need a lookup.
-            List<String> values = (List)value;
+            List<String> values = (List) value;
 
-            WebElement lookupInputCell = elementCache().lookupInputCell();
+            ReactSelect lookupSelect = elementCache().lookupSelect();
 
             for (String _value : values)
             {
-                lookupInputCell.sendKeys(_value);
-
-                // Wait for specified value to be the first option
-                final WebElement lookupItem = Locators.lookupMenu.append(Locators
-                        .lookupItem.position(1).withText(_value))
-                        .waitForElement(this, 5_000);
-
-                // was previously using elementCache().listGroupItem(_value).click() but the click would attempt to
-                // scroll the list item into view which would result in the menu being reattached to the input element,
-                // see changes in labkey-ui-components for issue 43051
-                lookupInputCell.sendKeys(Keys.DOWN, Keys.ENTER);
-
-                // Result varies by field type
-                final ExpectedCondition<WebElement> multiSelectCondition =
-                        LabKeyExpectedConditions.presenceOfNestedElementLocatedBy(this, Locators.itemElement(_value));
-                final ExpectedCondition<Boolean> singleSelectCondition =
-                        ExpectedConditions.and(ExpectedConditions.stalenessOf(lookupItem), wd -> getCellValue(gridCell).equalsIgnoreCase(_value));
-
-                getWrapper().shortWait().until(ExpectedConditions.or(
-                        singleSelectCondition, // pop-up closes for single-select
-                        multiSelectCondition // Selection appears for multi-select
-                ));
-
+                lookupSelect.select(_value);
             }
         }
         else
@@ -437,23 +413,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return cell.getText().trim();
     }
 
-    /**
-     * Get the displayed dropdown list for the given grid cell (td).
-     *
-     * @param gridCell The td element that contains the list.
-     * @return A list of the items in the list.
-     */
-    private List<String> getDropdownList(WebElement gridCell)
-    {
-        WebElement divLookup = Locators.lookupMenu.findWhenNeeded(gridCell);
-
-        // Wait for the dropdown list to show.
-        WebDriverWrapper.waitFor(()->divLookup.isDisplayed() && !divLookup.getText().toLowerCase().contains("Loading..."),
-                "The dropdown list for the cell did not appear in time.", 5_000);
-
-        List<WebElement> items = Locators.lookupItem.findElements(divLookup);
-        return getWrapper().getTexts(items);
-    }
 
     /**
      * Dismiss the dropdown list that is currently displayed on the grid.
@@ -462,14 +421,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid dismissDropdownList()
     {
-        var menu = Locators.lookupMenu.findOptionalElement(getComponentElement());
-
-        if (menu.isPresent())
-        {
-            Actions builder = new Actions(getDriver());
-            builder.sendKeys(elementCache().lookupInputCell(), Keys.ESCAPE).build().perform();
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(menu.get()));
-        }
+        elementCache().lookupSelect().close();
 
         return this;
     }
@@ -494,7 +446,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Make the dropdown appear.
             getWrapper().doubleClick(td);
-            listText = getDropdownList(td);
+            listText = elementCache().lookupSelect().getOptions();
         }
 
         return listText;
@@ -523,17 +475,20 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Get the input, will also make the dropdown show up.
             getWrapper().doubleClick(td);
-            final WebElement lookupMenu = Locators.lookupMenu.waitForElement(td, 5_000);
-            final String initialText = lookupMenu.getText();
-
-            // Type the filter into the cell.
-            WebElement lookupInputCell = elementCache().lookupInputCell();
-            lookupInputCell.sendKeys(filterText);
-
-            // Available options should change due to text entry. Elements don't go stale.
-            WebDriverWrapper.waitFor(() -> !initialText.equals(lookupMenu.getText()), 5_000);
-
-            listText = getDropdownList(td);
+            ReactSelect lookupSelect = elementCache().lookupSelect();
+//            lookupSelect.select(filterText); // TODO there is no method for typing in the reactSelect, only for selecting options
+            listText = lookupSelect.getOptions();
+//            final WebElement lookupMenu = Locators.lookupMenu.waitForElement(td, 5_000);
+//            final String initialText = lookupMenu.getText();
+//
+//            // Type the filter into the cell.
+//            WebElement lookupInputCell = elementCache().lookupInputCell();
+//            lookupInputCell.sendKeys(filterText);
+//
+//            // Available options should change due to text entry. Elements don't go stale.
+//            WebDriverWrapper.waitFor(() -> !initialText.equals(lookupMenu.getText()), 5_000);
+//
+//            listText = getDropdownList(td);
         }
 
         return listText;
@@ -793,9 +748,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return Locators.inputCell.findElement(getComponentElement());
         }
 
-        public WebElement lookupInputCell()
+        public ReactSelect lookupSelect()
         {
-            return Locators.lookupInputCell.findElement(getComponentElement());
+            return ReactSelect.finder(getDriver()).find(getComponentElement());
         }
 
     }
@@ -813,9 +768,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         static final Locator headerCells = Locator.xpath("//thead/tr/th");
         static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
-        static final Locator lookupInputCell = Locator.tagWithClass("input", "cell-lookup-input");
-        static final Locator.XPathLocator lookupMenu = Locator.tagWithClass("div", "cell-lookup-menu");
-        static final Locator.XPathLocator lookupItem = Locator.tagWithClass("a", "list-group-item");
 
         static Locator.XPathLocator itemElement(String text)
         {
