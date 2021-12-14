@@ -279,15 +279,20 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      *
      * @param groupName  Name of the group that will have the dataset permission.
      * @param datasetName Name of the dataset.
-     * @param permission A {@link DatasetRoles} value.
+     * @param role Label for the desired role.
      * @return A reference to this page.
      */
+    public StudySecurityPage setDatasetPermissions(String groupName, String datasetName, String role)
+    {
+        int position = getGroupColumnIndex(groupName);
+        selectOptionByText(elementCache().datasetPermissionSelect(datasetName, position), role);
+        return this;
+    }
+
+    @Deprecated
     public StudySecurityPage setDatasetPermissions(String groupName, String datasetName, DatasetRoles permission)
     {
-        Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
-        int position = getGroupColumnIndex(groupName);
-        selectOptionByText(elementCache().datasetPermissionSelect(datasetName, position), permission.getText());
-        return this;
+        return setDatasetPermissions(groupName, datasetName, permission.getText());
     }
 
     /**
@@ -297,6 +302,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      * @param permissions A Map where the dataset name is the key and a value from {@link DatasetRoles}.
      * @return A reference to this page.
      */
+    @Deprecated
     public StudySecurityPage setDatasetPermissionsAndSave(String groupName, Map<String, DatasetRoles> permissions)
     {
         Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
@@ -315,16 +321,16 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      * For a group set the permissions for all datasets.
      *
      * @param groupName Name of the group.
-     * @param permission The permission to set {@link DatasetRoles}
+     * @param role The role to apply
      * @return A reference to this page.
      */
-    public StudySecurityPage setAllDatasetPermissionsAndSave(String groupName, DatasetRoles permission)
+    public StudySecurityPage setRoleForAllDatasets(String groupName, String role)
     {
         Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
 
-        selectOptionByText(elementCache().allDatasetPermissionSelect(groupName), permission.getText());
+        selectOptionByText(elementCache().allDatasetPermissionSelect(groupName), role);
 
-        return saveDatasetPermissions();
+        return this;
     }
 
     /**
@@ -334,13 +340,24 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      * @param datasetName The name of the dataset.
      * @return The {@link DatasetRoles} permission.
      */
-    public DatasetRoles getDatasetPermission(String groupName, String datasetName)
+    public String getDatasetRole(String groupName, String datasetName)
     {
-        Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
-
         int position = getGroupColumnIndex(groupName);
 
-        String text = getSelectedOptionText(elementCache().datasetPermissionSelect(datasetName, position));
+        return getSelectedOptionText(elementCache().datasetPermissionSelect(datasetName, position));
+    }
+
+    /**
+     * Return the per-dataset permission for a group.
+     *
+     * @param groupName The name of the group.
+     * @param datasetName The name of the dataset.
+     * @return The {@link DatasetRoles} permission.
+     */
+    @Deprecated
+    public DatasetRoles getDatasetPermission(String groupName, String datasetName)
+    {
+        String text = getDatasetRole(groupName, datasetName);
 
         if(text.equals(DatasetRoles.AUTHOR.getText()))
             return DatasetRoles.AUTHOR;
@@ -367,6 +384,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      * @param groupName Name of the a group.
      * @return A list of available roles defined by {@link DatasetRoles}.
      */
+    @Deprecated
     public List<DatasetRoles> getAllowedDatasetPermissions(String groupName)
     {
         Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
@@ -459,6 +477,8 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
      */
     public List<String> getGroupsListedInPerDatasets()
     {
+        Assert.assertTrue(DATASET_PANEL_NOT_VISIBLE, isDatasetPermissionPanelVisible());
+
         List<WebElement> thElements = Locator.tag("table")
                 .childTag("tbody")
                 .childTag("tr").position(1)
@@ -644,7 +664,9 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
 
     /**
      * Permissions that can be set per dataset.
+     * @deprecated Available roles are not static
      */
+    @Deprecated
     public enum DatasetRoles
     {
         NONE("None"),
