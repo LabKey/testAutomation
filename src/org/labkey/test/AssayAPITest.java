@@ -68,6 +68,7 @@ public class AssayAPITest extends BaseWebDriverTest
     protected final static File FOO_XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
     protected final static File HELP_ICON_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
     protected final static File CREST_2_FILE = TestFileUtils.getSampleData("InlineImages/crest-2.png");
+    protected final static String SUBFOLDER_1 = "Sub1";
 
     private final static String PLATE_METADATA = "{\n" +
             "      \"control\" : {\n" +
@@ -93,6 +94,8 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         AssayAPITest initTest = (AssayAPITest) getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), "Assay");
+        initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER_1, "Assay");
+        initTest.goToProjectHome();;
 
         initTest.log("upload inline files to the pipeline root");
         initTest.goToModule("FileContent");
@@ -109,26 +112,27 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
         int pipelineCount = 0;
         String runName = "trial01.xls";
-        importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
-                TestFileUtils.getSampleData("GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
+        importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "/" + getProjectName(),
+                "XLS Assay", TestFileUtils.getSampleData("GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 100);
         waitForElement(Locator.paginationText(1, 100, 201));
 
-        goToProjectHome();
+        // Upload from child folder to parent folder
+        goToProjectFolder(getProjectName(), SUBFOLDER_1);
 
         //Issue 16073
-        importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "BatchPropRequired",
-                TestFileUtils.getSampleData("GPAT/" + runName), "trial01-1.xls", new String[]{"K770K3VY-19"});
+        importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "/" + getProjectName(),
+                "BatchPropRequired", TestFileUtils.getSampleData("GPAT/" + runName), "trial01-1.xls", new String[]{"K770K3VY-19"});
         waitForElement(Locator.paginationText(1, 100, 201));
     }
 
-    protected void importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
+    protected void importAssayAndRun(File assayPath, int pipelineCount, String container, String assayName, File runPath,
                                      String runName, String[] textToCheck) throws IOException, CommandException
     {
         // Issue 42637: Verify that .xar.xml file can be imported through the UI
         UIAssayHelper _uiAssayHelper = new UIAssayHelper(this);
-        _uiAssayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
+        _uiAssayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount, container);
 
         APIAssayHelper _apiAssayHelper = new APIAssayHelper(this);
         _apiAssayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
