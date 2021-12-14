@@ -304,11 +304,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      */
     public List<String> getOptions()
     {
+
+        boolean alreadyOpened = isExpanded();
+
         // Can only get the list of items once the list has been opened.
-        open();
+        if (!alreadyOpened)
+            open();
+
         List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
         List<String> rawItems = getWrapper().getTexts(selectedItems);
-        close();
+
+        // If it wasn't open before close it, otherwise leave it in the open state.
+        if(!alreadyOpened)
+            close();
+
         return rawItems.stream().map(String::trim).collect(Collectors.toList());
     }
 
@@ -349,6 +358,17 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         elementCache().input.sendKeys(Keys.ENTER);
 
         waitFor(() -> getValueLabelLocator().withText(value).existsIn(getComponentElement()), "Failed to create value \"" + value + "\".", 1_000);
+
+        return getThis();
+    }
+
+    public T enterValueInTextbox(String value)
+    {
+        waitForLoaded();
+        waitForInteractive();
+
+        elementCache().input.clear();
+        elementCache().input.sendKeys(value);
 
         return getThis();
     }

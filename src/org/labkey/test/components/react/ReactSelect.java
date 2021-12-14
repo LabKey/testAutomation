@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ReactSelect extends BaseReactSelect<ReactSelect>
 {
@@ -49,9 +50,30 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void select(String option)
     {
+
+        if(!isOpen())
+        {
+            waitForLoaded();
+            scrollIntoView();
+            open();
+        }
+        clickOption(option);
+        waitForClosed();
+    }
+
+    public void typeOptionThenSelect(String option)
+    {
+        if(!isOpen())
+        {
+            waitForLoaded();
+            scrollIntoView();
+            open();
+        }
+        enterValueInTextbox(option);
         waitForLoaded();
-        scrollIntoView();
-        open();
+
+        waitFor(()->getOptions().contains(option), String.format("Option '%s' is not in the list of options.", option), 1_000);
+
         clickOption(option);
         waitForClosed();
     }
@@ -60,6 +82,9 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
     {
         WebElement optionEl = null;
         int tryCount = 0;
+
+        // Get the value of the text box.
+        String optionTypedIn = getValue();
 
         while (null == optionEl)
         {
@@ -75,6 +100,18 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
                 {
                     close();
                     open();
+
+                    // If a value had been typed, closing and opening the list will clear it, so try to get back to the
+                    // original state and enter the value again in the textbox.
+                    if(!optionTypedIn.isEmpty())
+                    {
+                        enterValueInTextbox(option);
+
+                        // Don't know if this is will work as expected. It may take a moment for the list to populate
+                        // after typing in a value.
+                        waitFor(()->!getOptions().contains("Loading..."), 1_000);
+                    }
+
                 }
                 else
                 {

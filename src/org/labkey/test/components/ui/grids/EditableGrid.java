@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
@@ -336,9 +337,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             ReactSelect lookupSelect = elementCache().lookupSelect();
 
+            waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
+            lookupSelect.open();
+            List<String> valuesListed = lookupSelect.getOptions();
+
             for (String _value : values)
             {
-                lookupSelect.select(_value);
+
+                if(!valuesListed.contains(_value))
+                {
+                    lookupSelect.typeOptionThenSelect(_value);
+                }
+                else
+                {
+                    lookupSelect.select(_value);
+                }
             }
         }
         else
