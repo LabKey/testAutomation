@@ -339,20 +339,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
             lookupSelect.open();
-            List<String> valuesListed = lookupSelect.getOptions();
 
             for (String _value : values)
             {
-
-                if(!valuesListed.contains(_value))
-                {
-                    lookupSelect.typeOptionThenSelect(_value);
-                }
-                else
-                {
-                    lookupSelect.select(_value);
-                }
+                lookupSelect.typeOptionThenSelect(_value);
             }
+
         }
         else
         {

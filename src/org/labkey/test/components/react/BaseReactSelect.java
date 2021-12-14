@@ -366,10 +366,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     {
         waitForLoaded();
         waitForInteractive();
-
-        elementCache().input.clear();
         elementCache().input.sendKeys(value);
-
         return getThis();
     }
 

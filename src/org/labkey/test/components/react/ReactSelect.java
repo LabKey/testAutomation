@@ -50,25 +50,18 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void select(String option)
     {
-
-        if(!isOpen())
-        {
-            waitForLoaded();
-            scrollIntoView();
-            open();
-        }
+        waitForLoaded();
+        scrollIntoView();
+        open();
         clickOption(option);
         waitForClosed();
     }
 
     public void typeOptionThenSelect(String option)
     {
-        if(!isOpen())
-        {
-            waitForLoaded();
-            scrollIntoView();
-            open();
-        }
+        waitForLoaded();
+        scrollIntoView();
+        open();
         enterValueInTextbox(option);
         waitForLoaded();
 
@@ -82,9 +75,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
     {
         WebElement optionEl = null;
         int tryCount = 0;
-
-        // Get the value of the text box.
-        String optionTypedIn = getValue();
 
         while (null == optionEl)
         {
@@ -101,16 +91,14 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
                     close();
                     open();
 
-                    // If a value had been typed, closing and opening the list will clear it, so try to get back to the
-                    // original state and enter the value again in the textbox.
-                    if(!optionTypedIn.isEmpty())
-                    {
-                        enterValueInTextbox(option);
+                    // Since this is a retry method try to improve the odds of finding the item in the list by entering
+                    // it into the textbox, which should filter the list. Also, closing and opening the dropdown will
+                    // clear any value that may have been entered in the text box, this should protects against that as well.
+                    enterValueInTextbox(option);
 
-                        // Don't know if this is will work as expected. It may take a moment for the list to populate
-                        // after typing in a value.
-                        waitFor(()->!getOptions().contains("Loading..."), 1_000);
-                    }
+                    // Don't know if this is will work as expected. It may take a moment for the list to populate
+                    // after typing in a value.
+                    waitFor(()->!getOptions().contains("Loading..."), 1_000);
 
                 }
                 else
