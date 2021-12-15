@@ -450,6 +450,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Make the dropdown appear.
             getWrapper().doubleClick(td);
+            waitFor(()->elementCache().lookupSelect().isExpanded(), "Dropdown list for the cell did not show up.", 1_000);
             listText = elementCache().lookupSelect().getOptions();
         }
 
