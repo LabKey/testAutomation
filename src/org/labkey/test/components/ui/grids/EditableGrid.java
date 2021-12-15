@@ -327,8 +327,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         selectCell(gridCell);
 
         // Activate the cell.
-        var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(gridCell);
-        cellContent.sendKeys(Keys.ENTER);
+        activateCell(gridCell);
 
         if (value instanceof List)
         {
@@ -459,7 +458,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     /**
      * For the given row and column type some text into the cell to get the 'filtered' values displayed in the dropdown list.
-     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and it will return an empty list.
+     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and a empty list will be returned.
      *
      * @param row A 0 based index containing the cell.
      * @param columnName The column of the cell.
@@ -469,31 +468,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public List<String> getFilteredDropdownListForCell(int row, String columnName, String filterText)
     {
 
-        WebElement td = getCell(row, columnName);
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
 
-        // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
-        WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
+        // If the td does not contain a 'menu-selector' then it is not a look-up.
+        WebElement div = Locator.findAnyElementOrNull(gridCell, Locator.tagWithClass("span", "cell-menu-selector"));
 
         List<String> listText = new ArrayList<>();
 
         if (div != null)
         {
             // Get the input, will also make the dropdown show up.
-            getWrapper().doubleClick(td);
+            getWrapper().doubleClick(gridCell);
             ReactSelect lookupSelect = elementCache().lookupSelect();
-//            lookupSelect.select(filterText); // TODO there is no method for typing in the reactSelect, only for selecting options
+            lookupSelect.enterValueInTextbox(filterText);
             listText = lookupSelect.getOptions();
-//            final WebElement lookupMenu = Locators.lookupMenu.waitForElement(td, 5_000);
-//            final String initialText = lookupMenu.getText();
-//
-//            // Type the filter into the cell.
-//            WebElement lookupInputCell = elementCache().lookupInputCell();
-//            lookupInputCell.sendKeys(filterText);
-//
-//            // Available options should change due to text entry. Elements don't go stale.
-//            WebDriverWrapper.waitFor(() -> !initialText.equals(lookupMenu.getText()), 5_000);
-//
-//            listText = getDropdownList(td);
         }
 
         return listText;
@@ -643,29 +632,47 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
+    private void activateCell(WebElement cell)
+    {
+        // If it is a selector and it already has focus (is active) it will not have a div.cellular-display
+        if(Locator.tagWithClass("div", "select-input__control--is-focused")
+                .findElements(cell).isEmpty())
+        {
+            var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(cell);
+            cellContent.sendKeys(Keys.ENTER);
+        }
+    }
+
     /**
-     * tests the specified webElement to see if it is in 'cell-selected' state, which means it has an active/focused input in it
-     * @param cell
+     * Tests the specified webElement to see if it is in 'cell-selected' state, which means it has an active/focused input in it
+     * @param cell A WebElement that is the grid cell (a  td).
      * @return True if the edit is present
      */
     private boolean isCellSelected(WebElement cell)
     {
-        return Locator.tagWithClass("div", "cellular-display")
-                .findElement(cell)
-                .getAttribute("class").contains("cell-selected");
+        try
+        {
+            return Locator.tagWithClass("div", "cellular-display")
+                    .findElement(cell)
+                    .getAttribute("class").contains("cell-selected");
+        }
+        catch(NoSuchElementException nse)
+        {
+            // If the cell has a reactSelect it may have a different marker to indicate it is selected.
+            return Locator.tagWithClass("div", "select-input__control")
+                    .findElement(cell)
+                    .getAttribute("class").contains("select-input__control--is-focused");
+        }
     }
 
     /**
      *  tests the specified cell element to see if it is highlighted as a single-or-multi-cell selection area.  this appears as
      *  light-blue background, and is distinct from 'selected'
-     * @param cell
-     * @return
+     * @param cell WebElement (grid td) to check.
      */
     private boolean isInSelection(WebElement cell)  // 'in selection' shows as blue color, means it is part of one or many selected cells for copy/paste, etc
     {
-        return Locator.tagWithClass("div", "cellular-display")
-                .findElement(cell)
-                .getAttribute("class").contains("cell-selection");
+        return isCellSelected(cell);
     }
 
     /**
