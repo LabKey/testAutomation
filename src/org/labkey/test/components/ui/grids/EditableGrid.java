@@ -652,13 +652,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         try
         {
+            // If the cell is a reactSelect, and it is open/active, this will throw a NoSuchElementException because the
+            // div will not have the cell-selected in the class attribute.
             return Locator.tagWithClass("div", "cellular-display")
                     .findElement(cell)
                     .getAttribute("class").contains("cell-selected");
         }
         catch(NoSuchElementException nse)
         {
-            // If the cell has a reactSelect it may have a different marker to indicate it is selected.
+            // If the cell is an open/active reactSelect the class attribute is different.
             return Locator.tagWithClass("div", "select-input__control")
                     .findElement(cell)
                     .getAttribute("class").contains("select-input__control--is-focused");
@@ -672,7 +674,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     private boolean isInSelection(WebElement cell)  // 'in selection' shows as blue color, means it is part of one or many selected cells for copy/paste, etc
     {
-        return isCellSelected(cell);
+        // Should not need to add code for a reactSelect here. A selection involves clicking/dragging, which closes the reactSelect.
+        return Locator.tagWithClass("div", "cellular-display")
+                .findElement(cell)
+                .getAttribute("class").contains("cell-selection");
     }
 
     /**
