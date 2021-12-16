@@ -976,4 +976,19 @@ public class Ext4Helper
             return Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-button").withDescendant(Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-inner")).notHidden();
         }
     }
+
+    /**
+     * Ext uses non-standard markup to disable elements. Need to check for a 'disabled' class on the element or one of its ancestors.
+     * For use with {@link org.openqa.selenium.support.ui.WebDriverWait}
+     * <br>
+     * Ex: <code>shortWait().until(wd -&gt; elementIfEnabled(ext4Button("Request").findElement(getDriver()))).click();</code>
+     */
+    public static WebElement elementIfEnabled(WebElement el)
+    {
+        if (!el.isEnabled() || Locator.xpath("ancestor-or-self::*").withAttributeContaining("class", "disabled").existsIn(el))
+        {
+            return null;
+        }
+        return el;
+    }
 }
