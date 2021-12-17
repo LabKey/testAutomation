@@ -146,10 +146,16 @@ public class UIAssayHelper extends AbstractAssayHelper
      * @param pipelineCount  expected count of successful pipeline jobs including this one
      */
     @Override
+    public void uploadXarFileAsAssayDesign(File file, int pipelineCount, @Nullable String container)
+    {
+        uploadXarFileAsAssayDesign(file, container);
+        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
+    }
+
+    @Override
     public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
     {
-        uploadXarFileAsAssayDesign(file);
-        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
+        uploadXarFileAsAssayDesign(file, pipelineCount, null);
     }
 
     /**
@@ -158,10 +164,19 @@ public class UIAssayHelper extends AbstractAssayHelper
      */
     @Override
     @LogMethod
-    public void uploadXarFileAsAssayDesign(@LoggedParam File file)
+    public void uploadXarFileAsAssayDesign(@LoggedParam File file, @Nullable String container)
     {
         goToUploadXarPage();
         _test.setFormElement(Locator.name("fileUpload"), file);
+        if (null != container)
+            _test.setFormElement(Locator.id("assay-type-select-container"), container);
         _test.clickAndWait(Locator.button("Import"));
+    }
+
+    @Override
+    @LogMethod
+    public void uploadXarFileAsAssayDesign(@LoggedParam File file)
+    {
+        uploadXarFileAsAssayDesign(file, null);
     }
 }

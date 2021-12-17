@@ -51,11 +51,15 @@ public abstract class AbstractAssayHelper
      */
     public abstract void uploadXarFileAsAssayDesign(File file, int pipelineCount);
 
+    public abstract void uploadXarFileAsAssayDesign(File file, int pipelineCount, @Nullable String container);
+
     /**
      * Upload a xar file as an assay configuration. Does not wait for pipeline jobs to complete.
      * @param file XAR file to upload
      */
     public abstract void uploadXarFileAsAssayDesign(File file);
+
+    public abstract void uploadXarFileAsAssayDesign(File file, @Nullable String container);
 
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
