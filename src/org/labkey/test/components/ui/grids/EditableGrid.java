@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -439,22 +440,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public List<String> getDropdownListForCell(int row, String columnName)
     {
-        WebElement td = getCell(row, columnName);
-
-        // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
-        WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
-
-        List<String> listText = new ArrayList<>();
-
-        if (div != null)
-        {
-            // Make the dropdown appear.
-            getWrapper().doubleClick(td);
-            waitFor(()->elementCache().lookupSelect().isExpanded(), "Dropdown list for the cell did not show up.", 1_000);
-            listText = elementCache().lookupSelect().getOptions();
-        }
-
-        return listText;
+        return getFilteredDropdownListForCell(row, columnName, null);
     }
 
     /**
@@ -463,10 +449,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      *
      * @param row A 0 based index containing the cell.
      * @param columnName The column of the cell.
-     * @param filterText The text to type into the cell.
+     * @param filterText The text to type into the cell. If the value is null it will not filter the list.
      * @return A list values shown in the dropdown list after the text has been entered.
      */
-    public List<String> getFilteredDropdownListForCell(int row, String columnName, String filterText)
+    public List<String> getFilteredDropdownListForCell(int row, String columnName, @Nullable String filterText)
     {
 
         // Get a reference to the cell.
@@ -479,10 +465,23 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         if (div != null)
         {
-            // Get the input, will also make the dropdown show up.
+            selectCell(gridCell);
+            waitFor(()->isCellSelected(gridCell), "Grid cell is not selected, cannot get dropdown list.", 500);
+
+            // Double click to make the ReactSelect active. This may expand the list.
             getWrapper().doubleClick(gridCell);
+
             ReactSelect lookupSelect = elementCache().lookupSelect();
-            lookupSelect.enterValueInTextbox(filterText);
+
+            // If the double click did not expand the slect this will.
+            // This will also have no effect if the list was expended.
+            lookupSelect.open();
+
+            if (filterText != null && !filterText.trim().isEmpty())
+            {
+                lookupSelect.enterValueInTextbox(filterText);
+            }
+
             listText = lookupSelect.getOptions();
         }
 
