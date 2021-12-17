@@ -31,7 +31,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         super(element, driver);
     }
 
-    static public ReactSelectFinder finder(WebDriver driver)
+    public static ReactSelectFinder finder(WebDriver driver)
     {
         return new ReactSelectFinder(driver);
     }
@@ -93,7 +93,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
                     // Since this is a retry method try to improve the odds of finding the item in the list by entering
                     // it into the textbox, which should filter the list. Also, closing and opening the dropdown will
-                    // clear any value that may have been entered in the text box, this should protects against that as well.
+                    // clear any value that may have been entered in the text box, this should protect against that as well.
                     enterValueInTextbox(option);
 
                     // Don't know if this is will work as expected. It may take a moment for the list to populate

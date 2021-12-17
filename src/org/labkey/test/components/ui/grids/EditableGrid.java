@@ -98,7 +98,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         for (int i=0; i< columnTexts.size(); i++ )
         {
             if (columnTexts.get(i).equalsIgnoreCase(columnHeader))
-                return i + 1; // Zero (0) based index in the list, one (1) based index with the controls collection.
+                return i + 1; // Zero (0) based index in the list, one (1) based index with the control collection.
         }
         return -1;
     }
@@ -162,7 +162,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
                 if (columnName.equals(SELECT_COLUMN_HEADER))
                 {
-                    // Special case the check box.
+                    // Special case the checkbox.
                     if (null == cell.findElement(By.tagName("input")).getAttribute("checked"))
                         mapData.put(columnName, "false");
                     else
@@ -268,7 +268,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             rowCount++;
         }
 
-        return new ArrayList<List<Integer>>(Arrays.asList(unPopulatedRows, populatedRows));
+        return new ArrayList<>(Arrays.asList(unPopulatedRows, populatedRows));
     }
 
     /**
@@ -286,7 +286,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * </p>
      *
      * @param columnNameToSearch The name of the column to check if a row should be updated or not.
-     * @param valueToSearch The value to check for in 'columnNameToSearch' to see if a should be updated.
+     * @param valueToSearch The value to check for in 'columnNameToSearch' to see if the row should be updated.
      * @param columnNameToSet The column to update in a row.
      * @param valueToSet The new value to put into column 'columnNameToSet'.
      */
@@ -359,7 +359,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
             // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
-            // of the existing value so the new value should exist some where in the cell text value not necessarily
+            // of the existing value so the new value should exist somewhere in the cell text value not necessarily
             // at the end of it.
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
@@ -445,7 +445,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     /**
      * For the given row and column type some text into the cell to get the 'filtered' values displayed in the dropdown list.
-     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and a empty list will be returned.
+     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and an empty list will be returned.
      *
      * @param row A 0 based index containing the cell.
      * @param columnName The column of the cell.
@@ -473,8 +473,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             ReactSelect lookupSelect = elementCache().lookupSelect();
 
-            // If the double click did not expand the slect this will.
-            // This will also have no effect if the list was expended.
+            // If the double click did not expand the select this will.
+            // This will have no effect if the list is expended.
             lookupSelect.open();
 
             if (filterText != null && !filterText.trim().isEmpty())
@@ -507,7 +507,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         // wait for the cell value to change or the rowcount to change, and the target cell to go into highlight,
         // ... or for a second and a half
-        getWrapper().waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
+        WebDriverWrapper.waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
                         isInSelection(gridCell), 1500);
         return this;
     }
@@ -540,8 +540,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param endRowIndex   Index of the bottom-right cell's row
      * @param endColumn     Column header of the bottom-right cell
      * @return  the text contained in the prescribed selection
-     * @throws IOException
-     * @throws UnsupportedFlavorException
      */
     public String copyCellRange(int startRowIndex, String startColumn, int endRowIndex, String endColumn) throws IOException, UnsupportedFlavorException
     {
@@ -554,19 +552,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * Selects all cells in the table, then copies their contents into delimited text
      * @return  delimited text content of the cells in the grid
-     * @throws IOException
-     * @throws UnsupportedFlavorException
      */
     public String copyAllCells() throws IOException, UnsupportedFlavorException
     {
         selectAllCells();
-        getWrapper().waitFor(()-> areAllInSelection(),
+        WebDriverWrapper.waitFor(this::areAllInSelection,
                 "expect all cells to be selected before copying grid values", 1500);
 
         String selection = copyCurrentSelection();
         if (selection.isEmpty())
         {
-            log("initial attempt to copy current selection came up empty.  re-trying after 3000 msec");
+            log("initial attempt to copy current selection came up empty.  re-trying after 3000 ms");
             new WebDriverWait(getDriver(), Duration.ofSeconds(3));
             return copyCurrentSelection();
         }
@@ -598,7 +594,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 .build()
                 .perform();
 
-        getWrapper().waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
+        WebDriverWrapper.waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
                 "Cell range did not become selected", 2000);
         return this;
     }
@@ -613,28 +609,27 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // use 'ctrl-a' to select the entire grid
             Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
             new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
-            getWrapper().waitFor(() -> areAllInSelection(),
+            WebDriverWrapper.waitFor(this::areAllInSelection,
                     "the expected cells did not become selected", 3000);
         }
     }
 
     /**
      * puts the specified cell into a selected state (appears as a dark-blue outline) with an active input present in it.
-     * @param cell
      */
     private void selectCell(WebElement cell)
     {
         if (!isCellSelected(cell))
         {
             cell.click();
-            getWrapper().waitFor(()->  isCellSelected(cell),
+            WebDriverWrapper.waitFor(()->  isCellSelected(cell),
                     "the target cell did not become selected", 4000);
         }
     }
 
     private void activateCell(WebElement cell)
     {
-        // If it is a selector and it already has focus (is active) it will not have a div.cellular-display
+        // If it is a selector, and it already has focus (is active), it will not have a div.cellular-display
         if(Locator.tagWithClass("div", "select-input__control--is-focused")
                 .findElements(cell).isEmpty())
         {
@@ -713,7 +708,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         WebElement warnDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, column));
         getWrapper().mouseOver(warnDiv);   // cause the tooltip to be present
-        if (getWrapper().waitFor(()-> null != warnDiv.getAttribute("aria-describedby"), 1000))
+        if (WebDriverWrapper.waitFor(()-> null != warnDiv.getAttribute("aria-describedby"), 1000))
         {
             String popoverId = warnDiv.getAttribute("aria-describedby");
             return Locator.id(popoverId).findElement(getDriver()).getText();
@@ -759,7 +754,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
+        public final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
         public WebElement inputCell()
         {
             return Locators.inputCell.findElement(getComponentElement());
@@ -772,9 +767,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     }
 
-    protected static abstract class Locators
+    protected abstract static class Locators
     {
-        static public Locator.XPathLocator editableGrid()
+        private Locators()
+        {
+            // Do nothing constructor to prevent instantiation.
+        }
+
+        public static Locator.XPathLocator editableGrid()
         {
             return Locator.byClass("table-cellular");
         }
