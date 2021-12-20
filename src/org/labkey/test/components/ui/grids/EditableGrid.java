@@ -5,17 +5,16 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.util.LabKeyExpectedConditions;
+import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -29,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
@@ -98,7 +98,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         for (int i=0; i< columnTexts.size(); i++ )
         {
             if (columnTexts.get(i).equalsIgnoreCase(columnHeader))
-                return i + 1; // Zero (0) based index in the list, one (1) based index with the controls collection.
+                return i + 1; // Zero (0) based index in the list, one (1) based index with the control collection.
         }
         return -1;
     }
@@ -162,7 +162,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
                 if (columnName.equals(SELECT_COLUMN_HEADER))
                 {
-                    // Special case the check box.
+                    // Special case the checkbox.
                     if (null == cell.findElement(By.tagName("input")).getAttribute("checked"))
                         mapData.put(columnName, "false");
                     else
@@ -268,7 +268,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             rowCount++;
         }
 
-        return new ArrayList<List<Integer>>(Arrays.asList(unPopulatedRows, populatedRows));
+        return new ArrayList<>(Arrays.asList(unPopulatedRows, populatedRows));
     }
 
     /**
@@ -286,7 +286,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * </p>
      *
      * @param columnNameToSearch The name of the column to check if a row should be updated or not.
-     * @param valueToSearch The value to check for in 'columnNameToSearch' to see if a should be updated.
+     * @param valueToSearch The value to check for in 'columnNameToSearch' to see if the row should be updated.
      * @param columnNameToSet The column to update in a row.
      * @param valueToSet The new value to put into column 'columnNameToSet'.
      */
@@ -328,42 +328,23 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         selectCell(gridCell);
 
         // Activate the cell.
-        var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(gridCell);
-        cellContent.sendKeys(Keys.ENTER);
+        activateCell(gridCell);
 
         if (value instanceof List)
         {
             // If this is a list assume that it will need a lookup.
-            List<String> values = (List)value;
+            List<String> values = (List) value;
 
-            WebElement lookupInputCell = elementCache().lookupInputCell();
+            ReactSelect lookupSelect = elementCache().lookupSelect();
+
+            waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
+            lookupSelect.open();
 
             for (String _value : values)
             {
-                lookupInputCell.sendKeys(_value);
-
-                // Wait for specified value to be the first option
-                final WebElement lookupItem = Locators.lookupMenu.append(Locators
-                        .lookupItem.position(1).withText(_value))
-                        .waitForElement(this, 5_000);
-
-                // was previously using elementCache().listGroupItem(_value).click() but the click would attempt to
-                // scroll the list item into view which would result in the menu being reattached to the input element,
-                // see changes in labkey-ui-components for issue 43051
-                lookupInputCell.sendKeys(Keys.DOWN, Keys.ENTER);
-
-                // Result varies by field type
-                final ExpectedCondition<WebElement> multiSelectCondition =
-                        LabKeyExpectedConditions.presenceOfNestedElementLocatedBy(this, Locators.itemElement(_value));
-                final ExpectedCondition<Boolean> singleSelectCondition =
-                        ExpectedConditions.and(ExpectedConditions.stalenessOf(lookupItem), wd -> getCellValue(gridCell).equalsIgnoreCase(_value));
-
-                getWrapper().shortWait().until(ExpectedConditions.or(
-                        singleSelectCondition, // pop-up closes for single-select
-                        multiSelectCondition // Selection appears for multi-select
-                ));
-
+                lookupSelect.typeOptionThenSelect(_value);
             }
+
         }
         else
         {
@@ -378,7 +359,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
             // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
-            // of the existing value so the new value should exist some where in the cell text value not necessarily
+            // of the existing value so the new value should exist somewhere in the cell text value not necessarily
             // at the end of it.
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
@@ -437,23 +418,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return cell.getText().trim();
     }
 
-    /**
-     * Get the displayed dropdown list for the given grid cell (td).
-     *
-     * @param gridCell The td element that contains the list.
-     * @return A list of the items in the list.
-     */
-    private List<String> getDropdownList(WebElement gridCell)
-    {
-        WebElement divLookup = Locators.lookupMenu.findWhenNeeded(gridCell);
-
-        // Wait for the dropdown list to show.
-        WebDriverWrapper.waitFor(()->divLookup.isDisplayed() && !divLookup.getText().toLowerCase().contains("Loading..."),
-                "The dropdown list for the cell did not appear in time.", 5_000);
-
-        List<WebElement> items = Locators.lookupItem.findElements(divLookup);
-        return getWrapper().getTexts(items);
-    }
 
     /**
      * Dismiss the dropdown list that is currently displayed on the grid.
@@ -462,14 +426,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid dismissDropdownList()
     {
-        var menu = Locators.lookupMenu.findOptionalElement(getComponentElement());
-
-        if (menu.isPresent())
-        {
-            Actions builder = new Actions(getDriver());
-            builder.sendKeys(elementCache().lookupInputCell(), Keys.ESCAPE).build().perform();
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(menu.get()));
-        }
+        elementCache().lookupSelect().close();
 
         return this;
     }
@@ -483,57 +440,49 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public List<String> getDropdownListForCell(int row, String columnName)
     {
-        WebElement td = getCell(row, columnName);
-
-        // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
-        WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
-
-        List<String> listText = new ArrayList<>();
-
-        if (div != null)
-        {
-            // Make the dropdown appear.
-            getWrapper().doubleClick(td);
-            listText = getDropdownList(td);
-        }
-
-        return listText;
+        return getFilteredDropdownListForCell(row, columnName, null);
     }
 
     /**
      * For the given row and column type some text into the cell to get the 'filtered' values displayed in the dropdown list.
-     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and it will return an empty list.
+     * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and an empty list will be returned.
      *
      * @param row A 0 based index containing the cell.
      * @param columnName The column of the cell.
-     * @param filterText The text to type into the cell.
+     * @param filterText The text to type into the cell. If the value is null it will not filter the list.
      * @return A list values shown in the dropdown list after the text has been entered.
      */
-    public List<String> getFilteredDropdownListForCell(int row, String columnName, String filterText)
+    public List<String> getFilteredDropdownListForCell(int row, String columnName, @Nullable String filterText)
     {
 
-        WebElement td = getCell(row, columnName);
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
 
-        // If the td does not contain a div with a class containing 'size-limited' then it is not a look-up.
-        WebElement div = Locator.findAnyElementOrNull(td, Locator.tagWithClassContaining("div", "size-limited"));
+        // If the td does not contain a 'menu-selector' then it is not a look-up.
+        WebElement div = Locator.findAnyElementOrNull(gridCell, Locator.tagWithClass("span", "cell-menu-selector"));
 
         List<String> listText = new ArrayList<>();
 
         if (div != null)
         {
-            // Get the input, will also make the dropdown show up.
-            getWrapper().doubleClick(td);
-            final WebElement lookupMenu = Locators.lookupMenu.waitForElement(td, 5_000);
-            final String initialText = lookupMenu.getText();
+            selectCell(gridCell);
+            waitFor(()->isCellSelected(gridCell), "Grid cell is not selected, cannot get dropdown list.", 500);
 
-            // Type the filter into the cell.
-            WebElement lookupInputCell = elementCache().lookupInputCell();
-            lookupInputCell.sendKeys(filterText);
+            // Double click to make the ReactSelect active. This may expand the list.
+            getWrapper().doubleClick(gridCell);
 
-            // Available options should change due to text entry. Elements don't go stale.
-            WebDriverWrapper.waitFor(() -> !initialText.equals(lookupMenu.getText()), 5_000);
+            ReactSelect lookupSelect = elementCache().lookupSelect();
 
-            listText = getDropdownList(td);
+            // If the double click did not expand the select this will.
+            // This will have no effect if the list is expended.
+            lookupSelect.open();
+
+            if (filterText != null && !filterText.trim().isEmpty())
+            {
+                lookupSelect.enterValueInTextbox(filterText);
+            }
+
+            listText = lookupSelect.getOptions();
         }
 
         return listText;
@@ -558,7 +507,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         // wait for the cell value to change or the rowcount to change, and the target cell to go into highlight,
         // ... or for a second and a half
-        getWrapper().waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
+        WebDriverWrapper.waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
                         isInSelection(gridCell), 1500);
         return this;
     }
@@ -591,8 +540,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param endRowIndex   Index of the bottom-right cell's row
      * @param endColumn     Column header of the bottom-right cell
      * @return  the text contained in the prescribed selection
-     * @throws IOException
-     * @throws UnsupportedFlavorException
      */
     public String copyCellRange(int startRowIndex, String startColumn, int endRowIndex, String endColumn) throws IOException, UnsupportedFlavorException
     {
@@ -605,19 +552,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * Selects all cells in the table, then copies their contents into delimited text
      * @return  delimited text content of the cells in the grid
-     * @throws IOException
-     * @throws UnsupportedFlavorException
      */
     public String copyAllCells() throws IOException, UnsupportedFlavorException
     {
         selectAllCells();
-        getWrapper().waitFor(()-> areAllInSelection(),
+        WebDriverWrapper.waitFor(this::areAllInSelection,
                 "expect all cells to be selected before copying grid values", 1500);
 
         String selection = copyCurrentSelection();
         if (selection.isEmpty())
         {
-            log("initial attempt to copy current selection came up empty.  re-trying after 3000 msec");
+            log("initial attempt to copy current selection came up empty.  re-trying after 3000 ms");
             new WebDriverWait(getDriver(), Duration.ofSeconds(3));
             return copyCurrentSelection();
         }
@@ -649,7 +594,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 .build()
                 .perform();
 
-        getWrapper().waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
+        WebDriverWrapper.waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
                 "Cell range did not become selected", 2000);
         return this;
     }
@@ -664,45 +609,67 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // use 'ctrl-a' to select the entire grid
             Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
             new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
-            getWrapper().waitFor(() -> areAllInSelection(),
+            WebDriverWrapper.waitFor(this::areAllInSelection,
                     "the expected cells did not become selected", 3000);
         }
     }
 
     /**
      * puts the specified cell into a selected state (appears as a dark-blue outline) with an active input present in it.
-     * @param cell
      */
     private void selectCell(WebElement cell)
     {
         if (!isCellSelected(cell))
         {
             cell.click();
-            getWrapper().waitFor(()->  isCellSelected(cell),
+            WebDriverWrapper.waitFor(()->  isCellSelected(cell),
                     "the target cell did not become selected", 4000);
         }
     }
 
+    private void activateCell(WebElement cell)
+    {
+        // If it is a selector, and it already has focus (is active), it will not have a div.cellular-display
+        if(Locator.tagWithClass("div", "select-input__control--is-focused")
+                .findElements(cell).isEmpty())
+        {
+            var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(cell);
+            cellContent.sendKeys(Keys.ENTER);
+        }
+    }
+
     /**
-     * tests the specified webElement to see if it is in 'cell-selected' state, which means it has an active/focused input in it
-     * @param cell
+     * Tests the specified webElement to see if it is in 'cell-selected' state, which means it has an active/focused input in it
+     * @param cell A WebElement that is the grid cell (a  td).
      * @return True if the edit is present
      */
     private boolean isCellSelected(WebElement cell)
     {
-        return Locator.tagWithClass("div", "cellular-display")
-                .findElement(cell)
-                .getAttribute("class").contains("cell-selected");
+        try
+        {
+            // If the cell is a reactSelect, and it is open/active, this will throw a NoSuchElementException because the
+            // div will not have the cell-selected in the class attribute.
+            return Locator.tagWithClass("div", "cellular-display")
+                    .findElement(cell)
+                    .getAttribute("class").contains("cell-selected");
+        }
+        catch(NoSuchElementException nse)
+        {
+            // If the cell is an open/active reactSelect the class attribute is different.
+            return Locator.tagWithClass("div", "select-input__control")
+                    .findElement(cell)
+                    .getAttribute("class").contains("select-input__control--is-focused");
+        }
     }
 
     /**
      *  tests the specified cell element to see if it is highlighted as a single-or-multi-cell selection area.  this appears as
      *  light-blue background, and is distinct from 'selected'
-     * @param cell
-     * @return
+     * @param cell WebElement (grid td) to check.
      */
     private boolean isInSelection(WebElement cell)  // 'in selection' shows as blue color, means it is part of one or many selected cells for copy/paste, etc
     {
+        // Should not need to add code for a reactSelect here. A selection involves clicking/dragging, which closes the reactSelect.
         return Locator.tagWithClass("div", "cellular-display")
                 .findElement(cell)
                 .getAttribute("class").contains("cell-selection");
@@ -741,7 +708,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         WebElement warnDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, column));
         getWrapper().mouseOver(warnDiv);   // cause the tooltip to be present
-        if (getWrapper().waitFor(()-> null != warnDiv.getAttribute("aria-describedby"), 1000))
+        if (WebDriverWrapper.waitFor(()-> null != warnDiv.getAttribute("aria-describedby"), 1000))
         {
             String popoverId = warnDiv.getAttribute("aria-describedby");
             return Locator.id(popoverId).findElement(getDriver()).getText();
@@ -787,22 +754,27 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
+        public final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
         public WebElement inputCell()
         {
             return Locators.inputCell.findElement(getComponentElement());
         }
 
-        public WebElement lookupInputCell()
+        public ReactSelect lookupSelect()
         {
-            return Locators.lookupInputCell.findElement(getComponentElement());
+            return ReactSelect.finder(getDriver()).find(getComponentElement());
         }
 
     }
 
-    protected static abstract class Locators
+    protected abstract static class Locators
     {
-        static public Locator.XPathLocator editableGrid()
+        private Locators()
+        {
+            // Do nothing constructor to prevent instantiation.
+        }
+
+        public static Locator.XPathLocator editableGrid()
         {
             return Locator.byClass("table-cellular");
         }
@@ -813,9 +785,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         static final Locator headerCells = Locator.xpath("//thead/tr/th");
         static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
-        static final Locator lookupInputCell = Locator.tagWithClass("input", "cell-lookup-input");
-        static final Locator.XPathLocator lookupMenu = Locator.tagWithClass("div", "cell-lookup-menu");
-        static final Locator.XPathLocator lookupItem = Locator.tagWithClass("a", "list-group-item");
 
         static Locator.XPathLocator itemElement(String text)
         {

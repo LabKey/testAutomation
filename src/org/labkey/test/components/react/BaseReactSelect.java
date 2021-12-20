@@ -37,7 +37,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
     {
-        // Component needs to be refinding because Select may go stale after loading initial selections
+        // Component needs to be a RefindingWebElement because Select may go stale after loading initial selections
         _componentElement = new RefindingWebElement(Locator.xpath("(.|./div)").withClass(SELECTOR_CLASS), selectOrParent);
         _driver = driver;
     }
@@ -176,7 +176,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         long start = System.currentTimeMillis();
         waitFor(this::isInteractive, "The select-box did not become interactive in time", 2_000);
         long elapsed = System.currentTimeMillis() - start;
-        TestLogger.debug("waited [" + elapsed + "] msec for select to become interactive");
+        TestLogger.debug("waited [" + elapsed + "] ms for select to become interactive");
 
         return getThis();
     }
@@ -298,17 +298,26 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     }
 
     /**
-     * Get the items that are in the drop down list. That is the items that may be selected.
+     * Get the items that are in the dropdown list. That is the items that may be selected.
      *
      * @return List of strings for the values in the list.
      */
     public List<String> getOptions()
     {
+
+        boolean alreadyOpened = isExpanded();
+
         // Can only get the list of items once the list has been opened.
-        open();
+        if (!alreadyOpened)
+            open();
+
         List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
         List<String> rawItems = getWrapper().getTexts(selectedItems);
-        close();
+
+        // If it wasn't open before close it, otherwise leave it in the open state.
+        if(!alreadyOpened)
+            close();
+
         return rawItems.stream().map(String::trim).collect(Collectors.toList());
     }
 
@@ -353,6 +362,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         return getThis();
     }
 
+    /**
+     * Enter the given value into the text box of the select control. Useful for filtering the options list.
+     *
+     * @param value Value to type in.
+     * @return Reference to the select control.
+     */
+    public T enterValueInTextbox(String value)
+    {
+        waitForLoaded();
+        waitForInteractive();
+        elementCache().input.sendKeys(value);
+        return getThis();
+    }
+
     @Override
     public WebElement getComponentElement()
     {
@@ -389,20 +412,25 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         }
     }
 
-    public static abstract class Locators
+    public abstract static class Locators
     {
-        final public static Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
-        public static Locator options = Locator.tagWithClass("div", "select-input__option");
-        public static Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
-        public static Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
-        public static Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
-        public static Locator selectMenu = Locator.tagWithClass("div", "select-input__menu-list");
-        public static Locator.XPathLocator multiValue = Locator.tagWithClass("div", "select-input__multi-value");
-        public static Locator.XPathLocator multiValueLabels = Locator.tagWithClass("div", "select-input__multi-value__label");
-        public static Locator.XPathLocator multiValueRemove = Locator.tagWithClass("div", "select-input__multi-value__remove");
-        public static Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
-        public static Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
-        final public static Locator listItems = Locator.tagWithClass("div", "select-input__option");
+        private Locators()
+        {
+            // Do nothing constructor to prevent instantiation.
+        }
+
+        public static final Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
+        public static final Locator options = Locator.tagWithClass("div", "select-input__option");
+        public static final Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
+        public static final Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
+        public static final Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
+        public static final Locator selectMenu = Locator.tagWithClass("div", "select-input__menu-list");
+        public static final Locator.XPathLocator multiValue = Locator.tagWithClass("div", "select-input__multi-value");
+        public static final Locator.XPathLocator multiValueLabels = Locator.tagWithClass("div", "select-input__multi-value__label");
+        public static final Locator.XPathLocator multiValueRemove = Locator.tagWithClass("div", "select-input__multi-value__remove");
+        public static final Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
+        public static final Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
+        public static final Locator listItems = Locator.tagWithClass("div", "select-input__option");
 
         public static Locator.XPathLocator selectContainer()
         {
@@ -445,7 +473,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         }
     }
 
-    public static abstract class BaseReactSelectFinder<Select extends BaseReactSelect<Select>> extends WebDriverComponent.WebDriverComponentFinder<Select, BaseReactSelectFinder<Select>>
+    public abstract static class BaseReactSelectFinder<Select extends BaseReactSelect<Select>> extends WebDriverComponent.WebDriverComponentFinder<Select, BaseReactSelectFinder<Select>>
     {
         private Locator.XPathLocator _locator;
         private boolean _mustBeEnabled = false;

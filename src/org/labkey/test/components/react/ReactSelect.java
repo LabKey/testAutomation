@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ReactSelect extends BaseReactSelect<ReactSelect>
 {
@@ -30,7 +31,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         super(element, driver);
     }
 
-    static public ReactSelectFinder finder(WebDriver driver)
+    public static ReactSelectFinder finder(WebDriver driver)
     {
         return new ReactSelectFinder(driver);
     }
@@ -56,6 +57,20 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         waitForClosed();
     }
 
+    public void typeOptionThenSelect(String option)
+    {
+        waitForLoaded();
+        scrollIntoView();
+        open();
+        enterValueInTextbox(option);
+        waitForLoaded();
+
+        waitFor(()->getOptions().contains(option), String.format("Option '%s' is not in the list of options.", option), 1_000);
+
+        clickOption(option);
+        waitForClosed();
+    }
+
     protected void clickOption(String option)
     {
         WebElement optionEl = null;
@@ -75,6 +90,16 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
                 {
                     close();
                     open();
+
+                    // Since this is a retry method try to improve the odds of finding the item in the list by entering
+                    // it into the textbox, which should filter the list. Also, closing and opening the dropdown will
+                    // clear any value that may have been entered in the text box, this should protect against that as well.
+                    enterValueInTextbox(option);
+
+                    // Don't know if this is will work as expected. It may take a moment for the list to populate
+                    // after typing in a value.
+                    waitFor(()->!getOptions().contains("Loading..."), 1_000);
+
                 }
                 else
                 {
