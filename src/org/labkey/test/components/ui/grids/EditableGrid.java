@@ -458,34 +458,24 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
 
-        // If the td does not contain a 'menu-selector' then it is not a look-up.
-        WebElement div = Locator.findAnyElementOrNull(gridCell, Locator.tagWithClass("span", "cell-menu-selector"));
+        selectCell(gridCell);
+        waitFor(()->isCellSelected(gridCell), "Grid cell is not selected, cannot get dropdown list.", 500);
 
-        List<String> listText = new ArrayList<>();
+        // Double click to make the ReactSelect active. This may expand the list.
+        getWrapper().doubleClick(gridCell);
 
-        if (div != null)
+        ReactSelect lookupSelect = elementCache().lookupSelect();
+
+        // If the double click did not expand the select this will.
+        // This will have no effect if the list is expended.
+        lookupSelect.open();
+
+        if (filterText != null && !filterText.trim().isEmpty())
         {
-            selectCell(gridCell);
-            waitFor(()->isCellSelected(gridCell), "Grid cell is not selected, cannot get dropdown list.", 500);
-
-            // Double click to make the ReactSelect active. This may expand the list.
-            getWrapper().doubleClick(gridCell);
-
-            ReactSelect lookupSelect = elementCache().lookupSelect();
-
-            // If the double click did not expand the select this will.
-            // This will have no effect if the list is expended.
-            lookupSelect.open();
-
-            if (filterText != null && !filterText.trim().isEmpty())
-            {
-                lookupSelect.enterValueInTextbox(filterText);
-            }
-
-            listText = lookupSelect.getOptions();
+            lookupSelect.enterValueInTextbox(filterText);
         }
 
-        return listText;
+        return lookupSelect.getOptions();
     }
 
     /**
