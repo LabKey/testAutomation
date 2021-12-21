@@ -918,7 +918,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         waitFor(() -> getDriver().getWindowHandles().size() > index, WAIT_FOR_JAVASCRIPT);
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window(windows.get(index));
+        try
+        {
+            getDriver().switchTo().window(windows.get(index));
+        }
+        catch (StackOverflowError soe)
+        {
+            // Try to get info for troubleshooting WebDriver issue
+            // https://github.com/SeleniumHQ/selenium/issues/6081
+            throw new RuntimeException("Internal WebDriver error attempting to switch to window '" +
+                    windows.get(index) + "'. Available windows: " + windows, soe);
+        }
     }
 
     protected void closeExtraWindows()
