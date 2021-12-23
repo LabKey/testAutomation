@@ -101,6 +101,14 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         Locator infoPanel = Locator.tagWithClass("div", "panel-info");
         int infoCount = infoPanel.findElements(getDriver()).size();
 
+        if(infoCount > 1)
+        {
+            getWrapper().log("Whoa, there appears to be more than one panel in edit mode. That is odd.");
+        }
+
+        // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
+        getWrapper().scrollIntoView(button);
+
         button.click();
 
         WebDriverWrapper.waitFor(()->
