@@ -21,7 +21,7 @@ public class DeferredErrorCollector
     private int errorMark = 0;
 
     private final ArtifactCollector artifactCollector;
-    private final List<String> allErrorMessages = new ArrayList<>();
+    private final List<DeferredError> allErrors = new ArrayList<>();
     private final List<Class<? extends Throwable>> errorTypes = new ArrayList<>();
 
     private FatalErrorCollector _fatalErrorCollector;
@@ -115,7 +115,7 @@ public class DeferredErrorCollector
      */
     public boolean hasErrorBeenRecorded()
     {
-        return !allErrorMessages.isEmpty();
+        return !allErrors.isEmpty();
     }
 
     /**
@@ -125,7 +125,7 @@ public class DeferredErrorCollector
      */
     public int getErrorCount()
     {
-        return allErrorMessages.size();
+        return allErrors.size();
     }
 
     /**
@@ -156,7 +156,10 @@ public class DeferredErrorCollector
     public void screenShotIfNewError(@NotNull String screenshotName)
     {
         if (errorsSinceMark() > 0)
-            takeScreenShot(screenshotName);
+        {
+            final String s = takeScreenShot(screenshotName);
+            allErrors.get(allErrors.size() - 1).setScreenshotName(s);
+        }
         setErrorMark();
     }
 
@@ -307,56 +310,17 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Record an arbitrary Throwable.
-     *
-     * @param error Throwable to record.
-     */
-    public final void recordError(Throwable error)
-    {
-        recordError(error.getMessage(), error);
-    }
-
-    /**
      * Record an error, take a screen shot if requested, and records the call stack.
      * Allows subclasses to customize the error message.
      *
-     * @param errorMessage Message for error
      * @param error Throwable to record
      */
-    protected void recordError(String errorMessage, Throwable error)
+    protected void recordError(Throwable error)
     {
-        StringBuilder messageForFailure = new StringBuilder();
+        final DeferredError deferredError = new DeferredError(error);
+        allErrors.add(deferredError);
 
-        StackTraceElement[] cause = error.getStackTrace();
-
-        // Don't repeat everything in the list of all error messages, only some parts of this detailed error.
-        messageForFailure.append(errorMessage);
-
-        StringBuilder shallowCallStack = new StringBuilder();
-        int shallowStackDepth = 0;
-
-        shallowCallStack.append("\n");
-
-        // Filter out library methods from stack trace
-        for(StackTraceElement ste : cause)
-        {
-            if(ste.getClassName().toLowerCase().contains("org.labkey.test") && 
-                    !ste.getClassName().startsWith(this.getClass().getName()) &&
-                    shallowStackDepth < 6)
-            {
-                shallowCallStack.append("\t");
-                shallowCallStack.append(ste);
-                shallowCallStack.append("\n");
-                shallowStackDepth++;
-            }
-        }
-        
-        // Record the call stack.
-        messageForFailure.append(shallowCallStack);
-
-        allErrorMessages.add(messageForFailure.toString());
-
-        TestLogger.error("\n*******************************\n" + errorMessage + "\n*******************************\n", error);
+        TestLogger.error("\n*******************************\n" + error.getMessage() + "\n*******************************\n", error);
     }
 
     /**
@@ -373,9 +337,9 @@ public class DeferredErrorCollector
      */
     public void reportResults()
     {
-        if(hasErrorBeenRecorded())
+        if (hasErrorBeenRecorded())
         {
-            Assert.fail(getFailureMessage());
+            throw new DeferredAssertionError(getFailureMessage(), screenShotCount > 0);
         }
     }
 
@@ -388,26 +352,26 @@ public class DeferredErrorCollector
     {
         final String separator = "\n" + StringUtils.repeat("=", 42) + "\n";
         StringBuilder failureMessage = new StringBuilder();
-        if (allErrorMessages.size() > 1)
+        if (allErrors.size() > 1)
         {
             failureMessage
                     .append("Detected ")
-                    .append(allErrorMessages.size())
+                    .append(allErrors.size())
                     .append(" errors during test.")
                     .append(separator);
         }
-        for (int i = 0; i < allErrorMessages.size(); i++)
+        for (int i = 0; i < allErrors.size(); i++)
         {
-            if (allErrorMessages.size() > 1)
+            if (allErrors.size() > 1)
             {
                 failureMessage
                         .append("[")
                         .append(i + 1)
                         .append("/")
-                        .append(allErrorMessages.size())
+                        .append(allErrors.size())
                         .append("] ");
             }
-            failureMessage.append(allErrorMessages.get(i).trim());
+            failureMessage.append(allErrors.get(i).getErrorMessage().trim());
             failureMessage.append(separator);
         }
         return failureMessage.toString();
@@ -510,9 +474,9 @@ abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     }
 
     @Override
-    protected void recordError(String errorMessage, Throwable cause)
+    protected void recordError(Throwable cause)
     {
-        wrappedCollector.recordError(errorMessage, cause);
+        wrappedCollector.recordError(cause);
     }
 
     @Override
@@ -530,6 +494,33 @@ class FatalErrorCollector extends DeferredErrorCollectorWrapper
     protected FatalErrorCollector(DeferredErrorCollector collector)
     {
         super(collector);
+    }
+
+    /**
+     * Fatal errors will take screenshots automatically
+     */
+    @Override
+    public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
+    {
+        return this;
+    }
+
+    @Override
+    protected void recordError(Throwable cause)
+    {
+        if (cause instanceof Error e)
+        {
+            throw e;
+        }
+        else if (cause instanceof RuntimeException e)
+        {
+            throw e;
+        }
+        else
+        {
+            // Shouldn't be reachable. Adding for completeness.
+            throw new RuntimeException(cause);
+        }
     }
 
     @Override
@@ -553,10 +544,74 @@ class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
     }
 
     @Override
-    protected void recordError(String errorMessage, Throwable error)
+    protected void recordError(Throwable error)
     {
-        String shotName = super.takeScreenShot(_screenshotName);
-        errorMessage = errorMessage + "\nScreen shot name: " + shotName + "\n";
-        super.recordError(errorMessage, error);
+        super.recordError(error);
+        super.screenShotIfNewError(_screenshotName);
+    }
+}
+
+class DeferredError
+{
+    private final Throwable error;
+    private String screenshotName = null;
+
+    public DeferredError(Throwable error)
+    {
+        this.error = error;
+    }
+
+    public String getErrorMessage()
+    {
+        StringBuilder messageForFailure = new StringBuilder();
+
+        StackTraceElement[] cause = error.getStackTrace();
+
+        // Don't repeat everything in the list of all error messages, only some parts of this detailed error.
+        messageForFailure.append(error.getMessage());
+
+        // Add screenshot info if present
+        if (screenshotName != null)
+        {
+            messageForFailure
+                    .append("\nScreen shot name: ")
+                    .append(screenshotName)
+                    .append("\n");
+        }
+
+        StringBuilder shallowCallStack = new StringBuilder();
+        int shallowStackDepth = 0;
+
+        shallowCallStack.append("\n");
+
+        // Filter out library methods from stack trace
+        for(StackTraceElement ste : cause)
+        {
+            if(ste.getClassName().toLowerCase().contains("org.labkey.test") &&
+                    !ste.getClassName().startsWith(this.getClass().getName()) &&
+                    shallowStackDepth < 6)
+            {
+                shallowCallStack.append("\t");
+                shallowCallStack.append(ste);
+                shallowCallStack.append("\n");
+                shallowStackDepth++;
+            }
+        }
+
+        // Record the call stack.
+        messageForFailure.append(shallowCallStack);
+
+        return messageForFailure.toString();
+    }
+
+    public String getScreenshotName()
+    {
+        return screenshotName;
+    }
+
+    public DeferredError setScreenshotName(String screenshotName)
+    {
+        this.screenshotName = screenshotName;
+        return this;
     }
 }
