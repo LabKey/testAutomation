@@ -21,8 +21,6 @@
 <%@ page import="org.labkey.api.data.DataRegion" %>
 <%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.util.MailHelper" %>
-<%@ page import="org.labkey.api.util.PageFlowUtil" %>
-<%@ page import="org.labkey.api.util.UniqueID" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.template.ClientDependencies" %>
@@ -31,10 +29,10 @@
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="javax.mail.MessagingException" %>
 <%@ page import="javax.mail.internet.MimeMessage" %>
-<%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
-<%@ page import="static org.labkey.api.util.DOM.*" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
+<%@ page import="static org.labkey.api.util.DOM.*" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%!
@@ -55,7 +53,7 @@
     DataRegion emailRegion = new DataRegion();
     emailRegion.setName("EmailRecord");
 
-    String renderId = "emailRecordEmpty-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
+    String renderId = "emailRecordEmpty-" + getRequestScopedUID();
 
     %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
 
