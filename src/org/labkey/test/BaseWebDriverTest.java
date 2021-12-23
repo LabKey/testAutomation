@@ -270,8 +270,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         SingletonWebDriver.getInstance().setUp(this);
 
-        getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
-        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
+        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
+        getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
         try
         {
             getDriver().manage().window().setSize(new Dimension(1280, 1024));
@@ -956,7 +956,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     }
                 }
                 // Don't take screenshots if error was deferred and any screenshots were taken
-                if (!(error instanceof DeferredAssertionError dae && dae.isTookScreenshots()))
+                if (!(error instanceof DeferredErrorCollector.DeferredAssertionError))
                 {
                     getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
                 }

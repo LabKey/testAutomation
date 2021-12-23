@@ -315,21 +315,12 @@ public class DeferredErrorCollector
      *
      * @param error Throwable to record
      */
-    protected void recordError(Throwable error)
+    public void recordError(Throwable error)
     {
         final DeferredError deferredError = new DeferredError(error);
         allErrors.add(deferredError);
 
         TestLogger.error("\n*******************************\n" + error.getMessage() + "\n*******************************\n", error);
-    }
-
-    /**
-     * Use {@link #reportResults()}
-     */
-    @Deprecated (since = "21.9")
-    public void recordResults()
-    {
-        reportResults();
     }
 
     /**
@@ -339,7 +330,11 @@ public class DeferredErrorCollector
     {
         if (hasErrorBeenRecorded())
         {
-            throw new DeferredAssertionError(getFailureMessage(), screenShotCount > 0);
+            if (screenShotCount == 0)
+            {
+                withScreenshot("fallback").error("No screeshots taken for deferred errors. This screenshot may be relevant to the final failure.");
+            }
+            throw new DeferredAssertionError(getFailureMessage());
         }
     }
 
@@ -391,6 +386,14 @@ public class DeferredErrorCollector
         artifactCollector.dumpPageSnapshot(snapShotNumberedName, null);
 
         return snapShotNumberedName;
+    }
+
+    public static class DeferredAssertionError extends AssertionError
+    {
+        private DeferredAssertionError(Object detailMessage)
+        {
+            super(detailMessage);
+        }
     }
 }
 
@@ -474,7 +477,7 @@ abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     }
 
     @Override
-    protected void recordError(Throwable cause)
+    public void recordError(Throwable cause)
     {
         wrappedCollector.recordError(cause);
     }
@@ -506,7 +509,7 @@ class FatalErrorCollector extends DeferredErrorCollectorWrapper
     }
 
     @Override
-    protected void recordError(Throwable cause)
+    public void recordError(Throwable cause)
     {
         if (cause instanceof Error e)
         {
@@ -518,8 +521,8 @@ class FatalErrorCollector extends DeferredErrorCollectorWrapper
         }
         else
         {
-            // Shouldn't be reachable. Adding for completeness.
-            throw new RuntimeException(cause);
+            // Only reachable if called from outside DeferredErrorCollector.
+            throw new AssertionError(cause);
         }
     }
 
@@ -544,7 +547,7 @@ class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
     }
 
     @Override
-    protected void recordError(Throwable error)
+    public void recordError(Throwable error)
     {
         super.recordError(error);
         super.screenShotIfNewError(_screenshotName);
