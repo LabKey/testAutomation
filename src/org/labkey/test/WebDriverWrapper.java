@@ -84,8 +84,10 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
+import org.openqa.selenium.firefox.FirefoxDriverService;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -362,9 +364,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                     capabilities.setCapability(FirefoxDriver.BINARY, binary);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
+
+                    newDriverService = GeckoDriverService.createDefaultService();
                     try
                     {
-                        newWebDriver = new FirefoxDriver(firefoxOptions);
+                        newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
                     }
                     catch (WebDriverException retry)
                     {
@@ -372,10 +376,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         {
                             retry.printStackTrace(System.err);
                             sleep(10000);
-                            newWebDriver = new FirefoxDriver(firefoxOptions);
+                            newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
                         }
                         catch (WebDriverException rethrow)
                         {
+                            if (newDriverService.isRunning())
+                            {
+                                newDriverService.stop();
+                            }
                             throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. " +
                                     "Ensure that you are using compatible versions of Firefox and geckodriver. " +
                                     "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html", rethrow);
