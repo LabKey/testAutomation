@@ -292,7 +292,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public final DeferredErrorCollector checker()
     {
-        return _errorCollector;
+        return TestProperties.isCheckerFatal() ? _errorCollector.fatal() : _errorCollector;
     }
 
     /**
@@ -953,7 +953,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         TestLogger.warn("Alert was triggered by iframe: " + alert.getAlertText());
                     }
                 }
-                getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                // Don't take screenshots if error was deferred and any screenshots were taken
+                if (!(error instanceof DeferredErrorCollector.DeferredAssertionError))
+                {
+                    getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                }
                 String failureWindow = getDriver().getWindowHandle();
                 Set<String> otherWindowHandles = getDriver().getWindowHandles().stream()
                         .filter(handle -> !handle.equals(failureWindow)).collect(Collectors.toSet());
