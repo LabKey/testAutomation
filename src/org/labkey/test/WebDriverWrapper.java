@@ -64,6 +64,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -2803,7 +2804,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             scrollTo(0, 0);
             WebElement root = Locators.documentRoot.findElement(getDriver());
-            new Actions(getDriver()).moveToElement(root, 0, 0).perform();
+            final Dimension rootSize = root.getSize();
+            new Actions(getDriver()).moveToElement(root, - (rootSize.getWidth() / 2), - (rootSize.getHeight() / 2)).perform();
         }
         catch (WebDriverException ignore) { }
     }
