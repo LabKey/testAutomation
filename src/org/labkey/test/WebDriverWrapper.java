@@ -117,7 +117,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -362,7 +361,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
                         binary.addCommandLineOptions("--headless");
                     }
-                    capabilities.setCapability(FirefoxDriver.BINARY, binary);
+                    capabilities.setCapability(FirefoxDriver.Capability.BINARY, binary);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
 
                     newDriverService = GeckoDriverService.createDefaultService();
@@ -400,7 +399,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
-            String browserVersion = caps.getVersion();
+            String browserVersion = caps.getBrowserVersion();
             log("Browser: " + browserName + " " + browserVersion);
             return new ImmutablePair<>(newWebDriver, newDriverService);
         }
@@ -759,6 +758,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         new SiteNavBar(getDriver()).clickUserMenuItem(wait, items);
     }
 
+    /**
+     * @deprecated Use {@link BootstrapMenu}
+     */
+    @Deprecated(since = "22.1")
     @LogMethod(quiet = true)
     public WebElement clickMenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
@@ -1103,7 +1106,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     executeScript("document.location = arguments[0]", fullURL);
                     //noinspection ResultOfMethodCallIgnored
                     WebDriverWrapper.waitFor(() -> {
-                        Boolean stale;
+                        boolean stale;
                         try
                         {
                             stale = stalenessOf.apply(null);
@@ -1521,17 +1524,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         final MutableBoolean present = new MutableBoolean(true);
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
-        {
-            @Override
-            public boolean handle(String htmlSource, String text)
-            {
-                // Not found... stop enumerating and return false
-                if (htmlSource == null || !htmlSource.contains(text))
-                    present.setFalse();
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            // Not found... stop enumerating and return false
+            if (htmlSource == null || !htmlSource.contains(text))
+                present.setFalse();
 
-                return present.getValue();
-            }
+            return present.getValue();
         };
         TextSearcher searcher = new TextSearcher(this);
         searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
@@ -1555,7 +1553,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         List<String> orderedTexts = new ArrayList<>();
         foundTexts.stream()
-                .sorted(Comparator.comparing(Pair::getValue))
+                .sorted(Map.Entry.comparingByValue())
                 .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
 
         return orderedTexts;
@@ -1625,15 +1623,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         final MutableBoolean found = new MutableBoolean(false);
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler(){
-            @Override
-            public boolean handle(String htmlSource, String text)
-            {
-                if (htmlSource.contains(text))
-                    found.setTrue();
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            if (htmlSource.contains(text))
+                found.setTrue();
 
-                return !found.getValue(); // stop searching if any value is found
-            }
+            return !found.getValue(); // stop searching if any value is found
         };
         TextSearcher searcher = new TextSearcher(this);
         searcher.searchForTexts(handler, Arrays.asList(texts));
@@ -1755,19 +1749,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         final List<Integer> foundIndices = new ArrayList<>();
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
-        {
-            @Override
-            public boolean handle (String source, String text)
+        TextSearcher.TextHandler handler = (source, text1) -> {
+            int current_index = 0;
+            while ((source.indexOf(text1, current_index + 1)) != -1)
             {
-                int current_index = 0;
-                while ((source.indexOf(text, current_index + 1)) != -1)
-                {
-                    current_index = source.indexOf(text, current_index +1);
-                    foundIndices.add(current_index);
-                }
-                return true;
+                current_index = source.indexOf(text1, current_index +1);
+                foundIndices.add(current_index);
             }
+            return true;
         };
 
         searcher.searchForTexts(handler, Arrays.asList(text));
@@ -1780,25 +1769,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         final int RANGE = 20;
         List<String> errors = new ArrayList<>();
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
-        {
-            @Override
-            public boolean handle(String htmlSource, String text)
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            int position = htmlSource.indexOf(text);
+
+            if (position > -1)
             {
-                int position = htmlSource.indexOf(text);
+                int prefixStart = Math.max(0, position - RANGE);
+                int suffixEnd = Math.min(htmlSource.length() - 1, position + text.length() + RANGE);
+                String prefix = htmlSource.substring(prefixStart, position);
+                String suffix = htmlSource.substring(position + text.length(), suffixEnd);
 
-                if (position > -1)
-                {
-                    int prefixStart = Math.max(0, position - RANGE);
-                    int suffixEnd = Math.min(htmlSource.length() - 1, position + text.length() + RANGE);
-                    String prefix = htmlSource.substring(prefixStart, position);
-                    String suffix = htmlSource.substring(position + text.length(), suffixEnd);
-
-                    errors.add("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
-                }
-
-                return true;
+                errors.add("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
             }
+
+            return true;
         };
 
         searcher.searchForTexts(handler, Arrays.asList(texts));
@@ -1980,7 +1964,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if (null != listener)
                     listener.beforePageLoad();
             });
-            getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
+            getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(msWait));
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
         }
 
@@ -1989,7 +1973,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0 && shouldWait)
         {
             waitForPageToLoad(toBeStale, msWait);
-            getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+            getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
                     listener.afterPageLoad();
