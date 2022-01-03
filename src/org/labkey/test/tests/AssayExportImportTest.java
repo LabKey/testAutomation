@@ -230,6 +230,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         clickAndWait(Locator.lkButton("Save and Finish"));
 
+        // make sure we end up on the assay runs grid with the expected number of runs
+        assertTitleContains(assayName + " Runs");
+        DataRegionTable runs = new DataRegionTable("Runs", this.getDriver());
+        Assert.assertEquals("Unexpected number of assay runs", runFiles.size(), runs.getDataRowCount());
     }
 
     private void setFieldValues(String projectName, String assayName, String runId, Map<Integer, Map<String, String>> fieldValues)
