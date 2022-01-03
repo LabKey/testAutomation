@@ -81,10 +81,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -287,7 +285,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             clickAndWait(Locator.input("TestSecondary"));
 
             // delete the current secondaryAuth configuration
-            deleteAuthenticationConfiguration(configId, createDefaultConnection());
+            deleteAuthenticationConfiguration(configId);
         }
         catch (NoSuchElementException ignored)
         {
@@ -543,7 +541,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 {
                     log("Response: " + httpResponse.getResponseCode());
                 }
-                getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
+                getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
                 getDriver().get(startPage);
 
                 try
@@ -1006,7 +1004,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         // Navigate to pipeline details page, then refresh page and check for system maintenance complete, up to 10 minutes from the start of the test
         beginAt(smUrl);
         int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
-        waitForTextWithRefresh(timeLeft > 0 ? timeLeft : 0, "System maintenance complete");
+        waitForTextWithRefresh(Math.max(timeLeft, 0), "System maintenance complete");
     }
 
     public void goToProjectHome(String projectName)
@@ -1079,7 +1077,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // When setting a feature flag the first time, remember the previous setting
             if (!_originalFeatureFlags.containsKey(feature))
             {
-                _originalFeatureFlags.put(feature, previouslyEnabled.booleanValue());
+                _originalFeatureFlags.put(feature, previouslyEnabled);
             }
         }
         TestLogger.decreaseIndent();
@@ -1122,7 +1120,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean isMiniProfilerEnabled()
     {
         Connection cn = createDefaultConnection();
-        Command command = new Command("mini-profiler", "isEnabled");
+        Command<?> command = new Command<>("mini-profiler", "isEnabled");
         try
         {
             CommandResponse r = command.execute(cn, null);
@@ -1149,7 +1147,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void setMiniProfilerEnabled(boolean enabled)
     {
         Connection cn = createDefaultConnection();
-        PostCommand setEnabled = new PostCommand("mini-profiler", "enable");
+        PostCommand<?> setEnabled = new PostCommand<>("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
         setEnabled.setJsonObject(jsonObject);
@@ -1189,7 +1187,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     @LogMethod(quiet = true)
-    public void deleteAuthenticationConfiguration(@LoggedParam String id, Connection cn)
+    public void deleteAuthenticationConfiguration(@LoggedParam String id)
     {
         String url = WebTestHelper.buildURL("login", "deleteConfiguration", Maps.of("configuration", id));
         SimpleHttpRequest deleteRequest = new SimpleHttpRequest(url, "POST");
@@ -1209,7 +1207,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void setAuthenticationProvider(@LoggedParam String provider, @LoggedParam boolean enabled, Connection cn)
     {
-        Command command = new PostCommand("login", "setProviderEnabled");
+        Command<?> command = new PostCommand<>("login", "setProviderEnabled");
         command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
         try
         {
@@ -1438,7 +1436,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         List<String> finishedStates = new ArrayList<>(Arrays.asList("COMPLETE", "ERROR", "CANCELLED"));
         if (statusValues.contains("ERROR"))
             finishedStates.add("SPLIT WAITING"); // Split jobs never "finish" if subjobs have errors
-        return statusValues.stream().filter(finishedStates::contains).collect(Collectors.toList()).size();
+        return (int) statusValues.stream().filter(finishedStates::contains).count();
     }
 
     public void waitForPipelineJobsToComplete(final int finishedJobsExpected, final boolean expectError)

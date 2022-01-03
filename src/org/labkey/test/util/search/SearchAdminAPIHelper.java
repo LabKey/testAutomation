@@ -156,7 +156,6 @@ public abstract class SearchAdminAPIHelper
     {
         Default,
         MMapDirectory,
-        NIOFSDirectory,
-        SimpleFSDirectory
+        NIOFSDirectory
     }
 }
