@@ -187,6 +187,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText(assayName));
             waitForElement(Locator.lkButton("Import Data"));
+            checker().takeScreenShot("assay_grid_import");
             clickAndWait(Locator.lkButton("Import Data"));
         }
 
@@ -211,6 +212,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
                 setFormElement(Locator.tagWithAttribute("input", "type", "file"), runFiles.get(fileIndex++));
 
+                checker().takeScreenShot("before_assay_save_file");
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {
                     clickAndWait(Locator.lkButton("Save and Import Another Run"));
@@ -220,7 +222,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             }
             else
             {
-                checker().takeScreenShot("before_assay_save");
+                checker().takeScreenShot("before_assay_save_pipeline");
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {
                     clickAndWait(Locator.lkButton("Save and Import Another Run"));
