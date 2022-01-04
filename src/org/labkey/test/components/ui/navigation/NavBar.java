@@ -50,11 +50,19 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         return null;
     }
 
-    public FindByIdsDialog findByIds()
+    public FindByIdsDialog findBySampleIds()
     {
         elementCache().findAndSearchMenuButton.click();
-        waitFor(()->elementCache().findSamplesOption.isDisplayed(), "Find samples menu did not show up.", 500);
-        elementCache().findSamplesOption.click();
+        waitFor(()->elementCache().findSamplesByIdsOption.isDisplayed(), "Find samples by ID menu option did not show up.", 500);
+        elementCache().findSamplesByIdsOption.click();
+        return new FindByIdsDialog(getDriver());
+    }
+
+    public FindByIdsDialog findByBarcodes()
+    {
+        elementCache().findAndSearchMenuButton.click();
+        waitFor(()->elementCache().findSamplesByBarcodesOption.isDisplayed(), "Find samples by Barcode menu option did not show up.", 500);
+        elementCache().findSamplesByBarcodesOption.click();
         return new FindByIdsDialog(getDriver());
     }
 
@@ -108,5 +116,7 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         public WebElement searchForm = Locator.tagWithClass("form", "navbar__search-form").findWhenNeeded(this);
         public WebElement findAndSearchMenuButton = Locator.tagWithId("button", "find-and-search-menu").findWhenNeeded(searchForm);
         public WebElement findSamplesOption = Locator.linkContainingText("Find Samples").findWhenNeeded(searchForm);
+        public WebElement findSamplesByIdsOption = Locator.linkContainingText("Find Samples by ID").findWhenNeeded(searchForm);
+        public WebElement findSamplesByBarcodesOption = Locator.linkContainingText("Find Samples by Barcode").findWhenNeeded(searchForm);
     }
 }
