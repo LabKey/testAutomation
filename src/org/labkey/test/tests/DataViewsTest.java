@@ -33,7 +33,6 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
@@ -548,8 +547,8 @@ public class DataViewsTest extends ParticipantListTest
         // specify a custom height
         WebElement heightInput = Locator.name("height").withoutAttribute("disabled").waitForElement(getDriver(), 1000);
         setFormElement(heightInput, String.valueOf(NEW_CUSTOM_HEIGHT));
-        heightInput.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_UP);
-        fireEvent(heightInput, SeleniumEvent.blur);
+        Locator.byClass("x4-form-spinner-down").findElement(getDriver()).click();
+        Locator.byClass("x4-form-spinner-up").findElement(getDriver()).click();
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
 
