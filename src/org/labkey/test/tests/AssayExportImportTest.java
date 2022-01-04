@@ -179,6 +179,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
             runFiles.forEach(file -> _fileBrowserHelper.selectFileBrowserItem(file.getName()));
 
+            checker().takeScreenShot("file_webpart_selection");
             _fileBrowserHelper.selectImportDataAction(assayName);
 
         }
@@ -219,6 +220,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             }
             else
             {
+                checker().takeScreenShot("before_assay_save");
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {
                     clickAndWait(Locator.lkButton("Save and Import Another Run"));
@@ -227,7 +229,6 @@ public class AssayExportImportTest extends BaseWebDriverTest
             }
         }
 
-        checker().takeScreenShot("before_assay_finish");
         clickAndWait(Locator.lkButton("Save and Finish"));
 
         // make sure we end up on the assay runs grid with the expected number of runs
