@@ -227,10 +227,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
             }
         }
 
+        checker().takeScreenShot("before_assay_finish");
         clickAndWait(Locator.lkButton("Save and Finish"));
 
         // make sure we end up on the assay runs grid with the expected number of runs
-        scrollBy(0, 100); // testing screenshot info below view frame
         assertTitleContains(assayName + " Runs");
         DataRegionTable runs = new DataRegionTable("Runs", this.getDriver());
         Assert.assertEquals("Unexpected number of assay runs", runFiles.size(), runs.getDataRowCount());
