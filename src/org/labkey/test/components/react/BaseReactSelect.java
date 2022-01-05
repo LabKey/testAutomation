@@ -111,7 +111,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     protected T waitForLoaded()
     {
-        waitFor(() -> !isLoading(),
+        waitFor(() -> getComponentElement().isDisplayed() && !isLoading(),
                 "Took too long for to become loaded", WAIT_FOR_JAVASCRIPT);
         return getThis();
     }
@@ -477,7 +477,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     {
         private Locator.XPathLocator _locator;
         private boolean _mustBeEnabled = false;
-        private boolean _findParent = true;
 
         // Issue 40267: Calling findAll for the react select test component needs to be refined.
         protected BaseReactSelectFinder(WebDriver driver)
@@ -574,8 +573,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             Locator.XPathLocator tmpLoc = _locator;
             if (_mustBeEnabled)
                 tmpLoc = _locator.withoutClass("is-disabled");
-            if (_findParent)
-                tmpLoc.parent();
             return tmpLoc;
         }
     }
