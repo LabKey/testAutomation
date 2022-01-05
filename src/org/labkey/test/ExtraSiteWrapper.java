@@ -15,30 +15,36 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.service.DriverService;
 
 import java.io.File;
 
 public class ExtraSiteWrapper extends LabKeySiteWrapper implements AutoCloseable
 {
-    private WebDriver extraDriver;
+    private final Pair<WebDriver, DriverService> extraDriver;
 
     public ExtraSiteWrapper(BrowserType browserType, File downloadDir)
     {
         super();
-        this.extraDriver = createNewWebDriver(browserType, downloadDir).getKey();
+        this.extraDriver = createNewWebDriver(browserType, downloadDir);
     }
 
     @Override
     public void close()
     {
         getDriver().quit();
+        if (extraDriver.getRight() != null)
+        {
+            extraDriver.getRight().stop();
+        }
     }
 
     @Override
     public WebDriver getWrappedDriver()
     {
-        return extraDriver;
+        return extraDriver.getLeft();
     }
 
     @Override
