@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.ChooseAssayTypePage;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +128,9 @@ public abstract class AbstractAssayHelper
     public void deleteAssayDesign()
     {
         clickManageOption(true, "Delete assay design");
-        _test.clickButton("Confirm Delete");
+        WebElement confirmButton = Locator.lkButton("Confirm Delete").findWhenNeeded(_test.getDriver());
+        _test.waitFor(()->confirmButton.isDisplayed(), "'Confirm Delete' button is not visible.", 2_500);
+        _test.clickAndWait(confirmButton);
     }
 
     public File exportAssayDesign()

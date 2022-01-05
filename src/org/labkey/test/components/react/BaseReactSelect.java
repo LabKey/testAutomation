@@ -101,7 +101,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     {
         // if either are present, we're loading options
         return Locators.loadingSpinner.existsIn(getComponentElement()) ||
-                LOADING_TEXT.equalsIgnoreCase(getComponentElement().getText());
+                getComponentElement().getText().toLowerCase().contains(LOADING_TEXT);
     }
 
     public boolean isOpen()
