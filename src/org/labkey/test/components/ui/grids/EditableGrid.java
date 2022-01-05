@@ -459,7 +459,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         WebElement gridCell = getCell(row, columnName);
 
         selectCell(gridCell);
-        waitFor(()->isCellSelected(gridCell), "Grid cell is not selected, cannot get dropdown list.", 500);
 
         // Double click to make the ReactSelect active. This may expand the list.
         getWrapper().doubleClick(gridCell);

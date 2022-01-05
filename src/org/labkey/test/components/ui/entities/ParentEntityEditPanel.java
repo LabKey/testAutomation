@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -101,10 +102,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         Locator infoPanel = Locator.tagWithClass("div", "panel-info");
         int infoCount = infoPanel.findElements(getDriver()).size();
 
-        if(infoCount > 1)
-        {
-            getWrapper().log("Whoa, there appears to be more than one panel in edit mode. That is odd.");
-        }
+        Assert.assertTrue("Whoa, there appears to be more than one panel in edit mode. This should never happen.",
+                infoCount <= 1);
 
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
