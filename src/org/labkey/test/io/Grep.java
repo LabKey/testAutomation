@@ -60,7 +60,7 @@ public class Grep
     }
 
     /**
-     * Find all matches to the given pattern. Also includes line numbers for the given pattern.
+     * Find all matches to the given pattern. Also includes line numbers for each match.
      */
     public static List<Pair<String, Integer>> findMatches(File file, Pattern pattern, boolean firstMatch) throws IOException
     {
