@@ -376,15 +376,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         try
                         {
                             retry.printStackTrace(System.err);
+                            newDriverService.stop();
+                            newDriverService = GeckoDriverService.createDefaultService();
                             sleep(10000);
                             newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
                         }
                         catch (WebDriverException rethrow)
                         {
-                            if (newDriverService.isRunning())
-                            {
-                                newDriverService.stop();
-                            }
+                            newDriverService.stop();
                             throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. " +
                                     "Ensure that you are using compatible versions of Firefox and geckodriver. " +
                                     "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html", rethrow);
