@@ -6,7 +6,11 @@
         <transform id="step1" type="RemoteQueryTransformStep">
             <description>Copy to target</description>
             <source remoteSource="EtlTest_RemoteConnection" schemaName="lists" queryName="SourceList" />
-            <destination schemaName="etltest" queryName="target" targetOption="merge"/>
+            <destination schemaName="etltest" queryName="target" targetOption="merge">
+            <alternateKeys>
+                <column name="id"/>
+            </alternateKeys>
+            </destination>
         </transform>
     </transforms>
     <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified"/>
