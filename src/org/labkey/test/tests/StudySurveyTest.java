@@ -105,7 +105,7 @@ public class StudySurveyTest extends BaseWebDriverTest
         goToProjectHome();
         clickEditForLabel("Surveys: " + surveyDesignName, surveyLabel);
         setFormElement(Locator.name("date"), newDate);
-        clickButton("Save", 0);
+        waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Save"));
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
 

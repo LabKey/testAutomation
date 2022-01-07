@@ -1347,6 +1347,7 @@ public class DataRegionTable extends DataRegion
             getWrapper().waitForElement(Locator.css(".lk-filter-panel-label"));
         }
         WebElement panelEl = getWrapper().waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(getDataRegionName()));
+        getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(panelEl));
         return new DatasetFacetPanel(panelEl, this);
     }
 
