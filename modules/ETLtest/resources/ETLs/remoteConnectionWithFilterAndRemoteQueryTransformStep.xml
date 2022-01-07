@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Remote connection with RemoteQueryTransformStep type with incremental filter Test</name>
+    <description>Merge rows from List source to target</description>
+    <transforms>
+        <transform id="step1" type="RemoteQueryTransformStep">
+            <description>Copy to target</description>
+            <source remoteSource="EtlTest_RemoteConnection" schemaName="lists" queryName="SourceList" />
+            <destination schemaName="etltest" queryName="target" targetOption="merge">
+            <alternateKeys>
+                <column name="id"/>
+            </alternateKeys>
+            </destination>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified"/>
+</etl>
