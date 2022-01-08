@@ -14,8 +14,4 @@
   <datasets dir="datasets" file="datasets_manifest.xml">
     <definition file="Study001.dataset"/>
   </datasets>
-  <missingValueIndicators>
-    <missingValueIndicator indicator="Q" label="Data currently under quality control review."/>
-    <missingValueIndicator indicator="N" label="Required field marked by site as 'data not available'."/>
-  </missingValueIndicators>
 </study>
