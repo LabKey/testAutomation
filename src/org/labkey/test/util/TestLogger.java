@@ -16,16 +16,30 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.TestProperties;
+import org.labkey.test.TestFileUtils;
 
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 public class TestLogger
 {
+    static
+    {
+        LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
+        File file = new File(TestFileUtils.getTestRoot(), "src/log4j2.xml");
+
+        // this will force a reconfiguration
+        context.setConfigLocation(file.toURI());
+    }
+
+    private static final Logger LOG = LogManager.getLogger("org.labkey.test");
+    private static final Logger NO_OP = LogManager.getLogger("NoOpLogger");
+
     private static final int indentStep = 2;
     private static int currentIndent = 0;
     private static boolean suppressLogging = false;
@@ -59,61 +73,75 @@ public class TestLogger
         return StringUtils.repeat(' ', Math.min(currentIndent, MAX_INDENT));
     }
 
+    private static Logger getLog()
+    {
+        if (suppressLogging)
+        {
+            return NO_OP;
+        }
+        else
+        {
+            return LOG;
+        }
+    }
+
+    public static void debug(String msg, Throwable t)
+    {
+        log(Level.DEBUG, msg, t);
+    }
+
     public static void debug(String msg)
     {
-        // TODO: Log at debug level if/when we convert to Log4J or similar
-        if (TestProperties.isDebugLoggingEnabled())
-            log("DEBUG: " + msg, System.out);
+        debug(msg, null);
     }
 
     public static void info(String str, Throwable t)
     {
-        log(str, System.out, t);
+        log(Level.INFO, str, t);
     }
 
     public static void info(String str)
     {
-        log(str, System.out);
+        info(str, null);
     }
 
     public static void warn(String str, Throwable t)
     {
-        log("WARNING: " + str, System.out, t);
+        log(Level.WARN, str, t);
     }
 
     public static void warn(String str)
     {
-        log("WARNING: " + str, System.out);
-    }
-
-    public static void error(String str)
-    {
-        log(str, System.err);
+        warn(str, null);
     }
 
     public static void error(String str, Throwable t)
     {
-        log(str, System.err, t);
+        log(Level.ERROR, str, t);
+    }
+
+    public static void error(String str)
+    {
+        error(str, null);
+    }
+
+    private static void log(Level level, String message, Throwable throwable)
+    {
+        message = getIndentString() + message;
+
+        if (throwable != null)
+        {
+            getLog().log(level, message, throwable);
+        }
+        else
+        {
+            getLog().log(level, message);
+        }
     }
 
     public static void log(String str)
     {
-        if (!suppressLogging)
-        {
-            log(str, System.out);
-        }
-    }
-
-    private static void log(String str, PrintStream out, Throwable t)
-    {
-        log(str, out);
-        t.printStackTrace(out);
-    }
-
-    private static void log(String str, PrintStream out)
-    {
-        String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
-        out.println(d + " " + getIndentString() + str);
+        info(str);
     }
 
     /**

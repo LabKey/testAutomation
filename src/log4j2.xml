@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration packages="org.labkey.test">
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <!-- p=priority d=datetime t=thread m=message n=newline -->
+            <PatternLayout pattern="%-5p %d{ISO8601} %24.24t : %m%n" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="ERROR">
+            <AppenderRef ref="CONSOLE"/>
+        </Root>
+
+        <Logger name="org.labkey.test" additivity="false" level="INFO">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
+
+        <Logger name="NoOpLogger" level="OFF" additivity="false"/>
+
+    </Loggers>
+</Configuration>
