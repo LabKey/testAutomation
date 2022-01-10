@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.TestFileUtils;
@@ -30,21 +31,21 @@ public class TestLogger
 {
     static
     {
+        // log4j config isn't getting picked up automatically. Do it manually
         LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
         File file = new File(TestFileUtils.getTestRoot(), "src/log4j2.xml");
-
-        // this will force a reconfiguration
         context.setConfigLocation(file.toURI());
     }
 
-    private static final Logger LOG = LogManager.getLogger("org.labkey.test");
+    private static final Logger LOG = LogManager.getLogger(TestLogger.class);
     private static final Logger NO_OP = LogManager.getLogger("NoOpLogger");
 
     private static final int indentStep = 2;
+    private static final int MAX_INDENT = 20;
+
     private static int currentIndent = 0;
     private static boolean suppressLogging = false;
-
-    private static final int MAX_INDENT = 20;
+    private static String currentTestName = "";
 
     public static void resetLogger()
     {
@@ -73,8 +74,22 @@ public class TestLogger
         return StringUtils.repeat(' ', Math.min(currentIndent, MAX_INDENT));
     }
 
+    /**
+     * Temporary workaround to make sure log4j2.xml gets loaded for all loggers
+     */
+    public static Logger getLogger(final Class<?> clazz)
+    {
+        return LogManager.getLogger(clazz);
+    }
+
+    public static void setTestName(String testName)
+    {
+        currentTestName = testName;
+    }
+
     private static Logger getLog()
     {
+        ThreadContext.put("testName", currentTestName);
         if (suppressLogging)
         {
             return NO_OP;
