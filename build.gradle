@@ -117,6 +117,9 @@ if (!BuildUtils.isIntellij())  {
                 srcDirs = ["src"]
                 exclude "test/tests/**"
             }
+            resources {
+                srcDirs = ["resources"]
+            }
         }
     }
     project.tasks.jar {

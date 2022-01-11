@@ -33,7 +33,7 @@ public class TestLogger
     {
         // log4j config isn't getting picked up automatically. Do it manually
         LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
-        File file = new File(TestFileUtils.getTestRoot(), "src/log4j2.xml");
+        File file = new File(TestFileUtils.getTestRoot(), "resources/log4j2.xml");
         context.setConfigLocation(file.toURI());
     }
 
