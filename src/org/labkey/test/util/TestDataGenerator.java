@@ -34,6 +34,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
@@ -409,15 +410,20 @@ public class TestDataGenerator
 
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
     {
-        return getRowsFromServer(cn, null, null);
+        return getRowsFromServer(cn, null, null, null);
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns) throws IOException, CommandException
     {
-        return getRowsFromServer(cn, intendedColumns, null);
+        return getRowsFromServer(cn, intendedColumns, null, null);
     }
 
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, @Nullable  List<Filter> filters) throws IOException, CommandException
+    {
+        return getRowsFromServer(cn, intendedColumns, filters, null);
+    }
+
+    public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, @Nullable  List<Filter> filters, @Nullable List<Sort> sorts) throws IOException, CommandException
     {
         SelectRowsCommand cmd = new SelectRowsCommand(getSchema(), getQueryName());
 
@@ -427,6 +433,11 @@ public class TestDataGenerator
             {
                 cmd.addFilter(filter);
             }
+        }
+
+        if(sorts != null)
+        {
+            cmd.setSorts(sorts);
         }
 
         if (intendedColumns!=null)
