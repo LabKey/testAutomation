@@ -139,14 +139,14 @@ public class Crawler
         }
         if (projects.isEmpty())
         {
-//            _startingUrls.add(new UrlToCheck(null, "/admin-showAdmin.view#links", 0));
-//            _startingUrls.add(new UrlToCheck(null, "/admin-spider.view", 2));
+            _startingUrls.add(new UrlToCheck(null, "/admin-showAdmin.view#links", 0));
+            _startingUrls.add(new UrlToCheck(null, "/admin-spider.view", 2));
         }
         if (injectionTest)
         {
             test.getUrlsSeen().stream()
                 .filter(url -> !StringUtils.isBlank(url))
-                .map(url -> new UrlToCheck(null, url, 0))
+                .map(url -> new UrlToCheck(null, url, 1))
                 .filter(UrlToCheck::isVisitableURL)
                 .filter(UrlToCheck::isInjectableURL)
                 .forEach(_startingUrls::add);
@@ -341,8 +341,8 @@ public class Crawler
         if (!_projects.contains(project))
         {
             _projects.add(project);
-//            _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("project", project, "start"), 0));
-//            _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("admin", project, "spider"), 2));
+            _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("project", project, "start"), 0));
+            _startingUrls.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("admin", project, "spider"), 2));
         }
     }
 
