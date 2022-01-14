@@ -3,7 +3,7 @@
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">
             <!-- p=priority d=datetime t=thread m=message n=newline -->
-            <PatternLayout pattern="%-5p %d{ABSOLUTE} %maxLen{%c{1}%notEmpty{ - %X{testName}}}{36} : %m%n" />
+            <PatternLayout pattern="%-5p %d{ABSOLUTE} %maxLen{%c{1}%notEmpty{ - %X{testLogContext}}}{36} : %m%n" />
         </Console>
     </Appenders>
     <Loggers>

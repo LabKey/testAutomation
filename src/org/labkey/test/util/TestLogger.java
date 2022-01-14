@@ -45,7 +45,7 @@ public class TestLogger
 
     private static int currentIndent = 0;
     private static boolean suppressLogging = false;
-    private static String currentTestName = "";
+    private static String testLogContext = "";
 
     public static void resetLogger()
     {
@@ -82,14 +82,14 @@ public class TestLogger
         return LogManager.getLogger(clazz);
     }
 
-    public static void setTestName(String testName)
+    public static void setTestLogContext(String testLogContext)
     {
-        currentTestName = testName;
+        TestLogger.testLogContext = testLogContext;
     }
 
     private static Logger getLog()
     {
-        ThreadContext.put("testName", currentTestName);
+        ThreadContext.put("testLogContext", testLogContext);
         if (suppressLogging)
         {
             return NO_OP;
