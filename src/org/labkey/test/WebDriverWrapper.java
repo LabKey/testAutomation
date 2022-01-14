@@ -19,10 +19,8 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
@@ -93,7 +91,6 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -1053,9 +1050,36 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long beginAt(String relativeURL, int millis)
     {
-        long startTime = System.currentTimeMillis();
-        beginAt(relativeURL, millis, false);
-        return System.currentTimeMillis() - startTime;
+        if (relativeURL.startsWith(getBaseURL()))
+            relativeURL = relativeURL.substring(getBaseURL().length());
+        relativeURL = stripContextPath(relativeURL);
+        String logMessage = "";
+
+        try
+        {
+            if (relativeURL.length() == 0)
+                logMessage = "Navigating to root";
+            else
+            {
+                logMessage = "Navigating to " + relativeURL;
+                if (relativeURL.charAt(0) != '/')
+                {
+                    relativeURL = "/" + relativeURL;
+                }
+            }
+
+            final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
+
+            long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
+            logMessage += TestLogger.formatElapsedTime(elapsedTime);
+
+
+            return elapsedTime;
+        }
+        finally
+        {
+            log(logMessage); // log after navigation to
+        }
     }
 
     /**
@@ -1065,105 +1089,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param millis Max wait for page to load
      * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
      * @return array of downloaded files or null if navigation occurred
+     * @deprecated No longer needed by crawler
      */
+    @Deprecated (since = "22.2")
     public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
     {
-        if (relativeURL.startsWith(getBaseURL()))
-            relativeURL = relativeURL.substring(getBaseURL().length());
-        relativeURL = stripContextPath(relativeURL);
-        String logMessage = "";
-        Mutable<File[]> downloadedFiles = new MutableObject<>();
-
-        try
-        {
-            String messagePrefix = "Navigating to ";
-            if (relativeURL.length() == 0)
-            {
-                logMessage = messagePrefix + "root";
-            }
-            else
-            {
-                logMessage = messagePrefix + relativeURL;
-                if (relativeURL.charAt(0) != '/')
-                {
-                    relativeURL = "/" + relativeURL;
-                }
-            }
-
-            final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
-
-            long elapsedTime;
-
-            if (allowDownload)
-            {
-                Mutable<Boolean> navigated = new MutableObject<>(true);
-                final File downloadDir = BaseWebDriverTest.getDownloadDir();
-                final File[] existingDownloads = downloadDir.listFiles();
-
-                elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
-                    final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
-                    ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
-                    // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
-                    executeScript("document.location = arguments[0]", fullURL);
-                    //noinspection ResultOfMethodCallIgnored
-                    WebDriverWrapper.waitFor(() -> {
-                        boolean stale;
-                        try
-                        {
-                            stale = stalenessOf.apply(null);
-                        }
-                        catch (NullPointerException npe)
-                        {
-                            // Staleness check throws NPE sometimes when there's an alert present
-                            executeScript("return;"); // Try to trigger 'UnhandledAlertException'
-                            return false;
-                        }
-                        if (stale)
-                        {
-                            // Wait for page to load when element goes stale
-                            return true; // Stop waiting
-                        }
-                        else if (downloadDir.isDirectory()) // Don't check for download if dir doesn't exist
-                        {
-                            File[] filesArray = getNewFiles(0, downloadDir, existingDownloads);
-                            downloadedFiles.setValue(filesArray);
-                            if (downloadedFiles.getValue().length > 0)
-                            {
-                                navigated.setValue(false); // Don't wait for page load when a download occurs
-                                return true; // Stop waiting
-                            }
-                        }
-                        return false; // No navigation or download detected. Continue waiting.
-                    }, millis);
-                    return navigated.getValue();
-                });
-
-                if (!navigated.getValue())
-                {
-                    logMessage = logMessage.replace(messagePrefix, "Downloading from ");
-                }
-            }
-            else
-            {
-                elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
-            }
-
-            logMessage += TestLogger.formatElapsedTime(elapsedTime);
-
-
-            File[] ret = downloadedFiles.getValue();
-            return ret != null && ret.length > 0 ? ret : null;
-        }
-        finally
-        {
-            log(logMessage); // log after navigation to
-            if (downloadedFiles.getValue() != null)
-            {
-                Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
-                    log("  \u2517" + file.getName()); // Log downloaded files
-                });
-            }
-        }
+        beginAt(relativeURL, millis);
+        return null;
     }
 
     public long goToURL(final URL url, int milliseconds)
