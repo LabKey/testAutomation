@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -31,7 +30,8 @@ public class TestLogger
 {
     static
     {
-        // log4j config isn't getting picked up automatically. Do it manually
+        // 'testAutomation/resources' isn't included in classpath. Need to load config file explicitly
+        // TODO: Fixed in next gradle plugin release (>1.32.0)
         LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
         File file = new File(TestFileUtils.getTestRoot(), "resources/log4j2.xml");
         context.setConfigLocation(file.toURI());
@@ -51,17 +51,20 @@ public class TestLogger
     {
         currentIndent = 0;
         suppressLogging = false;
+        updateThreadContext();
     }
 
     public static void increaseIndent()
     {
         currentIndent += indentStep;
+        updateThreadContext();
     }
 
     public static void decreaseIndent()
     {
         if (currentIndent > 0)
             currentIndent -= indentStep;
+        updateThreadContext();
     }
 
     public static void suppressLogging(boolean suppress)
@@ -76,6 +79,7 @@ public class TestLogger
 
     /**
      * Temporary workaround to make sure log4j2.xml gets loaded for all loggers
+     * TODO: Remove once gradlePlugin v1.32.1 is released
      */
     public static Logger getLogger(final Class<?> clazz)
     {
@@ -85,11 +89,13 @@ public class TestLogger
     public static void setTestLogContext(String testLogContext)
     {
         TestLogger.testLogContext = testLogContext;
+        updateThreadContext();
     }
 
     private static Logger getLog()
     {
-        ThreadContext.put("testLogContext", testLogContext);
+        updateThreadContext();
+
         if (suppressLogging)
         {
             return NO_OP;
@@ -100,58 +106,50 @@ public class TestLogger
         }
     }
 
+    private static void updateThreadContext()
+    {
+        ThreadContext.put("testLogContext", testLogContext);
+        ThreadContext.put("testLogIndent", getIndentString());
+    }
+
     public static void debug(String msg, Throwable t)
     {
-        log(Level.DEBUG, msg, t);
+        getLog().debug(msg, t);
     }
 
     public static void debug(String msg)
     {
-        debug(msg, null);
+        getLog().debug(msg);
     }
 
     public static void info(String str, Throwable t)
     {
-        log(Level.INFO, str, t);
+        getLog().info(str, t);
     }
 
     public static void info(String str)
     {
-        info(str, null);
+        getLog().info(str);
     }
 
     public static void warn(String str, Throwable t)
     {
-        log(Level.WARN, str, t);
+        getLog().warn(str, t);
     }
 
     public static void warn(String str)
     {
-        warn(str, null);
+        getLog().warn(str);
     }
 
     public static void error(String str, Throwable t)
     {
-        log(Level.ERROR, str, t);
+        getLog().error(str, t);
     }
 
     public static void error(String str)
     {
-        error(str, null);
-    }
-
-    private static void log(Level level, String message, Throwable throwable)
-    {
-        message = getIndentString() + message;
-
-        if (throwable != null)
-        {
-            getLog().log(level, message, throwable);
-        }
-        else
-        {
-            getLog().log(level, message);
-        }
+        getLog().error(str);
     }
 
     public static void log(String str)
