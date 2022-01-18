@@ -125,9 +125,15 @@ public class ArtifactCollector
         File dumpDir = ensureDumpDir();
         final String artifactName = dumpDir.getName() + ".tar.gz";
         publishArtifact(dumpDir, artifactName);
+    }
+
+    public void reportTestMetadata(String artifactBaseName)
+    {
+        File dumpDir = ensureDumpDir();
+        final String artifactPath = dumpDir.getName() + ".tar.gz!" + artifactBaseName + ".png";
 
         // https://www.jetbrains.com/help/teamcity/reporting-test-metadata.html#Links+to+build+artifacts
-        TeamCityUtils.serviceMessage("testMetadata", Map.of("type", "artifact", "value", artifactName));
+        TeamCityUtils.serviceMessage("testMetadata", Map.of("type", "artifact", "value", artifactPath));
     }
 
     public static void dumpThreads()
@@ -147,12 +153,12 @@ public class ArtifactCollector
         return baseName + "#" + suffix;
     }
 
-    public void dumpPageSnapshot(String fileSuffix, @Nullable String subdir)
+    public String dumpPageSnapshot(String fileSuffix, @Nullable String subdir)
     {
-        dumpPageSnapshot(fileSuffix, subdir, true);
+        return dumpPageSnapshot(fileSuffix, subdir, true);
     }
 
-    public void dumpPageSnapshot(String fileSuffix, @Nullable String subdir, boolean includeFullScreen)
+    public String dumpPageSnapshot(String fileSuffix, @Nullable String subdir, boolean includeFullScreen)
     {
         File dumpDir = ensureDumpDir();
         if (subdir != null && subdir.length() > 0)
@@ -169,6 +175,8 @@ public class ArtifactCollector
         dumpScreen(dumpDir, baseName);
         dumpHtml(dumpDir, baseName);
         dumpPdf(dumpDir, baseName);
+
+        return baseName;
     }
 
     public void dumpHeap()

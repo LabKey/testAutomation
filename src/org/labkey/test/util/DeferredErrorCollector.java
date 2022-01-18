@@ -159,6 +159,7 @@ public class DeferredErrorCollector
         {
             final String s = takeScreenShot(screenshotName);
             allErrors.get(allErrors.size() - 1).setScreenshotName(s);
+            artifactCollector.reportTestMetadata(s);
         }
         setErrorMark();
     }
@@ -383,9 +384,7 @@ public class DeferredErrorCollector
     {
         String snapShotNumberedName = screenshotName + "_" + screenShotCount++;
 
-        artifactCollector.dumpPageSnapshot(snapShotNumberedName, null);
-
-        return snapShotNumberedName;
+        return artifactCollector.dumpPageSnapshot(snapShotNumberedName, null);
     }
 
     public static class DeferredAssertionError extends AssertionError

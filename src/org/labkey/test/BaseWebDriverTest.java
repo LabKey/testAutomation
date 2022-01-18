@@ -960,7 +960,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 // Don't take screenshots if error was deferred and any screenshots were taken
                 if (!(error instanceof DeferredErrorCollector.DeferredAssertionError))
                 {
-                    getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                    final String artifactBaseName = getArtifactCollector().dumpPageSnapshot(testName, null);// Snapshot of current window
+                    getArtifactCollector().reportTestMetadata(artifactBaseName);
                 }
                 String failureWindow = getDriver().getWindowHandle();
                 Set<String> otherWindowHandles = getDriver().getWindowHandles().stream()
