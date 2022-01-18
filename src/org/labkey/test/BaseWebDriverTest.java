@@ -531,6 +531,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             public void starting(Description description)
             {
                 TestLogger.resetLogger();
+                TestLogger.setTestLogContext("Before " + description.getTestClass().getSimpleName());
                 TestLogger.log("// BeforeClass - " + description.getTestClass().getSimpleName() + " \\\\");
                 TestLogger.increaseIndent();
             }
@@ -540,6 +541,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 TestLogger.resetLogger();
                 TestLogger.log("\\\\ AfterClass Complete - " + description.getTestClass().getSimpleName() + " //");
+                TestLogger.setTestLogContext("");
             }
         };
 
@@ -754,6 +756,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 testStartTimeStamp = System.currentTimeMillis();
 
                 TestLogger.resetLogger();
+                TestLogger.setTestLogContext(description.getMethodName());
                 TestLogger.log("// Begin Test Case [" + currentTestNumber + "/" + testCount + "] - " + description.getMethodName() + " \\\\");
                 logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "[" + currentTestNumber + "/" + testCount + "]." + description.getMethodName());
                 TestLogger.increaseIndent();
@@ -791,6 +794,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (currentTestNumber == testCount)
                 {
                     TestLogger.resetLogger();
+                    TestLogger.setTestLogContext("After " + description.getTestClass().getSimpleName());
                     TestLogger.log("// AfterClass - " + description.getTestClass().getSimpleName() + " \\\\");
                     TestLogger.increaseIndent();
                 }
