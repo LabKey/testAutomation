@@ -182,6 +182,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid search(String searchTerm)
     {
         doAndWaitForUpdate(()-> getOmniBox().setSearch(searchTerm));
+        waitForLoaded();
         return this;
     }
 
@@ -194,6 +195,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid sortOn(String column, SortDirection direction)
     {
         doAndWaitForUpdate(()-> getOmniBox().setSort(column, direction));
+        waitForLoaded();
         return this;
     }
 
@@ -223,6 +225,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid filterOn(String columnName, String operator, String value)
     {
         doAndWaitForUpdate(()-> getOmniBox().setFilter(columnName, operator, value));
+        waitForLoaded();
         return this;
     }
 
@@ -233,6 +236,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid clearSortsAndFilters()
     {
         doAndWaitForUpdate(()-> getOmniBox().clearAll());
+        waitForLoaded();
         return this;
     }
 
