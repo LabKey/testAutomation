@@ -51,6 +51,13 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return new ExportFolderPage(driver.getDriver());
     }
 
+    @Override
+    protected void waitForPage()
+    {
+        waitFor(()-> Locator.tagWithText("label", FOLDER_TYPE_AND_ACTIVE_MODULES).existsIn(getDriver()),
+                "The page did not render in time", WAIT_FOR_PAGE);
+    }
+
     public ExportFolderPage includeExperimentsAndRuns(boolean checked)
     {
         elementCache().experimentsAndRunsCheckbox.set(checked);
