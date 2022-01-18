@@ -19,10 +19,8 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
@@ -64,6 +62,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -84,13 +83,14 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
+import org.openqa.selenium.firefox.FirefoxDriverService;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -115,7 +115,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -360,22 +359,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
                         binary.addCommandLineOptions("--headless");
                     }
-                    capabilities.setCapability(FirefoxDriver.BINARY, binary);
+                    capabilities.setCapability(FirefoxDriver.Capability.BINARY, binary);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
+
+                    newDriverService = GeckoDriverService.createDefaultService();
                     try
                     {
-                        newWebDriver = new FirefoxDriver(firefoxOptions);
+                        newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
                     }
                     catch (WebDriverException retry)
                     {
                         try
                         {
                             retry.printStackTrace(System.err);
+                            newDriverService.stop();
+                            newDriverService = GeckoDriverService.createDefaultService();
                             sleep(10000);
-                            newWebDriver = new FirefoxDriver(firefoxOptions);
+                            newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
                         }
                         catch (WebDriverException rethrow)
                         {
+                            newDriverService.stop();
                             throw new WebDriverException("ERROR: Failed to initialize FirefoxDriver. " +
                                     "Ensure that you are using compatible versions of Firefox and geckodriver. " +
                                     "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html", rethrow);
@@ -392,7 +396,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
-            String browserVersion = caps.getVersion();
+            String browserVersion = caps.getBrowserVersion();
             log("Browser: " + browserName + " " + browserVersion);
             return new ImmutablePair<>(newWebDriver, newDriverService);
         }
@@ -751,6 +755,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         new SiteNavBar(getDriver()).clickUserMenuItem(wait, items);
     }
 
+    /**
+     * @deprecated Use {@link BootstrapMenu}
+     */
+    @Deprecated(since = "22.1")
     @LogMethod(quiet = true)
     public WebElement clickMenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
@@ -910,7 +918,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         waitFor(() -> getDriver().getWindowHandles().size() > index, WAIT_FOR_JAVASCRIPT);
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window(windows.get(index));
+        try
+        {
+            getDriver().switchTo().window(windows.get(index));
+        }
+        catch (StackOverflowError soe)
+        {
+            // Try to get info for troubleshooting WebDriver issue
+            // https://github.com/SeleniumHQ/selenium/issues/6081
+            throw new RuntimeException("Internal WebDriver error attempting to switch to window '" +
+                    windows.get(index) + "'. Available windows: " + windows, soe);
+        }
     }
 
     protected void closeExtraWindows()
@@ -1031,9 +1049,36 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long beginAt(String relativeURL, int millis)
     {
-        long startTime = System.currentTimeMillis();
-        beginAt(relativeURL, millis, false);
-        return System.currentTimeMillis() - startTime;
+        if (relativeURL.startsWith(getBaseURL()))
+            relativeURL = relativeURL.substring(getBaseURL().length());
+        relativeURL = stripContextPath(relativeURL);
+        String logMessage = "";
+
+        try
+        {
+            if (relativeURL.length() == 0)
+                logMessage = "Navigating to root";
+            else
+            {
+                logMessage = "Navigating to " + relativeURL;
+                if (relativeURL.charAt(0) != '/')
+                {
+                    relativeURL = "/" + relativeURL;
+                }
+            }
+
+            final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
+
+            long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
+            logMessage += TestLogger.formatElapsedTime(elapsedTime);
+
+
+            return elapsedTime;
+        }
+        finally
+        {
+            log(logMessage); // log after navigation to
+        }
     }
 
     /**
@@ -1043,105 +1088,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param millis Max wait for page to load
      * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
      * @return array of downloaded files or null if navigation occurred
+     * @deprecated No longer needed by crawler
      */
+    @Deprecated (since = "22.2")
     public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
     {
-        if (relativeURL.startsWith(getBaseURL()))
-            relativeURL = relativeURL.substring(getBaseURL().length());
-        relativeURL = stripContextPath(relativeURL);
-        String logMessage = "";
-        Mutable<File[]> downloadedFiles = new MutableObject<>();
-
-        try
-        {
-            String messagePrefix = "Navigating to ";
-            if (relativeURL.length() == 0)
-            {
-                logMessage = messagePrefix + "root";
-            }
-            else
-            {
-                logMessage = messagePrefix + relativeURL;
-                if (relativeURL.charAt(0) != '/')
-                {
-                    relativeURL = "/" + relativeURL;
-                }
-            }
-
-            final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
-
-            long elapsedTime;
-
-            if (allowDownload)
-            {
-                Mutable<Boolean> navigated = new MutableObject<>(true);
-                final File downloadDir = BaseWebDriverTest.getDownloadDir();
-                final File[] existingDownloads = downloadDir.listFiles();
-
-                elapsedTime = doAndMaybeWaitForPageToLoad(millis, () -> {
-                    final WebElement mightGoStale = Locators.documentRoot.findElement(getDriver());
-                    ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
-                    // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
-                    executeScript("document.location = arguments[0]", fullURL);
-                    //noinspection ResultOfMethodCallIgnored
-                    WebDriverWrapper.waitFor(() -> {
-                        Boolean stale;
-                        try
-                        {
-                            stale = stalenessOf.apply(null);
-                        }
-                        catch (NullPointerException npe)
-                        {
-                            // Staleness check throws NPE sometimes when there's an alert present
-                            executeScript("return;"); // Try to trigger 'UnhandledAlertException'
-                            return false;
-                        }
-                        if (stale)
-                        {
-                            // Wait for page to load when element goes stale
-                            return true; // Stop waiting
-                        }
-                        else if (downloadDir.isDirectory()) // Don't check for download if dir doesn't exist
-                        {
-                            File[] filesArray = getNewFiles(0, downloadDir, existingDownloads);
-                            downloadedFiles.setValue(filesArray);
-                            if (downloadedFiles.getValue().length > 0)
-                            {
-                                navigated.setValue(false); // Don't wait for page load when a download occurs
-                                return true; // Stop waiting
-                            }
-                        }
-                        return false; // No navigation or download detected. Continue waiting.
-                    }, millis);
-                    return navigated.getValue();
-                });
-
-                if (!navigated.getValue())
-                {
-                    logMessage = logMessage.replace(messagePrefix, "Downloading from ");
-                }
-            }
-            else
-            {
-                elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
-            }
-
-            logMessage += TestLogger.formatElapsedTime(elapsedTime);
-
-
-            File[] ret = downloadedFiles.getValue();
-            return ret != null && ret.length > 0 ? ret : null;
-        }
-        finally
-        {
-            log(logMessage); // log after navigation to
-            if (downloadedFiles.getValue() != null)
-            {
-                Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
-                    log("  \u2517" + file.getName()); // Log downloaded files
-                });
-            }
-        }
+        beginAt(relativeURL, millis);
+        return null;
     }
 
     public long goToURL(final URL url, int milliseconds)
@@ -1503,17 +1456,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         final MutableBoolean present = new MutableBoolean(true);
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
-        {
-            @Override
-            public boolean handle(String htmlSource, String text)
-            {
-                // Not found... stop enumerating and return false
-                if (htmlSource == null || !htmlSource.contains(text))
-                    present.setFalse();
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            // Not found... stop enumerating and return false
+            if (htmlSource == null || !htmlSource.contains(text))
+                present.setFalse();
 
-                return present.getValue();
-            }
+            return present.getValue();
         };
         TextSearcher searcher = new TextSearcher(this);
         searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
@@ -1537,7 +1485,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         List<String> orderedTexts = new ArrayList<>();
         foundTexts.stream()
-                .sorted(Comparator.comparing(Pair::getValue))
+                .sorted(Map.Entry.comparingByValue())
                 .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
 
         return orderedTexts;
@@ -1607,15 +1555,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         final MutableBoolean found = new MutableBoolean(false);
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler(){
-            @Override
-            public boolean handle(String htmlSource, String text)
-            {
-                if (htmlSource.contains(text))
-                    found.setTrue();
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            if (htmlSource.contains(text))
+                found.setTrue();
 
-                return !found.getValue(); // stop searching if any value is found
-            }
+            return !found.getValue(); // stop searching if any value is found
         };
         TextSearcher searcher = new TextSearcher(this);
         searcher.searchForTexts(handler, Arrays.asList(texts));
@@ -1737,19 +1681,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         final List<Integer> foundIndices = new ArrayList<>();
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
-        {
-            @Override
-            public boolean handle (String source, String text)
+        TextSearcher.TextHandler handler = (source, text1) -> {
+            int current_index = 0;
+            while ((source.indexOf(text1, current_index + 1)) != -1)
             {
-                int current_index = 0;
-                while ((source.indexOf(text, current_index + 1)) != -1)
-                {
-                    current_index = source.indexOf(text, current_index +1);
-                    foundIndices.add(current_index);
-                }
-                return true;
+                current_index = source.indexOf(text1, current_index +1);
+                foundIndices.add(current_index);
             }
+            return true;
         };
 
         searcher.searchForTexts(handler, Arrays.asList(text));
@@ -1762,25 +1701,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         final int RANGE = 20;
         List<String> errors = new ArrayList<>();
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
-        {
-            @Override
-            public boolean handle(String htmlSource, String text)
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            int position = htmlSource.indexOf(text);
+
+            if (position > -1)
             {
-                int position = htmlSource.indexOf(text);
+                int prefixStart = Math.max(0, position - RANGE);
+                int suffixEnd = Math.min(htmlSource.length() - 1, position + text.length() + RANGE);
+                String prefix = htmlSource.substring(prefixStart, position);
+                String suffix = htmlSource.substring(position + text.length(), suffixEnd);
 
-                if (position > -1)
-                {
-                    int prefixStart = Math.max(0, position - RANGE);
-                    int suffixEnd = Math.min(htmlSource.length() - 1, position + text.length() + RANGE);
-                    String prefix = htmlSource.substring(prefixStart, position);
-                    String suffix = htmlSource.substring(position + text.length(), suffixEnd);
-
-                    errors.add("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
-                }
-
-                return true;
+                errors.add("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
             }
+
+            return true;
         };
 
         searcher.searchForTexts(handler, Arrays.asList(texts));
@@ -1907,7 +1841,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                 }), "App didn't seem to load. No visible content. " + app.toString(), 10000);
         }
-        mouseOut();
         _testTimeout = false;
     }
 
@@ -1962,7 +1895,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if (null != listener)
                     listener.beforePageLoad();
             });
-            getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
+            getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(msWait));
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
         }
 
@@ -1971,7 +1904,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0 && shouldWait)
         {
             waitForPageToLoad(toBeStale, msWait);
-            getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+            getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
                     listener.afterPageLoad();
@@ -2802,7 +2735,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             scrollTo(0, 0);
             WebElement root = Locators.documentRoot.findElement(getDriver());
-            new Actions(getDriver()).moveToElement(root, 0, 0).perform();
+            final Dimension rootSize = root.getSize();
+            new Actions(getDriver()).moveToElement(root, - (rootSize.getWidth() / 2), - (rootSize.getHeight() / 2)).perform();
         }
         catch (WebDriverException ignore) { }
     }

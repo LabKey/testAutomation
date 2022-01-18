@@ -15,12 +15,15 @@
  */
 package org.labkey.test.io;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.serverapi.reader.Readers;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +54,18 @@ public class Grep
 
     private static int grep(File file, Pattern pattern) throws IOException
     {
+        final List<Pair<String, Integer>> matches = findMatches(file, pattern, true);
+
+        return matches.stream().findFirst().map(Pair::getRight).orElse(-1);
+    }
+
+    /**
+     * Find all matches to the given pattern. Also includes line numbers for each match.
+     */
+    public static List<Pair<String, Integer>> findMatches(File file, Pattern pattern, boolean firstMatch) throws IOException
+    {
+        List<Pair<String, Integer>> matches = new ArrayList<>();
+
         try (BufferedReader is = Readers.getReader(file))
         {
             Matcher matcher = pattern.matcher("");
@@ -62,9 +77,25 @@ public class Grep
                 matcher.reset(line);
 
                 if (matcher.find())
-                    return lineNumber;
+                {
+                    matches.add(Pair.of(matcher.group(1), lineNumber));
+                    if (firstMatch)
+                    {
+                        return matches;
+                    }
+                }
             }
         }
-        return -1;
+        return matches;
+    }
+
+    /**
+     * Find the first match to the given pattern
+     */
+    public static String findMatch(File file, Pattern pattern) throws IOException
+    {
+        final List<Pair<String, Integer>> matches = findMatches(file, pattern, true);
+
+        return matches.stream().findFirst().map(Pair::getLeft).orElse(null);
     }
 }

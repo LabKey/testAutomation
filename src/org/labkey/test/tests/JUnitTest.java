@@ -27,6 +27,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONValue;
 import org.junit.Assert;
@@ -52,13 +55,10 @@ import org.labkey.test.util.QuickBootstrapPseudoTest;
 import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.net.SocketTimeoutException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ import java.util.function.Predicate;
 @Category({BVT.class, UnitTests.class})
 public class JUnitTest extends TestSuite
 {
-    private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
+    private static final Logger LOG = TestLogger.getLogger(JUnitTest.class);
 
     public JUnitTest()
     {
@@ -173,7 +173,7 @@ public class JUnitTest extends TestSuite
         }
         catch (Throwable t)
         {
-            err("Unable to fetch Remote JUnit tests");
+            LOG.error("Unable to fetch Remote JUnit tests");
             t.printStackTrace();
             TestSuite testSuite = new TestSuite();
             testSuite.addTest(new Runner.ErrorTest(JUnitTest.class.getSimpleName(), t));
@@ -231,7 +231,7 @@ public class JUnitTest extends TestSuite
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
-                        log("Remote JUnitTest: Server modules starting up (attempt " + startupAttempts + ") ...");
+                        LOG.info("Remote JUnitTest: Server modules starting up (attempt " + startupAttempts + ") ...");
 
                         if (startupAttempts < 60)
                         {
@@ -251,7 +251,7 @@ public class JUnitTest extends TestSuite
                         responseBody.contains("<title>Account Setup</title>") ||
                         responseBody.contains("This server is being upgraded to a new version of LabKey Server."))
                     {
-                        log("Remote JUnitTest: Server needs install or upgrade ...");
+                        LOG.info("Remote JUnitTest: Server needs install or upgrade ...");
                         if (upgradeAttempts > 3)
                             throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
 
@@ -325,15 +325,16 @@ public class JUnitTest extends TestSuite
                 {
                     remotesuite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
                     // Exclude header and footer from count
-                    log("Remote JUnitTest: found " + (remotesuite.countTestCases() - 2) + " tests.");
+                    LOG.info("Remote JUnitTest: found " + (remotesuite.countTestCases() - 2) + " tests.");
                 }
 
                 return remotesuite;
             }
             else
             {
-                System.err.println("Getting unit test list from server failed with error code " + status + ". Error page content is:");
-                response.getEntity().writeTo(System.err);
+                LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
+                final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
+                response.getEntity().writeTo(streamLogger);
                 throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getStatusLine() + "): " + url);
             }
         }
@@ -381,27 +382,27 @@ public class JUnitTest extends TestSuite
                     throw new AssertionError("Error response from failed test: " + dump(resultJson, true));
 
                 WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(resultJson, false), connection);
-                log(getLogTestString("successful", startTime));
-                log(dump(resultJson, true));
+                LOG.info(getLogTestString("successful", startTime));
+                LOG.info(dump(resultJson, true));
             }
             catch (SocketTimeoutException ste)
             {
                 String timed_out = getLogTestString("timed out", startTime);
-                err(timed_out);
+                LOG.error(timed_out);
                 ArtifactCollector.dumpThreads();
                 throw new RuntimeException(timed_out, ste);
             }
             catch (IOException ioe)
             {
                 String message = getLogTestString("failed: " + ioe.getMessage(), startTime);
-                err(message);
+                LOG.error(message);
                 throw new RuntimeException(message, ioe);
             }
             catch (CommandException ce)
             {
                 WebTestHelper.logToServer(getLogTestString("failed", startTime) + ", " + dump(ce.getResponseText(), false), connection);
-                err(getLogTestString("failed", startTime));
-                err(dump(ce.getResponseText(), false));
+                LOG.error(getLogTestString("failed", startTime));
+                LOG.error(dump(ce.getResponseText(), false));
                 Assert.fail(("remote junit failed (HTTP status code " + ce.getStatusCode() + "): " + _remoteClass) + "\n" + dump(ce.getResponseText(), true));
             }
         }
@@ -448,24 +449,6 @@ public class JUnitTest extends TestSuite
                 sb.append("\n");
             }
         }
-    }
-
-    static void err(String str)
-    {
-        log(str, System.err);
-    }
-
-    static void log(String str)
-    {
-        log(str, System.out);
-    }
-
-    static void log(String str, PrintStream printStream)
-    {
-        if (str == null || str.length() == 0)
-            return;
-        String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date());      // Include time with log entry.  Use format that matches labkey log.
-        printStream.println(d + " " + str);
     }
 
     public static class BaseJUnitTestWrapper extends BaseWebDriverTest

@@ -158,6 +158,12 @@ public class APIAssayHelper extends AbstractAssayHelper
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
     }
 
+    @Override
+    public void uploadXarFileAsAssayDesign(File file, int pipelineCount, @Nullable String container)
+    {
+        throw new UnsupportedOperationException();
+    }
+
     @LogMethod
     @Override
     public void uploadXarFileAsAssayDesign(@LoggedParam File file)
@@ -173,6 +179,12 @@ public class APIAssayHelper extends AbstractAssayHelper
         {
             throw new RuntimeException("Failed to import XAR file", e);
         }
+    }
+
+    @Override
+    public void uploadXarFileAsAssayDesign(File file, String container)
+    {
+        throw new UnsupportedOperationException();
     }
 
     public int getIdFromAssayName(String assayName, String projectPath)

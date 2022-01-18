@@ -238,6 +238,12 @@ public class ArtifactCollector
 
     public File dumpPdf(File dir, String baseName)
     {
+        if (_test.getBrowserType() == WebDriverWrapper.BrowserType.CHROME && !TestProperties.isRunWebDriverHeadless())
+        {
+            // Avoid error: "PrintToPDF is only supported in headless mode"
+            return null;
+        }
+
         File pdfFile = new File(dir, baseName + ".pdf");
         try
         {
@@ -248,7 +254,7 @@ public class ArtifactCollector
             }
             return pdfFile;
         }
-        catch (IOException ioe)
+        catch (Exception ioe)
         {
             TestLogger.log("Failed dump page pdf: " + ioe.getMessage());
         }

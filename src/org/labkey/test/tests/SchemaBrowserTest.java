@@ -113,6 +113,11 @@ public class SchemaBrowserTest extends BaseWebDriverTest
         validateQueries(true);
     }
 
+    public void clickFkExpando(String schemaName, String queryName, String columnName)
+    {
+        click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName));
+    }
+
     public void createLists()
     {
         _listHelper.createList(PROJECT_NAME, AUTHORS_LIST,

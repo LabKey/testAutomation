@@ -202,8 +202,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         int fileIndex = 0;
         for(Map<String, String> runProperty : runProperties)
         {
-            runProperty.keySet().forEach((property)->setFormElement(Locator.name(property), runProperty.get(property))
-            );
+            runProperty.keySet().forEach((property)->setFormElement(Locator.name(property), runProperty.get(property)));
 
             if(!useFilesWebPart)
             {
@@ -211,7 +210,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
                 setFormElement(Locator.tagWithAttribute("input", "type", "file"), runFiles.get(fileIndex++));
 
-                if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
+                if (fileIndex < runProperties.size())
                 {
                     clickAndWait(Locator.lkButton("Save and Import Another Run"));
                     waitForElement(Locator.tagWithName("input", "instrumentSetting"));
@@ -230,6 +229,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         clickAndWait(Locator.lkButton("Save and Finish"));
 
+        // make sure we end up on the assay runs grid with the expected number of runs
+        assertTitleContains(assayName + " Runs");
+        DataRegionTable runs = new DataRegionTable("Runs", this.getDriver());
+        Assert.assertEquals("Unexpected number of assay runs", runFiles.size(), runs.getDataRowCount());
     }
 
     private void setFieldValues(String projectName, String assayName, String runId, Map<Integer, Map<String, String>> fieldValues)

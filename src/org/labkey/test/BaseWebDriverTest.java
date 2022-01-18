@@ -241,7 +241,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return currentTest;
     }
 
-    public static Class getCurrentTestClass()
+    public static Class<? extends BaseWebDriverTest> getCurrentTestClass()
     {
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
     }
@@ -270,8 +270,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         SingletonWebDriver.getInstance().setUp(this);
 
-        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-        getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+        getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
+        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
         try
         {
             getDriver().manage().window().setSize(new Dimension(1280, 1024));
@@ -292,7 +292,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public final DeferredErrorCollector checker()
     {
-        return _errorCollector;
+        return TestProperties.isCheckerFatal() ? _errorCollector.fatal() : _errorCollector;
     }
 
     /**
@@ -531,6 +531,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             public void starting(Description description)
             {
                 TestLogger.resetLogger();
+                TestLogger.setTestLogContext("Before " + description.getTestClass().getSimpleName());
                 TestLogger.log("// BeforeClass - " + description.getTestClass().getSimpleName() + " \\\\");
                 TestLogger.increaseIndent();
             }
@@ -540,13 +541,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 TestLogger.resetLogger();
                 TestLogger.log("\\\\ AfterClass Complete - " + description.getTestClass().getSimpleName() + " //");
+                TestLogger.setTestLogContext("");
             }
         };
 
         TestWatcher lock = new TestWatcher()
         {
             @Override
-            public Statement apply(Statement base, Description description)
+            public @NotNull Statement apply(Statement base, Description description)
             {
                 final Statement statement = super.apply(base, description);
                 return new Statement()
@@ -558,14 +560,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         {
                             statement.evaluate();
                         }
-                        synchronized (description.getTestClass()) { /* Make sure test methods have finished */ }
                     }
                 };
             }
         };
 
         return RuleChain.outerRule(lock).around(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
-//        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
     }
 
     private static boolean canConnectWithPrimaryUser()
@@ -632,7 +632,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return; // app admin can't enable stack traces
         }
         Connection cn = createDefaultConnection();
-        PostCommand command = new PostCommand("mini-profiler", "enableTroubleshootingStacktraces");
+        PostCommand<?> command = new PostCommand<>("mini-profiler", "enableTroubleshootingStacktraces");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", true);
         command.setJsonObject(jsonObject);
@@ -681,7 +681,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         TestWatcher _watcher = new TestWatcher()
         {
             @Override
-            public Statement apply(Statement base, Description description)
+            public @NotNull Statement apply(Statement base, Description description)
             {
                 final Statement statement = super.apply(base, description);
                 return new Statement()
@@ -756,6 +756,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 testStartTimeStamp = System.currentTimeMillis();
 
                 TestLogger.resetLogger();
+                TestLogger.setTestLogContext(description.getMethodName());
                 TestLogger.log("// Begin Test Case [" + currentTestNumber + "/" + testCount + "] - " + description.getMethodName() + " \\\\");
                 logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "[" + currentTestNumber + "/" + testCount + "]." + description.getMethodName());
                 TestLogger.increaseIndent();
@@ -772,7 +773,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
-                Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
+                long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
                 TestLogger.log("\\\\ Test Case Complete - " + description.getMethodName() + TestLogger.formatElapsedTime(elapsed) + " //");
@@ -781,7 +782,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void failed(Throwable e, Description description)
             {
-                Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
+                long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
                 TestLogger.log("\\\\ Failed Test Case - " + description.getMethodName() + TestLogger.formatElapsedTime(elapsed) + " //");
@@ -793,6 +794,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (currentTestNumber == testCount)
                 {
                     TestLogger.resetLogger();
+                    TestLogger.setTestLogContext("After " + description.getTestClass().getSimpleName());
                     TestLogger.log("// AfterClass - " + description.getTestClass().getSimpleName() + " \\\\");
                     TestLogger.increaseIndent();
                 }
@@ -803,7 +805,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         TestWatcher _lock = new TestWatcher()
         {
             @Override
-            public Statement apply(Statement base, Description description)
+            public @NotNull Statement apply(Statement base, Description description)
             {
                 final Statement statement = super.apply(base, description);
                 return new Statement()
@@ -855,17 +857,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (RuntimeException | Error e)
             {
                 log("Unable to dump pipeline files");
-                System.err.println(e.getMessage());
+                TestLogger.error(e.getMessage(), e);
             }
             try
             {
                 if (wasCausedBy(error, Arrays.asList(TestTimeoutException.class, SocketTimeoutException.class)))
-                    getArtifactCollector().dumpThreads();
+                    ArtifactCollector.dumpThreads();
             }
             catch (RuntimeException | Error e)
             {
                 log("Unable to dump threads");
-                System.err.println(e.getMessage());
+                TestLogger.error(e.getMessage(), e);
             }
 
             if (error instanceof UnreachableBrowserException || getWrappedDriver() == null)
@@ -917,7 +919,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (RuntimeException | Error e)
             {
                 log("Unable to determine information about the last page");
-                System.err.println(e.getMessage());
+                TestLogger.error(e.getMessage(), e);
             }
 
             // Render any client-side errors to page before taking a screenshot (just biologics for now)
@@ -932,7 +934,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (RuntimeException | Error e)
             {
                 log("Unable to render client-side errors to page");
-                System.err.println(e.getMessage());
+                TestLogger.error(e.getMessage(), e);
             }
 
             try
@@ -955,7 +957,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         TestLogger.warn("Alert was triggered by iframe: " + alert.getAlertText());
                     }
                 }
-                getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                // Don't take screenshots if error was deferred and any screenshots were taken
+                if (!(error instanceof DeferredErrorCollector.DeferredAssertionError))
+                {
+                    getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                }
                 String failureWindow = getDriver().getWindowHandle();
                 Set<String> otherWindowHandles = getDriver().getWindowHandles().stream()
                         .filter(handle -> !handle.equals(failureWindow)).collect(Collectors.toSet());
@@ -973,7 +979,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (RuntimeException e)
             {
                 log("Unable to dump screenshots");
-                System.err.println(e.getMessage());
+                TestLogger.error(e.getMessage(), e);
             }
             if (isTestRunningOnTeamCity()) // Don't risk modifying browser state when running locally
             {
@@ -1008,9 +1014,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void disablePageUnloadEvents()
     {
         executeScript(
-                "window.addEventListener(\"beforeunload\", function (event) {\n" +
-                        "    event.stopPropagation();\n" +
-                        "}, true);");
+                """
+                window.addEventListener("beforeunload", function (event) {
+                    event.stopPropagation();
+                }, true);
+                """);
         executeScript("beforeunload = null;");
         executeScript("window.onbeforeunload = null;");
     }
@@ -1207,7 +1215,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (newLeak != null)
             {
                 getArtifactCollector().dumpHeap();
-                getArtifactCollector().dumpThreads();
+                ArtifactCollector.dumpThreads();
                 fail(String.format("Found memory leak: %s [1 of %d, MAX:%d]\nSee test artifacts for more information.", newLeak, leakCount, MAX_LEAK_LIMIT));
             }
 
@@ -1582,7 +1590,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (changed)
         {
             clickButton("Save Changes", 0);
-            Window window = Window(getDriver()).withTitle("Success").waitFor();
+            Window<?> window = Window(getDriver()).withTitle("Success").waitFor();
             window.clickButton("OK", true);
             _ext4Helper.waitForMaskToDisappear();
         }
@@ -1681,7 +1689,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             _setPipelineRoot(rootPath, inherit);
 
-            waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize().toString() + "'"));
+            waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize() + "'"));
 
             getArtifactCollector().addArtifactLocation(new File(rootPath));
 
@@ -2028,11 +2036,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
         waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
-    }
-
-    public void clickFkExpando(String schemaName, String queryName, String columnName)
-    {
-        click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName));
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
@@ -2530,7 +2533,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         private static SingletonWebDriver getInstance()
         {
             if (Thread.interrupted())
-                return null; // Not for you
+                throw new IllegalStateException("Thread interrupted. Another thread may be using the WebDriver");
             return INSTANCE;
         }
 
@@ -2581,7 +2584,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             catch (UnreachableBrowserException log)
             {
-                log.printStackTrace(System.out);
+                TestLogger.warn("Ignoring error during tearDown", log);
             }
             finally
             {
