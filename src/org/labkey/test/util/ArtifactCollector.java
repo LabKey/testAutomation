@@ -52,6 +52,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -62,6 +63,8 @@ import static org.labkey.test.WebTestHelper.isLocalServer;
 
 public class ArtifactCollector
 {
+    private static final Map<Class<?>, Integer> _shotCounters = new HashMap<>();
+
     private final BaseWebDriverTest _test;
     private final WebDriverWrapper _driver;
 
@@ -92,7 +95,7 @@ public class ArtifactCollector
         String currentTestClassName;
         try
         {
-            currentTestClassName = BaseWebDriverTest.getCurrentTestClass().getSimpleName();
+            currentTestClassName = _test.getClass().getSimpleName();
         }
         catch (NullPointerException e)
         {
@@ -130,10 +133,13 @@ public class ArtifactCollector
     public void reportTestMetadata(String artifactBaseName)
     {
         File dumpDir = ensureDumpDir();
-        final String artifactPath = dumpDir.getName() + ".tar.gz!" + artifactBaseName + ".png";
+        final String baseArtifactPath = dumpDir.getName() + ".tar.gz!" + artifactBaseName;
+        final String pngPath = baseArtifactPath + ".png";
+        final String htmlPath = baseArtifactPath + ".html";
 
-        // https://www.jetbrains.com/help/teamcity/reporting-test-metadata.html#Links+to+build+artifacts
-        TeamCityUtils.serviceMessage("testMetadata", Map.of("type", "artifact", "value", artifactPath));
+        // https://www.jetbrains.com/help/teamcity/reporting-test-metadata.html#Links+to+Build+Artifacts
+        TeamCityUtils.serviceMessage("testMetadata", Map.of("type", "image", "value", pngPath));
+        TeamCityUtils.serviceMessage("testMetadata", Map.of("type", "artifact", "value", htmlPath));
     }
 
     public static void dumpThreads()
@@ -146,19 +152,31 @@ public class ArtifactCollector
         TestLogger.log("Threads dumped to standard labkey log file");
     }
 
-    private String screenshotBaseName(@NotNull String suffix)
+    private String buildBaseName(@NotNull String suffix)
     {
+        StringBuilder baseName = new StringBuilder();
         FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-        String baseName = dateFormat.format(new Date()) + _test.getClass().getSimpleName();
-        return baseName + "#" + suffix;
+        return baseName.append(dateFormat.format(new Date()))
+                .append(getAndIncrementShotCounter())
+                .append(_test.getClass().getSimpleName())
+                .append("#")
+                .append(suffix)
+                .toString();
     }
 
-    public String dumpPageSnapshot(String fileSuffix, @Nullable String subdir)
+    private int getAndIncrementShotCounter()
     {
-        return dumpPageSnapshot(fileSuffix, subdir, true);
+        Integer shotCounter = _shotCounters.getOrDefault(_test.getClass(), 0);
+        _shotCounters.put(_test.getClass(), shotCounter + 1);
+        return shotCounter;
     }
 
-    public String dumpPageSnapshot(String fileSuffix, @Nullable String subdir, boolean includeFullScreen)
+    public String dumpPageSnapshot(String snapshotName)
+    {
+        return dumpPageSnapshot(snapshotName, null);
+    }
+
+    public String dumpPageSnapshot(String snapshotName, @Nullable String subdir)
     {
         File dumpDir = ensureDumpDir();
         if (subdir != null && subdir.length() > 0)
@@ -168,10 +186,9 @@ public class ArtifactCollector
                 dumpDir.mkdirs();
         }
 
-        String baseName = screenshotBaseName(fileSuffix);
+        String baseName = buildBaseName(snapshotName);
 
-        if (includeFullScreen)
-            dumpFullScreen(dumpDir, baseName);
+        dumpFullScreen(dumpDir, baseName);
         dumpScreen(dumpDir, baseName);
         dumpHtml(dumpDir, baseName);
         dumpPdf(dumpDir, baseName);
@@ -218,13 +235,6 @@ public class ArtifactCollector
         }
 
         _driver.popLocation(); // go back to get screenshot if needed.
-    }
-
-    public File dumpScreen(@NotNull String suffix)
-    {
-        File dumpDir = ensureDumpDir();
-        String baseName = screenshotBaseName(suffix);
-        return dumpScreen(dumpDir, baseName);
     }
 
     public File dumpScreen(File dir, String baseName)
