@@ -2270,12 +2270,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void reloadStudyFromZip(File studyFile, boolean validateQueries, int pipelineJobs)
     {
+        reloadStudyFromZip(studyFile, validateQueries, pipelineJobs, false);
+    }
+
+    protected void reloadStudyFromZip(File studyFile, boolean validateQueries, int pipelineJobs, boolean expectError)
+    {
         goToManageStudy();
         clickButton("Reload Study");
         setFormElement(Locator.name("folderZip"), studyFile);
         if(! validateQueries) {uncheckCheckbox(Locator.checkboxByName("validateQueries"));}
         clickButton("Reload Study");
-        waitForPipelineJobsToComplete(pipelineJobs, "Study Reload", false);
+        waitForPipelineJobsToComplete(pipelineJobs, "Study Reload", expectError);
     }
 
     public AbstractContainerHelper getContainerHelper()
