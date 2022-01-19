@@ -249,7 +249,7 @@ public class ArtifactCollector
             }
             return pdfFile;
         }
-        catch (IOException ioe)
+        catch (Exception ioe)
         {
             TestLogger.log("Failed dump page pdf: " + ioe.getMessage());
         }
