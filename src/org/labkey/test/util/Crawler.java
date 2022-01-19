@@ -856,6 +856,12 @@ public class Crawler
         {
             url = WebTestHelper.getBaseURL() + url;
         }
+        final String[] splitUrl = url.split("\\?", 2);
+        if (splitUrl.length > 1)
+        {
+            // Properly encode spaces in the URL query
+            url = splitUrl[0] + "?" + splitUrl[1].replace(" ", "+");
+        }
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
 
@@ -865,7 +871,9 @@ public class Crawler
             APITestHelper.injectCookies(method);
             response = httpClient.execute(method, context);
             final Optional<Header> content_disposition = Arrays.stream(response.getHeaders("Content-Disposition")).findFirst();
-            if (content_disposition.isPresent() && content_disposition.get().getValue().startsWith("attachment"))
+            if (content_disposition.isPresent() &&
+                    (content_disposition.get().getValue().startsWith("attachment")
+                    || content_disposition.get().getValue().startsWith("inline")))
             {
                 return true;
             }
