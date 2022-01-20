@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ui.grids.DetailTable;
+import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -103,6 +104,23 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         sleep(1000); // bootstrap tab animation
     }
 
+    public void clickRunStepDetailsTab()
+    {
+        elementCache().runStepDetailsTab.click();
+        sleep(1000); // bootstrap tab animation
+    }
+
+    public void clickProvenanceMapTab()
+    {
+        elementCache().provenanceMapTab.click();
+        sleep(1000); // bootstrap tab animation
+    }
+
+    public ResponsiveGrid getProvenanceMapGrid()
+    {
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).inParentWithId("lineage-run-step-tabs-pane-2").find();
+    }
+
     @Override
     public WebElement getComponentElement()
     {
@@ -151,8 +169,10 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         WebElement nodeDetailsName = Locator.tagWithClass("div", "lineage-name-data")
                 .findWhenNeeded(nodeDetails);
 
-        WebElement detailsTab = Locator.tagWithId("a", "lineage-run-tabs-tab-1").findWhenNeeded(nodeDetails);
-        WebElement runPropertiesTab = Locator.tagWithId("a", "lineage-run-tabs-tab-2").findWhenNeeded(nodeDetails);
+        WebElement detailsTab = Locator.tagWithId("a", "lineage-run-tabs-tab-1").findWhenNeeded(this);
+        WebElement runPropertiesTab = Locator.tagWithId("a", "lineage-run-tabs-tab-2").findWhenNeeded(this);
+        WebElement runStepDetailsTab = Locator.tagWithId("a", "lineage-run-step-tabs-tab-1").findWhenNeeded(this);
+        WebElement provenanceMapTab = Locator.tagWithId("a", "lineage-run-step-tabs-tab-2").findWhenNeeded(this);
 
         NodeDetailGroup summaryList(String nodeLabel)
         {
