@@ -10,6 +10,8 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.WebDriverWrapper.sleep;
+
 /**
  * Automates the Labkey UI component implemented in /components/lineage/LineageGraph.tsx
  */
@@ -89,6 +91,18 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
             elementCache().nodeLineageLink.click();
     }
 
+    public void clickDetailsTab()
+    {
+        elementCache().detailsTab.click();
+        sleep(1000); // bootstrap tab animation
+    }
+
+    public void clickRunPropertiesTab()
+    {
+        elementCache().runPropertiesTab.click();
+        sleep(1000); // bootstrap tab animation
+    }
+
     @Override
     public WebElement getComponentElement()
     {
@@ -136,6 +150,9 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
                 .findWhenNeeded(nodeDetailContainer).withTimeout(3000);
         WebElement nodeDetailsName = Locator.tagWithClass("div", "lineage-name-data")
                 .findWhenNeeded(nodeDetails);
+
+        WebElement detailsTab = Locator.tagWithId("a", "lineage-run-tabs-tab-1").findWhenNeeded(nodeDetails);
+        WebElement runPropertiesTab = Locator.tagWithId("a", "lineage-run-tabs-tab-2").findWhenNeeded(nodeDetails);
 
         NodeDetailGroup summaryList(String nodeLabel)
         {
