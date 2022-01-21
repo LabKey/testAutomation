@@ -882,7 +882,7 @@ public class Crawler
                 return true;
             }
         }
-        catch (IOException e)
+        catch (IOException | IllegalArgumentException e)
         {
             e.printStackTrace();
         }
