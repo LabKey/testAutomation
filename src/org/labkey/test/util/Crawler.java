@@ -859,8 +859,12 @@ public class Crawler
         final String[] splitUrl = url.split("\\?", 2);
         if (splitUrl.length > 1)
         {
-            // Properly encode spaces in the URL query
-            url = splitUrl[0] + "?" + splitUrl[1].replace(" ", "+");
+            // Properly encode characters that tend to be unencoded in the URL query
+            final String query = splitUrl[1]
+                    .replace(" ", "+")
+                    .replace("<", "%3C")
+                    .replace(">", "%3E");
+            url = splitUrl[0] + "?" + query;
         }
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
