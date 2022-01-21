@@ -852,7 +852,7 @@ public class Crawler
     }
 
     private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]{2}");
-    public static boolean isDownloadUrl(String url)
+    private static boolean isDownloadUrl(String url)
     {
         if (url.startsWith("/")) // relative URL
         {
@@ -866,11 +866,11 @@ public class Crawler
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < query.length(); i++)
             {
-                // Encode '%' characters that aren't encoding other characters
                 String c = String.valueOf(query.charAt(i));
                 switch (c)
                 {
                     case "%" -> {
+                        // Encode '%' characters that aren't encoding other characters
                         c = "%25"; // Assume "%" isn't encoding some other character
                         int remaining = query.length() - i;
                         if (remaining > 2)
