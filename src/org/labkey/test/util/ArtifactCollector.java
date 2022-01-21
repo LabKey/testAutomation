@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +50,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,14 +152,7 @@ public class ArtifactCollector
 
     private String buildBaseName(@NotNull String suffix)
     {
-        StringBuilder baseName = new StringBuilder();
-        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-        return baseName.append(dateFormat.format(new Date()))
-                .append(getAndIncrementShotCounter())
-                .append(_test.getClass().getSimpleName())
-                .append("#")
-                .append(suffix)
-                .toString();
+        return getAndIncrementShotCounter() + "_" + suffix;
     }
 
     private int getAndIncrementShotCounter()
