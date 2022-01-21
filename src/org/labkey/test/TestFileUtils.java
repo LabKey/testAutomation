@@ -22,6 +22,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -75,6 +76,8 @@ import java.util.zip.ZipInputStream;
  */
 public abstract class TestFileUtils
 {
+    private static final Logger LOG = TestLogger.getLogger(TestFileUtils.class);
+
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;
@@ -130,7 +133,7 @@ public abstract class TestFileUtils
 
                 _labkeyRoot = _labkeyRoot.getAbsoluteFile().toPath().normalize().toFile();
 
-                TestLogger.log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
+                LOG.info("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
             }
             else
             {
@@ -152,9 +155,7 @@ public abstract class TestFileUtils
     {
         if (_testRoot == null)
         {
-            _testRoot = new File(getLabKeyRoot(), "server/test");
-            if (!_testRoot.exists())
-                _testRoot = new File(getLabKeyRoot(), "server/testAutomation");
+            _testRoot = new File(getLabKeyRoot(), "server/testAutomation");
         }
         return _testRoot;
     }
@@ -288,7 +289,7 @@ public abstract class TestFileUtils
                 }
                 catch (IOException e)
                 {
-                    TestLogger.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -304,7 +305,7 @@ public abstract class TestFileUtils
 
     public static void delete(File file)
     {
-        TestLogger.log("Deleting from filesystem: " + file.toString());
+        LOG.info("Deleting from filesystem: " + file.toString());
         checkFileLocation(file);
 
         if (!file.exists())
@@ -313,14 +314,14 @@ public abstract class TestFileUtils
         FileUtils.deleteQuietly(file);
 
         if (!file.exists())
-            TestLogger.log("Deletion successful.");
+            LOG.info("Deletion successful.");
         else
-            TestLogger.log("Failed to delete : " + file.getAbsolutePath());
+            LOG.info("Failed to delete : " + file.getAbsolutePath());
     }
 
     public static void deleteDir(File dir)
     {
-        TestLogger.log("Deleting from filesystem: " + dir.toString());
+        LOG.info("Deleting from filesystem: " + dir.toString());
         checkFileLocation(dir);
         if (!dir.exists())
             return;
@@ -328,11 +329,11 @@ public abstract class TestFileUtils
         try
         {
             FileUtils.deleteDirectory(dir);
-            TestLogger.log("Deletion successful.");
+            LOG.info("Deletion successful.");
         }
         catch (IOException e)
         {
-            TestLogger.log("WARNING: Exception deleting directory -- " + e.getMessage());
+            LOG.info("WARNING: Exception deleting directory -- " + e.getMessage());
         }
     }
 
@@ -343,7 +344,7 @@ public abstract class TestFileUtils
             if (!FileUtils.directoryContains(new File(getLabKeyRoot()), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
-                TestLogger.log("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
+                LOG.info("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }

@@ -19,9 +19,14 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
@@ -36,7 +41,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -55,6 +60,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
@@ -96,7 +102,6 @@ public class Crawler
     private final List<String> _warnings = new ArrayList<>();
     private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-    private final long _downloadCutoff;
     private final Set<String> _urlsVisited = new HashSet<>();
 
     private int _remainingAttemptsToGetProjectLinks = 4;
@@ -124,7 +129,6 @@ public class Crawler
         _actionsMayLinkTo404 = getAllowed404Sources();
         _injectionCheckEnabled = injectionTest;
         _specialCrawlExclusions = getSpecialCrawlExclusions();
-        _downloadCutoff = BaseWebDriverTest.getDownloadDir().lastModified();
         for (String project : projects)
         {
             addProject(project);
@@ -465,8 +469,17 @@ public class Crawler
                 else
                 {
                     int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
-                    _relativeURL = urlText.substring(relativeURLStart);
-                    _actionId = new ControllerActionId(_relativeURL);
+                    final String relativeURL = urlText.substring(relativeURLStart);
+                    if (!relativeURL.isBlank())
+                    {
+                        _relativeURL = relativeURL;
+                        _actionId = new ControllerActionId(_relativeURL);
+                    }
+                    else
+                    {
+                        _relativeURL = null;
+                        _actionId = null;
+                    }
                 }
             }
             else
@@ -821,27 +834,64 @@ public class Crawler
      */
     private boolean beginAt(String relativeUrl)
     {
-        deleteCrawlerDownloads();
         // Escape brackets to prevent 400 errors
         relativeUrl = relativeUrl
                 .replace("[", "%5B")
                 .replace("]", "%5D")
                 .replace("{", "%7B")
                 .replace("}", "%7D");
+        if (isDownloadUrl(relativeUrl))
+        {
+            TestLogger.log("Skip download URL: " + relativeUrl.replace(WebTestHelper.getBaseURL(), ""));
+            return false;
+        }
         _urlsVisited.add(relativeUrl);
-        return _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE, true) == null;
+        _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE);
+        return true;
     }
 
-    private void deleteCrawlerDownloads()
+    private boolean isDownloadUrl(String url)
     {
-        File[] downloadedByCrawler = BaseWebDriverTest.getDownloadDir().listFiles(file -> file.lastModified() > _downloadCutoff);
-        if (downloadedByCrawler != null)
+        if (url.startsWith("/")) // relative URL
         {
-            for (File toDelete : downloadedByCrawler)
+            url = WebTestHelper.getBaseURL() + url;
+        }
+        final String[] splitUrl = url.split("\\?", 2);
+        if (splitUrl.length > 1)
+        {
+            // Properly encode characters that tend to be unencoded in the URL query
+            final String query = splitUrl[1]
+                    .replace(" ", "+")
+                    .replace("<", "%3C")
+                    .replace(">", "%3E");
+            url = splitUrl[0] + "?" + query;
+        }
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpResponse response = null;
+
+        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        {
+            var method = new HttpGet(url);
+            APITestHelper.injectCookies(method);
+            response = httpClient.execute(method, context);
+            final Optional<Header> content_disposition = Arrays.stream(response.getHeaders("Content-Disposition")).findFirst();
+            if (content_disposition.isPresent() &&
+                    (content_disposition.get().getValue().startsWith("attachment")
+                    || content_disposition.get().getValue().startsWith("inline")))
             {
-                FileUtils.deleteQuietly(toDelete);
+                return true;
             }
         }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (null != response)
+                EntityUtils.consumeQuietly(response.getEntity());
+        }
+        return false;
     }
 
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
@@ -951,7 +1001,7 @@ public class Crawler
             else
             {
                 // Did not navigate. Test download URL for injection
-                actualUrl = new URL(WebTestHelper.getBaseURL() + urlToCheck.getUrlText());
+                actualUrl = new URL(WebTestHelper.getBaseURL() + relativeURL);
             }
         }
         catch (RuntimeException | AssertionError rethrow)

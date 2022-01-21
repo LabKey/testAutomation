@@ -35,6 +35,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
@@ -83,6 +84,9 @@ import java.util.Random;
  */
 public class WebTestHelper
 {
+
+    private static final Logger LOG = TestLogger.getLogger(WebTestHelper.class);
+
     public static final Random RANDOM = new Random();
     public static final String API_KEY = "apikey"; // Username for api/session key authentication
 
@@ -219,14 +223,14 @@ public class WebTestHelper
                 String webPortStr = System.getProperty("labkey.port");
                 if (webPortStr == null || webPortStr.trim().length() == 0)
                 {
-                    System.out.println("Using default labkey port (" + DEFAULT_WEB_PORT +
+                    LOG.info("Using default labkey port (" + DEFAULT_WEB_PORT +
                                         ").\nThis can be changed by setting the property 'labkey.port=[yourport]'.");
                     _webPort = DEFAULT_WEB_PORT;
                 }
                 else
                 {
                     _webPort = Integer.parseInt(webPortStr);
-                    System.out.println("Using labkey port '" + _webPort + "', as provided by system property 'labkey.port'.");
+                    LOG.info("Using labkey port '" + _webPort + "', as provided by system property 'labkey.port'.");
                 }
             }
             return _webPort;
@@ -242,12 +246,12 @@ public class WebTestHelper
                 _targetServer = System.getProperty("labkey.server");
                 if (_targetServer == null || _targetServer.length() == 0)
                 {
-                    System.out.println("Using default target server (" + DEFAULT_TARGET_SERVER +
+                    LOG.info("Using default target server (" + DEFAULT_TARGET_SERVER +
                                         ").\nThis can be changed by setting the property 'labkey.server=[yourserver]'.");
                     _targetServer = DEFAULT_TARGET_SERVER;
                 }
                 else
-                    System.out.println("Using target server '" + _targetServer + "', as provided by system property 'labkey.server'.");
+                    LOG.info("Using target server '" + _targetServer + "', as provided by system property 'labkey.server'.");
             }
             return _targetServer;
         }
@@ -345,12 +349,12 @@ public class WebTestHelper
                 _contextPath = System.getProperty("labkey.contextpath");
                 if (_contextPath == null)
                 {
-                    System.out.println("Using default labkey context path (" + DEFAULT_CONTEXT_PATH +
+                    LOG.info("Using default labkey context path (" + DEFAULT_CONTEXT_PATH +
                                         ").\nThis can be changed by setting the property 'labkey.contextpath=[yourpath]'.");
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
-                    System.out.println("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+                    LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
 
                 if ("/".equals(_contextPath))
                 {

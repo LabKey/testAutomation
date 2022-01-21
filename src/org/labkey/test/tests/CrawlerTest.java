@@ -71,7 +71,7 @@ public class CrawlerTest extends BaseWebDriverTest
         log("Verify that page is vulnerable");
         try
         {
-            beginAt(getInjectUrl(Crawler.injectScriptBlock), 10_000, true);
+            beginAt(getInjectUrl(Crawler.injectScriptBlock), 10_000);
             Assert.fail("Expected an injection alert.");
         }
         catch (UnhandledAlertException alert)
@@ -83,7 +83,7 @@ public class CrawlerTest extends BaseWebDriverTest
         }
         try
         {
-            beginAt(getInjectUrl(Crawler.injectAttributeScript), 10_000, true);
+            beginAt(getInjectUrl(Crawler.injectAttributeScript), 10_000);
             Assert.fail("Expected an injection alert.");
         }
         catch (UnhandledAlertException alert)
