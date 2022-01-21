@@ -424,7 +424,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void failed(Throwable e, Description description)
             {
-                String pseudoTestName = description.getTestClass().getSimpleName() + (beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
+                String pseudoTestName = beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS;
 
                 if (getCurrentTest() != null && description.getTestClass().equals(getCurrentTestClass()))
                 {
