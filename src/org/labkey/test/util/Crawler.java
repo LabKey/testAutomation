@@ -66,6 +66,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -850,7 +851,8 @@ public class Crawler
         return true;
     }
 
-    private boolean isDownloadUrl(String url)
+    private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]{2}");
+    public static boolean isDownloadUrl(String url)
     {
         if (url.startsWith("/")) // relative URL
         {
@@ -860,10 +862,33 @@ public class Crawler
         if (splitUrl.length > 1)
         {
             // Properly encode characters that tend to be unencoded in the URL query
-            final String query = splitUrl[1]
-                    .replace(" ", "+")
-                    .replace("<", "%3C")
-                    .replace(">", "%3E");
+            String query = splitUrl[1];
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < query.length(); i++)
+            {
+                // Encode '%' characters that aren't encoding other characters
+                String c = String.valueOf(query.charAt(i));
+                switch (c)
+                {
+                    case "%" -> {
+                        c = "%25"; // Assume "%" isn't encoding some other character
+                        int remaining = query.length() - i;
+                        if (remaining > 2)
+                        {
+                            String maybeHex = String.valueOf(query.charAt(i + 1)) + query.charAt(i + 2);
+                            if (HEX_PATTERN.matcher(maybeHex).matches())
+                            {
+                                c = "%"; // "%" is actually encoding some other character
+                            }
+                        }
+                    }
+                    case " " -> c = "+";
+                    case "<" -> c = "%3C";
+                    case ">" -> c = "%3E";
+                }
+                sb.append(c);
+            }
+            query = sb.toString();
             url = splitUrl[0] + "?" + query;
         }
         HttpContext context = WebTestHelper.getBasicHttpContext();
