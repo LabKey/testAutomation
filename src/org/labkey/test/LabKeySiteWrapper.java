@@ -78,6 +78,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -888,18 +889,30 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String serverErrors = getServerErrors();
         if (!serverErrors.isEmpty())
         {
-            Matcher errorMatcher = ERROR_PATTERN.matcher(serverErrors);
-            while (errorMatcher.find())
+            TestLogger.error("Server errors:");
+            TestLogger.increaseIndent();
+
+            final Iterator<String> iterator = Arrays.stream(serverErrors.split("\\n")).iterator();
+            while (iterator.hasNext())
             {
-                String[] errorLines = errorMatcher.group().split("\n");
-                TestLogger.error("Server error:");
-                TestLogger.increaseIndent();
-                for (int i = 0; i < 10 && i < errorLines.length; i++)
+                String line = iterator.next();
+                if (line.startsWith("ERROR") && !line.endsWith("Additional exception info:"))
                 {
-                    TestLogger.error(errorLines[i]);
+                    TestLogger.error(line);
+                    if (iterator.hasNext())
+                    {
+                        // Line after the ERROR usually has the exception type and error message
+                        TestLogger.error("    " + iterator.next());
+                    }
                 }
-                TestLogger.decreaseIndent();
+                if (line.startsWith("Caused by:"))
+                {
+                    // Append all nested exception messages
+                    TestLogger.error("  " + line);
+                }
             }
+
+            TestLogger.decreaseIndent();
 
             beginAt(buildURL("admin", "showErrorsSinceMark"));
             resetErrors();

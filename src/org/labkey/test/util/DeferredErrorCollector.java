@@ -157,8 +157,9 @@ public class DeferredErrorCollector
     {
         if (errorsSinceMark() > 0)
         {
-            final String s = takeScreenShot(screenshotName);
+            final String s = artifactCollector.dumpPageSnapshot(screenshotName);
             allErrors.get(allErrors.size() - 1).setScreenshotName(s);
+            artifactCollector.reportTestMetadata(s);
         }
         setErrorMark();
     }
@@ -374,18 +375,15 @@ public class DeferredErrorCollector
 
     /**
      * Take a screen shot and HTML dump of the current page.
-     * See {@link ArtifactCollector#dumpPageSnapshot(String, String)} for details.
+     * @deprecated Use {@link ArtifactCollector#dumpPageSnapshot(String)}
      *
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
      * @return The name of the file used. Basically the screenshotName parameter with a counter added to the end.
      */
+    @Deprecated (since = "22.2")
     public String takeScreenShot(@NotNull String screenshotName)
     {
-        String snapShotNumberedName = screenshotName + "_" + screenShotCount++;
-
-        artifactCollector.dumpPageSnapshot(snapShotNumberedName, null);
-
-        return snapShotNumberedName;
+        return artifactCollector.dumpPageSnapshot(screenshotName);
     }
 
     public static class DeferredAssertionError extends AssertionError

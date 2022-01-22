@@ -424,7 +424,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void failed(Throwable e, Description description)
             {
-                String pseudoTestName = description.getTestClass().getSimpleName() + (beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
+                String pseudoTestName = beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS;
 
                 if (getCurrentTest() != null && description.getTestClass().equals(getCurrentTestClass()))
                 {
@@ -960,7 +960,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 // Don't take screenshots if error was deferred and any screenshots were taken
                 if (!(error instanceof DeferredErrorCollector.DeferredAssertionError))
                 {
-                    getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                    final String artifactBaseName = getArtifactCollector().dumpPageSnapshot(testName);// Snapshot of current window
+                    getArtifactCollector().reportTestMetadata(artifactBaseName);
                 }
                 String failureWindow = getDriver().getWindowHandle();
                 Set<String> otherWindowHandles = getDriver().getWindowHandles().stream()
