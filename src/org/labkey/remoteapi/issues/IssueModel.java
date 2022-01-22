@@ -1,16 +1,13 @@
 package org.labkey.remoteapi.issues;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 public class IssueModel
 {
@@ -24,7 +21,8 @@ public class IssueModel
     private final String PRIORITY = "priority";
     private final String COMMENT = "comment";
     private final String NOTIFY_LIST = "notifyList";
-    private Map<String, Object> _properties = new HashMap<>();
+    private Map<String, Object> _properties = new CaseInsensitiveHashMap<>();
+    private List<File> _attachments = new ArrayList();
 
     // https://www.labkey.org/Documentation/wiki-page.view?name=sampleJSscripts#issues
     public IssueModel()
@@ -33,7 +31,7 @@ public class IssueModel
 
     public IssueModel setProperties(Map properties)
     {
-        _properties = properties;
+        _properties.putAll(properties);
         return this;
     }
 
@@ -46,6 +44,17 @@ public class IssueModel
     public JSONObject toJSON()
     {
         var json = new JSONObject(_properties);
+
+        // handle attachments
+        if (!_attachments.isEmpty())
+        {
+            List<String> names = _attachments.stream()
+                    .map(f -> f.getName())
+                    .collect(Collectors.toList());
+
+            json.put("attachment", String.join("|", names));
+        }
+
         return json;
     }
 
@@ -162,8 +171,25 @@ public class IssueModel
         return this;
     }
 
+    public IssueModel setProp(String propName, Object value)
+    {
+        _properties.put(propName, value);
+        return this;
+    }
 
-    public enum IssueAction{
+    public IssueModel addAttachment(File attachmentFile)
+    {
+        _attachments.add(attachmentFile);
+        return this;
+    }
+
+    public List<File> getAttachments()
+    {
+        return _attachments;
+    }
+
+    public enum IssueAction
+    {
         INSERT("insert"),
         UPDATE("update"),
         CLOSE("close"),
