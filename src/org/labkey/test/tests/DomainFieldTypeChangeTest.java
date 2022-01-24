@@ -1,0 +1,205 @@
+package org.labkey.test.tests;
+
+import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+@Category({Daily.class})
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
+public class DomainFieldTypeChangeTest extends BaseWebDriverTest
+{
+    @BeforeClass
+    public static void setupProject()
+    {
+        DomainFieldTypeChangeTest init = (DomainFieldTypeChangeTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        _containerHelper.createProject(getProjectName(), null);
+        new PortalHelper(getDriver()).addBodyWebPart("Lists");
+    }
+
+    @Before
+    public void preTest() throws Exception
+    {
+        goToProjectHome();
+    }
+
+    @Override
+    protected @Nullable String getProjectName()
+    {
+        return "Domain Field Type Change Test Project";
+    }
+
+    @Test
+    public void testProvisionedDomainFieldChanges() throws IOException, CommandException
+    {
+        String listName = "SampleListWithAllDataTypes";
+
+        log("Creating list with variety of data fields");
+        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+                .withColumns(List.of(
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("testInteger", FieldDefinition.ColumnType.Integer),
+                        new FieldDefinition("testDecimal", FieldDefinition.ColumnType.Decimal),
+                        new FieldDefinition("testDate", FieldDefinition.ColumnType.DateAndTime),
+                        new FieldDefinition("testBoolean", FieldDefinition.ColumnType.Boolean)));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
+
+        log("Inserting sample rows in the list");
+        dgen.addCustomRow(Map.of("name", "first", "testInteger", "1",
+                "testDecimal", "1.10", "testDate", "01-01-2022",
+                "testBoolean", "true"));
+        dgen.addCustomRow(Map.of("name", "Second", "testInteger", "2",
+                "testDecimal", "2.20", "testDate", "01-02-2022",
+                "testBoolean", "false"));
+        dgen.addCustomRow(Map.of("name", "Third", "testInteger", "3",
+                "testDecimal", "3.30", "testDate", "01-03-2022",
+                "testBoolean", "true"));
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
+
+        log("Verifying Integer to Decimal change");
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
+        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.Decimal);
+        domainFormPanel.getField("testBoolean").setNumberFormat("yes;no");
+        domainDesignerPage.clickFinish();
+
+        clickAndWait(Locator.linkWithText(listName));
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Incorrect values after changing integer to decimal", Arrays.asList("1.0", "2.0", "3.0"),
+                table.getColumnDataAsText("testInteger"));
+
+        log("Verifying changin data fields to string");
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
+        domainFormPanel = domainDesignerPage.fieldsPanel();
+        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.String);
+        domainFormPanel.getField("testDecimal").setType(FieldDefinition.ColumnType.String);
+        domainFormPanel.getField("testDate").setType(FieldDefinition.ColumnType.String);
+        domainFormPanel.getField("testBoolean").setType(FieldDefinition.ColumnType.String);
+        domainDesignerPage.clickFinish();
+
+        clickAndWait(Locator.linkWithText(listName));
+        table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("1", "2", "3"),
+                table.getColumnDataAsText("testInteger"));
+        checker().verifyEquals("Incorrect values after changing decimal to string", Arrays.asList("1.1", "2.2", "3.3"),
+                table.getColumnDataAsText("testDecimal"));
+        checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00"),
+                table.getColumnDataAsText("testDate"));
+        checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes"),
+                table.getColumnDataAsText("testBoolean"));
+    }
+
+    @Test
+    public void testNonProvisionedDomainFieldChanges()
+    {
+        String assayName = "Assay1";
+        String runName = "Run1";
+        File runFile = new File(TestFileUtils.getSampleData("AssayImportExport"), "GenericAssay_Run1.xls");
+        goToManageAssays();
+        APIAssayHelper assayHelper = new APIAssayHelper(this);
+        ReactAssayDesignerPage assayDesignerPage = assayHelper.createAssayDesign("General", assayName);
+
+        DomainFormPanel runFields = assayDesignerPage.goToRunFields();
+        runFields.addField("runTestInteger").setType(FieldDefinition.ColumnType.Integer);
+        runFields.addField("runTestDecimal").setType(FieldDefinition.ColumnType.Decimal);
+        runFields.addField("runTestDate").setType(FieldDefinition.ColumnType.DateAndTime);
+        runFields.addField("runTestBoolean").setType(FieldDefinition.ColumnType.Boolean);
+
+        DomainFormPanel batchFields = assayDesignerPage.goToBatchFields();
+        batchFields.addField("batchTestInteger").setType(FieldDefinition.ColumnType.Integer);
+        batchFields.addField("batchTestDecimal").setType(FieldDefinition.ColumnType.Decimal);
+        batchFields.addField("batchTestDate").setType(FieldDefinition.ColumnType.DateAndTime);
+        batchFields.addField("batchTestBoolean").setType(FieldDefinition.ColumnType.Boolean);
+        assayDesignerPage.clickFinish();
+
+        goToManageAssays();
+        clickAndWait(Locator.linkWithText(assayName));
+        DataRegionTable table = new DataRegionTable("Runs", getDriver());
+        table.clickHeaderButton("Import Data");
+        setFormElement(Locator.name("batchTestInteger"), "1");
+        setFormElement(Locator.name("batchTestDecimal"), "1.1");
+        setFormElement(Locator.name("batchTestDate"), "01-01-2022");
+        checkCheckbox(Locator.name("batchTestBoolean"));
+        clickButton("Next");
+
+        setFormElement(Locator.name("name"), runName);
+        setFormElement(Locator.name("runTestInteger"), "12");
+        setFormElement(Locator.name("runTestDecimal"), "1.12");
+        setFormElement(Locator.name("runTestDate"), "01-03-2022");
+        checkRadioButton(Locator.radioButtonById("Fileupload"));
+        setFormElement(Locator.input("__primaryFile__"), runFile);
+        clickButton("Save and Finish");
+
+        goToManageAssays();
+        clickAndWait(Locator.linkWithText(assayName));
+        waitForElement(Locator.linkWithText(runName));
+        click(Locator.linkWithText("Manage assay design"));
+        assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        runFields = assayDesignerPage.goToRunFields();
+        runFields.getField("runTestInteger").setType(FieldDefinition.ColumnType.Decimal);
+        checker().verifyEquals("Incorrect error message for integer to decimal", Arrays.asList("Cannot convert from INTEGER to DOUBLE for non-provisioned table"), assayDesignerPage.clickSaveExpectingErrors());
+        runFields.getField("runTestInteger").setType(FieldDefinition.ColumnType.String);
+        runFields.getField("runTestBoolean").setNumberFormat("yes;no");
+
+        batchFields = assayDesignerPage.goToBatchFields();
+        batchFields.getField("batchTestDate").setType(FieldDefinition.ColumnType.String);
+        batchFields.getField("batchTestDecimal").setType(FieldDefinition.ColumnType.String);
+        assayDesignerPage.clickFinish();
+
+//        assayDesignerPage = _assayHelper.clickEditAssayDesign();
+//        runFields = assayDesignerPage.goToRunFields();
+//        runFields.getField("runTestBoolean").setType(FieldDefinition.ColumnType.String);
+//        assayDesignerPage.clickFinish();
+
+        goToManageAssays();
+        clickAndWait(Locator.linkWithText(assayName));
+        table = new DataRegionTable("Runs", getDriver());
+        checker().verifyEquals("Run fields : Incorrect value after changing Integer to string", Arrays.asList("12"),
+                table.getColumnDataAsText("runTestInteger"));
+        checker().verifyEquals("Run fields : Incorrect value after changing Boolean to string", Arrays.asList("no"),
+                table.getColumnDataAsText("runTestBoolean"));
+        checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("2022-01-01 00:00:00"),
+                table.getColumnDataAsText("Batch/batchTestDate"));
+        checker().verifyEquals("Batch fields : Incorrect value after changing Decimal to string", Arrays.asList("1.1"),
+                table.getColumnDataAsText("Batch/batchTestDecimal"));
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return null;
+    }
+}
