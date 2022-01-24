@@ -148,14 +148,10 @@ public class TeamCityUtils
         messageBuilder.append("##teamcity[");
         messageBuilder.append(validateId(messageName));
         // Certain message types take a single unkeyed value rather than key/value pairs (e.g. 'publishArtifacts')
-        if (attributes.size() == 1 && attributes.containsKey(null))
+        if (attributes.size() == 1 && attributes.containsKey(""))
         {
             messageBuilder.append(" ");
             appendValue(messageBuilder, attributes.values().iterator().next());
-        }
-        else if (attributes.containsKey(null) || attributes.containsValue(null))
-        {
-            throw new IllegalArgumentException("Provide keys and values for all service message attributes: " + attributes);
         }
         else
         {
@@ -174,7 +170,7 @@ public class TeamCityUtils
 
     public static void serviceMessage(String messageName, String value)
     {
-        serviceMessage(messageName, Maps.of(null, value));
+        serviceMessage(messageName, Maps.of("", value));
     }
 
     // https://confluence.jetbrains.com/display/TCD18/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Escapedvalues
