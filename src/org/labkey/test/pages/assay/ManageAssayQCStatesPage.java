@@ -75,6 +75,17 @@ public class ManageAssayQCStatesPage extends LabKeyPage<ManageAssayQCStatesPage.
         return getSelectedOptionText(elementCache().defaultQCState);
     }
 
+    public ManageAssayQCStatesPage setRequireCommentOnQCStateChange(boolean requireComment)
+    {
+        selectOptionByText(elementCache().requireCommentOnQCStateChange, requireComment ? "Yes" : "No");
+        return this;
+    }
+
+    public boolean isRequireCommentOnQCStateChange()
+    {
+        return getSelectedOptionText(elementCache().requireCommentOnQCStateChange).equals("Yes");
+    }
+
     public void clickSave()
     {
         clickButton("Save");
@@ -96,5 +107,6 @@ public class ManageAssayQCStatesPage extends LabKeyPage<ManageAssayQCStatesPage.
         WebElement stateForm = Locator.tagWithAttribute("form", "name", "manageQCStates")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator defaultQCState = Locator.name("defaultQCState");
+        Locator.XPathLocator requireCommentOnQCStateChange = Locator.name("requireCommentOnQCStateChange");
     }
 }

@@ -38,6 +38,12 @@ public class UpdateQCStatePage extends LabKeyPage<UpdateQCStatePage.ElementCache
         return new AssayRunsPage(getDriver());
     }
 
+    public AssayRunsPage clickCancel()
+    {
+        clickButton("cancel");
+        return new AssayRunsPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
