@@ -9,6 +9,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -51,11 +52,9 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return new ExportFolderPage(driver.getDriver());
     }
 
-    @Override
     protected void waitForPage()
     {
-        waitFor(()-> Locator.tagWithText("label", FOLDER_TYPE_AND_ACTIVE_MODULES).existsIn(getDriver()),
-                "The page did not render in time", WAIT_FOR_PAGE);
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().exportBtn));
     }
 
     public ExportFolderPage includeExperimentsAndRuns(boolean checked)
