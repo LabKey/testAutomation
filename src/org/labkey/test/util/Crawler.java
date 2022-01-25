@@ -19,7 +19,6 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -42,7 +41,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -68,6 +66,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -104,7 +103,6 @@ public class Crawler
     private final List<String> _warnings = new ArrayList<>();
     private final boolean _injectionCheckEnabled;
     private final Set<String> _projects = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-    private final long _downloadCutoff;
     private final Set<String> _urlsVisited = new HashSet<>();
 
     private int _remainingAttemptsToGetProjectLinks = 4;
@@ -132,7 +130,6 @@ public class Crawler
         _actionsMayLinkTo404 = getAllowed404Sources();
         _injectionCheckEnabled = injectionTest;
         _specialCrawlExclusions = getSpecialCrawlExclusions();
-        _downloadCutoff = BaseWebDriverTest.getDownloadDir().lastModified();
         for (String project : projects)
         {
             addProject(project);
@@ -838,28 +835,61 @@ public class Crawler
      */
     private boolean beginAt(String relativeUrl)
     {
-        deleteCrawlerDownloads();
-        if (isDownloadUrl(relativeUrl))
-        {
-            TestLogger.log("Skip download URL: " + relativeUrl.replace(WebTestHelper.getBaseURL(), ""));
-            return false;
-        }
         // Escape brackets to prevent 400 errors
         relativeUrl = relativeUrl
                 .replace("[", "%5B")
                 .replace("]", "%5D")
                 .replace("{", "%7B")
                 .replace("}", "%7D");
+        if (isDownloadUrl(relativeUrl))
+        {
+            TestLogger.log("Skip download URL: " + relativeUrl.replace(WebTestHelper.getBaseURL(), ""));
+            return false;
+        }
         _urlsVisited.add(relativeUrl);
         _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE);
         return true;
     }
 
-    private boolean isDownloadUrl(String url)
+    private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]{2}");
+    private static boolean isDownloadUrl(String url)
     {
         if (url.startsWith("/")) // relative URL
         {
             url = WebTestHelper.getBaseURL() + url;
+        }
+        final String[] splitUrl = url.split("\\?", 2);
+        if (splitUrl.length > 1)
+        {
+            // Properly encode characters that tend to be unencoded in the URL query
+            String query = splitUrl[1];
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < query.length(); i++)
+            {
+                String c = String.valueOf(query.charAt(i));
+                switch (c)
+                {
+                    case "%" -> {
+                        // Encode '%' characters that aren't encoding other characters
+                        c = "%25"; // Assume "%" isn't encoding some other character
+                        int remaining = query.length() - i;
+                        if (remaining > 2)
+                        {
+                            String maybeHex = String.valueOf(query.charAt(i + 1)) + query.charAt(i + 2);
+                            if (HEX_PATTERN.matcher(maybeHex).matches())
+                            {
+                                c = "%"; // "%" is actually encoding some other character
+                            }
+                        }
+                    }
+                    case " " -> c = "+";
+                    case "<" -> c = "%3C";
+                    case ">" -> c = "%3E";
+                }
+                sb.append(c);
+            }
+            query = sb.toString();
+            url = splitUrl[0] + "?" + query;
         }
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
@@ -870,12 +900,14 @@ public class Crawler
             APITestHelper.injectCookies(method);
             response = httpClient.execute(method, context);
             final Optional<Header> content_disposition = Arrays.stream(response.getHeaders("Content-Disposition")).findFirst();
-            if (content_disposition.isPresent() && content_disposition.get().getValue().startsWith("attachment"))
+            if (content_disposition.isPresent() &&
+                    (content_disposition.get().getValue().startsWith("attachment")
+                    || content_disposition.get().getValue().startsWith("inline")))
             {
                 return true;
             }
         }
-        catch (IOException e)
+        catch (IOException | IllegalArgumentException e)
         {
             e.printStackTrace();
         }
@@ -885,18 +917,6 @@ public class Crawler
                 EntityUtils.consumeQuietly(response.getEntity());
         }
         return false;
-    }
-
-    private void deleteCrawlerDownloads()
-    {
-        File[] downloadedByCrawler = BaseWebDriverTest.getDownloadDir().listFiles(file -> file.lastModified() > _downloadCutoff);
-        if (downloadedByCrawler != null)
-        {
-            for (File toDelete : downloadedByCrawler)
-            {
-                FileUtils.deleteQuietly(toDelete);
-            }
-        }
     }
 
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
