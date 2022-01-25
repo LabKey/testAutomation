@@ -15,9 +15,11 @@
  */
 package org.labkey.test.pages.assay;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
@@ -81,16 +83,26 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
         return new ManageAssayQCStatesPage(getDriver());
     }
 
-    public AssayRunsPage setRowQcStatus(String state, String comment, int... rowIndices)
+    public AssayRunsPage setRowQcStatus(String state, String comment, boolean expectError, int... rowIndices)
     {
         for (int rowIndex : rowIndices)
         {
             getTable().checkCheckbox(rowIndex);
         }
-        return updateSelectedQcStatus()
+        UpdateQCStatePage updatePage = updateSelectedQcStatus()
                 .selectState(state)
-                .setComment(comment)
-                .clickUpdate();
+                .setComment(comment);
+
+        if (expectError)
+        {
+            clickButton("update", 0);
+            ModalDialog dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Error").find();
+            Assert.assertEquals("A comment is required when changing a QC State for the selected run(s).", dialog.getBodyText());
+            dialog.dismiss();
+            return updatePage.clickCancel();
+        }
+
+        return updatePage.clickUpdate();
     }
 
     @Override
