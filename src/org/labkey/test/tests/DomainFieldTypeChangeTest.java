@@ -187,7 +187,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         goToManageAssays();
         clickAndWait(Locator.linkWithText(assayName));
         table = new DataRegionTable("Runs", getDriver());
-        checker().verifyEquals("Run fields : Incorrect value after changing Integer to string", Arrays.asList("12"),
+        checker().verifyEquals("Run fields : Incorrect value after changing Integer to decimal", Arrays.asList("12.0"),
                 table.getColumnDataAsText("runTestInteger"));
         checker().verifyEquals("Run fields : Incorrect value after changing Boolean to string", Arrays.asList("no"),
                 table.getColumnDataAsText("runTestBoolean"));
@@ -195,6 +195,8 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
                 table.getColumnDataAsText("Batch/batchTestDate"));
         checker().verifyEquals("Batch fields : Incorrect value after changing Decimal to string", Arrays.asList("1.1"),
                 table.getColumnDataAsText("Batch/batchTestDecimal"));
+
+        checker().screenShotIfNewError("AfterRunAndBatchChanges");
     }
 
     @Override
