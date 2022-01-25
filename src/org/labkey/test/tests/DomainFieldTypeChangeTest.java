@@ -10,6 +10,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -114,14 +115,21 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_testDate"), "New01-02-2022");
         setFormElement(Locator.name("quf_testBoolean"), "NewTrue");
         clickButton("Submit");
-        checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("1", "2", "3", "New1"),
+        table.clickEditRow(0);
+        setFormElement(Locator.name("quf_testInteger"), "Edited1");
+        clickButton("Submit");
+        checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("Edited1", "2", "3", "New1"),
                 table.getColumnDataAsText("testInteger"));
         checker().verifyEquals("Incorrect values after changing decimal to string", Arrays.asList("1.1", "2.2", "3.3", "New1.1"),
                 table.getColumnDataAsText("testDecimal"));
-        checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
-                table.getColumnDataAsText("testDate"));
         checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes", "NewTrue"),
                 table.getColumnDataAsText("testBoolean"));
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+            checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("Jan 1 2022 12:00AM", "Jan 2 2022 12:00AM", "Jan 3 2022 12:00AM", "New01-02-2022"),
+                    table.getColumnDataAsText("testDate"));
+        else
+            checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
+                    table.getColumnDataAsText("testDate"));
     }
 
     @Test
@@ -191,10 +199,15 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
                 table.getColumnDataAsText("runTestInteger"));
         checker().verifyEquals("Run fields : Incorrect value after changing Boolean to string", Arrays.asList("no"),
                 table.getColumnDataAsText("runTestBoolean"));
-        checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("2022-01-01 00:00:00"),
-                table.getColumnDataAsText("Batch/batchTestDate"));
         checker().verifyEquals("Batch fields : Incorrect value after changing Decimal to string", Arrays.asList("1.1"),
                 table.getColumnDataAsText("Batch/batchTestDecimal"));
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+            checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("Jan 1 2022 12:00AM"),
+                    table.getColumnDataAsText("Batch/batchTestDate"));
+        else
+            checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("2022-01-01 00:00:00"),
+                    table.getColumnDataAsText("Batch/batchTestDate"));
+
 
         checker().screenShotIfNewError("AfterRunAndBatchChanges");
     }
