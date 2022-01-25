@@ -81,16 +81,10 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return this;
     }
 
-    public void assertModuleEnabled(String moduleName)
-    {
-        goToFolderTypeTab();
-        assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
-    }
-
-    public FolderManagementPage goToExportTab()
+    public ExportFolderPage goToExportTab()
     {
         selectTab("export");
-        return this;
+        return new ExportFolderPage(getDriver());
     }
 
     public ImportFolderPage goToImportTab()

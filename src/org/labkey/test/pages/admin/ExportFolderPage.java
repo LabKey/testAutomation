@@ -6,9 +6,9 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -49,6 +49,12 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     {
         driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "exportFolder"));
         return new ExportFolderPage(driver.getDriver());
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().exportBtn));
     }
 
     public ExportFolderPage includeExperimentsAndRuns(boolean checked)
