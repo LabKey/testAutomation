@@ -95,7 +95,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect values after changing integer to decimal", Arrays.asList("1.0", "2.0", "3.0"),
                 table.getColumnDataAsText("testInteger"));
 
-        log("Verifying changin data fields to string");
+        log("Verifying changing data fields to string");
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         domainFormPanel = domainDesignerPage.fieldsPanel();
         domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.String);
@@ -106,13 +106,21 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(listName));
         table = new DataRegionTable("query", getDriver());
-        checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("1", "2", "3"),
+        log("Verifying inserting string values");
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_name"), "Fourth");
+        setFormElement(Locator.name("quf_testInteger"), "New1");
+        setFormElement(Locator.name("quf_testDecimal"), "New1.1");
+        setFormElement(Locator.name("quf_testDate"), "New01-02-2022");
+        setFormElement(Locator.name("quf_testBoolean"), "NewTrue");
+        clickButton("Submit");
+        checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("1", "2", "3", "New1"),
                 table.getColumnDataAsText("testInteger"));
-        checker().verifyEquals("Incorrect values after changing decimal to string", Arrays.asList("1.1", "2.2", "3.3"),
+        checker().verifyEquals("Incorrect values after changing decimal to string", Arrays.asList("1.1", "2.2", "3.3", "New1.1"),
                 table.getColumnDataAsText("testDecimal"));
-        checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00"),
+        checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
                 table.getColumnDataAsText("testDate"));
-        checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes"),
+        checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes", "NewTrue"),
                 table.getColumnDataAsText("testBoolean"));
     }
 
@@ -164,8 +172,6 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         assayDesignerPage = _assayHelper.clickEditAssayDesign();
         runFields = assayDesignerPage.goToRunFields();
         runFields.getField("runTestInteger").setType(FieldDefinition.ColumnType.Decimal);
-        checker().verifyEquals("Incorrect error message for integer to decimal", Arrays.asList("Cannot convert from INTEGER to DOUBLE for non-provisioned table"), assayDesignerPage.clickSaveExpectingErrors());
-        runFields.getField("runTestInteger").setType(FieldDefinition.ColumnType.String);
         runFields.getField("runTestBoolean").setNumberFormat("yes;no");
 
         batchFields = assayDesignerPage.goToBatchFields();
@@ -173,10 +179,10 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         batchFields.getField("batchTestDecimal").setType(FieldDefinition.ColumnType.String);
         assayDesignerPage.clickFinish();
 
-//        assayDesignerPage = _assayHelper.clickEditAssayDesign();
-//        runFields = assayDesignerPage.goToRunFields();
-//        runFields.getField("runTestBoolean").setType(FieldDefinition.ColumnType.String);
-//        assayDesignerPage.clickFinish();
+        assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        runFields = assayDesignerPage.goToRunFields();
+        runFields.getField("runTestBoolean").setType(FieldDefinition.ColumnType.String);
+        assayDesignerPage.clickFinish();
 
         goToManageAssays();
         clickAndWait(Locator.linkWithText(assayName));
