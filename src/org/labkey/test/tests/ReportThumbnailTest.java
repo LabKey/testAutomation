@@ -41,7 +41,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -391,7 +390,12 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        checker().verifyEquals("Thumbnail Revision number is not correct", String.valueOf(currentRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+
+        checker()
+                .withScreenshot("InitialThumbnailRevisionNumberIncorrect")
+                .verifyEquals("Thumbnail Revision number is not correct.",
+                        currentRevNum, getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
@@ -400,7 +404,12 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
-        checker().verifyEquals("Thumbnail Revision number is not correct", String.valueOf(nextRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+
+        checker()
+                .withScreenshot("UpdatedThumbnailRevisionNumberIncorrect")
+                .verifyEquals("Updated Thumbnail Revision number is not correct.",
+                        nextRevNum, getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
     }
@@ -427,13 +436,13 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _ext4Helper.waitForMaskToDisappear();
     }
 
-    protected String getRevisionNumber(Locator loc)
+    protected int getRevisionNumber(Locator loc)
     {
         String url = waitForElement(loc).getAttribute("src");
 
         try
         {
-            return WebTestHelper.parseUrlQuery(new URL(url)).get("revision");
+            return Integer.parseInt(WebTestHelper.parseUrlQuery(new URL(url)).get("revision"));
         }
         catch (MalformedURLException e)
         {
@@ -511,7 +520,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customIcon"));
-        assertEquals("Icon Revision number is not correct", String.valueOf(customRevNum), getRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img")));
+        assertEquals("Icon Revision number is not correct", customRevNum, getRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img")));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
     }
