@@ -9,7 +9,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
@@ -210,12 +209,6 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
 
 
         checker().screenShotIfNewError("AfterRunAndBatchChanges");
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
     }
 
     @Override
