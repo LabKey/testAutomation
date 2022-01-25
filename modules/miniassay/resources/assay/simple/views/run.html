@@ -37,7 +37,7 @@
 
   function renderDatas(title, datas)
   {
-    if (!datas || datas.length == 0)
+    if (!datas || datas.length === 0)
       return "";
 
     s = "<h3>" + title + "</h3>";
@@ -47,7 +47,7 @@
     {
       var data = datas[i];
       s += "<tr>";
-      s += "<td colspan=2><a href='" + _url('experiment', 'showData', c, {rowId: data.rowId}) + "'>" + data.name + "</a></td>";
+      s += "<td colspan=2><a href='" + _url('experiment', 'showData', c, {rowId: data.id}) + "'>" + data.name + "</a></td>";
       s += "</tr>";
     }
 
