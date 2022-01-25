@@ -51,7 +51,12 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
     public DatasetDesignerPage clickEditDefinition()
     {
         doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().editDefinitionButton)));
-        return new DatasetDesignerPage(getDriver());
+
+        // Wait until a panel body is displayed before returning.
+        DatasetDesignerPage ddp = new DatasetDesignerPage(getDriver());
+        ddp.waitForPage();
+
+        return ddp;
     }
 
     public ViewDatasetDataPage clickViewData()
