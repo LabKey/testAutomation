@@ -715,7 +715,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             protected void succeeded(Description description)
             {
                 closeExtraWindows();
-                checker().wrapAssertion(() -> checkErrors());
+                checker().withScreenshot(description.getMethodName() + "_serverErrors").wrapAssertion(() -> checkErrors());
                 checker().reportResults();
             }
         };
