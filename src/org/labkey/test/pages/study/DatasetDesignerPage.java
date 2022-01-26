@@ -42,7 +42,9 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
 
     public void waitForPage()
     {
-        waitFor(()-> getFieldsPanel().getComponentElement().isDisplayed(),
+        // Wait for a panel body to be displayed.
+        WebElement panelBody = Locator.tagWithClass("div", "panel-body").findWhenNeeded(getDriver());
+        waitFor(panelBody::isDisplayed,
                 "The page did not render in time", WAIT_FOR_PAGE);
     }
 
