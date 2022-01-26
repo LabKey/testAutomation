@@ -198,7 +198,7 @@ public class IssueModel
         UPDATE("update"),
         RESOLVE("resolve"),
         CLOSE("close"),
-        OPEN("open");
+        REOPEN("reopen");
 
         IssueAction(String value)
         {

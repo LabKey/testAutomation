@@ -9,6 +9,7 @@ import org.labkey.remoteapi.issues.GetIssueResponse;
 import org.labkey.remoteapi.issues.IssueCommand;
 import org.labkey.remoteapi.issues.IssueModel;
 import org.labkey.remoteapi.issues.IssueResponse;
+import org.labkey.remoteapi.issues.IssueResponseModel;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -53,7 +54,6 @@ public class IssueAPITest extends BaseWebDriverTest
     public static void setupProject()
     {
         IssueAPITest init = (IssueAPITest) getCurrentTest();
-
         init.doSetup();
     }
 
@@ -83,29 +83,15 @@ public class IssueAPITest extends BaseWebDriverTest
         String title = "Insert Issue Test Issue";
         IssueModel testIssue = basicIssueModel(title, comment);
 
-        Map<String, String> expectedChanges = new HashMap<>();
-        expectedChanges.put("Title", title);
-        expectedChanges.put("Assigned To", TEST_USER_DISPLAY_NAME);
-        expectedChanges.put("Notify", TEST_BUDDY_DISPLAY_NAME);
-        expectedChanges.put("Type", "Defect");
-        expectedChanges.put("Priority", "3");
-
         IssueCommand cmd = new IssueCommand();
         cmd.setIssue(testIssue);
         IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
-
-        //var issueListPage = _issuesHelper.goToIssueList(getProjectName(), ISSUES);
         assertNotNull("expect our issue response to tell us an issue ID", response.getIssueId());
 
         var issuePage = DetailsPage.beginAt(this, getProjectName(), response.getIssueId().toString());
         var issueComment = issuePage.getComments().get(0);
         assertEquals("expect that the comment was set", comment, issueComment.getComment());
         assertEquals("expect issue author to be correctly identified", TEST_USER_DISPLAY_NAME, issueComment.getUser());
-
-        // fieldChanges on IssueComment seems not to work at all, this was a hopeful attempt to use it
-        // we should fix it, and we should also be able to validate these things over the API
-//        assertEquals("expect title, assignment, notify, type, pri to be set",
-//                expectedChanges, issueComment.getFieldChanges());
     }
 
     @Test
@@ -121,23 +107,15 @@ public class IssueAPITest extends BaseWebDriverTest
                 .setAction(IssueModel.IssueAction.UPDATE)
                 .setPriority(updatedPri);
 
-        IssueCommand cmd = new IssueCommand();
-        cmd.setIssue(originalIssue);
-        IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
-        var issueId = response.getIssueId();
+        // insert the issue
+        var issueId = doIssueAction(originalIssue);
 
+        // update
         updateIssue.setIssueId(issueId);
-        IssueCommand updateCmd = new IssueCommand();
-        updateCmd.setIssue(updateIssue);
-        var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
+        doIssueAction(updateIssue);
 
-        // navigate to the page for easy visualization
-        var issuePage = DetailsPage.beginAt(this, getProjectName(), response.getIssueId().toString());
-
-        // get issue status from the server
-        GetIssueCommand getCmd = new GetIssueCommand(issueId);
-        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
-        var updatedModel = getResponse.getIssueModel();
+        // verify
+        var updatedModel = getIssueResponse(issueId);
         var latestComment = updatedModel.getComments().get(1);
         assertEquals("expect updated title", title, updatedModel.getTitle());
         assertThat("expect current comment reponse to have updated", latestComment.getComment(), containsString(comment));
@@ -154,31 +132,24 @@ public class IssueAPITest extends BaseWebDriverTest
         Long updatedPri = 4L;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
 
-        IssueModel updateIssue = basicIssueModel(newTitle, newComment)
+        IssueModel resolveIssue = basicIssueModel(newTitle, newComment)
                 .setAction(IssueModel.IssueAction.RESOLVE)
                 .setResolution("Fixed")
                 .setPriority(updatedPri);
 
         // create the issue
-        IssueCommand cmd = new IssueCommand();
-        cmd.setIssue(originalIssue);
-        IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
-        var issueId = response.getIssueId();
+        var issueId = doIssueAction(originalIssue);
 
         // resolve the issue
-        updateIssue.setIssueId(issueId);
-        IssueCommand updateCmd = new IssueCommand();
-        updateCmd.setIssue(updateIssue);
-        var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
+        resolveIssue.setIssueId(issueId);
+        doIssueAction(resolveIssue);
 
         // get the updated issue from the server
-        GetIssueCommand getCmd = new GetIssueCommand(issueId);
-        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
-        var updatedIssue = getResponse.getIssueModel();
-        assertEquals("expect status to be resolved", "resolved", updatedIssue.getStatus());
-        assertEquals("expect resolution to be updated", "Fixed", updatedIssue.resolution());
-        assertEquals("expect a new title", newTitle, updatedIssue.getTitle());
-        assertNotNull(updatedIssue.getResolved());
+        var issueResponse = getIssueResponse(issueId);
+        assertEquals("expect status to be resolved", "resolved", issueResponse.getStatus());
+        assertEquals("expect resolution to be updated", "Fixed", issueResponse.resolution());
+        assertEquals("expect a new title", newTitle, issueResponse.getTitle());
+        assertNotNull(issueResponse.getResolved());
     }
 
     @Test
@@ -190,25 +161,87 @@ public class IssueAPITest extends BaseWebDriverTest
         String newTitle = "Closed test issue";
         Long updatedPri = 4L;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
-        IssueModel updateIssue = basicIssueModel(newTitle, newComment)
+        IssueModel closeIssue = basicIssueModel(newTitle, newComment)
                 .setAction(IssueModel.IssueAction.CLOSE)
                 .setPriority(updatedPri);
 
-        IssueCommand cmd = new IssueCommand();
-        cmd.setIssue(originalIssue);
-        IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
-        var issueId = response.getIssueId();
+        // insert the issue
+        var issueId = doIssueAction(originalIssue);
 
-        updateIssue.setIssueId(issueId);
-        IssueCommand updateCmd = new IssueCommand();
-        updateCmd.setIssue(updateIssue);
-        var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
+        // close the issue
+        closeIssue.setIssueId(issueId);
+        doIssueAction(closeIssue);
 
-        GetIssueCommand getCmd = new GetIssueCommand(issueId);
-        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
-        var updatedIssue = getResponse.getIssueModel();
+        // verify
+        var updatedIssue = getIssueResponse(issueId);
         assertEquals("closed", updatedIssue.getStatus());
         assertEquals(newTitle, updatedIssue.getTitle());
+    }
+
+    //@Test
+    public void testAssignAnIssue() throws Exception
+    {
+        String title = "Assign Test Issue";
+        IssueModel originalIssue = basicIssueModel(title, "Gonna assign this");
+        IssueModel updateIssue = basicIssueModel(null, "assigned now")
+                .setAction(IssueModel.IssueAction.UPDATE)
+                .setAssignedTo(TEST_BUDDY_ID);
+
+        // create the issue
+        var issueId = doIssueAction(originalIssue);
+
+        // assign the issue
+        updateIssue.setIssueId(issueId);
+        doIssueAction(updateIssue);
+
+        // get the updated result
+        var updatedIssue = getIssueResponse(issueId);
+        assertEquals("should be assigned to buddy", TEST_BUDDY_ID, updatedIssue.getAssignedTo());
+        assertEquals("passing null title should not update", title, updatedIssue.getTitle());
+    }
+
+    @Test
+    public void testReopenAnIssue() throws Exception
+    {
+        IssueModel originalIssue = basicIssueModel("Reopen test issue", "Gonna close and reopen this");
+        IssueModel closeIssue = basicIssueModel(null, null)
+                .setAction(IssueModel.IssueAction.CLOSE);
+        IssueModel reopenIssue = basicIssueModel(null, null)
+                .setAction(IssueModel.IssueAction.REOPEN);
+
+        // insert
+        var issueId = doIssueAction(originalIssue);
+
+        // close
+        closeIssue.setIssueId(issueId);
+        doIssueAction(closeIssue);
+
+        // verify
+        var closedIssue = getIssueResponse(issueId);
+        assertEquals("closed", closedIssue.getStatus());
+
+        // reopen
+        reopenIssue.setIssueId(issueId);
+        doIssueAction(reopenIssue);
+
+        // verify
+        var updatedIssue = getIssueResponse(issueId);
+        assertEquals("open", updatedIssue.getStatus());
+    }
+
+    private Long doIssueAction(IssueModel params) throws Exception
+    {
+        IssueCommand updateCmd = new IssueCommand();
+        updateCmd.setIssue(params);
+        var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
+        return updateResponse.getIssueId();
+    }
+
+    private IssueResponseModel getIssueResponse(Long issueId) throws Exception
+    {
+        GetIssueCommand getCmd = new GetIssueCommand(issueId);
+        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
+        return getResponse.getIssueModel();
     }
 
     private IssueModel basicIssueModel(String title, String comment)
