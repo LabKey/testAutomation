@@ -1097,7 +1097,7 @@ public class Crawler
             }
             else if (urlToCheck.isFromForm()) // Forms may 404 with bad input
             {
-                return doesUrlExist(urlToCheck); // Only a valid error if form references a non-existent action
+                return doesUrlExist(urlToCheck); // Ignore if action exists, forms may 404 with bad input
             }
         }
 
@@ -1129,6 +1129,7 @@ public class Crawler
         catch (IOException | IllegalArgumentException e)
         {
             TestLogger.warn("Unable to verify existence of action: " + urlToCheck.getActionId(), e);
+            return true;
         }
         finally
         {
