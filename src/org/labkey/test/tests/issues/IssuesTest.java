@@ -97,8 +97,13 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String TEST_EMAIL_TEMPLATE_BAD = TEST_EMAIL_TEMPLATE +
             "\n'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
     private static String NAME;
-    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
+    protected IssuesHelper _issuesHelper;
     private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+
+    public IssuesTest()
+    {
+        _issuesHelper = new IssuesHelper(this);
+    }
 
     @BeforeClass
     public static void doSetup()
