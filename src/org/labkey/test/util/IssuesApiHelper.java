@@ -17,9 +17,9 @@ import java.util.Map;
 
 public class IssuesApiHelper extends IssuesHelper
 {
-    private Connection _connection;
-    private APIUserHelper _userHelper;
-    private Integer _defaultPriority = 3;
+    private final Connection _connection;
+    private final APIUserHelper _userHelper;
+    private final Long _defaultPriority = 3L;
 
     public IssuesApiHelper(WrapsDriver driverWrapper)
     {
@@ -33,7 +33,6 @@ public class IssuesApiHelper extends IssuesHelper
     {
         IssueModel issue = new IssueModel();
 
-//        props.forEach(issue::setProp);
         issue.setProperties(props);
         Arrays.stream(attachments).forEach(issue::addAttachment);
         issue.setAction(IssueModel.IssueAction.INSERT);

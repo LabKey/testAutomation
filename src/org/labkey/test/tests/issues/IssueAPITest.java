@@ -4,6 +4,8 @@ import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.issues.GetIssueCommand;
+import org.labkey.remoteapi.issues.GetIssueResponse;
 import org.labkey.remoteapi.issues.IssueCommand;
 import org.labkey.remoteapi.issues.IssueModel;
 import org.labkey.remoteapi.issues.IssueResponse;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -112,10 +115,11 @@ public class IssueAPITest extends BaseWebDriverTest
         String originalTitle = "Pre-Update Issue Test Issue";
         String comment = "This is the update comment";
         String title = "Updated issue test issue";
+        Long updatedPri = 4L;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
-        IssueModel updateIssue = basicIssueModel(comment, title)
+        IssueModel updateIssue = basicIssueModel(title, comment)
                 .setAction(IssueModel.IssueAction.UPDATE)
-                .setPriority(4);
+                .setPriority(updatedPri);
 
         IssueCommand cmd = new IssueCommand();
         cmd.setIssue(originalIssue);
@@ -129,9 +133,82 @@ public class IssueAPITest extends BaseWebDriverTest
 
         // navigate to the page for easy visualization
         var issuePage = DetailsPage.beginAt(this, getProjectName(), response.getIssueId().toString());
-        var issueComment = issuePage.getComments().get(1);
-        assertEquals("expect that the comment was updated", comment, issueComment.getComment());
-        assertEquals("expect issue author to be correctly identified", TEST_USER_DISPLAY_NAME, issueComment.getUser());
+
+        // get issue status from the server
+        GetIssueCommand getCmd = new GetIssueCommand(issueId);
+        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
+        var updatedModel = getResponse.getIssueModel();
+        var latestComment = updatedModel.getComments().get(1);
+        assertEquals("expect updated title", title, updatedModel.getTitle());
+        assertThat("expect current comment reponse to have updated", latestComment.getComment(), containsString(comment));
+        assertEquals("expect priority to now be 4", updatedPri, updatedModel.getPriority());
+    }
+
+    @Test
+    public void testResolveAnIssue() throws Exception
+    {
+        String originalComment = "This issue will be immediately resolved";
+        String originalTitle = "Resolve Issue Test";
+        String newComment = "This issue should now be resolved";
+        String newTitle = "Resolved test issue";
+        Long updatedPri = 4L;
+        IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
+
+        IssueModel updateIssue = basicIssueModel(newTitle, newComment)
+                .setAction(IssueModel.IssueAction.RESOLVE)
+                .setResolution("Fixed")
+                .setPriority(updatedPri);
+
+        // create the issue
+        IssueCommand cmd = new IssueCommand();
+        cmd.setIssue(originalIssue);
+        IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
+        var issueId = response.getIssueId();
+
+        // resolve the issue
+        updateIssue.setIssueId(issueId);
+        IssueCommand updateCmd = new IssueCommand();
+        updateCmd.setIssue(updateIssue);
+        var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
+
+        // get the updated issue from the server
+        GetIssueCommand getCmd = new GetIssueCommand(issueId);
+        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
+        var updatedIssue = getResponse.getIssueModel();
+        assertEquals("expect status to be resolved", "resolved", updatedIssue.getStatus());
+        assertEquals("expect resolution to be updated", "Fixed", updatedIssue.resolution());
+        assertEquals("expect a new title", newTitle, updatedIssue.getTitle());
+        assertNotNull(updatedIssue.getResolved());
+    }
+
+    @Test
+    public void testCloseAnIssue() throws Exception
+    {
+        String originalComment = "This issue will be immediately closed";
+        String originalTitle = "Close Issue Test";
+        String newComment = "This issue should now be closed";
+        String newTitle = "Closed test issue";
+        Long updatedPri = 4L;
+        IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
+        IssueModel updateIssue = basicIssueModel(newTitle, newComment)
+                .setAction(IssueModel.IssueAction.CLOSE)
+                .setPriority(updatedPri);
+
+        IssueCommand cmd = new IssueCommand();
+        cmd.setIssue(originalIssue);
+        IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
+        var issueId = response.getIssueId();
+
+        updateIssue.setIssueId(issueId);
+        IssueCommand updateCmd = new IssueCommand();
+        updateCmd.setIssue(updateIssue);
+        var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
+
+        GetIssueCommand getCmd = new GetIssueCommand(issueId);
+        GetIssueResponse getResponse = getCmd.execute(createDefaultConnection(), getProjectName());
+        var updatedIssue = getResponse.getIssueModel();
+        assertEquals("closed", updatedIssue.getStatus());
+        assertEquals(newTitle, updatedIssue.getTitle());
     }
 
     private IssueModel basicIssueModel(String title, String comment)
@@ -143,9 +220,10 @@ public class IssueAPITest extends BaseWebDriverTest
                 .setAssignedTo(TEST_USER_ID)
                 .setNotify(TEST_BUDDY_NAME)
                 .setIssueDefName(ISSUES)
-                .setPriority(3)
+                .setPriority(3L)
                 .setType("Defect");
     }
+
 
     @Override
     protected BrowserType bestBrowser()

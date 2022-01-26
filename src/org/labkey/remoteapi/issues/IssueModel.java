@@ -1,10 +1,13 @@
 package org.labkey.remoteapi.issues;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,8 +24,12 @@ public class IssueModel
     private final String PRIORITY = "priority";
     private final String COMMENT = "comment";
     private final String NOTIFY_LIST = "notifyList";
-    private Map<String, Object> _properties = new CaseInsensitiveHashMap<>();
-    private List<File> _attachments = new ArrayList();
+    private final String RESOLUTION = "resolution";
+    private final String RESOLVED = "resolved";
+    private final String STATUS = "status";
+
+    private final Map<String, Object> _properties = new CaseInsensitiveHashMap<>();
+    private final List<File> _attachments = new ArrayList();
 
     // https://www.labkey.org/Documentation/wiki-page.view?name=sampleJSscripts#issues
     public IssueModel()
@@ -34,12 +41,6 @@ public class IssueModel
         _properties.putAll(properties);
         return this;
     }
-
-    // todo: c'tor for json
-//    public IssueModel(JSONObject json)
-//    {
-//          convert json to map here
-//    }
 
     public JSONObject toJSON()
     {
@@ -111,10 +112,6 @@ public class IssueModel
         _properties.put(NOTIFY_LIST, notify);
         return this;
     }
-//    public IssueModel setNotifyList(List<Integer> notifyList)
-//    {
-//        _properties.put(NOTIFY_LIST, new JSONArray(notifyList))
-//    }
 
     public Integer getAssignedTo()
     {
@@ -145,19 +142,17 @@ public class IssueModel
 
     public IssueModel setType(String type)
     {
-        _properties.put(TYPE, type);
-        return this;
+        return setProp(TYPE, type);
     }
 
-    public Integer getPriority()
+    public Long getPriority()
     {
-        return (Integer)_properties.get(PRIORITY);
+        return (Long) _properties.get(PRIORITY);
     }
 
-    public IssueModel setPriority(Integer priority)
+    public IssueModel setPriority(Long priority)
     {
-        _properties.put(PRIORITY, priority);
-        return this;
+        return setProp(PRIORITY, priority);
     }
 
     public String getComment()
@@ -167,8 +162,17 @@ public class IssueModel
 
     public IssueModel setComment(String comment)
     {
-        _properties.put(COMMENT, comment);
-        return this;
+        return setProp(COMMENT, comment);
+    }
+
+    public String getResolution()
+    {
+        return (String) _properties.get(RESOLUTION);
+    }
+
+    public IssueModel setResolution(String resolution)
+    {
+        return setProp(RESOLUTION, resolution);
     }
 
     public IssueModel setProp(String propName, Object value)
@@ -192,6 +196,7 @@ public class IssueModel
     {
         INSERT("insert"),
         UPDATE("update"),
+        RESOLVE("resolve"),
         CLOSE("close"),
         OPEN("open");
 
