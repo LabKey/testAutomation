@@ -1346,6 +1346,8 @@ public class DataRegionTable extends DataRegion
             clickHeaderButton("Filter");
             getWrapper().waitForElement(Locator.css(".lk-filter-panel-label"));
         }
+        // See handleAfterInitGroupConfig in ReportFilterPanel.js
+        org.labkey.test.Locators.pageSignal("initSelectionComplete").waitForElement(getDriver(), 5_000);
         WebElement panelEl = getWrapper().waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(getDataRegionName()));
         return new DatasetFacetPanel(panelEl, this);
     }
