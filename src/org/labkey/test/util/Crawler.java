@@ -1089,8 +1089,10 @@ public class Crawler
     {
         if (code == HttpStatus.SC_NOT_FOUND) // 404
         {
-            if (origin == null || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
-                return true; // Ignore 404s from the initial set of links
+            if (origin == null // Ignore 404s from the initial set of links
+                    || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString()))
+                    || urlToCheck.isFromForm()) // Forms may 404 with bad input
+                return true;
         }
 
         if (code == HttpStatus.SC_METHOD_NOT_ALLOWED) // 405
