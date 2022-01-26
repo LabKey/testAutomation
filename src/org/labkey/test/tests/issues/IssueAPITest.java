@@ -16,7 +16,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.util.APIUserHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.PermissionsHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -178,7 +180,7 @@ public class IssueAPITest extends BaseWebDriverTest
         assertEquals(newTitle, updatedIssue.getTitle());
     }
 
-    //@Test
+    @Test
     public void testAssignAnIssue() throws Exception
     {
         String title = "Assign Test Issue";

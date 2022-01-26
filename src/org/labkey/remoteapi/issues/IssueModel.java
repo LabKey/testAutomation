@@ -118,7 +118,7 @@ public class IssueModel
         return (Integer)_properties.get(ASSIGNED_TO);
     }
 
-    public IssueModel setAssignedTo(Integer assignedTo)
+    public IssueModel setAssignedTo(Long assignedTo)
     {
         _properties.put(ASSIGNED_TO, assignedTo);
         return this;

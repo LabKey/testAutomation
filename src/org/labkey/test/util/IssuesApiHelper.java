@@ -46,7 +46,7 @@ public class IssuesApiHelper extends IssuesHelper
 
             Assert.assertTrue("Unable to properly match user with displayName: " + displayName, user.size() == 1);
             if (user.size() == 1)
-                issue.setAssignedTo(user.get(0).getUserId());
+                issue.setAssignedTo(Long.valueOf(user.get(0).getUserId()));
         }
 
         if (!props.containsKey("priority"))

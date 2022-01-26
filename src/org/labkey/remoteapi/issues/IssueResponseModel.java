@@ -46,9 +46,9 @@ public class IssueResponseModel
     }
 
     // read-only props from the server
-    public Integer getAssignedTo()
+    public Long getAssignedTo()
     {
-        return (Integer) _serverProps.get(ASSIGNED_TO);
+        return (Long) _serverProps.get(ASSIGNED_TO);
     }
 
     public String getTitle()
