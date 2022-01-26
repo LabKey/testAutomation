@@ -157,6 +157,7 @@ def initPropertiesTask = project.tasks.register("initProperties", Task) {
         })
 }
 
+project.tasks.uiTests.dependsOn(initPropertiesTask)
 project.parent.parent.tasks.ijConfigure.dependsOn(initPropertiesTask)
 
 if (project.hasProperty('doPublishing'))
