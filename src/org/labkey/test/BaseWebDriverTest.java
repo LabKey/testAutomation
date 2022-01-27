@@ -1845,20 +1845,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToProjectHome(getProjectName());
     }
 
-    protected void startImportStudyFromZip(File studyFile)
+    protected void startImportStudyFromZip(File folderArchive)
     {
-        startImportStudyFromZip(studyFile, false);
+        startImportStudyFromZip(folderArchive, false);
     }
 
-    protected void startImportStudyFromZip(File studyFile, boolean ignoreQueryValidation)
+    protected void startImportStudyFromZip(File folderArchive, boolean ignoreQueryValidation)
     {
-        startImportStudyFromZip(studyFile, ignoreQueryValidation, false);
+        startImportStudyFromZip(folderArchive, ignoreQueryValidation, false);
     }
 
-    protected void startImportStudyFromZip(File studyFile, boolean ignoreQueryValidation, boolean createSharedDatasets)
+    protected void startImportStudyFromZip(File folderArchive, boolean ignoreQueryValidation, boolean createSharedDatasets)
     {
         clickButton("Import Study");
-        setFormElement(Locator.name("folderZip"), studyFile);
+        setFormElement(Locator.name("folderZip"), folderArchive);
         if (ignoreQueryValidation)
         {
             click(Locator.checkboxByName("validateQueries"));
@@ -1882,43 +1882,43 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    protected void importStudyFromZip(File studyFile)
+    protected void importStudyFromZip(File folderArchive)
     {
-        importStudyFromZip(studyFile, false);
+        importStudyFromZip(folderArchive, false);
     }
 
-    protected void importFolderFromZip(File folderFile)
+    protected void importFolderFromZip(File folderArchive)
     {
-        importFolderFromZip(folderFile, true, 1);
+        importFolderFromZip(folderArchive, true, 1);
     }
 
-    protected void importStudyFromZip(File studyFile, boolean ignoreQueryValidation)
+    protected void importStudyFromZip(File folderArchive, boolean ignoreQueryValidation)
     {
-        startImportStudyFromZip(studyFile, ignoreQueryValidation);
+        startImportStudyFromZip(folderArchive, ignoreQueryValidation);
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
-    public void importStudyFromZip(File studyFile, boolean ignoreQueryValidation, boolean createSharedDataset)
+    public void importStudyFromZip(File folderArchive, boolean ignoreQueryValidation, boolean createSharedDataset)
     {
-        startImportStudyFromZip(studyFile, ignoreQueryValidation, createSharedDataset);
+        startImportStudyFromZip(folderArchive, ignoreQueryValidation, createSharedDataset);
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
-    protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs)
+    protected void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs)
     {
-        importFolderFromZip(folderFile, validateQueries, completedJobs, false);
+        importFolderFromZip(folderArchive, validateQueries, completedJobs, false);
     }
 
-    protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs, boolean expectErrors)
+    protected void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs, boolean expectErrors)
     {
-        importFolderFromZip(folderFile, validateQueries, completedJobs, expectErrors, MAX_WAIT_SECONDS * 1000);
+        importFolderFromZip(folderArchive, validateQueries, completedJobs, expectErrors, MAX_WAIT_SECONDS * 1000);
     }
 
-    protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
+    protected void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
     {
         goToFolderManagement().goToImportTab();
         waitForElement(Locator.name("folderZip"));
-        setFormElement(Locator.name("folderZip"), folderFile);
+        setFormElement(Locator.name("folderZip"), folderArchive);
         if (!validateQueries)
             uncheckCheckbox(Locator.name("validateQueries"));
         clickButtonContainingText("Import Folder");
@@ -2264,21 +2264,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             signOut();
     }
 
-    protected void reloadStudyFromZip(File studyFile)
+    protected void reloadStudyFromZip(File folderArchive)
     {
-        reloadStudyFromZip(studyFile, true, 2);
+        reloadStudyFromZip(folderArchive, true, 2);
     }
 
-    protected void reloadStudyFromZip(File studyFile, boolean validateQueries, int pipelineJobs)
+    protected void reloadStudyFromZip(File folderArchive, boolean validateQueries, int pipelineJobs)
     {
-        reloadStudyFromZip(studyFile, validateQueries, pipelineJobs, false);
+        reloadStudyFromZip(folderArchive, validateQueries, pipelineJobs, false);
     }
 
-    protected void reloadStudyFromZip(File studyFile, boolean validateQueries, int pipelineJobs, boolean expectError)
+    protected void reloadStudyFromZip(File folderArchive, boolean validateQueries, int pipelineJobs, boolean expectError)
     {
         goToManageStudy();
         clickButton("Reload Study");
-        setFormElement(Locator.name("folderZip"), studyFile);
+        setFormElement(Locator.name("folderZip"), folderArchive);
         if(! validateQueries) {uncheckCheckbox(Locator.checkboxByName("validateQueries"));}
         clickButton("Reload Study");
         waitForPipelineJobsToComplete(pipelineJobs, "Study Reload", expectError);
