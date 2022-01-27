@@ -20,7 +20,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -62,6 +61,11 @@ public class FolderTypePage extends FolderManagementPage
         elementCache().findActiveModuleCheckbox(module).uncheck();
         // TODO: Handle disabled checkboxes and warning for dependent modules
         return this;
+    }
+
+    public void assertModuleEnabled(String moduleName)
+    {
+        assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 
     public void save()
