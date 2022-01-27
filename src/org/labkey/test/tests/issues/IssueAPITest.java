@@ -6,24 +6,23 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.issues.GetIssueCommand;
 import org.labkey.remoteapi.issues.GetIssueResponse;
-import org.labkey.remoteapi.issues.IssueCommand;
+import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.remoteapi.issues.IssueModel;
 import org.labkey.remoteapi.issues.IssueResponse;
 import org.labkey.remoteapi.issues.IssueResponseModel;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
-import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.PermissionsHelper;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,11 +37,11 @@ public class IssueAPITest extends BaseWebDriverTest
     IssuesHelper _issuesHelper = new IssuesHelper(this);
     APIUserHelper _userHelper = new APIUserHelper(this);
     static String ISSUES = "issues";
-    static Integer TEST_USER_ID;
+    static Long TEST_USER_ID;
     static String TEST_USER_NAME;
     static String TEST_USER_DISPLAY_NAME;
 
-    static Integer TEST_BUDDY_ID;
+    static Long TEST_BUDDY_ID;
     static String TEST_BUDDY_NAME = "testbuddy@issues.test";
     static String TEST_BUDDY_DISPLAY_NAME;
 
@@ -61,15 +60,18 @@ public class IssueAPITest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        TEST_USER_NAME = getUsername();
-        TEST_USER_ID = _userHelper.getUserId(TEST_USER_NAME);
-        TEST_USER_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_USER_NAME);
-        _userHelper.createUser(TEST_BUDDY_NAME);
-        TEST_BUDDY_ID = _userHelper.getUserId(TEST_BUDDY_NAME);
-        TEST_BUDDY_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_BUDDY_NAME);
-
         _containerHelper.createProject(getProjectName(), null);
         _issuesHelper.createNewIssuesList(ISSUES, getContainerHelper());
+
+        TEST_USER_NAME = getUsername();
+        TEST_USER_ID = Long.valueOf(_userHelper.getUserId(TEST_USER_NAME));
+        TEST_USER_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_USER_NAME);
+        _userHelper.createUser(TEST_BUDDY_NAME);
+        TEST_BUDDY_ID = Long.valueOf(_userHelper.getUserId(TEST_BUDDY_NAME));
+        TEST_BUDDY_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_BUDDY_NAME);
+        var permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.addMemberToRole(TEST_BUDDY_NAME, "Project Administrator",
+                PermissionsHelper.MemberType.user, getProjectName());
     }
 
     @Before
@@ -83,17 +85,21 @@ public class IssueAPITest extends BaseWebDriverTest
     {
         String comment = "This is a test to see if we can just... insert an issue";
         String title = "Insert Issue Test Issue";
+        File testFile = TestFileUtils.writeTempFile("err.txt", "I found a bug");
         IssueModel testIssue = basicIssueModel(title, comment);
+        testIssue.addAttachment(testFile);
 
-        IssueCommand cmd = new IssueCommand();
-        cmd.setIssue(testIssue);
+        IssuesCommand cmd = new IssuesCommand();
+        cmd.setIssues(List.of(testIssue));
         IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
-        assertNotNull("expect our issue response to tell us an issue ID", response.getIssueId());
+        assertNotNull("expect our issue response to tell us an issue ID", response.getIssueIds().get(0));
 
-        var issuePage = DetailsPage.beginAt(this, getProjectName(), response.getIssueId().toString());
-        var issueComment = issuePage.getComments().get(0);
-        assertEquals("expect that the comment was set", comment, issueComment.getComment());
-        assertEquals("expect issue author to be correctly identified", TEST_USER_DISPLAY_NAME, issueComment.getUser());
+        var issueResponseModel = getIssueResponse(response.getIssueIds().get(0));
+        var lastComment = issueResponseModel.getComments().get(0);
+        var attachments = lastComment.getAttachments();
+        assertThat("expect that the comment was set", lastComment.getComment(), containsString(comment));
+        assertEquals("expect issue author to be correctly identified", TEST_USER_DISPLAY_NAME, lastComment.getCreatedBy());
+        assertEquals("expect a single attachment", List.of(testFile.getName()), attachments);
     }
 
     @Test
@@ -106,7 +112,7 @@ public class IssueAPITest extends BaseWebDriverTest
         Long updatedPri = 4L;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
         IssueModel updateIssue = basicIssueModel(title, comment)
-                .setAction(IssueModel.IssueAction.UPDATE)
+                .setAction(IssueModel.IssueAction.update)
                 .setPriority(updatedPri);
 
         // insert the issue
@@ -135,7 +141,7 @@ public class IssueAPITest extends BaseWebDriverTest
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
 
         IssueModel resolveIssue = basicIssueModel(newTitle, newComment)
-                .setAction(IssueModel.IssueAction.RESOLVE)
+                .setAction(IssueModel.IssueAction.resolve)
                 .setResolution("Fixed")
                 .setPriority(updatedPri);
 
@@ -149,7 +155,7 @@ public class IssueAPITest extends BaseWebDriverTest
         // get the updated issue from the server
         var issueResponse = getIssueResponse(issueId);
         assertEquals("expect status to be resolved", "resolved", issueResponse.getStatus());
-        assertEquals("expect resolution to be updated", "Fixed", issueResponse.resolution());
+        assertEquals("expect resolution to be updated", "Fixed", issueResponse.getResolution());
         assertEquals("expect a new title", newTitle, issueResponse.getTitle());
         assertNotNull(issueResponse.getResolved());
     }
@@ -164,7 +170,7 @@ public class IssueAPITest extends BaseWebDriverTest
         Long updatedPri = 4L;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
         IssueModel closeIssue = basicIssueModel(newTitle, newComment)
-                .setAction(IssueModel.IssueAction.CLOSE)
+                .setAction(IssueModel.IssueAction.close)
                 .setPriority(updatedPri);
 
         // insert the issue
@@ -186,7 +192,7 @@ public class IssueAPITest extends BaseWebDriverTest
         String title = "Assign Test Issue";
         IssueModel originalIssue = basicIssueModel(title, "Gonna assign this");
         IssueModel updateIssue = basicIssueModel(null, "assigned now")
-                .setAction(IssueModel.IssueAction.UPDATE)
+                .setAction(IssueModel.IssueAction.update)
                 .setAssignedTo(TEST_BUDDY_ID);
 
         // create the issue
@@ -207,9 +213,9 @@ public class IssueAPITest extends BaseWebDriverTest
     {
         IssueModel originalIssue = basicIssueModel("Reopen test issue", "Gonna close and reopen this");
         IssueModel closeIssue = basicIssueModel(null, null)
-                .setAction(IssueModel.IssueAction.CLOSE);
+                .setAction(IssueModel.IssueAction.close);
         IssueModel reopenIssue = basicIssueModel(null, null)
-                .setAction(IssueModel.IssueAction.REOPEN);
+                .setAction(IssueModel.IssueAction.reopen);
 
         // insert
         var issueId = doIssueAction(originalIssue);
@@ -231,12 +237,103 @@ public class IssueAPITest extends BaseWebDriverTest
         assertEquals("open", updatedIssue.getStatus());
     }
 
+    @Test
+    public void testUpdateMultipleIssues() throws Exception
+    {
+        File firstFile = TestFileUtils.writeTempFile("firstErr.txt", "first error of 2");
+        File secondFile = TestFileUtils.writeTempFile("secondErr.txt", "second error of 2");
+        IssueModel firstIssue = basicIssueModel("first of three", "to test multiple issues at once")
+                .addAttachment(firstFile);
+        IssueModel secondIssue = basicIssueModel("second of three", "to test multiple issues at once")
+                .addAttachment(secondFile);
+        IssueModel thirdIssue = basicIssueModel("third of three", "to test multiple issues at once")
+                .addAttachment(firstFile).addAttachment(secondFile);
+        List<IssueModel> issues = new ArrayList<>();
+        issues.add(firstIssue);
+        issues.add(secondIssue);
+        issues.add(thirdIssue);
+
+        IssuesCommand insertCmd = new IssuesCommand();
+        insertCmd.setIssues(issues);
+        var insertResponse = insertCmd.execute(createDefaultConnection(), getProjectName());
+        List<Long> issueIds =  insertResponse.getIssueIds();
+        for (Long issueId : issueIds)
+        {
+            var issueresponseModel = getIssueResponse(issueId);
+            switch (issueresponseModel.getTitle())
+            {
+                case "first of three":
+                {
+                    // verify initial values
+                    assertEquals("expect the first attachment",
+                            List.of(firstFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
+                    // set new ones for update
+                    firstIssue.setIssueId(issueId)
+                            .setAction(IssueModel.IssueAction.resolve)
+                            .setResolution("fixed");
+                    break;
+                }
+                case "second of three":
+                {
+                    // verify expected
+                    assertEquals("expect the second attachment only",
+                            List.of(secondFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
+                    // set for update
+                    secondIssue.setIssueId(issueId)
+                            .setAction(IssueModel.IssueAction.close)
+                            .setComment("close comment");
+                    break;
+                }
+                case "third of three":
+                {
+                    // verify expected
+                    assertEquals("expect both attachments",
+                            List.of(firstFile.getName(), secondFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
+                    // set for updated
+                    thirdIssue.setIssueId(issueId)
+                            .setComment("Assigning to buddy")
+                            .setAssignedTo(TEST_BUDDY_ID);
+                    break;
+                }
+            }
+        }
+
+        // now update the issues
+        IssuesCommand updateCmd = new IssuesCommand();
+        updateCmd.setIssues(issues);
+        insertCmd.execute(createDefaultConnection(), getProjectName());
+        for (Long issueId : issueIds)
+        {
+            var issueresponseModel = getIssueResponse(issueId);
+            switch (issueresponseModel.getTitle())
+            {
+                case "first of three":
+                {
+                    assertEquals("expect new status", "resolved", issueresponseModel.getStatus());
+                    assertEquals("expect fixed", "fixed", issueresponseModel.getResolution());
+                    break;
+                }
+                case "second of three":
+                {
+                    assertEquals("expect new status", "closed", issueresponseModel.getStatus());
+                    break;
+                }
+                case "third of three":
+                {
+                    assertEquals("expect assignment to buddy",
+                            TEST_BUDDY_ID, issueresponseModel.getAssignedTo());
+                    break;
+                }
+            }
+        }
+    }
+
     private Long doIssueAction(IssueModel params) throws Exception
     {
-        IssueCommand updateCmd = new IssueCommand();
-        updateCmd.setIssue(params);
+        IssuesCommand updateCmd = new IssuesCommand();
+        updateCmd.setIssues(List.of(params));
         var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
-        return updateResponse.getIssueId();
+        return updateResponse.getIssueIds().get(0);
     }
 
     private IssueResponseModel getIssueResponse(Long issueId) throws Exception
@@ -251,7 +348,7 @@ public class IssueAPITest extends BaseWebDriverTest
         return new IssueModel()
                 .setTitle(title)
                 .setComment(comment)
-                .setAction(IssueModel.IssueAction.INSERT)
+                .setAction(IssueModel.IssueAction.insert)
                 .setAssignedTo(TEST_USER_ID)
                 .setNotify(TEST_BUDDY_NAME)
                 .setIssueDefName(ISSUES)

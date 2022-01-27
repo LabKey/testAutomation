@@ -2,7 +2,7 @@ package org.labkey.test.util;
 
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.issues.IssueCommand;
+import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.remoteapi.issues.IssueModel;
 import org.labkey.remoteapi.issues.IssueResponse;
 import org.labkey.remoteapi.security.GetUsersResponse;
@@ -17,14 +17,12 @@ import java.util.Map;
 
 public class IssuesApiHelper extends IssuesHelper
 {
-    private final Connection _connection;
     private final APIUserHelper _userHelper;
     private final Long _defaultPriority = 3L;
 
     public IssuesApiHelper(WrapsDriver driverWrapper)
     {
         super(driverWrapper);
-        _connection = WebTestHelper.getRemoteApiConnection(true);
         _userHelper = new APIUserHelper(this);
     }
 
@@ -35,7 +33,7 @@ public class IssuesApiHelper extends IssuesHelper
 
         issue.setProperties(props);
         Arrays.stream(attachments).forEach(issue::addAttachment);
-        issue.setAction(IssueModel.IssueAction.INSERT);
+        issue.setAction(IssueModel.IssueAction.insert);
 
         // translate display name to userId
         if (props.containsKey("assignedTo"))
@@ -54,12 +52,12 @@ public class IssuesApiHelper extends IssuesHelper
 
         try
         {
-            IssueCommand command = new IssueCommand(issue);
-            IssueResponse response = command.execute(_connection, getCurrentContainerPath());
+            IssuesCommand command = new IssuesCommand(List.of(issue));
+            IssueResponse response = command.execute(createDefaultConnection(), getCurrentContainerPath());
 
             Assert.assertEquals("Unexpected errors", 200, response.getStatusCode());
 
-            return DetailsPage.beginAt(this, String.valueOf(response.getIssueId()));
+            return DetailsPage.beginAt(this, String.valueOf(response.getIssueIds().get(0)));
         }
         catch (Exception e)
         {

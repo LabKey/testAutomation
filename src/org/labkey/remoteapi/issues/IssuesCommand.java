@@ -11,20 +11,21 @@ import org.labkey.remoteapi.PostCommand;
 
 import java.io.File;
 import java.net.URI;
+import java.util.List;
 
-public class IssueCommand extends PostCommand<IssueResponse>
+public class IssuesCommand extends PostCommand<IssueResponse>
 {
-    private IssueModel _issue;
+    private List<IssueModel> _issues;
 
-    public IssueCommand()
+    public IssuesCommand()
     {
         super("issues", "issues");
     }
 
-    public IssueCommand(IssueModel issue)
+    public IssuesCommand(List<IssueModel> issues)
     {
         this();
-        _issue = issue;
+        _issues = issues;
     }
 
     @Override
@@ -33,9 +34,9 @@ public class IssueCommand extends PostCommand<IssueResponse>
         return new IssueResponse(text, status, contentType, json, this);
     }
 
-    public void setIssue(IssueModel issue)
+    public void setIssues(List<IssueModel> issues)
     {
-        _issue = issue;
+        _issues = issues;
     }
 
     @Override
@@ -49,18 +50,21 @@ public class IssueCommand extends PostCommand<IssueResponse>
     {
         HttpPost request = new HttpPost(uri);
 
-        JSONArray issueArray = new JSONArray();
-        issueArray.put(_issue.toJSON());
-
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        builder.addTextBody("issues", issueArray.toString(), ContentType.APPLICATION_JSON);
-        for (File attachment : _issue.getAttachments())
+        JSONArray issuesArray = new JSONArray();
+        for (IssueModel issue: _issues)
         {
-            builder.addBinaryBody(attachment.getName(), attachment, ContentType.APPLICATION_OCTET_STREAM, attachment.getName());
+            issuesArray.put(issue.toJSON());
+
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+
+            builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+            builder.addTextBody("issues", issuesArray.toString(), ContentType.APPLICATION_JSON);
+            for (File attachment : issue.getAttachments())
+            {
+                builder.addBinaryBody(attachment.getName(), attachment, ContentType.APPLICATION_OCTET_STREAM, attachment.getName());
+            }
+            request.setEntity(builder.build());
         }
-        request.setEntity(builder.build());
         return request;
     }
 }

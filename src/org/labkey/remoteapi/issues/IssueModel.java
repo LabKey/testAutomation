@@ -1,33 +1,16 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class IssueModel
 {
-    // keys
-    private final String TITLE= "title";
-    private final String ISSUE_ID = "issueid";
-    private final String ISSUE_DEF_NAME = "issueDefName";
-    private final String ASSIGNED_TO = "assignedto";
-    private final String ACTION = "action";
-    private final String TYPE = "type";
-    private final String PRIORITY = "priority";
-    private final String COMMENT = "comment";
-    private final String NOTIFY_LIST = "notifyList";
-    private final String RESOLUTION = "resolution";
-    private final String RESOLVED = "resolved";
-    private final String STATUS = "status";
-
     private final Map<String, Object> _properties = new CaseInsensitiveHashMap<>();
     private final List<File> _attachments = new ArrayList();
 
@@ -61,45 +44,42 @@ public class IssueModel
 
     public IssueAction getAction()
     {
-        return IssueAction.valueOf(_properties.get(ACTION).toString());
+        return IssueAction.valueOf(_properties.get(ModelKeys.action).toString());
     }
 
     public IssueModel setAction(IssueAction action)
     {
-        _properties.put(ACTION, action.getValue());
-        return this;
+        return setProp(ModelKeys.action, action);
     }
 
     public Long getIssueId()
     {
-        if (_properties.get(ISSUE_ID) != null)
-            return (Long)_properties.get(ISSUE_ID);
+        if (_properties.get(ModelKeys.issueid) != null)
+            return (Long)_properties.get(ModelKeys.issueid);
         else
             return null;
     }
 
     public IssueModel setIssueId(Long issueId)
     {
-        _properties.put(ISSUE_ID, issueId);
-        return this;
+        return setProp(ModelKeys.issueid, issueId);
     }
 
     public String getTitle()
     {
-        return (String) _properties.get(TITLE);
+        return (String) _properties.get(ModelKeys.title);
     }
 
     public IssueModel setTitle(String title)
     {
-        _properties.put(TITLE, title);
-        return this;
+        return setProp(ModelKeys.title, title);
     }
 
     // per https://www.labkey.org/Documentation/wiki-page.view?name=sampleJSscripts#issues, for a single notify user
     // you can supply an email address as a string; for multiple notifies, userIDs are necessary
     public String getNotify()
     {
-        return (String) _properties.get("notifyList");
+        return (String) _properties.get(ModelKeys.notifyList.toString());
     }
 
     /**
@@ -109,70 +89,72 @@ public class IssueModel
      */
     public IssueModel setNotify(String notify)
     {
-        _properties.put(NOTIFY_LIST, notify);
-        return this;
+        return setProp(ModelKeys.notifyList, notify);
     }
 
     public Integer getAssignedTo()
     {
-        return (Integer)_properties.get(ASSIGNED_TO);
+        return (Integer)_properties.get(ModelKeys.assignedto);
     }
 
     public IssueModel setAssignedTo(Long assignedTo)
     {
-        _properties.put(ASSIGNED_TO, assignedTo);
-        return this;
+        return setProp(ModelKeys.assignedto, assignedTo);
     }
 
     public String getIssueDefName()
     {
-        return (String) _properties.get(ISSUE_DEF_NAME);
+        return (String) _properties.get(ModelKeys.issueDefName.toString());
     }
 
     public IssueModel setIssueDefName(String issueDefName)
     {
-        _properties.put(ISSUE_DEF_NAME, issueDefName);
-        return this;
+        return setProp(ModelKeys.issueDefName, issueDefName);
     }
 
     public String getType()
     {
-        return _properties.get(TYPE).toString();
+        return (String) _properties.get(ModelKeys.type);
     }
 
     public IssueModel setType(String type)
     {
-        return setProp(TYPE, type);
+        return setProp(ModelKeys.type, type);
     }
 
     public Long getPriority()
     {
-        return (Long) _properties.get(PRIORITY);
+        return (Long) _properties.get(ModelKeys.priority);
     }
 
     public IssueModel setPriority(Long priority)
     {
-        return setProp(PRIORITY, priority);
+        return setProp(ModelKeys.priority, priority);
     }
 
     public String getComment()
     {
-        return _properties.get(COMMENT).toString();
+        return _properties.get(ModelKeys.comment).toString();
     }
 
     public IssueModel setComment(String comment)
     {
-        return setProp(COMMENT, comment);
+        return setProp(ModelKeys.comment, comment);
     }
 
     public String getResolution()
     {
-        return (String) _properties.get(RESOLUTION);
+        return (String) _properties.get(ModelKeys.resolution.toString());
     }
 
     public IssueModel setResolution(String resolution)
     {
-        return setProp(RESOLUTION, resolution);
+        return setProp(ModelKeys.resolution, resolution);
+    }
+
+    public IssueModel setProp(ModelKeys propKey, Object value)
+    {
+        return setProp(propKey.toString(), value);
     }
 
     public IssueModel setProp(String propName, Object value)
@@ -192,21 +174,39 @@ public class IssueModel
         return _attachments;
     }
 
+    public enum ModelKeys
+    {
+        title("title"),
+        issueid("issueid"),
+        issueDefName("issueDefName"),
+        assignedto("assignedto"),
+        action("action"),
+        type("type"),
+        priority("priority"),
+        comment("comment"),
+        notifyList("notifyList"),
+        resolution("resolution"),
+        resolved("resolved"),
+        status("status");
+
+        ModelKeys(String value)
+        {
+            _value = value;
+        }
+        private final String _value;
+    }
+
     public enum IssueAction
     {
-        INSERT("insert"),
-        UPDATE("update"),
-        RESOLVE("resolve"),
-        CLOSE("close"),
-        REOPEN("reopen");
+        insert("insert"),
+        update("update"),
+        resolve("resolve"),
+        close("close"),
+        reopen("reopen");
 
         IssueAction(String value)
         {
             _value = value;
-        }
-        public String getValue()
-        {
-            return _value;
         }
         private final String _value;
     }

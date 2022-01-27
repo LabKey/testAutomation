@@ -48,56 +48,99 @@ public class IssueResponseModel
     // read-only props from the server
     public Long getAssignedTo()
     {
-        return (Long) _serverProps.get(ASSIGNED_TO);
+        return (Long) getProp(ResponseKeys.AssignedTo);
     }
 
     public String getTitle()
     {
-        return (String) _serverProps.get(TITLE);
+        return (String) getProp(ResponseKeys.Title);
     }
 
     public String getStatus()
     {
-        return (String) _serverProps.get(STATUS);
+        return (String) getProp(ResponseKeys.Status);
     }
 
-    public String closedBy()
+    public String getClosedBy()
     {
-        return (String) _serverProps.get(CLOSED_BY);
+        return (String) getProp(ResponseKeys.ClosedBy);
     }
 
-    public String modifiedBy()
+    public String getModifiedBy()
     {
-        return (String) _serverProps.get(MODIFIED_BY);
+        return (String) getProp(ResponseKeys.ModifiedBy);
     }
 
-    public String resolvedBy()
+    public String getResolvedBy()
     {
-        return (String) _serverProps.get(RESOLVED_BY);
+        return (String) getProp(ResponseKeys.ResolvedBy);
     }
 
-    public String resolution()
+    public String getResolution()
     {
-        return (String) _serverProps.get(RESOLUTION);
+        return (String) getProp(ResponseKeys.resolution);
     }
 
     public String getResolved()
     {
-        return (String) _serverProps.get(RESOLVED);
+        return (String) getProp(ResponseKeys.resolved);
     }
 
     public Long getPriority()
     {
-        return (Long) _serverProps.get(PRIORITY);
+        return (Long) getProp(ResponseKeys.priority);
     }
 
     public String getType()
     {
-        return (String) _serverProps.get(TYPE);
+        return (String) getProp(ResponseKeys.type);
     }
 
     public List<IssueComment> getComments()
     {
         return _issueComments;
+    }
+
+    /**
+     * for ad-hoc querying of _serverProps
+     * @param key
+     * @return  the object at that key
+     */
+    public Object getProperties(String key)
+    {
+        return _serverProps.get(key);
+    }
+
+    public Object getProp(ResponseKeys key)
+    {
+        return _serverProps.get(key.toString());
+    }
+
+    /**
+     * Contains the case-sensitive keys used by issues-getIssue.api
+     */
+    public enum ResponseKeys{
+        Title( "Title"),
+        IssueId( "IssueId"),
+        issueDefName( "issueDefName"),
+        AssignedTo( "AssignedTo"),
+        type( "type"),
+        priority( "priority"),
+        comment( "comment"),
+        notifyList( "notifyList"),
+        resolution( "resolution"),
+        resolved( "resolved"),
+        ResolvedBy( "ResolvedBy"),
+        Closed( "Closed"),
+        ClosedBy( "ClosedBy"),
+        Status( "Status"),
+        Modified( "Modified"),
+        ModifiedBy( "ModifiedBy");
+        
+        ResponseKeys(String value)
+        {
+            _value = value;
+        }
+        private final String _value;
     }
 }
