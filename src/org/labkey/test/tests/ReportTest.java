@@ -69,9 +69,7 @@ public abstract class ReportTest extends StudyBaseTest
     {
         Locator link = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to navigate to the Detail View')]");
 
-        waitForElement(link);
-        scrollIntoView(link);
-        clickAndWait(link);
+        waitAndClickAndWait(link);
     }
 
     protected void clickReportPermissionsLink(String reportName)
