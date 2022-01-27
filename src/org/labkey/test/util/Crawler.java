@@ -890,6 +890,10 @@ public class Crawler
                 sb.append(c);
             }
             query = sb.toString();
+            if (!splitUrl[1].equals(query))
+            {
+                TestLogger.warn(String.format("URL query not properly encoded.\n   in: [%s]\n  out: [%s]", splitUrl[1], query));
+            }
             url = splitUrl[0] + "?" + query;
         }
         HttpContext context = WebTestHelper.getBasicHttpContext();
