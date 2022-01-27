@@ -1349,6 +1349,7 @@ public class DataRegionTable extends DataRegion
         // See handleAfterInitGroupConfig in ReportFilterPanel.js
         org.labkey.test.Locators.pageSignal("initSelectionComplete").waitForElement(getDriver(), 5_000);
         WebElement panelEl = getWrapper().waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(getDataRegionName()));
+        getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(panelEl));
         return new DatasetFacetPanel(panelEl, this);
     }
 
