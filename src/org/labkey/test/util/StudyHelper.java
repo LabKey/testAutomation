@@ -476,28 +476,28 @@ public class StudyHelper
         return new File(getStudySubfolderPath(), "drt_temp");
     }
 
-    // Return the root of the sample folder archive in /study (i.e., where folder.xml lives)
+    // Return the root of the Study001 folder archive (i.e., where folder.xml lives)
     public static String getFolderArchiveRootPath()
     {
         return getFolderArchiveFile("folder.xml").getParentFile().getAbsolutePath();
     }
 
-    // Return the root of the /study node within the sample folder archive in /study (i.e., where study.xml lives)
+    // Return the root of the /study node within the Study001 folder archive (i.e., where study.xml lives)
     public static String getStudySubfolderPath()
     {
         return getFolderArchiveFile("study/study.xml").getParentFile().getAbsolutePath();
     }
 
-    // Return the specified file from within the sample folder archive in /study
+    // Return the specified file from within the Study001 folder archive
     public static File getFolderArchiveFile(String relativePath)
     {
-        return TestFileUtils.getSampleData("study/" + relativePath);
+        return TestFileUtils.getSampleData("studies/Study001.folder/" + relativePath);
     }
 
-    // Return the specified file from within the sample folder archive in /study
+    // Return a specimen archive file
     public static File getSpecimenArchiveFile(String archiveName)
     {
-        return getFolderArchiveFile("study/specimens/" + archiveName);
+        return TestFileUtils.getSampleData("studies/SpecimenArchives/" + archiveName);
     }
 
     // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
