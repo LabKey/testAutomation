@@ -9,6 +9,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Optional;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 /**
  * Wraps the functionality of the LabKey ui component defined in domainproperties/CollapsiblePanelHeader.tsx
  * Subclasses should add panel-specific functionality.
@@ -94,7 +96,8 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn, .domain-form-collapse-btn").findWhenNeeded(this);
+        protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn, .domain-form-collapse-btn")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         protected final WebElement headerStatusIcon = Locator.css(".domain-panel-status-icon > svg").findWhenNeeded(this);
         protected final WebElement panelTitle = panelTitleLocator.findWhenNeeded(this);
         protected final WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
