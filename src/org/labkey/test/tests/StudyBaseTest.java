@@ -240,11 +240,6 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickButton("Delete", WAIT_FOR_PAGE * 2);
     }
 
-    protected void initializePipeline()
-    {
-        initializePipeline(StudyHelper.getStudySubfolderPath());
-    }
-    
     protected void initializePipeline(String pipelinePath)
     {
         if(pipelinePath==null)
