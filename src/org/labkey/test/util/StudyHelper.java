@@ -45,8 +45,8 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class StudyHelper
 {
-    public static final File SPECIMEN_ARCHIVE_A = getFolderArchiveFile("study/specimens/sample_a.specimens");
-    public static final File SPECIMEN_ARCHIVE_B = getFolderArchiveFile("study/specimens/sample_b.specimens");
+    public static final File SPECIMEN_ARCHIVE_A = getSpecimenArchiveFile("sample_a.specimens");
+    public static final File SPECIMEN_ARCHIVE_B = getSpecimenArchiveFile("sample_b.specimens");
 
     private static Boolean _specimenModulePresent = null;
 
@@ -492,6 +492,12 @@ public class StudyHelper
     public static File getFolderArchiveFile(String relativePath)
     {
         return TestFileUtils.getSampleData("study/" + relativePath);
+    }
+
+    // Return the specified file from within the sample folder archive in /study
+    public static File getSpecimenArchiveFile(String archiveName)
+    {
+        return getFolderArchiveFile("study/specimens/" + archiveName);
     }
 
     // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many

@@ -35,7 +35,7 @@ import java.io.File;
 public class AliquotTest extends SpecimenBaseTest
 {
     protected static final String PROJECT_NAME = "AliquotVerifyProject";
-    protected static final File SPECIMEN_ARCHIVE_148 = StudyHelper.getFolderArchiveFile("study/specimens/lab148.specimens");
+    protected static final File SPECIMEN_ARCHIVE_148 = StudyHelper.getSpecimenArchiveFile("lab148.specimens");
 
     @Override
     protected String getProjectName()

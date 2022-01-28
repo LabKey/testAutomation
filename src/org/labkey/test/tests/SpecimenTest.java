@@ -64,7 +64,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 public class SpecimenTest extends SpecimenBaseTest
 {
     protected static final String PROJECT_NAME = "SpecimenVerifyProject";
-    private final File REQUEST_ATTACHMENT = StudyHelper.getFolderArchiveFile("study/specimens/labs.txt");
+    private final File REQUEST_ATTACHMENT = StudyHelper.getSpecimenArchiveFile("labs.txt");
     private final PortalHelper _portalHelper = new PortalHelper(this);
     private final String[] SPECIMEN_IDS = {"AAA07XK5-01", "AAA07XK5-02"};
 
@@ -964,7 +964,7 @@ public class SpecimenTest extends SpecimenBaseTest
     @LogMethod
     private void verifyDrawTimestamp()
     {
-        File SPECIMEN_ARCHIVE_DTS = StudyHelper.getFolderArchiveFile("study/specimens/dts.specimens");
+        File SPECIMEN_ARCHIVE_DTS = StudyHelper.getSpecimenArchiveFile("dts.specimens");
         startSpecimenImport(2, SPECIMEN_ARCHIVE_DTS);
         waitForSpecimenImport();
 
