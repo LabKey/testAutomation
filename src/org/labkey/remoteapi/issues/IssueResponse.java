@@ -28,7 +28,7 @@ public class IssueResponse extends CommandResponse
         JSONArray issuesArray = (JSONArray)json.get("issues");
         for (int i=0; i< issuesArray.size(); i++)
         {
-            _issueIds.add((Long) issuesArray.get(0));
+            _issueIds.add((Long) issuesArray.get(i));
         }
     }
 

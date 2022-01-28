@@ -54,11 +54,15 @@ public class IssuesCommand extends PostCommand<IssueResponse>
         for (IssueModel issue: _issues)
         {
             issuesArray.put(issue.toJSON());
+        }
 
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-            builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-            builder.addTextBody("issues", issuesArray.toString(), ContentType.APPLICATION_JSON);
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.addTextBody("issues", issuesArray.toString(), ContentType.APPLICATION_JSON);
+
+        for(IssueModel issue: _issues)
+        {
             for (File attachment : issue.getAttachments())
             {
                 builder.addBinaryBody(attachment.getName(), attachment, ContentType.APPLICATION_OCTET_STREAM, attachment.getName());

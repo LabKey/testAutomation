@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
-@Category({InDevelopment.class})
+@Category({})
 public class IssueAPITest extends BaseWebDriverTest
 {
     IssuesHelper _issuesHelper = new IssuesHelper(this);
@@ -45,11 +46,6 @@ public class IssueAPITest extends BaseWebDriverTest
     static String TEST_BUDDY_NAME = "testbuddy@issues.test";
     static String TEST_BUDDY_DISPLAY_NAME;
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
 
     @BeforeClass
     public static void setupProject()
@@ -66,8 +62,7 @@ public class IssueAPITest extends BaseWebDriverTest
         TEST_USER_NAME = getUsername();
         TEST_USER_ID = Long.valueOf(_userHelper.getUserId(TEST_USER_NAME));
         TEST_USER_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_USER_NAME);
-        _userHelper.createUser(TEST_BUDDY_NAME);
-        TEST_BUDDY_ID = Long.valueOf(_userHelper.getUserId(TEST_BUDDY_NAME));
+        TEST_BUDDY_ID = _userHelper.createUser(TEST_BUDDY_NAME).getUserId().longValue();
         TEST_BUDDY_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_BUDDY_NAME);
         var permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.addMemberToRole(TEST_BUDDY_NAME, "Project Administrator",
@@ -257,6 +252,11 @@ public class IssueAPITest extends BaseWebDriverTest
         insertCmd.setIssues(issues);
         var insertResponse = insertCmd.execute(createDefaultConnection(), getProjectName());
         List<Long> issueIds =  insertResponse.getIssueIds();
+        var distinctIds = issueIds.stream().distinct().collect(Collectors.toList());
+        // ensure we got as many issueIDs back as we sent issues in
+        assertEquals("Expect to get as many issueIds as there are inputs", issues.size(), issueIds.size());
+        // make sure we didn't get a list of IDs with duplicates
+        assertEquals("expect distinct list to be same length as inputs", issueIds.size(), distinctIds.size());
         for (Long issueId : issueIds)
         {
             var issueresponseModel = getIssueResponse(issueId);
@@ -289,7 +289,7 @@ public class IssueAPITest extends BaseWebDriverTest
                     // verify expected
                     assertEquals("expect both attachments",
                             List.of(firstFile.getName(), secondFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
-                    // set for updated
+                    // set for update
                     thirdIssue.setIssueId(issueId)
                             .setComment("Assigning to buddy")
                             .setAssignedTo(TEST_BUDDY_ID);
@@ -298,10 +298,18 @@ public class IssueAPITest extends BaseWebDriverTest
             }
         }
 
-        // now update the issues
+        // now confirm that we touched every issue- in order to update these, we set the issueId
+        for(IssueModel model : issues)
+        {
+            assertNotNull("expect every issue to have been updated with its ID during initial validation", model.getIssueId());
+        }
+
+        // now update the issues all in one API call
         IssuesCommand updateCmd = new IssuesCommand();
         updateCmd.setIssues(issues);
         insertCmd.execute(createDefaultConnection(), getProjectName());
+
+        // make sure each one received the updates we specified above
         for (Long issueId : issueIds)
         {
             var issueresponseModel = getIssueResponse(issueId);

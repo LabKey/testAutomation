@@ -44,7 +44,7 @@ public class IssueModel
 
     public IssueAction getAction()
     {
-        return IssueAction.valueOf(_properties.get(ModelKeys.action).toString());
+        return IssueAction.valueOf((String) getProp(ModelKeys.action));
     }
 
     public IssueModel setAction(IssueAction action)
@@ -54,8 +54,8 @@ public class IssueModel
 
     public Long getIssueId()
     {
-        if (_properties.get(ModelKeys.issueid) != null)
-            return (Long)_properties.get(ModelKeys.issueid);
+        if (getProp(ModelKeys.issueid) != null)
+            return (Long) getProp(ModelKeys.issueid);
         else
             return null;
     }
@@ -67,7 +67,7 @@ public class IssueModel
 
     public String getTitle()
     {
-        return (String) _properties.get(ModelKeys.title);
+        return (String) getProp(ModelKeys.title);
     }
 
     public IssueModel setTitle(String title)
@@ -94,7 +94,7 @@ public class IssueModel
 
     public Integer getAssignedTo()
     {
-        return (Integer)_properties.get(ModelKeys.assignedto);
+        return (Integer) getProp(ModelKeys.assignedto);
     }
 
     public IssueModel setAssignedTo(Long assignedTo)
@@ -104,7 +104,7 @@ public class IssueModel
 
     public String getIssueDefName()
     {
-        return (String) _properties.get(ModelKeys.issueDefName.toString());
+        return (String) getProp(ModelKeys.issueDefName);
     }
 
     public IssueModel setIssueDefName(String issueDefName)
@@ -114,7 +114,7 @@ public class IssueModel
 
     public String getType()
     {
-        return (String) _properties.get(ModelKeys.type);
+        return (String) getProp(ModelKeys.type);
     }
 
     public IssueModel setType(String type)
@@ -124,7 +124,7 @@ public class IssueModel
 
     public Long getPriority()
     {
-        return (Long) _properties.get(ModelKeys.priority);
+        return (Long) getProp(ModelKeys.priority);
     }
 
     public IssueModel setPriority(Long priority)
@@ -134,7 +134,7 @@ public class IssueModel
 
     public String getComment()
     {
-        return _properties.get(ModelKeys.comment).toString();
+        return (String) getProp(ModelKeys.comment);
     }
 
     public IssueModel setComment(String comment)
@@ -144,7 +144,7 @@ public class IssueModel
 
     public String getResolution()
     {
-        return (String) _properties.get(ModelKeys.resolution.toString());
+        return (String) getProp(ModelKeys.resolution);
     }
 
     public IssueModel setResolution(String resolution)
@@ -163,6 +163,11 @@ public class IssueModel
         return this;
     }
 
+    public Object getProp(ModelKeys modelKeys)
+    {
+        return  _properties.get(modelKeys.toString());
+    }
+
     public IssueModel addAttachment(File attachmentFile)
     {
         _attachments.add(attachmentFile);
@@ -176,24 +181,23 @@ public class IssueModel
 
     public enum ModelKeys
     {
-        title("title"),
-        issueid("issueid"),
-        issueDefName("issueDefName"),
-        assignedto("assignedto"),
-        action("action"),
-        type("type"),
-        priority("priority"),
-        comment("comment"),
-        notifyList("notifyList"),
-        resolution("resolution"),
-        resolved("resolved"),
-        status("status");
+        title(),
+        issueid(),
+        issueDefName(),
+        assignedto(),
+        action(),
+        type(),
+        priority(),
+        comment(),
+        notifyList(),
+        resolution(),
+        resolved(),
+        status();
 
-        ModelKeys(String value)
+        ModelKeys()
         {
-            _value = value;
+
         }
-        private final String _value;
     }
 
     public enum IssueAction
