@@ -19,24 +19,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
-import org.apache.logging.log4j.core.LoggerContext;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.TestFileUtils;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 public class TestLogger
 {
-    static
-    {
-        // 'testAutomation/resources' isn't included in classpath. Need to load config file explicitly
-        // TODO: Fixed in next gradle plugin release (>1.32.0)
-        LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false);
-        File file = new File(TestFileUtils.getTestRoot(), "resources/log4j2.xml");
-        context.setConfigLocation(file.toURI());
-    }
-
     private static final Logger LOG = LogManager.getLogger(TestLogger.class);
     private static final Logger NO_OP = LogManager.getLogger("NoOpLogger");
 
@@ -72,29 +61,16 @@ public class TestLogger
         suppressLogging = suppress;
     }
 
-    private static String getIndentString()
-    {
-        return StringUtils.repeat(' ', Math.min(currentIndent, MAX_INDENT));
-    }
-
-    /**
-     * Temporary workaround to make sure log4j2.xml gets loaded for all loggers
-     * TODO: Remove once gradlePlugin v1.32.1 is released
-     */
-    public static Logger getLogger(final Class<?> clazz)
-    {
-        return LogManager.getLogger(clazz);
-    }
-
     public static void setTestLogContext(String testLogContext)
     {
         TestLogger.testLogContext = testLogContext;
         updateThreadContext();
     }
 
-    private static Logger getLog()
+    @Contract (pure = true)
+    public static Logger log()
     {
-        updateThreadContext();
+        updateThreadContext(); // Just to be safe
 
         if (suppressLogging)
         {
@@ -109,49 +85,53 @@ public class TestLogger
     private static void updateThreadContext()
     {
         ThreadContext.put("testLogContext", testLogContext);
-        ThreadContext.put("testLogIndent", getIndentString());
+        ThreadContext.put("testLogIndent", StringUtils.repeat(' ', Math.min(currentIndent, MAX_INDENT)));
     }
 
-    public static void debug(String msg, Throwable t)
+    public static void debug(String message, Throwable t)
     {
-        getLog().debug(msg, t);
+        log().debug(message, t);
     }
 
-    public static void debug(String msg)
+    public static void debug(String message)
     {
-        getLog().debug(msg);
+        log().debug(message);
     }
 
-    public static void info(String str, Throwable t)
+    public static void info(String message, Throwable t)
     {
-        getLog().info(str, t);
+        log().info(message, t);
     }
 
-    public static void info(String str)
+    public static void info(String message)
     {
-        getLog().info(str);
+        log().info(message);
     }
 
-    public static void warn(String str, Throwable t)
+    public static void warn(String message, Throwable t)
     {
-        getLog().warn(str, t);
+        log().warn(message, t);
     }
 
-    public static void warn(String str)
+    public static void warn(String message)
     {
-        getLog().warn(str);
+        log().warn(message);
     }
 
-    public static void error(String str, Throwable t)
+    public static void error(String message, Throwable t)
     {
-        getLog().error(str, t);
+        log().error(message, t);
     }
 
-    public static void error(String str)
+    public static void error(String message)
     {
-        getLog().error(str);
+        log().error(message);
     }
 
+    /**
+     * @deprecated Use a specific log level. Usually {@link #info(String)}
+     */
+    @Deprecated
     public static void log(String str)
     {
         info(str);

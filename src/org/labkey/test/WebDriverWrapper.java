@@ -1801,12 +1801,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertTextPresentInThisOrder(text1, text2);
     }
 
-    private void waitForPageToLoad(WebElement toBeStale, int millis)
+    private void waitForPageToLoad(WebElement toBeStale, Timer timer)
     {
         _testTimeout = true;
         try
         {
-            new WebDriverWait(getDriver(), Duration.ofMillis(millis))
+            new WebDriverWait(getDriver(), timer.timeRemaining())
                     .withMessage("waiting for browser to navigate")
                     .until(ExpectedConditions.stalenessOf(toBeStale));
         }
@@ -1816,12 +1816,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         // WebDriver usually does this automatically, but not always.
-        new WebDriverWait(getDriver(), Duration.ofMillis(millis))
+        new WebDriverWait(getDriver(), timer.timeRemaining())
                 .withMessage("waiting for document to be ready")
                 .until(wd -> Objects.equals(executeScript("return document.readyState;"), "complete"));
+        Locators.documentRoot.waitForElement(getDriver(), (int) timer.timeRemaining().toMillis());
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
+        if (timer.isTimedOut())
+        {
+            throw new TimeoutException("Timed out waiting for JavaScript libraries to init after page load.");
+        }
 
         List<WebElement> apps = Locator.findElements(getDriver(),
             Locator.tagWithAttributeContaining("div", "id", "error-handler-app"), // from errorView.jsp
@@ -1839,7 +1844,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     {
                         return false;
                     }
-                }), "App didn't seem to load. No visible content. " + app.toString(), 10000);
+                }), "App didn't seem to load. No visible content. " + app.toString(), (int) timer.timeRemaining().toMillis());
         }
         _testTimeout = false;
     }
@@ -1886,14 +1891,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public long doAndMaybeWaitForPageToLoad(int msWait, Supplier<Boolean> action)
     {
-        long startTime = System.currentTimeMillis();
+        Timer loadTimer = new Timer(Duration.ofMillis(msWait));
         WebElement toBeStale = null;
 
         if (msWait > 0)
         {
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
+                {
+                    TestLogger.log().trace("beforePageLoad - " + listener.getClass().getSimpleName());
                     listener.beforePageLoad();
+                }
             });
             getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(msWait));
             toBeStale = Locators.documentRoot.findElement(getDriver()); // Document should become stale
@@ -1903,11 +1911,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (msWait > 0 && shouldWait)
         {
-            waitForPageToLoad(toBeStale, msWait);
+            waitForPageToLoad(toBeStale, loadTimer);
             getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
+                {
+                    TestLogger.log().trace("afterPageLoad - " + listener.getClass().getSimpleName());
                     listener.afterPageLoad();
+                }
             });
             if (getDriver().getTitle().isEmpty() && onLabKeyPage())
             {
@@ -1916,7 +1927,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         }
 
-        return System.currentTimeMillis() - startTime;
+        return loadTimer.elapsed().toMillis();
     }
 
     public long doAndAcceptUnloadAlert(Runnable func, String partialAlertText)
