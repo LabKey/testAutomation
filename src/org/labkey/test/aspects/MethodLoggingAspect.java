@@ -16,7 +16,6 @@
 package org.labkey.test.aspects;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -39,10 +38,10 @@ import java.util.Stack;
 @Aspect
 public class MethodLoggingAspect
 {
-    private static final Stack<Long> startTimes = new Stack<>();
-    private static final Stack<String> methodStack = new Stack<>();
-    private static final Stack<String> quietMethods = new Stack<>();
-    private static final Stack<String> quietMethodsArgStrings = new Stack<>();
+    private static Stack<Long> startTimes = new Stack<>();
+    private static Stack<String> methodStack = new Stack<>();
+    private static Stack<String> quietMethods = new Stack<>();
+    private static Stack<String> quietMethodsArgStrings = new Stack<>();
 
     @Pointcut(value = "execution(@org.labkey.test.util.LogMethod * *(..))")
     void loggedMethod(){}
@@ -73,7 +72,7 @@ public class MethodLoggingAspect
 
         String argsString = getArgsString(loggedParameters);
 
-        if (logMethod.quiet() && !TestLogger.log().isEnabled(Level.TRACE))
+        if (logMethod.quiet())
         {
             TestLogger.suppressLogging(true);
             quietMethods.add(method);
@@ -82,7 +81,7 @@ public class MethodLoggingAspect
 
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
-            TestLogger.info(">>" + method + argsString);
+            TestLogger.log(">>" + method + argsString);
             TestLogger.increaseIndent();
         }
     }
@@ -104,7 +103,7 @@ public class MethodLoggingAspect
     {
         methodStack.pop(); // Discard current method, duplicated in joinPoint
         String caller = methodStack.isEmpty() ? "" : methodStack.peek();
-        long elapsed = System.currentTimeMillis() - startTimes.pop();
+        Long elapsed = System.currentTimeMillis()-startTimes.pop();
         String method = joinPoint.getStaticPart().getSignature().getName();
 
         String argString = " done";
@@ -121,8 +120,7 @@ public class MethodLoggingAspect
         {
             String elapsedStr = TestLogger.formatElapsedTime(elapsed);
             TestLogger.decreaseIndent();
-            // Only log on successful return
-            TestLogger.info(logPrefix + method + argString + " " + elapsedStr);
+            TestLogger.log(logPrefix + method + argString + " " + elapsedStr); // Only log on successful return
         }
     }
 
@@ -171,46 +169,46 @@ public class MethodLoggingAspect
 
     private String getArgString(Object arg, int maxArgLength)
     {
-        StringBuilder argString = new StringBuilder();
+        String argString = "";
         if (arg instanceof Object[])
         {
             for (Object nestedArg : (Object[])arg)
             {
-                argString.append(argString.length() > 0 ? ", " : "").append(getArgString(nestedArg, maxArgLength));
+                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg, maxArgLength);
             }
-            argString = new StringBuilder("[" + argString + "]");
+            argString = "[" + argString + "]";
         }
         else if (arg instanceof Collection)
         {
-            for (Object nestedArg : (Collection<?>)arg)
+            for (Object nestedArg : (Collection)arg)
             {
-                argString.append(argString.length() > 0 ? ", " : "").append(getArgString(nestedArg, maxArgLength));
+                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg, maxArgLength);
             }
-            argString = new StringBuilder("[" + argString + "]");
+            argString = "[" + argString + "]";
         }
         else if (arg instanceof File)
         {
-            argString = new StringBuilder(((File) arg).getName());
+            argString = ((File) arg).getName();
         }
         else if (arg instanceof Duration)
         {
-            argString = new StringBuilder(((Duration) arg).toString().replace("PT", ""));
+            argString = ((Duration) arg).toString().replace("PT", "");
         }
         else
         {
             if (arg != null && arg.toString() != null)
             {
-                argString = new StringBuilder(arg.toString());
+                argString = arg.toString();
                 if (!(arg instanceof Number || arg instanceof Boolean))
                 {
                     if (argString.length() > maxArgLength)
-                        argString = new StringBuilder(T_STR + argString.substring(argString.length() - maxArgLength)); // trim start of long arguments
-                    argString = new StringBuilder("'" + argString + "'");
+                        argString = T_STR + argString.substring(argString.length() - maxArgLength); // trim start of long arguments
+                    argString = "'" + argString + "'";
                 }
             }
             else
-                argString = new StringBuilder("null");
+                argString = "null";
         }
-        return argString.toString();
+        return argString;
     }
 }
