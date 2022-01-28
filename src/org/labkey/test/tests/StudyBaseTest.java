@@ -158,13 +158,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     private void deleteLogFiles(String directoryName)
     {
         File dataRoot = new File(StudyHelper.getPipelinePath() + directoryName);
-        File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
-            @Override
-            public boolean accept(File dir, String name)
-            {
-                return name.endsWith(".log");
-            }
-        });
+        File[] logFiles = dataRoot.listFiles((dir, name) -> name.endsWith(".log"));
         if (null != logFiles)
             for (File f : logFiles)
                 if (!f.delete())
@@ -178,20 +172,20 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         initializeFolder();
         initializePipeline(pipelinePath);
 
-        // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
-        // complete before doing any further tests.
         clickFolder(getFolderName());
 
+        // Start importing a folder archive to create the study and load all the datasets. We'll wait for this import to
+        // complete before doing any further tests.
         log("Import new study with alt-ID");
         importFolderFromZip(TestFileUtils.getSampleData("studies/AltIdStudy.folder.zip"));
     }
 
-    protected void importStudy(File studyArchive, @Nullable String pipelinePath)
+    protected void importStudy(File folderArchive, @Nullable String pipelinePath)
     {
         initializeFolder();
         initializePipeline(pipelinePath);
         clickFolder(getFolderName());
-        importFolderFromZip(studyArchive);
+        importFolderFromZip(folderArchive);
     }
 
     protected void exportStudy(boolean zipFile)

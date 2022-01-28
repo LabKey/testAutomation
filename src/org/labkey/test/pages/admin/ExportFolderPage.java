@@ -6,7 +6,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;

@@ -24,6 +24,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -889,6 +890,10 @@ public class Crawler
                 sb.append(c);
             }
             query = sb.toString();
+            if (!splitUrl[1].equals(query))
+            {
+                TestLogger.warn(String.format("URL query not properly encoded.\n   in: [%s]\n  out: [%s]", splitUrl[1], query));
+            }
             url = splitUrl[0] + "?" + query;
         }
         HttpContext context = WebTestHelper.getBasicHttpContext();
@@ -1089,8 +1094,15 @@ public class Crawler
     {
         if (code == HttpStatus.SC_NOT_FOUND) // 404
         {
-            if (origin == null || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
-                return true; // Ignore 404s from the initial set of links
+            if (origin == null // Ignore 404s from the initial set of links
+                    || _actionsMayLinkTo404.contains(new ControllerActionId(origin.toString())))
+            {
+                return true;
+            }
+            else if (urlToCheck.isFromForm()) // Forms may 404 with bad input
+            {
+                return doesUrlExist(urlToCheck); // Ignore if action exists, forms may 404 with bad input
+            }
         }
 
         if (code == HttpStatus.SC_METHOD_NOT_ALLOWED) // 405
@@ -1100,6 +1112,34 @@ public class Crawler
         }
 
         return false;
+    }
+
+    private boolean doesUrlExist(UrlToCheck urlToCheck)
+    {
+        final String url = stripQueryParams(urlToCheck.getRelativeURL());
+
+        // Check whether 404 was due to a missing action
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpResponse response = null;
+
+        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        {
+            // LabKey actions don't support HEAD requests. Only a non-existent action will 404
+            var method = new HttpHead(url);
+            response = httpClient.execute(method, context);
+            // If url 404s, then the action doesn't exist
+            return response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_FOUND;
+        }
+        catch (IOException | IllegalArgumentException e)
+        {
+            TestLogger.warn("Unable to verify existence of action: " + urlToCheck.getActionId(), e);
+            return true;
+        }
+        finally
+        {
+            if (null != response)
+                EntityUtils.consumeQuietly(response.getEntity());
+        }
     }
 
     protected void checkForForbiddenWords(String relativeURL)
