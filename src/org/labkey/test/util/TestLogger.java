@@ -129,9 +129,9 @@ public class TestLogger
     }
 
     /**
-     * @deprecated Use a specific log level. Usually {@link #info(String)}
+     * Prefer to use a specific log level. Usually {@link #info(String)}
+     * Not deprecating because it is too widely used.
      */
-    @Deprecated
     public static void log(String str)
     {
         info(str);
