@@ -491,7 +491,7 @@ public class StudyHelper
     // Return the specified file from within the Study001 folder archive
     public static File getFolderArchiveFile(String relativePath)
     {
-        return TestFileUtils.getSampleData("studies/Study001.folder/" + relativePath);
+        return TestFileUtils.getSampleData("studies/Study001/" + relativePath);
     }
 
     // Return a specimen archive file
