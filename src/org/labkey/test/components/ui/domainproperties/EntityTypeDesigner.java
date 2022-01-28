@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extends DomainDesigner<EntityTypeDesigner<T>.ElementCache>
 {
@@ -91,6 +92,13 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return getThis();
     }
 
+    public String getNameExpressionPreview()
+    {
+        getWrapper().mouseOver(elementCache().helpTarget("Pattern"));
+        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 500);
+        return elementCache().toolTip.getText();
+    }
+
     public String getAutoLinkDataToStudy()
     {
         expandPropertiesPanel();
@@ -149,5 +157,14 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         {
             return BootstrapLocators.warningBanner.findOptionalElement(this);
         }
+
+        protected final WebElement helpTarget(String labelText)
+        {
+            return Locator.tagContainingText("span", labelText).childTag("span").withClass("label-help-target").findWhenNeeded(this);
+        }
+
+        // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.
+        protected final WebElement toolTip = Locator.tagWithId("div", "tooltip").refindWhenNeeded(getDriver());
+
     }
 }
