@@ -36,7 +36,6 @@ import org.labkey.test.util.study.specimen.SpecimenHelper;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -118,7 +117,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void startSpecimenImport(int completeJobsExpected, File specimenArchive)
     {
-        _specimenImporter = new SpecimenImporter(new File(StudyHelper.getPipelinePath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
+        _specimenImporter = new SpecimenImporter(new File(StudyHelper.getStudySubfolderPath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
         _specimenImporter.startImport();
     }
 
@@ -150,14 +149,14 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
         deleteLogFiles(".");
         deleteLogFiles("datasets");
-        TestFileUtils.deleteDir(new File(StudyHelper.getPipelinePath(), "assaydata"));
-        TestFileUtils.deleteDir(new File(StudyHelper.getPipelinePath(), "reports_temp"));
+        TestFileUtils.deleteDir(new File(StudyHelper.getStudySubfolderPath(), "assaydata"));
+        TestFileUtils.deleteDir(new File(StudyHelper.getStudySubfolderPath(), "reports_temp"));
         TestFileUtils.deleteDir(ARCHIVE_TEMP_DIR);
     }
 
     private void deleteLogFiles(String directoryName)
     {
-        File dataRoot = new File(StudyHelper.getPipelinePath() + directoryName);
+        File dataRoot = new File(StudyHelper.getStudySubfolderPath() + directoryName);
         File[] logFiles = dataRoot.listFiles((dir, name) -> name.endsWith(".log"));
         if (null != logFiles)
             for (File f : logFiles)
@@ -243,13 +242,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void initializePipeline()
     {
-        initializePipeline(StudyHelper.getPipelinePath());
+        initializePipeline(StudyHelper.getStudySubfolderPath());
     }
     
     protected void initializePipeline(String pipelinePath)
     {
         if(pipelinePath==null)
-            pipelinePath = StudyHelper.getPipelinePath();
+            pipelinePath = StudyHelper.getStudySubfolderPath();
 
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
