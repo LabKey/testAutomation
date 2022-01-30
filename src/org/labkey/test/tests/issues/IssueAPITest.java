@@ -1,19 +1,17 @@
 package org.labkey.test.tests.issues;
 
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.issues.GetIssueCommand;
 import org.labkey.remoteapi.issues.GetIssueResponse;
-import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.remoteapi.issues.IssueModel;
 import org.labkey.remoteapi.issues.IssueResponse;
 import org.labkey.remoteapi.issues.IssueResponseModel;
+import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
@@ -29,7 +27,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({})
@@ -291,6 +288,7 @@ public class IssueAPITest extends BaseWebDriverTest
                             List.of(firstFile.getName(), secondFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
                     // set for update
                     thirdIssue.setIssueId(issueId)
+                            .setAction(IssueModel.IssueAction.update)
                             .setComment("Assigning to buddy")
                             .setAssignedTo(TEST_BUDDY_ID);
                     break;
