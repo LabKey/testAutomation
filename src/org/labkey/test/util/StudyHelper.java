@@ -497,7 +497,7 @@ public class StudyHelper
     // Return a specimen archive file
     public static File getSpecimenArchiveFile(String archiveName)
     {
-        return TestFileUtils.getSampleData("studies/SpecimenArchives/" + archiveName);
+        return TestFileUtils.getSampleData("study/specimens/" + archiveName);
     }
 
     // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
