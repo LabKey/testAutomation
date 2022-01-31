@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.issues.GetIssueCommand;
 import org.labkey.remoteapi.issues.GetIssueResponse;
 import org.labkey.remoteapi.issues.IssueModel;
@@ -11,6 +12,7 @@ import org.labkey.remoteapi.issues.IssueResponse;
 import org.labkey.remoteapi.issues.IssueResponseModel;
 import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -24,9 +26,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({})
@@ -230,6 +234,56 @@ public class IssueAPITest extends BaseWebDriverTest
     }
 
     @Test
+    public void testInsertIssueWithAssignment() throws Exception
+    {
+        IssueModel issue = basicIssueModel("Insert with Assignment", "This is buddy's issue")
+                .setAssignedTo(TEST_BUDDY_ID);
+
+        var issueId = doIssueAction(issue);
+        var hopefullyAssignedIssue = getIssueResponse(issueId);
+        assertEquals("expect issue to be assigned to buddy", TEST_BUDDY_ID, hopefullyAssignedIssue.getAssignedTo());
+    }
+
+    @Test
+    public void testInsertIssueWithoutIssueDefId() throws Exception
+    {
+        IssueModel issue = new IssueModel()
+                .setTitle("test to ensure default for container if no issueDefName is specified")
+                .setComment("hopefully blows up")
+                .setAction(IssueModel.IssueAction.insert)
+                .setAssignedTo(TEST_USER_ID)
+                .setNotify(TEST_BUDDY_NAME)
+                .setPriority(3L)
+                .setType("Defect");
+        var issueId = doIssueAction(issue);
+        var issueModel = getIssueResponse(issueId);
+        assertEquals("expect the default issueList to have been supplied", ISSUES, issueModel.getIssueDefName());
+    }
+
+    @Test
+    public void testResolveAClosedIssue() throws Exception
+    {
+        IssueModel issue = basicIssueModel("Resolve closed issue test", "should be fine");
+
+        var issueId = doIssueAction(issue);
+
+        IssueModel close = basicIssueModel(null, null).setAction(IssueModel.IssueAction.close)
+                .setIssueId(issueId);
+        IssueModel resolve = basicIssueModel(null, null).setAction(IssueModel.IssueAction.resolve)
+                .setIssueId(issueId);
+
+        doIssueAction(close);
+        var closedResponse = getIssueResponse(issueId);
+        assertEquals("expect status to be closed", "closed", closedResponse.getStatus());
+        assertEquals("expect to be assigned to guest", Long.valueOf(0), closedResponse.getAssignedTo());
+
+        doIssueAction(resolve);
+        var resolvedResponse = getIssueResponse(issueId);
+        assertEquals("expect to be assigned to test user", TEST_USER_ID, resolvedResponse.getAssignedTo());
+        assertEquals("expect status to be resolved", "resolved", resolvedResponse.getStatus());
+    }
+
+    @Test
     public void testUpdateMultipleIssues() throws Exception
     {
         File firstFile = TestFileUtils.writeTempFile("firstErr.txt", "first error of 2");
@@ -331,6 +385,61 @@ public class IssueAPITest extends BaseWebDriverTest
                     break;
                 }
             }
+        }
+    }
+
+    @Test
+    public void testWithNoAction() throws Exception
+    {
+        IssueModel issue = new IssueModel()
+                .setTitle("test with no action")
+                .setComment("hopefully blows up")
+                .setAssignedTo(TEST_USER_ID)
+                .setNotify(TEST_BUDDY_NAME)
+                .setPriority(3L)
+                .setType("Defect");
+        try
+        {
+            doIssueAction(issue);
+            fail("should produce an error");
+        }catch (CommandException success)
+        {
+            assertEquals("Action must be specified : (update, resolve, close, reopen)", success.getMessage());
+        }
+    }
+
+    @Test
+    public void testIssueWithoutAssignedTo() throws Exception
+    {
+        IssueModel issue = new IssueModel()
+                .setTitle("test with no assignedTo")
+                .setComment("should assign to guest")
+                .setAction(IssueModel.IssueAction.insert)
+                .setNotify(TEST_BUDDY_NAME)
+                .setPriority(3L)
+                .setType("Defect");
+
+        var issueResponse= getIssueResponse( doIssueAction(issue));
+        assertEquals("should be assigned to guest", Long.valueOf(0), issueResponse.getAssignedTo());
+        assertEquals("should be open", "open", issueResponse.getStatus());
+    }
+
+    @Test
+    public void testIssueWithoutPri() throws Exception
+    {
+        IssueModel issue = new IssueModel()
+                .setTitle("test with no priority")
+                .setComment("should get a CommandException")
+                .setAction(IssueModel.IssueAction.insert)
+                .setType("Defect");
+
+        try{
+            doIssueAction(issue);
+            fail("expect error if command is executed without required property priority");
+        }catch(CommandException success)
+        {
+            assertThat(success.getMessage(), containsString("Data does not contain required field: priority"));
+            resetErrors();
         }
     }
 

@@ -10,30 +10,15 @@ import java.util.Map;
 
 public class IssueResponseModel
 {
-    // keys
-    private final String TITLE= "Title";
-    private final String ISSUE_ID = "IssueId";
-    private final String ISSUE_DEF_NAME = "issueDefName";
-    private final String ASSIGNED_TO = "AssignedTo";
-    private final String TYPE = "type";
-    private final String PRIORITY = "priority";
-    private final String COMMENT = "comment";
-    private final String NOTIFY_LIST = "notifyList";
-    private final String RESOLUTION = "resolution";
-    private final String RESOLVED = "resolved";
-    private final String RESOLVED_BY = "ResolvedBy";
-    private final String CLOSED = "Closed";
-    private final String CLOSED_BY = "ClosedBy";
-    private final String STATUS = "Status";
-    private final String MODIFIED = "Modified";
-    private final String MODIFIED_BY = "ModifiedBy";
     private final List<IssueComment> _issueComments = new ArrayList<>();
     private final Map<String, Object> _serverProps = new CaseInsensitiveHashMap<>();
+    private final Map<String, Object> _allProps = new CaseInsensitiveHashMap<>();
 
     public IssueResponseModel(JSONObject json)
     {
         JSONObject props = (JSONObject) json.get("properties");
         _serverProps.putAll(props);
+        _allProps.putAll(json);
 
         if (json.get("comments") != null)
         {
@@ -94,6 +79,11 @@ public class IssueResponseModel
     public String getType()
     {
         return (String) getProp(ResponseKeys.type);
+    }
+
+    public String getIssueDefName()
+    {
+        return (String) _allProps.get(ResponseKeys.issueDefName.toString());
     }
 
     public List<IssueComment> getComments()
