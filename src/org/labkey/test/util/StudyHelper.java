@@ -45,8 +45,8 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class StudyHelper
 {
-    public static final File SPECIMEN_ARCHIVE_A = TestFileUtils.getSampleData("study/specimens/sample_a.specimens");
-    public static final File SPECIMEN_ARCHIVE_B = TestFileUtils.getSampleData("study/specimens/sample_b.specimens");
+    public static final File SPECIMEN_ARCHIVE_A = getSpecimenArchiveFile("sample_a.specimens");
+    public static final File SPECIMEN_ARCHIVE_B = getSpecimenArchiveFile("sample_b.specimens");
 
     private static Boolean _specimenModulePresent = null;
 
@@ -473,17 +473,31 @@ public class StudyHelper
 
     public static File getStudyTempDir()
     {
-        return new File(getPipelinePath(), "drt_temp");
+        return new File(getStudySubfolderPath(), "drt_temp");
     }
 
-    public static String getPipelinePath()
+    // Return the root of the Study001 folder archive (i.e., where folder.xml lives)
+    public static String getFolderArchiveRootPath()
     {
-        return TestFileUtils.getSampleData("study/study.xml").getParentFile().getAbsolutePath();
+        return getFolderArchiveFile("folder.xml").getParentFile().getAbsolutePath();
     }
 
-    public static File getStudySampleData(String relativePath)
+    // Return the root of the /study node within the Study001 folder archive (i.e., where study.xml lives)
+    public static String getStudySubfolderPath()
     {
-        return TestFileUtils.getSampleData("study/" + relativePath);
+        return getFolderArchiveFile("study/study.xml").getParentFile().getAbsolutePath();
+    }
+
+    // Return the specified file from within the Study001 folder archive
+    public static File getFolderArchiveFile(String relativePath)
+    {
+        return TestFileUtils.getSampleData("studies/Study001/" + relativePath);
+    }
+
+    // Return a specimen archive file
+    public static File getSpecimenArchiveFile(String archiveName)
+    {
+        return TestFileUtils.getSampleData("study/specimens/" + archiveName);
     }
 
     // Emulates previous behavior of setting "advanced" repository type on the create study page, which is what many
