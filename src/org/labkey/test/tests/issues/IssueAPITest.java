@@ -433,6 +433,7 @@ public class IssueAPITest extends BaseWebDriverTest
                 .setAction(IssueModel.IssueAction.insert)
                 .setType("Defect");
 
+        // revisit when  https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=44784 is resolved
         try{
             doIssueAction(issue);
             fail("expect error if command is executed without required property priority");

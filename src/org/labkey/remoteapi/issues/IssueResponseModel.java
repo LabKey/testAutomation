@@ -110,23 +110,21 @@ public class IssueResponseModel
      * Contains the case-sensitive keys used by issues-getIssue.api
      */
     public enum ResponseKeys{
-        Title(),
-        IssueId(),
-        issueDefName(),
-        AssignedTo(),
-        type(),
-        priority(),
-        comment(),
-        notifyList(),
-        resolution(),
-        resolved(),
-        ResolvedBy(),
-        Closed(),
-        ClosedBy(),
-        Status(),
-        Modified(),
-        ModifiedBy();
-        
-        ResponseKeys(){}
+        Title,
+        IssueId,
+        issueDefName,
+        AssignedTo,
+        type,
+        priority,
+        comment,
+        notifyList,
+        resolution,
+        resolved,
+        ResolvedBy,
+        Closed,
+        ClosedBy,
+        Status,
+        Modified,
+        ModifiedBy
     }
 }

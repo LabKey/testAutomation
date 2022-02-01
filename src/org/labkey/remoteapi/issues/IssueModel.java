@@ -54,10 +54,7 @@ public class IssueModel
 
     public Long getIssueId()
     {
-        if (getProp(ModelKeys.issueid) != null)
-            return (Long) getProp(ModelKeys.issueid);
-        else
-            return null;
+        return (Long) getProp(ModelKeys.issueid);
     }
 
     public IssueModel setIssueId(Long issueId)
@@ -181,37 +178,26 @@ public class IssueModel
 
     public enum ModelKeys
     {
-        title(),
-        issueid(),
-        issueDefName(),
-        assignedto(),
-        action(),
-        type(),
-        priority(),
-        comment(),
-        notifyList(),
-        resolution(),
-        resolved(),
-        status();
-
-        ModelKeys()
-        {
-
-        }
+        title,
+        issueid,
+        issueDefName,
+        assignedto,
+        action,
+        type,
+        priority,
+        comment,
+        notifyList,
+        resolution,
+        resolved,
+        status
     }
 
     public enum IssueAction
     {
-        insert("insert"),
-        update("update"),
-        resolve("resolve"),
-        close("close"),
-        reopen("reopen");
-
-        IssueAction(String value)
-        {
-            _value = value;
-        }
-        private final String _value;
+        insert,
+        update,
+        resolve,
+        close,
+        reopen
     }
 }
