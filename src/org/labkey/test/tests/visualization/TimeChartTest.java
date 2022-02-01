@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.tests.ReportTest;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -83,15 +84,15 @@ public abstract class TimeChartTest extends ReportTest
     @LogMethod protected void configureVisitStudy()
     {
         _containerHelper.createSubfolder(getProjectName(), VISIT_FOLDER_NAME, "Study");
-        initializePipeline();
+        initializePipeline(StudyHelper.getFolderArchiveRootPath());
 
         clickFolder(VISIT_FOLDER_NAME);
         clickButton("Process and Import Data");
-        _fileBrowserHelper.importFile("study.xml", "Import Study");
-        waitForText("Import Study from Pipeline");
+        _fileBrowserHelper.importFile("folder.xml", "Import Folder");
+        waitForText("Import Folder from Pipeline");
         clickButton("Start Import");
 
-        waitForPipelineJobsToComplete(1, "study import", false);
+        waitForPipelineJobsToComplete(1, "folder import", false);
     }
 
     protected void verifyAxisValueChanges(@Nullable String[] textPresent, @Nullable String[] textNotPresent)
