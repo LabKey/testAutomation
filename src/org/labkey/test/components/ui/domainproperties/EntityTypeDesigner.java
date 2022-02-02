@@ -94,7 +94,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public String getNameExpressionPreview()
     {
-        getWrapper().mouseOver(elementCache().helpTarget("Pattern"));
+        getWrapper().mouseOver(elementCache().helpTarget("Naming "));
         waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 500);
         return elementCache().toolTip.getText();
     }
@@ -158,13 +158,13 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
             return BootstrapLocators.warningBanner.findOptionalElement(this);
         }
 
-        protected final WebElement helpTarget(String labelText)
+        public final WebElement helpTarget(String divLabelText)
         {
-            return Locator.tagContainingText("span", labelText).childTag("span").withClass("label-help-target").findWhenNeeded(this);
+            return Locator.xpath(String.format("//div[text()='%s']//span[@class='label-help-target']", divLabelText)).findWhenNeeded(this);
         }
 
         // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.
-        protected final WebElement toolTip = Locator.tagWithId("div", "tooltip").refindWhenNeeded(getDriver());
+        public final WebElement toolTip = Locator.tagWithId("div", "tooltip").refindWhenNeeded(getDriver());
 
     }
 }

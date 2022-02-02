@@ -52,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "SampleTypeNameExprTest";
+    private static final String PROJECT_NAME = "SM_SampleType_Name_Expression_Test";
     private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
 
     private static final String PARENT_SAMPLE_TYPE = "Parent_SampleType";
@@ -98,8 +98,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         TestDataGenerator dataGenerator = SampleTypeAPIHelper.createEmptySampleType(getCurrentContainerPath(), definition);
 
-        log(String.format("Give the parent sample type '%1$s' two samples named '%2$s' and '%3$s'",
-                PARENT_SAMPLE_TYPE, PARENT_SAMPLE_01, PARENT_SAMPLE_02));
+        log(String.format("Give the parent sample type '%1$s' three samples named '%2$s', '%3$s' and '%4$s'.",
+                PARENT_SAMPLE_TYPE, PARENT_SAMPLE_01, PARENT_SAMPLE_02, PARENT_SAMPLE_03));
 
         Map<String, Object> sampleData = Map.of(
                 "name", PARENT_SAMPLE_01,
