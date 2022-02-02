@@ -49,7 +49,6 @@ public class PipelineCancelTest  extends BaseWebDriverTest
 
         goToProjectHome();
         assertTextPresent("This folder does not contain a study."); //part of the import will be done, but it shouldn't have gotten to participants.
-
     }
 
     @Override

@@ -1813,20 +1813,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void setExportPhi(PhiSelectType exportPhiLevel)
     {
-        if(NotPHI != exportPhiLevel)
+        if (NotPHI != exportPhiLevel)
         {
             new Checkbox(Locator.tagContainingText("label", "Include PHI Columns:").precedingSibling("input").findElement(getDriver())).check();
-            switch(exportPhiLevel)
+            switch (exportPhiLevel)
             {
-                case Limited:
-                    selectPhiCombo("Limited PHI");
-                    break;
-                case PHI:
-                    selectPhiCombo("Full and Limited PHI");
-                    break;
-                case Restricted:
-                    selectPhiCombo("Restricted, Full and Limited PHI");
-                    break;
+                case Limited -> selectPhiCombo("Limited PHI");
+                case PHI -> selectPhiCombo("Full and Limited PHI");
+                case Restricted -> selectPhiCombo("Restricted, Full and Limited PHI");
             }
         }
         else

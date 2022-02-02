@@ -197,7 +197,6 @@ public class Crawler
             new ControllerActionId("project", "togglePageAdminMode"),
             new ControllerActionId("query", "printRows"), // Data region print button. 404s on "TargetedMS Runs" grid
             new ControllerActionId("reports", "streamFile"),
-            new ControllerActionId("study", "importStudyFromPipeline"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
 
             // Disable crawler for single-page apps until we make `beginAt` work with them
@@ -263,7 +262,7 @@ public class Crawler
         final List<Function<UrlToCheck, Boolean>> urlVisitableChecks = new ArrayList<>();
 
         // Don't crawl pipeline status if it will redirect.
-        final ControllerActionId pipelineStatusAction = new ControllerActionId("pipeline", "status-details");
+        final ControllerActionId pipelineStatusAction = new ControllerActionId("pipeline-status", "details");
         urlVisitableChecks.add(url -> pipelineStatusAction.equals(url.getActionId()) && url.getRelativeURL().contains("redirect=1"));
 
         return urlVisitableChecks;
