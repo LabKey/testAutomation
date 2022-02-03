@@ -99,6 +99,34 @@ public class SecurityApiTest extends BaseWebDriverTest
         return new Pattern[0];
     }
 
+    /**
+     * A Note About This Test
+     *
+     * This is "one of those tests" that are seldom change and very rarely fail. However, when they do you spend more time
+     * than you want trying to just get it to run. Hopefully the following comments can help you if you are one of those
+     * poor souls who now finds themselves in this position.
+     *
+     * If you cannot get this test to run in IntelliJ try running it from the command line. Running in IntelliJ can throw
+     * a ClassNotFoundException. You are welcome to try and track it down and correct it if you want, but running from the
+     * command line (gradlew uiTests) does appear to be more reliable.
+     *
+     * The failed output from the test, especially on TeamCity, can be difficult to read. It is kind of a diff but not
+     * really. However, fear not! When you run the test locally from the command line you should see a line at the end of
+     * the output that looks like this:
+     *
+     * There were failing tests. See the report at: file:///Users/janedoe/labkey/trunk/build/modules/testAutomation/test/logs/reports/html/index.html
+     *
+     * Open this file in a browser, click on the test name, then click on the "Standard output" button. This presents the
+     * output in a more readable way (basically a log). Near the top is an "Expected:" comment with the expected output.
+     * A little ways down is a comment "Actual:" with the actual output (go figure).
+     * Looking at the expected vs. actual output in this log might be easier to compare and see what the difference is.
+     *
+     * The expected output comes from the security-api.xml file. Odds are you are going to have to change that file in
+     * some way. You didn't hear it from me but the easiest fix could be to replace the contents of the security-api.xml
+     * file with the actual output from the log. Obviously the smaller the change the better, but as a last resort you
+     * could try that as a fix.
+     *
+     */
     @Test
     public void testApiUserRolesAndPermissions() throws Exception
     {
