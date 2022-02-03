@@ -91,7 +91,7 @@
                                 "org.labkey.api.security.permissions.UpdatePermission",
                                 "org.labkey.announcements.model.SecureMessageBoardReadPermission",
                                 "org.labkey.api.security.permissions.SampleWorkflowJobPermission",
-                                "org.labkey.api.security.permissions.UpdateSampleStatusPermission",
+                                "org.labkey.api.security.permissions.UpdateSampleStatusPermission"
                             ],
                             "groups": []
                         },
