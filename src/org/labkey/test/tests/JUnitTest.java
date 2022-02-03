@@ -28,6 +28,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +69,7 @@ import java.util.function.Predicate;
 @Category({BVT.class, UnitTests.class})
 public class JUnitTest extends TestSuite
 {
-    private static final Logger LOG = TestLogger.getLogger(JUnitTest.class);
+    private static final Logger LOG = LogManager.getLogger(JUnitTest.class);
 
     public JUnitTest()
     {

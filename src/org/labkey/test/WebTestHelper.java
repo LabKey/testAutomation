@@ -35,6 +35,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +86,7 @@ import java.util.Random;
 public class WebTestHelper
 {
 
-    private static final Logger LOG = TestLogger.getLogger(WebTestHelper.class);
+    private static final Logger LOG = LogManager.getLogger(WebTestHelper.class);
 
     public static final Random RANDOM = new Random();
     public static final String API_KEY = "apikey"; // Username for api/session key authentication
