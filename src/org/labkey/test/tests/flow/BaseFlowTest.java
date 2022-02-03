@@ -406,8 +406,10 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     protected void importAnalysis_selectFCSFiles(String containerPath, final SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
     {
         _ext4Helper.waitForOnReady();
-        if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
+        if (Locator.id(SelectFCSFileOption.Browse.name()).waitForElement(getDriver(), 5_000).isSelected())
+        {
             _fileBrowserHelper.waitForFileGridReady();
+        }
 
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         switch (selectFCSFilesOption)
