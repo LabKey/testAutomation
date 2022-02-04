@@ -103,7 +103,7 @@ public class SecurityApiTest extends BaseWebDriverTest
      * A Note About This Test
      *
      * This is "one of those tests" that are seldom changed and very rarely fail. However, when it does fail you can spend
-     * more time than you want just trying to get it to run. Hopefully the following comments can help you run the test.
+     * more time than you want just trying to get it to run. Hopefully the following comments will help.
      *
      * If you cannot get this test to run in IntelliJ try running it from the command line. Running in IntelliJ can throw
      * a ClassNotFoundException. You are welcome to try and track it down and correct it if you want, but running from the
@@ -112,7 +112,7 @@ public class SecurityApiTest extends BaseWebDriverTest
      * The failed output from the test can be difficult to read. Especially if the failure was between expected and actual
      * roles and permissions. If that is the type of failure you are seeing the failure message is a rough diff between
      * the expected JSON and the JSON that was returned. If you run the test locally from the command line you might be
-     * able to better understand what the differences are. After running locally you should see a message at the end of
+     * better able to understand what the differences are. After running locally you should see a message at the end of
      * the run output that looks like this:
      *
      * There were failing tests. See the report at: file:///Users/janedoe/labkey/trunk/build/modules/testAutomation/test/logs/reports/html/index.html
@@ -120,12 +120,11 @@ public class SecurityApiTest extends BaseWebDriverTest
      * Open this file in a browser, click on the test name, then click on the "Standard output" button. This presents the
      * output in a more readable way (basically a log). Near the top is an "Expected:" comment with the expected output.
      * A little ways down is a comment "Actual:" with the actual output (go figure). It might be easier to compare the
-     * expected vs. actual results as it appears in this log.
+     * expected vs. actual results from this log output.
      *
      * The expected output comes from the security-api.xml file. If this is a role and/or permission error odds are you
-     * are going to have to change that file in some way. Try to make the smallest change possible. If you are changing
-     * permissions, either adding or removing, you will need to update the value(s) in the effectivePermissions collection
-     * for a given role.
+     * will need to make a change to that file. Try to make the smallest change possible. If you are changing permissions,
+     * either adding or removing, you will need to update the value(s) in the effectivePermissions collection for a given role.
      *
      * If you still have a hard time getting the test to pass locally try running with a bootstrapped database. That is
      * how the test is run on TeamCity and it may address any assumptions the test makes about the environment.
