@@ -102,7 +102,7 @@ public class SecurityApiTest extends BaseWebDriverTest
     /**
      * A Note About This Test
      *
-     * This is "one of those tests" that are seldom change and very rarely fail. However, when it does fail you can spend
+     * This is "one of those tests" that are seldom changed and very rarely fail. However, when it does fail you can spend
      * more time than you want just trying to get it to run. Hopefully the following comments can help you run the test.
      *
      * If you cannot get this test to run in IntelliJ try running it from the command line. Running in IntelliJ can throw
