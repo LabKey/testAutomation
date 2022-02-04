@@ -20,7 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.pages.reports.ManageViewsPage;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
 
 public abstract class ReportTest extends StudyBaseTest
 {
@@ -67,16 +69,16 @@ public abstract class ReportTest extends StudyBaseTest
 
     protected void clickReportDetailsLink(String reportName)
     {
-        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to navigate to the Detail View')]");
-
-        waitAndClickAndWait(link);
+        Locator loc = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to navigate to the Detail View')]");
+        WebElement link = shortWait().until(LabKeyExpectedConditions.animationIsDone(loc));
+        clickAndWait(link);
     }
 
     protected void clickReportPermissionsLink(String reportName)
     {
-        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").withPredicate(Locator.linkWithText(reportName)).append("//a[contains(@data-qtip, 'Click to customize the permissions')]");
-
-        waitAndClickAndWait(link);
+        Locator loc = Locator.xpath("//tr").withClass("x4-grid-row").withPredicate(Locator.linkWithText(reportName)).append("//a[contains(@data-qtip, 'Click to customize the permissions')]");
+        WebElement link = shortWait().until(LabKeyExpectedConditions.animationIsDone(loc));
+        clickAndWait(link);
     }
 
     @Override

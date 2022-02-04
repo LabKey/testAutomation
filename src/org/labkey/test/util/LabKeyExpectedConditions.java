@@ -76,7 +76,7 @@ public class LabKeyExpectedConditions
                     WebElement el = loc.findElement(driver);
                     return animationIsDone(el).apply(driver);
                 }
-                catch (StaleElementReferenceException recheck)
+                catch (StaleElementReferenceException | NoSuchElementException recheck)
                 {
                     return null;
                 }
