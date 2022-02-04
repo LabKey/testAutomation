@@ -110,9 +110,10 @@ public class SecurityApiTest extends BaseWebDriverTest
      * command line (gradlew uiTests) does appear to be more reliable.
      *
      * The failed output from the test can be difficult to read. Especially if the failure was between expected and actual
-     * roles and permissions. If that is the type of failure the failure message is a rough diff between what was expected
-     * and what was actually returned. When you run the test locally from the command line you should see a message at the
-     * end of the run output that looks like this:
+     * roles and permissions. If that is the type of failure you are seeing the failure message is a rough diff between
+     * the expected JSON and the JSON that was returned. If you run the test locally from the command line you might be
+     * able to better understand what the differences are. After running locally you should see a message at the end of
+     * the run output that looks like this:
      *
      * There were failing tests. See the report at: file:///Users/janedoe/labkey/trunk/build/modules/testAutomation/test/logs/reports/html/index.html
      *
