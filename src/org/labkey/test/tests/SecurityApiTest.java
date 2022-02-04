@@ -102,30 +102,34 @@ public class SecurityApiTest extends BaseWebDriverTest
     /**
      * A Note About This Test
      *
-     * This is "one of those tests" that are seldom change and very rarely fail. However, when they do you spend more time
-     * than you want trying to just get it to run. Hopefully the following comments can help you if you are one of those
-     * poor souls who now finds themselves in this position.
+     * This is "one of those tests" that are seldom change and very rarely fail. However, when it does fail you can spend
+     * more time than you want just trying to get it to run. Hopefully the following comments can help you run the test.
      *
      * If you cannot get this test to run in IntelliJ try running it from the command line. Running in IntelliJ can throw
      * a ClassNotFoundException. You are welcome to try and track it down and correct it if you want, but running from the
      * command line (gradlew uiTests) does appear to be more reliable.
      *
-     * The failed output from the test, especially on TeamCity, can be difficult to read. It is kind of a diff but not
-     * really. However, fear not! When you run the test locally from the command line you should see a line at the end of
-     * the output that looks like this:
+     * The failed output from the test can be difficult to read. Especially if the failure was between expected and actual
+     * roles and permissions. If that is the type of failure the failure message is a rough diff between what was expected
+     * and what was actually returned. When you run the test locally from the command line you should see a message at the
+     * end of the run output that looks like this:
      *
      * There were failing tests. See the report at: file:///Users/janedoe/labkey/trunk/build/modules/testAutomation/test/logs/reports/html/index.html
      *
      * Open this file in a browser, click on the test name, then click on the "Standard output" button. This presents the
      * output in a more readable way (basically a log). Near the top is an "Expected:" comment with the expected output.
-     * A little ways down is a comment "Actual:" with the actual output (go figure).
-     * Looking at the expected vs. actual output in this log might be easier to compare and see what the difference is.
+     * A little ways down is a comment "Actual:" with the actual output (go figure). It might be easier to compare the
+     * expected vs. actual results as it appears in this log.
      *
-     * The expected output comes from the security-api.xml file. Odds are you are going to have to change that file in
-     * some way. You didn't hear it from me but the easiest fix could be to replace the contents of the security-api.xml
-     * file with the actual output from the log. Obviously the smaller the change the better, but as a last resort you
-     * could try that as a fix.
+     * The expected output comes from the security-api.xml file. If this is a role and/or permission error odds are you
+     * are going to have to change that file in some way. Try to make the smallest change possible. If you are changing
+     * permissions, either adding or removing, you will need to update the value(s) in the effectivePermissions collection
+     * for a given role.
      *
+     * If you still have a hard time getting the test to pass locally try running with a bootstrapped database. That is
+     * how the test is run on TeamCity and it may address any assumptions the test makes about the environment.
+     *
+     * Vaya con Dios
      */
     @Test
     public void testApiUserRolesAndPermissions() throws Exception
