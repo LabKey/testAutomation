@@ -10,10 +10,13 @@ target folder, that should be respected.  The same is true for both updateRows a
 <script type='text/javascript'>
 
     function testContainerPath() {
-        var folderContainerId = LABKEY.Security.currentContainer.type === 'workbook' ? LABKEY.Security.currentContainer.parentId : LABKEY.Security.currentContainer.id;
+        var container = LABKEY.container;
+        var folderContainerId = container.type === 'workbook' ? container.parentId : container.id;
         var workbook1;
         var workbook2;
+        var workbooksTitle = 'API Test Workbook';
         var subfolder1 = 'this is a placeholder so we fail if the actual ID is not found';
+        var subfolderName = 'API_Test_Folder';
         var workbook1Path;
         var workbook2Path;
         var subfolder1Path = 'this is a placeholder so we fail if the actual ID is not found';
@@ -53,7 +56,7 @@ target folder, that should be respected.  The same is true for both updateRows a
         var multi = new LABKEY.MultiRequest();
         multi.add(LABKEY.Security.createContainer, {
             containerPath: folderContainerId,
-            title: 'API Test Workbook',
+            title: workbooksTitle,
             description: 'Workbook created by JS API 1',
             isWorkbook: true,
             scope: this,
@@ -67,7 +70,7 @@ target folder, that should be respected.  The same is true for both updateRows a
 
         multi.add(LABKEY.Security.createContainer, {
             containerPath: folderContainerId,
-            title: 'API Test Workbook',
+            title: workbooksTitle,
             description: 'Workbook created by JS API 2',
             isWorkbook: true,
             scope: this,
@@ -81,14 +84,14 @@ target folder, that should be respected.  The same is true for both updateRows a
 
         multi.add(LABKEY.Security.createContainer, {
             containerPath: folderContainerId,
-            name: 'API_Test_Folder',
+            name: subfolderName,
             title: 'API Test Folder',
             description: 'Folder created by JS API',
             isWorkbook: false,
             scope: this,
             failure: failureCallback,
             success: function (response) {
-                success('Created subfolder: API_Test_Folder');
+                success('Created subfolder: ' + subfolderName);
                 subfolder1 = response.id;
                 subfolder1Path = response.path;
             }
@@ -119,7 +122,61 @@ target folder, that should be respected.  The same is true for both updateRows a
             }
         });
 
-        multi.send(doTests, this);
+        function cleanUp(done) {
+            document.getElementById('containerPathDiv').innerHTML = '';
+
+            var cleanupRequests = new LABKEY.MultiRequest();
+
+            cleanupRequests.add(LABKEY.Domain.drop, {
+                containerPath: folderContainerId,
+                schemaName: 'lists',
+                queryName: listName,
+                success: function() {
+                    success('Cleanup - Deleted list "' + listName + '"');
+                },
+                failure: function(err, response) {
+                    if (err && err.exception && err.exception.indexOf('was not found') > 0) {
+                        success('Cleanup - ' + err.exception);
+                    } else {
+                        failureCallback(err, response);
+                    }
+                }
+            });
+
+            LABKEY.Security.getContainers({
+                containerPath: LABKEY.container.path,
+                depth: 1,
+                includeSubfolders: true,
+                success: function(response) {
+                    var pathsToDelete = [];
+
+                    response.children.forEach(function(c) {
+                        if (c.title === workbooksTitle) {
+                            pathsToDelete.push(c.path);
+                        } else if (c.name === subfolderName) {
+                            pathsToDelete.push(c.path);
+                        }
+                    });
+
+                    if (pathsToDelete.length > 0) {
+                        pathsToDelete.forEach(function(path) {
+                            cleanupRequests.add(LABKEY.Security.deleteContainer, {
+                                containerPath: path,
+                                success: function() {
+                                    success('Cleanup - Deleted subfolder: ' + path);
+                                },
+                                failure: failureCallback
+                            });
+                        });
+                    } else {
+                        success('Cleanup - No subfolders need to be deleted.')
+                    }
+
+                    cleanupRequests.send(done, this);
+                },
+                failure: failureCallback,
+            });
+        }
 
         function getVerifySelect(response, pkField, expectedFieldName, containerField) {
             var pks = [];
@@ -198,7 +255,7 @@ target folder, that should be respected.  The same is true for both updateRows a
 
                     for (var i = 0; i < results.rows.length; i++) {
                         var r = results.rows[i];
-                        //on the returned rows, LK isnt consistent about field name case
+                        //on the returned rows, LK isn't consistent about field name case
                         var val = r[expectedFieldName] || r[expectedFieldName.toLowerCase()];
                         if ('updated' !== val) {
                             console.log(r);
@@ -259,7 +316,7 @@ target folder, that should be respected.  The same is true for both updateRows a
                 failure: failureCallback
             });
 
-            //expect failure because container isnt a child workbook
+            //expect failure because container isn't a child workbook
             multiInsert.add(LABKEY.Query.insertRows, {
                 containerPath: folderContainerId,
                 schemaName: 'lists',
@@ -270,8 +327,11 @@ target folder, that should be respected.  The same is true for both updateRows a
                     container: subfolder1
                 }],
                 failure: function (response) {
-                    if (response.exception !== 'Unknown table: lists.' + listName + ' in container: ' + subfolder1Path){
-                        logError('Incorrect error from cross-container insert: ' + response.exception);
+                    var expectedError = 'Row supplied container value: ' + subfolder1 + ' cannot be used for actions against the container: ' + container.path;
+                    if (response.exception !== expectedError) {
+                        logError('Incorrect error from cross-container insert:');
+                        logError('Expected: "' + expectedError + '"');
+                        logError('Actual: "' + response.exception + '"');
                     }
                     else {
                         success('Cross-container insert into non-workbook for list');
@@ -338,7 +398,7 @@ target folder, that should be respected.  The same is true for both updateRows a
                 }
             });
 
-            //expect failure because container isnt a child workbook
+            //expect failure because container isn't a child workbook
             multiInsert.add(LABKEY.Query.insertRows, {
                 containerPath: folderContainerId,
                 schemaName: 'vehicle',
@@ -349,8 +409,11 @@ target folder, that should be respected.  The same is true for both updateRows a
                     container: subfolder1
                 }],
                 failure: function (response) {
-                    if (response.exception !== 'Row supplied container value: ' + subfolder1 + ' cannot be used for actions against the container: ' + LABKEY.Security.currentContainer.path){
-                        logError('Incorrect error from cross-container insert: ' + response.exception);
+                    var expectedError = 'Row supplied container value: ' + subfolder1 + ' cannot be used for actions against the container: ' + container.path;
+                    if (response.exception !== expectedError) {
+                        logError('Incorrect error from cross-container insert:');
+                        logError('Expected: "' + expectedError + '"');
+                        logError('Actual: "' + response.exception + '"');
                     }
                     else {
                         success('Cross-container insert into non-workbook for module-schema');
@@ -371,6 +434,10 @@ target folder, that should be respected.  The same is true for both updateRows a
                 }, this);
             }, this);
         }
+
+        cleanUp(function() {
+            multi.send(doTests, this);
+        });
     }
 </script>
 <button onclick='testContainerPath();'>RunContainerPathTest</button>
