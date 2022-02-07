@@ -1206,7 +1206,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean onLabKeyPage()
     {
-        return (Boolean)executeScript("return window.LABKEY != undefined;");
+        return new LabKeyExpectedConditions.BooleanWait<>(shortWait())
+                .until(ignored -> executeScript("return window.LABKEY != undefined;", Boolean.class));
     }
 
     public boolean onLabKeyClassicPage()
@@ -1804,16 +1805,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
     private void waitForPageToLoad(WebElement toBeStale, Timer timer)
     {
         _testTimeout = true;
-        try
-        {
-            new WebDriverWait(getDriver(), timer.timeRemaining())
-                    .withMessage("waiting for browser to navigate")
-                    .until(ExpectedConditions.stalenessOf(toBeStale));
-        }
-        catch (NullPointerException ignore)
-        {
-            // Staleness check sometimes throws an NPE if the element goes stale too quickly. Carry on.
-        }
+        new WebDriverWait(getDriver(), timer.timeRemaining())
+                .ignoring(NullPointerException.class)
+                .withMessage("waiting for browser to navigate")
+                .until(ExpectedConditions.stalenessOf(toBeStale));
 
         // WebDriver usually does this automatically, but not always.
         new WebDriverWait(getDriver(), timer.timeRemaining())
@@ -1920,7 +1915,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     listener.afterPageLoad();
                 }
             });
-            if (getDriver().getTitle().isEmpty() && onLabKeyPage())
+            if (onLabKeyPage() && getDriver().getTitle().isEmpty())
             {
                 String warning = "Action doesn't define a page title";
                 addActionWarning(warning, getDriver().getCurrentUrl());
