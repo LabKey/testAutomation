@@ -99,6 +99,19 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().toolTip.getText();
     }
 
+    public T dismissToolTip()
+    {
+
+        // As far as I can tell every entity designer page has a "Learn more" link. This link is inside the container
+        // but far enough away from the other elements to make the tool tip for a given field go away.
+        // Of course this may not be true in the future.
+        getWrapper().mouseOver(elementCache().learnMoreLink);
+
+        waitFor(()->!elementCache().toolTip.isDisplayed(), "The tool tip did not go away.", 1_000);
+
+        return getThis();
+    }
+
     public String getAutoLinkDataToStudy()
     {
         expandPropertiesPanel();
@@ -157,6 +170,8 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         {
             return BootstrapLocators.warningBanner.findOptionalElement(this);
         }
+
+        public final WebElement learnMoreLink = Locator.linkContainingText("Learn more").findWhenNeeded(this);
 
         public final WebElement helpTarget(String divLabelText)
         {

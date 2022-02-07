@@ -52,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "SM_SampleType_Name_Expression_Test";
+    private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
     private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
 
     private static final String PARENT_SAMPLE_TYPE = "Parent_SampleType";
@@ -288,7 +288,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     /**
      * <p>
-     *     Verify that a derived sample, using a name expression, can be created through the UI.
+     *     Verify that a derived sample, using a name expression, can be created by clicking the "Derive Samples" link
+     *     from a sample's detail page.
      * </p>
      * <p>
      *     This test will:
@@ -299,16 +300,19 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      * @throws Exception Can be thrown by test helper.
      */
     @Test
-    public void testCreateDerivedThroughUI() throws Exception
+    public void testDeriveSampleFromSampleDetailsPage() throws Exception
     {
 
-        // This test is for Issue 44760.
+        // This test exposes Issue 44760. The issue is not caused by using the UI but rather by the latest lineage lookup
+        // name expression feature.
         goToProjectHome();
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         final String sampleType = "DerivedUI_SampleType";
         final String nameExpression = String.format("DUI_${genId}_${materialInputs/%s/Str}", PARENT_SAMPLE_TYPE);
+
+        // TODO: When Issue 44760 this test can be updated to use a parent alias in the name expression.
 
         log(String.format("Create a sample type named '%s' with a name expression of '%s'.", sampleType, nameExpression));
 
@@ -358,7 +362,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      * Simple helper to build the expected text in the tool-tip for the name expression.
      *
      * @param expectedPreview What the expected preview example should look like. If null will return default tool-tip.
-     * @param error Should the name expression generate an error?
+     * @param error Should the name expression generate an error? If so the expected error message should be passed in as the expectedPreview.
      * @return The expected text in the tool-tip including header and other text.
      */
     private String generateExpectedToolTip(@Nullable String expectedPreview, boolean error)
