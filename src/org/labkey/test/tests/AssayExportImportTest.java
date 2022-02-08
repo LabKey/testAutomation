@@ -202,6 +202,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         int fileIndex = 0;
         for(Map<String, String> runProperty : runProperties)
         {
+            sleep(1000); // give it a second to finish the import of the last run in the "Save and Import Another Run" case
             runProperty.keySet().forEach((property)->setFormElement(Locator.name(property), runProperty.get(property)));
 
             if(!useFilesWebPart)
