@@ -362,10 +362,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      * Simple helper to build the expected text in the tool-tip for the name expression.
      *
      * @param expectedPreview What the expected preview example should look like. If null will return default tool-tip.
-     * @param error Should the name expression generate an error? If so the expected error message should be passed in as the expectedPreview.
      * @return The expected text in the tool-tip including header and other text.
      */
-    private String generateExpectedToolTip(@Nullable String expectedPreview, boolean error)
+    private String generateExpectedToolTip(@Nullable String expectedPreview)
     {
 
         StringBuilder expectedToolTip = new StringBuilder();
@@ -375,11 +374,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         if(expectedPreview != null)
         {
-            if(!error)
-            {
-                expectedToolTip.append("Example of name that will be generated from the current pattern: ");
-            }
-
+            expectedToolTip.append("Example of name that will be generated from the current pattern: ");
             expectedToolTip.append(expectedPreview);
             expectedToolTip.append("\n");
         }
@@ -420,7 +415,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         createPage.setName(sampleType);
 
         log("Check the default tool-tip.");
-        String expectedMsg = generateExpectedToolTip(null, false);
+        String expectedMsg = generateExpectedToolTip(null);
         String actualMsg = createPage.getNameExpressionPreview();
 
         checker().withScreenshot("Default_Preview_Error")
@@ -440,7 +435,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setNameExpression(nameExpression);
 
-        expectedMsg = generateExpectedToolTip("SNP_1001_3_parentStrValue", false);
+        expectedMsg = generateExpectedToolTip("SNP_1001_3_parentStrValue");
         actualMsg = createPage.getNameExpressionPreview();
 
         log("Verify that the preview shows the fields as expected.");
@@ -457,7 +452,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         createPage.setNameExpression(nameExpression);
 
         String dateExample = "SNP_1001_2021-04-28";
-        expectedMsg = generateExpectedToolTip(dateExample, false);
+        expectedMsg = generateExpectedToolTip(dateExample);
         actualMsg = createPage.getNameExpressionPreview();
 
         log("Verify that the preview shows the formatted date field as expected.");
@@ -531,7 +526,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setNameExpression(nameExpression);
 
-        String expectedMsg = generateExpectedToolTip("Unable to generate example name from the current pattern. Check for syntax errors.", true);
+        String expectedMsg = "Naming Pattern\n" +
+                "Pattern used for generating unique IDs for this sample type.\n" +
+                "Unable to generate example name from the current pattern. Check for syntax errors.\n" +
+                "More info";
+
         String actualMsg = createPage.getNameExpressionPreview();
 
         log("Validate tool-tip shows there is an error, and cannot generate an example name.");
@@ -554,7 +553,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setNameExpression(nameExpression);
 
-        expectedMsg = generateExpectedToolTip(nameExpression, false);
+        expectedMsg = generateExpectedToolTip(nameExpression);
         actualMsg = createPage.getNameExpressionPreview();
 
         log("Validate the tool-tip is unaffected and shows an example name.");
