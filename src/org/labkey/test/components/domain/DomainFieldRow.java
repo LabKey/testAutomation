@@ -97,11 +97,28 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
 
     /**
-     * selects the field data type.  Note: after the field is initially created, the select will be disabled
+     * Selects the field data type.
      */
     public DomainFieldRow setType(FieldDefinition.ColumnType columnType)
     {
+        return setType(columnType, false);
+    }
+
+    /**
+     * Selects the field data type.
+     * @param confirmDialogExpected boolean indicating if this field data type change expects a confirm dialog
+     */
+    public DomainFieldRow setType(FieldDefinition.ColumnType columnType, boolean confirmDialogExpected)
+    {
         elementCache().fieldTypeSelectInput.selectByVisibleText(columnType.getLabel());
+
+        if (confirmDialogExpected)
+        {
+            ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                    .withTitle("Confirm Data Type Change").timeout(1000).waitFor();
+            confirmDialog.dismiss("Yes, Change Data Type");
+        }
+
         return this;
     }
 
