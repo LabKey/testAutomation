@@ -20,10 +20,8 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
@@ -858,67 +856,61 @@ public class Crawler
         {
             url = WebTestHelper.getBaseURL() + url;
         }
-        final String[] splitUrl = url.split("\\?", 2);
-        if (splitUrl.length > 1)
-        {
-            // Properly encode characters that tend to be unencoded in the URL query
-            String query = splitUrl[1];
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < query.length(); i++)
-            {
-                String c = String.valueOf(query.charAt(i));
-                switch (c)
-                {
-                    case "%" -> {
-                        // Encode '%' characters that aren't encoding other characters
-                        c = "%25"; // Assume "%" isn't encoding some other character
-                        int remaining = query.length() - i;
-                        if (remaining > 2)
-                        {
-                            String maybeHex = String.valueOf(query.charAt(i + 1)) + query.charAt(i + 2);
-                            if (HEX_PATTERN.matcher(maybeHex).matches())
-                            {
-                                c = "%"; // "%" is actually encoding some other character
-                            }
-                        }
-                    }
-                    case " " -> c = "+";
-                    case "<" -> c = "%3C";
-                    case ">" -> c = "%3E";
-                }
-                sb.append(c);
-            }
-            query = sb.toString();
-            if (!splitUrl[1].equals(query))
-            {
-                TestLogger.warn(String.format("URL query not properly encoded.\n   in: [%s]\n  out: [%s]", splitUrl[1], query));
-            }
-            url = splitUrl[0] + "?" + query;
-        }
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = null;
+//        final String[] splitUrl = url.split("\\?", 2);
+//        if (splitUrl.length > 1)
+//        {
+//            // Properly encode characters that tend to be unencoded in the URL query
+//            String query = splitUrl[1];
+//            StringBuilder sb = new StringBuilder();
+//            for (int i = 0; i < query.length(); i++)
+//            {
+//                String c = String.valueOf(query.charAt(i));
+//                switch (c)
+//                {
+//                    case "%" -> {
+//                        // Encode '%' characters that aren't encoding other characters
+//                        c = "%25"; // Assume "%" isn't encoding some other character
+//                        int remaining = query.length() - i;
+//                        if (remaining > 2)
+//                        {
+//                            String maybeHex = String.valueOf(query.charAt(i + 1)) + query.charAt(i + 2);
+//                            if (HEX_PATTERN.matcher(maybeHex).matches())
+//                            {
+//                                c = "%"; // "%" is actually encoding some other character
+//                            }
+//                        }
+//                    }
+//                    case " " -> c = "+";
+//                    case "<" -> c = "%3C";
+//                    case ">" -> c = "%3E";
+//                }
+//                sb.append(c);
+//            }
+//            query = sb.toString();
+//            if (!splitUrl[1].equals(query))
+//            {
+//                TestLogger.warn(String.format("URL query not properly encoded.\n   in: [%s]\n  out: [%s]", splitUrl[1], query));
+//            }
+//            url = splitUrl[0] + "?" + query;
+//        }
 
-        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try
         {
-            var method = new HttpGet(url);
-            APITestHelper.injectCookies(method);
-            response = httpClient.execute(method, context);
-            final Optional<Header> content_disposition = Arrays.stream(response.getHeaders("Content-Disposition")).findFirst();
+            SimpleHttpRequest request = new SimpleHttpRequest(url);
+            SimpleHttpResponse httpResponse = request.getResponse(false);
+            Optional<String> content_disposition = httpResponse.getResponseHeaderFields()
+                    .getOrDefault("Content-Disposition", Collections.emptyList()).stream().findFirst();
+
             if (content_disposition.isPresent() &&
-                    (content_disposition.get().getValue().startsWith("attachment")
-                    || content_disposition.get().getValue().startsWith("inline")))
+                    (content_disposition.get().startsWith("attachment")
+                    || content_disposition.get().startsWith("inline")))
             {
                 return true;
             }
         }
         catch (IOException | IllegalArgumentException e)
         {
-            e.printStackTrace();
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consumeQuietly(response.getEntity());
+            TestLogger.warn("Ignoring error checking for download URL : " + url, e);
         }
         return false;
     }

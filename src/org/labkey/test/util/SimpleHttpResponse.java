@@ -32,18 +32,21 @@ public class SimpleHttpResponse
 
     private SimpleHttpResponse(){}
 
-    static SimpleHttpResponse readResponse(HttpURLConnection con) throws IOException
+    static SimpleHttpResponse readResponse(HttpURLConnection con, boolean readBody) throws IOException
     {
         SimpleHttpResponse response = new SimpleHttpResponse();
         response.responseCode = con.getResponseCode();
         response.responseMessage = con.getResponseMessage();
-        try
+        if (readBody)
         {
-            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getInputStream());
-        }
-        catch (IOException error)
-        {
-            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
+            try
+            {
+                response.responseBody = TestFileUtils.getStreamContentsAsString(con.getInputStream());
+            }
+            catch (IOException error)
+            {
+                response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
+            }
         }
         response.responseHeaderFields = new HashMap<>(con.getHeaderFields());
 
