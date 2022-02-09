@@ -69,14 +69,13 @@ project.dependencies {
     implementation "org.reflections:reflections:${reflectionsVersion}"
     uiTestRuntimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
 
-    if (project.hasProperty("teamcity") || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)
-    {
+    if (!project.hasProperty('testWithLocalApi') && // Use this property temporarily when upgrading XMLBeans
+            (project.hasProperty("teamcity") || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)) {
         // LabKey XML schemas are used to decode exported folder XMLs and test case XMLs
         // Don't include local version so that running tests doesn't require building API module
         implementation("org.labkey.api:api:${labkeySchemasTestVersion}") { transitive = false }
     }
-    else
-    {
+    else {
         // Use local version outside of TeamCity so as to not confuse IntelliJ
         BuildUtils.addLabKeyDependency(
                 project: project,
