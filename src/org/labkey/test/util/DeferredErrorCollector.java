@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class DeferredErrorCollector
 {
-    private int screenShotCount = 0;
     private int errorMark = 0;
 
     private final ArtifactCollector artifactCollector;
@@ -331,9 +330,11 @@ public class DeferredErrorCollector
     {
         if (hasErrorBeenRecorded())
         {
-            if (screenShotCount == 0)
+            if (allErrors.get(allErrors.size() - 1).getScreenshotName() == null)
             {
-                withScreenshot("fallback").error("No screeshots taken for deferred errors. This screenshot may be relevant to the final failure.");
+                withScreenshot("fallback").error("No screeshot taken for last deferred error(s). " +
+                        "This screenshot may be relevant to previous failures. " +
+                        "Please update test to take appropriate screenshots.");
             }
             throw new DeferredAssertionError(getFailureMessage());
         }

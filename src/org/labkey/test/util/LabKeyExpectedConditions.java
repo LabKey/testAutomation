@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -27,8 +28,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 public class LabKeyExpectedConditions
 {
@@ -284,4 +289,29 @@ public class LabKeyExpectedConditions
                 : ExpectedConditions.invisibilityOf(element);
     }
 
+    /**
+     * Wraps a 'Wait' to terminate after function return a non-null value.
+     * Normally, 'Wait' expects a non-null, non-false return value
+     * @param <T> Argument type to pass into wait function
+     */
+    public static class BooleanWait<T> implements Wait<T>
+    {
+        private final Wait<T> _wrapped;
+
+        public BooleanWait(FluentWait<T> wrapped)
+        {
+            _wrapped = wrapped;
+        }
+
+        @Override @NotNull
+        public <V> V until(Function<? super T, V> isTrue)
+        {
+            List<V> result;
+            result = _wrapped.until(input -> {
+                V value = isTrue.apply(input);
+                return value == null ? null : Collections.singletonList(value);
+            });
+            return result.get(0);
+        }
+    }
 }
