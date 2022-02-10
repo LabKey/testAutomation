@@ -19,7 +19,10 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpHead;
@@ -31,6 +34,7 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -39,7 +43,11 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,17 +67,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebTestHelper.getBaseURL;
+import static org.labkey.test.WebTestHelper.stripContextPath;
 
 public class Crawler
 {
@@ -833,86 +841,103 @@ public class Crawler
      */
     private boolean beginAt(String relativeUrl)
     {
+        _urlsVisited.add(relativeUrl);
+
         // Escape brackets to prevent 400 errors
         relativeUrl = relativeUrl
                 .replace("[", "%5B")
                 .replace("]", "%5D")
                 .replace("{", "%7B")
                 .replace("}", "%7D");
-        if (isDownloadUrl(relativeUrl))
-        {
-            TestLogger.log("Skip download URL: " + relativeUrl.replace(WebTestHelper.getBaseURL(), ""));
-            return false;
-        }
-        _urlsVisited.add(relativeUrl);
-        _test.beginAt(relativeUrl, WebDriverWrapper.WAIT_FOR_PAGE);
-        return true;
-    }
-
-    private static final Pattern HEX_PATTERN = Pattern.compile("[0-9a-fA-F]{2}");
-    private static boolean isDownloadUrl(String url)
-    {
-        if (url.startsWith("/")) // relative URL
-        {
-            url = WebTestHelper.getBaseURL() + url;
-        }
-        final String[] splitUrl = url.split("\\?", 2);
-        if (splitUrl.length > 1)
-        {
-            // Properly encode characters that tend to be unencoded in the URL query
-            String query = splitUrl[1];
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < query.length(); i++)
-            {
-                String c = String.valueOf(query.charAt(i));
-                switch (c)
-                {
-                    case "%" -> {
-                        // Encode '%' characters that aren't encoding other characters
-                        c = "%25"; // Assume "%" isn't encoding some other character
-                        int remaining = query.length() - i;
-                        if (remaining > 2)
-                        {
-                            String maybeHex = String.valueOf(query.charAt(i + 1)) + query.charAt(i + 2);
-                            if (HEX_PATTERN.matcher(maybeHex).matches())
-                            {
-                                c = "%"; // "%" is actually encoding some other character
-                            }
-                        }
-                    }
-                    case " " -> c = "+";
-                    case "<" -> c = "%3C";
-                    case ">" -> c = "%3E";
-                }
-                sb.append(c);
-            }
-            query = sb.toString();
-            if (!splitUrl[1].equals(query))
-            {
-                TestLogger.warn(String.format("URL query not properly encoded.\n   in: [%s]\n  out: [%s]", splitUrl[1], query));
-            }
-            url = splitUrl[0] + "?" + query;
-        }
+        if (relativeUrl.startsWith(getBaseURL()))
+            relativeUrl = relativeUrl.substring(getBaseURL().length());
+        relativeUrl = stripContextPath(relativeUrl);
+        String logMessage = "";
+        Mutable<File[]> downloadedFiles = new MutableObject<>();
 
         try
         {
-            SimpleHttpRequest request = new SimpleHttpRequest(url);
-            SimpleHttpResponse httpResponse = request.getResponse(false);
-            Optional<String> content_disposition = httpResponse.getResponseHeaderFields()
-                    .getOrDefault("Content-Disposition", Collections.emptyList()).stream().findFirst();
-
-            if (content_disposition.isPresent() &&
-                    (content_disposition.get().startsWith("attachment")
-                    || content_disposition.get().startsWith("inline")))
+            String messagePrefix = "Navigating to ";
+            if (relativeUrl.length() == 0)
             {
-                return true;
+                logMessage = messagePrefix + "root";
+            }
+            else
+            {
+                logMessage = messagePrefix + relativeUrl;
+                if (relativeUrl.charAt(0) != '/')
+                {
+                    relativeUrl = "/" + relativeUrl;
+                }
+            }
+
+            final String fullURL = WebTestHelper.getBaseURL() + relativeUrl;
+
+            Mutable<Boolean> navigated = new MutableObject<>(true);
+            final File downloadDir = BaseWebDriverTest.getDownloadDir();
+            final File[] existingDownloads = downloadDir.listFiles();
+
+            long elapsedTime = _test.doAndMaybeWaitForPageToLoad(WebDriverWrapper.WAIT_FOR_PAGE, () -> {
+                final WebElement mightGoStale = Locators.documentRoot.findElement(_test.getDriver());
+                ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
+                // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
+                _test.executeScript("document.location = arguments[0]", fullURL);
+                //noinspection ResultOfMethodCallIgnored
+                if (!WebDriverWrapper.waitFor(() -> {
+                    boolean stale;
+                    try
+                    {
+                        stale = stalenessOf.apply(null);
+                    }
+                    catch (NullPointerException npe)
+                    {
+                        // Staleness check throws NPE sometimes when there's an alert present
+                        _test.executeScript("return;"); // Try to trigger 'UnhandledAlertException'
+                        return false;
+                    }
+                    if (stale)
+                    {
+                        // Wait for page to load when element goes stale
+                        return true; // Stop waiting
+                    }
+                    else if (downloadDir.isDirectory()) // Don't check for download if dir doesn't exist
+                    {
+                        File[] filesArray = WebDriverWrapper.getNewFiles(0, downloadDir, existingDownloads);
+                        downloadedFiles.setValue(filesArray);
+                        if (downloadedFiles.getValue().length > 0)
+                        {
+                            navigated.setValue(false); // Don't wait for page load when a download occurs
+                            return true; // Stop waiting
+                        }
+                    }
+                    return false; // No navigation or download detected. Continue waiting.
+                }, WebDriverWrapper.WAIT_FOR_PAGE))
+                {
+                    TestLogger.warn("URL didn't trigger a download or navigation: " + fullURL);
+                }
+                return navigated.getValue();
+            });
+
+            if (!navigated.getValue())
+            {
+                logMessage = logMessage.replace(messagePrefix, "Downloading from ");
+            }
+
+            logMessage += TestLogger.formatElapsedTime(elapsedTime);
+
+            return navigated.getValue();
+        }
+        finally
+        {
+            TestLogger.info(logMessage); // log after navigation to
+            if (downloadedFiles.getValue() != null)
+            {
+                Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
+                    TestLogger.info("  \u2517" + file.getName()); // Log downloaded files
+                    FileUtils.deleteQuietly(file); // Clean up crawled downloads
+                });
             }
         }
-        catch (IOException | IllegalArgumentException e)
-        {
-            TestLogger.warn("Ignoring error checking for download URL : " + url, e);
-        }
-        return false;
     }
 
     private List<UrlToCheck> crawlLink(final UrlToCheck urlToCheck)
