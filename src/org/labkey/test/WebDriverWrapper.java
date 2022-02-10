@@ -304,6 +304,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("browser.download.manager.showAlertOnComplete", false);
                     profile.setPreference("browser.download.manager.showWhenStarting", false);
                     profile.setPreference("browser.download.panel.shown", false);
+                    profile.setPreference("browser.download.viewableInternally.enabledTypes", ""); // Default includes 'xml', which overrides the 'saveToDisk' setting
                     profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                             "application/vnd.ms-excel," + // .xls
