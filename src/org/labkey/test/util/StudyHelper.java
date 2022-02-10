@@ -363,22 +363,27 @@ public class StudyHelper
         _test.click(Locator.css(".studyWizardListList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 8 : Grid Views
+        // Wizard page 9 : Queries
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Queries']"));
+        _test.click(Locator.css(".studyWizardQueryList .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 9 : Grid Views
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Grid Views']"));
         _test.click(Locator.css(".studyWizardViewList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard Page 9 : Reports and Charts
+        // Wizard Page 10 : Reports and Charts
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports and Charts']"));
         _test.click(Locator.css(".studyWizardReportList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 10 : Folder Objects
+        // Wizard page 11 : Folder Objects
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
         _test.click(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 11 : Publish Options
+        // Wizard page 12 : Publish Options
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
