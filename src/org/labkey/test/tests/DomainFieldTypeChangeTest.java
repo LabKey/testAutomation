@@ -86,7 +86,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         log("Verifying Integer to Decimal change");
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.Decimal);
+        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.Decimal, true);
         domainFormPanel.getField("testBoolean").setNumberFormat("yes;no");
         domainDesignerPage.clickFinish();
 
@@ -98,10 +98,10 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         log("Verifying changing data fields to string");
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.String);
-        domainFormPanel.getField("testDecimal").setType(FieldDefinition.ColumnType.String);
-        domainFormPanel.getField("testDate").setType(FieldDefinition.ColumnType.String);
-        domainFormPanel.getField("testBoolean").setType(FieldDefinition.ColumnType.String);
+        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField("testDecimal").setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField("testDate").setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField("testBoolean").setType(FieldDefinition.ColumnType.String, true);
         domainDesignerPage.clickFinish();
 
         clickAndWait(Locator.linkWithText(listName));
@@ -178,17 +178,17 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         click(Locator.linkWithText("Manage assay design"));
         assayDesignerPage = _assayHelper.clickEditAssayDesign();
         runFields = assayDesignerPage.goToRunFields();
-        runFields.getField("runTestInteger").setType(FieldDefinition.ColumnType.Decimal);
+        runFields.getField("runTestInteger").setType(FieldDefinition.ColumnType.Decimal, true);
         runFields.getField("runTestBoolean").setNumberFormat("yes;no");
 
         batchFields = assayDesignerPage.goToBatchFields();
-        batchFields.getField("batchTestDate").setType(FieldDefinition.ColumnType.String);
-        batchFields.getField("batchTestDecimal").setType(FieldDefinition.ColumnType.String);
+        batchFields.getField("batchTestDate").setType(FieldDefinition.ColumnType.String, true);
+        batchFields.getField("batchTestDecimal").setType(FieldDefinition.ColumnType.String, true);
         assayDesignerPage.clickFinish();
 
         assayDesignerPage = _assayHelper.clickEditAssayDesign();
         runFields = assayDesignerPage.goToRunFields();
-        runFields.getField("runTestBoolean").setType(FieldDefinition.ColumnType.String);
+        runFields.getField("runTestBoolean").setType(FieldDefinition.ColumnType.String, true);
         assayDesignerPage.clickFinish();
 
         goToManageAssays();
