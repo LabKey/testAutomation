@@ -343,10 +343,10 @@ public class StudyHelper
         _test.clickButton("Next", 0);
 
         // Visits
-        if ("Visits".equalsIgnoreCase(visitNounPlural))
-            advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardVisitList), true);
-        else
-            advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardTimepointList), true);
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + visitNounPlural + "']"));
+        _test.waitForElement(Locator.css(".studyWizardVisitList"));
+        _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
 
         // Specimens, if present & active
         if (isSpecimenModuleActive())
@@ -589,7 +589,6 @@ public class StudyHelper
         studyWizardMouseList("Mice", "Mouse Group"),
         studyWizardDatasetList("Datasets", "Label"),
         studyWizardVisitList("Visits", "Label"),
-        studyWizardTimepointList("Timepoints", "Label"),
         studySpecimens("Specimens", null),
         studyObjects("Study Objects", "Name"),
         studyWizardListList("Lists", "Name"),
