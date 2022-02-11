@@ -89,7 +89,9 @@
                                 "org.labkey.api.security.permissions.ReadSomePermission",
                                 "org.labkey.api.lists.permissions.ManagePicklistsPermission",
                                 "org.labkey.api.security.permissions.UpdatePermission",
-                                "org.labkey.announcements.model.SecureMessageBoardReadPermission"
+                                "org.labkey.announcements.model.SecureMessageBoardReadPermission",
+                                "org.labkey.api.security.permissions.SampleWorkflowJobPermission",
+                                "org.labkey.api.security.permissions.UpdateSampleStatusPermission"
                             ],
                             "groups": []
                         },
