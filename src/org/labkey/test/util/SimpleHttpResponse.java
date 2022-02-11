@@ -19,6 +19,7 @@ import org.labkey.test.TestFileUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class SimpleHttpResponse
         {
             response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
         }
+        response.responseHeaderFields = new HashMap<>(con.getHeaderFields());
 
         return response;
     }
