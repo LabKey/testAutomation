@@ -84,11 +84,6 @@ public class SimpleHttpRequest
 
     public SimpleHttpResponse getResponse() throws IOException
     {
-        return getResponse(true);
-    }
-
-    public SimpleHttpResponse getResponse(boolean readBody) throws IOException
-    {
         HttpURLConnection con = null;
 
         try
@@ -121,7 +116,7 @@ public class SimpleHttpRequest
             }
 
             con.connect();
-            return SimpleHttpResponse.readResponse(con, readBody);
+            return SimpleHttpResponse.readResponse(con);
         }
         finally
         {

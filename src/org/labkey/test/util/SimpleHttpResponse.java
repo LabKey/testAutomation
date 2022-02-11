@@ -19,7 +19,6 @@ import org.labkey.test.TestFileUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,23 +31,19 @@ public class SimpleHttpResponse
 
     private SimpleHttpResponse(){}
 
-    static SimpleHttpResponse readResponse(HttpURLConnection con, boolean readBody) throws IOException
+    static SimpleHttpResponse readResponse(HttpURLConnection con) throws IOException
     {
         SimpleHttpResponse response = new SimpleHttpResponse();
         response.responseCode = con.getResponseCode();
         response.responseMessage = con.getResponseMessage();
-        if (readBody)
+        try
         {
-            try
-            {
-                response.responseBody = TestFileUtils.getStreamContentsAsString(con.getInputStream());
-            }
-            catch (IOException error)
-            {
-                response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
-            }
+            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getInputStream());
         }
-        response.responseHeaderFields = new HashMap<>(con.getHeaderFields());
+        catch (IOException error)
+        {
+            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
+        }
 
         return response;
     }
