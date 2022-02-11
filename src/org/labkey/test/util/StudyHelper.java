@@ -331,6 +331,7 @@ public class StudyHelper
 
         // Datasets
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
+        _test.waitForElement(Locator.css(".studyWizardDatasetList"));
         _test.click(Locator.css(".studyWizardDatasetList .x-grid3-hd-checker  div"));
         if (hiddenDatasetNames != null)
         {
@@ -342,31 +343,32 @@ public class StudyHelper
         _test.clickButton("Next", 0);
 
         // Visits
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + visitNounPlural + "']"));
-        _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
-        _test.clickButton("Next", 0);
+        if ("Visits".equalsIgnoreCase(visitNounPlural))
+            advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardVisitList), true);
+        else
+            advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardTimepointList), true);
 
         // Specimens, if present & active
         if (isSpecimenModuleActive())
             advanceThroughPublishStudyWizard(Arrays.asList(Panel.studySpecimens));
 
         // Study Objects
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyObjects));
+        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyObjects), true);
 
         // Lists
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardListList));
+        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardListList), true);
 
         // Queries
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardQueryList));
+        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardQueryList), true);
 
         // Grid Views
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardViewList));
+        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardViewList), true);
 
         // Reports and Charts
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardReportList));
+        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardReportList), true);
 
         // Folder Objects
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.folderObjects));
+        advanceThroughPublishStudyWizard(Arrays.asList(Panel.folderObjects), true);
 
         // Publish Options
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
