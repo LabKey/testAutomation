@@ -586,7 +586,6 @@ public class StudyHelper
     public enum Panel
     {
         studyWizardParticipantList("Participants", "Participant Group"),
-        studyWizardMouseList("Mice", "Mouse Group"),
         studyWizardDatasetList("Datasets", "Label"),
         studyWizardVisitList("Visits", "Label"),
         studySpecimens("Specimens", null),
