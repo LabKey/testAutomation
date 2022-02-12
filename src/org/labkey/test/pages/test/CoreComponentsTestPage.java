@@ -42,9 +42,10 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
                 .waitFor();
     }
 
-    public EditableGrid getEditableGrid()
+    public EditableGrid getEditableGrid(String schema, String query)
     {
         getComponentSelect().select("EditableGridPanel");
+        applySchemaQuery(schema, query);
         return new EditableGrid.EditableGridFinder(getDriver()).waitFor();
     }
 
@@ -56,37 +57,22 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
      */
     public QueryGrid getGridPanel(String schema, String query)
     {
-        getComponentSelect().select("GridPanel");       // note: we use GridPanel now, not QueryGridPanel
+        getComponentSelect().select("GridPanel");
+        applySchemaQuery(schema, query);
+        return new QueryGrid.QueryGridFinder(getDriver()).inPanelWithHeaderText("GridPanel").waitFor();
+    }
+
+    private void applySchemaQuery(String schema, String query)
+    {
         Input.Input(Locator.input("schemaName"), getDriver()).waitFor().set(schema);
         Input.Input(Locator.input("queryName"), getDriver()).waitFor().set(query);
         Locator.button("Apply").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
-
-        return new QueryGrid.QueryGridFinder(getDriver()).inPanelWithHeaderText("GridPanel").waitFor();
     }
 
     public HeatMap getHeatMap()
     {
         getComponentSelect().select("HeatMap");
         return new HeatMap.HeatMapFinder(getDriver()).waitFor();
-    }
-
-
-    /**
-     * This is here to support comparative testing of QueryGrid:QueryGridPanel components, until the latter is
-     * no longer in use.-
-     * @param schema
-     * @param query
-     * @return
-     */
-    @Deprecated
-    public QueryGrid getQueryGridPanel(String schema, String query)
-    {
-        getComponentSelect().select("QueryGridPanel");       // note: we use GridPanel now, not QueryGridPanel- this is here for backward compat testing only
-        Input.Input(Locator.input("schemaNameField"), getDriver()).waitFor().set(schema);
-        Input.Input(Locator.input("queryNameField"), getDriver()).waitFor().set(query);
-        Locator.button("Apply").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
-
-        return new QueryGrid.QueryGridFinder(getDriver()).inPanelWithHeaderText("QueryGridPanel").waitFor();
     }
 
     /**
