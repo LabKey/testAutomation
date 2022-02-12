@@ -2,6 +2,7 @@ package org.labkey.test.components.ui.domainproperties;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -96,7 +97,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getNameExpressionPreview()
     {
         getWrapper().mouseOver(elementCache().helpTarget("Naming "));
-        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 500);
+        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
         return elementCache().toolTip.getText();
     }
 
@@ -130,20 +131,53 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
      */
     public String getCurrentGenId()
     {
+        // Protect against scenarios where the genId banner takes a moment to show up.
+        waitFor(()->elementCache().genIdAlert.isDisplayed(),
+                "The GenId banner is not visible.", 1_000);
+
         String rawText = elementCache().genIdAlert.getText().split("\n")[0];
         rawText = rawText.substring(rawText.indexOf(":")+1);
         return rawText.trim();
     }
 
     /**
-     * Click the 'Edit genId' button.
+     * Click the 'Edit GenId' button.
      *
      * @return A {@link GenIdDialog}
      */
     public GenIdDialog clickEditGenId()
     {
+        // There is code that checks to see if the Edit genId button should be shown. Try to protect against that.
+        waitFor(()->elementCache().editGenIdButton.isDisplayed(),
+                "The 'Edit GenId' is not visible.", 1_000);
+
         elementCache().editGenIdButton.click();
         return new GenIdDialog(getDriver());
+    }
+
+    /**
+     * Check if the 'Rest GenId' button is visible.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isRestGenIdVisible()
+    {
+        return elementCache().resetGenIdButton.isDisplayed();
+    }
+
+    /**
+     * Click the 'Rest GenId' button and return the confirm dialog.
+     *
+     * @return A {@link ModalDialog} asking to confirm the reset.
+     */
+    public ModalDialog clickRestGenId()
+    {
+        // There is code that checks to see if the Reset genId button should be shown. Try to protect against that.
+        waitFor(()->elementCache().resetGenIdButton.isDisplayed(),
+                "The 'Reset GenId' is not visible.", 1_000);
+
+        elementCache().resetGenIdButton.click();
+        return new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Are you sure you want to reset genId").waitFor();
     }
 
     public String getAutoLinkDataToStudy()
@@ -217,6 +251,16 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
             return this;
         }
 
+        public String clickUpdateExpectError()
+        {
+            Locators.dismissButton("Update").findElement(getComponentElement()).click();
+            WebElement alert = Locator.tagWithClass("div", "alert-danger").findWhenNeeded(getComponentElement());
+
+            WebDriverWrapper.waitFor(()->alert.isDisplayed(), "No error message was shown on the dialog.", 500);
+
+            return alert.getText();
+        }
+
         @Override
         protected ElementCache newElementCache()
         {
@@ -263,7 +307,9 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         protected final WebElement genIdAlert = Locator.tagWithClass("div", "genid-alert").refindWhenNeeded(this);
 
-        protected final WebElement editGenIdButton = Locator.button("Edit genId").findWhenNeeded(this);
+        protected final WebElement editGenIdButton = Locator.tagWithClass("button", "edit-genid-btn").findWhenNeeded(this);
+
+        protected final WebElement resetGenIdButton = Locator.tagWithClass("button", "reset-genid-btn").findWhenNeeded(this);
 
     }
 
