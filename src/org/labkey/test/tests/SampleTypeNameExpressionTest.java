@@ -123,6 +123,20 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Name\tB\tMaterialInputs/InputsExpressionTest",
                 "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Pat");
+
+
+        verifyNames(
+                "InputsWithDataTypeExpression",
+                "Name\tB\tMaterialInputs/InputsWithDataTypeExpression",
+                "${Inputs/InputsWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Red");
+
+        verifyNames(
+                "MaterialWithDataTypeExpression",
+                "Name\tB\tMaterialInputs/MaterialWithDataTypeExpression",
+                "${MaterialInputs/MaterialWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Ned");
+
     }
 
     @Test
