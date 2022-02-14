@@ -52,6 +52,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.IOException;
@@ -452,11 +453,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Cancel");
         assertTitleContains(ISSUE.get("title"));
 
-        //("Dumbster");
-        goToModule("Dumbster");
-        pushLocation();
-
-        EmailRecordTable emailTable = new EmailRecordTable(this);
+        EmailRecordTable emailTable = goToEmailRecord();
         EmailMessage message = emailTable.getMessageWithSubjectContaining(ISSUE.get("title") + ",\" has been opened and assigned to " + _userHelper.getDisplayNameForEmail(USER1));
 
         // Presumed to get the first message
@@ -468,6 +465,11 @@ public class IssuesTest extends BaseWebDriverTest
         assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE.get("title")));
 
         assertTextNotPresent("This line shouldn't appear");
+        emailTable.clickMessage(message);
+        WebElement detailsLink = Locator.linkContainingText("issues-details").findElement(emailTable.getRowEl(message));
+        shortWait().until(ExpectedConditions.visibilityOf(detailsLink));
+        clickAndWait(detailsLink);
+        assertTextPresent(ISSUE.get("title"), ISSUE.get("comment"));
     }
 
     private void updateIssue()
