@@ -381,14 +381,24 @@ public class StudyHelper
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
     }
 
-    public void advanceThroughPublishStudyWizard(List<StudyHelper.Panel> wizardPanels)
+    public void advanceThroughPublishStudyWizard(StudyHelper.IPanel wizardPanel)
+    {
+        advanceThroughPublishStudyWizard(wizardPanel, false);
+    }
+
+    public void advanceThroughPublishStudyWizard(StudyHelper.IPanel wizardPanel, boolean selectAll)
+    {
+        advanceThroughPublishStudyWizard(Arrays.asList(wizardPanel), selectAll);
+    }
+
+    public void advanceThroughPublishStudyWizard(List<StudyHelper.IPanel> wizardPanels)
     {
         advanceThroughPublishStudyWizard(wizardPanels, false);
     }
 
-    public void advanceThroughPublishStudyWizard(List<StudyHelper.Panel> wizardPanels, boolean selectAll)
+    public void advanceThroughPublishStudyWizard(List<StudyHelper.IPanel> wizardPanels, boolean selectAll)
     {
-        for (Panel panel : wizardPanels)
+        for (IPanel panel : wizardPanels)
         {
             _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + panel.getPanelTitle() + "']"));
             if (panel.getLabelColumn() != null) // grids only
@@ -583,7 +593,14 @@ public class StudyHelper
         SPECIMEN
     }
 
-    public enum Panel
+    public interface IPanel
+    {
+        String name();
+        String getPanelTitle();
+        String getLabelColumn();
+    }
+
+    public enum Panel implements IPanel
     {
         studyGeneralSetup("General Setup", null),
         studyWizardParticipantList("Participants", "Participant Group"),
@@ -617,5 +634,29 @@ public class StudyHelper
         {
             return labelColumn;
         }
+    }
+
+    public static IPanel participantList(String singular, String plural)
+    {
+        return new IPanel()
+        {
+            @Override
+            public String name()
+            {
+                return "studyWizardParticipantList";
+            }
+
+            @Override
+            public String getPanelTitle()
+            {
+                return plural;
+            }
+
+            @Override
+            public String getLabelColumn()
+            {
+                return singular + " Group";
+            }
+        };
     }
 }
