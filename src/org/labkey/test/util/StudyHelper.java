@@ -350,25 +350,25 @@ public class StudyHelper
 
         // Specimens, if present & active
         if (isSpecimenModuleActive())
-            advanceThroughPublishStudyWizard(Arrays.asList(Panel.studySpecimens));
+            advanceThroughPublishStudyWizard(Panel.studySpecimens);
 
         // Study Objects
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyObjects), true);
+        advanceThroughPublishStudyWizard(Panel.studyObjects, true);
 
         // Lists
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardListList), true);
+        advanceThroughPublishStudyWizard(Panel.studyWizardListList, true);
 
         // Queries
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardQueryList), true);
+        advanceThroughPublishStudyWizard(Panel.studyWizardQueryList, true);
 
         // Grid Views
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardViewList), true);
+        advanceThroughPublishStudyWizard(Panel.studyWizardViewList, true);
 
         // Reports and Charts
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.studyWizardReportList), true);
+        advanceThroughPublishStudyWizard(Panel.studyWizardReportList, true);
 
         // Folder Objects
-        advanceThroughPublishStudyWizard(Arrays.asList(Panel.folderObjects), true);
+        advanceThroughPublishStudyWizard(Panel.folderObjects, true);
 
         // Publish Options
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
