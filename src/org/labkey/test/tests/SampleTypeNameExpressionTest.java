@@ -1094,6 +1094,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         actualMsg = getServerErrors();
 
+        // The number recorded in the server error is off by one from the number shown in the UI. The API actually is
+        // sending the request with off by 1 value, just the UI on LKSM is displaying it with +1. The idea is, we want
+        // to show current as the next id to use. But in code, current is the previous.
+        expectedMsg = String.format("Unable to set genId to %d due to conflict with existing samples.", badGenId - 1);
+
         checker().verifyTrue(String.format("Server message should contains '%s' but is doesn't look like it is there (see log for server error).", expectedMsg),
                 actualMsg.contains(expectedMsg));
 
