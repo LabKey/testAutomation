@@ -141,6 +141,20 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
+    /**
+     * Get the fields panel without adding/creating a field. Can be useful when testing fields that should be auto-created.
+     *
+     * @return A {@link DomainFormPanel}
+     */
+    public DomainFormPanel clickManuallyDefineFields()
+    {
+        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
+        elementCache().manuallyDefineButton.click();
+
+        return this;
+    }
+
     public DomainFieldRow addField(String name)
     {
         if (isManuallyDefineFieldsPresent())
@@ -170,9 +184,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public DomainFieldRow manuallyDefineFields(String name)
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
-        elementCache().manuallyDefineButton.click();
+        clickManuallyDefineFields();
 
         DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
         newFieldRow.setName(name);
