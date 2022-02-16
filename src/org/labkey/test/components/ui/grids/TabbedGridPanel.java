@@ -54,15 +54,17 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
 
     public QueryGrid selectGrid(String tabText)
     {
+        QueryGrid grid = getSelectedGrid();
+
         if (!isSelected(tabText))
         {
             var tab = elementCache().navTab(tabText);
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(tab));
             tab.click();
             WebDriverWrapper.waitFor(()-> isSelected(tabText), "tab did not become selected in time", 2000);
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(grid.getComponentElement()));
+            grid = getSelectedGrid();
         }
-
-        QueryGrid grid = getSelectedGrid();
 
         WebDriverWrapper.waitFor(grid::isLoaded,
                 String.format("The grid under tab '%s' did not become active in time.", tabText),
@@ -73,7 +75,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
 
     public QueryGrid getSelectedGrid()
     {
-        return new QueryGrid(elementCache().body, getDriver());
+        return new QueryGrid.QueryGridFinder(getDriver()).find(elementCache().body);
     }
 
     @Override

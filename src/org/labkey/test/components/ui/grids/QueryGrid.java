@@ -30,7 +30,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     final private WebDriver _driver;
     final private WebElement _queryGridPanel;
 
-    protected QueryGrid(WebElement element, WebDriver driver)
+    private QueryGrid(WebElement element, WebDriver driver)
     {
         super(element, driver);
         _queryGridPanel = element;
@@ -354,39 +354,26 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
     {
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "grid-panel")
+                .withDescendant(ResponsiveGrid.Locators.responsiveGrid());
         private Locator _locator;
 
         /**
-         * Find the first div with a class of panel-body and assume the grid panel is in there.
+         * Find the first div with a class of grid-panel and assume the grid panel is in there.
          *
          * @param driver Reference to a WebDriver.
          */
         public QueryGridFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locator.tagWithClass("div", "panel-body")
-                    .withDescendant(ResponsiveGrid.Locators.responsiveGrid());
+            _locator = _baseLocator;
         }
 
         public QueryGridFinder inPanelWithHeaderText(String panelHeading)
         {
-            _locator = Locator.tagWithClass("div", "panel")
-                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(panelHeading))
-                    .withDescendant(ResponsiveGrid.Locators.responsiveGrid())
-                    .child(Locator.tagWithClass("div", "panel-body"));
+            _locator = _baseLocator
+                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(panelHeading));
             return this;
-        }
-
-        /**
-         * Given a containing web element find the grid panel in it.
-         *
-         * @param driver Reference to a WebDriver.
-         * @param containingPanel A locator to scope the search for a gridPanel.
-         */
-        public QueryGridFinder(WebDriver driver, Locator containingPanel)
-        {
-            super(driver);
-            _locator= containingPanel;
         }
 
         @Override
