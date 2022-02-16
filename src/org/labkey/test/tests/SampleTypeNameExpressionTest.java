@@ -143,10 +143,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testSimpleNameExpression()
     {
         String nameExpression = "${A}-${B}.${genId}.${batchRandomId}.${randomId}";
-        String data = "A\tB\tC\n" +
-                "a\tb\tc\n" +
-                "a\tb\tc\n" +
-                "a\tb\tc\n";
+        String data = """
+                A\tB\tC
+                a\tb\tc
+                a\tb\tc
+                a\tb\tc
+                """;
+
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition("SimpleNameExprTest")
                         .setNameExpression(nameExpression)
@@ -213,11 +216,12 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         colorsGen.createList(createDefaultConnection(), "Key");
         colorsGen.insertRows();
 
-        String pasteData = "ColorLookup\tNoun\n" +
-                "red\tryder\n" +
-                "green\tgiant\n" +
-                "blue\tangel\n" +
-                "yellow\tjersey";
+        String pasteData = """
+                ColorLookup\tNoun
+                red\tryder
+                green\tgiant
+                blue\tangel
+                yellow\tjersey""";
 
         // now create a sampleType with a Color column that looks up to Colors
         var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
@@ -530,10 +534,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setNameExpression(nameExpression);
 
-        String expectedMsg = "Naming Pattern\n" +
-                "Pattern used for generating unique IDs for this sample type.\n" +
-                "Unable to generate example name from the current pattern. Check for syntax errors.\n" +
-                "More info";
+        String expectedMsg = """
+                Naming Pattern
+                Pattern used for generating unique IDs for this sample type.
+                Unable to generate example name from the current pattern. Check for syntax errors.
+                More info""";
 
         String actualMsg = createPage.getNameExpressionPreview();
 
@@ -994,7 +999,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         checker()
                 .withScreenshot("Update_GenId_Rest_Button_Hidden_Error")
                 .verifyFalse("The 'Reset GenId' button should not be visible if the sample type has samples.",
-                        updatePage.isRestGenIdVisible());
+                        updatePage.isResetGenIdVisible());
 
         updatePage.clickCancel();
 
@@ -1005,10 +1010,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
 
-        waitFor(updatePage::isRestGenIdVisible,
+        waitFor(updatePage::isResetGenIdVisible,
                 "The 'Reset GenId' button should now be visible if the sample type is empty. Fatal error.", 500);
 
-        ModalDialog deleteDialog = updatePage.clickRestGenId();
+        ModalDialog deleteDialog = updatePage.clickResetGenId();
 
         String expectedMsg = String.format("The current genId is at %d. Resetting will reset genId back to 1 and cannot be undone.", nextGenId);
 
@@ -1027,7 +1032,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Click 'Rest GenId' again and this time reset the genId.");
 
-        deleteDialog = updatePage.clickRestGenId();
+        deleteDialog = updatePage.clickResetGenId();
         deleteDialog.dismiss("Reset");
 
         nextGenId = 1;

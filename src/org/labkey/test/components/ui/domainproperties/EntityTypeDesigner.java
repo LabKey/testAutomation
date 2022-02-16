@@ -152,25 +152,25 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
                 "The 'Edit GenId' is not visible.", 1_000);
 
         elementCache().editGenIdButton.click();
-        return new GenIdDialog(getDriver());
+        return new GenIdDialog();
     }
 
     /**
-     * Check if the 'Rest GenId' button is visible.
+     * Check if the 'Reset GenId' button is visible.
      *
      * @return True if visible, false otherwise.
      */
-    public boolean isRestGenIdVisible()
+    public boolean isResetGenIdVisible()
     {
         return elementCache().resetGenIdButton.isDisplayed();
     }
 
     /**
-     * Click the 'Rest GenId' button and return the confirm dialog.
+     * Click the 'Reset GenId' button and return the confirm dialog.
      *
      * @return A {@link ModalDialog} asking to confirm the reset.
      */
-    public ModalDialog clickRestGenId()
+    public ModalDialog clickResetGenId()
     {
         // There is code that checks to see if the Reset genId button should be shown. Try to protect against that.
         waitFor(()->elementCache().resetGenIdButton.isDisplayed(),
@@ -227,27 +227,24 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     /**
      * Dialog that allows the user to set the genId value.
      */
-    public static class GenIdDialog extends ModalDialog
+    public class GenIdDialog extends ModalDialog
     {
 
-        public GenIdDialog(WebDriver driver)
-        {
-            this(new ModalDialogFinder(driver).withTitle("Are you sure you want to update genId"));
-        }
+        protected final WebElement input = Locator.input("newgenidval").findWhenNeeded(this);
 
-        private GenIdDialog(ModalDialogFinder finder)
+        public GenIdDialog()
         {
-            super(finder);
+            super(new ModalDialogFinder(EntityTypeDesigner.this.getDriver()).withTitle("Are you sure you want to update genId"));
         }
 
         public String getGenId()
         {
-            return getWrapper().getFormElement(elementCache().input);
+            return getWrapper().getFormElement(input);
         }
 
         public GenIdDialog setGenId(String value)
         {
-            getWrapper().setFormElement(elementCache().input, value);
+            getWrapper().setFormElement(input, value);
             return this;
         }
 
@@ -259,23 +256,6 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
             WebDriverWrapper.waitFor(()->alert.isDisplayed(), "No error message was shown on the dialog.", 500);
 
             return alert.getText();
-        }
-
-        @Override
-        protected ElementCache newElementCache()
-        {
-            return new ElementCache();
-        }
-
-        @Override
-        protected ElementCache elementCache()
-        {
-            return (ElementCache) super.elementCache();
-        }
-
-        protected class ElementCache extends ModalDialog.ElementCache
-        {
-            protected final WebElement input = Locator.input("newgenidval").findWhenNeeded(this);
         }
 
     }
