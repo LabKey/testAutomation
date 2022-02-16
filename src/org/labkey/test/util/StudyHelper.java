@@ -319,18 +319,19 @@ public class StudyHelper
         _test.clickButton("Publish Study", 0);
         _test._extHelper.waitForExtDialog("Publish Study");
 
-        // Wizard page 1 : General Setup
+        // General Setup
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
         _test.setFormElement(Locator.name("studyName"), studyName);
         _test.clickButton("Next", 0);
 
-        // Wizard page 2 : Participants
+        // Participants
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + subjectNounPlural + "']"));
         _test.checkCheckbox(Locator.radioButtonByNameAndValue("renderType", "all"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 3 : Datasets
+        // Datasets
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
+        _test.waitForElement(Locator.css(".studyWizardDatasetList"));
         _test.click(Locator.css(".studyWizardDatasetList .x-grid3-hd-checker  div"));
         if (hiddenDatasetNames != null)
         {
@@ -341,44 +342,35 @@ public class StudyHelper
         _test.click(Locator.xpath("//input[@name='refreshType' and @value='Manual']"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 4 : Visits
+        // Visits
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + visitNounPlural + "']"));
+        _test.waitForElement(Locator.css(".studyWizardVisitList"));
         _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 5 : Specimens, if present & active
+        // Specimens, if present & active
         if (isSpecimenModuleActive())
-        {
-            _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-            _test.clickButton("Next", 0);
-        }
+            advanceThroughPublishStudyWizard(Panel.studySpecimens);
 
-        // Wizard Page 6 : Study Objects
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
-        _test.click(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
-        _test.clickButton("Next", 0);
+        // Study Objects
+        advanceThroughPublishStudyWizard(Panel.studyObjects, true);
 
-        // Wizard page 7 : Lists
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
-        _test.click(Locator.css(".studyWizardListList .x-grid3-hd-checker  div"));
-        _test.clickButton("Next", 0);
+        // Lists
+        advanceThroughPublishStudyWizard(Panel.studyWizardListList, true);
 
-        // Wizard page 8 : Grid Views
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Grid Views']"));
-        _test.click(Locator.css(".studyWizardViewList .x-grid3-hd-checker  div"));
-        _test.clickButton("Next", 0);
+        // Queries
+        advanceThroughPublishStudyWizard(Panel.studyWizardQueryList, true);
 
-        // Wizard Page 9 : Reports and Charts
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports and Charts']"));
-        _test.click(Locator.css(".studyWizardReportList .x-grid3-hd-checker  div"));
-        _test.clickButton("Next", 0);
+        // Grid Views
+        advanceThroughPublishStudyWizard(Panel.studyWizardViewList, true);
 
-        // Wizard page 10 : Folder Objects
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
-        _test.click(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
-        _test.clickButton("Next", 0);
+        // Reports and Charts
+        advanceThroughPublishStudyWizard(Panel.studyWizardReportList, true);
 
-        // Wizard page 11 : Publish Options
+        // Folder Objects
+        advanceThroughPublishStudyWizard(Panel.folderObjects, true);
+
+        // Publish Options
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
@@ -387,6 +379,40 @@ public class StudyHelper
         _test._extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         _test.clickButton("Finish");
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
+    }
+
+    public void advanceThroughPublishStudyWizard(StudyHelper.IPanel wizardPanel)
+    {
+        advanceThroughPublishStudyWizard(wizardPanel, false);
+    }
+
+    public void advanceThroughPublishStudyWizard(StudyHelper.IPanel wizardPanel, boolean selectAll)
+    {
+        advanceThroughPublishStudyWizard(Arrays.asList(wizardPanel), selectAll);
+    }
+
+    public void advanceThroughPublishStudyWizard(List<StudyHelper.IPanel> wizardPanels)
+    {
+        advanceThroughPublishStudyWizard(wizardPanels, false);
+    }
+
+    public void advanceThroughPublishStudyWizard(List<StudyHelper.IPanel> wizardPanels, boolean selectAll)
+    {
+        for (IPanel panel : wizardPanels)
+        {
+            _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + panel.getPanelTitle() + "']"));
+            if (panel.getLabelColumn() != null) // grids only
+            {
+                _test.waitForElement(Locator.css("." + panel.name()));
+                if (selectAll)
+                    _test.click(Locator.css("." + panel.name() + " .x-grid3-hd-checker  div"));
+            }
+
+            if (_test.isElementPresent(Locator.extButton("Finish")))
+                _test.clickButton("Finish");
+            else
+                _test.clickButton("Next", 0);
+        }
     }
 
     public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath)
@@ -565,5 +591,72 @@ public class StudyHelper
         SPECIMEN_EVENT,
         VIAL,
         SPECIMEN
+    }
+
+    public interface IPanel
+    {
+        String name();
+        String getPanelTitle();
+        String getLabelColumn();
+    }
+
+    public enum Panel implements IPanel
+    {
+        studyGeneralSetup("General Setup", null),
+        studyWizardParticipantList("Participants", "Participant Group"),
+        studyWizardMouseList("Mice", "Mouse Group"),
+        studyWizardDatasetList("Datasets", "Label"),
+        studyWizardVisitList("Visits", "Label"),
+        studySpecimens("Specimens", null),
+        studyObjects("Study Objects", "Name"),
+        studyWizardListList("Lists", "Name"),
+        studyWizardQueryList("Queries", "Query Name"),
+        studyWizardViewList("Grid Views", "Name"),
+        studyWizardReportList("Reports and Charts", "Name"),
+        folderObjects("Folder Objects", "Name"),
+        studyWizardPublishOptionsList("Publish Options", "Name");
+
+        private final String panelTitle;
+        private final String labelColumn;
+
+        Panel(String panelTitle, String labelColumn)
+        {
+            this.panelTitle = panelTitle;
+            this.labelColumn = labelColumn;
+        }
+
+        public String getPanelTitle()
+        {
+            return panelTitle;
+        }
+
+        public String getLabelColumn()
+        {
+            return labelColumn;
+        }
+    }
+
+    public static IPanel participantList(String singular, String plural)
+    {
+        return new IPanel()
+        {
+            @Override
+            public String name()
+            {
+                return "studyWizardParticipantList";
+            }
+
+            @Override
+            public String getPanelTitle()
+            {
+                return plural;
+            }
+
+            @Override
+            public String getLabelColumn()
+            {
+                return singular + " Group";
+            }
+        };
     }
 }
