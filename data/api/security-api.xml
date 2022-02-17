@@ -112,11 +112,9 @@
                             "effectivePermissions": [
                                 "org.labkey.api.security.permissions.ReadPermission",
                                 "org.labkey.api.security.permissions.ReadSomePermission",
-                                "org.labkey.api.security.permissions.ReadSomePermission",
                                 "org.labkey.api.security.permissions.AssayReadPermission",
                                 "org.labkey.api.security.permissions.DataClassReadPermission",
                                 "org.labkey.api.security.permissions.NotebookReadPermission",
-                                "org.labkey.api.security.permissions.ReadPermission",
                                 "org.labkey.api.security.permissions.MediaReadPermission"
                             ],
                             "groups": []
