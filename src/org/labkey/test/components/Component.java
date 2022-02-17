@@ -153,7 +153,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return (F) this;
         }
 
-        protected final Locator buildLocator()
+        public final Locator buildLocator()
         {
             return index != null ? locator().index(index) : locator();
         }

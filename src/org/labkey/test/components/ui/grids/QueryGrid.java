@@ -7,6 +7,7 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.ui.OmniBox;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -322,9 +323,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return (ElementCache) super.elementCache();
     }
 
-    protected class ElementCache extends ResponsiveGrid.ElementCache
+    protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
-        ResponsiveGrid _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
+        ResponsiveGrid<?> _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
         GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
         OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
         Optional<GridTabBar> gridTabBar()
@@ -354,7 +355,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "grid-panel")
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "grid-panel__body")
                 .withDescendant(ResponsiveGrid.Locators.responsiveGrid());
         private Locator _locator;
 
@@ -371,8 +372,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         public QueryGridFinder inPanelWithHeaderText(String panelHeading)
         {
-            _locator = _baseLocator
-                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(panelHeading));
+            _locator = new Panel.PanelFinder(getDriver()).withTitle(panelHeading).buildLocator()
+                    .append(_baseLocator);
             return this;
         }
 
