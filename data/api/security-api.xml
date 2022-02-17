@@ -95,7 +95,7 @@
                                 "org.labkey.api.security.permissions.AssayReadPermission",
                                 "org.labkey.api.security.permissions.NotebookReadPermission",
                                 "org.labkey.api.security.permissions.DataClassReadPermission",
-                                "org.labkey.api.security.permissions.MediaReadPermission",
+                                "org.labkey.api.security.permissions.MediaReadPermission"
                             ],
                             "groups": []
                         },
