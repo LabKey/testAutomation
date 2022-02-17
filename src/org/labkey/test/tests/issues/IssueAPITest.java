@@ -439,7 +439,7 @@ public class IssueAPITest extends BaseWebDriverTest
             fail("expect error if command is executed without required property priority");
         }catch(CommandException success)
         {
-            assertThat(success.getMessage(), containsString("Data does not contain required field: priority"));
+            assertThat(success.getMessage().toLowerCase(), containsString("data does not contain required field: priority"));
             resetErrors();
         }
     }
