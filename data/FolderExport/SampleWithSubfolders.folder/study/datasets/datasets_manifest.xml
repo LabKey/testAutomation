@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datasets metaDataFile="datasets_metadata.xml" xmlns="http://labkey.org/study/xml">
-  <categories>
-    <category>Assays</category>
-    <category>Consent</category>
-    <category>Exams</category>
-    <category>Status</category>
-    <category>Tests</category>
-  </categories>
   <datasets>
     <dataset name="GenericAssay" id="5010" category="Assays" type="Standard">
       <tags/>

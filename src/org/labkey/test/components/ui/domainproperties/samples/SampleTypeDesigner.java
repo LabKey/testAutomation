@@ -10,7 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/samples/SampleTypeDesigner.tsx
@@ -18,7 +17,7 @@ import java.util.Optional;
  */
 public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extends EntityTypeDesigner<T>
 {
-    public final static String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
+    public static final String CURRENT_SAMPLE_TYPE = "(Current Sample Type)";
 
     public SampleTypeDesigner(WebDriver driver)
     {

@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datasets metaDataFile="datasets_metadata.xml" xmlns="http://labkey.org/study/xml">
-  <categories>
-    <category>Panda</category>
-    <category>PandaVisit</category>
-    <category>PandaVisitInt</category>
-    <category>PandaVisitString</category>
-    <category>PandaVisitDouble</category>
-    <category>PandaVisitDate</category>
-    <category>PandaVisitCode</category>
-  </categories>
   <datasets>
     <dataset name="P_One" id="5001" category="Panda" demographicData="true" type="Standard" />
     <dataset name="P_Two" id="5002" category="Panda" demographicData="true" type="Standard" />
