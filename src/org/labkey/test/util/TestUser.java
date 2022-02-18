@@ -1,6 +1,5 @@
 package org.labkey.test.util;
 
-import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.Locator;
@@ -15,45 +14,49 @@ import static org.labkey.test.util.TestLogger.log;
 
 public class TestUser
 {
-    private final WebDriverWrapper _test;
+    private WebDriverWrapper _test;
     private final String _email;
     private CreateUserResponse _createUserResponse;
     private String _password;
-    private final APIUserHelper _apiUserHelper;
+    private APIUserHelper _apiUserHelper;
     private Connection _impersionationConnection;
 
-    public TestUser(WebDriverWrapper test, String email)
+    public TestUser(String email)
     {
-        _test = test;
         _email = email;
-        _apiUserHelper = new APIUserHelper(_test);
-        create();
     }
 
     /**
      * Creates the user immediately via the API, and stores the createUserResponse to hang on to data like
-     *
+     * the user's userId and
      * @return
      */
-    private TestUser create()
+    public TestUser create(WebDriverWrapper test)
     {
+        _test = test;
+        _apiUserHelper = new APIUserHelper(_test);
         _createUserResponse = _apiUserHelper.createUser(_email);
         return this;
     }
 
     public void deleteUser()
     {
-        _apiUserHelper.deleteUsers(false, _email);
+        getApiUserHelper().deleteUsers(false, _email);
     }
 
     public Long getUserId()
     {
-        return (Long) _createUserResponse.getUserId();
+        return (Long) getCreateUserResponse().getUserId();
     }
 
     public String getEmail()
     {
-        return _createUserResponse.getEmail();
+        return _email;
+    }
+
+    public String getUserDisplayName()
+    {
+        return getApiUserHelper().getDisplayNameForEmail(getEmail());
     }
 
     /**
@@ -65,23 +68,23 @@ public class TestUser
      */
     public TestUser setPassword(String password)
     {
-        if (_password == null)  // if null, this is the initial password-
+        if (_password == null)  // if null, this is the initial password- we can use the UI to set it now
         {
             //... borrowed from LKSW's setInitialPassword - in the future, do via API
-            _test.beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", _email)));
+            getWrapper().beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", _email)));
             // Get setPassword URL from notification email.
-            WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(_test.getDriver());
+            WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(getWrapper().getDriver());
 
-            _test.clickAndWait(resetLink, WAIT_FOR_PAGE);
+            getWrapper().clickAndWait(resetLink, WAIT_FOR_PAGE);
 
-            _test.setFormElement(Locator.id("password"), password);
-            _test.setFormElement(Locator.id("password2"), password);
+            getWrapper().setFormElement(Locator.id("password"), password);
+            getWrapper().setFormElement(Locator.id("password2"), password);
 
-            _test.clickButton("Set Password");
+            getWrapper().clickButton("Set Password");
         }
         else
         {
-            log("Warning: user " +_email+ "has already selected a password.");
+            throw new IllegalStateException("User " +_email+ "has already selected a password.");
         }
         _password = password;
         return this;
@@ -94,8 +97,7 @@ public class TestUser
 
     public TestUser addPermission(String role, String containerContext)
     {
-        // apply permission setting right away
-        new ApiPermissionsHelper(_test).addMemberToRole(getEmail(), role, PermissionsHelper.MemberType.user, containerContext);
+        new ApiPermissionsHelper(getWrapper()).addMemberToRole(getEmail(), role, PermissionsHelper.MemberType.user, containerContext);
 
         return this;
     }
@@ -103,17 +105,53 @@ public class TestUser
     public void impersonate() throws Exception
     {
         if (_impersionationConnection != null)
-            log("Already impersonating.");
+            log("Already impersonating.");  // maybe an error?
 
         log("Begin impersonating as user: " + getEmail());
-        _impersionationConnection = _test.createDefaultConnection();
+        _impersionationConnection = getWrapper().createDefaultConnection();
         _impersionationConnection.impersonate(getEmail());
     }
 
     public void stopImpersonating() throws Exception
     {
+        if (_impersionationConnection == null)
+        {
+            throw new IllegalStateException("User " + _email + "is not yet impersonating");
+        }
+
         log("Stop impersonating uer " + getEmail());
         _impersionationConnection.stopImpersonate();
         _impersionationConnection = null;
+    }
+
+    private CreateUserResponse getCreateUserResponse()
+    {
+        if (_createUserResponse == null)
+        {
+            throw new IllegalStateException("User" + _email + " has not yet been created");
+        }
+        return _createUserResponse;
+    }
+
+    private APIUserHelper getApiUserHelper()
+    {
+        if (_apiUserHelper == null)
+        {
+            throw new IllegalStateException("create() must be called on this instance before attempting to reference _apiUserHelper");
+        }
+        return _apiUserHelper;
+    }
+
+    /**
+     * checks _test for null and if so, throws
+     * @return
+     */
+    private WebDriverWrapper getWrapper()
+    {
+        if (_test == null)
+        {
+            throw new IllegalStateException("create() must be called on this instance before attempting to reference _test");
+        }
+        return _test;
     }
 }
