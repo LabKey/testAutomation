@@ -15,7 +15,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -109,8 +108,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
-    public boolean hasTabs() { return elementCache().gridTabBar().isPresent(); }
-
     public boolean gridErrorMessagePresent()
     {
         try
@@ -147,11 +144,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public OmniBox getOmniBox()
     {
         return elementCache().omniBox;
-    }
-
-    public GridTabBar getGridTabBar()
-    {
-        return elementCache().gridTabBar().orElseThrow();
     }
 
     // record count
@@ -328,10 +320,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         ResponsiveGrid<?> _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
         GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
         OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
-        Optional<GridTabBar> gridTabBar()
-        {
-            return new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
-        }
 
         Locator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         Locator selectAllBtnLoc = Locator.tagWithClass("span", "selection-status__select-all")
