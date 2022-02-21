@@ -26,8 +26,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.ui.domainproperties.EntityTypeDesigner;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -38,7 +40,9 @@ import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -139,10 +143,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testSimpleNameExpression()
     {
         String nameExpression = "${A}-${B}.${genId}.${batchRandomId}.${randomId}";
-        String data = "A\tB\tC\n" +
-                "a\tb\tc\n" +
-                "a\tb\tc\n" +
-                "a\tb\tc\n";
+        String data = """
+                A\tB\tC
+                a\tb\tc
+                a\tb\tc
+                a\tb\tc
+                """;
+
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition("SimpleNameExprTest")
                         .setNameExpression(nameExpression)
@@ -177,6 +184,20 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Name\tB\tMaterialInputs/InputsExpressionTest",
                 "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Pat");
+
+
+        verifyNames(
+                "InputsWithDataTypeExpression",
+                "Name\tB\tMaterialInputs/InputsWithDataTypeExpression",
+                "${Inputs/InputsWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Red");
+
+        verifyNames(
+                "MaterialWithDataTypeExpression",
+                "Name\tB\tMaterialInputs/MaterialWithDataTypeExpression",
+                "${MaterialInputs/MaterialWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Ned");
+
     }
 
     @Test
@@ -209,11 +230,12 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         colorsGen.createList(createDefaultConnection(), "Key");
         colorsGen.insertRows();
 
-        String pasteData = "ColorLookup\tNoun\n" +
-                "red\tryder\n" +
-                "green\tgiant\n" +
-                "blue\tangel\n" +
-                "yellow\tjersey";
+        String pasteData = """
+                ColorLookup\tNoun
+                red\tryder
+                green\tgiant
+                blue\tangel
+                yellow\tjersey""";
 
         // now create a sampleType with a Color column that looks up to Colors
         var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
@@ -526,10 +548,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setNameExpression(nameExpression);
 
-        String expectedMsg = "Naming Pattern\n" +
-                "Pattern used for generating unique IDs for this sample type.\n" +
-                "Unable to generate example name from the current pattern. Check for syntax errors.\n" +
-                "More info";
+        String expectedMsg = """
+                Naming Pattern
+                Pattern used for generating unique IDs for this sample type.
+                Unable to generate example name from the current pattern. Check for syntax errors.
+                More info""";
 
         String actualMsg = createPage.getNameExpressionPreview();
 
@@ -562,7 +585,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         log("Click the 'Save' button and wait for the warning dialog.");
         Locator.button("Save").findElement(getDriver()).click();
 
-        ModalDialog dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Naming Patten Warning(s)").waitFor();
+        ModalDialog dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Naming Pattern Warning(s)").waitFor();
 
         actualMsg = dialog.getBodyText();
         log("Dialog text: " + actualMsg);
@@ -580,6 +603,526 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Validate save worked by looking for a link with the sample type name.");
         waitForElement(Locator.linkWithText(sampleType));
+
+    }
+
+    /**
+     * <p>
+     *     Test that GenId works as expected when bulk import is used.
+     * </p>
+     * <p>
+     *     This test will Use a simple genId parameter in the name expression and will:
+     *     <ul>
+     *         <li>Use bulk import to create the initial samples in the sample type.</li>
+     *         <li>Validate sample names are as expected.</li>
+     *         <li>Validate that the next genId is as expected.</li>
+     *         <li>Change the genId to some other (larger) number.</li>
+     *         <li>Use bulk import again and validate that the new genId was used to name the samples.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testGenIdWithBulkImport()
+    {
+
+        goToProjectHome();
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        final String sampleType = "Test_GenId_Bulk_Import";
+
+        log(String.format("Create a sample type named '%s'.", sampleType));
+
+        CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
+
+        String namePrefix = "BulkGenId_";
+
+        String nameExpression = String.format("%s${genId}", namePrefix);
+
+        log(String.format("Use a basic genId name expression '%s'.", nameExpression));
+
+        createPage.setName(sampleType);
+        createPage.setNameExpression(nameExpression);
+
+        createPage.clickSave();
+
+        log("Use bulk import to creat the first few samples.");
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Description", "D1"));
+        sampleData.add(Map.of("Description", "D2"));
+        sampleData.add(Map.of("Description", "D3"));
+        sampleData.add(Map.of("Description", "D4"));
+        sampleData.add(Map.of("Description", "D5"));
+
+        sampleTypeHelper.goToSampleType(sampleType);
+        sampleTypeHelper.bulkImport(sampleData);
+
+        DataRegionTable drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        int nextGenId = 1;
+        List<String> expectedSamples = Arrays.asList(String.format("%s%d", namePrefix, nextGenId++),
+                String.format("%s%d", namePrefix, nextGenId++),
+                String.format("%s%d", namePrefix, nextGenId++),
+                String.format("%s%d", namePrefix, nextGenId++),
+                String.format("%s%d", namePrefix, nextGenId++));
+
+        List<String> actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("Bulk_Import_GenId_Error")
+                .verifyEquals("Names of samples that were imported by file/bulk are not as expected.",
+                        expectedSamples, actualSamples);
+
+        // To avoid repeatedly flagging the same unexpected sample name, take the current actual results and make them
+        // part of the expected results for the next part of the test.
+        expectedSamples = actualSamples;
+
+        log("Check that the next genId is as expected.");
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
+
+        checker()
+                .withScreenshot("Bulk_Import_Next_GenId_Error")
+                .verifyEquals("The value for the next genId is not as expected.",
+                        Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        nextGenId = 501;
+        log(String.format("Update genId to '%d'.", nextGenId));
+
+        EntityTypeDesigner.GenIdDialog idDialog = updatePage.clickEditGenId();
+        idDialog.setGenId(Integer.toString(nextGenId));
+        idDialog.dismiss("Update");
+
+        log("Validate that the banner has been updated.");
+
+        checker()
+                .withScreenshot("Bulk_Import_Updated_Banner_Error")
+                .verifyEquals("Banner does not show the expected genId",
+                        Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        updatePage.clickSave();
+
+        log("Now create a few more sample with the updated genId.");
+
+        sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Description", "D1"));
+        sampleData.add(Map.of("Description", "D2"));
+
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId));
+
+        sampleTypeHelper.bulkImport(sampleData);
+
+        drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("Bulk_Import_Changed_GenId_Error")
+                .verifyEquals("Names of samples with updated genId are not as expected.",
+                        expectedSamples, actualSamples);
+
+    }
+
+    /**
+     * <p>
+     *     Test that using a name expression with 'genId:minValue()' works as expected.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Set minValue to 100 and create some samples. Validate the names.</li>
+     *         <li>Validate that the next genId is as expected.</li>
+     *         <li>Change the minValue to 50, and validate that genId continues with the next larger (100+) value.</li>
+     *         <li>Change minValue to 500 and validate that new samples start with genId 500.</li>
+     *         <li>Validate that the displayed next genId is as expected.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testGenIdMinValue()
+    {
+
+        goToProjectHome();
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        final String sampleType = "Test_GenId_MinValue";
+
+        log(String.format("Create a sample type named '%s'.", sampleType));
+
+        CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
+
+        createPage.setName(sampleType);
+
+        int minValue = 100;
+        int nextGenId = minValue + 1;
+        String namePrefix = "MinValueGenId_";
+
+        String nameExpression = String.format("%s${genId:minValue(%d)}", namePrefix, minValue);
+
+        log(String.format("Set the name expression with a min value: '%s'.", nameExpression));
+
+        createPage.setNameExpression(nameExpression);
+
+        createPage.clickSave();
+
+        // Issue 44844 causes problems with genId if bulk import is used to create the initial samples in a sample type.
+        // Because of that, create these first sample "manually".
+        log("Create some samples and validate that the min value is used for the generated name.");
+        sampleTypeHelper.goToSampleType(sampleType);
+        sampleTypeHelper.insertRow(Map.of("Description", "This is the first sample with no name."));
+        sampleTypeHelper.insertRow(Map.of("Description", "This is the second sample with no name."));
+
+        DataRegionTable drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        List<String> expectedSamples = Arrays.asList(String.format("%s%d", namePrefix, nextGenId++),
+                String.format("%s%d", namePrefix, nextGenId++));
+
+        List<String> actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("GenId_MinValue_Sample_Name_Error")
+                .verifyEquals("Sample names are not as expected.", expectedSamples, actualSamples);
+
+        // To avoid repeatedly flagging the same unexpected sample name, take the current actual results and make them
+        // part of the expected results for the next part of the test.
+        expectedSamples = actualSamples;
+
+        log("Validate that the next genId value is incremented as expected.");
+
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
+
+        // Hopefully the genId will be consistent from run to run.
+        checker()
+                .withScreenshot("GenId_MinValue_Next_GenId_Error")
+                .verifyEquals("The value shown for the next genId is not as expected.",
+                Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        minValue = 50;
+        nameExpression = String.format("%s${genId:minValue(%d)}", namePrefix, minValue);
+
+        log(String.format("Update minValue to something smaller: '%s'", nameExpression));
+
+        updatePage.setNameExpression(nameExpression);
+        updatePage.clickSave();
+
+        log("Create a few more sample now that the minValue is smaller than the next genId value.");
+
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Description", "This is the third sample with no name. The min value is smaller."));
+        sampleData.add(Map.of("Description", "This is the fourth sample with no name. The min value is smaller."));
+
+        sampleTypeHelper.bulkImport(sampleData);
+
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+
+        drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("GenId_Smaller_MinValue_Sample_Name_Error")
+                .verifyEquals("Sample names when the minValue is smaller than the genId are not as expected.",
+                        expectedSamples, actualSamples);
+
+        expectedSamples = actualSamples;
+
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        updatePage = new UpdateSampleTypePage(getDriver());
+
+        log("The displayed genId should have incremented normall regardless of the minValue.");
+        checker().verifyEquals("After makin minValue smaller the value for the next genId is not as expected.",
+                Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        minValue = 500;
+        nextGenId = minValue + 1;
+        nameExpression = String.format("%s${genId:minValue(%d)}", namePrefix, minValue);
+
+        log(String.format("Now update minValue to something larger: '%s'", nameExpression));
+
+        updatePage.setNameExpression(nameExpression);
+        updatePage.clickSave();
+
+        log("Create a few more sample with the new larger minValue.");
+
+        sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Description", "This is the fifth sample with no name. The min value is larger."));
+        sampleData.add(Map.of("Description", "This is the sixth sample with no name. The min value is larger."));
+
+        sampleTypeHelper.bulkImport(sampleData);
+
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+
+        drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker().withScreenshot("GenId_Larger_MinValue_Sample_Name_Error")
+                .verifyEquals("Sample names with a larger minValue are not as expected.", expectedSamples, actualSamples);
+
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        updatePage = new UpdateSampleTypePage(getDriver());
+
+        log("The displayed next genId should be updated to the new larger value.");
+        checker().verifyEquals("The value for the next genId has not increased as expected.",
+                Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        // Don't stay in the edit state.
+        updatePage.clickCancel();
+    }
+
+    /**
+     * <p>
+     *     Test setting and resetting the genId value.
+     * </p>
+     * <p>
+     *     This test will use a simple genId name expression (no minValue).
+     *     <ul>
+     *         <li>Validate that initial sample start with genId of 1.</li>
+     *         <li>Update genId to 100 and validate banner shows new genId.</li>
+     *         <li>Validate new sample start at genId 100.</li>
+     *         <li>Validate genId cannot be reset if the sample type contains samples.</li>
+     *         <li>Delete the samples from the sample type and validate that genId can be reset and starts at 1.</li>
+     *         <li>Validate that trying to set the genId to a value less than the current genId causes an error.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testSetAndResetOfGenId()
+    {
+
+        goToProjectHome();
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        final String sampleType = "Test_Set_GenId";
+
+        log(String.format("Create a sample type named '%s'.", sampleType));
+
+        CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
+
+        createPage.setName(sampleType);
+
+        String namePrefix = "SGId_";
+
+        String nameExpression = String.format("%s${genId}", namePrefix);
+
+        log(String.format("Set the name expression with no min value: '%s'.", nameExpression));
+
+        createPage.setNameExpression(nameExpression);
+
+        log("Validate that the genId banner is not present at creation time.");
+
+        checker()
+                .withScreenshot("Create_Time_GenId_Error")
+                .verifyFalse("The genId banner should not be shown on the create page.", createPage.isGenIdVisible());
+
+        createPage.clickSave();
+
+        // Issue 44844 causes problems with genId if bulk import is used to create the initial samples in a sample type.
+        // Because of that, create these first sample "manually".
+        log("Creat a couple of samples and validate genId used started at 1.");
+        sampleTypeHelper.goToSampleType(sampleType);
+        sampleTypeHelper.insertRow(Map.of("Description", "This is the first sample with no name."));
+        sampleTypeHelper.insertRow(Map.of("Description", "This is the second sample with no name."));
+
+        DataRegionTable drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        int nextGenId = 1;
+        List<String> expectedSamples = Arrays.asList(String.format("%s%d", namePrefix, nextGenId++),
+                String.format("%s%d", namePrefix, nextGenId++));
+
+        List<String> actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("Initial_GenId_Sample_Name_Error")
+                .verifyEquals("Sample names with default genId value are not as expected.",
+                        expectedSamples, actualSamples);
+
+        // To avoid repeatedly flagging the same unexpected sample name, take the current actual results and make them
+        // part of the expected results for the next part of the test.
+        expectedSamples = actualSamples;
+
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
+
+        nextGenId = 100;
+        log(String.format("Update genId to a larger value '%d'", nextGenId));
+
+        EntityTypeDesigner.GenIdDialog idDialog = updatePage.clickEditGenId();
+        idDialog.setGenId(Integer.toString(nextGenId));
+        idDialog.dismiss("Update");
+
+        log("Validate that the banner has been updated.");
+
+        checker()
+                .withScreenshot("Updated_GenId_Banner_Error")
+                .verifyEquals("Banner does not show the expected genId",
+                        Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        updatePage.clickSave();
+
+        log("Now create a few more sample with the updated genId.");
+
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Description", "This is the third sample with no name. The genId has been updated."));
+        sampleData.add(Map.of("Description", "This is the fourth sample with no name. The genId has been updated."));
+
+        sampleTypeHelper.bulkImport(sampleData);
+
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+        expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+
+        drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("Updated_GenId_Samples_Error")
+                .verifyEquals("Sample names with updated genId are not as expected.", expectedSamples, actualSamples);
+
+        log("Before resetting the genId first validate that the reset button is not currently visible.");
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        updatePage = new UpdateSampleTypePage(getDriver());
+
+        checker()
+                .withScreenshot("Update_GenId_Rest_Button_Hidden_Error")
+                .verifyFalse("The 'Reset GenId' button should not be visible if the sample type has samples.",
+                        updatePage.isResetGenIdVisible());
+
+        updatePage.clickCancel();
+
+        log("Delete all of the samples and validate that the 'Reset GenId' button is now visible.");
+        sampleTypeHelper.getSamplesDataRegionTable().checkAllOnPage();
+        sampleTypeHelper.deleteSamples(sampleTypeHelper.getSamplesDataRegionTable(), "Permanently delete 4 samples");
+
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        updatePage = new UpdateSampleTypePage(getDriver());
+
+        waitFor(updatePage::isResetGenIdVisible,
+                "The 'Reset GenId' button should now be visible if the sample type is empty. Fatal error.", 500);
+
+        ModalDialog deleteDialog = updatePage.clickResetGenId();
+
+        String expectedMsg = String.format("The current genId is at %d. Resetting will reset genId back to 1 and cannot be undone.", nextGenId);
+
+        checker()
+                .withScreenshot("Reset_GenId_Dialog_Error")
+                .verifyEquals("Message in the reset confirm dialog is not as expected.",
+                        expectedMsg, deleteDialog.getBodyText());
+
+        log("Click 'Cancel' and verify banner/genId does not change.");
+        deleteDialog.dismiss("Cancel");
+
+        checker()
+                .withScreenshot("Reset_GenId_Cancel_Error")
+                .verifyEquals("Next genId should not be changed after canceling out of the reset dialog.",
+                        Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        log("Click 'Rest GenId' again and this time reset the genId.");
+
+        deleteDialog = updatePage.clickResetGenId();
+        deleteDialog.dismiss("Reset");
+
+        nextGenId = 1;
+        checker()
+                .withScreenshot("Reset_GenId_Rest_Error")
+                .verifyEquals(String.format("Next genId should have been reset to %d.", nextGenId),
+                        Integer.toString(nextGenId), updatePage.getCurrentGenId());
+
+        updatePage.clickSave();
+
+        log(String.format("Now create some more samples and validate that the genId is starting at %d", nextGenId));
+
+        expectedSamples = new ArrayList<>();
+        sampleData = new ArrayList<>();
+        for(int i = 1; i <= 15; i++)
+        {
+            sampleData.add(Map.of("Description", String.format("Sample %d with rest genId.", i)));
+            expectedSamples.add(String.format("%s%d", namePrefix, nextGenId++));
+        }
+
+        sampleTypeHelper.bulkImport(sampleData);
+
+        drt = sampleTypeHelper.getSamplesDataRegionTable();
+
+        actualSamples = drt.getColumnDataAsText("Name");
+
+        Collections.sort(expectedSamples);
+        Collections.sort(actualSamples);
+
+        checker()
+                .withScreenshot("Reset_GenId_Samples_Error")
+                .verifyEquals("Sample names after genId has been reset are not as expected.",
+                        expectedSamples, actualSamples);
+
+        log("Now set the genId to a smaller value and verify that an error is generated.");
+
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        updatePage = new UpdateSampleTypePage(getDriver());
+
+        idDialog = updatePage.clickEditGenId();
+
+        int badGenId = nextGenId / 2;
+        idDialog.setGenId(Integer.toString(badGenId));
+
+        int serverErrorCount = getServerErrorCount();
+
+        log(String.format("Server error count before %d.", serverErrorCount));
+
+        String actualMsg = idDialog.clickUpdateExpectError();
+        expectedMsg = String.format("Unable to set genId to %d due to conflict with existing samples.", badGenId);
+
+        checker()
+                .withScreenshot("Invalid_GenId_Warning_Error")
+                .verifyEquals("Warning in reset dialog not as expected.", expectedMsg, actualMsg);
+
+        // Don't know why but two server errors are generated.
+        checker().verifyEquals("A server error should have been generated by resetting the genId to a smaller value.",
+            serverErrorCount + 2, getServerErrorCount());
+
+        actualMsg = getServerErrors();
+
+        // The number recorded in the server error is off by one from the number shown in the UI. The API actually is
+        // sending the request with off by 1 value, just the UI on LKSM is displaying it with +1. The idea is, we want
+        // to show current as the next id to use. But in code, current is the previous.
+        expectedMsg = String.format("Unable to set genId to %d due to conflict with existing samples.", badGenId - 1);
+
+        checker().verifyTrue(String.format("Server message should contains '%s' but is doesn't look like it is there (see log for server error).", expectedMsg),
+                actualMsg.contains(expectedMsg));
+
+        // Reset the server errors so the test that follows this one does not fail.
+        resetErrors();
+
+        log("Clean up.");
+
+        idDialog.dismiss("Cancel");
+        updatePage.clickCancel();
 
     }
 

@@ -1932,16 +1932,29 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void importFolderFromPipeline(String folderFile, int completedJobsExpected, boolean validateQueries)
     {
+        importFolderFromPipeline(folderFile, completedJobsExpected, validateQueries, null);
+    }
+
+    // The "Shared Datasets" section won't appear in most cases, so most callers should set createSharedDatasets == null (don't care).
+    public void importFolderFromPipeline(String folderFile, int completedJobsExpected, boolean validateQueries, Boolean createSharedDatasets)
+    {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Use Pipeline");
         _fileBrowserHelper.importFile(folderFile, "Import Folder");
 
         waitForText("Import Folder from Pipeline");
-        Locator validateQuriesCheckbox = Locator.name("validateQueries");
-        waitForElement(validateQuriesCheckbox);
+        if (null != createSharedDatasets)
+        {
+            Locator createSharedDatasetsCheckbox = Locator.name("createSharedDatasets");
+            waitForElement(createSharedDatasetsCheckbox);
+            if (!createSharedDatasets)
+                uncheckCheckbox(createSharedDatasetsCheckbox);
+        }
+        Locator validateQueriesCheckbox = Locator.name("validateQueries");
+        waitForElement(validateQueriesCheckbox);
         if (!validateQueries)
-            uncheckCheckbox(validateQuriesCheckbox);
+            uncheckCheckbox(validateQueriesCheckbox);
         clickButton("Start Import");
 
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);

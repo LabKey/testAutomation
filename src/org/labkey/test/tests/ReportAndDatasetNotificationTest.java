@@ -178,7 +178,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
         openCustomizePanel("Data Views");
         _ext4Helper.uncheckCheckbox("datasets");
-        _ext4Helper.uncheckCheckbox("queries");
+        _ext4Helper.uncheckCheckbox("grid views");
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
 

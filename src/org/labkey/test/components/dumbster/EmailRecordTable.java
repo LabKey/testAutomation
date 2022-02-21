@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.html.Table;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,6 +116,11 @@ public class EmailRecordTable extends Table
     public EmailMessage getMessage(String subject)
     {
         return getMessage(actualSubject -> actualSubject.equals(subject));
+    }
+
+    public WebElement getRowEl(EmailMessage message)
+    {
+        return Locator.xpath("./tbody/tr[" + message.getRowIndex() + "]").findElement(this);
     }
 
     public EmailMessage getMessageRegEx(String regExp)

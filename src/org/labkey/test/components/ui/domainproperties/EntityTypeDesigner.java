@@ -2,6 +2,8 @@ package org.labkey.test.components.ui.domainproperties;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
@@ -95,7 +97,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getNameExpressionPreview()
     {
         getWrapper().mouseOver(elementCache().helpTarget("Naming "));
-        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 500);
+        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
         return elementCache().toolTip.getText();
     }
 
@@ -110,6 +112,72 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         waitFor(()->!elementCache().toolTip.isDisplayed(), "The tool tip did not go away.", 1_000);
 
         return getThis();
+    }
+
+    /**
+     * Check to see if the genId banner is visible.
+     *
+     * @return True if visible, false if not.
+     */
+    public boolean isGenIdVisible()
+    {
+        return elementCache().genIdAlert.isDisplayed();
+    }
+
+    /**
+     * The genId value displayed in the genId banner.
+     *
+     * @return The current genId value.
+     */
+    public String getCurrentGenId()
+    {
+        // Protect against scenarios where the genId banner takes a moment to show up.
+        waitFor(()->elementCache().genIdAlert.isDisplayed(),
+                "The GenId banner is not visible.", 1_000);
+
+        String rawText = elementCache().genIdAlert.getText().split("\n")[0];
+        rawText = rawText.substring(rawText.indexOf(":")+1);
+        return rawText.trim();
+    }
+
+    /**
+     * Click the 'Edit GenId' button.
+     *
+     * @return A {@link GenIdDialog}
+     */
+    public GenIdDialog clickEditGenId()
+    {
+        // There is code that checks to see if the Edit genId button should be shown. Try to protect against that.
+        waitFor(()->elementCache().editGenIdButton.isDisplayed(),
+                "The 'Edit GenId' is not visible.", 1_000);
+
+        elementCache().editGenIdButton.click();
+        return new GenIdDialog();
+    }
+
+    /**
+     * Check if the 'Reset GenId' button is visible.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isResetGenIdVisible()
+    {
+        return elementCache().resetGenIdButton.isDisplayed();
+    }
+
+    /**
+     * Click the 'Reset GenId' button and return the confirm dialog.
+     *
+     * @return A {@link ModalDialog} asking to confirm the reset.
+     */
+    public ModalDialog clickResetGenId()
+    {
+        // There is code that checks to see if the Reset genId button should be shown. Try to protect against that.
+        waitFor(()->elementCache().resetGenIdButton.isDisplayed(),
+                "The 'Reset GenId' is not visible.", 1_000);
+
+        elementCache().resetGenIdButton.click();
+        return new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Are you sure you want to reset genId").waitFor();
     }
 
     public String getAutoLinkDataToStudy()
@@ -156,6 +224,42 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().optionalWarningAlert();
     }
 
+    /**
+     * Dialog that allows the user to set the genId value.
+     */
+    public class GenIdDialog extends ModalDialog
+    {
+
+        protected final WebElement input = Locator.input("newgenidval").findWhenNeeded(this);
+
+        public GenIdDialog()
+        {
+            super(new ModalDialogFinder(EntityTypeDesigner.this.getDriver()).withTitle("Are you sure you want to update genId"));
+        }
+
+        public String getGenId()
+        {
+            return getWrapper().getFormElement(input);
+        }
+
+        public GenIdDialog setGenId(String value)
+        {
+            getWrapper().setFormElement(input, value);
+            return this;
+        }
+
+        public String clickUpdateExpectError()
+        {
+            Locators.dismissButton("Update").findElement(getComponentElement()).click();
+            WebElement alert = Locator.tagWithClass("div", "alert-danger").findWhenNeeded(getComponentElement());
+
+            WebDriverWrapper.waitFor(()->alert.isDisplayed(), "No error message was shown on the dialog.", 500);
+
+            return alert.getText();
+        }
+
+    }
+
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
         protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
@@ -181,5 +285,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.
         public final WebElement toolTip = Locator.tagWithId("div", "tooltip").refindWhenNeeded(getDriver());
 
+        protected final WebElement genIdAlert = Locator.tagWithClass("div", "genid-alert").refindWhenNeeded(this);
+
+        protected final WebElement editGenIdButton = Locator.tagWithClass("button", "edit-genid-btn").findWhenNeeded(this);
+
+        protected final WebElement resetGenIdButton = Locator.tagWithClass("button", "reset-genid-btn").findWhenNeeded(this);
+
     }
+
 }
