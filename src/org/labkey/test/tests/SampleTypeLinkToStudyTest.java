@@ -14,6 +14,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.admin.ImportFolderPage;
@@ -551,17 +552,104 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Category should not have overridden", categoryName, getCategory(DATE_BASED_STUDY, SAMPLE_TYPE2));
     }
 
+    @Test
+    public void testAutoLinkToStudyWithNonStandardFieldNames()
+    {
+        String sampleTypeName = "Sample type with unconventional column name";
+        log("Creating sample type with Subject/timepoint fields and auto link enabled");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)
+                .setAutoLinkDataToStudy("/" + VISIT_BASED_STUDY)
+                .setFields(List.of(
+                        new FieldDefinition("testingVisitID", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("testingVisitDate", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("testingParticipantID", FieldDefinition.ColumnType.Subject))));
+
+        log("Inserting rows in the sample type");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "S1");
+        setFormElement(Locator.name("quf_testingVisitID"), "1");
+        setFormElement(Locator.name("quf_testingVisitDate"), "12/12/2020");
+        setFormElement(Locator.name("quf_testingParticipantID"), "P1");
+        clickButton("Submit");
+
+        log("Verifying the auto link to study");
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyTrue("Missing linked column",
+                samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyEquals("Missing auto link for the inserted row", "linked",
+                samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
+
+    }
+
+    @Test
+    public void testSubjectTimepointFromParentSample()
+    {
+        String parentSampleType = "parent sample";
+        log("Creating the parent sample with subject/timepoint fields");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        String data = "Name\tVisitId\tVisitDate\tParticipantId\n" +
+                "Parent-1\t1\t" + now + "\tP1\n" +
+                "Parent-2\t2\t" + now + "\tP2\n";
+        sampleHelper.createSampleType(new SampleTypeDefinition(parentSampleType)
+                .setFields(List.of(
+                        new FieldDefinition("VisitId", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("VisitDate", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data);
+
+        log("Creating the child sample");
+        String childSampleType = "child sample";
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(childSampleType)
+                .setAutoLinkDataToStudy("/" + VISIT_BASED_STUDY)
+                .addParentAlias(parentSampleType));
+
+        log("Customizing the view to add parent fields in child sample");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(childSampleType));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        CustomizeView customizeView = samplesTable.getCustomizeView();
+        customizeView.openCustomizeViewPanel();
+        customizeView.showHiddenItems();
+        customizeView.addColumn("INPUTS/MATERIALS/" + parentSampleType + "/VisitId");
+        customizeView.addColumn("INPUTS/MATERIALS/" + parentSampleType + "/VisitDate");
+        customizeView.addColumn("INPUTS/MATERIALS/" + parentSampleType + "/ParticipantId");
+        customizeView.saveCustomView();
+
+        log("Bulk importing in the child sample");
+        ImportDataPage importDataPage = samplesTable.clickImportBulkData();
+        importDataPage.setText("Name\tmaterialInputs/" + parentSampleType + "\nChild-1\tParent-2\nChild-2\tParent-1");
+        importDataPage.submit();
+
+        log("Verifying the inserted rows are linked");
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyEquals("Missing auto link for the inserted child row", Arrays.asList("linked","linked"),
+                samplesTable.getColumnDataAsText( "linked_to_Visit_Based_Study_Test_Project_Study"));
+
+        log("Verifying subject/timepoint columns are populated correctly");
+        checker().verifyEquals("Incorrect visit id in child sample", Arrays.asList("1.0","2.0"),
+                samplesTable.getColumnDataAsText("Inputs/Materials/parent sample/VisitId"));
+        checker().verifyEquals("Incorrect visit ParticipantId in child sample", Arrays.asList("P1","P2"),
+                samplesTable.getColumnDataAsText("Inputs/Materials/parent sample/ParticipantId"));
+    }
+
     @Before
     public void preTest() throws Exception
     {
         //deleting the datasets from study folders.
-        if(TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 1"))
+        if (TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 1"))
             TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 1");
-        if(TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 2"))
+        if (TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 2"))
             TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 2");
-        if(TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 1"))
+        if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 1"))
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
-        if(TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
+        if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
     }
 
