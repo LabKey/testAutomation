@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 10)
+@BaseWebDriverTest.ClassTimeout(minutes = 12)
 public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 {
     final static String SAMPLE_TYPE_PROJECT = "Sample Type Test Project";
@@ -583,7 +583,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
         checker().verifyEquals("Missing auto link for the inserted row", "linked",
                 samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
-
     }
 
     @Test
@@ -629,6 +628,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         log("Verifying the inserted rows are linked");
         samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        customizeView = samplesTable.getCustomizeView();
+        customizeView.openCustomizeViewPanel();
+        customizeView.addColumn("linked_to_Visit_Based_Study_Test_Project_Study");
+        customizeView.saveCustomView();
         checker().verifyEquals("Missing auto link for the inserted child row", Arrays.asList("linked","linked"),
                 samplesTable.getColumnDataAsText( "linked_to_Visit_Based_Study_Test_Project_Study"));
 
