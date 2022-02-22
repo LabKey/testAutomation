@@ -640,6 +640,25 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 samplesTable.getColumnDataAsText("Inputs/Materials/parent sample/VisitId"));
         checker().verifyEquals("Incorrect visit ParticipantId in child sample", Arrays.asList("P1","P2"),
                 samplesTable.getColumnDataAsText("Inputs/Materials/parent sample/ParticipantId"));
+
+        log("Verifying adding data to the child sample type using the derivation steps");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(parentSampleType));
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.checkCheckbox(0);
+        samplesTable.clickHeaderButton("Derive Samples");
+        selectOptionByText(Locator.name("targetSampleTypeId"), childSampleType + " in /" + getProjectName());
+        clickButton("Next");
+        setFormElement(Locator.name("outputSample1_Name"), "derivedChildSample");
+        clickButton("Submit");
+
+        log("Verifying the auto link to study by deriving single samples from parent sample");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(childSampleType));
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.setFilter("Name", "Equals", "derivedChildSample");
+        checker().verifyEquals("Incorrect child row created", Arrays.asList("derivedChildSample", "", "2.0", now + " 00:00", "P2", "linked"),
+                samplesTable.getRowDataAsText(0));
     }
 
     @Before
