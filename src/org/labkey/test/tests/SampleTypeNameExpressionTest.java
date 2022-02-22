@@ -272,6 +272,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix)
     {
+        goToProjectHome();
+
         String name1 = namePrefix + "_1";
         String name2 = namePrefix + "_2";
         String data = header + "\n" +
