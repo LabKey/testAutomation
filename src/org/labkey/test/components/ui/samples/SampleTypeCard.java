@@ -3,50 +3,18 @@ package org.labkey.test.components.ui.samples;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.Card;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
  * Automates shared component implemented by /internal/components/samples/SampleSetCards.tsx
- * TODO: Pull generic functionality into a base component for '/internal/components/base/Cards.tsx'
  */
-public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCache>
+public class SampleTypeCard extends Card
 {
-    private final WebElement _el;
-    private final WebDriver _driver;
-
     protected SampleTypeCard(WebElement element, WebDriver driver)
     {
-        _el = element;
-        _driver = driver;
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return _driver;
-    }
-
-    public String getTitle()
-    {
-        return elementCache().titleElement.getText();
-    }
-
-    /**
-     * gets the contents of the 'content' element, minus the title (which is a child of the content element) because
-     * title is separately available here
-     * @return the text of the 'content' element, minus the title
-     */
-    public String getContent()
-    {
-        String content = elementCache().contentElement.getText();
-        return content.replace(getTitle(), "").trim();
+        super(element, driver);
     }
 
     /**
@@ -59,14 +27,7 @@ public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCac
         return elementCache().cardBlockCenterElement.getAttribute("class").contains("cards__block-disabled");
     }
 
-    /**
-     * gets the contents of the 'alt' attribute of the center Icon element
-     * @return The text of the 'alt' attribute
-     */
-    public String getIconAltString()
-    {
-        return elementCache().cardBlockCenterContentImg.getAttribute("alt");
-    }
+
 
     @Override
     protected ElementCache newElementCache()
@@ -74,19 +35,17 @@ public class SampleTypeCard extends WebDriverComponent<SampleTypeCard.ElementCac
         return new ElementCache();
     }
 
-
-    protected class ElementCache extends Component<?>.ElementCache
+    @Override
+    protected ElementCache elementCache()
     {
-        final WebElement titleElement = Locator.tagWithClass("div", "cards__card-title")
-                .findWhenNeeded(this);
-        final WebElement contentElement = Locator.tagWithClass("div", "cards__card-content")
-                .findWhenNeeded(this);
-        final WebElement cardBlockCenterElement = Locator.tagWithClass("div", "cards__block-center")
-                .findWhenNeeded(this);
-        final WebElement cardBlockCenterContentImg = Locator.tagWithClass("div", "cards__block-center-content")
-                .child("img").findWhenNeeded(this);
+        return (ElementCache) super.elementCache();
     }
 
+    protected class ElementCache extends Card.ElementCache
+    {
+        final WebElement cardBlockCenterElement = Locator.tagWithClass("div", "cards__block-center")
+                .findWhenNeeded(this);
+    }
 
     public static class SampleTypeCardFinder extends WebDriverComponentFinder<SampleTypeCard, SampleTypeCardFinder>
     {

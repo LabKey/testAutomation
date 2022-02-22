@@ -28,7 +28,7 @@ public class LoggedOutDialog extends ModalDialog
 
     protected LoggedOutDialog(WebDriver driver)
     {
-        super(new ModalDialogFinder(driver).withTitle("Logged Out")
+        super(new ModalDialogFinder(driver).withTitle("Session Expired")
                 .waitFor().getComponentElement(), driver);
     }
 

@@ -175,6 +175,16 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return elementCache().getOptions();
     }
 
+    /**
+     * sets the filter and captures the text for each resulting option
+     * @param filter    the text to set in the filter input
+     * @return  A list of strings for each option shown for that filter expression
+     */
+    public List<String> getOptionsForFilter(String filter)
+    {
+        return getWrapper().getTexts(setFilter(filter));
+    }
+
     public static class SearchingReactSelectFinder extends BaseReactSelect.BaseReactSelectFinder<FilteringReactSelect>
     {
         private SearchingReactSelectFinder(WebDriver driver)

@@ -896,7 +896,7 @@ public class SecurityTest extends BaseWebDriverTest
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));
-        waitForElement(Locators.labkeyErrorSubHeading.withText("Registration is not enabled."));
+        waitForElement(Locators.labkeyErrorHeading.withText("Registration is not enabled."));
 
         // cleanup: sign admin back in
         signIn();

@@ -50,35 +50,36 @@ public class EditableGridTest extends BaseWebDriverTest
     public void testTooWideErrorCase() throws Exception
     {
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        EditableGrid testGrid = testPage.getEditableGrid();
+        EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
         String wideShape = "Too wide\tACME\tthing\tanother\televen\toff the map\tMoar columns\n";
 
+        clickButton("Add Row", 0);
         testGrid.pasteFromCell(0, "Description", wideShape);
         assertThat("Expect cell error to explain that paste cannot add columns",
                 testGrid.getCellPopoverText(0, "Description"),
                 is("Unable to paste. Cannot paste columns beyond the columns found in the grid."));
         assertThat("Expect failed paste to leave data unchanged",
-                testGrid.getColumnData("LSID *"), everyItem(is("")));
+                testGrid.getColumnData("Name"), everyItem(is("")));
     }
 
     @Test
     public void testCanAddRowsWithTallShape()
     {
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        EditableGrid testGrid = testPage.getEditableGrid();
+        EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
         String tallShape = "42\n" +
                 "41\n" +
                 "40\n" +
                 "39\n" +
                 "38";
 
-        int initialRowCount = testGrid.getRowCount();
-        assertThat(initialRowCount, is(2));
-
+        assertThat(testGrid.getRowCount(), is(0));
+        clickButton("Add Row", 0);
         testGrid.pasteFromCell(0, "Description", tallShape);
         List<String> pastedColData = testGrid.getColumnData("Description");
-        List<String> unpastedColData = testGrid.getColumnData("LSID *");
+        List<String> unpastedColData = testGrid.getColumnData("Name");
 
+        assertThat(testGrid.getRowCount(), is(5));
         assertEquals("Didn't get correct values", List.of("42", "41", "40", "39", "38"), pastedColData);
         assertThat("expect other column to remain empty",
                 unpastedColData, everyItem(is("")));
