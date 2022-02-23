@@ -93,7 +93,7 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
     {
         var input = elementCache().searchInput;
         String placeholder = input.getComponentElement().getAttribute("placeholder");
-        input.set("");
+        getWrapper().actionClear(elementCache().searchInput.getComponentElement());
         // wait for the results container to collapse, and for the placeholder for the input to be shown
         getWrapper().waitFor(()-> !isResultContainerExpanded() &&
                 Locator.css("input:placeholder-shown").withAttribute("placeholder", placeholder)
