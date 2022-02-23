@@ -93,7 +93,7 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
     {
         var input = elementCache().searchInput;
         String placeholder = input.getComponentElement().getAttribute("placeholder");
-        input.set("");
+        getWrapper().actionClear(elementCache().searchInput.getComponentElement());
         // wait for the results container to collapse, and for the placeholder for the input to be shown
         getWrapper().waitFor(()-> !isResultContainerExpanded() &&
                 Locator.css("input:placeholder-shown").withAttribute("placeholder", placeholder)
@@ -139,7 +139,7 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final Input searchInput = Input.Input(Locator.input("concept-search"), getDriver())
+        final Input searchInput = Input.Input(Locator.tagWithClass("input", "form-control"), getDriver())
                 .timeout(2000).findWhenNeeded(this);
 
         WebElement resultContainer()
@@ -159,7 +159,6 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
     public static class OntologyTreeSearchFinder extends WebDriverComponentFinder<OntologyTreeSearch, OntologyTreeSearchFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "concept-search-container");
-        private String _title = null;
 
         public OntologyTreeSearchFinder(WebDriver driver)
         {
