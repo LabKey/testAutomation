@@ -159,7 +159,6 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
     public static class OntologyTreeSearchFinder extends WebDriverComponentFinder<OntologyTreeSearch, OntologyTreeSearchFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "concept-search-container");
-        private final String _title = null;
 
         public OntologyTreeSearchFinder(WebDriver driver)
         {
