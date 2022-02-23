@@ -4,13 +4,19 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.FileBrowserHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.util.Map;
+
+import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 
 public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
 {
@@ -51,9 +57,12 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return new ExportFolderPage(driver.getDriver());
     }
 
+    @Override
     protected void waitForPage()
     {
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().exportBtn));
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache()
+                .exportLocationRadioButtons.get(ExportLocation.browserAsZip).getComponentElement()));
     }
 
     public ExportFolderPage includeExperimentsAndRuns(boolean checked)
@@ -88,13 +97,13 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
 
     public ExportFolderPage includeSampleDatasetData(boolean checked)
     {
-        elementCache().SampleDatasetData.set(checked);
+        elementCache().sampleDatasetData.set(checked);
         return this;
     }
 
     public ExportFolderPage includeSampleDatasetDefinitions(boolean checked)
     {
-        elementCache().SampleDatasetDefinitions.set(checked);
+        elementCache().sampleDatasetDefinitions.set(checked);
         return this;
     }
 
@@ -110,10 +119,58 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
+    public ExportFolderPage includeObject(String label, boolean include)
+    {
+        elementCache().exportItemCheckbox(label).set(include);
+        return this;
+    }
+
+    public void includePhiColumns(FieldDefinition.PhiSelectType exportPhiLevel)
+    {
+        if (NotPHI != exportPhiLevel)
+        {
+            elementCache().phiColumnCheckbox.check();
+            switch (exportPhiLevel)
+            {
+                case Limited -> selectPhiCombo("Limited PHI");
+                case PHI -> selectPhiCombo("Full and Limited PHI");
+                case Restricted -> selectPhiCombo("Restricted, Full and Limited PHI");
+            }
+        }
+        else
+        {
+            elementCache().phiColumnCheckbox.uncheck();
+        }
+    }
+
+    private void selectPhiCombo(String selection)
+    {
+        elementCache().phiColumnComboBox.selectComboBoxItem(selection);
+    }
+
+    public void exportToPipelineAsIndividualFiles()
+    {
+        selectExportLocation(ExportLocation.pipelineAsFiles);
+        clickAndWait(elementCache().exportBtn);
+        new FileBrowserHelper(this).waitForFileGridReady();
+    }
+
+    public void exportToPipelineAsZip()
+    {
+        selectExportLocation(ExportLocation.pipelineAsZip);
+        clickAndWait(elementCache().exportBtn);
+        new FileBrowserHelper(this).waitForFileGridReady();
+    }
+
     public File exportToBrowserAsZipFile()
     {
-        elementCache().browserAsZipFileToggle.check();
+        selectExportLocation(ExportLocation.browserAsZip);
         return clickAndWaitForDownload(elementCache().exportBtn);
+    }
+
+    private void selectExportLocation(ExportLocation location)
+    {
+        elementCache().exportLocationRadioButtons.get(location).check();
     }
 
     @Override
@@ -122,33 +179,53 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        public Checkbox experimentsAndRunsCheckbox = new Checkbox(Locator.tagWithText("label", EXPERIMENTS_AND_RUNS)
-                .precedingSibling("input").findWhenNeeded(getDriver()));
-        public Checkbox qcStateSettingsCheckbox = new Checkbox(Locator.tagContainingText("label", QC_STATE_SETTINGS)
-                .precedingSibling("input").findWhenNeeded(getDriver()));
+        public Checkbox exportItemCheckbox(String label)
+        {
+            return new Checkbox.CheckboxFinder().withLabel(label).findWhenNeeded(this);
+        }
 
-        public Checkbox roleAssighmentsCheckbox = new Checkbox(Locator.tagWithText("label", ROLE_ASSIGNMENTS)
-                .precedingSibling("input").findWhenNeeded(getDriver()));
+        public final Checkbox experimentsAndRunsCheckbox = exportItemCheckbox(EXPERIMENTS_AND_RUNS);
 
-        public Checkbox includeFilesCheckbox = new Checkbox(Locator.tagWithText("label", FILES)
-                .precedingSibling("input").findWhenNeeded(getDriver()));
+        // Use partial label for QC State. Actual label varies depending on enabled modules
+        public final Checkbox qcStateSettingsCheckbox = new Checkbox.CheckboxFinder().withLabelContaining(QC_STATE_SETTINGS)
+                .findWhenNeeded(getDriver());
 
-        public Checkbox etlDefinitionsCheckbox = new Checkbox(Locator.tagWithText("label", ETLS)
-                .precedingSibling("input").findWhenNeeded(getDriver()));
-        public Checkbox exportSecurityGroupsCheckbox = new Checkbox(Locator.tagWithText("label", SECURITY_GROUPS)
-                .precedingSibling("input").findWhenNeeded(getDriver()));
-        public Checkbox includeSubfoldersCheckBox = new Checkbox(Locator.tagContainingText("label", "Include Subfolders")
-                .precedingSibling("input").findWhenNeeded(getDriver()));
-        public Checkbox SampleDatasetData = new Checkbox(Locator.tagContainingText("label","Datasets: Sample Dataset Data")
-                .precedingSibling("input").findWhenNeeded(getDriver()));
-        public Checkbox SampleDatasetDefinitions = new Checkbox(Locator.tagContainingText("label","Datasets: Sample Dataset Definitions")
-                .precedingSibling("input").findWhenNeeded(getDriver()));
+        public final Checkbox roleAssighmentsCheckbox = exportItemCheckbox(ROLE_ASSIGNMENTS);
 
-        RadioButton browserAsZipFileToggle = new RadioButton(Locator.tagContainingText("label", "Browser as zip file")
-            .precedingSibling("input").findWhenNeeded(getDriver()));
+        public final Checkbox includeFilesCheckbox = exportItemCheckbox(FILES);
 
-        WebElement exportBtn = Locator.linkWithSpan("Export").findWhenNeeded(getDriver());
+        public final Checkbox etlDefinitionsCheckbox = exportItemCheckbox(ETLS);
+        public final Checkbox exportSecurityGroupsCheckbox = exportItemCheckbox(SECURITY_GROUPS);
+        public final Checkbox includeSubfoldersCheckBox = new Checkbox.CheckboxFinder().withLabelContaining("Include Subfolders")
+                .findWhenNeeded(getDriver());
+        public final Checkbox sampleDatasetData = new Checkbox.CheckboxFinder().withLabelContaining("Datasets: Sample Dataset Data")
+                .findWhenNeeded(getDriver());
+        public final Checkbox sampleDatasetDefinitions = new Checkbox.CheckboxFinder().withLabelContaining("Datasets: Sample Dataset Definitions")
+                .findWhenNeeded(getDriver());
+
+        public final Checkbox phiColumnCheckbox = new Checkbox.CheckboxFinder().withLabelContaining("Include PHI Columns:")
+                .findWhenNeeded(this);
+        public final ComboBox phiColumnComboBox = new ComboBox.ComboBoxFinder(getDriver()).withInputNamed("exportPhiLevel")
+                .findWhenNeeded(this);
+
+        public final Map<ExportLocation, RadioButton> exportLocationRadioButtons = Map.of(
+                ExportLocation.pipelineAsFiles, new RadioButton.RadioButtonFinder()
+                        .withLabel("Pipeline root export directory, as individual files").findWhenNeeded(getDriver()),
+                ExportLocation.pipelineAsZip, new RadioButton.RadioButtonFinder()
+                        .withLabel("Pipeline root export directory, as zip file").findWhenNeeded(getDriver()),
+                ExportLocation.browserAsZip, new RadioButton.RadioButtonFinder()
+                        .withLabel("Browser as zip file").findWhenNeeded(getDriver())
+        );
+
+        public final WebElement exportBtn = Locator.linkWithSpan("Export").findWhenNeeded(getDriver());
+    }
+
+    public enum ExportLocation
+    {
+        pipelineAsFiles,
+        pipelineAsZip,
+        browserAsZip
     }
 }

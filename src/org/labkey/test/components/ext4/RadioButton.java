@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.ext4;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
@@ -30,6 +31,16 @@ public class RadioButton extends Checkbox
     public static RadioButtonFinder RadioButton()
     {
         return new RadioButtonFinder();
+    }
+
+    @Override
+    public void set(@NotNull Boolean checked)
+    {
+        if (!checked)
+        {
+            throw new IllegalArgumentException("Unable to uncheck radio button");
+        }
+        super.set(checked);
     }
 
     @Override
