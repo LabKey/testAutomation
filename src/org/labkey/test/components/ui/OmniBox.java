@@ -49,18 +49,13 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return _omniBoxElement;
     }
 
-    private void doAndWait(Runnable run)
-    {
-        _linkedComponent.doAndWaitForUpdate(run);
-    }
-
     public OmniBox clearAll()
     {
         List<OmniBoxValue> valueItems = getValues();
         for (int i = getValues().size() - 1 ; i >= 0; i--) // dismiss from the right first;
         {
             OmniBoxValue obValue = valueItems.get(i);
-            doAndWait(obValue::dismiss);
+            _linkedComponent.doAndWaitForUpdate(obValue::dismiss);
         }
 
         Assert.assertEquals("not all of the omnibox values were cleared", 0, getValues().size());
@@ -206,7 +201,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
     {
         new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
 
-        doAndWait(() -> {
+        _linkedComponent.doAndWaitForUpdate(() -> {
             elementCache().input.sendKeys(inputValue);
             stopEditing();
         });
