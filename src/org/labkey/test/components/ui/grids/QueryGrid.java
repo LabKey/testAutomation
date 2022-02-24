@@ -12,9 +12,11 @@ import org.labkey.test.components.ui.OmniBox;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -165,28 +167,37 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    @Override
+    public void doAndWaitForUpdate(Runnable func)
+    {
+        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.child("*").findOptionalElement(this);
+
+        func.run();
+
+        optionalStatus.ifPresent(el -> getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el)));
+
+        waitForLoaded();
+        clearElementCache();
+    }
+
+
     // search, sort and filter methods
 
     /**
      * searches the grid, from the omnibox and waits for the grid to refresh
-     * @param searchTerm
-     * @return
      */
     public QueryGrid search(String searchTerm)
     {
-        doAndWaitForUpdate(()-> getOmniBox().setSearch(searchTerm));
+        getOmniBox().setSearch(searchTerm);
         return this;
     }
 
     /**
      * Applies a sort to the grid via the omnibox and waits for the grid to refresh
-     * @param column
-     * @param direction
-     * @return
      */
     public QueryGrid sortOn(String column, SortDirection direction)
     {
-        doAndWaitForUpdate(()-> getOmniBox().setSort(column, direction));
+        getOmniBox().setSort(column, direction);
         return this;
     }
 
@@ -200,38 +211,21 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid filterOn(String columnName, OmniBox.FilterOperator operator, String value)
     {
-        return filterOn(columnName, operator.getValue(), value);
-    }
-
-    /**
-     * @deprecated Use the filterOn method that takes an enum.
-     * @see QueryGrid#filterOn(String, OmniBox.FilterOperator, String) 
-     *
-     * @param columnName
-     * @param operator
-     * @param value
-     * @return
-     */
-    @Deprecated
-    public QueryGrid filterOn(String columnName, String operator, String value)
-    {
-        doAndWaitForUpdate(()-> getOmniBox().setFilter(columnName, operator, value));
+        getOmniBox().setFilter(columnName, operator, value);
         return this;
     }
 
     /**
      * clears search, sort, and filter expressions via the omnibox
-     * @return
      */
     public QueryGrid clearSortsAndFilters()
     {
-        doAndWaitForUpdate(()-> getOmniBox().clearAll());
+        getOmniBox().clearAll();
         return this;
     }
 
     /**
      *  Selects all rows in the target domain, including those on other pages, if there are any
-     * @return
      */
     public QueryGrid selectAllRows()
     {
@@ -319,9 +313,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         ResponsiveGrid<?> _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
         GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
-        OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
+        OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
 
-        Locator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
+        Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         Locator selectAllBtnLoc = Locator.tagWithClass("span", "selection-status__select-all")
                 .child(Locator.buttonContainingText("Select all"));
         Locator clearBtnLoc = Locator.tagWithClass("span", "selection-status__clear-all")

@@ -68,24 +68,20 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         WebDriverWrapper.waitFor(this::isLoaded, "Grid still loading", 30000);
     }
 
-    private void waitForUpdate()
-    {
-        waitForLoaded();
-        clearElementCache();
-    }
-
     @Override
     protected void clearElementCache()
     {
         super.clearElementCache();
     }
 
+    @Override
     public void doAndWaitForUpdate(Runnable func)
     {
         // Look at WebDriverWrapper.doAndWaitForElementToRefresh for an example.
         func.run();
 
-        waitForUpdate();
+        waitForLoaded();
+        clearElementCache();
     }
 
     public Boolean hasData()

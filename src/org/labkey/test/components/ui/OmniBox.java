@@ -5,13 +5,15 @@
 package org.labkey.test.components.ui;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.selenium.LazyWebElement;
-import org.labkey.test.selenium.RefindingWebElement;
+import org.labkey.test.components.ui.OmniBoxValue.OmniBoxValueFinder;
+import org.labkey.test.components.ui.OmniBoxValue.OmniType;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,17 +24,17 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
-import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-
 public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 {
-    final private WebElement _omniBoxElement;
-    final private WebDriver _driver;
+    private final WebElement _omniBoxElement;
+    private final WebDriver _driver;
+    private final UpdatingComponent _linkedComponent;
 
-    public OmniBox(WebElement element, WebDriver driver)
+    private OmniBox(WebElement element, WebDriver driver, UpdatingComponent linkedComponent)
     {
         _omniBoxElement = element;
         _driver = driver;
+        _linkedComponent = linkedComponent;
     }
 
     @Override
@@ -47,40 +49,28 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return _omniBoxElement;
     }
 
+    private void doAndWait(Runnable run)
+    {
+        _linkedComponent.doAndWaitForUpdate(run);
+    }
+
     public OmniBox clearAll()
     {
         List<OmniBoxValue> valueItems = getValues();
-        for (int i=getValues().size()-1 ; i >= 0; i--)
+        for (int i = getValues().size() - 1 ; i >= 0; i--) // dismiss from the right first;
         {
-            valueItems.get(i).dismiss();        // dismiss from the right first;
+            OmniBoxValue obValue = valueItems.get(i);
+            doAndWait(obValue::dismiss);
         }
 
-        // dismiss any filter/search/sort dropdown prompts
-        if (isOpen())
-            close();
-
-        getWrapper().waitFor(()-> getValues().size() == 0,
-                "not all of the omnibox values were cleared", 1000);
-
-        return this;
-    }
-
-    public OmniBox clearLast()
-    {
-        int numValues = getValues().size();
-        if (numValues > 0)
-        {
-            sendClearValue();
-            new WebDriverWait(_driver, 1).until(
-                    wd -> getValues().size() == numValues - 1);
-        }
+        Assert.assertEquals("not all of the omnibox values were cleared", 0, getValues().size());
 
         return this;
     }
 
     public OmniBox focus()
     {
-        elementCache().control.click();
+        elementCache().input.click();
         new WebDriverWait(_driver, Duration.ofSeconds(2))
                 .until(ExpectedConditions.attributeContains(this.getComponentElement(), "class", "is-open"));
         return this;
@@ -88,7 +78,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     public OmniBox blur()
     {
-        getWrapper().fireEvent(elementCache().control, WebDriverWrapper.SeleniumEvent.blur);
+        getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         return this;
     }
 
@@ -100,28 +90,23 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     public List<OmniBoxValue> getValues()
     {
-        return new OmniBoxValue.OmniBoxValueFinder(getDriver()).findAll(this);
+        return new OmniBoxValueFinder(getDriver()).findAll(this);
     }
 
     public OmniBoxValue getValue(String expected)
     {
-        return new OmniBoxValue.OmniBoxValueFinder(getDriver()).withText(expected).find(this);
+        return new OmniBoxValueFinder(getDriver()).withText(expected).find(this);
     }
 
     public Optional<OmniBoxValue> getOptionalValue(String expected)
     {
-        return new OmniBoxValue.OmniBoxValueFinder(getDriver()).withText(expected).findOptional(this);
-    }
-
-    private WebElement editingValueElement()
-    {
-        return Locators.editingValue.waitForElement(this, WAIT_FOR_JAVASCRIPT);
+        return new OmniBoxValueFinder(getDriver()).withText(expected).findOptional(this);
     }
 
     public OmniBox editValue(String expectedValue, String newValue)
     {
         var input = getValue(expectedValue).openEdit();
-        WebDriverWrapper.waitFor(()-> isEditing(), "did not begin editing", 1500);
+        WebDriverWrapper.waitFor(this::isEditing, "did not begin editing", 1500);
         input.set(newValue);
         stopEditing();
         return this;
@@ -130,7 +115,6 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
     /**
      * 'open' checks to see if 'is-open' is on the class of the component element
      * it is concerned with whether or not the ul.Omnibox-autocomplete list is expanded
-     * @return
      */
     private boolean isOpen()
     {
@@ -140,15 +124,17 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     private OmniBox close()
     {
-        elementCache().input.sendKeys(Keys.ESCAPE);
-        getWrapper().waitFor(()-> !isOpen(), 500);
+        if (isOpen())
+        {
+            elementCache().input.sendKeys(Keys.ESCAPE);
+            WebDriverWrapper.waitFor(() -> !isOpen(), "Didn't close omnibox popup", 500);
+        }
         return this;
     }
 
     public boolean isEditing()  // there is always an input; 'editing' means it currently has a value
     {
-        return !Locators.editingValue.findElement(this)
-                .getAttribute("value").isEmpty();
+        return !elementCache().input.getAttribute("value").isEmpty();
     }
 
     public OmniBox stopEditing()    // click just outside the omnibox, above/center
@@ -156,16 +142,15 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         if (!isEditing())
             return this;
 
-        editingValueElement().sendKeys(Keys.ENTER);
+        elementCache().input.sendKeys(Keys.ENTER);
 
         WebDriverWrapper.waitFor(()-> !isEditing(), "did not stop editing", 1500);
         return this;
     }
 
-    private void sendClearValue()
+    public OmniBox setFilter(String columnName, FilterOperator operator)
     {
-        new WebDriverWait(_driver, Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
-        elementCache().input.sendKeys(Keys.BACK_SPACE);
+        return setFilter(columnName, operator.getValue(), null);
     }
 
     /**
@@ -182,34 +167,29 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
     }
 
     /**
-     * @deprecated Use the overloaded method that takes an enum.
-     * @see OmniBox#setFilter(String, FilterOperator, String)
+     * @deprecated Use {@link OmniBox#setFilter(String, FilterOperator, String)}
      */
     @Deprecated
     public OmniBox setFilter(String columnName, String operator, @Nullable String value)
     {
         StringBuilder expectedFilterText = new StringBuilder();     // this builds the text to search for as a filter-item in the box
         expectedFilterText.append(columnName);
-        expectedFilterText.append(" " + operator);
+        expectedFilterText.append(" ").append(operator);
 
         StringBuilder commandExpression = new StringBuilder("filter");  // this builds the command to enter into the box
-        commandExpression.append(" " + enquoteIfMultiWord(columnName));
-        commandExpression.append(" " + enquoteIfMultiWord(operator));
+        commandExpression.append(" ").append(enquoteIfMultiWord(columnName));
+        commandExpression.append(" ").append(enquoteIfMultiWord(operator));
         if (null != value)
         {
-            commandExpression.append(" " + enquoteIfMultiWord(value));
-            expectedFilterText.append(" " + value);
+            commandExpression.append(" ").append(enquoteIfMultiWord(value));
         }
 
-        this.setText(commandExpression.toString());
-        if (WebDriverWrapper.waitFor(()->  getOptionalValue(expectedFilterText.toString()).isEmpty(), 2500))
-            return this;
-
-        // try again if necessary and fail if it doesn't work
-        getWrapper().log("Retrying attempt to set filter with text [" + commandExpression.toString() + "]");
-        this.setText(commandExpression.toString());
-        WebDriverWrapper.waitFor(()->  getValue(expectedFilterText.toString()) != null,
-                "Expect a new value to be present with [" + expectedFilterText.toString() + "]", 1500);
+        this.setText(commandExpression.toString(), valueFinder(OmniType.filter, expectedFilterText.toString()).findOptional(this).isEmpty());
+        if (null != value)
+        {
+            expectedFilterText.append(" ").append(value);
+        }
+        valueFinder(OmniType.filter, expectedFilterText.toString()).waitFor(this);
 
         return this;
     }
@@ -224,23 +204,41 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return  result;
     }
 
-    private OmniBox setText(String inputValue)
+    private void setText(String inputValue, boolean expectNewValue)
     {
         new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
-        elementCache().input.sendKeys(inputValue);
-        elementCache().input.sendKeys(Keys.ENTER);
+        int initialCount = getValues().size();
 
-        return this;
+        doAndWait(() -> {
+            elementCache().input.sendKeys(inputValue);
+            stopEditing();
+        });
+
+        if (expectNewValue)
+        {
+            WebDriverWrapper.waitFor(() -> getValues().size() == initialCount + 1, "New omni box entry didn't appear", 5_000);
+        }
     }
 
     public OmniBox setSearch(String searchTerm)
     {
-        return this.setText("search \"" + searchTerm + "\"");
+        this.setText("search \"" + searchTerm + "\"", true);
+        valueFinder(OmniType.search, searchTerm).waitFor(this);
+        return this;
     }
 
     public OmniBox setSort(String columnName, SortDirection direction)
     {
-        return this.setText("sort \"" + columnName + "\"" + (direction.equals(SortDirection.DESC) ? " desc" : ""));
+        OmniBoxValueFinder valueFinder = valueFinder(OmniType.sort, columnName);
+        this.setText("sort \"" + columnName + "\"" + (direction.equals(SortDirection.DESC) ? " desc" : ""),
+                valueFinder.findOptional(this).isEmpty());
+        valueFinder.waitFor(this);
+        return this;
+    }
+
+    private OmniBoxValueFinder valueFinder(OmniType type, String value)
+    {
+        return new OmniBoxValueFinder(getDriver()).withType(type).withText(value);
     }
 
     @Override
@@ -251,39 +249,35 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement control = new LazyWebElement(Locators.omniBoxControl, this);
-        public WebElement input = new RefindingWebElement(Locators.omniBoxInput, this);
-    }
-
-    private static abstract class Locators
-    {
-        static final Locator.CssLocator omniBoxControl = Locator.css("div.OmniBox-control");
-        static final Locator.CssLocator omniBoxInput = Locator.css("div.OmniBox-input > input");
-        static final Locator.XPathLocator values = Locator.tagWithClass("div", "OmniBox-value").childTag("span");
-        static final Locator.XPathLocator editingValue = Locator.tagWithClass("div", "OmniBox-input")
-                .child(Locator.tag("input").withAttribute("value"));
+        public WebElement input = Locator.css("div.OmniBox-input > input").refindWhenNeeded(this);
     }
 
     public static class OmniBoxFinder extends WebDriverComponent.WebDriverComponentFinder<OmniBox, OmniBoxFinder>
     {
-        private Locator _locator;
+        private final Locator _baseLocator = Locator.css("div.OmniBox-control");
+        private final UpdatingComponent _linkedComponent;
+
+        public OmniBoxFinder(WebDriver driver, UpdatingComponent linkedComponent)
+        {
+            super(driver);
+            _linkedComponent = linkedComponent;
+        }
 
         public OmniBoxFinder(WebDriver driver)
         {
-            super(driver);
-            _locator= Locators.omniBoxControl;
+            this(driver, UpdatingComponent.DEFAULT);
         }
 
         @Override
         protected OmniBox construct(WebElement el, WebDriver driver)
         {
-            return new OmniBox(el, driver);
+            return new OmniBox(el, driver, _linkedComponent);
         }
 
         @Override
         protected Locator locator()
         {
-            return _locator;
+            return _baseLocator;
         }
     }
 
