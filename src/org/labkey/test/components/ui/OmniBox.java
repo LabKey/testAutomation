@@ -137,7 +137,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return !elementCache().input.getAttribute("value").isEmpty();
     }
 
-    public OmniBox stopEditing()    // click just outside the omnibox, above/center
+    public OmniBox stopEditing()
     {
         if (!isEditing())
             return this;
@@ -145,6 +145,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         elementCache().input.sendKeys(Keys.ENTER);
 
         WebDriverWrapper.waitFor(()-> !isEditing(), "did not stop editing", 1500);
+        getWrapper().mouseOver(elementCache().input); // Make sure mouse isn't over a value
         return this;
     }
 
@@ -182,13 +183,10 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         if (null != value)
         {
             commandExpression.append(" ").append(enquoteIfMultiWord(value));
-        }
-
-        this.setText(commandExpression.toString(), valueFinder(OmniType.filter, expectedFilterText.toString()).findOptional(this).isEmpty());
-        if (null != value)
-        {
             expectedFilterText.append(" ").append(value);
         }
+
+        this.setText(commandExpression.toString());
         valueFinder(OmniType.filter, expectedFilterText.toString()).waitFor(this);
 
         return this;
@@ -204,35 +202,27 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
         return  result;
     }
 
-    private void setText(String inputValue, boolean expectNewValue)
+    private void setText(String inputValue)
     {
         new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(1)).until(ExpectedConditions.elementToBeClickable(elementCache().input));
-        int initialCount = getValues().size();
 
         doAndWait(() -> {
             elementCache().input.sendKeys(inputValue);
             stopEditing();
         });
-
-        if (expectNewValue)
-        {
-            WebDriverWrapper.waitFor(() -> getValues().size() == initialCount + 1, "New omni box entry didn't appear", 5_000);
-        }
     }
 
     public OmniBox setSearch(String searchTerm)
     {
-        this.setText("search \"" + searchTerm + "\"", true);
+        this.setText("search \"" + searchTerm + "\"");
         valueFinder(OmniType.search, searchTerm).waitFor(this);
         return this;
     }
 
     public OmniBox setSort(String columnName, SortDirection direction)
     {
-        OmniBoxValueFinder valueFinder = valueFinder(OmniType.sort, columnName);
-        this.setText("sort \"" + columnName + "\"" + (direction.equals(SortDirection.DESC) ? " desc" : ""),
-                valueFinder.findOptional(this).isEmpty());
-        valueFinder.waitFor(this);
+        this.setText("sort \"" + columnName + "\"" + (direction == SortDirection.DESC ? " desc" : ""));
+        valueFinder(OmniType.sort, columnName).waitFor(this);
         return this;
     }
 

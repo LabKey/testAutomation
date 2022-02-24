@@ -170,7 +170,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     @Override
     public void doAndWaitForUpdate(Runnable func)
     {
-        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.child("*").findOptionalElement(this);
+        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.findOptionalElement(this);
 
         func.run();
 
