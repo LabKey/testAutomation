@@ -41,25 +41,19 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         beginAt(WebTestHelper.buildURL("test", "NotFound"));
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
-        checker().verifyEquals("Incorrect error heading message", "Oops! The requested page cannot be found.",
+        checker().verifyEquals("Incorrect error heading message", "404: page not found",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "404: page not found.",
-                errorPage.getSubErrorHeading());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
         beginAt(WebTestHelper.buildRelativeUrl("project", getCurrentContainerPath(), "beginning"));
         errorPage = new LabkeyErrorPage(getDriver());
-        checker().verifyEquals("Incorrect error heading message", "Oops! The requested page cannot be found.",
+        checker().verifyEquals("Incorrect error heading message", "Unable to find action 'beginning' to handle request in controller 'project'",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "Unable to find action 'beginning' to handle request in controller 'project'.",
-                errorPage.getSubErrorHeading());
 
         beginAt(WebTestHelper.buildRelativeUrl("projects", getCurrentContainerPath(), "begin"));
         errorPage = new LabkeyErrorPage(getDriver());
-        checker().verifyEquals("Incorrect error heading message", "Oops! The requested page cannot be found.",
+        checker().verifyEquals("Incorrect error heading message", "No LabKey Server module registered to handle request for controller: projects",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "No LabKey Server module registered to handle request for controller: projects.",
-                errorPage.getSubErrorHeading());
 
     }
 
