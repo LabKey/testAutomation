@@ -160,9 +160,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param columnLabel    header text of the specified column
      * @param text          Text to be found in the specified column
      * @param checked       true for checked, false for unchecked
-     * @return
+     * @return this grid
      */
-    public ResponsiveGrid selectRow(String columnLabel, String text, boolean checked)
+    public ResponsiveGrid<?> selectRow(String columnLabel, String text, boolean checked)
     {
         GridRow row = getRow(columnLabel, text);
         selectRowAndVerifyCheckedCounts(row, checked);
