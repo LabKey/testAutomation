@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
+public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
 {
     final WebElement _gridElement;
     final WebDriver _driver;
@@ -713,7 +713,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     }
 
-    public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid<?>, ResponsiveGridFinder>
+    public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid, ResponsiveGridFinder>
     {
         private Locator _locator;
 
