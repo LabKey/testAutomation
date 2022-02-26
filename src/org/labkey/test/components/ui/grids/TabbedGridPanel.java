@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -44,6 +45,13 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
     public List<String> getTabs()
     {
         return getWrapper().getTexts(elementCache().navTabs());
+    }
+
+    public List<String> getTabsWithoutCounts()
+    {
+        return getTabs().stream()
+                .map(tab -> tab.replaceFirst(" \\([0-9]+\\)$", ""))
+                .collect(Collectors.toList());
     }
 
     private boolean isSelected(String tabText)
