@@ -34,6 +34,8 @@ import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
+import org.labkey.test.pages.query.NewQueryPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
@@ -509,14 +511,11 @@ public class NabAssayTest extends AbstractAssayTest
     {
         final String QUERY_NAME = "Data";
 
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        goToSchemaBrowser();
-        selectQuery("assay.NAb.TestAssayNab", QUERY_NAME);
-        createNewQuery("assay.NAb.TestAssayNab");
-        setFormElement(Locator.name("ff_newQueryName"), "New NabQuery");
-        clickAndWait(Locator.lkButton("Create and Edit Source"));
-        setCodeEditorValue("queryText",
+        SourceQueryPage queryPage = NewQueryPage.beginAt(this, getProjectName() + "/" + TEST_ASSAY_FLDR_NAB, "assay.NAb.TestAssayNab")
+                .setName("New NabQuery")
+                .setBaseTable(QUERY_NAME)
+                .clickCreate();
+        queryPage.setSource(
                 "SELECT \n" +
                         QUERY_NAME + ".Properties.AUC As AUC,\n" +
                         QUERY_NAME + ".Properties.CurveIC50_4pl,\n" +
@@ -525,7 +524,7 @@ public class NabAssayTest extends AbstractAssayTest
                         QUERY_NAME + ".WellgroupName\n" +
                         "FROM " + QUERY_NAME + "\n"
         );
-        clickButton("Save & Finish");
+        queryPage.clickSaveAndFinish();
         assertTextPresent("AUC", "Curve IC50 4pl", "Curve IC50 4pl OOR Indicator", "Participant ID", "Wellgroup Name",
                           "<20.0", "ptid 1 C", "473.94");
     }
