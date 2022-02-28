@@ -26,6 +26,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.ManageDatasetsPage;
+import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.pages.study.ManageVisitPage;
@@ -287,8 +288,8 @@ public class StudyHelper
         _test.clickFolder(folder);
         _test.clickTab("Manage");
         _test.clickButton("Export Study");
+        ExportFolderPage exportFolderPage = new ExportFolderPage(_test.getDriver());
 
-        _test.waitForElement(Locator.tagWithClass("table", "export-location"));
         List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "Datasets: Study Dataset Definitions", "Datasets: Study Dataset Data", "Datasets: Assay Dataset Definitions", "Datasets: Assay Dataset Data", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         if (isSpecimenModuleActive())
         {
@@ -304,8 +305,14 @@ public class StudyHelper
         }
         assertTrue("Missing study objects: " + String.join(", ", missingObjects), missingObjects.isEmpty());
 
-        _test.checkRadioButton(Locator.tagWithClass("table", "export-location").index(zipFile ? 1 : 0)); // zip file vs. individual files
-        _test.clickButton("Export");
+        if (zipFile)
+        {
+            exportFolderPage.exportToPipelineAsZip();
+        }
+        else
+        {
+            exportFolderPage.exportToPipelineAsIndividualFiles();
+        }
     }
 
     @LogMethod
