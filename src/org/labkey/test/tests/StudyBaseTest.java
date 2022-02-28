@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
+import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -194,15 +195,16 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void exportStudy(boolean zipFile, boolean exportPhi, PhiSelectType exportPhiLevel)
     {
-        exportStudy(zipFile, exportPhi, exportPhiLevel, false, false, false, Collections.emptySet());
+        exportStudy(zipFile, exportPhiLevel, false, false, false, Collections.emptySet());
     }
 
-    @LogMethod protected void exportStudy(boolean zipFile, boolean exportPhi, PhiSelectType exportPhiLevel,
+    @LogMethod protected void exportStudy(boolean zipFile, @Nullable PhiSelectType exportPhiLevel,
                                           boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
                                           @Nullable Set<String> uncheckObjects)
     {
         clickTab("Manage");
         clickButton("Export Study");
+        ExportFolderPage exportFolderPage = new ExportFolderPage(getDriver());
 
         waitForText("Visit Map", "Cohort Settings", "QC State Settings", "Datasets: Study Dataset Definitions", "Datasets: Study Dataset Data",
                 "Datasets: Assay Dataset Definitions", "Datasets: Assay Dataset Data", "Participant Comment Settings");
@@ -212,23 +214,34 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
             assertTextPresent("Specimens", "Specimen Settings");
         }
 
+        if (exportPhiLevel != null)
+        {
+            exportFolderPage.includePhiColumns(exportPhiLevel);
+        }
+
         if (uncheckObjects != null)
         {
-            for (String uncheckObject : uncheckObjects)
-                uncheckCheckbox(Locator.checkboxByNameAndValue("types", uncheckObject));
+            for (String folderObject : uncheckObjects)
+            {
+                exportFolderPage.includeObject(folderObject, false);
+            }
         }
-        checkRadioButton(Locator.tagWithClass("table", "export-location").index(zipFile ? 1 : 0));
-        if(!exportPhi)
-        {
-            setExportPhi(exportPhiLevel);   // exportPhiLevel is level to include
-        }
+
         if(useAlternateIDs)
             new Checkbox(Locator.tagWithClass("input", "alternate-ids").findElement(getDriver())).check();
         if(useAlternateDates)
             new Checkbox(Locator.tagWithClass("input", "shift-dates").findElement(getDriver())).check();
         if(maskClinic)
             new Checkbox(Locator.tagContainingText("label", "Mask Clinic Names").precedingSibling("input").findElement(getDriver())).check();
-        clickButton("Export");
+
+        if (zipFile)
+        {
+            exportFolderPage.exportToPipelineAsZip();
+        }
+        else
+        {
+            exportFolderPage.exportToPipelineAsIndividualFiles();
+        }
     }
 
     /* pre-requisite: test is already in the folder where the study exists */

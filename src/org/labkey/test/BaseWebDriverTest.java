@@ -127,8 +127,6 @@ import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
-import static org.labkey.test.params.FieldDefinition.PhiSelectType;
-import static org.labkey.test.params.FieldDefinition.PhiSelectType.NotPHI;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -1483,14 +1481,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    protected ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles,boolean exportETLDefination, int locationIndex)
+    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefination)
     {
         if (folderName != null)
             clickFolder(folderName);
-        goToFolderManagement().goToExportTab();
-        waitForElement(Locator.tagWithClass("table", "export-location"));
-
-        ExportFolderPage exportFolderPage = new ExportFolderPage(getDriver());
+        ExportFolderPage exportFolderPage = goToFolderManagement().goToExportTab();
 
         if (exportETLDefination)
             exportFolderPage.includeETLDefintions(exportETLDefination);
@@ -1507,7 +1502,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (includeFiles)
             exportFolderPage.includeFiles(includeFiles);
 
-        checkRadioButton(Locator.tagWithClass("table", "export-location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
         return exportFolderPage;
     }
 
@@ -1515,33 +1509,32 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void exportFolderAsIndividualFiles(String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders)
     {
         // first locator with this name is "Pipeline root export directory, as individual files
-        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, false,false, 0);
-        clickButton("Export");
-        _fileBrowserHelper.waitForFileGridReady();
+        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, false,false)
+                .exportToPipelineAsIndividualFiles();
     }
 
     protected void exportFolderAsZip(boolean exportSecurityGroups, boolean exportRoleAssignments)
     {
-        prepareForFolderExport(null, exportSecurityGroups, exportRoleAssignments, false, false,false,1);
-        clickButton("Export");
+        prepareForFolderExport(null, exportSecurityGroups, exportRoleAssignments, false, false,false)
+                .exportToPipelineAsZip();
     }
 
     protected File exportFolderAsZip(String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles)
     {
-        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, includeFiles,false,2);
-        return clickAndWaitForDownload(findButton("Export"));
+        return prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, includeFiles,false)
+                .exportToBrowserAsZipFile();
     }
 
     protected File exportFolderAsZipWithETLAndSubfolder(String folderName,boolean includeSubfolder,boolean exportETLDefination)
     {
-        prepareForFolderExport(folderName,false,false,includeSubfolder,false,exportETLDefination,2);
-        return clickAndWaitForDownload(findButton("Export"));
+        return prepareForFolderExport(folderName,false,false,includeSubfolder,false,exportETLDefination)
+                .exportToBrowserAsZipFile();
     }
 
     protected File exportFolderToBrowserAsZip()
     {
-        prepareForFolderExport(null, false, false, false, false,false,2);
-        return clickAndWaitForDownload(findButton("Export"));
+        return prepareForFolderExport(null, false, false, false, false,false)
+                .exportToBrowserAsZipFile();
     }
 
     protected void goToModuleProperties()
@@ -1809,29 +1802,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         // if the row does not exist then most likely the cohort passed in is incorrect
         int rowIndex = cohortTable.getRowIndex("Label", cohort);
         cohortTable.updateRow(rowIndex, Map.of("enrolled", enroll), true);
-    }
-
-    public void setExportPhi(PhiSelectType exportPhiLevel)
-    {
-        if (NotPHI != exportPhiLevel)
-        {
-            new Checkbox(Locator.tagContainingText("label", "Include PHI Columns:").precedingSibling("input").findElement(getDriver())).check();
-            switch (exportPhiLevel)
-            {
-                case Limited -> selectPhiCombo("Limited PHI");
-                case PHI -> selectPhiCombo("Full and Limited PHI");
-                case Restricted -> selectPhiCombo("Restricted, Full and Limited PHI");
-            }
-        }
-        else
-        {
-            new Checkbox(Locator.tagContainingText("label", "Include PHI Columns:").precedingSibling("input").findElement(getDriver())).uncheck();
-        }
-    }
-
-    private void selectPhiCombo(String label)
-    {
-        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithInputNamed("exportPhiLevel"), Ext4Helper.TextMatchTechnique.EXACT, label);
     }
 
     public void goToProjectHome()
