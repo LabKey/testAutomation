@@ -326,13 +326,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
-        GridBar gridBar = new GridBar.GridBarFinder(_driver, QueryGrid.this).findWhenNeeded();
-        OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
+        final GridBar gridBar = new GridBar.GridBarFinder(_driver, QueryGrid.this).findWhenNeeded();
+        final OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
 
-        Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
-        Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
+        final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
+        final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
                 .child(Locator.buttonContainingText("Select all")));
-        Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
+        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
                 .child(Locator.tagContainingText("button", "Clear")));
 
     }
