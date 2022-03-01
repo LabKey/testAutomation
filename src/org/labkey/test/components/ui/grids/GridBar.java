@@ -69,13 +69,13 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         // GridPanel
         Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
         WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
-        return getWrapper().doAndWaitForDownload(()->exportButton.click());
+        return getWrapper().doAndWaitForDownload(exportButton::click);
     }
 
     /**
      * gets the Pager for the current grid, if it exists.
      * If the grid is filtered down to an empty set or if there are no loaded rows, it will not be present
-     * @return
+     * @return grid pager
      */
     public Pager pager()
     {
@@ -85,7 +85,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     /**
      * says whether or not the grid currently shows a pager (for example, when filtered down to zero
      * or not loaded, the pager will not be present)
-     * @return
+     * @return <code>true</code> if grid has a pager
      */
     public boolean hasPager()
     {
@@ -440,35 +440,18 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         static final Locator viewSelectorMenu = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "viewselector");
     }
 
-    public static class GridBarFinder extends WebDriverComponentFinder<GridBar, GridBarFinder>
+    public static class GridBarFinder extends ComponentFinder<QueryGrid, GridBar, GridBarFinder>
     {
-        private final Locator _locator = Locators.gridBar();
-        private final QueryGrid _queryGrid;
-
-        /**
-         * At this time (Feb 2020) a grid bar will not exist without a grid panel, and a responsive grid. Rather
-         * than take a responsive grid and search up the html chain for a the correct grid bar, take a container
-         * element and search for the grid bar in it.
-         *
-         * @param driver A reference to a WebDriver
-         * @param queryGrid The query grid associated with this grid bar.
-         */
-        public GridBarFinder(WebDriver driver, QueryGrid queryGrid)
-        {
-            super(driver);
-            _queryGrid = queryGrid;
-        }
-
         @Override
-        protected GridBar construct(WebElement el, WebDriver driver)
+        protected GridBar construct(WebElement el)
         {
-            return new GridBar(el, _queryGrid);
+            return new GridBar(el, getContext());
         }
 
         @Override
         protected Locator locator()
         {
-            return _locator;
+            return Locators.gridBar();
         }
     }
 

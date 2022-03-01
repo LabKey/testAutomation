@@ -326,7 +326,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
-        final GridBar gridBar = new GridBar.GridBarFinder(_driver, QueryGrid.this).findWhenNeeded();
+        final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
         final OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
