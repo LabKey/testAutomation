@@ -142,7 +142,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public GridBar getGridBar()
     {
-        return elementCache()._gridBar;
+        return elementCache().gridBar;
     }
 
     public OmniBox getOmniBox()
@@ -326,8 +326,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
-        ResponsiveGrid<?> _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
-        GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
+        GridBar gridBar = new GridBar.GridBarFinder(_driver, QueryGrid.this).findWhenNeeded();
         OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
 
         Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");

@@ -250,7 +250,7 @@ public class OmniBox extends WebDriverComponent<OmniBox.ElementCache>
 
         public OmniBoxFinder(WebDriver driver)
         {
-            this(driver, UpdatingComponent.DEFAULT);
+            this(driver, UpdatingComponent.NO_OP);
         }
 
         @Override
