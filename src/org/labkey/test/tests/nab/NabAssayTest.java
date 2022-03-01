@@ -411,11 +411,12 @@ public class NabAssayTest extends AbstractAssayTest
 
         if (isStudyModuleInstalled())
         {
+            log("Link to Study");
             region.checkAllOnPage();
             region.clickHeaderButton("Link to Study");
 
             selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-            clickButton("Next");
+            clickButton("Next", 300_000);
 
             region = new DataRegionTable("Data", this);
             region.clickHeaderButtonAndWait("Link to Study");
