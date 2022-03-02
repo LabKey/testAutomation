@@ -413,13 +413,14 @@ public class NabAssayTest extends AbstractAssayTest
         {
             log("Link to Study");
             region.checkAllOnPage();
-            region.clickHeaderButton("Link to Study");
+            region.clickHeaderButtonAndWait("Link to Study");
 
             selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-            clickButton("Next", 300_000);
+            clickButton("Next");
 
             region = new DataRegionTable("Data", this);
             region.clickHeaderButtonAndWait("Link to Study");
+            log("Link to Study complete.");
             assertStudyData(4);
 
             assertAliasedAUCStudyData();
