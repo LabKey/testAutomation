@@ -34,7 +34,7 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @Override
     @LogMethod
-    public void doCreateFolder(String child, String parentPath, String foldertype)
+    public void doCreateFolder(String parentPath, String child, String foldertype)
     {
         String[] ancestors = parentPath.split("/");
         createSubfolder(ancestors[0], ancestors[ancestors.length - 1], child, foldertype, null);
