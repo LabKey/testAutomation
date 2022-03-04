@@ -416,7 +416,7 @@ public class NabAssayTest extends AbstractAssayTest
             region.clickHeaderButtonAndWait("Link to Study");
 
             selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-            clickButton("Next");
+            clickButton("Next", 300_000); // Triggers a query that is, sometimes, very slow on SQL Server
 
             region = new DataRegionTable("Data", this);
             region.clickHeaderButtonAndWait("Link to Study");
