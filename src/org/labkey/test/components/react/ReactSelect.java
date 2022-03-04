@@ -149,7 +149,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public static class ReactSelectFinder extends BaseReactSelect.BaseReactSelectFinder<ReactSelect>
     {
-        private ReactSelectFinder(WebDriver driver)
+        public ReactSelectFinder(WebDriver driver)
         {
             super(driver);
         }

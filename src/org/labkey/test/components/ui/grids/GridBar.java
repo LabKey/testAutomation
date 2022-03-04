@@ -4,9 +4,9 @@
  */
 package org.labkey.test.components.ui.grids;
 
-import com.sun.istack.Nullable;
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -28,25 +28,24 @@ import java.util.Map;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.sleep;
 
+/**
+ * Wrapper for QueryGrid pager and some standard query grid menus
+ */
 public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 {
-    final private WebElement _gridBarElement;
-    final private WebElement _containerElement;
-    final private WebDriver _driver;
-    private final ResponsiveGrid _responsiveGrid;
+    private final WebElement _gridBarElement;
+    private final QueryGrid _queryGrid;
 
-    protected GridBar(WebDriver driver, WebElement container, ResponsiveGrid responsiveGrid)
+    protected GridBar(WebElement element, QueryGrid queryGrid)
     {
-        _gridBarElement = Locators.gridBar().findWhenNeeded(container);
-        _containerElement = container;
-        _responsiveGrid = responsiveGrid;  // The responsive grid that is associated with this bar.
-        _driver = driver;
+        _gridBarElement = element;
+        _queryGrid = queryGrid;  // The query grid that is associated with this bar.
     }
 
     @Override
     protected WebDriver getDriver()
     {
-        return _driver;
+        return _queryGrid.getDriver();
     }
 
     @Override
@@ -70,27 +69,27 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         // GridPanel
         Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
         WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
-        return getWrapper().doAndWaitForDownload(()->exportButton.click());
+        return getWrapper().doAndWaitForDownload(exportButton::click);
     }
 
     /**
      * gets the Pager for the current grid, if it exists.
      * If the grid is filtered down to an empty set or if there are no loaded rows, it will not be present
-     * @return
+     * @return grid pager
      */
     public Pager pager()
     {
-        return new Pager.PagerFinder(getDriver(), _responsiveGrid).waitFor(this);
+        return new Pager.PagerFinder(getDriver(), _queryGrid).waitFor(this);
     }
 
     /**
      * says whether or not the grid currently shows a pager (for example, when filtered down to zero
      * or not loaded, the pager will not be present)
-     * @return
+     * @return <code>true</code> if grid has a pager
      */
     public boolean hasPager()
     {
-        return new Pager.PagerFinder(getDriver(), _responsiveGrid).findOptional(this).isPresent();
+        return new Pager.PagerFinder(getDriver(), _queryGrid).findOptional(this).isPresent();
     }
 
     /**
@@ -138,7 +137,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         catch(NoSuchElementException | StaleElementReferenceException nse)
         {
             // If the paging count isn't present return the number of rows in the grid.
-            return _responsiveGrid.getRows().size();
+            return _queryGrid.getRows().size();
         }
     }
 
@@ -156,20 +155,20 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      * clicks the 'next' button on the pager associated with this grid and waits for the grid to update
      * @return
      */
-    public ResponsiveGrid clickNext()
+    public QueryGrid clickNext()
     {
         pager().clickNext();
-        return _responsiveGrid;
+        return _queryGrid;
     }
 
     /**
      * clicks the 'previous' button on the pager and waits for the grid to update
      * @return
      */
-    public ResponsiveGrid clickPrevious()
+    public QueryGrid clickPrevious()
     {
         pager().clickPrevious();
-        return _responsiveGrid;
+        return _queryGrid;
     }
 
     /**
@@ -182,10 +181,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
         Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");   // n of n
         Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-        WebElement btn = selectBtn.waitForElement(_containerElement, 5_000);
+        WebElement btn = selectBtn.waitForElement(_queryGrid, 5_000);
         btn.click();
 
-        getWrapper().waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
+        WebDriverWrapper.waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
                         selectBtn.findOptionalElement(this).isEmpty() &&
                                 selectedText.findOptionalElement(this).isPresent() ,
                 WAIT_FOR_JAVASCRIPT);
@@ -202,12 +201,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
         Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
 
-        if(!clearBtn.findOptionalElement(this).isEmpty())
+        if(clearBtn.findOptionalElement(this).isPresent())
         {
             WebElement btn = clearBtn.waitForElement(this, 5_000);
             btn.click();
 
-            getWrapper().waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
+            WebDriverWrapper.waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
                     WAIT_FOR_JAVASCRIPT);
         }
 
@@ -217,25 +216,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     /**
      * Click a button on the grid bar with the given text.
      * @param buttonCaption Button caption.
-     * @param doAction The action to perform after the click. Can be null.
      */
-    public void clickButton(String buttonCaption, @Nullable Runnable doAction)
+    public void clickButton(String buttonCaption)
     {
-        Locator button = Locator.xpath("//button[contains(text(), '" + buttonCaption + "')]");
-
-        if(!button.findOptionalElement(this).isEmpty())
-        {
-            WebElement btn = button.waitForElement(this, 5_000);
-            getWrapper().scrollIntoView(btn);
-            btn.click();
-
-            if(doAction != null)
-            {
-                doAction.run();
-            }
-
-        }
-
+        Locator.buttonContainingText(buttonCaption).waitForElement(this, 5_000).click();
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
@@ -432,7 +416,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         protected MultiMenu findMenu(String buttonText)
         {
             if (!menus.containsKey(buttonText))
-                menus.put(buttonText, new MultiMenu.MultiMenuFinder(_driver).withText(buttonText).find(this));
+                menus.put(buttonText, new MultiMenu.MultiMenuFinder(getDriver()).withText(buttonText).find(this));
 
             return menus.get(buttonText);
         }
@@ -456,39 +440,18 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         static final Locator viewSelectorMenu = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "viewselector");
     }
 
-    public static class GridBarFinder extends WebDriverComponentFinder<GridBar, GridBarFinder>
+    public static class GridBarFinder extends ComponentFinder<QueryGrid, GridBar, GridBarFinder>
     {
-        private Locator _locator;
-        private WebElement _container;
-        private ResponsiveGrid _responsiveGrid;
-
-        /**
-         * At this time (Feb 2020) a grid bar will not exist without a grid panel, and a responsive grid. Rather
-         * than take a responsive grid and search up the html chain for a the correct grid bar, take a container
-         * element and search for the grid bar in it.
-         *
-         * @param driver A reference to a WebDriver
-         * @param containerPanel The panel / html element containing the grid bar.
-         * @param responsiveGrid The responsive grid associated with this grid bar.
-         */
-        public GridBarFinder(WebDriver driver, WebElement containerPanel, ResponsiveGrid responsiveGrid)
-        {
-            super(driver);
-            _locator= Locators.gridBar();
-            _responsiveGrid = responsiveGrid;
-            _container = containerPanel;
-        }
-
         @Override
-        protected GridBar construct(WebElement el, WebDriver driver)
+        protected GridBar construct(WebElement el)
         {
-            return new GridBar(driver, _container, _responsiveGrid);
+            return new GridBar(el, getContext());
         }
 
         @Override
         protected Locator locator()
         {
-            return _locator;
+            return Locators.gridBar();
         }
     }
 
