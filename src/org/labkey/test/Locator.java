@@ -253,6 +253,39 @@ public abstract class Locator extends By
 
     public abstract Locator withText(String text);
 
+    public Locator append(Locator toAppend)
+    {
+        if (toAppend instanceof XPathLocator xpLoc)
+        {
+            return append(xpLoc);
+        }
+        else if (toAppend instanceof CssLocator cssLoc)
+        {
+            return append(cssLoc);
+        }
+        else
+        {
+            throw unsupportedAppend(toAppend);
+        }
+    }
+
+    public XPathLocator append(XPathLocator toAppend)
+    {
+        throw unsupportedAppend(toAppend);
+    }
+
+    public CssLocator append(CssLocator toAppend)
+    {
+        throw unsupportedAppend(toAppend);
+    }
+
+    private IllegalArgumentException unsupportedAppend(Locator toAppend)
+    {
+        return new IllegalArgumentException(String.format("Unable to append provided Locator types: %s.append(%s)",
+                getClass().getSimpleName(),
+                toAppend.getClass().getSimpleName()));
+    }
+
     /**
      * Locate the nth element matched by the selector. Can only find a single element.
      * @param index zero-based index of desired element
@@ -1096,6 +1129,7 @@ public abstract class Locator extends By
                     _cssLoc.append(((XPathCSSLocator)child)._cssLoc));
         }
 
+        @Override
         public CssLocator append(CssLocator child)
         {
             return _cssLoc.append(child);
@@ -1291,6 +1325,7 @@ public abstract class Locator extends By
             return new XPathLocator(getLoc() + clause);
         }
 
+        @Override
         public XPathLocator append(XPathLocator child)
         {
             return append(child.getLoc());
@@ -1606,6 +1641,20 @@ public abstract class Locator extends By
                 return new CssLocator(getLoc() + clause);
         }
 
+        @Override
+        public Locator append(Locator toAppend)
+        {
+            if (toAppend instanceof XPathCSSLocator xcLoc)
+            {
+                return append(xcLoc._cssLoc);
+            }
+            else
+            {
+                return super.append(toAppend);
+            }
+        }
+
+        @Override
         public CssLocator append(CssLocator clause)
         {
             return append(" " + clause.getLoc());

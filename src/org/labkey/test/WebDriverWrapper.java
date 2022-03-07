@@ -158,8 +158,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public final static int WAIT_FOR_PAGE = 60000;
 
-    protected boolean _testTimeout = false;
-
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public int longWaitForPage = defaultWaitForPage * 5;
 
@@ -728,12 +726,30 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void refresh(int millis)
     {
-        doAndWaitForPageToLoad(() -> getDriver().navigate().refresh(), millis);
+        doAndWaitForPageToLoad(() -> {
+            try
+            {
+                getDriver().navigate().refresh();
+            }
+            catch (TimeoutException ex)
+            {
+                throw new TestTimeoutException(ex); // Triggers thread dump.
+            }
+        }, millis);
     }
 
     public void goBack(int millis)
     {
-        doAndWaitForPageToLoad(() -> getDriver().navigate().back(), millis);
+        doAndWaitForPageToLoad(() -> {
+            try
+            {
+                getDriver().navigate().back();
+            }
+            catch (TimeoutException ex)
+            {
+                throw new TestTimeoutException(ex); // Triggers thread dump.
+            }
+        }, millis);
     }
 
     public void goBack()
@@ -975,7 +991,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         catch (java.util.concurrent.TimeoutException | InterruptedException | ExecutionException e)
         {
-            throw new TestTimeoutException("Timed out getting page text. Page is probably too complex. Refactor test to look for specific element(s) instead.", e);
+            throw new RuntimeException("Timed out getting page text. Page is probably too complex. Refactor test to look for specific element(s) instead.", e);
         }
         finally
         {
@@ -1070,7 +1086,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
 
-            long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
+            long elapsedTime = doAndWaitForPageToLoad(() -> {
+                try
+                {
+                    getDriver().navigate().to(fullURL);
+                }
+                catch (TimeoutException ex)
+                {
+                    throw new TestTimeoutException(ex); // Triggers thread dump.
+                }
+            }, millis);
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
@@ -1100,19 +1125,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long goToURL(final URL url, int milliseconds)
     {
-        String logMessage = "Navigating to " + url.toString();
-        try
-        {
-
-            long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(url), milliseconds);
-            logMessage += TestLogger.formatElapsedTime(elapsedTime);
-
-            return elapsedTime;
-        }
-        finally
-        {
-            log(logMessage);
-        }
+        return beginAt(url.toString(), milliseconds);
     }
 
     public ExecuteQueryPage navigateToQuery(String schemaName, String queryName)
@@ -1805,11 +1818,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void waitForPageToLoad(WebElement toBeStale, Timer timer)
     {
-        _testTimeout = true;
-        new WebDriverWait(getDriver(), timer.timeRemaining())
-                .ignoring(NullPointerException.class)
-                .withMessage("waiting for browser to navigate")
-                .until(ExpectedConditions.stalenessOf(toBeStale));
+        try
+        {
+            new WebDriverWait(getDriver(), timer.timeRemaining())
+                    .ignoring(NullPointerException.class)
+                    .withMessage("waiting for browser to navigate")
+                    .until(ExpectedConditions.stalenessOf(toBeStale));
+        }
+        catch (TimeoutException ex)
+        {
+            throw new TestTimeoutException(ex); // Triggers thread dump.
+        }
 
         // WebDriver usually does this automatically, but not always.
         new WebDriverWait(getDriver(), timer.timeRemaining())
@@ -1842,7 +1861,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                 }), "App didn't seem to load. No visible content. " + app.toString(), (int) timer.timeRemaining().toMillis());
         }
-        _testTimeout = false;
     }
 
     /**

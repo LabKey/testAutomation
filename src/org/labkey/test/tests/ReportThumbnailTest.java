@@ -394,7 +394,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         checker()
                 .withScreenshot("InitialThumbnailRevisionNumberIncorrect")
                 .verifyEquals("Thumbnail Revision number is not correct.",
-                        currentRevNum, getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+                        currentRevNum, getRevisionNumber("thumbnail"));
 
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
@@ -408,7 +408,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         checker()
                 .withScreenshot("UpdatedThumbnailRevisionNumberIncorrect")
                 .verifyEquals("Updated Thumbnail Revision number is not correct.",
-                        nextRevNum, getRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img")));
+                        nextRevNum, getRevisionNumber("thumbnail"));
 
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
@@ -436,8 +436,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _ext4Helper.waitForMaskToDisappear();
     }
 
-    protected int getRevisionNumber(Locator loc)
+    protected int getRevisionNumber(String imgType)
     {
+        Locator loc = Locator.css(".data-window div." + imgType + " img");
         String url = waitForElement(loc).getAttribute("src");
 
         try
@@ -520,7 +521,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customIcon"));
-        assertEquals("Icon Revision number is not correct", customRevNum, getRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img")));
+        assertEquals("Icon Revision number is not correct", customRevNum, getRevisionNumber("icon"));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
     }

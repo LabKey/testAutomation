@@ -15,64 +15,19 @@
  */
 package org.labkey.test;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class CachingLocator extends Locator
+public class CachingLocator extends Locator.ImmutableLocator
 {
-    private Locator _locator;
-
     private List<WebElement> cachedWebElements;
     private SearchContext cachedContext;
 
     public CachingLocator(Locator locator)
     {
-        super(locator.toString());
-        _locator = locator;
-    }
-
-    private void clearCache()
-    {
-        cachedWebElements = null;
-    }
-
-    @Override
-    public Locator containing(String contains)
-    {
-        clearCache();
-        _locator = _locator.containing(contains);
-        return this;
-    }
-
-    @Override
-    public Locator withText(String text)
-    {
-        clearCache();
-        _locator = _locator.withText(text);
-        return this;
-    }
-
-    @Override
-    public Locator index(Integer index)
-    {
-        clearCache();
-        _locator = _locator.index(index);
-        return this;
-    }
-
-    @Override
-    public String toString()
-    {
-        return _locator.toString();
-    }
-
-    @Override
-    protected By getBy()
-    {
-        return _locator.getBy();
+        super(locator);
     }
 
     @Override
@@ -80,7 +35,7 @@ public class CachingLocator extends Locator
     {
         if (cachedWebElements == null || cachedWebElements.isEmpty() || context != cachedContext)
         {
-            cachedWebElements = _locator.findElements(context);
+            cachedWebElements = super.findElements(context);
             cachedContext = context;
         }
 

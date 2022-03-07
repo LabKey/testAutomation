@@ -7,10 +7,13 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.Panel;
+import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.OmniBox;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -30,7 +33,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     final private WebDriver _driver;
     final private WebElement _queryGridPanel;
 
-    protected QueryGrid(WebElement element, WebDriver driver)
+    private QueryGrid(WebElement element, WebDriver driver)
     {
         super(element, driver);
         _queryGridPanel = element;
@@ -53,8 +56,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * Returns the first row with a column text equivalent to the supplied text
-     * @param text
-     * @return
+     * @param text column text to search for
+     * @return row data
      */
     public Map<String, String> getRowMap(String text)
     {
@@ -64,8 +67,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     /**
      * Returns the first row with the supplied text in the specified column
      * @param columnLabel    The text in the column header cell
-     * @param text
-     * @return
+     * @param text text in the data cell
+     * @return row data
      */
     public Map<String, String> getRowMap(String columnLabel, String text)
     {
@@ -76,7 +79,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     /**
      * returns the first row with matching text in the specified column(s)
      * @param partialMap Map where keys are columnText, values are full text
-     * @return
+     * @return row data
      */
     public Map<String, String> getRowMap(Map<String, String> partialMap)
     {
@@ -85,8 +88,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * returns the first row with a descendant matching the supplied locator
-     * @param containing
-     * @return
+     * @param containing Locator for an element in the row
+     * @return row data
      */
     public Map<String, String> getRowMap(Locator.XPathLocator containing)
     {
@@ -97,18 +100,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * Selects or un-selects the first row with the specified text in the specified column
-     * @param columnLabel
-     * @param text
+     * @param columnLabel The exact text of the column header
+     * @param text The full text of the cell to match
      * @param checked   whether or not to check the box
-     * @return
+     * @return this grid
      */
+    @Override
     public QueryGrid selectRow(String columnLabel, String text, boolean checked)
     {
         getRow(columnLabel, text).select(checked);
         return this;
     }
-
-    public boolean hasTabs() { return elementCache().gridTabBar().isPresent(); }
 
     public boolean gridErrorMessagePresent()
     {
@@ -140,17 +142,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public GridBar getGridBar()
     {
-        return elementCache()._gridBar;
+        return elementCache().gridBar;
     }
 
     public OmniBox getOmniBox()
     {
         return elementCache().omniBox;
-    }
-
-    public GridTabBar getGridTabBar()
-    {
-        return elementCache().gridTabBar().orElseThrow();
     }
 
     // record count
@@ -172,28 +169,37 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    @Override
+    public void doAndWaitForUpdate(Runnable func)
+    {
+        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.findOptionalElement(this);
+
+        func.run();
+
+        optionalStatus.ifPresent(el -> getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el)));
+
+        waitForLoaded();
+        clearElementCache();
+    }
+
+
     // search, sort and filter methods
 
     /**
      * searches the grid, from the omnibox and waits for the grid to refresh
-     * @param searchTerm
-     * @return
      */
     public QueryGrid search(String searchTerm)
     {
-        doAndWaitForUpdate(()-> getOmniBox().setSearch(searchTerm));
+        getOmniBox().setSearch(searchTerm);
         return this;
     }
 
     /**
      * Applies a sort to the grid via the omnibox and waits for the grid to refresh
-     * @param column
-     * @param direction
-     * @return
      */
     public QueryGrid sortOn(String column, SortDirection direction)
     {
-        doAndWaitForUpdate(()-> getOmniBox().setSort(column, direction));
+        getOmniBox().setSort(column, direction);
         return this;
     }
 
@@ -207,53 +213,45 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid filterOn(String columnName, OmniBox.FilterOperator operator, String value)
     {
-        return filterOn(columnName, operator.getValue(), value);
-    }
-
-    /**
-     * @deprecated Use the filterOn method that takes an enum.
-     * @see QueryGrid#filterOn(String, OmniBox.FilterOperator, String) 
-     *
-     * @param columnName
-     * @param operator
-     * @param value
-     * @return
-     */
-    @Deprecated
-    public QueryGrid filterOn(String columnName, String operator, String value)
-    {
-        doAndWaitForUpdate(()-> getOmniBox().setFilter(columnName, operator, value));
+        getOmniBox().setFilter(columnName, operator, value);
         return this;
     }
 
     /**
      * clears search, sort, and filter expressions via the omnibox
-     * @return
      */
     public QueryGrid clearSortsAndFilters()
     {
-        doAndWaitForUpdate(()-> getOmniBox().clearAll());
+        getOmniBox().clearAll();
         return this;
     }
 
     /**
      *  Selects all rows in the target domain, including those on other pages, if there are any
-     * @return
      */
     public QueryGrid selectAllRows()
     {
         if (isGridPanel())
         {
-            if (elementCache().selectAllBtnLoc.existsIn(this))
-                doAndWaitForUpdate(()->
-                        elementCache().selectAllN_Btn().click());
+            WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(this);
+            if (selectAllBtn.isDisplayed())
+            {
+                doAndWaitForUpdate(selectAllBtn::click);
+            }
             else
-                doAndWaitForUpdate(() ->
-                        selectAllOnPage(true, null));
+            {
+                ReactCheckBox selectAll = selectAllBox();
+                if (selectAll.isIndeterminate() || !selectAll.isChecked())
+                {
+                    doAndWaitForUpdate(() -> selectAllOnPage(true, null));
+                }
+            }
         }
         else
+        {
             doAndWaitForUpdate(() ->
                     getGridBar().selectAllRows());
+        }
 
         return this;
     }
@@ -276,16 +274,21 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         {
             if (isGridPanel())
             {
-                if (elementCache().clearBtnLoc.existsIn(this))
-                    doAndWaitForUpdate(() ->
-                            elementCache().clearAllSelectionStatusBtn().click());
+                WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(this);
+                if (clearBtn.isDisplayed())
+                {
+                    doAndWaitForUpdate(clearBtn::click);
+                }
                 else
-                    doAndWaitForUpdate(() ->
-                            selectAllOnPage(false));
+                {
+                    doAndWaitForUpdate(() -> selectAllOnPage(false));
+                }
             }
             else
+            {
                 doAndWaitForUpdate(() ->
                         getGridBar().clearAllSelections());
+            }
         }
 
         return this;
@@ -303,7 +306,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     /**
      * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
      * use this to test which one so we can fork behavior until QGP is gone
-     * @return
      */
     private boolean isGridPanel()
     {
@@ -322,71 +324,41 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return (ElementCache) super.elementCache();
     }
 
-    protected class ElementCache extends ResponsiveGrid.ElementCache
+    protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
-        ResponsiveGrid _responsiveGrid = new ResponsiveGrid.ResponsiveGridFinder(_driver).findWhenNeeded(_queryGridPanel);
-        GridBar _gridBar = new GridBar.GridBarFinder(_driver, _queryGridPanel, _responsiveGrid).findWhenNeeded();
-        OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver).findWhenNeeded(this);
-        Optional<GridTabBar> gridTabBar()
-        {
-            return new GridTabBar.GridTabBarFinder(_driver, _responsiveGrid).findOptional(_queryGridPanel);
-        }
+        final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
+        final OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
 
-        Locator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
-        Locator selectAllBtnLoc = Locator.tagWithClass("span", "selection-status__select-all")
-                .child(Locator.buttonContainingText("Select all"));
-        Locator clearBtnLoc = Locator.tagWithClass("span", "selection-status__clear-all")
-                .child(Locator.tagContainingText("button", "Clear"));
+        final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
+        final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
+                .child(Locator.buttonContainingText("Select all")));
+        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
+                .child(Locator.tagContainingText("button", "Clear")));
 
-        WebElement selectionStatusContainer()
-        {
-            return selectionStatusContainerLoc.findElement(this);
-        }
-        WebElement clearAllSelectionStatusBtn()
-        {
-            return clearBtnLoc.findElement(selectionStatusContainer());
-        }
-        WebElement selectAllN_Btn()
-        {
-            return selectAllBtnLoc.findElement(selectionStatusContainer());
-        }
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
     {
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "grid-panel__body")
+                .withDescendant(ResponsiveGrid.Locators.responsiveGrid());
         private Locator _locator;
 
         /**
-         * Find the first div with a class of panel-body and assume the grid panel is in there.
+         * Find the first div with a class of grid-panel and assume the grid panel is in there.
          *
          * @param driver Reference to a WebDriver.
          */
         public QueryGridFinder(WebDriver driver)
         {
             super(driver);
-            _locator= Locator.tagWithClass("div", "panel-body")
-                    .withDescendant(ResponsiveGrid.Locators.responsiveGrid());
+            _locator = _baseLocator;
         }
 
         public QueryGridFinder inPanelWithHeaderText(String panelHeading)
         {
-            _locator = Locator.tagWithClass("div", "panel")
-                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(panelHeading))
-                    .withDescendant(ResponsiveGrid.Locators.responsiveGrid())
-                    .child(Locator.tagWithClass("div", "panel-body"));
+            _locator = new Panel.PanelFinder(getDriver()).withTitle(panelHeading).buildLocator()
+                    .append(_baseLocator);
             return this;
-        }
-
-        /**
-         * Given a containing web element find the grid panel in it.
-         *
-         * @param driver Reference to a WebDriver.
-         * @param containingPanel A locator to scope the search for a gridPanel.
-         */
-        public QueryGridFinder(WebDriver driver, Locator containingPanel)
-        {
-            super(driver);
-            _locator= containingPanel;
         }
 
         @Override

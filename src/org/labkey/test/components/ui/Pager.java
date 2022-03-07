@@ -6,13 +6,12 @@ package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.DropdownButtonGroup;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import java.util.Optional;
 
 /**
  * Wrapper for UI component defined in 'packages/components/src/internal/components/gridbar/PageSizeSelector.tsx'
@@ -60,7 +59,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         int currentPageSize = getPageSize();
         if(currentPageSize != Integer.parseInt(pageSize))
         {
-            elementCache().pageSizeDropdown.clickSubMenu(pageSize);
+            _pagedComponent.doAndWaitForUpdate(() -> elementCache().pageSizeDropdown.clickSubMenu(pageSize));
             WebDriverWrapper.waitFor(()-> currentPageSize != getPageSize(), 1_000);
         }
         return this;
@@ -73,7 +72,9 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager clickPrevious()
     {
-        elementCache().prevButton().ifPresent(button -> {
+        WebElement button = elementCache().prevButton();
+        _pagedComponent.doAndWaitForUpdate(() ->
+        {
             getWrapper().scrollIntoView(button);
             button.click();
         });
@@ -82,19 +83,15 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public boolean isPreviousEnabled()
     {
-        if (!elementCache().prevButton().isPresent())
-            return false;
-
-        String prevBtnClass = elementCache().prevButton().get().getAttribute("class");
-        if (prevBtnClass.contains("pagination-buttons__prev"))      // this is the new g
-            return !elementCache().prevButton().get().getAttribute("disabled").equals("true");
-        else
-            return !prevBtnClass.contains("disabled-button");
+        WebElement button = elementCache().prevButton();
+        return button.isDisplayed() && isButtonEnabled(button);
     }
 
     public Pager clickNext()
     {
-        elementCache().nextButton().ifPresent(button -> {
+        WebElement button = elementCache().nextButton();
+        _pagedComponent.doAndWaitForUpdate(() ->
+        {
             getWrapper().scrollIntoView(button);
             button.click();
         });
@@ -103,14 +100,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public boolean isNextEnabled()
     {
-        if (!elementCache().nextButton().isPresent())
-            return false;
-
-        String nextBtnClass = elementCache().nextButton().get().getAttribute("class");
-        if (nextBtnClass.contains("pagination-buttons__next"))
-            return !elementCache().nextButton().get().getAttribute("disabled").equals("true");
-        else
-            return !nextBtnClass.contains("disabled-button");
+        WebElement button = elementCache().nextButton();
+        return button.isDisplayed() && isButtonEnabled(button);
     }
 
     public int start()
@@ -160,7 +151,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
      * if the pager does not show a total, it indicates that there are no more to the set than are shown on the current page.
      * use this to understand whether or not there are more pages of information (which
      * could be the whole set, or a filtered range of it, or both).
-     * @return
+     * @return <code>true</code> if pager shows a "total"
      */
     public boolean hasTotal()
     {
@@ -172,6 +163,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return elementCache().counts.getText();
     }
 
+    private boolean isButtonEnabled(WebElement btn)
+    {
+        return btn.isEnabled() && !btn.getAttribute("class").contains("disabled-button");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -179,7 +175,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     }
 
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         DropdownButtonGroup jumpToDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
                 .withButtonClass("current-page-dropdown").findWhenNeeded(this);
@@ -190,22 +186,22 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         final Locator.XPathLocator queryModelPagingCounts = Locator.tagWithClass("span", "pagination-info");
         final Locator pagingCountsSpan = Locator.XPathLocator.union(queryGridModelPagingCounts, queryModelPagingCounts);
 
-        Optional<WebElement> prevButton()
+        WebElement prevButton()
         {
             return Locator.XPathLocator.union(
                     Locator.tagWithClass("button", "pagination-button--previous"),     // used in GridPanel
                     Locator.tagWithClass("button", "pagination-buttons__prev"),     // used in ReportList
                     Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left"))) // used in QueryGridPanel, here for back-support
-                    .findOptionalElement(this);
+                    .findWhenNeeded(this);
         }
 
-        Optional<WebElement> nextButton()
+        WebElement nextButton()
         {
             return Locator.XPathLocator.union(
                     Locator.tagWithClass("button", "pagination-button--next"), // used in GridPanel
                     Locator.tagWithClass("button", "pagination-buttons__next"), // used in ReportList
                     Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")))
-                    .findOptionalElement(this);
+                    .findWhenNeeded(this);
         }
 
         public WebElement counts = pagingCountsSpan
