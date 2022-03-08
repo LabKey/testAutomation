@@ -97,7 +97,7 @@ public abstract class Panel<EC extends ElementCache> extends WebDriverComponent<
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withChild(Locator.byClass("panel-heading"));
+                return _baseLocator.withChild(Locator.byClass("panel-heading").withText(_title));
             else
                 return _baseLocator;
         }

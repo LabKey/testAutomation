@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid.ElementCache> implements UpdatingComponent
+public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
 {
     final WebElement _gridElement;
     final WebDriver _driver;
@@ -68,24 +68,20 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         WebDriverWrapper.waitFor(this::isLoaded, "Grid still loading", 30000);
     }
 
-    private void waitForUpdate()
-    {
-        waitForLoaded();
-        clearElementCache();
-    }
-
     @Override
     protected void clearElementCache()
     {
         super.clearElementCache();
     }
 
+    @Override
     public void doAndWaitForUpdate(Runnable func)
     {
         // Look at WebDriverWrapper.doAndWaitForElementToRefresh for an example.
         func.run();
 
-        waitForUpdate();
+        waitForLoaded();
+        clearElementCache();
     }
 
     public Boolean hasData()
@@ -96,9 +92,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     /**
      * Sorts from the grid header menu (rather than from the omnibox)
      * @param columnLabel column header for
-     * @return
+     * @return this grid
      */
-    public ResponsiveGrid sortColumnAscending(String columnLabel)
+    public T sortColumnAscending(String columnLabel)
     {
         doAndWaitForUpdate(()->
             sortColumn(columnLabel, SortDirection.ASC));
@@ -107,10 +103,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Sorts from the grid header menu (rather than from the omnibox)
-     * @param columnLabel
-     * @return
+     * @param columnLabel Text of column
+     * @return this grid
      */
-    public ResponsiveGrid sortColumnDescending(String columnLabel)
+    public T sortColumnDescending(String columnLabel)
     {
         doAndWaitForUpdate(()->
             sortColumn(columnLabel, SortDirection.DESC));
@@ -126,19 +122,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 .click();
         WebElement menuItem = Locator.css("li > a > span." + sortCls)
                 .findElement(headerCell);
-        getWrapper().waitFor(()-> menuItem.isDisplayed(), 1000);
+        waitFor(()-> menuItem.isDisplayed(), 1000);
         doAndWaitForUpdate(menuItem::click);
-        getWrapper().waitFor(()-> !menuItem.isDisplayed(), 1000);
+        waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
     /**
-     * where possible, use text, column or other strategies to get the row
-     * @param index
-     * @param checked
-     * @return
+     * Check/uncheck row at index
+     * @param index Row index (zero-based)
+     * @param checked the desired checkbox state
+     * @return this grid
      */
-    @Deprecated
-    public ResponsiveGrid selectRow(int index, boolean checked)
+    public T selectRow(int index, boolean checked)
     {
         getRow(index).select(checked);
         return getThis();
@@ -148,9 +143,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * Finds the first row with the specified texts in the specified columns, and sets its checkbox
      * @param partialMap    key-column, value-text in that column
      * @param checked       the desired checkbox state
-     * @return
+     * @return this grid
      */
-    public ResponsiveGrid selectRow(Map<String, String> partialMap, boolean checked)
+    public T selectRow(Map<String, String> partialMap, boolean checked)
     {
         GridRow row = getRow(partialMap);
         selectRowAndVerifyCheckedCounts(row, checked);
@@ -164,9 +159,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param columnLabel    header text of the specified column
      * @param text          Text to be found in the specified column
      * @param checked       true for checked, false for unchecked
-     * @return
+     * @return this grid
      */
-    public ResponsiveGrid selectRow(String columnLabel, String text, boolean checked)
+    public ResponsiveGrid<?> selectRow(String columnLabel, String text, boolean checked)
     {
         GridRow row = getRow(columnLabel, text);
         selectRowAndVerifyCheckedCounts(row, checked);
@@ -198,9 +193,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param columnLabel    Header text of the column to search
      * @param texts         Text to search for in the specified column
      * @param checked       True for checked, false for unchecked
-     * @return
+     * @return this grid
      */
-    public ResponsiveGrid selectRows(String columnLabel, Collection<String> texts, boolean checked)
+    public T selectRows(String columnLabel, Collection<String> texts, boolean checked)
     {
         for (String text : texts)
         {
@@ -210,12 +205,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * where possible, find ways to identify rows other than via index
-     * use
-     * @param index
-     * @return
+     * Is the row at the selected index selected
+     * @param index Row index (zero-based)
+     * @return <code>true</code> if row is checked
      */
-    @Deprecated
     public boolean isRowSelected(int index)
     {
        return new GridRow.GridRowFinder(this).index(index).find(this).isSelected();
@@ -283,7 +276,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param checked   true to select all on the current page, false to deselect all
      * @param expectedState signals what state to verify in the select-all box.
      *                      if null, no verification is done on the select-all box, but .
-     * @return
+     * @return this grid
      */
     public T selectAllOnPage(boolean checked, @Nullable ReactCheckBox.CheckboxState expectedState)
     {
@@ -302,7 +295,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             if (!checked)
                 assertThat("more than 0 rows in the current page were selected", getSelectedRows().size(), is(0));
             else
-                assertTrue("not all rows in the current page were selected", getSelectedRows().stream().allMatch(a-> a.isSelected()));
+                assertTrue("not all rows in the current page were selected", getSelectedRows().stream().allMatch(GridRow::isSelected));
         }
 
         return getThis();
@@ -388,7 +381,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * gets a list of all rows currently in the grid, after waiting for it to be loaded
-     * @return
+     * @return All grid rows
      */
     public List<GridRow> getRows()
     {
@@ -749,9 +742,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         }
 
         @Override
-        protected ResponsiveGrid construct(WebElement el, WebDriver driver)
+        protected ResponsiveGrid<?> construct(WebElement el, WebDriver driver)
         {
-            return new ResponsiveGrid(el, driver);
+            return new ResponsiveGrid<>(el, driver);
         }
 
         @Override
