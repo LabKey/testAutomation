@@ -9,7 +9,11 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class FindByIdsDialog  extends ModalDialog
+/**
+ * Wraps 'labkey-ui-component' defined in <code>internal/components/search/FindByIdsModal.tsx</code>
+ * TODO: Move to package: 'org.labkey.test.components.ui.search'
+ */
+public class FindByIdsDialog extends ModalDialog
 {
     public static final String TITLE = "Find Samples";
 

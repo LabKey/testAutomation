@@ -8,6 +8,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.notifications.ServerNotificationMenu;
 import org.labkey.test.util.search.HasSearchResults;
 import org.openqa.selenium.Keys;
@@ -15,7 +16,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 {
@@ -52,17 +52,19 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 
     public FindByIdsDialog findBySampleIds()
     {
-        elementCache().findAndSearchMenuButton.click();
-        waitFor(()->elementCache().findSamplesByIdsOption.isDisplayed(), "Find samples by ID menu option did not show up.", 500);
-        elementCache().findSamplesByIdsOption.click();
+        elementCache().searchMenu.doMenuAction(" Find Samples by ID");
         return new FindByIdsDialog(getDriver());
     }
 
     public FindByIdsDialog findByBarcodes()
     {
-        elementCache().findAndSearchMenuButton.click();
-        waitFor(()->elementCache().findSamplesByBarcodesOption.isDisplayed(), "Find samples by Barcode menu option did not show up.", 500);
-        elementCache().findSamplesByBarcodesOption.click();
+        elementCache().searchMenu.doMenuAction(" Find Samples by Barcode");
+        return new FindByIdsDialog(getDriver());
+    }
+
+    public FindByIdsDialog goToSampleFinder()
+    {
+        elementCache().searchMenu.doMenuAction(" Sample Finder");
         return new FindByIdsDialog(getDriver());
     }
 
@@ -113,10 +115,6 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").findWhenNeeded(this);
         public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").findWhenNeeded(this);
         public Input searchBox = Input.Input(Locator.tagWithClass("input", "navbar__search-input"), getDriver()).findWhenNeeded(this);
-        public WebElement searchForm = Locator.tagWithClass("form", "navbar__search-form").findWhenNeeded(this);
-        public WebElement findAndSearchMenuButton = Locator.tagWithId("button", "find-and-search-menu").findWhenNeeded(searchForm);
-        public WebElement findSamplesOption = Locator.linkContainingText("Find Samples").findWhenNeeded(searchForm);
-        public WebElement findSamplesByIdsOption = Locator.linkContainingText("Find Samples by ID").findWhenNeeded(searchForm);
-        public WebElement findSamplesByBarcodesOption = Locator.linkContainingText("Find Samples by Barcode").findWhenNeeded(searchForm);
+        public MultiMenu searchMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonId("find-and-search-menu").findWhenNeeded(this);
     }
 }
