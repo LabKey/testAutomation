@@ -12,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -158,6 +159,12 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return columns;
     }
 
+    public EntityBulkUpdateDialog waitForColumnsToBe(List<String> expectedColumns, int waitMilliseconds)
+    {
+        WebDriverWrapper.waitFor(()-> expectedColumns.equals(getColumns()),
+                "Wrong editable fields", waitMilliseconds);
+        return this;
+    }
     // dismiss the dialog
 
     public void clickEditWithGrid()
