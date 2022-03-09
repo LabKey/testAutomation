@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.search;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.Tabs;
 import org.openqa.selenium.WebDriver;
@@ -16,9 +17,12 @@ public class EntityFieldFilterModal extends ModalDialog
 {
     private static final Locator listItem = Locator.byClass("list-group-item");
 
-    protected EntityFieldFilterModal(WebDriver driver)
+    private final UpdatingComponent _linkedComponent;
+
+    protected EntityFieldFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
     {
         super(new ModalDialog.ModalDialogFinder(driver));
+        _linkedComponent = linkedComponent;
     }
 
     @Override
