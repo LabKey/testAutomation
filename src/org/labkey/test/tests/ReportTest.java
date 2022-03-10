@@ -77,7 +77,7 @@ public abstract class ReportTest extends StudyBaseTest
     protected void clickReportPermissionsLink(String reportName)
     {
         WebElement row = findReportGridRow(reportName);
-        WebElement link = Locator.tagWithAttribute("a", "data-qtip", "Click to customize the permissions").findElement(row);
+        WebElement link = Locator.tagWithAttributeContaining("a", "data-qtip", "Click to customize the permissions").findElement(row);
         clickAndWait(link);
     }
 
