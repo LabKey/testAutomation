@@ -52,19 +52,19 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 
     public FindByIdsDialog findBySampleIds()
     {
-        elementCache().searchMenu.doMenuAction(" Find Samples by ID");
+        elementCache().searchMenu.doMenuAction("Find Samples by ID");
         return new FindByIdsDialog(getDriver());
     }
 
     public FindByIdsDialog findByBarcodes()
     {
-        elementCache().searchMenu.doMenuAction(" Find Samples by Barcode");
+        elementCache().searchMenu.doMenuAction("Find Samples by Barcode");
         return new FindByIdsDialog(getDriver());
     }
 
     public FindByIdsDialog goToSampleFinder()
     {
-        elementCache().searchMenu.doMenuAction(" Sample Finder");
+        elementCache().searchMenu.doMenuAction("Sample Finder");
         return new FindByIdsDialog(getDriver());
     }
 
