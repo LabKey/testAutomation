@@ -108,6 +108,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
 
+        // Some tests appear to fail because the button is not enabled even after changes have been made to the form.
+        // This may be a timing issue.
+        WebDriverWrapper.waitFor(()->button.isEnabled(), String.format("Button with text '%s' is not enabled.", button.getText()), 1_500);
+
         button.click();
 
         WebDriverWrapper.waitFor(()->
