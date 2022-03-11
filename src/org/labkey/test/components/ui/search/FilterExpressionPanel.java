@@ -82,9 +82,9 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final ReactSelect filterTypeSelect = new ReactSelect.ReactSelectFinder(getDriver()).findWhenNeeded(this);
-        final Input filterValue1 = Input.Input(Locator.name("field-value-text"), getDriver()).refindWhenNeeded(this);
-        final Input filterValue2 = Input.Input(Locator.name("field-value-text-second"), getDriver()).refindWhenNeeded(this);;
+        protected final ReactSelect filterTypeSelect = new ReactSelect.ReactSelectFinder(getDriver()).findWhenNeeded(this);
+        protected final Input filterValue1 = Input.Input(Locator.name("field-value-text"), getDriver()).refindWhenNeeded(this);
+        protected final Input filterValue2 = Input.Input(Locator.name("field-value-text-second"), getDriver()).refindWhenNeeded(this);;
     }
 
     public static class FilterExpressionPanelFinder extends WebDriverComponentFinder<FilterExpressionPanel, FilterExpressionPanelFinder>

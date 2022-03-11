@@ -5,10 +5,12 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.ui.OmniBoxValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.components.html.Input.Input;
 
@@ -35,29 +37,47 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         return _driver;
     }
 
+    /**
+     * Select a single facet value by clicking its label. Should replace all existing selections.
+     * @param value desired value
+     */
     public void selectValue(String value)
     {
-
+        elementCache().findCheckboxLabel(value).click();
     }
 
+    /**
+     * Check all of the specified options. Should retain any existing selections.
+     * @param values values to select
+     */
     public void checkValues(String... values)
     {
-
+        for (String value : values)
+        {
+            elementCache().findCheckbox(value).check();
+        }
     }
 
+    /**
+     * Unheck all of the specified options. Other existing selections should be unchanged.
+     * @param values values to deselect
+     */
     public void uncheckValues(String... values)
     {
-
+        for (String value : values)
+        {
+            elementCache().findCheckbox(value).uncheck();
+        }
     }
 
     public List<String> getAvailableValues()
     {
-        return null;
+        return elementCache().getAvailableValues();
     }
 
     public List<String> getSelectedValues()
     {
-        return null;
+        return elementCache().getSelectedValues();
     }
 
     @Override
@@ -68,19 +88,36 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        Input filterInput = Input(Locator.id("find-filter-typeahead-input"), getDriver()).findWhenNeeded(this);
-        WebElement checkboxSection = Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
-        WebElement selectedItemsSection = Locator.byClass("search-filter-tags__div").findWhenNeeded(this);
+        protected final Input filterInput =
+                Input(Locator.id("find-filter-typeahead-input"), getDriver()).findWhenNeeded(this);
+        protected final WebElement checkboxSection =
+                Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
+        protected final Locator.XPathLocator checkboxLabelLoc
+                = Locator.byClass("search-filter-values__value");
 
-        Checkbox findCheckbox(String value)
+        protected List<String> getAvailableValues()
         {
-            return Checkbox.Checkbox(Locator.byClass("search-filter-values__value").withText(value)
+            return getWrapper().getTexts(checkboxLabelLoc.findElements(checkboxSection));
+        }
+
+        protected Checkbox findCheckbox(String value)
+        {
+            return Checkbox.Checkbox(checkboxLabelLoc.withText(value)
                     .precedingSibling("input")).find(checkboxSection);
         }
 
-        WebElement findCheckboxLabel(String value)
+        protected WebElement findCheckboxLabel(String value)
         {
-            return Locator.byClass("search-filter-values__value").withText(value).findElement(checkboxSection);
+            return checkboxLabelLoc.withText(value).findElement(checkboxSection);
+        }
+
+        protected final WebElement selectedItemsSection =
+                Locator.byClass("search-filter-tags__div").findWhenNeeded(this);
+
+        protected List<String> getSelectedValues()
+        {
+            return new OmniBoxValue.OmniBoxValueFinder(getDriver()).findAll(selectedItemsSection)
+                    .stream().map(OmniBoxValue::getText).collect(Collectors.toList());
         }
     }
 
