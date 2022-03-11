@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,16 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     }
 
     /**
+     * Waits for initial state (empty filter card panel) or for search results grid to appear
+     */
+    @Override
+    protected void waitForReady()
+    {
+        loadingWait().withMessage("Sample finder loading").until(wd -> !BootstrapLocators.loadingSpinner.existsIn(this) &&
+                (isEmptySearch() || elementCache().resultsGrid.getComponentElement().isDisplayed()));
+    }
+
+    /**
      * Open the entity filter dialog for the specified parent type.
      *
      * @param parentNoun "Source" or "Parent" in SM. "Registry Parent" or "SampleParent" in Biologics
@@ -54,33 +65,63 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         return new EntityFieldFilterModal(getDriver(), this::doAndWaitForUpdate);
     }
 
+    /**
+     * Get the tabbed query grid panel containing the current search results.
+     * Throws {@link NoSuchElementException} if there are no search criteria currently defined
+     */
     public TabbedGridPanel getResultsGrid()
     {
-        if (!elementCache().resultsGrid.getComponentElement().isDisplayed())
+        if (isEmptySearch())
         {
-            throw new NoSuchElementException("No search results currently shown");
+            throw new NoSuchElementException("No search criteria are currently set");
         }
         return elementCache().resultsGrid;
+    }
+
+    /**
+     * remove the search card for the specified entity
+     * @param queryName name of the entity (Sample Type, Source Type, etc.) to be removed
+     * @return this component
+     */
+    public SampleFinder removeSearchCard(String queryName)
+    {
+        elementCache().findFilterCard(queryName).clickRemove();
+        return this;
+    }
+
+    /**
+     * Reset sample finder to its initial state, with no search criteria
+     * @return this component
+     */
+    public SampleFinder removeAllSearchCards()
+    {
+        List<WebElement> removeButtons = Locator.tagWithAttribute("i", "title", "Remove filter")
+                .findElements(elementCache().filterCardsSection);
+        Collections.reverse(removeButtons);
+        // Don't wait for search results to update after each removed card
+        for (WebElement button : removeButtons)
+        {
+            button.click();
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(button));
+        }
+        getWrapper().shortWait().withMessage("Clearing all search cards").until(wd -> isEmptySearch());
+
+        clearElementCache();
+        return this;
     }
 
     /**
      * Waiter that will wait for the search results to load. This is a hook for perf tests to support longer waits.
      * @return WebDriverWait to be used by {@link #waitForReady()}
      */
-    protected WebDriverWait loadWait()
+    protected WebDriverWait loadingWait()
     {
         return getWrapper().shortWait();
     }
 
-    /**
-     * Waits for initial state (empty filter card panel) or for search results grid to appear
-     */
-    @Override
-    protected void waitForReady()
+    private boolean isEmptySearch()
     {
-        loadWait().withMessage("Sample finder loading").until(wd -> !BootstrapLocators.loadingSpinner.existsIn(this) &&
-        (Locator.css(".filter-cards.empty").isDisplayed(this)
-                || elementCache().resultsGrid.getComponentElement().isDisplayed()));
+        return Locator.css(".filter-cards.empty").isDisplayed(this);
     }
 
     private void doAndWaitForUpdate(Runnable func)

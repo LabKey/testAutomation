@@ -3,9 +3,12 @@ package org.labkey.test.components.ui.search;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 import static org.labkey.test.components.html.Input.Input;
 
@@ -47,6 +50,16 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
     }
 
+    public List<String> getAvailableValues()
+    {
+        return null;
+    }
+
+    public List<String> getSelectedValues()
+    {
+        return null;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -56,7 +69,19 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     protected class ElementCache extends Component<?>.ElementCache
     {
         Input filterInput = Input(Locator.id("find-filter-typeahead-input"), getDriver()).findWhenNeeded(this);
-        WebElement selectedItemsSection = Locator.byClass("search-filter-tags__div").refindWhenNeeded(this);
+        WebElement checkboxSection = Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
+        WebElement selectedItemsSection = Locator.byClass("search-filter-tags__div").findWhenNeeded(this);
+
+        Checkbox findCheckbox(String value)
+        {
+            return Checkbox.Checkbox(Locator.byClass("search-filter-values__value").withText(value)
+                    .precedingSibling("input")).find(checkboxSection);
+        }
+
+        WebElement findCheckboxLabel(String value)
+        {
+            return Locator.byClass("search-filter-values__value").withText(value).findElement(checkboxSection);
+        }
     }
 
     public static class FilterFacetedPanelFinder extends WebDriverComponentFinder<FilterFacetedPanel, FilterFacetedPanelFinder>

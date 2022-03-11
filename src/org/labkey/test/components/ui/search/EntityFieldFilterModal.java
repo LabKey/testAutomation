@@ -1,6 +1,6 @@
 package org.labkey.test.components.ui.search;
 
-import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.Filter.Operator;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.UpdatingComponent;
@@ -55,32 +55,76 @@ public class EntityFieldFilterModal extends ModalDialog
         return this;
     }
 
-    public EntityFieldFilterModal setFilterValue(Filter filter)
+    /**
+     * @see FilterExpressionPanel#setFilterValue(Operator)
+     * @return this component
+     */
+    public EntityFieldFilterModal setFilterValue(Operator operator)
     {
-        return setFilterValue(filter, null, null);
-    }
-
-    public EntityFieldFilterModal setFilterValue(Filter filter, String value)
-    {
-        return setFilterValue(filter, value, null);
-    }
-
-    public EntityFieldFilterModal setFilterValue(Filter filter, String value1, String value2)
-    {
-        selectExpressionTab().setFilterValue(filter, value1, value2);
+        selectExpressionTab().setFilterValue(operator);
         return this;
     }
 
+    /**
+     * @see FilterExpressionPanel#setFilterValue(Operator, String)
+     * @return this component
+     */
+    public EntityFieldFilterModal setFilterValue(Operator operator, String value)
+    {
+        selectExpressionTab().setFilterValue(operator, value);
+        return this;
+    }
+
+    /**
+     * @see FilterExpressionPanel#setFilterValue(Operator, String, String)
+     * @return this component
+     */
+    public EntityFieldFilterModal setFilterValue(Operator operator, String value1, String value2)
+    {
+        selectExpressionTab().setFilterValue(operator, value1, value2);
+        return this;
+    }
+
+    /**
+     * Select the filter expression tab for the current field.
+     * @return panel for configuring the filter expression
+     */
     public FilterExpressionPanel selectExpressionTab()
     {
         elementCache().filterTabs.selectTab("Filter");
         return elementCache().filterExpressionPanel;
     }
 
+    /**
+     * Select the facet tab for the current field. Will throw <code>NoSuchElementException</code> if tab isn't present.
+     * @return panel for configuring faceted filter
+     */
     public FilterFacetedPanel selectFacetTab()
     {
         elementCache().filterTabs.selectTab("Choose values");
         return elementCache().filterFacetedPanel;
+    }
+
+    /**
+     * Save current changes to the search criteria.
+     * Throw <code>IllegalStateException</code> if the save button is disabled because no changes have been made.
+     */
+    public void clickFindSamples()
+    {
+        if (!elementCache().submitButton.isEnabled())
+        {
+            throw new IllegalStateException("Confirmation button is not enabled.");
+        }
+
+        _linkedComponent.doAndWaitForUpdate(() -> {
+            elementCache().submitButton.click();
+            waitForClose();
+        });
+    }
+
+    public void cancel()
+    {
+        dismiss("Cancel");
     }
 
     @Override
@@ -114,6 +158,7 @@ public class EntityFieldFilterModal extends ModalDialog
         protected final FilterFacetedPanel filterFacetedPanel =
                 new FilterFacetedPanel.FilterFacetedPanelFinder(getDriver()).refindWhenNeeded(filterPanel);
 
+        protected final WebElement submitButton = Locator.css(".modal-footer .btn-success").findWhenNeeded(this);
     }
 
 }
