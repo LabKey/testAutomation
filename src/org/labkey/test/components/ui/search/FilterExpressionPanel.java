@@ -10,10 +10,19 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.Map;
+
 public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPanel.ElementCache>
 {
     private final WebElement _el;
     private final WebDriver _driver;
+
+    private final Map<Operator, String> filterTypesLabelOverrides = Map.of(
+            Operator.CONTAINS_ONE_OF, "Contains One Of",
+            Operator.CONTAINS_NONE_OF, "Does Not Contain Any Of",
+            Operator.BETWEEN, "Between",
+            Operator.NOT_BETWEEN, "Not Between"
+    );
 
     protected FilterExpressionPanel(WebElement element, WebDriver driver)
     {
@@ -39,7 +48,7 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
      */
     public void setFilterValue(Operator operator)
     {
-        elementCache().filterTypeSelect.select(operator.getDisplayValue());
+        setFilterType(operator);
     }
 
     /**
@@ -49,7 +58,7 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
      */
     public void setFilterValue(Operator operator, String value)
     {
-        elementCache().filterTypeSelect.select(operator.getDisplayValue());
+        setFilterType(operator);
         elementCache().filterValue1.set(value);
     }
 
@@ -61,7 +70,7 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
      */
     public void setFilterValue(Operator operator, String value1, String value2)
     {
-        elementCache().filterTypeSelect.select(operator.getDisplayValue());
+        setFilterType(operator);
         elementCache().filterValue1.set(value1);
         elementCache().filterValue2.set(value2);
     }
@@ -72,6 +81,18 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(
                 elementCache().filterValue1.getComponentElement(),
                 elementCache().filterValue2.getComponentElement()));
+    }
+
+    private void setFilterType(Operator operator)
+    {
+        if (filterTypesLabelOverrides.containsKey(operator))
+        {
+            elementCache().filterTypeSelect.select(filterTypesLabelOverrides.get(operator));
+        }
+        else
+        {
+            elementCache().filterTypeSelect.select(operator.getDisplayValue());
+        }
     }
 
     @Override
