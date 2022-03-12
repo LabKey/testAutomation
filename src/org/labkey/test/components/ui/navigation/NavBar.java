@@ -10,6 +10,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.notifications.ServerNotificationMenu;
+import org.labkey.test.components.ui.search.SampleFinder;
 import org.labkey.test.util.search.HasSearchResults;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -62,10 +63,10 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         return new FindByIdsDialog(getDriver());
     }
 
-    public FindByIdsDialog goToSampleFinder()
+    public SampleFinder goToSampleFinder()
     {
         elementCache().searchMenu.doMenuAction("Sample Finder");
-        return new FindByIdsDialog(getDriver());
+        return new SampleFinder(getDriver());
     }
 
     public String getDisplayedProjectName()

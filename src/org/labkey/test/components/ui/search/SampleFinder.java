@@ -23,11 +23,11 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     private final WebElement _el;
     private final WebDriver _driver;
 
-    protected SampleFinder(WebDriver driver)
+    public SampleFinder(WebDriver driver)
     {
         _el = Locator.byClass("g-section")
-                .withDescendant(Locator.byClass("panel-content-title-large").withText("Find Samples"))
-                .waitForElement(getDriver(), 5_000);
+                .withDescendant(Locator.byClass("filter-cards"))
+                .waitForElement(driver, 5_000);
         _driver = driver;
     }
 
@@ -153,7 +153,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
         WebElement findAddParentButton(String parentNoun)
         {
-            return BootstrapLocators.button(" " + parentNoun + " Properties")
+            return BootstrapLocators.button(parentNoun + " Properties")
                     .withChild(Locator.byClass("container--addition-icon")).findElement(panelHeading);
         }
 

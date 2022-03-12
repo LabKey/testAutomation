@@ -33,9 +33,14 @@ public class EntityFieldFilterModal extends ModalDialog
                 .visibilityOfNestedElementsLocatedBy(elementCache().querySelectionPanel, listItem));
     }
 
-    public EntityFieldFilterModal selectParentQuery(String query)
+    /**
+     * Select parent
+     * @param parentName name of parent type
+     * @return this component
+     */
+    public EntityFieldFilterModal selectParent(String parentName)
     {
-        WebElement queryItem = listItem.withText(query).findElement(elementCache().querySelectionPanel);
+        WebElement queryItem = listItem.withText(parentName).findElement(elementCache().querySelectionPanel);
         getWrapper().doAndWaitForElementToRefresh(queryItem::click,
                 () -> listItem.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
 
@@ -44,13 +49,17 @@ public class EntityFieldFilterModal extends ModalDialog
         return this;
     }
 
+    /**
+     * Select field to configure filters for
+     * @param fieldLabel Field's label
+     * @return this component
+     */
     public EntityFieldFilterModal selectField(String fieldLabel)
     {
         WebElement fieldItem = listItem.withText(fieldLabel).findElement(elementCache().fieldsSelectionPanel);
         fieldItem.click();
-        getWrapper().shortWait().until(wd -> elementCache().filterPanel.isDisplayed() &&
-                Locator.byClass("parent-search-panel__col-sub-title").findElement(this)
-                        .getText().equals("Find values for " + fieldLabel));
+        Locator.byClass("parent-search-panel__col-sub-title").withText("Find values for " + fieldLabel)
+                .waitForElement(elementCache().filterPanel, 10_000);
 
         return this;
     }
@@ -109,7 +118,7 @@ public class EntityFieldFilterModal extends ModalDialog
      * Save current changes to the search criteria.
      * Throw <code>IllegalStateException</code> if the save button is disabled because no changes have been made.
      */
-    public void clickFindSamples()
+    public void confirm()
     {
         if (!elementCache().submitButton.isEnabled())
         {
