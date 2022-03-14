@@ -372,9 +372,11 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
     private List<String> getTemplateColumnHeaders(File template) throws IOException
     {
-        Workbook workbook = ExcelHelper.create(template);
-        Sheet sheet = workbook.getSheetAt(0);
-        return ExcelHelper.getRowData(sheet, 0);
+        try (Workbook workbook = ExcelHelper.create(template))
+        {
+            Sheet sheet = workbook.getSheetAt(0);
+            return ExcelHelper.getRowData(sheet, 0);
+        }
     }
 
     @Test

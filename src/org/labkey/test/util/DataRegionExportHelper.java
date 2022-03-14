@@ -94,10 +94,9 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 
     public Sheet exportXLSAndVerifyRowCountAndHeader(int numRows, Set<String> expectedHeaders)
     {
-        try
+        File exportedFile = exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
-            File exportedFile = exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
-            Workbook workbook = ExcelHelper.create(exportedFile);
             Sheet sheet = workbook.getSheetAt(0);
 
             assertEquals("Wrong number of rows exported to " + exportedFile.getName(), numRows, sheet.getLastRowNum());

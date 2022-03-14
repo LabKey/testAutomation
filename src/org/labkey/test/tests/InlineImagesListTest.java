@@ -136,7 +136,6 @@ public class InlineImagesListTest extends BaseWebDriverTest
         DataRegionTable list;
         DataRegionExportHelper exportHelper;
         File exportedFile;
-        Workbook workbook;
         Sheet sheet;
         List<String> exportedColumn;
 
@@ -229,9 +228,9 @@ public class InlineImagesListTest extends BaseWebDriverTest
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
-        try{
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
+        {
 
-            workbook = ExcelHelper.create(exportedFile);
             sheet = workbook.getSheetAt(0);
 
             assertEquals("Wrong number of rows exported to " + exportedFile.getName(), 3, sheet.getLastRowNum());
@@ -297,32 +296,34 @@ public class InlineImagesListTest extends BaseWebDriverTest
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
-        workbook = ExcelHelper.create(exportedFile);
-        sheet = workbook.getSheetAt(0);
-
-        assertEquals("Wrong number of rows exported to " + exportedFile.getName(), 3, sheet.getLastRowNum());
-
-        log("Validate that the value for the first attachment column is as expected.");
-        exportedColumn = ExcelHelper.getColumnData(sheet, 2);
-        assertEquals("Files in '" + LIST_ATTACHMENT01_LABEL + "' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList(LIST_ATTACHMENT01_LABEL, LRG_PNG_FILE.getName(), JPG01_FILE.getName(), PDF_FILE.getName()), exportedColumn);
-
-        for(int i=0; i < 6; i++)
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
-            log("Column " + i + " width: " + sheet.getColumnWidth(i));
+            sheet = workbook.getSheetAt(0);
+
+            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), 3, sheet.getLastRowNum());
+
+            log("Validate that the value for the first attachment column is as expected.");
+            exportedColumn = ExcelHelper.getColumnData(sheet, 2);
+            assertEquals("Files in '" + LIST_ATTACHMENT01_LABEL + "' column not exported as expected [" + exportedFile.getName() + "]",
+                    Arrays.asList(LIST_ATTACHMENT01_LABEL, LRG_PNG_FILE.getName(), JPG01_FILE.getName(), PDF_FILE.getName()), exportedColumn);
+
+            for (int i = 0; i < 6; i++)
+            {
+                log("Column " + i + " width: " + sheet.getColumnWidth(i));
+            }
+
+            log("Validate that the column widths are as expected.");
+            assertTrue("Column '" + LIST_ATTACHMENT01_LABEL + "' width not in expected range (" + COLUMN_WIDTH_LARGE_LBOUND + " to " + COLUMN_WIDTH_LARGE_UBOUND + "). Actual width: " + sheet.getColumnWidth(2), (sheet.getColumnWidth(2) > COLUMN_WIDTH_LARGE_LBOUND) && (sheet.getColumnWidth(2) < COLUMN_WIDTH_LARGE_UBOUND));
+            assertTrue("Column '" + LIST_ATTACHMENT02_LABEL + "' width not in expected range (" + COLUMN_WIDTH_SMALL_LBOUND + " to " + COLUMN_WIDTH_SMALL_UBOUND + "). Actual width: " + sheet.getColumnWidth(3), (sheet.getColumnWidth(3) > COLUMN_WIDTH_SMALL_LBOUND) && (sheet.getColumnWidth(3) < COLUMN_WIDTH_SMALL_UBOUND));
+
+            for (int j = 0; j <= sheet.getLastRowNum(); j++)
+            {
+                log("Row " + j + " height: " + sheet.getRow(j).getHeight());
+            }
+
+            assertTrue("Height of row 1 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(1).getHeight(), (sheet.getRow(1).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(1).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
+            assertTrue("Height of row 2 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(2).getHeight(), (sheet.getRow(2).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(2).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
+            assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_TEXT_LBOUND + " to " + ROW_HEIGHT_TEXT_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_TEXT_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_TEXT_UBOUND));
         }
-
-        log("Validate that the column widths are as expected.");
-        assertTrue("Column '" + LIST_ATTACHMENT01_LABEL + "' width not in expected range (" + COLUMN_WIDTH_LARGE_LBOUND + " to " + COLUMN_WIDTH_LARGE_UBOUND + "). Actual width: " + sheet.getColumnWidth(2), (sheet.getColumnWidth(2) > COLUMN_WIDTH_LARGE_LBOUND) && (sheet.getColumnWidth(2) < COLUMN_WIDTH_LARGE_UBOUND));
-        assertTrue("Column '" + LIST_ATTACHMENT02_LABEL + "' width not in expected range (" + COLUMN_WIDTH_SMALL_LBOUND + " to " + COLUMN_WIDTH_SMALL_UBOUND + "). Actual width: " + sheet.getColumnWidth(3), (sheet.getColumnWidth(3) > COLUMN_WIDTH_SMALL_LBOUND) && (sheet.getColumnWidth(3) < COLUMN_WIDTH_SMALL_UBOUND));
-
-        for(int j=0; j <= sheet.getLastRowNum(); j++)
-        {
-            log("Row " + j + " height: " + sheet.getRow(j).getHeight());
-        }
-
-        assertTrue("Height of row 1 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(1).getHeight(), (sheet.getRow(1).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(1).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
-        assertTrue("Height of row 2 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(2).getHeight(), (sheet.getRow(2).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(2).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
-        assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_TEXT_LBOUND + " to " + ROW_HEIGHT_TEXT_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_TEXT_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_TEXT_UBOUND));
     }
 }
