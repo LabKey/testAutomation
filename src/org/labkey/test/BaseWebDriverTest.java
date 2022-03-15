@@ -91,7 +91,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
@@ -840,6 +842,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             log("Test interrupted. Skipping failure handling");
             return;
+        }
+
+        if (error instanceof DirectoryNotEmptyException notEmpty)
+        {
+            try
+            {
+                Path path = Paths.get(notEmpty.getFile());
+                List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
+                        .filter(s -> !s.isEmpty()).collect(Collectors.toList());
+                TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+            }
+            catch (IOException ignore) { }
         }
 
         try

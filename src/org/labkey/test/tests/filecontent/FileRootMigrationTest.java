@@ -31,14 +31,10 @@ import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -80,18 +76,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
     @Before
     public void cleanFiles() throws IOException
     {
-        try
-        {
-            FileUtils.deleteDirectory(targetFileRoot);
-        }
-        catch (DirectoryNotEmptyException e)
-        {
-            Path path = targetFileRoot.toPath();
-            List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
-                    .filter(s -> !s.isEmpty()).collect(Collectors.toList());
-            TestLogger.error("Remaining files after delete attempt: " + path + "\n\t" + String.join("\t\n", subdirs), e);
-            throw e;
-        }
+        FileUtils.deleteDirectory(targetFileRoot);
         targetFileRoot.mkdirs();
         FileRootsManagementPage.beginAt(this, getProjectName())
                 .useDefaultFileRoot()
