@@ -990,7 +990,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
 
             // Do last. Heap dump will navigate
-            if (error instanceof DirectoryNotEmptyException notEmpty)
+            if (unwrapRuntimeException(error) instanceof DirectoryNotEmptyException notEmpty)
             {
                 try
                 {
@@ -1024,6 +1024,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             throwable = throwable.getCause();
         }
         return false;
+    }
+
+    private Throwable unwrapRuntimeException(Throwable throwable)
+    {
+        while (throwable != null)
+        {
+            if (throwable instanceof RuntimeException)
+            {
+                throwable = throwable.getCause();
+            }
+            else
+            {
+                return throwable;
+            }
+        }
+        return null;
     }
 
     protected void disablePageUnloadEvents()
