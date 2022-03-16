@@ -844,18 +844,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return;
         }
 
-        if (error instanceof DirectoryNotEmptyException notEmpty)
-        {
-            try
-            {
-                Path path = Paths.get(notEmpty.getFile());
-                List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
-                        .filter(s -> !s.isEmpty()).collect(Collectors.toList());
-                TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
-            }
-            catch (IOException ignore) { }
-        }
-
         try
         {
             try
@@ -999,6 +987,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 clearLastPageInfo(); // Make sure server error screenshot doesn't reuse cached page text
                 // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
                 checker().withScreenshot(testName + "_serverErrors").wrapAssertion(this::checkErrors);
+            }
+
+            // Do last. Heap dump will navigate
+            if (error instanceof DirectoryNotEmptyException notEmpty)
+            {
+                try
+                {
+                    Path path = Paths.get(notEmpty.getFile());
+                    List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
+                            .filter(s -> !s.isEmpty()).collect(Collectors.toList());
+                    TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    getArtifactCollector().dumpHeap();
+                }
+                catch (IOException ignore) { }
             }
         }
         finally
