@@ -1030,7 +1030,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         while (throwable != null)
         {
-            if (throwable instanceof RuntimeException)
+            if (throwable.getClass() == RuntimeException.class)
             {
                 throwable = throwable.getCause();
             }
