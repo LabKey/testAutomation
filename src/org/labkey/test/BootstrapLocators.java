@@ -14,7 +14,7 @@ public abstract class BootstrapLocators
 
     public static Locator.XPathLocator button()
     {
-        return Locator.tagWithClass("a", "btn");
+        return Locator.byClass("btn");
     }
 
     public static Locator.XPathLocator button(String text)
