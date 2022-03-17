@@ -1,5 +1,7 @@
 package org.labkey.test.components.ui.search;
 
+import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
@@ -12,7 +14,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -108,6 +112,15 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
         clearElementCache();
         return this;
+    }
+
+    /**
+     * Get components wrapping the filter cards currently present
+     * @return All current filter cards
+     */
+    public List<FilterCard> getSearchCards()
+    {
+        return elementCache().findFilterCards();
     }
 
     /**
@@ -213,9 +226,56 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
             });
         }
 
-        String getQueryName()
+        String getParentName()
         {
             return name.getText();
+        }
+
+        FilterCardValues getFilterValues()
+        {
+            Map<String, WebElement> filters = new HashMap<>();
+            List<WebElement> rows = Locator.byClass("filter-display__row").findElements(this);
+            for (WebElement row : rows)
+            {
+                WebElement labelEl = Locator.byClass("filter-display__field-label").findElement(row);
+                WebElement valueEl = Locator.byClass("filter-display__filter-value").findElement(row);
+
+                String label = StringUtils.strip(labelEl.getText(), ":");
+
+                filters.put(label, valueEl);
+            }
+            return new FilterCardValues(filters);
+        }
+    }
+
+    public static class FilterCardValues
+    {
+        private final Map<String, WebElement> _filters = new CaseInsensitiveHashMap<>();
+        private final Map<String, WebElement> _negatedFilters = new CaseInsensitiveHashMap<>();
+
+        public FilterCardValues(Map<String, WebElement> allFilters)
+        {
+            for (Map.Entry<String, WebElement> entry : allFilters.entrySet())
+            {
+                if (entry.getValue().getAttribute("class").contains("negate"))
+                {
+                    _negatedFilters.put(entry.getKey(), entry.getValue());
+                }
+                else
+                {
+                    _filters.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        public Map<String, WebElement> getFilters()
+        {
+            return _filters;
+        }
+
+        public Map<String, WebElement> getNegatedFilters()
+        {
+            return _negatedFilters;
         }
     }
 }

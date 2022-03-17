@@ -65,6 +65,20 @@ public class EntityFieldFilterModal extends ModalDialog
     }
 
     /**
+     * Select parent and field to configure filters for
+     * @param parentName name of parent type
+     * @param fieldLabel Field's label
+     * @return this component
+     */
+    public EntityFieldFilterModal selectParentField(String parentName, String fieldLabel)
+    {
+        selectParent(parentName);
+        selectField(fieldLabel);
+
+        return this;
+    }
+
+    /**
      * @see FilterExpressionPanel#setFilterValue(Operator)
      * @return this component
      */
