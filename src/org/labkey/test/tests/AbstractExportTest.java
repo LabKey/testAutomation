@@ -396,9 +396,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
 
     protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn)
     {
-        try
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
-            Workbook workbook = ExcelHelper.create(exportedFile);
             Sheet sheet = workbook.getSheetAt(0);
             int expectedFileRowCount = expectedDataRowCount;
             if (exportHeaderType.equals(ColumnHeaderType.None))

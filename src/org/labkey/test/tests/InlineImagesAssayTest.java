@@ -179,7 +179,6 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Export the grid to excel.");
         File exportedFile;
-        Workbook workbook;
         DataRegionTable list;
         DataRegionExportHelper exportHelper;
 
@@ -187,15 +186,15 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
-        workbook = ExcelHelper.create(exportedFile);
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
+        {
+            validateExcelExport(exportedFile, workbook);
 
-        validateExcelExport(exportedFile, workbook);
-
-        log("Validate that the 'File' (last) column is as expected.");
-        assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Batch File Field", "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName()),
-                ExcelHelper.getColumnData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 7));
-
+            log("Validate that the 'File' (last) column is as expected.");
+            assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
+                    Arrays.asList("Batch File Field", "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName()),
+                    ExcelHelper.getColumnData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 7));
+        }
 
         log("Remove the 'File' (last) column from the batch and see that things still work.");
 
@@ -219,14 +218,16 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
-        workbook = ExcelHelper.create(exportedFile);
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
+        {
 
-        validateExcelExport(exportedFile, workbook);
+            validateExcelExport(exportedFile, workbook);
 
-        log("Validate that the removed column no longer shows up in the export.");
-        List<String> exportedHeaders = ExcelHelper.getRowData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 0);
-        assertFalse("Value of removed 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                exportedHeaders.contains("Batch File Field"));
+            log("Validate that the removed column no longer shows up in the export.");
+            List<String> exportedHeaders = ExcelHelper.getRowData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 0);
+            assertFalse("Value of removed 'File' column not exported as expected [" + exportedFile.getName() + "]",
+                    exportedHeaders.contains("Batch File Field"));
+        }
     }
 
     private void validateExcelExport(File exportedFile, Workbook workbook)

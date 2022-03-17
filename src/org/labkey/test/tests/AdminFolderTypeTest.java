@@ -60,6 +60,13 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
         goToCreateProject();
         checker().verifyFalse(folderTypeName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
+        /* Test coverage for Issue 44995: Filter disabled folder types from folder management admin page */
+
+        goToHome();
+        goToFolderManagement().goToFolderTypeTab();
+        checker().verifyFalse("Disabled folder " + folderTypeName + " should not be present at Folder Management --> Folder type",
+               isElementPresent(Locator.radioButtonByNameAndValue("folderType", folderTypeName)));
+
         log("Enabling the folder type " + folderTypeName);
         folderTypePage = goToAdminConsole().clickFolderType();
         folderTypePage.enableFolderType(folderTypeName).clickSave();

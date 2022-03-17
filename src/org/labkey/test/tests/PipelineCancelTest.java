@@ -19,8 +19,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
@@ -36,6 +36,13 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     protected String getProjectName()
     {
         return "Pipeline Cancel Test";
+    }
+
+    @Override
+    protected void checkLinks()
+    {
+        if ( TestProperties.isLinkCheckEnabled() )
+            log("Skipping crawl. Some custom views 404 after cancelled folder import.");
     }
 
     @Test
