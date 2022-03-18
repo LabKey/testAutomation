@@ -44,9 +44,6 @@ public class SideWebPart extends WebPart
     }
 
     @Override
-    protected void waitForReady() {}
-
-    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
