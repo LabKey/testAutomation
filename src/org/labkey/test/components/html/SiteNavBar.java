@@ -42,17 +42,20 @@ import static org.junit.Assert.assertTrue;
 public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 {
     protected final WebDriver _driver;
-    protected WebElement _componentElement;
+    protected final WebElement _componentElement;
 
     public SiteNavBar(WebDriver driver)
     {
         _driver = driver;
+        _componentElement = Locator.byClass("navbar-nav-lk")
+                .findWhenNeeded(driver)
+                .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
     public WebElement getComponentElement()
     {
-        return elementCache().navbarNavBlock;
+        return _componentElement;
     }
     @Override
     protected WebDriver getDriver()
@@ -191,26 +194,18 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         return new SiteNavBar.Elements();
     }
 
-    protected class Elements extends Component.ElementCache
+    protected class Elements extends Component<?>.ElementCache
     {
-        public final WebElement headerBlock = Locator.tagWithClass("div", "labkey-page-header")
-                .findWhenNeeded(getDriver())
-                .withTimeout(WebDriverWrapper.WAIT_FOR_PAGE);
-
-        public final WebElement navbarNavBlock = Locator.byClass("navbar-nav-lk")
-                .findWhenNeeded(headerBlock)
-                .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-
         public final WebElement searchContainer = Locator.byClass("navbar-search")
-                .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchToggle = Locator.id("global-search-trigger")
-                .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchInput = Locator.input("q")
-                .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchSubmitInput = Locator.tagWithClass("a", "btn-search")
                 .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public final AdminMenu adminMenu = adminMenuFinder().findWhenNeeded(navbarNavBlock).withExpandRetries(4);
-        public final UserMenu userMenu = userMenuFinder().findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+        public final AdminMenu adminMenu = adminMenuFinder().findWhenNeeded(this).withExpandRetries(4);
+        public final UserMenu userMenu = userMenuFinder().findWhenNeeded(this).withExpandRetries(4);
     }
 
     protected SimpleWebDriverComponentFinder<AdminMenu> adminMenuFinder()

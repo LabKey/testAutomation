@@ -69,12 +69,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     @Override
-    protected void clearElementCache()
-    {
-        super.clearElementCache();
-    }
-
-    @Override
     public void doAndWaitForUpdate(Runnable func)
     {
         // Look at WebDriverWrapper.doAndWaitForElementToRefresh for an example.
