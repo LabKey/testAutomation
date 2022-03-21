@@ -91,7 +91,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
@@ -986,6 +988,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 // Reset errors before next test and make it easier to view server-side errors that may have happened during the test.
                 checker().withScreenshot(testName + "_serverErrors").wrapAssertion(this::checkErrors);
             }
+
+            // Do last. Heap dump will navigate
+            if (unwrapRuntimeException(error) instanceof DirectoryNotEmptyException notEmpty)
+            {
+                try
+                {
+                    Path path = Paths.get(notEmpty.getFile());
+                    List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
+                            .filter(s -> !s.isEmpty()).collect(Collectors.toList());
+                    TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    getArtifactCollector().dumpHeap();
+                }
+                catch (IOException e)
+                {
+                    TestLogger.warn("Unable to collect extra info about 'DirectoryNotEmptyException'", e);
+                }
+            }
         }
         finally
         {
@@ -1008,6 +1027,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             throwable = throwable.getCause();
         }
         return false;
+    }
+
+    private Throwable unwrapRuntimeException(Throwable throwable)
+    {
+        while (throwable != null)
+        {
+            if (throwable.getClass() == RuntimeException.class)
+            {
+                throwable = throwable.getCause();
+            }
+            else
+            {
+                return throwable;
+            }
+        }
+        return null;
     }
 
     protected void disablePageUnloadEvents()
