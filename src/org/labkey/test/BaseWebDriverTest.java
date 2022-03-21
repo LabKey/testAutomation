@@ -1000,7 +1000,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
                     getArtifactCollector().dumpHeap();
                 }
-                catch (IOException ignore) { }
+                catch (IOException e)
+                {
+                    TestLogger.warn("Unable to collect extra info about 'DirectoryNotEmptyException'", e);
+                }
             }
         }
         finally
