@@ -102,7 +102,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     /** Click the 'Save' button. */
     public void clickSave()
     {
-        clickSave(2_000);
+        clickSave(5_000);
     }
 
     /** Click the 'Save' button.
