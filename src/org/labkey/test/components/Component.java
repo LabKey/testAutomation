@@ -20,7 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -58,6 +60,15 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     {
         if (null == _elementCache)
         {
+            try
+            {
+                getComponentElement().isEnabled(); // Trigger refind
+            }
+            catch (NoSuchElementException | StaleElementReferenceException ignore)
+            {
+                // Pass if element doesn't exist. Might be checking if component is visible.
+            }
+
             _elementCache = newElementCache();
             waitForReady(_elementCache);
         }
