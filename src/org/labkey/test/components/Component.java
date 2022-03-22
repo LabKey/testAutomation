@@ -58,13 +58,23 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     {
         if (null == _elementCache)
         {
+            getComponentElement().isEnabled(); // Trigger refind
             _elementCache = newElementCache();
             waitForReady(_elementCache);
         }
         return _elementCache;
     }
 
-    protected void waitForReady(EC ec) { }
+    /**
+     * @deprecated Passing in the ElementCache is unnecessary
+     */
+    @Deprecated (since = "22.4")
+    protected void waitForReady(EC ec)
+    {
+        waitForReady();
+    }
+
+    protected void waitForReady() { }
 
     protected EC newElementCache()
     {

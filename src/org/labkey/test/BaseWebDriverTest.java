@@ -1395,25 +1395,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         // Download full action coverage table and add to TeamCity artifacts.
         File downloadActions = downloadFromUrl("admin-exportActions.view");
-        File actionCoverageFile = new File(TestProperties.getDumpDir(), "ActionCoverage.tsv");
-        replaceArtifact(downloadActions, actionCoverageFile, "exported action coverage");
-
-        if (BROWSER_TYPE == BrowserType.CHROME)
-            refresh(); // Chrome blocks sequential downloads from javascript
-    }
-
-    private void replaceArtifact(File downloadedFile, File artifactFile, String description)
-    {
+        File actionCoverageFile = new File(TestFileUtils.getGradleReportDir(), "ActionCoverage.tsv");
         try
         {
-            Files.move(downloadedFile.toPath(), artifactFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            getArtifactCollector().publishArtifact(artifactFile);
+            Files.move(downloadActions.toPath(), actionCoverageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e)
         {
-            TestLogger.error("Failed to move " + description + " file.");
-            e.printStackTrace();
+            TestLogger.error("Failed to move " + "exported action coverage" + " file.", e);
         }
+
+        if (BROWSER_TYPE == BrowserType.CHROME)
+            refresh(); // Chrome blocks sequential downloads from javascript
     }
 
     @LogMethod

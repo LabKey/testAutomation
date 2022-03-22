@@ -31,7 +31,6 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,10 +48,7 @@ public abstract class ExcelHelper
 
     public static Workbook create(File file) throws IOException
     {
-        try (FileInputStream fIn = new FileInputStream(file))
-        {
-            return WorkbookFactory.create(fIn);
-        }
+        return WorkbookFactory.create(file);
     }
 
     public static SimpleDateFormat getDateTimeFormat()

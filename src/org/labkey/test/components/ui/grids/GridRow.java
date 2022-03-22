@@ -119,6 +119,14 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
                 getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link)), 1000);
     }
 
+    public void clickLinkWithTitle(String text)
+    {
+        log("seeking link with title [" + text + "]");
+        WebElement link = Locator.linkWithTitle(text).waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+        log("found element with title [" + text + "]");
+        link.click();
+    }
+
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the image to display in a modal
      */

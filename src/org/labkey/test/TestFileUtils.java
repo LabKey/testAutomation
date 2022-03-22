@@ -174,6 +174,11 @@ public abstract class TestFileUtils
         return _buildDir;
     }
 
+    public static File getGradleReportDir()
+    {
+        return new File(getTestBuildDir(), "test/logs/reports");
+    }
+
     public static File getDefaultDeployDir()
     {
         return new File(getLabKeyRoot(), "build/deploy");

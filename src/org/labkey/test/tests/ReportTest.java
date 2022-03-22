@@ -69,16 +69,24 @@ public abstract class ReportTest extends StudyBaseTest
 
     protected void clickReportDetailsLink(String reportName)
     {
-        Locator loc = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to navigate to the Detail View')]");
-        WebElement link = shortWait().until(LabKeyExpectedConditions.animationIsDone(loc));
+        WebElement row = findReportGridRow(reportName);
+        WebElement link = Locator.tagWithAttribute("a", "data-qtip", "Click to navigate to the Detail View").findElement(row);
         clickAndWait(link);
     }
 
     protected void clickReportPermissionsLink(String reportName)
     {
-        Locator loc = Locator.xpath("//tr").withClass("x4-grid-row").withPredicate(Locator.linkWithText(reportName)).append("//a[contains(@data-qtip, 'Click to customize the permissions')]");
-        WebElement link = shortWait().until(LabKeyExpectedConditions.animationIsDone(loc));
+        WebElement row = findReportGridRow(reportName);
+        WebElement link = Locator.tagWithAttributeContaining("a", "data-qtip", "Click to customize the permissions").findElement(row);
         clickAndWait(link);
+    }
+
+    private WebElement findReportGridRow(String reportName)
+    {
+        WebElement row = Locator.tagWithClass("tr", "x4-grid-row").withPredicate(Locator.linkWithText(reportName)).waitForElement(getDriver(), 5_000);
+        shortWait().until(LabKeyExpectedConditions.animationIsDone(row));
+        mouseOver(Locator.tag("td").last().findElement(row)); // Try to avoid triggering tooltip from other reports
+        return row;
     }
 
     @Override

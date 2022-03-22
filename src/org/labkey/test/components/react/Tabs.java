@@ -147,7 +147,7 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     public static class TabsFinder extends WebDriverComponentFinder<Tabs, TabsFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("ul", "tablist").parent();
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("ul", "nav-tabs").parent();
 
         public TabsFinder(WebDriver driver)
         {

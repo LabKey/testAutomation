@@ -515,7 +515,7 @@ public class StudyHelper
         return getFolderArchiveFile("folder.xml").getParentFile().getAbsolutePath();
     }
 
-    // Return the root of the /study node within the Study001 folder archive (i.e., where study.xml lives)
+    // Return the root of the /study subfolder within the Study001 folder archive (i.e., where study.xml lives)
     public static String getStudySubfolderPath()
     {
         return getFolderArchiveFile("study/study.xml").getParentFile().getAbsolutePath();
