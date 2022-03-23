@@ -49,9 +49,6 @@ public class BodyWebPart<EC extends BodyWebPart.ElementCache> extends WebPart<EC
     }
 
     @Override
-    protected void waitForReady() {}
-
-    @Override
     protected EC newElementCache()
     {
         return (EC) new ElementCache();

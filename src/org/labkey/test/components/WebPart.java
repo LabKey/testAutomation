@@ -68,8 +68,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebPartPa
         return _wDriver;
     }
 
-    protected abstract void waitForReady();
-
     private void waitForStale()
     {
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Arrays.asList(getComponentElement())));
