@@ -3,7 +3,7 @@ package org.labkey.test.util.exp;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
-import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Arrays;
@@ -22,12 +22,11 @@ public class DataClassAPIHelper
      */
     static public TestDataGenerator createEmptyDataClass(String containerPath, DataClassDefinition dataClassDefinition)
     {
-        deleteDomain(new FieldDefinition.LookupInfo(containerPath, "exp.data", dataClassDefinition.getName()));
+        DomainUtils.ensureDeleted(containerPath, "exp.data", dataClassDefinition.getName());
 
-        TestDataGenerator dgen;
         try
         {
-            return TestDataGenerator.createDomain(containerPath, dataClassDefinition);
+            return DomainUtils.createDomain(containerPath, dataClassDefinition);
         }
         catch (CommandException e)
         {
@@ -37,7 +36,6 @@ public class DataClassAPIHelper
 
     /**
      * A set of FieldDefinition provided for convenience
-     * @return
      */
     public static List<FieldDefinition> dataClassTestFields()
     {
@@ -50,24 +48,4 @@ public class DataClassAPIHelper
                 new FieldDefinition("attachmentColumn", FieldDefinition.ColumnType.Attachment));
     }
 
-    /**
-     * Removes the specified domain if it exists
-     * @param targetDomain
-     */
-    public static void deleteDomain(FieldDefinition.LookupInfo targetDomain)
-    {
-        try
-        {
-            if (TestDataGenerator.doesDomainExists(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable()))
-            {
-                TestDataGenerator.deleteDomain(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable());
-            }
-
-        }
-        catch (CommandException ex)
-        {
-            throw new RuntimeException(String
-                    .format("Failed to delete '%s'.", targetDomain.getTable()), ex);
-        }
-    }
 }

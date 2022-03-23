@@ -9,6 +9,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Arrays;
@@ -35,18 +36,15 @@ public class SampleTypeAPIHelper
      */
     static public TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition)
     {
-        deleteDomain(new FieldDefinition.LookupInfo(containerPath, "samples", sampleTypeDefinition.getName()));
-
-        TestDataGenerator dgen;
+        DomainUtils.ensureDeleted(containerPath, "samples", sampleTypeDefinition.getName());
         try
         {
-            dgen = TestDataGenerator.createDomain(containerPath, sampleTypeDefinition);
+            return DomainUtils.createDomain(containerPath, sampleTypeDefinition);
         }
         catch (CommandException e)
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }
-        return dgen;
     }
 
     /**
@@ -61,27 +59,6 @@ public class SampleTypeAPIHelper
                 new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
                 new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
                 new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
-    }
-
-    /**
-     * Removes the specified domain if it exists
-     * @param targetDomain
-     */
-    public static void deleteDomain(FieldDefinition.LookupInfo targetDomain)
-    {
-        try
-        {
-            if (TestDataGenerator.doesDomainExists(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable()))
-            {
-                TestDataGenerator.deleteDomain(targetDomain.getFolder(), targetDomain.getSchema(), targetDomain.getTable());
-            }
-
-        }
-        catch (CommandException ex)
-        {
-            throw new RuntimeException(String
-                    .format("Failed to delete '%s'.", targetDomain.getTable()), ex);
-        }
     }
 
     /**
