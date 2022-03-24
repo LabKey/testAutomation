@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
-import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
 
 import java.util.ArrayList;
@@ -29,11 +28,11 @@ public class TestDataValidator
 
     private FieldDefinition.LookupInfo _lookupInfo;
 
-    private Map<String, PropertyDescriptor> _columns = new CaseInsensitiveHashMap<>();
+    private Map<String, FieldDefinition> _columns = new CaseInsensitiveHashMap<>();
     private List<Map<String, Object>> _rows = new ArrayList<>();
 
     public TestDataValidator(FieldDefinition.LookupInfo lookupInfo,
-                             Map<String, PropertyDescriptor> columns, List<Map<String, Object>> rows)
+                             Map<String, FieldDefinition> columns, List<Map<String, Object>> rows)
     {
         _lookupInfo = lookupInfo;
         _columns = columns;
