@@ -1,11 +1,13 @@
 package org.labkey.test.util.exp;
 
 import org.labkey.remoteapi.CommandException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,9 +28,9 @@ public class DataClassAPIHelper
 
         try
         {
-            return DomainUtils.createDomain(containerPath, dataClassDefinition);
+            return dataClassDefinition.create(WebTestHelper.getRemoteApiConnection(), containerPath);
         }
-        catch (CommandException e)
+        catch (CommandException | IOException e)
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }

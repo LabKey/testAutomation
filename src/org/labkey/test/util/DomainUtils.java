@@ -3,12 +3,10 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainCommand;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.params.property.DomainProps;
 
 import java.io.IOException;
 
@@ -17,23 +15,6 @@ public final class DomainUtils
     private DomainUtils()
     {
         /* Don't instantiate utility class */
-    }
-
-    public static TestDataGenerator createDomain(String containerPath, DomainProps def) throws CommandException
-    {
-        Connection connection = WebTestHelper.getRemoteApiConnection();
-
-        CreateDomainCommand createDomainCommand = def.getCreateCommand();
-        try
-        {
-            createDomainCommand.execute(connection, containerPath);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to create domain.", e);
-        }
-
-        return def.getTestDataGenerator(containerPath);
     }
 
     /**
@@ -45,8 +26,7 @@ public final class DomainUtils
      * @return The command response after executing the delete. Calling function would need to validate the response.
      * @throws CommandException Thrown if there is some kind of exception deleting the domain.
      */
-    public static CommandResponse deleteDomain(final String containerPath, final String schema,
-                                               final String queryName)
+    public static CommandResponse deleteDomain(final String containerPath, final String schema, final String queryName)
             throws CommandException
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
@@ -98,13 +78,13 @@ public final class DomainUtils
     /**
      * Removes the specified domain if it exists
      */
-    public static void ensureDeleted(String folder, String schema, String table)
+    public static void ensureDeleted(String containerPath, String schema, String table)
     {
         try
         {
-            if (doesDomainExist(folder, schema, table))
+            if (doesDomainExist(containerPath, schema, table))
             {
-                deleteDomain(folder, schema, table);
+                deleteDomain(containerPath, schema, table);
             }
 
         }

@@ -39,7 +39,6 @@ import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.property.DomainProps;
 
 import java.io.File;
 import java.io.IOException;
@@ -475,15 +474,6 @@ public class TestDataGenerator
     static public PropertyDescriptor simpleFieldDef(String name, FieldDefinition.ColumnType type)
     {
         return new FieldDefinition(name, type);
-    }
-
-    /**
-     * @deprecated Moved to {@link DomainUtils#createDomain(String, DomainProps)}
-     */
-    @Deprecated
-    public static TestDataGenerator createDomain(String containerPath, DomainProps def) throws CommandException
-    {
-        return DomainUtils.createDomain(containerPath, def);
     }
 
     /**

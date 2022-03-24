@@ -12,6 +12,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,9 +40,9 @@ public class SampleTypeAPIHelper
         DomainUtils.ensureDeleted(containerPath, "samples", sampleTypeDefinition.getName());
         try
         {
-            return DomainUtils.createDomain(containerPath, sampleTypeDefinition);
+            return sampleTypeDefinition.create(WebTestHelper.getRemoteApiConnection(), containerPath);
         }
-        catch (CommandException e)
+        catch (CommandException | IOException e)
         {
             throw new RuntimeException("Failed to create sample type.", e);
         }
