@@ -94,15 +94,9 @@ public class TestDataGenerator
         return _lookupInfo.getTable();
     }
 
-    public List<PropertyDescriptor> getFields()
-    {
-        return new ArrayList<>(_columns.values());
-    }
-
     /**
      *
      * @param columns   The fieldSet for the domain/sampleset/list.
-     * @return
      */
     public TestDataGenerator withColumns(List<? extends PropertyDescriptor> columns)
     {
@@ -158,8 +152,7 @@ public class TestDataGenerator
      *  // helper to allow adding values as List.of(a, b, c)
      *  Note: this helper uses the indexes of the fieldSet in testDataGenerator, so you can only use this helper
      *  for fields that are explicitly part of the domain.  To add values into off-domain/lookup columns, use @addCustomRow
-     * @param values
-     * @return
+     * @param values values are mapped to columns in the order the columns were added
      */
     public TestDataGenerator addRow(List<Object> values)
     {
@@ -180,7 +173,6 @@ public class TestDataGenerator
      *  To insert them to the server, use this.
      *  it is acceptable to add columns that don't exist in the destination, but be careful
      * @param customRow use Map.of(colName1, colValue1 ...)
-     * @return
      */
     public TestDataGenerator addCustomRow(Map<String, Object> customRow)
     {
@@ -198,14 +190,9 @@ public class TestDataGenerator
         return _rows.size();
     }
 
-    public List<PropertyDescriptor> getColumns()
+    public List<FieldDefinition> getColumns()
     {
-        List<PropertyDescriptor> cols = new ArrayList<>();
-        for (PropertyDescriptor field : _columns.values())
-        {
-            cols.add(field);
-        }
-        return cols;
+        return new ArrayList<>(_columns.values());
     }
 
     public void generateRows(int numberOfRowsToGenerate)
@@ -349,9 +336,15 @@ public class TestDataGenerator
      */
     public File writeData(String fileName)
     {
-        if (!TestFileUtils.getTestTempDir().exists())
-            TestFileUtils.getTestTempDir().mkdirs();
-        return TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), fileName, writeTsvContents());
+        try
+        {
+            return TestFileUtils.writeTempFile(fileName, writeTsvContents());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public DomainResponse createDomain(Connection cn, String domainKind) throws IOException, CommandException
@@ -359,10 +352,10 @@ public class TestDataGenerator
         return createDomain(cn, domainKind, null);
     }
 
-    public DomainResponse createDomain(Connection cn, String domainKind, Map domainOptions) throws IOException, CommandException
+    public DomainResponse createDomain(Connection cn, String domainKind, Map<String, Object> domainOptions) throws IOException, CommandException
     {
         CreateDomainCommand cmd = new CreateDomainCommand(domainKind, getQueryName());
-        cmd.getDomainDesign().setFields(getColumns());
+        cmd.getDomainDesign().setFields(new ArrayList<>(getColumns()));
 
         if (domainOptions!= null)
             cmd.setOptions(domainOptions);
