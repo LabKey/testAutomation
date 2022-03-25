@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
@@ -41,6 +42,12 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     public WebElement getComponentElement()
     {
         return _tableElement;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        getWrapper().shortWait().withMessage("waiting for detailTable to load").until(wd -> isLoaded());
     }
 
     public Boolean isLoaded()
@@ -104,8 +111,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      */
     public String getFieldValueByKey(String fieldKey)
     {
-        return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey)
-                .findElement(this).getText();
+        return elementCache().dataFieldByKey(fieldKey).getText();
     }
 
     /**
@@ -128,9 +134,6 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      **/
     public Map<String, String> getTableData()
     {
-        // Explicitly check that the table has been loaded before trying to get the data.
-        getWrapper().waitFor(this::isLoaded, "Cannot get the table data because the table is not loaded.", 500);
-
         Map<String, String> tableData = new HashMap<>();
 
         for(WebElement tableRow : getComponentElement().findElements(By.cssSelector("tr")))
@@ -156,6 +159,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     @Override
     protected ElementCache newElementCache()
     {
+        waitForReady();
         return new ElementCache();
     }
 
@@ -164,6 +168,11 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         public final WebElement dataCaptionField(String caption)
         {
             return Locator.tagWithAttribute("td", "data-caption", caption).findWhenNeeded(this);
+        }
+
+        public final WebElement dataFieldByKey(String fieldKey)
+        {
+            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey).findElement(this);
         }
 
         // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
@@ -176,7 +185,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 
     public static class DetailTableFinder extends WebDriverComponent.WebDriverComponentFinder<DetailTable, DetailTableFinder>
     {
-        private Locator.XPathLocator _baseLocator = Locators.detailTable;
+        private final Locator.XPathLocator _baseLocator = Locators.detailTable;
         private Locator _locator;
 
         public DetailTableFinder(WebDriver driver)
