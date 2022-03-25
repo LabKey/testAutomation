@@ -159,7 +159,6 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     @Override
     protected ElementCache newElementCache()
     {
-        waitForReady();
         return new ElementCache();
     }
 
