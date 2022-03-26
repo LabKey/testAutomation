@@ -349,11 +349,19 @@ public class TestDataGenerator
         }
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.params.property.DomainProps#create(Connection, String)}
+     */
+    @Deprecated
     public DomainResponse createDomain(Connection cn, String domainKind) throws IOException, CommandException
     {
         return createDomain(cn, domainKind, null);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.params.property.DomainProps#create(Connection, String)}
+     */
+    @Deprecated
     public DomainResponse createDomain(Connection cn, String domainKind, Map<String, Object> domainOptions) throws IOException, CommandException
     {
         CreateDomainCommand cmd = new CreateDomainCommand(domainKind, getQueryName());
@@ -365,11 +373,16 @@ public class TestDataGenerator
         return cmd.execute(cn, _lookupInfo.getFolder());
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.params.list.IntListDefinition#create(Connection, String)}
+     */
+    @Deprecated
     public DomainResponse createList(Connection cn, String keyName) throws IOException, CommandException
     {
         return createDomain(cn, "IntList", Map.of("keyName", keyName));
     }
 
+    //TODO: Move to DomainUtils
     public DomainResponse getDomain(Connection cn) throws IOException, CommandException
     {
         GetDomainCommand cmd = new GetDomainCommand(getSchema(), getQueryName());
@@ -377,6 +390,7 @@ public class TestDataGenerator
         return response;
     }
 
+    //TODO: Move to DomainUtils
     public CommandResponse deleteDomain(Connection cn) throws IOException, CommandException
     {
         DropDomainCommand delCmd = new DropDomainCommand(getSchema(), getQueryName());

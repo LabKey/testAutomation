@@ -22,6 +22,9 @@ import java.util.Set;
 
 public class SampleTypeAPIHelper
 {
+
+    public static final String SCHEMA_NAME = "exp.materials";
+
     // Global constants to ease migration from "Sample Set" to "Sample Type"
     public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
     public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";

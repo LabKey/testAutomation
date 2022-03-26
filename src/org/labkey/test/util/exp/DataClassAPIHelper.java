@@ -14,6 +14,7 @@ import java.util.List;
 public class DataClassAPIHelper
 {
 
+    public static final String SCHEMA_NAME = "exp.data";
 
     /**
      * Create a dataclass in the specified container with the fields provided.
@@ -24,7 +25,7 @@ public class DataClassAPIHelper
      */
     static public TestDataGenerator createEmptyDataClass(String containerPath, DataClassDefinition dataClassDefinition)
     {
-        DomainUtils.ensureDeleted(containerPath, "exp.data", dataClassDefinition.getName());
+        DomainUtils.ensureDeleted(containerPath, SCHEMA_NAME, dataClassDefinition.getName());
 
         try
         {
