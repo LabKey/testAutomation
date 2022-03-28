@@ -337,6 +337,18 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         });
     }
 
+    @Test
+    public void testStableURLWithValueLessURLFilter()
+    {
+        String nonBlankColumn = getDataRegionColumnName();
+        dataRegion.setFilter(nonBlankColumn, "Is Not Blank");
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.URL, stableUrlScript ->
+        {
+            assertScriptContentLineCount(stableUrlScript, 2);
+            assertStableURLContents(stableUrlScript);
+        });
+    }
+
     protected final List<String> checkFirstNRows(int n)
     {
         List<String> rowIds = new ArrayList<>();
@@ -497,6 +509,12 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         assertTrue("Script is missing queryName property", perlScript.contains("-queryName => '" + getDataRegionQueryName() + "'"));
         if (null != filterColumn)
             assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', eq, ''foo'']"));
+    }
+
+    protected final void assertStableURLContents(String stableURL)
+    {
+        assertTrue("Script is missing title", stableURL.contains("The following URL can be used to reload the query, preserving any filters, sorts, or custom sets of columns:"));
+        assertTrue("Script is missing URL", stableURL.contains("query-executeQuery.view?"));
     }
 
     protected boolean expectSortedExport()
