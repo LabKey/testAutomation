@@ -38,7 +38,7 @@ public class SampleTypeAPIHelper
      * @param sampleTypeDefinition domain properties for the new sample type.
      * @return A TestDataGenerator for inserting rows into the created sample type.
      */
-    static public TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition)
+    public static TestDataGenerator createEmptySampleType(String containerPath, SampleTypeDefinition sampleTypeDefinition)
     {
         DomainUtils.ensureDeleted(containerPath, "samples", sampleTypeDefinition.getName());
         try
@@ -66,49 +66,50 @@ public class SampleTypeAPIHelper
     }
 
     /**
-     * Given a folder name, the name of a sample type, and a list of sample names return the list of sample ids.
-     * Sample ids are useful when interacting with a sample/sample type using the command apis.
+     * Given a folder name, the name of a sample type, and a list of sample names return the list of row ids.
+     * Row ids are useful when interacting with a sample/sample type using the command apis.
      *
-     * @param folder Name of the folder where the sample type is.
+     * @param containerPath Path of the container where the sample type is defined.
      * @param sampleTypeName The name of the sample type.
      * @param sampleNames A list of sample name you want to get the id's for.
-     * @return A map of containing the sample name and its id.
+     * @return A map of containing sample names and their corresponding row ids.
      * @throws Exception Because this uses the Select Rows Command it can throw a few different type of exceptions.
      */
-    public static Map<String, Long> getSampleIdFromName(String folder, String sampleTypeName, List<String> sampleNames) throws Exception
+    public static Map<String, Long> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {
-        StringBuilder nameFilter = new StringBuilder();
-        for(String name : sampleNames)
-        {
-            nameFilter.append(name);
-            // Keep adding ';' until the last Sample Id.
-            if(sampleNames.indexOf(name) != sampleNames.size() - 1)
-            {
-                nameFilter.append(";");
-            }
-        }
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
         cmd.setColumns(Arrays.asList("RowId", "Name"));
-        cmd.addFilter("Name", nameFilter.toString(), Filter.Operator.IN);
+        cmd.addFilter("Name", String.join(";", sampleNames), Filter.Operator.IN);
 
-        SelectRowsResponse response = cmd.execute(connection, folder);
+        SelectRowsResponse response = cmd.execute(connection, containerPath);
 
-        Map<String, Long> sampleIds = new HashMap<>();
+        Map<String, Long> rowIds = new HashMap<>();
 
         for(Map<String, Object> row : response.getRows())
         {
             Object name = row.get("Name");
             Object value = row.get("RowId");
-            sampleIds.put(name.toString(), Long.parseLong(value.toString()));
+            rowIds.put(name.toString(), Long.parseLong(value.toString()));
         }
 
         // Check that the names returned from the query match the names sent in.
         Set<String> names = new HashSet<>(sampleNames);
         Assert.assertTrue("The sample names returned from the query do not match the sample names sent in.",
-                names.containsAll(sampleIds.keySet()));
+                names.containsAll(rowIds.keySet()));
 
-        return sampleIds;
+        return rowIds;
+    }
+
+    /**
+     * This method has a misleading name. "Name" and "Sample ID" refer to the same column. This is actually fetching
+     * row IDs of the specified samples.
+     * @deprecated Use {@link #getRowIdsForSamples(String, String, List)}
+     */
+    @Deprecated(since = "22.4")
+    public static Map<String, Long> getSampleIdFromName(String folder, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
+    {
+        return getRowIdsForSamples(folder, sampleTypeName, sampleNames);
     }
 }
