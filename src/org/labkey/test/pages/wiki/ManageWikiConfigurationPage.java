@@ -1,17 +1,27 @@
 package org.labkey.test.pages.wiki;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Map;
+
 public class ManageWikiConfigurationPage extends LabKeyPage<ManageWikiConfigurationPage.ElementCache>
 {
     public ManageWikiConfigurationPage(WebDriver driver)
     {
         super(driver);
+    }
+
+    public static ManageWikiConfigurationPage beginAt(WebDriverWrapper driver, String containerPath, Map<String, String> values)
+    {
+        driver.beginAt(WebTestHelper.buildURL("wiki", containerPath, "manage", values));
+        return new ManageWikiConfigurationPage(driver.getDriver());
     }
 
     @Override
@@ -41,15 +51,15 @@ public class ManageWikiConfigurationPage extends LabKeyPage<ManageWikiConfigurat
         return this;
     }
 
+    public String getAliases()
+    {
+        return elementCache().aliases.getText();
+    }
+
     public ManageWikiConfigurationPage setAliases(String value)
     {
         elementCache().aliases.sendKeys(value);
         return this;
-    }
-
-    public String getAliases()
-    {
-        return elementCache().aliases.getText();
     }
 
     public ManageWikiConfigurationPage save()

@@ -24,6 +24,7 @@ import java.util.Map;
 public class WikiAliasesTest extends BaseWebDriverTest
 {
     private static String wikiName = "Sample Wiki for testing aliases";
+    private static String wikiName2 = "Sample Wiki for testing aliases - Wiki 2";
     private static String wikiTitle = "Title for " + wikiName;
     private static String wikiBody = "Wiki body for " + wikiName;
 
@@ -71,13 +72,22 @@ public class WikiAliasesTest extends BaseWebDriverTest
 
         log("Verifying adding new alias with rename button");
         ManageWikiConfigurationPage manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
-        manageWikiConfigurationPage.rename(duplicateAlias, true)
-                .setAliases(aliases)
-                .save();
+        manageWikiConfigurationPage.rename(duplicateAlias + " notAlias", true).save();
+        Assert.assertEquals("Incorrect value for alias after rename operation with add alias checked", wikiName,
+                ManageWikiConfigurationPage.beginAt(this, getProjectName(), Map.of("name", duplicateAlias + " notAlias")).getAliases());
+
+        log("Verifying the add alias checkbox");
+        manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
+        manageWikiConfigurationPage.rename(duplicateAlias, false).save();
+        Assert.assertEquals("Incorrect value for alias after rename operation without add alias checked", wikiName,
+                ManageWikiConfigurationPage.beginAt(this, getProjectName(), Map.of("name", duplicateAlias)).getAliases());
+
+        log("Setting aliases in aliases textarea");
+        wikiHelper.manageWikiConfiguration().setAliases(aliases).save();
 
         log("Verifying  all the aliases added works with wiki-page.view");
         manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
-        String listOfAliases[] = manageWikiConfigurationPage.getAliases().split("\n");
+        String listOfAliases[] = (manageWikiConfigurationPage.getAliases() + "\n" + manageWikiConfigurationPage.getAliases().toLowerCase()).split("\n");
         for (int i = 0; i < listOfAliases.length; i++)
         {
             beginAt(WebTestHelper.buildURL("wiki", getProjectName(), "page", Map.of("name", listOfAliases[i])));
@@ -87,18 +97,29 @@ public class WikiAliasesTest extends BaseWebDriverTest
 
         log("Verifying same alias name is not allowed");
         manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
-        String errMsg = manageWikiConfigurationPage.setAliases( "\n" + duplicateAlias)
+        String errMsg = manageWikiConfigurationPage.setAliases("\n" + duplicateAlias)
                 .saveExpectingErrors();
-        Assert.assertEquals("Incorrect error message", "Warning: Alias '" + duplicateAlias + "' already exists in this folder.",errMsg);
+        Assert.assertEquals("Incorrect error message", "Warning: Alias '" + duplicateAlias + "' already exists in this folder.", errMsg);
 
         log("Testing case insensitive");
         manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
         errMsg = manageWikiConfigurationPage.setAliases("\n" + duplicateAlias.toLowerCase()).saveExpectingErrors();
-        Assert.assertEquals("Incorrect error message", "Warning: Alias '" + duplicateAlias.toLowerCase() + "' already exists in this folder.",errMsg);
+        Assert.assertEquals("Incorrect error message", "Warning: Alias '" + duplicateAlias.toLowerCase() + "' already exists in this folder.", errMsg);
+
+        log("Testing adding same wiki alias on different wiki fails within same folder");
+        wikiHelper.createWikiPage(wikiName2, null, wikiTitle, wikiBody, true, null, false);
+        manageWikiConfigurationPage = ManageWikiConfigurationPage.beginAt(this, getProjectName(), Map.of("name", wikiName2));
+        Assert.assertEquals("This alias creation should throw error", "Warning: Alias '" + duplicateAlias + "' already exists in this folder.",
+                manageWikiConfigurationPage.setAliases(duplicateAlias).saveExpectingErrors());
+
+        log("Testing creating new wiki with name same as one of the aliases of different wiki");
+        wikiHelper.createWikiPage(wikiName, null, "Title: New wiki with same alias", "Testing creating new wiki with name same as one of the aliases of different wiki", true, null, false);
+        beginAt(WebTestHelper.buildURL("wiki", getProjectName(), "page", Map.of("name", wikiName)));
+        Assert.assertEquals("Incorrect wiki body for wiki " + wikiName, "Testing creating new wiki with name same as one of the aliases of different wiki",
+                Locator.tagWithClass("div", "labkey-wiki").findElement(getDriver()).getText());
 
         log("Creating same name alias in different folder");
         navigateToFolder(getProjectName(), SUBFOLDER);
-        wikiHelper = new WikiHelper(this);
         wikiHelper.createWikiPage(wikiName, null, wikiTitle, wikiBody, true, null, false);
 
         manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
