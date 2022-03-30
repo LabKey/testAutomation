@@ -216,7 +216,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         samplesTable.uncheckAllOnPage();
         samplesTable.checkCheckbox(0);
-        samplesTable.clickHeaderButton("Derive Samples");
+        samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), sampleTypeName + " in /" + getProjectName());
         clickButton("Next");
         setFormElement(Locator.name("outputSample1_Name"), sampleName);

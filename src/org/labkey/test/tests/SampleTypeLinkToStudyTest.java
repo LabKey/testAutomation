@@ -295,7 +295,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         samplesTable.setSort("Name", SortDirection.ASC);
         samplesTable.checkCheckbox(0);
-        samplesTable.clickHeaderButton("Derive Samples");
+        samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), "Plasma in /" + SAMPLE_TYPE_PROJECT);
         clickButton("Next");
         setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
@@ -361,7 +361,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         customizeView.saveCustomView();
 
         table.checkCheckbox(0);
-        table.clickHeaderButton("Link to Study");
+        table.clickHeaderButtonAndWait("Link to Study");
         selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
 
@@ -646,7 +646,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(parentSampleType));
         samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         samplesTable.checkCheckbox(0);
-        samplesTable.clickHeaderButton("Derive Samples");
+        samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), childSampleType + " in /" + getProjectName());
         clickButton("Next");
         setFormElement(Locator.name("outputSample1_Name"), "derivedChildSample");
