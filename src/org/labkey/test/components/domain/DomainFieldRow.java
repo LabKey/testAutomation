@@ -417,7 +417,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
         setType(FieldDefinition.ColumnType.Lookup);
+        WebDriverWrapper.waitFor(() -> Locator.tagContainingText("option","Current Project").findOptionalElement(this).isPresent(), 2000);
         setFromFolder(lookupInfo.getFolder());
+        WebDriverWrapper.waitFor(() -> Locator.tagContainingText("option","core").findOptionalElement(this).isPresent(), 2000);
         setFromSchema(lookupInfo.getSchema());
         if (lookupInfo.getTableType() == null)
             throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
