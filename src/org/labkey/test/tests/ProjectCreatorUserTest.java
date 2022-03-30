@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,6 +11,7 @@ import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 
@@ -20,6 +22,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
 @Category(Daily.class)
@@ -29,6 +32,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     private static final String PROJECT_CREATOR_USER = "project_creator@permission.test";
     private static final String READER = "reader@permission.test";
     private static String PROJECT_NAME_PC = "Folder by Project Creator";
+    private static String TEMPLATE_PROJECT = "Template project";
 
     @BeforeClass
     public static void setup()
@@ -45,6 +49,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
     private void doSetup()
     {
+        _containerHelper.createProject(TEMPLATE_PROJECT, "Study");
         _userHelper.createUser(PROJECT_CREATOR_USER, true, true);
         _userHelper.createUser(READER, true, true);
         new ApiPermissionsHelper(this).addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
@@ -54,8 +59,14 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        _containerHelper.deleteProject(PROJECT_NAME_PC, afterTest, 1000000);
+        _containerHelper.deleteProject(TEMPLATE_PROJECT);
         _userHelper.deleteUsers(false, PROJECT_CREATOR_USER, READER);
+    }
+
+    @Before
+    public void beforeTest()
+    {
+        _containerHelper.deleteProject(PROJECT_NAME_PC, false, WAIT_FOR_PAGE);
     }
 
     @Test
@@ -96,9 +107,6 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     @Test
     public void testCreateProjectByReader() throws IOException, CommandException
     {
-        log("Cleanup : Deleting the project");
-        _containerHelper.deleteProject(PROJECT_NAME_PC, false, WAIT_FOR_PAGE);
-
         log("Verifying Reader creating the project fails");
         goToHome();
         impersonate(READER);
@@ -111,6 +119,23 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         assertEquals("Should not be able to create the project", "403 : Forbidden", response);
         assertFalse(projectMenu().projectLinkExists(PROJECT_NAME_PC));
+    }
+
+    @Test
+    public void testCreateProjectByTemplate() throws IOException, CommandException
+    {
+        String containerId = ((APIContainerHelper) _containerHelper).getContainerId(TEMPLATE_PROJECT);
+        goToHome();
+        impersonate(PROJECT_CREATOR_USER);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", PROJECT_NAME_PC);
+        params.put("assignProjectAdmin", "true");
+        params.put("folderType", "Template");
+        params.put("templateSourceId", containerId);
+        createProject(params);
+        stopImpersonating();
+
+        assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
     }
 
     private String createProject(Map<String, Object> params) throws IOException
