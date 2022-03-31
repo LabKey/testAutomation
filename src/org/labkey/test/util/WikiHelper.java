@@ -22,6 +22,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.wiki.EditPage;
+import org.labkey.test.pages.wiki.ManageWikiConfigurationPage;
 
 import java.io.File;
 
@@ -92,6 +93,13 @@ public class WikiHelper
     {
         _test.clickAndWait(Locator.tagWithAttribute("span", "title", "Edit"));
         return new EditPage(_test.getWrappedDriver());
+    }
+
+    public ManageWikiConfigurationPage manageWikiConfiguration()
+    {
+        _test.clickTab("Wiki", true);
+        _test.clickAndWait(Locator.linkWithText("Manage"));
+        return new ManageWikiConfigurationPage(_test.getDriver());
     }
 
     private void setSourceFromFile(File file)
