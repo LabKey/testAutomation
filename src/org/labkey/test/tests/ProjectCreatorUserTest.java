@@ -9,6 +9,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APIContainerHelper;
@@ -50,6 +51,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(TEMPLATE_PROJECT, "Study");
+        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
         _userHelper.createUser(PROJECT_CREATOR_USER, true, true);
         _userHelper.createUser(READER, true, true);
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
