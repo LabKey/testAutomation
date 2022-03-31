@@ -31,8 +31,8 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 {
     private static final String PROJECT_CREATOR_USER = "project_creator@permission.test";
     private static final String READER = "reader@permission.test";
-    private static String PROJECT_NAME_PC = "Folder by Project Creator";
-    private static String TEMPLATE_PROJECT = "Template project";
+    private static final String PROJECT_NAME_PC = "Folder by Project Creator";
+    private static final String TEMPLATE_PROJECT = "Template project";
 
     @BeforeClass
     public static void setup()
@@ -52,14 +52,16 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         _containerHelper.createProject(TEMPLATE_PROJECT, "Study");
         _userHelper.createUser(PROJECT_CREATOR_USER, true, true);
         _userHelper.createUser(READER, true, true);
-        new ApiPermissionsHelper(this).addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
+        ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
+        permHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
+        permHelper.addMemberToRole(PROJECT_CREATOR_USER, "Folder Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        _containerHelper.deleteProject(TEMPLATE_PROJECT);
+        _containerHelper.deleteProject(TEMPLATE_PROJECT, afterTest);
         _userHelper.deleteUsers(false, PROJECT_CREATOR_USER, READER);
     }
 
