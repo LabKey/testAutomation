@@ -8,6 +8,8 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -51,6 +53,73 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return driver;
     }
 
+    @Override
+    protected void waitForReady()
+    {
+
+        // The panel is ready if:
+        // 1. There are no spinners.
+        // 2. If there are currently no parents there should be only one entity type select.
+        // 3. If there are parents
+        WebDriverWrapper.waitFor(()->
+        {
+            if(BootstrapLocators.loadingSpinner.findWhenNeeded(this).isDisplayed())
+            {
+                return false;
+            }
+            else
+            {
+
+                // There are no existing parents.
+
+                try
+                {
+                    System.out.println("Checking to see if there are currently no parents.");
+                    return ReactSelect.finder(getDriver())
+                            .withNamedInput("entityType0")
+                            .find(this).isInteractive();
+                }
+                catch (NoSuchElementException noNewParents)
+                {
+                    System.out.println("New parent added is not present.");
+                    // The new parent type is not there (not necessarily a bad thing) so ignore this error and check for existing parents.
+                }
+
+                try
+                {
+                    System.out.println("Now checking to see if the parent selects are populated.");
+                    // If there are existing parents then all of the FilteringReactSelect controls (i.e. the parents) should have values selected.
+
+                    List<FilteringReactSelect> filteringReactSelects = FilteringReactSelect.finder(getDriver()).findAll(this);
+
+                    if(filteringReactSelects.isEmpty())
+                    {
+                        System.out.println("There are no parent select controls, this is odd.");
+                        return false;
+                    }
+
+                    for (FilteringReactSelect select : FilteringReactSelect.finder(getDriver()).findAll(this))
+                    {
+                        if (!select.hasSelection())
+                        {
+                            System.out.println("Found an unpopulated parent select.");
+                            return false;
+                        }
+                    }
+
+                    System.out.println("Parent selects are there and populated.");
+                    return true;
+                }
+                catch (NoSuchElementException | StaleElementReferenceException exception)
+                {
+                    System.out.println("Got an exception with parent selects, this is odd.");
+                    return false;
+                }
+
+            }
+        }, "The ParentEntityEdit panel did not become active in timely fashion.", 5_000);
+    }
+
     private void clickButtonWaitForPanel(WebElement button)
     {
         clickButtonWaitForPanel(button, 2_500);
@@ -77,6 +146,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         Assert.assertTrue("Whoa, there appears to be more than one panel in edit mode. This should never happen.",
                 infoCount <= 1);
 
+        // A reference to the editing header title
+        WebElement editorHeading = Locator.tagContainingText("div", "Editing").withClass("detail__edit--heading").findWhenNeeded(getDriver());
+
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
 
@@ -86,9 +158,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         button.click();
 
+        // Wait until the counts of panels not in edit mode increases and the editor heading is no longer visible.
         WebDriverWrapper.waitFor(()->
-                        (defaultPanel.findElements(getDriver()).size() > defaultCount) &&
-                                (infoPanel.findElements(getDriver()).size() < infoCount),
+                        (defaultPanel.findElements(getDriver()).size() > defaultCount) && !editorHeading.isDisplayed(),
                 "Panel did not change state.", wait);
     }
 
@@ -120,6 +192,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         WebElement progressbar = Locator.tagWithClass("div", "progress-bar").findWhenNeeded(getDriver());
         WebDriverWrapper.waitFor(()->!progressbar.isDisplayed(),
                 "It looks like an update took too long.", waitTime);
+
     }
 
     /**
