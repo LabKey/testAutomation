@@ -12,11 +12,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +47,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return getClass().getSimpleName() + " Project";
+        return null;
     }
 
     private void doSetup()
@@ -136,10 +138,17 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         params.put("assignProjectAdmin", "true");
         params.put("folderType", "Template");
         params.put("templateSourceId", containerId);
+        params.put("templateWriterTypes", "Lists");
         createProject(params);
         stopImpersonating();
 
+        goToProjectHome(PROJECT_NAME_PC);
         assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
+        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
+        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
+
+        ManageListsGrid listsGrid = goToManageLists().getGrid();
+        assertEquals("Incorrect lists copied from template", Arrays.asList("Lab Machines", "Reagents", "Technicians"), listsGrid.getListNames());
     }
 
     private String createProject(Map<String, Object> params) throws IOException
