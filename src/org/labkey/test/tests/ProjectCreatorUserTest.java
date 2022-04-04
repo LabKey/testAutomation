@@ -79,6 +79,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     public void testCreateProjectByProjectCreator() throws IOException, CommandException
     {
         log("Project Creator creating the project with admin permission");
+        goToHome();
         impersonate(PROJECT_CREATOR_USER);
         Map<String, Object> params = new HashMap<>();
         params.put("name", PROJECT_NAME_PC);
