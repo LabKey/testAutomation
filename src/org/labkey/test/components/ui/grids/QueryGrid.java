@@ -299,7 +299,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid selectView(String viewName)
     {
         doAndWaitForUpdate(()->
-                getGridBar().doMenuAction("Grid Views", Arrays.asList(viewName)));
+                getGridBar().doMenuAction("Views", Arrays.asList(viewName)));
         return this;
     }
 

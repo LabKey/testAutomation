@@ -435,8 +435,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         }
 
         static final Locator.XPathLocator viewSelectorButtonGroup = Locator.tagWithClass("div", "dropdown")
-                .withChild(Locator.button("Grid Views"));
-        static final Locator.XPathLocator viewSelectorToggleButton = Locator.button("Grid Views");
+                .withChild(Locator.button("Views"));
+        static final Locator.XPathLocator viewSelectorToggleButton = Locator.button("Views");
         static final Locator viewSelectorMenu = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "viewselector");
     }
 
