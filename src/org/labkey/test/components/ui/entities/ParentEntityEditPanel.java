@@ -59,8 +59,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         // The panel is ready if:
         // 1. There are no spinners.
-        // 2. If there are currently no parents there should be only one entity type select.
-        // 3. If there are parents
+        // 2. If there are currently no parents there should be only one entity type select (ReactSelect) and it should be ready.
+        // 3. If there are parents (i.e. FilterReactSelect controls present) none of them should be empty.
         WebDriverWrapper.waitFor(()->
         {
             if(BootstrapLocators.loadingSpinner.findWhenNeeded(this).isDisplayed())
@@ -70,31 +70,27 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             else
             {
 
-                // There are no existing parents.
+                // Check to see if there are no existing parents.
+                List<ReactSelect> noParentsSelectors = ReactSelect.finder(getDriver())
+                        .withNamedInput("entityType0")
+                        .findAll(this);
 
-                try
+                Assert.assertFalse("It looks like there are multiple new parent ReactSelect controls present, that should never happen.",
+                        noParentsSelectors.size() > 1);
+
+                if(noParentsSelectors.size() == 1)
                 {
-                    System.out.println("Checking to see if there are currently no parents.");
-                    return ReactSelect.finder(getDriver())
-                            .withNamedInput("entityType0")
-                            .find(this).isInteractive();
-                }
-                catch (NoSuchElementException noNewParents)
-                {
-                    System.out.println("New parent added is not present.");
-                    // The new parent type is not there (not necessarily a bad thing) so ignore this error and check for existing parents.
+                    return noParentsSelectors.get(0).isInteractive();
                 }
 
                 try
                 {
-                    System.out.println("Now checking to see if the parent selects are populated.");
-                    // If there are existing parents then all of the FilteringReactSelect controls (i.e. the parents) should have values selected.
+                    // If there are existing parents then all the FilteringReactSelect controls (i.e. the parents) should have values selected.
 
                     List<FilteringReactSelect> filteringReactSelects = FilteringReactSelect.finder(getDriver()).findAll(this);
 
                     if(filteringReactSelects.isEmpty())
                     {
-                        System.out.println("There are no parent select controls, this is odd.");
                         return false;
                     }
 
@@ -102,17 +98,14 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                     {
                         if (!select.hasSelection())
                         {
-                            System.out.println("Found an unpopulated parent select.");
                             return false;
                         }
                     }
 
-                    System.out.println("Parent selects are there and populated.");
                     return true;
                 }
                 catch (NoSuchElementException | StaleElementReferenceException exception)
                 {
-                    System.out.println("Got an exception with parent selects, this is odd.");
                     return false;
                 }
 
