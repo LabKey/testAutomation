@@ -71,16 +71,16 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             {
 
                 // Check to see if there are no existing parents.
-                List<ReactSelect> noParentsSelectors = ReactSelect.finder(getDriver())
+                List<ReactSelect> firstParentSelector = ReactSelect.finder(getDriver())
                         .withNamedInput("entityType0")
                         .findAll(this);
 
                 Assert.assertFalse("It looks like there are multiple new parent ReactSelect controls present, that should never happen.",
-                        noParentsSelectors.size() > 1);
+                        firstParentSelector.size() > 1);
 
-                if(noParentsSelectors.size() == 1)
+                if(!firstParentSelector.isEmpty())
                 {
-                    return noParentsSelectors.get(0).isInteractive();
+                    return firstParentSelector.get(0).isInteractive();
                 }
 
                 try
