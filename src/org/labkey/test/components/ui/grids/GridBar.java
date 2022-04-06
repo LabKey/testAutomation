@@ -433,11 +433,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return Locator.XPathLocator.union(Locator.tagWithClassContaining("div", "query-grid-bar"),
                     Locator.tagWithClassContaining("div", "grid-panel__button-bar"));
         }
-
-        static final Locator.XPathLocator viewSelectorButtonGroup = Locator.tagWithClass("div", "dropdown")
-                .withChild(Locator.button("Views"));
-        static final Locator.XPathLocator viewSelectorToggleButton = Locator.button("Views");
-        static final Locator viewSelectorMenu = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "viewselector");
     }
 
     public static class GridBarFinder extends ComponentFinder<QueryGrid, GridBar, GridBarFinder>
