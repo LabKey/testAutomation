@@ -5,34 +5,38 @@ import java.util.Date;
 
 public class TestDateUtils
 {
+    // Stash a consistent "today" date to allow tests to work when spanning midnight
+    private static final Date TODAY = Calendar.getInstance().getTime();
+
     private TestDateUtils()
     {
         // Prevent instantiation
     }
 
     /**
-     * @return A Date object representing today's date
+     * @return A Date object representing today's date. May refer to yesterday for suites crossing midnight
      */
     public static Date getTodaysDate()
     {
-        Calendar calToday = Calendar.getInstance();
-        return calToday.getTime();
+        return TODAY;
     }
 
     /**
      * Get a date that is some period of time before or after today's date.
-     * Will return the new date in the "MM/dd/yyyy" format.
-     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html">Calendar</a>
-     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#YEAR">YEAR</a>
-     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#MONTH">MONTH</a>
-     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#HOUR">HOUR</a>
-     * @param dateValueToChange One of the date values from Calendar (YEAR, MONTH or HOUR)
+     * Will return the new date
+     * @see Calendar#add(int, int)
+     * @see Calendar#YEAR
+     * @see Calendar#MONTH
+     * @see Calendar#DAY_OF_MONTH
+     * @see Calendar#HOUR
+     * @param dateValueToChange One of the date values from Calendar (e.g. YEAR, MONTH, or HOUR)
      * @param amount The amount to change the given value.
-     * @return The new date in a MM/dd/yyyy format.
+     * @return The new date
      */
     public static Date diffFromTodaysDate(int dateValueToChange, int amount)
     {
         Calendar calToday = Calendar.getInstance();
+        calToday.setTime(getTodaysDate());
         calToday.add(dateValueToChange, amount);
         return calToday.getTime();
     }

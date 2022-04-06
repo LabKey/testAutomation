@@ -10,12 +10,16 @@ import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPanel.ElementCache>
 {
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd H:m");
+
     private final WebElement _el;
     private final WebDriver _driver;
 
@@ -92,12 +96,14 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
             }
             else if (value1 instanceof Date dateVal1)
             {
-                elementCache().dateValues.get(index).set(dateVal1.toString());
+                final String dateStr1 = DATE_FORMAT.format(dateVal1);
+                elementCache().dateValues.get(index).set(dateStr1);
                 if (value2 instanceof Date dateVal2)
                 {
-                    elementCache().dateValuesSecond.get(index).set(dateVal2.toString());
+                    final String dateStr2 = DATE_FORMAT.format(dateVal2);
+                    elementCache().dateValuesSecond.get(index).set(dateStr2);
                 }
-                else
+                else if (value2 != null)
                 {
                     throw new IllegalArgumentException("Mismatched expression value types: " +
                             value1.getClass().getSimpleName() + "=/=" +
