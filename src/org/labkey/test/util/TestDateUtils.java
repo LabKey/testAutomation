@@ -18,7 +18,8 @@ public class TestDateUtils
      */
     public static Date getTodaysDate()
     {
-        return TODAY;
+        // Return a copy. Dates are not immutable
+        return (Date) TODAY.clone();
     }
 
     /**
