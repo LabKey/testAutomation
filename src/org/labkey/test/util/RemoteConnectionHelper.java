@@ -148,13 +148,13 @@ public class RemoteConnectionHelper
         _test.setFormElement(Locator.name("url"), url);
 
         if (null != user)
-        _test.setFormElement(Locator.name("user"), user);
+        _test.setFormElement(Locator.name("userEmail"), user);
 
         if (null != password)
         _test.setFormElement(Locator.name("password"), password);
 
         if (null != container)
-        _test.setFormElement(Locator.name("container"), container);
+        _test.setFormElement(Locator.name("folderPath"), container);
     }
 
     private void verifyExpectedError(String expectedError)
