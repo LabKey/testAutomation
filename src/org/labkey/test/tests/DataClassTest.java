@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
@@ -133,7 +133,7 @@ public class DataClassTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testIgnoreReservedFieldNames()
+    public void testIgnoreReservedFieldNames() throws Exception
     {
         final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey to support this data class: " +
@@ -142,9 +142,7 @@ public class DataClassTest extends BaseWebDriverTest
         List<String> lines = new ArrayList<>();
         lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,created,createdby,modified,modifiedBy,Container,SampleID");
 
-        if (!TestFileUtils.getTestTempDir().exists())
-            TestFileUtils.getTestTempDir().mkdirs();
-        File inferenceFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "InferFieldsForDataClass.csv", String.join(System.lineSeparator(), lines));
+        File inferenceFile = TestFileUtils.writeTempFile("InferFieldsForDataClass.csv", String.join(System.lineSeparator(), lines));
 
         goToProjectHome();
 
