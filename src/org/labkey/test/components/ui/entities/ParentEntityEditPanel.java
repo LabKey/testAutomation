@@ -59,8 +59,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         // The panel is ready if:
         // 1. There are no spinners.
-        // 2. If there are currently no parents there should be only one entity type select (ReactSelect) and it should be ready.
-        // 3. If there are parents (i.e. FilterReactSelect controls present) none of them should be empty.
+        // 2. If there are parents (i.e. FilterReactSelect controls present) they should all be interactive (not in the process of loading).
+        // 3. If there are no parents there should be only one entity type select (ReactSelect) and it should be interactive and have a list of options.
         WebDriverWrapper.waitFor(()->
         {
             if(BootstrapLocators.loadingSpinner.findWhenNeeded(this).isDisplayed())
@@ -70,39 +70,39 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             else
             {
 
-                // Check to see if there are no existing parents.
-                List<ReactSelect> firstParentSelector = ReactSelect.finder(getDriver())
-                        .withNamedInput("entityType0")
-                        .findAll(this);
-
-                Assert.assertFalse("It looks like there are multiple new parent ReactSelect controls present, that should never happen.",
-                        firstParentSelector.size() > 1);
-
-                if(!firstParentSelector.isEmpty())
-                {
-                    return firstParentSelector.get(0).isInteractive();
-                }
-
                 try
                 {
-                    // If there are existing parents then all the FilteringReactSelect controls (i.e. the parents) should have values selected.
 
+                    // If there are existing parents then all the FilteringReactSelect controls (i.e. the parents) should
+                    // be interactive. When this panel is in a dialog waitForReady can be called after the parent entity type is selected.
+                    // In that scenario the parent selector will be empty, but it should be interactive.
                     List<FilteringReactSelect> filteringReactSelects = FilteringReactSelect.finder(getDriver()).findAll(this);
 
-                    if(filteringReactSelects.isEmpty())
+                    if(filteringReactSelects.size() > 1)
                     {
-                        return false;
-                    }
-
-                    for (FilteringReactSelect select : FilteringReactSelect.finder(getDriver()).findAll(this))
-                    {
-                        if (!select.hasSelection())
+                        for (FilteringReactSelect select : filteringReactSelects)
                         {
-                            return false;
+                            if (!select.isInteractive())
+                            {
+                                // There is a parent selector but it is not interactive. Not ready.
+                                return false;
+                            }
                         }
-                    }
 
-                    return true;
+                        // All the parent selectors are interactive, panel is ready.
+                        return true;
+                    }
+                    else
+                    {
+                        // If there are no existing parents check to see if this is the 'first' parent.
+                        ReactSelect firstParentSelector = ReactSelect.finder(getDriver())
+                                .withNamedInput("entityType0")
+                                .find(this);
+
+                        // For the first parent the panel is ready if the entity type selector is ready and the options have been populated.
+                        return firstParentSelector.isInteractive() && !firstParentSelector.getOptions().isEmpty();
+
+                    }
                 }
                 catch (NoSuchElementException | StaleElementReferenceException exception)
                 {
