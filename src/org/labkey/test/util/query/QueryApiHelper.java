@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class QueryHelper
+public class QueryApiHelper
 {
     private final Connection _connection;
     private final String _containerPath;
@@ -30,7 +30,7 @@ public class QueryHelper
 
     private int _insertTimout = 180_000;
 
-    public QueryHelper(Connection connection, String containerPath, String schema, String query)
+    public QueryApiHelper(Connection connection, String containerPath, String schema, String query)
     {
         _connection = connection;
         _containerPath = containerPath;
@@ -38,7 +38,7 @@ public class QueryHelper
         _query = query;
     }
 
-    public QueryHelper setInsertTimout(int insertTimout)
+    public QueryApiHelper setInsertTimout(int insertTimout)
     {
         _insertTimout = insertTimout;
         return this;

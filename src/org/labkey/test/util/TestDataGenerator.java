@@ -33,7 +33,7 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.query.QueryHelper;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -396,7 +396,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public DomainResponse getDomain(Connection cn) throws IOException, CommandException
@@ -405,7 +405,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public CommandResponse deleteDomain(Connection cn) throws IOException, CommandException
@@ -431,7 +431,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public SaveRowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
@@ -440,7 +440,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public SelectRowsResponse getRowsFromServer(Connection cn) throws IOException, CommandException
@@ -449,7 +449,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns) throws IOException, CommandException
@@ -458,7 +458,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, @Nullable  List<Filter> filters) throws IOException, CommandException
@@ -467,7 +467,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public SelectRowsResponse getRowsFromServer(Connection cn, List<String> intendedColumns, @Nullable  List<Filter> filters, @Nullable List<Sort> sorts) throws IOException, CommandException
@@ -476,7 +476,7 @@ public class TestDataGenerator
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.query.QueryHelper}
+     * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
     public SaveRowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
@@ -484,9 +484,9 @@ public class TestDataGenerator
         return getQueryHelper(cn).deleteRows(rowsToDelete);
     }
 
-    public QueryHelper getQueryHelper(Connection connection)
+    public QueryApiHelper getQueryHelper(Connection connection)
     {
-        return new QueryHelper(connection, _containerPath, _schemaName, _queryName);
+        return new QueryApiHelper(connection, _containerPath, _schemaName, _queryName);
     }
 
     public TestDataValidator getValidator()
