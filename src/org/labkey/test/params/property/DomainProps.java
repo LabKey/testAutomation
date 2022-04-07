@@ -6,6 +6,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public abstract class DomainProps
 
     public final TestDataGenerator create(Connection connection, String containerPath) throws IOException, CommandException
     {
+        TestLogger.info(String.format("Creating domain '%s.%s' in '%s'", getSchemaName(), getQueryName(), containerPath));
         getCreateCommand().execute(connection, containerPath);
         return getTestDataGenerator(containerPath);
     }
