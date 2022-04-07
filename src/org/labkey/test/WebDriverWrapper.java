@@ -600,53 +600,70 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public List<String> getLinkAddresses()
+    public List<Pair<String, Map<String, String>>> getLinkAddresses()
     {
         return getLinkAddresses(false);
     }
 
     public List<String> getFormAddresses()
     {
-        return getLinkAddresses(true);
+        return getLinkAddresses(true).stream().map(Pair::getLeft).collect(Collectors.toList());
     }
 
-    private List<String> getLinkAddresses(boolean includeForms)
+    @SuppressWarnings("unchecked")
+    private List<Pair<String, Map<String, String>>> getLinkAddresses(boolean includeForms)
     {
-        String js = "getLinkAddresses = function () {\n" +
-                "        var i, j;\n" +
-                "        var addresses = new Array();\n" +
+        String js = ("""
+                getLinkAddresses = function () {
+                    var i, j;
+                    var addresses = new Array();
+                """) +
                 (!includeForms ?
-                "        var links = window.document.links;\n" +
-                "        for (i = 0; i < links.length; i++) {\n" +
-                "          if (links[i].href && links[i].href != '#') addresses.push(links[i].href);\n" +
-                "        }\n"
+                """
+                    var links = window.document.links;
+                    for (i = 0; i < links.length; i++) {
+                        if (links[i].href && links[i].href != '#') {
+                            addresses.push({href: links[i].href, attributes: links[i].attributes});
+                        }
+                    }
+                """
                 : // includeForms
-                "        var forms = window.document.forms;\n" +
-                "        for (i = 0; i < forms.length ; i++) {\n" +
-                "          var action = forms[i].getAttribute('action');\n" +   // raw attribute value
-                "          if (action === 'begin' || action === '#') continue;\n" +
-                "          if ((action === '' || action == undefined) && LABKEY.ActionURL.getAction() === 'begin') continue;" +
-                "          action = forms[i].action || window.location.href;\n" +
-                "          if (typeof action !== 'string') continue;\n" +
-                "          var and = '&';\n" +
-                "          if (action.indexOf('?')==-1) and = '?';\n" + // No parameters in action, start query string
-                "          for (j=0 ; j<forms[i].elements.length ; j++) {\n" +
-                "            if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') {\n" +
-                "              action += and + forms[i].elements[j].name + '=' + (forms[i].elements[j].value || '');\n" +
-                "              and = '&';\n" +
-                "            }\n" +
-                "          }\n" +
-                "          addresses.push(action);\n" +
-                "        }\n"
-                ) +
-                "        return addresses;\n" +
-                "};\n" +
-                "return getLinkAddresses();";
-        @SuppressWarnings("unchecked")
-        List<String> linkArray = (ArrayList<String>) executeScript(js);
-        ArrayList<String> links = new ArrayList<>();
-        for (String link : linkArray)
+                """
+                    var forms = window.document.forms;
+                    for (i = 0; i < forms.length ; i++) {
+                        var action = forms[i].getAttribute('action'); // raw attribute value
+                        if (action === 'begin' || action === '#' ||
+                          ((action === '' || action == undefined) && LABKEY.ActionURL.getAction() === 'begin')) {
+                            continue;
+                        }
+                        action = forms[i].action || window.location.href;
+                        if (typeof action !== 'string') {
+                            continue;
+                        }
+                        var and = '&';
+                        if (action.indexOf('?')==-1) {
+                            and = '?';// No parameters in action, start query string
+                        }
+                        for (j=0 ; j<forms[i].elements.length ; j++) {
+                            if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') {
+                                action += and + forms[i].elements[j].name + '=' + (forms[i].elements[j].value || '');
+                                and = '&';
+                            }
+                        }
+                        addresses.push({href: forms[i].href, attributes: forms[i].attributes});
+                    }
+                """) +
+                ("""
+                    return addresses;
+                };
+                return getLinkAddresses();
+                """);
+
+        List<Map<String, Object>> linksWithAttributes = (List<Map<String, Object>>) executeScript(js);
+        List<Pair<String, Map<String, String>>> links = new ArrayList<>();
+        for (Map<String, Object> entry : linksWithAttributes)
         {
+            String link = (String) entry.get("href");
             if (link.contains("#"))
             {
                 link = link.substring(0, link.indexOf("#"));
@@ -654,7 +671,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
             link = trimToNull(link);
             if (null != link)
             {
-                links.add(link);
+                Map<String, String> attributes = new HashMap<>();
+                Map<String, Object> rawAttributes = (Map<String, Object>) entry.get("attributes");
+                rawAttributes.forEach((key, value) -> attributes.put(key, (String) value));
+
+                links.add(Pair.of(link, attributes));
             }
         }
 
