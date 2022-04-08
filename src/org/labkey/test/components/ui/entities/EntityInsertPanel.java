@@ -304,7 +304,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     {
         if (!isGridVisible())
         {
-            modeSelectListItem(" Grid")
+            modeSelectListItem("from Grid")
                     .waitForElement(this, 2000).click();
             clearElementCache();
             WebDriverWrapper.waitFor(() -> isGridVisible(),
