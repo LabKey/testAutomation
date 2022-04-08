@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.search;
 
-import org.labkey.remoteapi.query.Filter.Operator;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.UpdatingComponent;
@@ -30,7 +29,7 @@ public class EntityFieldFilterModal extends ModalDialog
     {
         super.waitForReady(ec);
         getWrapper().shortWait().until(ExpectedConditions
-                .visibilityOfNestedElementsLocatedBy(elementCache().querySelectionPanel, listItem));
+                .visibilityOf(listItem.findWhenNeeded(elementCache().querySelectionPanel)));
     }
 
     /**
@@ -58,7 +57,7 @@ public class EntityFieldFilterModal extends ModalDialog
     {
         WebElement fieldItem = listItem.withText(fieldLabel).findElement(elementCache().fieldsSelectionPanel);
         fieldItem.click();
-        Locator.byClass("parent-search-panel__col-sub-title").withText("Find values for " + fieldLabel)
+        Locator.byClass("filter-modal__col-sub-title").withText("Find values for " + fieldLabel)
                 .waitForElement(elementCache().filterPanel, 10_000);
 
         return this;
@@ -75,36 +74,6 @@ public class EntityFieldFilterModal extends ModalDialog
         selectParent(parentName);
         selectField(fieldLabel);
 
-        return this;
-    }
-
-    /**
-     * @see FilterExpressionPanel#setFilterValue(Operator)
-     * @return this component
-     */
-    public EntityFieldFilterModal setFilterValue(Operator operator)
-    {
-        selectExpressionTab().setFilterValue(operator);
-        return this;
-    }
-
-    /**
-     * @see FilterExpressionPanel#setFilterValue(Operator, String)
-     * @return this component
-     */
-    public EntityFieldFilterModal setFilterValue(Operator operator, String value)
-    {
-        selectExpressionTab().setFilterValue(operator, value);
-        return this;
-    }
-
-    /**
-     * @see FilterExpressionPanel#setFilterValue(Operator, String, String)
-     * @return this component
-     */
-    public EntityFieldFilterModal setFilterValue(Operator operator, String value1, String value2)
-    {
-        selectExpressionTab().setFilterValue(operator, value1, value2);
         return this;
     }
 
@@ -165,15 +134,15 @@ public class EntityFieldFilterModal extends ModalDialog
     protected class ElementCache extends ModalDialog.ElementCache
     {
         // Entities column
-        protected final WebElement querySelectionPanel = Locator.byClass("parent-search-panel__col_queries")
+        protected final WebElement querySelectionPanel = Locator.byClass("filter-modal__col_queries")
                 .findWhenNeeded(this);
 
         // Fields column
-        protected final WebElement fieldsSelectionPanel = Locator.byClass("parent-search-panel__col_fields")
+        protected final WebElement fieldsSelectionPanel = Locator.byClass("filter-modal__col_fields")
                 .findWhenNeeded(this);
 
         // Values column
-        protected final WebElement filterPanel = Locator.byClass("parent-search-panel__col_filter_exp")
+        protected final WebElement filterPanel = Locator.byClass("filter-modal__col_filter_exp")
                 .findWhenNeeded(this);
         protected final Tabs filterTabs = new Tabs.TabsFinder(getDriver()).refindWhenNeeded(filterPanel);
         protected final FilterExpressionPanel filterExpressionPanel =

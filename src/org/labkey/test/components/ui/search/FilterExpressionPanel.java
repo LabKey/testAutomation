@@ -5,15 +5,21 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPanel.ElementCache>
 {
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd H:m");
+
     private final WebElement _el;
     private final WebDriver _driver;
 
@@ -43,55 +49,87 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
     }
 
     /**
-     * Set a valueless filter expression (e.g. 'Not Blank')
-     * @param operator filter type
+     * Set the first filter expression
      */
-    public void setFilterValue(Operator operator)
+    public void setFilter(Expression expression)
     {
-        setFilterType(operator);
+        setFilter(0, expression);
     }
 
     /**
-     * Set a single value filter expression (e.g. 'Greater Than')
-     * @param operator filter type
-     * @param value filter value
+     * Set both filter expressions
      */
-    public void setFilterValue(Operator operator, String value)
+    public void setFilters(Expression expression0, Expression expression1)
     {
-        setFilterType(operator);
-        elementCache().filterValue1.set(value);
-    }
-
-    /**
-     * Set a two-value filter expression (e.g. 'Between')
-     * @param operator filter type
-     * @param value1 first value
-     * @param value2 second value
-     */
-    public void setFilterValue(Operator operator, String value1, String value2)
-    {
-        setFilterType(operator);
-        elementCache().filterValue1.set(value1);
-        elementCache().filterValue2.set(value2);
+        setFilter(0, expression0);
+        setFilter(1, expression1);
     }
 
     public void clearFilter()
     {
-        elementCache().filterTypeSelect.clearSelection();
-        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(
-                elementCache().filterValue1.getComponentElement(),
-                elementCache().filterValue2.getComponentElement()));
+        if (elementCache().filterTypeSelects.get(1).getComponentElement().isDisplayed())
+        {
+            elementCache().filterTypeSelects.get(1).clearSelection();
+        }
+        elementCache().filterTypeSelects.get(0).clearSelection();
     }
 
-    private void setFilterType(Operator operator)
+    private void setFilter(int index, Expression expression)
+    {
+        Operator operator = expression._operator;
+        Object value1 = expression._value1;
+        Object value2 = expression._value2;
+
+        setFilterType(index, operator);
+        if (value1 != null)
+        {
+            if (value1 instanceof Boolean boolVal)
+            {
+                if (boolVal)
+                {
+                    elementCache().boolTrueRadios.get(index).check();
+                }
+                else
+                {
+                    elementCache().boolFalseRadios.get(index).check();
+                }
+            }
+            else if (value1 instanceof Date dateVal1)
+            {
+                final String dateStr1 = DATE_FORMAT.format(dateVal1);
+                elementCache().dateValues.get(index).set(dateStr1);
+                if (value2 instanceof Date dateVal2)
+                {
+                    final String dateStr2 = DATE_FORMAT.format(dateVal2);
+                    elementCache().dateValuesSecond.get(index).set(dateStr2);
+                }
+                else if (value2 != null)
+                {
+                    throw new IllegalArgumentException("Mismatched expression value types: " +
+                            value1.getClass().getSimpleName() + "=/=" +
+                            value2.getClass().getSimpleName());
+                }
+            }
+            else
+            {
+                elementCache().textValuesFirst.get(index).set(value1.toString());
+                if (value2 != null)
+                {
+                    elementCache().textValuesSecond.get(index).set(value2.toString());
+                }
+            }
+        }
+    }
+
+    private void setFilterType(int index, Operator operator)
     {
         if (filterTypesLabelOverrides.containsKey(operator))
         {
-            elementCache().filterTypeSelect.select(filterTypesLabelOverrides.get(operator));
+            elementCache().filterTypeSelects.get(index).select(filterTypesLabelOverrides.get(operator));
         }
         else
         {
-            elementCache().filterTypeSelect.select(operator.getDisplayValue());
+            elementCache().filterTypeSelects.get(index).select(operator.getDisplayValue());
         }
     }
 
@@ -103,14 +141,32 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        protected final ReactSelect filterTypeSelect = new ReactSelect.ReactSelectFinder(getDriver()).findWhenNeeded(this);
-        protected final Input filterValue1 = Input.Input(Locator.name("field-value-text"), getDriver()).refindWhenNeeded(this);
-        protected final Input filterValue2 = Input.Input(Locator.name("field-value-text-second"), getDriver()).refindWhenNeeded(this);;
+        protected final List<ReactSelect> filterTypeSelects = List.of(
+                new ReactSelect.ReactSelectFinder(getDriver()).index(0).findWhenNeeded(this),
+                new ReactSelect.ReactSelectFinder(getDriver()).index(1).refindWhenNeeded(this));
+        protected final List<Input> textValuesFirst = List.of(
+                Input.Input(Locator.name("field-value-text-0"), getDriver()).refindWhenNeeded(this),
+                Input.Input(Locator.name("field-value-text-1"), getDriver()).refindWhenNeeded(this));
+        protected final List<Input> textValuesSecond = List.of(
+                Input.Input(Locator.name("field-value-text-0-second"), getDriver()).refindWhenNeeded(this),
+                Input.Input(Locator.name("field-value-text-1-second"), getDriver()).refindWhenNeeded(this));
+        protected final List<Input> dateValues = List.of(
+                Input.Input(Locator.name("field-value-date-0"), getDriver()).refindWhenNeeded(this),
+                Input.Input(Locator.name("field-value-date-1"), getDriver()).refindWhenNeeded(this));
+        protected final List<Input> dateValuesSecond = List.of(
+                Input.Input(Locator.name("field-value-date-0-second"), getDriver()).refindWhenNeeded(this),
+                Input.Input(Locator.name("field-value-date-1-second"), getDriver()).refindWhenNeeded(this));
+        protected final List<RadioButton> boolTrueRadios = List.of(
+                RadioButton.RadioButton(Locator.radioButtonByNameAndValue("field-value-bool-0", "true")).refindWhenNeeded(this),
+                RadioButton.RadioButton(Locator.radioButtonByNameAndValue("field-value-bool-1", "true")).refindWhenNeeded(this));
+        protected final List<RadioButton> boolFalseRadios = List.of(
+                RadioButton.RadioButton(Locator.radioButtonByNameAndValue("field-value-bool-0", "false")).refindWhenNeeded(this),
+                RadioButton.RadioButton(Locator.radioButtonByNameAndValue("field-value-bool-1", "false")).refindWhenNeeded(this));
     }
 
     public static class FilterExpressionPanelFinder extends WebDriverComponentFinder<FilterExpressionPanel, FilterExpressionPanelFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.byClass("search-filter__input-wrapper").parent();
+        private final Locator.XPathLocator _baseLocator = Locator.byClass("filter-expression__input-wrapper").parent();
 
         public FilterExpressionPanelFinder(WebDriver driver)
         {
@@ -127,6 +183,45 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         protected Locator locator()
         {
             return _baseLocator;
+        }
+    }
+
+    public static class Expression
+    {
+        private final Operator _operator;
+        private final Object _value1;
+        private final Object _value2;
+
+        /**
+         * Set a two-value filter expression (e.g. 'Between')
+         * @param operator filter type
+         * @param value1 first value
+         * @param value2 second value
+         */
+        public Expression(Operator operator, Object value1, Object value2)
+        {
+            _operator = operator;
+            _value1 = value1;
+            _value2 = value2;
+        }
+
+        /**
+         * Set a single value filter expression (e.g. 'Greater Than')
+         * @param operator filter type
+         * @param value filter value
+         */
+        public Expression(Operator operator, Object value)
+        {
+            this(operator, value, null);
+        }
+
+        /**
+         * Set a valueless filter expression (e.g. 'Not Blank')
+         * @param operator filter type
+         */
+        public Expression(Operator operator)
+        {
+            this(operator, null, null);
         }
     }
 }
