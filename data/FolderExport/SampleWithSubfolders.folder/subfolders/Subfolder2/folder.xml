@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--Exported from LabKey Server at http://localhost:8080/labkey/project/FolderExportTest/Folder%201/Subfolder2/begin.view by cnathe@labkey.com on Tue Oct 30 14:42:03 CDT 2012-->
-<folder archiveVersion="12.26" label="Subfolder2" type="normal" title="Subfolder2" xmlns="http://labkey.org/folder/xml">
+<folder archiveVersion="13.11" label="Subfolder2" type="normal" title="Subfolder2" xmlns="http://labkey.org/folder/xml">
   <folderType name="Study">
     <defaultModule>Core</defaultModule>
     <modules>
