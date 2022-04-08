@@ -1032,7 +1032,7 @@ public class Crawler
                                 List<String> rel = Arrays.asList(StringUtils.trimToEmpty(attributes.get("rel")).split(" +"));
                                 if (target.equals("_blank"))
                                 {
-                                    MatcherAssert.assertThat("Bad 'rel' attribute for link to " + href,
+                                    MatcherAssert.assertThat(String.format("Bad 'rel' attribute for link to %s. On Page: %s", href, actualUrl),
                                             rel, CoreMatchers.hasItems("noopener", "noreferrer"));
                                 }
                             }
