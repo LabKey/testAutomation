@@ -173,6 +173,10 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         final WebElement filterCardsSection = Locator.byClass("filter-cards").findWhenNeeded(this);
         List<FilterCard> findFilterCards()
         {
+            if (filterCardsSection.getAttribute("class").contains("empty"))
+            {
+                return Collections.emptyList();
+            }
             return Locator.byClass("filter-cards__card").findElements(filterCardsSection)
                     .stream().map(FilterCard::new).collect(Collectors.toList());
         }

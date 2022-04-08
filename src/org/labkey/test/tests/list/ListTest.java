@@ -1006,7 +1006,7 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testIgnoreReservedFieldNames()
+    public void testIgnoreReservedFieldNames() throws Exception
     {
         final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey: " +
@@ -1015,9 +1015,7 @@ public class ListTest extends BaseWebDriverTest
         List<String> lines = new ArrayList<>();
         lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,created,createdby,modified,modifiedBy,Container,SampleID");
 
-        if (!TestFileUtils.getTestTempDir().exists())
-            TestFileUtils.getTestTempDir().mkdirs();
-        File inferenceFile = TestFileUtils.saveFile(TestFileUtils.getTestTempDir(), "InferFieldsForList.csv", String.join(System.lineSeparator(), lines));
+        File inferenceFile = TestFileUtils.writeTempFile("InferFieldsForList.csv", String.join(System.lineSeparator(), lines));
 
         goToProjectHome();
 
