@@ -41,7 +41,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -174,7 +173,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
 
         //create List
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
+        FieldDefinition[] columns = new FieldDefinition[] {
                 new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, ""),
                 new ListHelper.ListColumn("ssn","SSN", ListHelper.ListColumnType.String,""),
                 new ListHelper.ListColumn("company","Company",ListHelper.ListColumnType.String,"")
@@ -534,7 +533,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         updCmd.addRow(row2);
         updCmd.addRow(row3);
         resp = updCmd.execute(cn, getProjectName());
-        Map updateCo = resp.getRows().get(0);
+        Map<String, Object> updateCo = resp.getRows().get(0);
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
         //Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));
@@ -784,7 +783,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Setup the data class
      */
-    private void setupDataClass() throws CommandException
+    private void setupDataClass() throws CommandException, IOException
     {
         //Setup Data Class
         goToProjectHome();
@@ -798,7 +797,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         }
 
         DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
-                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)));
-        TestDataGenerator.createDomain(getProjectName(), dataClass);
+                .setFields(List.of(
+                        new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
+                        new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
+        dataClass.create(createDefaultConnection(), getProjectName());
     }
 }

@@ -166,6 +166,6 @@ public class DataClassDefinition extends DomainProps
     @Override
     public TestDataGenerator getTestDataGenerator(String containerPath)
     {
-        return super.getTestDataGenerator(containerPath).withColumns(List.of(new FieldDefinition("Name")));
+        return super.getTestDataGenerator(containerPath).withColumns(List.of(new FieldDefinition("Name", FieldDefinition.ColumnType.String)));
     }
 }

@@ -184,7 +184,7 @@ public class SampleTypeDefinition extends DomainProps
     {
         Domain domain = new Domain(getName());
         ArrayList<PropertyDescriptor> fields = new ArrayList<>(getFields());
-        fields.add(0, new PropertyDescriptor("Name", "string"));
+        fields.add(0, new FieldDefinition("Name", FieldDefinition.ColumnType.String));
         domain.setFields(fields);
         domain.setDescription(getDescription());
         return domain;
