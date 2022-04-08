@@ -123,7 +123,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
     public static class FilterFacetedPanelFinder extends WebDriverComponentFinder<FilterFacetedPanel, FilterFacetedPanelFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.byClass("search-filter-values__panel").parent();
+        private final Locator.XPathLocator _baseLocator = Locator.byClass("filter-values__panel").parent();
 
         public FilterFacetedPanelFinder(WebDriver driver)
         {
