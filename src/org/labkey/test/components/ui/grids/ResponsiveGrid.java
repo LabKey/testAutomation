@@ -111,6 +111,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         String sortCls = "fa-sort-amount-" + (direction.equals(SortDirection.DESC) ? "desc" : "asc");
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+
+        // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
+        getWrapper().scrollIntoView(headerCell);
+        getWrapper().scrollBy(0, 100);
+
         Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell)
                 .click();
