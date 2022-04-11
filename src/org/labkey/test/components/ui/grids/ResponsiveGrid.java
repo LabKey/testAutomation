@@ -13,7 +13,6 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
-import org.labkey.test.components.ui.search.EntityFieldFilterModal;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -136,16 +135,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return filterColumn(columnLabel, operator, null);
     }
 
-    public T filterColumn(String columnLabel, Filter.Operator operator, String value)
+    public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
     {
         T _this = getThis();
         clickColumnMenuItem(columnLabel, "Filter...", false);
-        // TODO should probably factor out a shared component, FilterModal, from EntityFieldFilterModal
-        EntityFieldFilterModal filterModal = new EntityFieldFilterModal(getDriver(), _this::doAndWaitForUpdate);
-        if (value == null)
-            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator));
-        else
-            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        GridFilterModal filterModal = new GridFilterModal(getDriver(), _this::doAndWaitForUpdate);
+        filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
         filterModal.confirm();
         return _this;
     }
