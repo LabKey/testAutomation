@@ -15,7 +15,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -298,8 +297,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     // select view
     public QueryGrid selectView(String viewName)
     {
-        doAndWaitForUpdate(()->
-                getGridBar().doMenuAction("Grid Views", Arrays.asList(viewName)));
+        WebElement viewBtn = Locator.tagWithClass("span", "fa-table").findElement(this);
+        viewBtn.click();
+
+        WebElement viewMenuItem = Locator.tagWithClass("ul", "dropdown-menu")
+                .child(Locator.tagWithText("li", viewName))
+                .findElement(this);
+        doAndWaitForUpdate(viewMenuItem::click);
         return this;
     }
 

@@ -215,6 +215,12 @@ public class MultiMenu extends BootstrapMenu
             return this;
         }
 
+        public MultiMenuFinder withButtonClass(String cls)
+        {
+            _locator = Locators.menuContainer().withChild(Locator.tagWithClass("button", cls));
+            return this;
+        }
+
         /**
          * Looks for the export button using the fa-download class
          * @return export menu utility

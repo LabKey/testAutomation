@@ -593,8 +593,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         goToProjectHome();
 
         log("Create a simple sample type with some samples.");
-        final TestDataGenerator dgen = TestDataGenerator.createDomain(getProjectName(),
-                new SampleTypeDefinition(sampleTypeName).setFields(new ArrayList<FieldDefinition>()));
+        final TestDataGenerator dgen = new SampleTypeDefinition(sampleTypeName)
+                .create(createDefaultConnection(), getProjectName());
 
         for(int i = 1; i < newSampleIndex; i++)
         {
@@ -895,11 +895,13 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeleteSampleSources() throws CommandException, IOException
     {
-        SampleTypeDefinition sampleType = new SampleTypeDefinition("DeleteSourcesSamples").addField(new FieldDefinition("strCol"));
-        DataClassDefinition dataClass = new DataClassDefinition("DeleteSourcesData").addField(new FieldDefinition("strCol"));
+        SampleTypeDefinition sampleType = new SampleTypeDefinition("DeleteSourcesSamples")
+                .addField(new FieldDefinition("strCol", FieldDefinition.ColumnType.String));
+        DataClassDefinition dataClass = new DataClassDefinition("DeleteSourcesData")
+                .addField(new FieldDefinition("strCol", FieldDefinition.ColumnType.String));
 
-        TestDataGenerator sampleGenerator = TestDataGenerator.createDomain(getProjectName(), sampleType);
-        TestDataGenerator dataGenerator = TestDataGenerator.createDomain(getProjectName(), dataClass);
+        TestDataGenerator sampleGenerator = sampleType.create(createDefaultConnection(), getProjectName());
+        TestDataGenerator dataGenerator = dataClass.create(createDefaultConnection(), getProjectName());
 
         final String sampleParentKey = "MaterialInputs/" + sampleType.getName();
         final String dataParentKey = "DataInputs/" + dataClass.getName();

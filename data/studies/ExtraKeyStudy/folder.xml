@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<folder archiveVersion="12.1" label="ExtraKeyStudy" xmlns="http://labkey.org/folder/xml">
+<folder archiveVersion="13.11" label="ExtraKeyStudy" xmlns="http://labkey.org/folder/xml">
   <study dir="study"/>
   <queries dir="queries"/>
   <views dir="views"/>
