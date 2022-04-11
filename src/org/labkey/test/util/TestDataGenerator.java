@@ -212,6 +212,11 @@ public class TestDataGenerator
 
     public void generateRows(int numberOfRowsToGenerate)
     {
+        generateRows(numberOfRowsToGenerate, null);
+    }
+
+    public void generateRows(int numberOfRowsToGenerate, List<String> colsToLeaveEmpty)
+    {
         if (_columns.keySet().size() == 0)
             throw new IllegalStateException("can't generate row data without column definitions");
 
@@ -229,6 +234,9 @@ public class TestDataGenerator
                 // get the column definition
                 String columnName = columnDefinition.getName();
                 String columnType = columnDefinition.getRangeURI();
+
+                if (colsToLeaveEmpty != null && colsToLeaveEmpty.contains(columnName))
+                    continue;
 
                 Object columnValue;
                 columnValue = _dataSuppliers.getOrDefault(columnName, getDefaultDataSupplier(columnType)).get();

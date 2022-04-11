@@ -5,7 +5,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.ui.OmniBoxValue;
+import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -116,8 +116,8 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
         protected List<String> getSelectedValues()
         {
-            return new OmniBoxValue.OmniBoxValueFinder(getDriver()).findAll(selectedItemsSection)
-                    .stream().map(OmniBoxValue::getText).collect(Collectors.toList());
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(selectedItemsSection)
+                    .stream().map(FilterStatusValue::getText).collect(Collectors.toList());
         }
     }
 

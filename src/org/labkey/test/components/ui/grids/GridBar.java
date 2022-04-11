@@ -10,9 +10,11 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -399,6 +401,20 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     }
 
+    public GridBar searchFor(String searchStr)
+    {
+        elementCache().searchBox.set(searchStr);
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return this;
+    }
+
+    public GridBar clearSearch()
+    {
+        elementCache().searchBox.set("");
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -419,6 +435,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         protected final BootstrapMenu aliquotView = BootstrapMenu.finder(getDriver()).locatedBy(
                 Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
+
+        protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
     }
 
     protected static abstract class Locators

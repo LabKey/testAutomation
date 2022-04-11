@@ -5,6 +5,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
@@ -12,6 +13,8 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.ui.search.EntityFieldFilterModal;
+import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
@@ -84,7 +87,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * Sorts from the grid header menu (rather than from the omnibox)
+     * Sorts from the grid header menu
      * @param columnLabel column header for
      * @return this grid
      */
@@ -96,7 +99,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * Sorts from the grid header menu (rather than from the omnibox)
+     * Sorts from the grid header menu
      * @param columnLabel Text of column
      * @return this grid
      */
@@ -107,17 +110,66 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return getThis();
     }
 
-    private void sortColumn(String columnLabel, SortDirection direction)
+    public void sortColumn(String columnLabel, SortDirection direction)
     {
-        String sortCls = "fa-sort-amount-" + (direction.equals(SortDirection.DESC) ? "desc" : "asc");
+        clickColumnMenuItem(columnLabel, direction.equals(SortDirection.DESC) ? "Sort descending" : "Sort ascending", true);
+    }
+
+    public void clearSort(String columnLabel)
+    {
+        clickColumnMenuItem(columnLabel, "Clear sort", true);
+    }
+
+    public boolean hasColumnSortIcon(String columnLabel)
+    {
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        Optional<WebElement> colHeaderIcon = Locator.XPathLocator.union(
+                Locator.tagWithClass("span", "fa-sort-amount-asc"),
+                Locator.tagWithClass("span", "fa-sort-amount-desc")
+        ).findOptionalElement(headerCell);
+        return colHeaderIcon.isPresent();
+
+    }
+
+    public T filterColumn(String columnLabel, Filter.Operator operator)
+    {
+        return filterColumn(columnLabel, operator, null);
+    }
+
+    public T filterColumn(String columnLabel, Filter.Operator operator, String value)
+    {
+        T _this = getThis();
+        clickColumnMenuItem(columnLabel, "Filter...", false);
+        EntityFieldFilterModal filterModal = new EntityFieldFilterModal(getDriver(), _this::doAndWaitForUpdate);
+        if (value == null)
+            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator));
+        else
+            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        filterModal.confirm();
+        return _this;
+    }
+
+    public T removeColumnFilter(String columnLabel)
+    {
+        clickColumnMenuItem(columnLabel, "Remove filter", true);
+        return getThis();
+    }
+
+    protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
+    {
+        // TODO remove this in favor of changes from develop
+        getWrapper().scrollBy(0, 100); // scroll down to make sure column header menu options will be in view
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell)
                 .click();
-        WebElement menuItem = Locator.css("li > a > span." + sortCls)
-                .findElement(headerCell);
+
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findElement(headerCell);
         waitFor(()-> menuItem.isDisplayed(), 1000);
-        doAndWaitForUpdate(menuItem::click);
+        if (waitForUpdate)
+            doAndWaitForUpdate(menuItem::click);
+        else
+            menuItem.click();
         waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
