@@ -93,7 +93,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         protected final WebElement checkboxSection =
                 Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
         protected final Locator.XPathLocator checkboxLabelLoc
-                = Locator.byClass("search-filter-values__value");
+                = Locator.byClass("filter-faceted__value");
 
         protected List<String> getAvailableValues()
         {
@@ -112,7 +112,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         }
 
         protected final WebElement selectedItemsSection =
-                Locator.byClass("search-filter-tags__div").findWhenNeeded(this);
+                Locator.byClass("filter-faceted__tags-value").findWhenNeeded(this);
 
         protected List<String> getSelectedValues()
         {
@@ -123,7 +123,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
     public static class FilterFacetedPanelFinder extends WebDriverComponentFinder<FilterFacetedPanel, FilterFacetedPanelFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.byClass("filter-values__panel").parent();
+        private final Locator.XPathLocator _baseLocator = Locator.byClass("filter-faceted__panel").parent();
 
         public FilterFacetedPanelFinder(WebDriver driver)
         {
