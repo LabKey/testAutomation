@@ -158,8 +158,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
     {
-        // TODO remove this in favor of changes from develop
-        getWrapper().scrollBy(0, 100); // scroll down to make sure column header menu options will be in view
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
 
         // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
