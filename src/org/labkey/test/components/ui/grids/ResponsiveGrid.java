@@ -140,6 +140,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         T _this = getThis();
         clickColumnMenuItem(columnLabel, "Filter...", false);
+        // TODO should probably factor out a shared component, FilterModal, from EntityFieldFilterModal
         EntityFieldFilterModal filterModal = new EntityFieldFilterModal(getDriver(), _this::doAndWaitForUpdate);
         if (value == null)
             filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator));

@@ -18,7 +18,7 @@ public class EntityFieldFilterModal extends ModalDialog
 
     private final UpdatingComponent _linkedComponent;
 
-    protected EntityFieldFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
+    public EntityFieldFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
     {
         super(new ModalDialog.ModalDialogFinder(driver));
         _linkedComponent = linkedComponent;
@@ -28,8 +28,12 @@ public class EntityFieldFilterModal extends ModalDialog
     protected void waitForReady(ModalDialog.ElementCache ec)
     {
         super.waitForReady(ec);
-        getWrapper().shortWait().until(ExpectedConditions
-                .visibilityOf(listItem.findWhenNeeded(elementCache().querySelectionPanel)));
+
+        // TODO need to factor out the QueryFilterPanel part of this modal
+        getWrapper().shortWait().until(wb ->
+            listItem.findElementOrNull(elementCache().querySelectionPanel) != null ||
+            listItem.findElementOrNull(elementCache().fieldsSelectionPanel) != null
+        );
     }
 
     /**
