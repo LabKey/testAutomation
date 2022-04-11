@@ -70,18 +70,9 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             }
 
             _elementCache = newElementCache();
-            waitForReady(_elementCache);
+            waitForReady();
         }
         return _elementCache;
-    }
-
-    /**
-     * @deprecated Passing in the ElementCache is unnecessary
-     */
-    @Deprecated (since = "22.4")
-    protected void waitForReady(EC ec)
-    {
-        waitForReady();
     }
 
     protected void waitForReady() { }

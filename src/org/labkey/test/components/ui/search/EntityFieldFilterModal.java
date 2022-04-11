@@ -9,13 +9,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.List;
+
 /**
  * Wraps 'labkey-ui-component' defined in <code>internal/components/search/EntityFieldFilterModal.tsx</code>
  */
 public class EntityFieldFilterModal extends ModalDialog
 {
-    private static final Locator listItem = Locator.byClass("list-group-item");
-
     private final UpdatingComponent _linkedComponent;
 
     protected EntityFieldFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
@@ -25,27 +25,36 @@ public class EntityFieldFilterModal extends ModalDialog
     }
 
     @Override
-    protected void waitForReady(ModalDialog.ElementCache ec)
+    protected void waitForReady()
     {
-        super.waitForReady(ec);
+        super.waitForReady();
         getWrapper().shortWait().until(ExpectedConditions
-                .visibilityOf(listItem.findWhenNeeded(elementCache().querySelectionPanel)));
+                .visibilityOf(elementCache().querySelectionPanel));
     }
 
     /**
-     * Select parent
-     * @param parentName name of parent type
+     * Select parent/source query
+     * @param queryName name of parent/source type
      * @return this component
      */
-    public EntityFieldFilterModal selectParent(String parentName)
+    public EntityFieldFilterModal selectQuery(String queryName)
     {
-        WebElement queryItem = listItem.withText(parentName).findElement(elementCache().querySelectionPanel);
+        WebElement queryItem = elementCache().findQueryOption(queryName);
         getWrapper().doAndWaitForElementToRefresh(queryItem::click,
-                () -> listItem.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
+                () -> elementCache().listItemLoc.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
 
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfElementLocated(BootstrapLocators.loadingSpinner));
 
         return this;
+    }
+
+    /**
+     * Get visible source/parent queries
+     * @return query names in dialog
+     */
+    public List<String> getAvailableQueries()
+    {
+        return getWrapper().getTexts(elementCache().findQueryOptions());
     }
 
     /**
@@ -55,7 +64,7 @@ public class EntityFieldFilterModal extends ModalDialog
      */
     public EntityFieldFilterModal selectField(String fieldLabel)
     {
-        WebElement fieldItem = listItem.withText(fieldLabel).findElement(elementCache().fieldsSelectionPanel);
+        WebElement fieldItem = elementCache().findFieldOption(fieldLabel);
         fieldItem.click();
         Locator.byClass("filter-modal__col-sub-title").withText("Find values for " + fieldLabel)
                 .waitForElement(elementCache().filterPanel, 10_000);
@@ -64,14 +73,23 @@ public class EntityFieldFilterModal extends ModalDialog
     }
 
     /**
-     * Select parent and field to configure filters for
-     * @param parentName name of parent type
+     * Get fields for currently selected query
+     * @return visible field labels
+     */
+    public List<String> getAvailableFields()
+    {
+        return getWrapper().getTexts(elementCache().findFieldOptions());
+    }
+
+    /**
+     * Select parent/source and field to configure filters for
+     * @param queryName name of parent/source type
      * @param fieldLabel Field's label
      * @return this component
      */
-    public EntityFieldFilterModal selectParentField(String parentName, String fieldLabel)
+    public EntityFieldFilterModal selectQueryField(String queryName, String fieldLabel)
     {
-        selectParent(parentName);
+        selectQuery(queryName);
         selectField(fieldLabel);
 
         return this;
@@ -133,13 +151,31 @@ public class EntityFieldFilterModal extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        // Entities column
+        protected final Locator listItemLoc = Locator.byClass("list-group-item");
+
+        // Queries column
         protected final WebElement querySelectionPanel = Locator.byClass("filter-modal__col_queries")
                 .findWhenNeeded(this);
+        protected WebElement findQueryOption(String queryName)
+        {
+            return listItemLoc.withText(queryName).findElement(elementCache().querySelectionPanel);
+        }
+        protected List<WebElement> findQueryOptions()
+        {
+            return listItemLoc.findElements(elementCache().querySelectionPanel);
+        }
 
         // Fields column
         protected final WebElement fieldsSelectionPanel = Locator.byClass("filter-modal__col_fields")
                 .findWhenNeeded(this);
+        protected WebElement findFieldOption(String queryName)
+        {
+            return listItemLoc.withText(queryName).findElement(elementCache().fieldsSelectionPanel);
+        }
+        protected List<WebElement> findFieldOptions()
+        {
+            return listItemLoc.findElements(elementCache().fieldsSelectionPanel);
+        }
 
         // Values column
         protected final WebElement filterPanel = Locator.byClass("filter-modal__col_filter_exp")

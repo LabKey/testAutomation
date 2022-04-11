@@ -60,7 +60,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     /**
      * Open the entity filter dialog for the specified parent type.
      *
-     * @param parentNoun "Source" or "Parent" in SM. "Registry Parent" or "SampleParent" in Biologics
+     * @param parentNoun "Source" or "Parent" in SM. "Registry Parent" or "Sample Parent" in Biologics
      * @return component wrapper for the EntityFieldFilterModal
      */
     public EntityFieldFilterModal clickAddParent(String parentNoun)
