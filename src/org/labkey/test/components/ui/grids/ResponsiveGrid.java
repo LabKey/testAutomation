@@ -114,7 +114,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
         getWrapper().scrollIntoView(headerCell);
-        getWrapper().scrollBy(0, 100);
+        getWrapper().scrollBy(0, 250);
 
         Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell)
