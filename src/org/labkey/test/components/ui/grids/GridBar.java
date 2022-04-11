@@ -64,11 +64,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        // QueryGridPanel (deprecated)
-        Locator.CssLocator queryGridButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass());
-        // GridPanel
-        Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
-        WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
+        WebElement exportButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
         return getWrapper().doAndWaitForDownload(exportButton::click);
     }
 
@@ -429,9 +425,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         static public Locator.XPathLocator gridBar()
         {
-            // QueryGridModel grid uses query-grid-bar, QueryModel grid uses grid-panel__button-bar
-            return Locator.XPathLocator.union(Locator.tagWithClassContaining("div", "query-grid-bar"),
-                    Locator.tagWithClassContaining("div", "grid-panel__button-bar"));
+            return Locator.tagWithClassContaining("div", "grid-panel__button-bar");
         }
     }
 
