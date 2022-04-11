@@ -8,80 +8,114 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Arrays;
 import java.util.List;
 
-// Replacing the @see org.labkey.test.pages.samplemanagement.... for now. The javadoc compiler cannot resolve the
-// reference to the module. Don't have time to investigate a fix for this pr.
 /**
  * <p>
  * This is a base class for the edit lineage panels that are shown on the sample overview page. Samples can have two
- * "types" of lineage, another sample (Parent) and a source (Source). The panel is the same for both. It has two
- * select/combos on it. The first selects the type (i.e. the name of the Sample Type) and the second selects the
- * specific entity to app (i.e. the sample).
+ * "types" of lineage, another sample or a source. The panel is the same for both. It has two select controls on it. The
+ * first selects the type (i.e. the name of the Sample Type) and the second selects the specific parent (i.e. the sample).
  * </p>
- * <p>
- *  It is not intended that this base class to be exposed directly from a page. Rather the derived classes
- *  EditParentsPanel and EditSourcesPanel are the classes that should be exposed on the form.
- *  </p>
- * <p>see org.labkey.test.pages.samplemanagement.samples.EditParentsPanel</p>
- * <p>see org.labkey.test.pages.samplemanagement.samples.EditSourcesPanel</p>
  * @see <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/ParentEntityEditPanel.tsx">ParentEntityEditPanel.tsx</a>
  */
 public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPanel.ElementCache>
 {
-    private final WebDriver _driver;
-    private final WebElement _editingDiv;
-
-    /** Identifies if this is a Source or Parent (sample type) of lineage element. */
-    private final ParentType _parentType;
+    private final WebDriver driver;
+    private final WebElement editingDiv;
 
     /**
      * Constructor for the panel.
      *
      * @param element The WebElement containing the panel.
      * @param driver A reference to the WebDriver
-     * @param parentType An enum of type @ParentType used to identify the type of lineage entity is being edited.
-     *                   This is used to set the expected text when searching for web elements.
      */
-    public ParentEntityEditPanel(WebElement element, WebDriver driver, ParentType parentType)
+    public ParentEntityEditPanel(WebElement element, WebDriver driver)
     {
-        _driver = driver;
-        _editingDiv = element;
-        _parentType = parentType;
+        this.driver = driver;
+        editingDiv = element;
     }
 
     @Override
     public WebElement getComponentElement()
     {
-        return _editingDiv;
+        return editingDiv;
     }
 
     @Override
     protected WebDriver getDriver()
     {
-        return _driver;
+        return driver;
     }
 
-    // TODO: It would be nice if the save and cancel buttons would return a specific page type. That would require
-    //  using generics (much in the same way the modal dialog does), but I don't have time to do that right now.
-
-    /**
-     * Check to see if the panel is loaded. A panel is considered loaded if all of the combo-boxes in the panel are
-     * valid and are not loading.
-     *
-     * @return True if all of the combo-box references are valid and not loading.
-     */
-    public boolean isPanelLoaded()
+    @Override
+    protected void waitForReady()
     {
-        return getAllTypeCombo().stream().allMatch(rs -> rs.isInteractive() && !rs.isLoading());
+
+        // The panel is ready if:
+        // 1. There are no spinners.
+        // 2. If there are parents (i.e. FilterReactSelect controls present) they should all be interactive (not in the process of loading).
+        // 3. If there are no parents there should be only one entity type select (ReactSelect) and it should be interactive and have a list of options.
+        WebDriverWrapper.waitFor(()->
+        {
+            if(BootstrapLocators.loadingSpinner.findWhenNeeded(this).isDisplayed())
+            {
+                return false;
+            }
+            else
+            {
+
+                try
+                {
+
+                    // If there are existing parents then all the FilteringReactSelect controls (i.e. the parents) should
+                    // be interactive. When this panel is in a dialog waitForReady can be called after the parent entity type is selected.
+                    // In that scenario the parent selector will be empty, but it should be interactive.
+                    List<FilteringReactSelect> filteringReactSelects = FilteringReactSelect.finder(getDriver()).findAll(this);
+
+                    if(filteringReactSelects.size() > 1)
+                    {
+                        for (FilteringReactSelect select : filteringReactSelects)
+                        {
+                            if (!select.isInteractive())
+                            {
+                                // There is a parent selector but it is not interactive. Not ready.
+                                return false;
+                            }
+                        }
+
+                        // All the parent selectors are interactive, panel is ready.
+                        return true;
+                    }
+                    else
+                    {
+                        // If there are no existing parents check to see if this is the 'first' parent.
+                        ReactSelect firstParentSelector = ReactSelect.finder(getDriver())
+                                .withNamedInput("entityType0")
+                                .find(this);
+
+                        // For the first parent the panel is ready if the entity type selector is ready and the options have been populated.
+                        return firstParentSelector.isInteractive() && !firstParentSelector.getOptions().isEmpty();
+
+                    }
+                }
+                catch (NoSuchElementException | StaleElementReferenceException exception)
+                {
+                    return false;
+                }
+
+            }
+        }, "The ParentEntityEdit panel did not become active in timely fashion.", 5_000);
     }
 
     private void clickButtonWaitForPanel(WebElement button)
     {
-        clickButtonWaitForPanel(button, 1_000);
+        clickButtonWaitForPanel(button, 2_500);
     }
 
     /**
@@ -105,14 +139,21 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         Assert.assertTrue("Whoa, there appears to be more than one panel in edit mode. This should never happen.",
                 infoCount <= 1);
 
+        // A reference to the editing header title
+        WebElement editorHeading = Locator.tagContainingText("div", "Editing").withClass("detail__edit--heading").findWhenNeeded(getDriver());
+
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
 
+        // Some tests appear to fail because the button is not enabled even after changes have been made to the form.
+        // This may be a timing issue.
+        WebDriverWrapper.waitFor(button::isEnabled, String.format("Button with text '%s' is not enabled.", button.getText()), 1_500);
+
         button.click();
 
+        // Wait until the counts of panels not in edit mode increases and the editor heading is no longer visible.
         WebDriverWrapper.waitFor(()->
-                        (defaultPanel.findElements(getDriver()).size() > defaultCount) &&
-                                (infoPanel.findElements(getDriver()).size() < infoCount),
+                        (defaultPanel.findElements(getDriver()).size() > defaultCount) && !editorHeading.isDisplayed(),
                 "Panel did not change state.", wait);
     }
 
@@ -120,13 +161,13 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public void clickCancel()
     {
         clickButtonWaitForPanel(elementCache()
-                .button("Cancel", "Editing " + _parentType.getType() + " Details"));
+                .button("Cancel"));
     }
 
     /** Click the 'Save' button. */
     public void clickSave()
     {
-        clickSave(2_000);
+        clickSave(5_000);
     }
 
     /** Click the 'Save' button.
@@ -137,14 +178,13 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         // The wait time is used here to validate the panel exits edit mode.
         clickButtonWaitForPanel(elementCache()
-                .button("Save", "Editing " + _parentType.getType() + " Details"),
+                .button("Save"),
                 waitTime);
 
         // After the panel exits edit mode the page might still be updating, wait for that to happen.
-        Locator progressbar = Locator.tagWithClass("div", "progress-bar");
-        if (getWrapper().isElementPresent(progressbar))
-            WebDriverWrapper.waitFor(()->!getWrapper().isElementVisible(progressbar),
-                    "It looks like an update took too long.", waitTime);
+        WebElement progressbar = Locator.tagWithClass("div", "progress-bar").findWhenNeeded(getDriver());
+        WebDriverWrapper.waitFor(()->!progressbar.isDisplayed(),
+                "It looks like an update took too long.", waitTime);
 
     }
 
@@ -156,7 +196,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public String clickSaveExpectingError()
     {
         elementCache()
-                .button("Save", "Editing " + _parentType.getType() + " Details")
+                .button("Save")
                 .click();
         return BootstrapLocators.errorBanner.waitForElement(this, 1_000).getText();
     }
@@ -170,7 +210,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         // If element is enabled the disabled attribute will not be there and getAttribute will return null.
         return null == elementCache()
-                .button("Save", "Editing " + _parentType.getType() + " Details")
+                .button("Save")
                 .getAttribute("disabled");
     }
 
@@ -186,52 +226,79 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     }
 
     /**
-     * Get the combo that will list the types, either Sources or Samples. Because this is an edit panel there will
-     * always be at least one type combo. This will return the combo that can be used to add a new parent type.
+     * Get the select control that can be used to add a new parent entity type (sources or sample types). If there isn't
+     * a 'Select a type' select currently present the 'Add' button will be clicked to create one.
      *
-     * @return A reference to the appropriate combo that will be for the new parent sample or source type.
+     * Useful for test that validate parent entity types are available. Like for sub-folder testing.
+     *
+     * @return A reference to a select control that can be used to add a new parent type.
      */
-    protected ReactSelect getAddNewTypeCombo()
+    public ReactSelect getAddNewEntityTypeSelect()
     {
-        var numOfTypes = getAllTypeCombo().size();
-        var typeCombo = getTypeCombo(numOfTypes);
+        var numOfTypes = getAllEntityTypes().size();
+        var selectType = getEntityTypeByPosition(numOfTypes - 1);
 
-        // If the 'last' combo in the list contains the text "Select a..." it can be used to add a new type.
-        // If it does not contain that then the addButton must be clicked.
-        if (typeCombo.hasSelection())
+        // If the last select in the list contains no selection, it can be used to add a new parent entity type.
+        // If the last select does have items selected then the addButton must be clicked to create a new type select control.
+        if (selectType.hasSelection())
         {
             // Since there is already a parent need to click the "Add" button to add a new one.
             elementCache().addButton.click();
 
-            // Now need to go find the new combo but wait until it shows up.
-            WebDriverWrapper.waitFor(()-> getAllTypeCombo().size() > numOfTypes,
+            // Now need to go find the new select but wait until it shows up.
+            WebDriverWrapper.waitFor(()-> getAllEntityTypes().size() > numOfTypes,
                     "The new type field did not show up in a timely fashion.",
                     1_000);
 
-            typeCombo = getTypeCombo(numOfTypes + 1);
+            selectType = getEntityTypeByPosition(numOfTypes);
         }
 
-        return typeCombo;
+        return selectType;
     }
 
     /**
-     * Get the type combos by its label. This is the label to the left of the control.
+     * Get the type select by its ordinal position.
      *
-     * @return A combo beside a label with the given text.
+     * @return A select at this given ordinal position.
      */
-    protected ReactSelect getTypeCombo(int index)
+    private ReactSelect getEntityTypeByPosition(int index)
     {
         return ReactSelect.finder(getDriver())
-                .followingLabelWithSpan(_parentType.getType() + " Type " + index)
+                .withNamedInput(String.format("entityType%d", index))
                 .find(this);
     }
 
+    public ReactSelect getEntityType(String entityName)
+    {
+        Locator input = Locator.tagWithAttribute("input", "value", entityName.toLowerCase());
+        if(getWrapper().isElementPresent(input))
+        {
+            String inputName = input.findElement(this).getAttribute("name");
+            return new ReactSelect.ReactSelectFinder(getDriver()).withNamedInput(inputName).find(this);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /**
-     * Get all of the type combos in the panel. This includes those already set and any 'add new' combos as well.
+     * Return a list of entity types that are being used for parents.
      *
-     * @return A collection of all of the combos that select the type.
+     * @return List of entity type names currently being used.
      */
-    protected List<ReactSelect> getAllTypeCombo()
+    public List<String> getEntityTypeNames()
+    {
+        List<WebElement> labels = Locator.tagWithClass("label", "entity-insert--type-select").findElements(this);
+        return labels.stream().map(WebElement::getText).toList();
+    }
+
+    /**
+     * Get all the type select controls in the panel. This includes those already set and the 'add new' control if present.
+     *
+     * @return A collection of all the ReactSelect controls that select the parent type.
+     */
+    public List<ReactSelect> getAllEntityTypes()
     {
         return ReactSelect.finder(getDriver())
                 .followingLabelWithClass("entity-insert--type-select")
@@ -239,22 +306,23 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     }
 
     /**
-     * Get the id combos by it's index (zero based). This would include any 'add new' combos. The parent id combo
-     * boxes do not have unique labels so there is no get based on the label.
+     * Get a select for a given parent entity type.
      *
-     * @return A combo at the given position in the collection of combos.
+     * @param typeName Type name.
+     * @return A {@link FilteringReactSelect}
      */
-    protected FilteringReactSelect getIdCombo(int index)
+    public FilteringReactSelect getParent(String typeName)
     {
-        return getAllIdCombo().get(index);
+        return FilteringReactSelect.finder(getDriver()).withNamedInput(String.format("parentEntityValue_%s", typeName))
+                .find(this);
     }
 
     /**
-     * Get all of the id combos in the panel. This includes those already set and any 'add new' combos as well.
+     * Get all the parent react select controls in the panel. This includes those already set and the 'add new' control as well.
      *
-     * @return A collection of all of the combos that select the sample or source ids.
+     * @return A collection of all the ReactSelect controls that select the sample or source parent.
      */
-    protected List<FilteringReactSelect> getAllIdCombo()
+    public List<FilteringReactSelect> getAllParents()
     {
         return FilteringReactSelect.finder(getDriver())
                 .followingLabelWithClass("entity-insert--parent-select")
@@ -262,29 +330,40 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     }
 
     /**
-     * Add a specific type(s) (sample or source) from the given type.
+     * Add a parent from the given entity type. This will add the entity type if it is not already present.
+     *
+     * @param typeName Entity type name.
+     * @param parentId Id of the parent sample/source.
+     * @return This panel.
+     */
+    public ParentEntityEditPanel addParent(String typeName, String parentId)
+    {
+        return addParents(typeName, Arrays.asList(parentId));
+    }
+
+    /**
+     * Add a specific parents (samples or sources) from the given type. If the type is not currently being used for
+     * parent elements it will be added.
      *
      * @param typeName The name of the type. For example if you have a Source Type named 'Sources01' the value of
      *                 this parameter would be "Sources01".
-     * @param ids A list of the individuals samples or sources to add.
+     * @param parentIds A list of the individuals samples or sources to add.
      * @return A reference to this panel.
      */
-    public ParentEntityEditPanel addType(String typeName, List<String> ids)
+    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds)
     {
-        getAddNewTypeCombo().select(typeName);
+        if(getEntityType(typeName) == null)
+            getAddNewEntityTypeSelect().select(typeName);
 
-        // Will get the ID Combo for the last field. A new parent is added to the end.
-        int numOfTypes = getAllTypeCombo().size();
+        var selectParent = FilteringReactSelect.finder(getDriver())
+                .withNamedInput(String.format("parentEntityValue_%s", typeName))
+                .find(this);
 
-        var parentIdCombo = FilteringReactSelect.finder(getDriver())
-                .followingLabelWithSpan(_parentType.getType() + " IDs")
-                .findAll(this).get(numOfTypes - 1);
-
-        for (String id : ids)
+        for (String id : parentIds)
         {
-            int selCount = parentIdCombo.getSelections().size();
-            parentIdCombo.typeAheadSelect(id);
-            getWrapper().waitFor(()-> parentIdCombo.getSelections().size() > selCount, 500);
+            int selCount = selectParent.getSelections().size();
+            selectParent.typeAheadSelect(id);
+            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount, 500);
         }
 
         return this;
@@ -292,20 +371,20 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
     /**
      * Remove a lineage type from the sample. Clicking this will remove all parents of that type. For example if the
-     * given sample has added 'Sources01' Source Type and sources 'S1', 'S2' and 'S3', clicking this will remove this
-     * Source Type and all of the sources.
+     * given sample has added 'Sources01' source type and parent sources 'S1', 'S2' and 'S3', clicking this will remove this
+     * source type and all the parent sources.
      *
      * @param typeName The name of the type to remove.
      * @return A reference to this panel.
      */
-    public ParentEntityEditPanel removeType(String typeName)
+    public ParentEntityEditPanel removeEntityType(String typeName)
     {
-        // Find all the react selects
-        List<ReactSelect> typeCombos = getAllTypeCombo();
+        // Find all the ReactSelects
+        List<ReactSelect> selectControls = getAllEntityTypes();
 
         int index = 0;
         boolean found = false;
-        for (ReactSelect reactSelect : typeCombos)
+        for (ReactSelect reactSelect : selectControls)
         {
             if (reactSelect.getSelections().contains(typeName))
             {
@@ -318,21 +397,22 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         if (found)
         {
-           elementCache().removeButton(index + 1).click();
+           elementCache().removeButton(index).click();
 
            // Need to check if this is removing the last/only type.
-           if (typeCombos.size() > 1)
+           if (selectControls.size() > 1)
            {
-               // If it is not removing the last one can simply check that the count of combos is as expected.
-               getWrapper().waitFor(() -> getAllTypeCombo().size() < typeCombos.size(),
+               // If it is not, removing the last one can simply check that the count of select controls is as expected.
+               WebDriverWrapper.waitFor(() -> getAllEntityTypes().size() < selectControls.size(),
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);
            }
            else
            {
-               // If this is removing the last/only one the count of combos will still be 1, so need a different check.
-               ReactSelect rs = getAllTypeCombo().get(0);
-               getWrapper().waitFor(() -> rs.getSelections().isEmpty(),
+               // If this is removing the last/only one the count of select controls will still be 1 ('add new' one is shown),
+               // so need a different check.
+               ReactSelect rs = getAllEntityTypes().get(0);
+               WebDriverWrapper.waitFor(() -> rs.getSelections().isEmpty(),
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);
            }
@@ -341,31 +421,38 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return this;
     }
 
-    protected ParentEntityEditPanel addParentId(int index, String id)
+    public ParentEntityEditPanel removeParent(String parentEntity, String parentId)
     {
-        FilteringReactSelect parentIdCombo = getIdCombo(index);
-
-        getWrapper().scrollIntoView(parentIdCombo.getComponentElement());
-
-        int selCount = parentIdCombo.getSelections().size();
-        parentIdCombo.typeAheadSelect(id);
-        getWrapper().waitFor(()-> parentIdCombo.getSelections().size() > selCount, 500);
-
+        getParent(parentEntity).removeSelection(parentId);
         return this;
     }
 
     /**
-     * Remove a parent id from the id combobox. This will click the 'x' next to the id of the sample/source to be
-     * removed.
-     *
-     * @param index The index of the id combo to look in.
-     * @param id The id of the parent to remove.
-     * @return This edit panel.
+     * Simple finder for this panel.
      */
-    protected ParentEntityEditPanel removeParentId(int index, String id)
+    public static class ParentEntityEditPanelFinder extends WebDriverComponentFinder<ParentEntityEditPanel, ParentEntityEditPanelFinder>
     {
-        getIdCombo(index).removeSelection(id);
-        return this;
+        public ParentEntityEditPanelFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        @Override
+        protected ParentEntityEditPanel construct(WebElement element, WebDriver driver)
+        {
+            return new ParentEntityEditPanel(element, driver);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return Locator
+                    .tagContainingText("div", "Editing")
+                    .withClass("detail__edit--heading")
+                    .parent()
+                    .followingSibling("div")
+                    .withClass("panel-body");
+        }
     }
 
     @Override
@@ -377,12 +464,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected class ElementCache extends Component<?>.ElementCache
     {
         // The 'Save' and 'Cancel' buttons are actually on the page and not the panel, so the search context needs
-        // to be the entire page. And since it is unknown how many edit panels are on the page at a given time, and
-        // where this particular panel is in the collection use the panel title as a starting point to find the
-        // buttons.
-        WebElement button(String buttonText, String panelTitle)
+        // to be the entire page. This is has a dependence that only one entity panel can be in edit mode at a time.
+        WebElement button(String buttonText)
         {
-            return Locator.tagWithText("div", panelTitle)
+            return Locator.tagWithClass("div", "detail__edit--heading")
                     .parent("div")
                     .parent("div")
                     .followingSibling("div")
@@ -391,7 +476,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                     .findElement(getDriver());
         }
 
-        // This is the 'Add' button that is contained inside of the panel.
+        // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator
                 .tagContainingText("span", "Add")
                 .findWhenNeeded(this);
@@ -400,26 +485,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         WebElement removeButton(int index)
         {
             return Locator
-                    .tagWithText("span", "Remove " + _parentType.getType() + " Type " + index)
-                    .findElement(this);
+                    .tagWithClass("span", "container--action-button")
+                    .findElements(this).get(index);
         }
     }
 
-    public interface ParentType
-    {
-        String getType();
-
-        static ParentType setParentType(String typeName)
-        {
-            return new ParentType()
-            {
-                @Override
-                public String getType()
-                {
-                    return typeName;
-                }
-
-            };
-        }
-    }
 }

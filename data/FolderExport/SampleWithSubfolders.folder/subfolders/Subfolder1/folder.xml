@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<folder archiveVersion="12.26" label="Subfolder1" type="normal" title="Subfolder1" xmlns="http://labkey.org/folder/xml">
+<folder archiveVersion="13.11" label="Subfolder1" type="normal" title="Subfolder1" xmlns="http://labkey.org/folder/xml">
   <folderType name="My XML-defined Tabbed Folder Type">
     <defaultModule>Core</defaultModule>
     <modules>
