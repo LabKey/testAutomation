@@ -10,7 +10,6 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.react.ReactCheckBox;
-import org.labkey.test.components.ui.FilterStatus;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -147,9 +146,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().gridBar;
     }
 
-    public FilterStatus getFilterStatus()
+    public List<FilterStatusValue> getFilterStatusValues()
     {
-        return elementCache()._filterStatus;
+        return getFilterStatusValues(false);
+    }
+
+    public List<FilterStatusValue> getFilterStatusValues(boolean includeView)
+    {
+        if (includeView)
+            return elementCache().getAllFilterStatusValues();
+        else
+            return elementCache().getFilterStatusFilterValues();
     }
 
     // record count
@@ -206,27 +213,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
-     * Applies a sort to the grid via the column header menu and waits for the grid to refresh
-     */
-    public QueryGrid sortOn(String column, SortDirection direction)
-    {
-        sortColumn(column, direction);
-        return this;
-    }
-
-    /**
      * clears grid filter expressions added by the user (i.e. from the filter modal)
      */
-    public QueryGrid clearUserDefinedFilters()
+    public QueryGrid clearFilters()
     {
-        List<FilterStatusValue> valueItems = getFilterStatus().getFilterValues();
+        List<FilterStatusValue> valueItems = elementCache().getFilterStatusFilterValues();
         for (int i = valueItems.size() - 1 ; i >= 0; i--) // dismiss from the right first;
         {
             FilterStatusValue obValue = valueItems.get(i);
             doAndWaitForUpdate(obValue::remove);
         }
 
-        Assert.assertEquals("not all of the filter values were cleared", 0, getFilterStatus().getFilterValues().size());
+        Assert.assertEquals("not all of the filter values were cleared", 0, elementCache().getFilterStatusFilterValues().size());
         return this;
     }
 
@@ -336,7 +334,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
-        final FilterStatus _filterStatus = new FilterStatus.FilterStatusFinder(_driver).findWhenNeeded(this);
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
@@ -344,6 +341,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
                 .child(Locator.tagContainingText("button", "Clear")));
 
+        final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
+
+        public List<FilterStatusValue> getAllFilterStatusValues()
+        {
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
+        }
+
+        public List<FilterStatusValue> getFilterStatusFilterValues()
+        {
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel)
+                    .stream().filter(FilterStatusValue::isFilter).toList();
+        }
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>

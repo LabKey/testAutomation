@@ -234,7 +234,8 @@ public class GridPanelTest extends BaseWebDriverTest
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("empty_filter_test_set").setFields(standardTestSampleFields());
         TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
-        sampleSetDataGenerator.generateRows(30, List.of("descColumn"));
+        sampleSetDataGenerator.addDataSupplier("descColumn", () -> null);
+        sampleSetDataGenerator.generateRows(30);
         for (int i=0; i < 5; i++)  // add some rows with a descColumn we can filter on
         {
             sampleSetDataGenerator.addCustomRow(

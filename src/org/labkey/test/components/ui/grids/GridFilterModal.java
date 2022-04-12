@@ -28,7 +28,7 @@ public class GridFilterModal extends ModalDialog
     @Override
     protected void waitForReady(ModalDialog.ElementCache ec)
     {
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(listItem.findElementOrNull(elementCache().fieldsSelectionPanel)));
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(listItem.findWhenNeeded(elementCache().fieldsSelectionPanel)));
     }
 
     /**
@@ -72,28 +72,25 @@ public class GridFilterModal extends ModalDialog
      */
     public void confirm()
     {
-        confirm(false);
+        _linkedComponent.doAndWaitForUpdate(() -> {
+            elementCache().submitButton.click();
+            waitForClose();
+        });
     }
 
-    public void confirm(boolean errorExpected)
+    public String confirmExpectingError()
+    {
+        clickConfirm();
+        return getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().errorAlert)).getText();
+    }
+
+    protected void clickConfirm()
     {
         if (!elementCache().submitButton.isEnabled())
         {
             throw new IllegalStateException("Confirmation button is not enabled.");
         }
-
-        if (errorExpected)
-        {
-            elementCache().submitButton.click();
-            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().errorAlert));
-        }
-        else
-        {
-            _linkedComponent.doAndWaitForUpdate(() -> {
-                elementCache().submitButton.click();
-                waitForClose();
-            });
-        }
+        elementCache().submitButton.click();
     }
 
     public void cancel()

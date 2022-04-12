@@ -22,7 +22,7 @@ public class EntityFieldFilterModal extends GridFilterModal
     @Override
     protected void waitForReady(ModalDialog.ElementCache ec)
     {
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(listItem.findElementOrNull(elementCache().querySelectionPanel)));
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(listItem.findWhenNeeded(elementCache().querySelectionPanel)));
     }
 
     /**
