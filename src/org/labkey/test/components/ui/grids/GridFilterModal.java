@@ -72,20 +72,37 @@ public class GridFilterModal extends ModalDialog
      */
     public void confirm()
     {
+        confirm(false);
+    }
+
+    public void confirm(boolean errorExpected)
+    {
         if (!elementCache().submitButton.isEnabled())
         {
             throw new IllegalStateException("Confirmation button is not enabled.");
         }
 
-        _linkedComponent.doAndWaitForUpdate(() -> {
+        if (errorExpected)
+        {
             elementCache().submitButton.click();
-            waitForClose();
-        });
+            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().errorAlert));
+        }
+        else
+        {
+            _linkedComponent.doAndWaitForUpdate(() -> {
+                elementCache().submitButton.click();
+                waitForClose();
+            });
+        }
     }
 
     public void cancel()
     {
         dismiss("Cancel");
+    }
+
+    public String getErrorMsg() {
+        return elementCache().errorAlert.getText();
     }
 
     @Override
@@ -116,6 +133,7 @@ public class GridFilterModal extends ModalDialog
                 new FilterFacetedPanel.FilterFacetedPanelFinder(getDriver()).refindWhenNeeded(filterPanel);
 
         protected final WebElement submitButton = Locator.css(".modal-footer .btn-success").findWhenNeeded(this);
+        protected final WebElement errorAlert = Locator.css(".modal-body .alert-danger").findWhenNeeded(this);
     }
 
 }

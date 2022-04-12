@@ -138,11 +138,26 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
     {
         T _this = getThis();
-        clickColumnMenuItem(columnLabel, "Filter...", false);
-        GridFilterModal filterModal = new GridFilterModal(getDriver(), _this::doAndWaitForUpdate);
-        filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
         filterModal.confirm();
         return _this;
+    }
+
+    public String filterColumnExpectingError(String columnLabel, Filter.Operator operator, Object value)
+    {
+        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
+        filterModal.confirm(true);
+        String errorMsg = filterModal.getErrorMsg();
+        filterModal.cancel();
+        return errorMsg;
+    }
+
+    private GridFilterModal initFilterColumn(String columnLabel, Filter.Operator operator, Object value)
+    {
+        clickColumnMenuItem(columnLabel, "Filter...", false);
+        GridFilterModal filterModal = new GridFilterModal(getDriver(), getThis()::doAndWaitForUpdate);
+        filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        return filterModal;
     }
 
     public T removeColumnFilter(String columnLabel)
