@@ -87,7 +87,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
     public static class FilterStatusValueFinder extends WebDriverComponentFinder<FilterStatusValue, FilterStatusValueFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "OmniBox-value");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "filter-status-value");
         private String _text = null;
         private FilterStatusType _type = null;
 
