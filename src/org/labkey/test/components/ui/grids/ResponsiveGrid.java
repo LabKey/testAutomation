@@ -143,6 +143,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return _this;
     }
 
+    public T filterColumn(String columnLabel, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
+    {
+        T _this = getThis();
+        GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
+        filterModal.selectExpressionTab().setFilters(
+                new FilterExpressionPanel.Expression(operator1, value1),
+                new FilterExpressionPanel.Expression(operator2, value2)
+        );
+        filterModal.confirm();
+        return _this;
+    }
+
     public String filterColumnExpectingError(String columnLabel, Filter.Operator operator, Object value)
     {
         GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
@@ -156,7 +168,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         clickColumnMenuItem(columnLabel, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), getThis()::doAndWaitForUpdate);
-        filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        if (operator != null)
+            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
         return filterModal;
     }
 
