@@ -34,10 +34,11 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 12)
@@ -138,7 +139,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
         String expectedComment = "2 row(s) were linked to a study from the sample type: " + SAMPLE_TYPE1;
         verifyLinkToHistory(expectedComment);
-        verifyAuditLogEvents(expectedComment, numOfRowsLinked, Arrays.asList("stool", "plasma"));
+        verifyAuditLogEvents(expectedComment, numOfRowsLinked, Set.of("stool", "plasma"));
     }
 
     @Test
@@ -708,7 +709,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Mismatch in the comment", expectedComments, table.getDataAsText(0, "Comment"));
     }
 
-    private void verifyAuditLogEvents(String Comment, @Nullable Integer numOfRowsLinked, @Nullable List<String> linkedSamples)
+    private void verifyAuditLogEvents(String Comment, @Nullable Integer numOfRowsLinked, @Nullable Set<String> linkedSamples)
     {
         goToAdminConsole().clickAuditLog();
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Link to Study events"));
@@ -720,7 +721,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         {
             doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Sample timeline events"));
             auditTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-            List<String> samples = new ArrayList<>();
+            Set<String> samples = new HashSet<>();
             for (int i = 0; i < numOfRowsLinked; i++)
                 samples.add(auditTable.getDataAsText(i, "SampleName"));
             checker().verifyEquals("Incorrect sample names in the audit log", linkedSamples, samples);
