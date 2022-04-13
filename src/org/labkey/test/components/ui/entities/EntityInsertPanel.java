@@ -315,9 +315,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public ResponsiveGrid uploadFileExpectingPreview(File file, boolean updateData)
     {
-        showFileUpload();
-        setUpdateDataForFileUpload(updateData);
-        fileUploadPanel().uploadFile(file);
+        uploadFile(file, updateData);
         return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(this);
     }
 
