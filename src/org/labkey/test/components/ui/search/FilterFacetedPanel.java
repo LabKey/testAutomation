@@ -5,7 +5,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.ui.OmniBoxValue;
+import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -93,7 +93,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         protected final WebElement checkboxSection =
                 Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
         protected final Locator.XPathLocator checkboxLabelLoc
-                = Locator.byClass("search-filter-values__value");
+                = Locator.byClass("filter-faceted__value");
 
         protected List<String> getAvailableValues()
         {
@@ -112,18 +112,18 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         }
 
         protected final WebElement selectedItemsSection =
-                Locator.byClass("search-filter-tags__div").findWhenNeeded(this);
+                Locator.byClass("filter-faceted__tags-value").findWhenNeeded(this);
 
         protected List<String> getSelectedValues()
         {
-            return new OmniBoxValue.OmniBoxValueFinder(getDriver()).findAll(selectedItemsSection)
-                    .stream().map(OmniBoxValue::getText).collect(Collectors.toList());
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(selectedItemsSection)
+                    .stream().map(FilterStatusValue::getText).collect(Collectors.toList());
         }
     }
 
     public static class FilterFacetedPanelFinder extends WebDriverComponentFinder<FilterFacetedPanel, FilterFacetedPanelFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.byClass("filter-values__panel").parent();
+        private final Locator.XPathLocator _baseLocator = Locator.byClass("filter-faceted__panel").parent();
 
         public FilterFacetedPanelFinder(WebDriver driver)
         {
