@@ -4,17 +4,16 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class OmniBoxValue extends WebDriverComponent<OmniBoxValue.ElementCache>
+public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.ElementCache>
 {
     private final WebElement _el;
     private final WebDriver _driver;
 
-    protected OmniBoxValue(WebElement element, WebDriver driver)
+    protected FilterStatusValue(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -37,14 +36,9 @@ public class OmniBoxValue extends WebDriverComponent<OmniBoxValue.ElementCache>
         return elementCache().textSpan().getText();
     }
 
-    public boolean isActive()
+    private boolean isActive()
     {
         return getComponentElement().getAttribute("class").contains("is-active");
-    }
-
-    public boolean isSort()
-    {
-        return elementCache().icon.getAttribute("class").contains("fa-sort");
     }
 
     public boolean isFilter()
@@ -52,32 +46,17 @@ public class OmniBoxValue extends WebDriverComponent<OmniBoxValue.ElementCache>
         return elementCache().icon.getAttribute("class").contains("fa-filter");
     }
 
-    public boolean isSearch()
-    {
-        return elementCache().icon.getAttribute("class").contains("fa-search");
-    }
-
-    public boolean isClose()
+    private boolean isClose()
     {
         return elementCache().icon.getAttribute("class").contains("fa-close");
     }
 
-    public Input openEdit()
-    {
-        getWrapper().mouseOver(getComponentElement());
-        WebDriverWrapper.waitFor(()-> isActive() && isClose(),
-                "the omnibox item with text ["+getText()+"] did not become active", 500);
-        elementCache().textSpan().click();
-        return Input.Input(Locator.tagWithClass("div", "OmniBox-input")
-                .child(Locator.tag("input").withAttribute("value")), getDriver()).waitFor();
-    }
-
-    public void dismiss()
+    public void remove()
     {
         String originalText = getText();
         getWrapper().mouseOver(getComponentElement());
         WebDriverWrapper.waitFor(()-> isActive() && isClose(),
-                "the omnibox item with text ["+getText()+"] did not become active", 500);
+                "the filter status item with text ["+getText()+"] did not become active", 500);
         elementCache().icon.click();
 
         // if the item you're dismissing is not the rightmost, it won't become stale; instead, its text will
@@ -106,33 +85,33 @@ public class OmniBoxValue extends WebDriverComponent<OmniBoxValue.ElementCache>
     }
 
 
-    public static class OmniBoxValueFinder extends WebDriverComponentFinder<OmniBoxValue, OmniBoxValueFinder>
+    public static class FilterStatusValueFinder extends WebDriverComponentFinder<FilterStatusValue, FilterStatusValueFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "OmniBox-value");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "filter-status-value");
         private String _text = null;
-        private OmniType _type = null;
+        private FilterStatusType _type = null;
 
-        public OmniBoxValueFinder(WebDriver driver)
+        public FilterStatusValueFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public OmniBoxValueFinder withText(String text)
+        public FilterStatusValueFinder withText(String text)
         {
             _text = text;
             return this;
         }
 
-        public OmniBoxValueFinder withType(OmniType type)
+        public FilterStatusValueFinder withType(FilterStatusType type)
         {
             _type = type;
             return this;
         }
 
         @Override
-        protected OmniBoxValue construct(WebElement el, WebDriver driver)
+        protected FilterStatusValue construct(WebElement el, WebDriver driver)
         {
-            return new OmniBoxValue(el, driver);
+            return new FilterStatusValue(el, driver);
         }
 
         @Override
@@ -152,16 +131,14 @@ public class OmniBoxValue extends WebDriverComponent<OmniBoxValue.ElementCache>
         }
     }
 
-    public enum OmniType
+    public enum FilterStatusType
     {
-        sort("fa-sort"),
         filter("fa-filter"),
-        search("fa-search"),
         view("fa-table");
 
         private final String iconCls;
 
-        OmniType(String iconCls)
+        FilterStatusType(String iconCls)
         {
             this.iconCls = iconCls;
         }
