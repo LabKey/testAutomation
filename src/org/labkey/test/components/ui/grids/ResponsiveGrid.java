@@ -5,6 +5,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
@@ -12,6 +13,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
@@ -84,7 +86,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * Sorts from the grid header menu (rather than from the omnibox)
+     * Sorts from the grid header menu
      * @param columnLabel column header for
      * @return this grid
      */
@@ -96,7 +98,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * Sorts from the grid header menu (rather than from the omnibox)
+     * Sorts from the grid header menu
      * @param columnLabel Text of column
      * @return this grid
      */
@@ -107,9 +109,77 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return getThis();
     }
 
-    private void sortColumn(String columnLabel, SortDirection direction)
+    public void sortColumn(String columnLabel, SortDirection direction)
     {
-        String sortCls = "fa-sort-amount-" + (direction.equals(SortDirection.DESC) ? "desc" : "asc");
+        clickColumnMenuItem(columnLabel, direction.equals(SortDirection.DESC) ? "Sort descending" : "Sort ascending", true);
+    }
+
+    public void clearSort(String columnLabel)
+    {
+        clickColumnMenuItem(columnLabel, "Clear sort", true);
+    }
+
+    public boolean hasColumnSortIcon(String columnLabel)
+    {
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        Optional<WebElement> colHeaderIcon = Locator.XPathLocator.union(
+                Locator.tagWithClass("span", "fa-sort-amount-asc"),
+                Locator.tagWithClass("span", "fa-sort-amount-desc")
+        ).findOptionalElement(headerCell);
+        return colHeaderIcon.isPresent();
+
+    }
+
+    public T filterColumn(String columnLabel, Filter.Operator operator)
+    {
+        return filterColumn(columnLabel, operator, null);
+    }
+
+    public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
+    {
+        T _this = getThis();
+        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
+        filterModal.confirm();
+        return _this;
+    }
+
+    public T filterColumn(String columnLabel, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
+    {
+        T _this = getThis();
+        GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
+        filterModal.selectExpressionTab().setFilters(
+                new FilterExpressionPanel.Expression(operator1, value1),
+                new FilterExpressionPanel.Expression(operator2, value2)
+        );
+        filterModal.confirm();
+        return _this;
+    }
+
+    public String filterColumnExpectingError(String columnLabel, Filter.Operator operator, Object value)
+    {
+        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
+        String errorMsg = filterModal.confirmExpectingError();
+        filterModal.cancel();
+        return errorMsg;
+    }
+
+    private GridFilterModal initFilterColumn(String columnLabel, Filter.Operator operator, Object value)
+    {
+        clickColumnMenuItem(columnLabel, "Filter...", false);
+        GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
+        if (operator != null)
+            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        return filterModal;
+    }
+
+    public T removeColumnFilter(String columnLabel)
+    {
+        clickColumnMenuItem(columnLabel, "Remove filter", true);
+        return getThis();
+    }
+
+    protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
+    {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
 
         // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
@@ -119,10 +189,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell)
                 .click();
-        WebElement menuItem = Locator.css("li > a > span." + sortCls)
-                .findElement(headerCell);
+
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findElement(headerCell);
         waitFor(()-> menuItem.isDisplayed(), 1000);
-        doAndWaitForUpdate(menuItem::click);
+        if (waitForUpdate)
+            doAndWaitForUpdate(menuItem::click);
+        else
+            menuItem.click();
         waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
