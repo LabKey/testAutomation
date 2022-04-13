@@ -10,9 +10,11 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -64,11 +66,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        // QueryGridPanel (deprecated)
-        Locator.CssLocator queryGridButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass());
-        // GridPanel
-        Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
-        WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
+        WebElement exportButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
         return getWrapper().doAndWaitForDownload(exportButton::click);
     }
 
@@ -403,6 +401,20 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     }
 
+    public GridBar searchFor(String searchStr)
+    {
+        elementCache().searchBox.set(searchStr);
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return this;
+    }
+
+    public GridBar clearSearch()
+    {
+        elementCache().searchBox.set("");
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -423,15 +435,15 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         protected final BootstrapMenu aliquotView = BootstrapMenu.finder(getDriver()).locatedBy(
                 Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
+
+        protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
     }
 
     protected static abstract class Locators
     {
         static public Locator.XPathLocator gridBar()
         {
-            // QueryGridModel grid uses query-grid-bar, QueryModel grid uses grid-panel__button-bar
-            return Locator.XPathLocator.union(Locator.tagWithClassContaining("div", "query-grid-bar"),
-                    Locator.tagWithClassContaining("div", "grid-panel__button-bar"));
+            return Locator.tagWithClassContaining("div", "grid-panel__button-bar");
         }
     }
 

@@ -10,7 +10,7 @@
 
 # ${imgout:labkeyl.png}
         png(filename="labkeyl.png")
-        plot(labkey.data$name, labkey.data$age, main="Age")
+        plot(as.factor(labkey.data$name), labkey.data$age, main="Age")
         dev.off()
 
 filename <- paste("do_render", ".gct");
