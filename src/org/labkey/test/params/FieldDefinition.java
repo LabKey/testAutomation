@@ -463,7 +463,7 @@ public class FieldDefinition extends PropertyDescriptor
             return _conceptURI;
         }
 
-        protected LookupInfo getLookupInfo()
+        public LookupInfo getLookupInfo()
         {
             return _lookupInfo;
         }
