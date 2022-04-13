@@ -73,8 +73,8 @@ public class DataReportsTest extends ReportTest
         return "data <- labkey.data\n" +
             "dbirth <- data$" + database + "bdt\n" +
             "dbirth\n" +
-            "sex <- data$" + database + "sex\n" +
-            "sexor <- data$" + database + "sexor\n" +
+            "sex <- as.factor(data$" + database + "sex)\n" +
+            "sexor <- as.factor(data$" + database + "sexor)\n" +
             R_SCRIPT1_METHOD + " <- function(x)\n" +
             "{\n" + function + "\n}\n" +
             "png(filename=\"${imgout:img1}\")\n" +
