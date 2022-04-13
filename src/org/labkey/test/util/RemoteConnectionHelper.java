@@ -15,9 +15,11 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.tests.RemoteConnectionTest;
+import org.labkey.test.Locators;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -26,16 +28,9 @@ public class RemoteConnectionHelper
 {
     protected BaseWebDriverTest _test;
 
-    // If true then this helper won't navigate back and forth between the
-    // remote connection management page and the project folder.  Right now
-    // only used for the RemoteConnectionTest
-    private boolean _navToProjectFolder = true;
-
     public RemoteConnectionHelper(BaseWebDriverTest test)
     {
         _test = test;
-        if (test instanceof RemoteConnectionTest)
-            _navToProjectFolder = false;
     }
 
     public void createConnection(String name, String url, String container)
@@ -50,28 +45,22 @@ public class RemoteConnectionHelper
 
     public boolean testConnection(String name)
     {
-        boolean success = false;
-        _goToManageRemoteConnections();
-        WebElement target = findConnection(name, "test");
-        if (null != target)
-        {
-            _test.clickAndWait(target, _test.getDefaultWaitForPage());
-            success = _test.isTextPresent("not successful") ? false: true;
-            _test.clickAndWait(Locator.linkWithText("Manage Remote Connections"));
-        }
-        _goToProjectHome();
+        boolean success;
+        WebElement target = findConnectionStrict(name, "test");
+        _test.clickAndWait(target, _test.getDefaultWaitForPage());
+        success = !_test.isTextPresent("not successful");
+        _test.clickAndWait(Locator.linkWithText("Manage Remote Connections"));
         return success;
     }
 
     public void createConnection(String name, String url, String container, String user, String password, String expectedError)
     {
-        _goToManageRemoteConnections();
         _test.clickAndWait(Locator.linkWithText("Create New Connection"));
         setConnectionProperties(name, url, container, user, password);
         _test.clickButton("save");
         verifyExpectedError(expectedError);
-        _goToProjectHome();
     }
+
     public void editConnection(String name, String newName, String newUrl, String newContainer, String newUser, String newPassword)
     {
         editConnection(name, newName, newUrl, newContainer, newUser, newPassword, null);
@@ -80,29 +69,23 @@ public class RemoteConnectionHelper
     // edit properties of the connection.  if the parameter passed in is null then the old value is used
     public void editConnection(String name, String newName, String newUrl, String newContainer, String newUser, String newPassword, String expectedError)
     {
-        _goToManageRemoteConnections();
-        WebElement target = findConnection(name, "edit");
-        if (null != target)
-        {
-            _test.clickAndWait(target, _test.getDefaultWaitForPage());
-            setConnectionProperties(newName, newUrl, newContainer, newUser, newPassword);
-            _test.clickButton("save");
-            verifyExpectedError(expectedError);
-        }
-        _goToProjectHome();
+        WebElement target = findConnectionStrict(name, "edit");
+
+        _test.clickAndWait(target, _test.getDefaultWaitForPage());
+        setConnectionProperties(newName, newUrl, newContainer, newUser, newPassword);
+        _test.clickButton("save");
+        verifyExpectedError(expectedError);
     }
 
     public void deleteConnection(String name)
     {
-        _goToManageRemoteConnections();
         WebElement target = findConnection(name, "delete");
-        if (null != target)
+        if (target != null)
         {
             _test.clickAndWait(target, _test.getDefaultWaitForPage());
             _test.assertTextPresent(name);
             _test.clickButton("delete");
         }
-        _goToProjectHome();
     }
 
     public void goToManageRemoteConnections()
@@ -113,30 +96,23 @@ public class RemoteConnectionHelper
 
     public int getNumConnections()
     {
-        _goToManageRemoteConnections();
         List<WebElement> items = Locator.xpath("//a[contains(text(), 'edit')]").findElements(_test.getDriver());
-        _goToProjectHome();
         return items.size();
     }
 
     public WebElement findConnection(String name)
     {
-        _goToManageRemoteConnections();
-        WebElement elt =  findConnection(name, "edit");
-        _goToProjectHome();
-        return elt;
+        return findConnection(name, "edit");
     }
 
-    private void _goToManageRemoteConnections()
+    public WebElement findConnectionStrict(String name, String action)
     {
-        if (_navToProjectFolder)
-            goToManageRemoteConnections();
-    }
-
-    private void _goToProjectHome()
-    {
-        if (_navToProjectFolder)
-            _test.goToProjectHome();
+        WebElement link = findConnection(name, action);
+        if (link == null)
+        {
+            throw new NoSuchElementException("Connection not found: " + name);
+        }
+        return link;
     }
 
     private void setConnectionProperties(String name, String url, String container, String user, String password)
@@ -161,7 +137,8 @@ public class RemoteConnectionHelper
     {
         if (null != expectedError)
         {
-            _test.assertTextPresent(expectedError);
+            String error = Locators.labkeyError.findOptionalElement(_test.getDriver()).map(WebElement::getText).orElse(null);
+            Assert.assertEquals("Remote connection error.", expectedError, error);
             _test.clickButton("cancel");
         }
     }
