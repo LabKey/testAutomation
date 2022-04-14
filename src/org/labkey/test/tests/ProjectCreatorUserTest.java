@@ -64,7 +64,6 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        super.doCleanup(afterTest);
         _containerHelper.deleteProject(TEMPLATE_PROJECT, afterTest);
         _userHelper.deleteUsers(false, PROJECT_CREATOR_USER, READER);
     }
