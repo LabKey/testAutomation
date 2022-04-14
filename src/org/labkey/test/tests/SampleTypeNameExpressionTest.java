@@ -185,6 +185,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Pat");
 
+        verifyNames(
+                "InputsExpressionTest2",
+                "Name\tB\tMaterialInputs/InputsExpressionTest2",
+                "${Inputs:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Bat", false);
 
         verifyNames(
                 "InputsWithDataTypeExpression",
@@ -193,10 +198,22 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 null, "Red");
 
         verifyNames(
+                "InputsWithDataTypeExpression2",
+                "Name\tB\tMaterialInputs/InputsWithDataTypeExpression2",
+                "${Inputs/InputsWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Ted", false);
+
+        verifyNames(
                 "MaterialWithDataTypeExpression",
                 "Name\tB\tMaterialInputs/MaterialWithDataTypeExpression",
                 "${MaterialInputs/MaterialWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ned");
+
+        verifyNames(
+                "MaterialWithDataTypeExpression2",
+                "Name\tB\tMaterialInputs/MaterialWithDataTypeExpression2",
+                "${MaterialInputs/MaterialWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                null, "Med", false);
 
     }
 
@@ -272,6 +289,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix)
     {
+        verifyNames(sampleTypeName, header, nameExpression, currentTypeAlias, namePrefix, true);
+    }
+
+    private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix, boolean useFirst)
+    {
         goToProjectHome();
 
         String name1 = namePrefix + "_1";
@@ -282,8 +304,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 name1 + "\tb\t\n" +
                 name2 + "\tb\t\n" +
 
-                // Name generated and uses first input "Bob"
+                // Name generated, uses first input "Bob" if useFirst or [name1, name2] if not useFirst
                 "\tb\t" + name1 + "," + name2 + "\n" +
+
+                // Name generated: should be name2 without [] regardless of useFirst
+                "\tb\t" + name2 + "\n" +
 
                 // Name generated and uses defaultValue('SS')
                 "\tb\t\n";
@@ -304,10 +329,12 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertTrue("First name (" + names.get(0) + ") not as expected", names.get(0).startsWith(DEFAULT_SAMPLE_PARENT_VALUE + "_"));
         String batchRandomId = names.get(0).split("_")[1];
 
-        assertEquals("Second name not as expected",  name1 + "_" + batchRandomId, names.get(1));
+        assertEquals("Second name not as expected", name2 + "_" + batchRandomId, names.get(1));
 
-        assertEquals("Third name not as expected", name2,  names.get(2));
-        assertEquals("Fourth name not as expected", name1, names.get(3));
+        assertEquals("Third name not as expected",  (useFirst ? name1 : ("[" + name1 + ", " + name2 + "]")) + "_" + batchRandomId, names.get(2));
+
+        assertEquals("Fourth name not as expected", name2,  names.get(3));
+        assertEquals("Fifth name not as expected", name1, names.get(4));
     }
 
     /**
