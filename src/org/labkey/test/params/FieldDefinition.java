@@ -15,6 +15,7 @@
  */
 package org.labkey.test.params;
 
+import net.jodah.failsafe.internal.util.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -384,6 +385,13 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public FieldDefinition setTextChoiceValues(List<String> values)
+    {
+        Assert.isTrue(getType().equals(ColumnType.TextChoice), "Type is not set to 'ColumnType.TextChoice'.");
+        setValidators(List.of(new FieldDefinition.TextChoiceValidator(values)));
+        return this;
+    }
+
     public enum RangeType
     {
         Equals("Equals", Filter.Operator.EQUAL),
@@ -431,7 +439,9 @@ public class FieldDefinition extends PropertyDescriptor
         VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
         VisitDate("Visit Date","dateTime","http://cpas.labkey.com/Study#VisitId",null),
         Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials")),
-        Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
+        Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null),
+        TextChoice("Text Choice", "string", "http://www.labkey.org/types#textChoice", null),
+        ;
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _rangeURI;     // the key used inside the API
@@ -834,6 +844,49 @@ public class FieldDefinition extends PropertyDescriptor
         {
             return _secondRange;
         }
+    }
+
+    /**
+     * TextChoice is implemented using a validator, however it is more 'limited' in scope. The user does not name a TextChoice
+     * validator or add a description or error message. A TextChoice is a lot like a look-up field, but it is not linked
+     * to an external data source. The user only provides the list of (string) values that the field will display in the dropdown.
+     * Another difference is that there can only be one TextChoice on a field, whereas you can have multiple validators on a field.
+     */
+    public static class TextChoiceValidator extends FieldValidator<TextChoiceValidator>
+    {
+        private List<String> _values;
+
+        public TextChoiceValidator(List<String> values)
+        {
+            // The TextChoice validator only has a name and no description or message.
+            // And the name is generated (not user defined).
+            super("Text Choice Validator", "", "");
+            _values = values;
+        }
+
+        @Override
+        protected TextChoiceValidator getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected String getType()
+        {
+            return "TextChoice";
+        }
+
+        @Override
+        protected String getExpression()
+        {
+            return String.join("|", _values);
+        }
+
+        public List<String> getValues()
+        {
+            return _values;
+        }
+
     }
 
 }

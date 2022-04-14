@@ -1,6 +1,7 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -25,6 +26,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -597,6 +599,150 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         WebDriverWrapper.waitFor(() -> elementCache().selectedConceptLink().isPresent(),
                 "the expected ontology link is not present", 2000);
         elementCache().removeSelectedConceptLink().get().click();
+        return this;
+    }
+
+    // TextChoice Field settings
+    //
+    // To a user a TextChoice field looks and behaves a lot like a lookup, even though it is implemented using a validator
+    // behind the scenes. Because of that the validator aspect of the TextChoice field is hidden from the user (just like
+    // it is in the product).
+
+    /**
+     * Set the list of allowed values for a TextChoice field.
+     *
+     * @param values List of values (Strings).
+     * @return A reference to this field row.
+     */
+    public DomainFieldRow setTextChoiceValues(List<String> values)
+    {
+        Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this).click();
+
+        TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
+        addValuesDialog.addValues(values);
+        return addValuesDialog.clickApply();
+    }
+
+    /**
+     * Get the displayed list of allowed values a TextChoice field.
+     *
+     * @return Values shown in the list for the TextCHoice field.
+     */
+    public List<String> getTextChoiceValues()
+    {
+        // Intentionally using '.collect(Collectors.toList())' so the returned list is mutable (e.g. can sort it when
+        // comparing against expected).
+        return Locator.tagWithClass("button", "list-group-item").findElements(this)
+                .stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of the values that are 'locked' for a TextChoice field. A locked value is one that has been applied and cannot be deleted.
+     *
+     * @return List of locked values.
+     */
+    public List<String> getLockedTextChoiceValues()
+    {
+        // Intentionally using '.collect(Collectors.toList())' so the returned list is mutable (e.g. can sort it when
+        // comparing against expected).
+        return Locator.tagWithClass("button", "list-group-item")
+                .withChild(Locator.tagWithClass("span", "choices-list__locked"))
+                .findElements(this)
+                .stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
+    /**
+     * Click on a value in the list of values for a TextChoice field. If the value is already selected this will have
+     * no effect.
+     *
+     * @param value The value to click on.
+     * @return This field row.
+     */
+    public DomainFieldRow selectTextChoiceValue(String value)
+    {
+        Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this).click();
+        return this;
+    }
+
+    /**
+     * Check if the 'Apply' button is enabled for a TextChoice field. I will not be enabled if the value has not been
+     * changed, or if it conflicts with an existing value. Note: The button is only visible if a value is selected.
+     *
+     * @return True if the button is enabled, false otherwise.
+     */
+    public boolean isTextChoiceApplyButtonEnabled()
+    {
+        WebElement button = Locator.button("Apply").findElement(this);
+        return button.isEnabled();
+    }
+
+    /**
+     * Enter text into the update textbox for a value. Note: The field is only visible if a value is selected.
+     *
+     * @param updatedValue Value to enter into the update textbox.
+     * @return This field row.
+     */
+    public DomainFieldRow setUpdateTextChoiceValue(String updatedValue)
+    {
+        getWrapper().setFormElement(Locator.tagWithName("input", "value").findElement(this), updatedValue);
+        return this;
+    }
+
+    /**
+     * Update the selected value in the TextChoice field. This will select the given field.
+     *
+     * @param originalValue The original value to select and change.
+     * @param newValue The new value to replace it.
+     * @return This field row.
+     */
+    public DomainFieldRow updateTextChoiceValue(String originalValue, String newValue)
+    {
+        selectTextChoiceValue(originalValue);
+        setUpdateTextChoiceValue(newValue);
+        WebDriverWrapper.waitFor(this::isTextChoiceApplyButtonEnabled, "'Apply' button is not enabled.", 1_000);
+        Locator.button("Apply").findElement(this).click();
+
+        return this;
+    }
+
+    /**
+     * Update a TextChoice value and expect an error. Can happen if the new value already exists in the list of values.
+     *
+     * @param originalValue The original value to select and change.
+     * @param newValue The new value to replace it.
+     * @return The error message.
+     */
+    public String updateTextChoiceValueExpectError(String originalValue, String newValue)
+    {
+        updateTextChoiceValue(originalValue, newValue);
+        WebElement alert = BootstrapLocators.errorBanner.waitForElement(this, 1_000);
+        return alert.getText();
+    }
+
+    /**
+     * Check to see if the 'Delete' button is enabled for a TextChoice field.  Note: The button is only visible if a
+     * value is selected.
+     *
+     * @return True if the button is enabled, false otherwise.
+     */
+    public boolean isTextChoiceDeleteButtonEnabled()
+    {
+        WebElement button = Locator.button("Delete").findElement(this);
+        return button.isEnabled();
+    }
+
+    /**
+     * Delete a value from the list of values for a TextChoice field. This will select the value before deleting it.
+     *
+     * @param value The value to delete.
+     * @return This field row.
+     */
+    public DomainFieldRow deleteTextChoiceValue(String value)
+    {
+        selectTextChoiceValue(value);
+        WebElement button = Locator.button("Delete").findElement(this);
+        WebDriverWrapper.waitFor(button::isEnabled, "'Delete' button is not enabled.", 1_000);
+        button.click();
         return this;
     }
 

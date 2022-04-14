@@ -108,6 +108,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         {
             List<FieldDefinition.RegExValidator> regexValidators = new ArrayList<>();
             List<FieldDefinition.RangeValidator> rangeValidators = new ArrayList<>();
+            FieldDefinition.TextChoiceValidator textChoiceValidator = null;
 
             List<FieldDefinition.FieldValidator<?>> validators = fieldDefinition.getValidators();
             for (FieldDefinition.FieldValidator<?> validator : validators)
@@ -119,6 +120,15 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 else if (validator instanceof FieldDefinition.RangeValidator)
                 {
                     rangeValidators.add((FieldDefinition.RangeValidator) validator);
+                }
+                else if (validator instanceof FieldDefinition.TextChoiceValidator)
+                {
+                    // TextChoice is a field type and not an attribute on a field, any other validators that are applied
+                    // will be ignored (TextChoice field cannot have validators).
+                    textChoiceValidator = (FieldDefinition.TextChoiceValidator) validator;
+                    regexValidators = new ArrayList<>();
+                    rangeValidators = new ArrayList<>();
+                    break;
                 }
                 else
                 {
@@ -133,6 +143,10 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             if (!rangeValidators.isEmpty())
             {
                 fieldRow.setRangeValidators(rangeValidators);
+            }
+            if (null != textChoiceValidator)
+            {
+                fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
             }
         }
 
