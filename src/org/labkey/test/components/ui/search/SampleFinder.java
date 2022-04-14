@@ -27,12 +27,17 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     private final WebElement _el;
     private final WebDriver _driver;
 
+    protected SampleFinder(WebElement el, WebDriver driver)
+    {
+        _el = el;
+        _driver = driver;
+    }
+
     public SampleFinder(WebDriver driver)
     {
-        _el = Locator.byClass("g-section")
+        this(Locator.byClass("g-section")
                 .withDescendant(Locator.byClass("filter-cards"))
-                .waitForElement(driver, 5_000);
-        _driver = driver;
+                .waitForElement(driver, 5_000), driver);
     }
 
     @Override
@@ -85,19 +90,16 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     /**
      * remove the search card for the specified entity
      * @param queryName name of the entity (Sample Type, Source Type, etc.) to be removed
-     * @return this component
      */
-    public SampleFinder removeSearchCard(String queryName)
+    public void removeSearchCard(String queryName)
     {
         elementCache().findFilterCard(queryName).clickRemove();
-        return this;
     }
 
     /**
      * Reset sample finder to its initial state, with no search criteria
-     * @return this component
      */
-    public SampleFinder removeAllSearchCards()
+    public void removeAllSearchCards()
     {
         List<WebElement> removeButtons = Locator.tagWithAttribute("i", "title", "Remove filter")
                 .findElements(elementCache().filterCardsSection);
@@ -111,7 +113,6 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         getWrapper().shortWait().withMessage("Clearing all search cards").until(wd -> isEmptySearch());
 
         clearElementCache();
-        return this;
     }
 
     /**
@@ -230,12 +231,12 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
             });
         }
 
-        String getParentName()
+        public String getParentName()
         {
             return name.getText();
         }
 
-        FilterCardValues getFilterValues()
+        public FilterCardValues getFilterValues()
         {
             Map<String, WebElement> filters = new HashMap<>();
             List<WebElement> rows = Locator.byClass("filter-display__row").findElements(this);

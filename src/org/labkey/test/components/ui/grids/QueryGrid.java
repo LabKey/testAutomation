@@ -6,14 +6,12 @@ package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -41,6 +39,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         super(element, driver);
         _queryGridPanel = element;
         _driver = driver;
+    }
+
+    protected QueryGrid(QueryGrid wrappedGrid)
+    {
+        this(wrappedGrid.getComponentElement(), wrappedGrid.getDriver());
     }
 
     @Override
