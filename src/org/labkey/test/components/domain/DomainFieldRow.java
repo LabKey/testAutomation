@@ -626,7 +626,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     /**
      * Get the displayed list of allowed values a TextChoice field.
      *
-     * @return Values shown in the list for the TextCHoice field.
+     * @return Values shown in the list for the TextChoice field.
      */
     public List<String> getTextChoiceValues()
     {
@@ -720,7 +720,21 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
 
     /**
-     * Check to see if the 'Delete' button is enabled for a TextChoice field.  Note: The button is only visible if a
+     * Update a TextChoice value that is currently being used and expect an info message with the number updated.
+     *
+     * @param originalValue The original value to select and change.
+     * @param newValue The new value to replace it.
+     * @return The info message indicating the number of entites updated.
+     */
+    public String updateLockedTextChoiceValue(String originalValue, String newValue)
+    {
+        updateTextChoiceValue(originalValue, newValue);
+        WebElement alert = BootstrapLocators.infoBanner.waitForElement(this, 1_000);
+        return alert.getText();
+    }
+
+    /**
+     * Check to see if the 'Delete' button is enabled for a TextChoice field. Note: The button is only visible if a
      * value is selected.
      *
      * @return True if the button is enabled, false otherwise.
