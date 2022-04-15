@@ -491,7 +491,7 @@ public class TestDataGenerator
 
     public TestDataValidator getValidator()
     {
-        return new TestDataValidator(_insertedRows);
+        return new TestDataValidator(_rows);
     }
 
     /**
