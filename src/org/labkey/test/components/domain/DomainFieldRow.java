@@ -1,6 +1,7 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -652,6 +653,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
 
     /**
+     * Enter a value into the search field for TextChoice values. If no values have been this will error with a
+     * no-such-element exception.
+     *
+     * @param searchValue Value to search for.
+     * @return List of values matching the search value.
+     */
+    public List<String> searchForTextChoiceValue(String searchValue)
+    {
+        WebElement searchTxtBox = Locator.tagWithClass("input", "domain-text-choices-search").findElement(this);
+        getWrapper().setFormElement(searchTxtBox, searchValue);
+        return getTextChoiceValues();
+    }
+
+    /**
      * Click on a value in the list of values for a TextChoice field. If the value is already selected this will have
      * no effect.
      *
@@ -688,6 +703,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    private void updateValue(String originalValue, String newValue, boolean clickApply)
+    {
+        selectTextChoiceValue(originalValue);
+        setUpdateTextChoiceValue(newValue);
+
+        if(clickApply)
+        {
+            WebDriverWrapper.waitFor(this::isTextChoiceApplyButtonEnabled, "'Apply' button is not enabled.", 1_000);
+            Locator.button("Apply").findElement(this).click();
+        }
+    }
+
     /**
      * Update the selected value in the TextChoice field. This will select the given field.
      *
@@ -697,10 +724,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow updateTextChoiceValue(String originalValue, String newValue)
     {
-        selectTextChoiceValue(originalValue);
-        setUpdateTextChoiceValue(newValue);
-        WebDriverWrapper.waitFor(this::isTextChoiceApplyButtonEnabled, "'Apply' button is not enabled.", 1_000);
-        Locator.button("Apply").findElement(this).click();
+        WebElement alert = Locator.tagWithClass("div", "alert").findWhenNeeded(this);
+        updateValue(originalValue, newValue, true);
+
+        Assert.assertFalse("An unexpected alert was present after applying the change.",
+                alert.isDisplayed());
 
         return this;
     }
@@ -714,7 +742,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public String updateTextChoiceValueExpectError(String originalValue, String newValue)
     {
-        updateTextChoiceValue(originalValue, newValue);
+        updateValue(originalValue, newValue, false);
         WebElement alert = BootstrapLocators.errorBanner.waitForElement(this, 1_000);
         return alert.getText();
     }
@@ -728,7 +756,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public String updateLockedTextChoiceValue(String originalValue, String newValue)
     {
-        updateTextChoiceValue(originalValue, newValue);
+        updateValue(originalValue, newValue, true);
         WebElement alert = BootstrapLocators.infoBanner.waitForElement(this, 1_000);
         return alert.getText();
     }
@@ -741,7 +769,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public boolean isTextChoiceDeleteButtonEnabled()
     {
-        WebElement button = Locator.button("Delete").findElement(this);
+        WebElement button = Locator.buttonContainingText("Delete").findElement(this);
         return button.isEnabled();
     }
 
