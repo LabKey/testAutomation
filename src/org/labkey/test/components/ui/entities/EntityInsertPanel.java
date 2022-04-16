@@ -180,7 +180,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public EntityInsertPanel setUpdateDataForFileUpload(boolean checked)
     {
         showFileUpload();
-        elementCache().updateDataCheckbox.set(checked);
+        if (checked && elementCache().updateDataCheckbox.isDisplayed())
+            elementCache().updateDataCheckbox.set(true);
         return this;
     }
 
