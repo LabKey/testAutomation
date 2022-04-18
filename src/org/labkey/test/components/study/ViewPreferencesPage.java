@@ -13,7 +13,7 @@ public class ViewPreferencesPage extends LabKeyPage
 
     public void selectDefaultGrid(String gridName)
     {
-        clickAndWait(Locator.linkWithText("select").withAttributeContaining("onclick",gridName));
+        clickAndWait(Locator.xpath("//TR[@data-viewLabel='GRID1']//a[normalize-space()='select']"));
         clickButton("Done");
     }
 }
