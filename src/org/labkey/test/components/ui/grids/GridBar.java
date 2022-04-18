@@ -217,7 +217,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void clickButton(String buttonCaption)
     {
-        Locator.buttonContainingText(buttonCaption).waitForElement(this, 5_000).click();
+        Locator.XPathLocator btnAsLink = Locator.tagWithClass("a", "btn").containing(buttonCaption);
+        if (btnAsLink.isDisplayed(this))
+            btnAsLink.findElement(this).click();
+        else
+            Locator.buttonContainingText(buttonCaption).waitForElement(this, 5_000).click();
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
