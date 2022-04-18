@@ -417,9 +417,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
         setType(FieldDefinition.ColumnType.Lookup);
-        WebDriverWrapper.waitFor(() -> Locator.tagContainingText("option","Current Project").findOptionalElement(this).isPresent(), 2000);
         setFromFolder(lookupInfo.getFolder());
-        WebDriverWrapper.waitFor(() -> Locator.tagContainingText("option","core").findOptionalElement(this).isPresent(), 2000);
         setFromSchema(lookupInfo.getSchema());
         if (lookupInfo.getTableType() == null)
             throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
@@ -441,6 +439,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             containerPath = "";
         }
+        WebDriverWrapper.waitFor(() -> Locator.tagContainingText("option","Current Project")
+                .findOptionalElement(elementCache().lookupContainerSelect.getWrappedElement()).isPresent(), 2000);
         String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
         if (!containerPath.equals(initialValue))
         {
@@ -461,6 +461,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setFromSchema(String schemaName)
     {
         expand();
+        WebDriverWrapper.waitFor(() -> Locator.tagContainingText("option","core")
+                .findOptionalElement(elementCache().getLookupSchemaSelect().getWrappedElement()).isPresent(), 2000);
         String initialValue = elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
         if (!schemaName.equals(initialValue))
         {
