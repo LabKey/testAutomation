@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 
 public class UserNotificationsPanel extends WebDriverComponent<UserNotificationsPanel.Elements>
 {
-    private static final Locator inboxIcon = Locator.xpath("//a[contains(@onclick, 'LABKEY.Notification.showPanel')]");
+    private static final Locator inboxIcon = Locator.tagWithClass("i", "fa-inbox").parent("a");
     private static final Locator inboxCount = Locator.byClass("labkey-notification-inbox").followingSibling("span").attributeStartsWith("id", "labkey-notifications-count");
     private static final Locator.XPathLocator visibleNotification = Locator.byClass("labkey-notification").withoutAttribute("style"); // style is, currently, used only to hide notifications
 
