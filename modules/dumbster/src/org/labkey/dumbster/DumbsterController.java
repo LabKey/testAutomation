@@ -29,6 +29,7 @@ import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
+import org.labkey.api.util.HtmlString;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
@@ -56,14 +57,8 @@ public class DumbsterController extends SpringActionController
         setActionResolver(_actionResolver);
     }
 
-    @Override
-    public PageConfig defaultPageConfig()
-    {
-        return new PageConfig();
-    }
-
     @RequiresPermission(ReadPermission.class)
-    public class BeginAction extends SimpleViewAction
+    public static class BeginAction extends SimpleViewAction<Object>
     {
         @Override
         public ModelAndView getView(Object o, BindException errors)
@@ -71,7 +66,7 @@ public class DumbsterController extends SpringActionController
             if (getUser().hasRootAdminPermission())
                 return new MailWebPart();
             else
-                return new HtmlView("You must be a site or application administrator to view the email record.");
+                return new HtmlView(HtmlString.unsafe("You must be a site or application administrator to view the email record."));
         }
 
         @Override
@@ -82,7 +77,7 @@ public class DumbsterController extends SpringActionController
     }
 
     @RequiresPermission(AdminPermission.class)
-    public class SetRecordEmailAction extends MutatingApiAction<RecordEmailForm>
+    public static class SetRecordEmailAction extends MutatingApiAction<RecordEmailForm>
     {
         @Override
         public ApiResponse execute(RecordEmailForm form, BindException errors)
@@ -160,7 +155,7 @@ public class DumbsterController extends SpringActionController
     }
 
     @RequiresPermission(AdminPermission.class)
-    public class ViewMessage extends ExportAction<MessageForm>
+    public static class ViewMessage extends ExportAction<MessageForm>
     {
         @Override
         public void export(MessageForm form, HttpServletResponse response, BindException errors) throws Exception

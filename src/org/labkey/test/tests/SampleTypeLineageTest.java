@@ -259,6 +259,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(subFolderSampleType));
         checkCheckbox(Locator.name(".toggle"));
         clickButton("Derive Samples");
+        waitForElement(Locator.name("inputRole0"));
 
         selectOptionByText(Locator.name("inputRole0"), "Add a new role...");
         setFormElement(Locator.id("customRole0"), "FirstRole");
@@ -1024,7 +1025,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         log("Derive one sample from another");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
         clickButton("Derive Samples");
-        clickButton("Next");
+        waitAndClickAndWait(Locator.lkButton("Next"));
         String childName = parentSampleNames.get(0) + ".1";
         setFormElement(Locator.name("outputSample1_Name"), childName);
         clickButton("Submit");
@@ -1041,7 +1042,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
         clickButton("Derive Samples");
-        clickButton("Next");
+        waitAndClickAndWait(Locator.lkButton("Next"));
         String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
         setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
         clickButton("Submit");
