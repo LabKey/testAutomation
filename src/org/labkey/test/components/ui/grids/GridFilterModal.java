@@ -10,13 +10,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.List;
+
 /**
  * Wraps 'labkey-ui-component' defined in <code>public/QueryModel/GridFilterModal.tsx</code>
  */
 public class GridFilterModal extends ModalDialog
 {
-    protected static final Locator listItem = Locator.byClass("list-group-item");
-
     private final UpdatingComponent _linkedComponent;
 
     public GridFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
@@ -26,9 +26,9 @@ public class GridFilterModal extends ModalDialog
     }
 
     @Override
-    protected void waitForReady(ModalDialog.ElementCache ec)
+    protected void waitForReady()
     {
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(listItem.findWhenNeeded(elementCache().fieldsSelectionPanel)));
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().fieldsSelectionPanel));
     }
 
     /**
@@ -38,12 +38,21 @@ public class GridFilterModal extends ModalDialog
      */
     public GridFilterModal selectField(String fieldLabel)
     {
-        WebElement fieldItem = listItem.withText(fieldLabel).findElement(elementCache().fieldsSelectionPanel);
+        WebElement fieldItem = elementCache().findFieldOption(fieldLabel);
         fieldItem.click();
         Locator.byClass("filter-modal__col-sub-title").withText("Find values for " + fieldLabel)
                 .waitForElement(elementCache().filterPanel, 10_000);
 
         return this;
+    }
+
+    /**
+     * Get fields for currently selected query
+     * @return visible field labels
+     */
+    public List<String> getAvailableFields()
+    {
+        return getWrapper().getTexts(elementCache().findFieldOptions());
     }
 
     /**
@@ -116,9 +125,20 @@ public class GridFilterModal extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
+        public final Locator listItemLoc = Locator.byClass("list-group-item");
+
         // Fields column
         public final WebElement fieldsSelectionPanel = Locator.byClass("filter-modal__col_fields")
                 .findWhenNeeded(this);
+
+        protected WebElement findFieldOption(String queryName)
+        {
+            return listItemLoc.withText(queryName).findElement(elementCache().fieldsSelectionPanel);
+        }
+        protected List<WebElement> findFieldOptions()
+        {
+            return listItemLoc.findElements(elementCache().fieldsSelectionPanel);
+        }
 
         // Values column
         protected final WebElement filterPanel = Locator.byClass("filter-modal__col_filter_exp")
