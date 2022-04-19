@@ -180,7 +180,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public EntityInsertPanel setUpdateDataForFileUpload(boolean checked)
     {
         showFileUpload();
-        elementCache().updateDataCheckbox.set(checked);
+        if (checked && elementCache().updateDataCheckbox.isDisplayed())
+            elementCache().updateDataCheckbox.set(true);
         return this;
     }
 
@@ -315,10 +316,15 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public ResponsiveGrid uploadFileExpectingPreview(File file, boolean updateData)
     {
+        uploadFile(file, updateData);
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(this);
+    }
+
+    public void uploadFile(File file, boolean updateData)
+    {
         showFileUpload();
         setUpdateDataForFileUpload(updateData);
         fileUploadPanel().uploadFile(file);
-        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(this);
     }
 
     public FileUploadPanel showFileUpload()

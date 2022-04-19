@@ -9,6 +9,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.List;
+
 /**
  * Wraps 'labkey-ui-component' defined in <code>internal/components/search/EntityFieldFilterModal.tsx</code>
  */
@@ -20,21 +22,22 @@ public class EntityFieldFilterModal extends GridFilterModal
     }
 
     @Override
-    protected void waitForReady(ModalDialog.ElementCache ec)
+    protected void waitForReady()
     {
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(listItem.findWhenNeeded(elementCache().querySelectionPanel)));
+        getWrapper().shortWait().until(ExpectedConditions
+                .visibilityOf(elementCache().querySelectionPanel));
     }
 
     /**
-     * Select parent
-     * @param parentName name of parent type
+     * Select parent/source query
+     * @param queryName name of parent/source type
      * @return this component
      */
-    public EntityFieldFilterModal selectParent(String parentName)
+    public EntityFieldFilterModal selectQuery(String queryName)
     {
-        WebElement queryItem = listItem.withText(parentName).findElement(elementCache().querySelectionPanel);
+        WebElement queryItem = elementCache().findQueryOption(queryName);
         getWrapper().doAndWaitForElementToRefresh(queryItem::click,
-                () -> listItem.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
+                () -> elementCache().listItemLoc.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
 
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfElementLocated(BootstrapLocators.loadingSpinner));
 
@@ -42,14 +45,23 @@ public class EntityFieldFilterModal extends GridFilterModal
     }
 
     /**
-     * Select parent and field to configure filters for
-     * @param parentName name of parent type
+     * Get visible source/parent queries
+     * @return query names in dialog
+     */
+    public List<String> getAvailableQueries()
+    {
+        return getWrapper().getTexts(elementCache().findQueryOptions());
+    }
+
+    /**
+     * Select parent/source and field to configure filters for
+     * @param queryName name of parent/source type
      * @param fieldLabel Field's label
      * @return this component
      */
-    public EntityFieldFilterModal selectParentField(String parentName, String fieldLabel)
+    public EntityFieldFilterModal selectQueryField(String queryName, String fieldLabel)
     {
-        selectParent(parentName);
+        selectQuery(queryName);
         selectField(fieldLabel);
 
         return this;
@@ -69,9 +81,19 @@ public class EntityFieldFilterModal extends GridFilterModal
 
     protected class ElementCache extends GridFilterModal.ElementCache
     {
-        // Entities column
+
+        // Queries column
         protected final WebElement querySelectionPanel = Locator.byClass("filter-modal__col_queries")
                 .findWhenNeeded(this);
+        protected WebElement findQueryOption(String queryName)
+        {
+            return listItemLoc.withText(queryName).findElement(elementCache().querySelectionPanel);
+        }
+        protected List<WebElement> findQueryOptions()
+        {
+            return listItemLoc.findElements(elementCache().querySelectionPanel);
+        }
+
     }
 
 }
