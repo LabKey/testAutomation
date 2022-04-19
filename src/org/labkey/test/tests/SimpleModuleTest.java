@@ -1385,7 +1385,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToModule("Wiki");
         wikiHelper.createNewWikiPage();
         setFormElement(Locator.id("wiki-input-name"), "Parameterized QWP");
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getTestRoot(), "modules/simpletest/resources/views/parameterizedQWP.html")));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getTestRoot(), "modules/simpletest/resources/views/parameterizedQWP.html.wiki")));
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");

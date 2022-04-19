@@ -222,12 +222,11 @@ public class MultiMenu extends BootstrapMenu
         }
 
         /**
-         * Looks for the export button using the fa-download class
-         * @return export menu utility
+         * Looks for a menu with an 'fa-*' icon instead of text
          */
-        public MultiMenuFinder exportButton()
+        public MultiMenuFinder withButtonIcon(String iconClass)
         {
-            _locator = Locators.menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withChild(Locator.byClass("fa-download")));
+            _locator = Locators.menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withChild(Locator.byClass(iconClass)));
             return this;
         }
 
