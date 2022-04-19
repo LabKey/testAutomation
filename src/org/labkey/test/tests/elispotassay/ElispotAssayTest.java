@@ -554,7 +554,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickAndWait(runTable.detailsLink(3));
-        waitForElement(Locator.css("#plate-summary-div-1 table"));
+        waitForElement(Locator.css(".plate-summary-grid"));
 
         DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
 //        table.setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);      // TODO: we're not showing by default now
@@ -572,7 +572,6 @@ public class ElispotAssayTest extends AbstractAssayTest
             assertEquals(median, table.getDataAsText(row++, columnIdx));
         PlateSummary plateSummary = new PlateSummary(this, 0);
         assertEquals(Arrays.asList("809.0","859.0","821.0","924.0","799.0","833.0","805.0","781.0","782.0","673.0","303.0","TNTC"), plateSummary.getRowValues(C));
-        //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -600,7 +599,7 @@ public class ElispotAssayTest extends AbstractAssayTest
             assertEquals("Background subtraction should be true for all runs.", "true", item);
 
         clickAndWait(DataRegionTable.detailsLinkLocator());
-        waitForElement(Locator.css("#plate-summary-div-1 table"));
+        waitForElement(Locator.css(".plate-summary-grid"));
 
         DataRegionTable detailsTable = new CrosstabDataRegion("AntigenStats", this);
         Map<String, String> expectedBackgroundMedians = new HashMap<>();
