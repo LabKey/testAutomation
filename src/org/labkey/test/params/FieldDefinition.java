@@ -29,6 +29,12 @@ import java.util.Map;
 
 public class FieldDefinition extends PropertyDescriptor
 {
+    private static final String SNOWMAN = "\u2603";
+    private static final String ANGSTROM = "\u00C5";
+    private static final String A_UMLAUT = "\u00E4";
+    // Non-alphanumeric characters supported for field names
+    public static final String TRICKY_CHARACTERS = "><&$,/%\\'}{][ \"" + SNOWMAN + ANGSTROM + A_UMLAUT;
+
     // for UI helpers
     private ColumnType _type;
     private LookupInfo _lookup;
