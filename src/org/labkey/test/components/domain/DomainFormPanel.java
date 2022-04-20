@@ -108,7 +108,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         {
             List<FieldDefinition.RegExValidator> regexValidators = new ArrayList<>();
             List<FieldDefinition.RangeValidator> rangeValidators = new ArrayList<>();
-            FieldDefinition.TextChoiceValidator textChoiceValidator = null;
 
             List<FieldDefinition.FieldValidator<?>> validators = fieldDefinition.getValidators();
             for (FieldDefinition.FieldValidator<?> validator : validators)
@@ -121,14 +120,14 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 {
                     rangeValidators.add((FieldDefinition.RangeValidator) validator);
                 }
-                else if (validator instanceof FieldDefinition.TextChoiceValidator)
+                else if (validator instanceof FieldDefinition.TextChoiceValidator textChoiceValidator)
                 {
-                    // TextChoice is a field type and not an attribute on a field, any other validators that are applied
-                    // will be ignored (TextChoice field cannot have validators).
-                    textChoiceValidator = (FieldDefinition.TextChoiceValidator) validator;
-                    regexValidators = new ArrayList<>();
-                    rangeValidators = new ArrayList<>();
-                    break;
+                    // TextChoice is a field type; implemented using a special validator. TextChoice field cannot have other validators.
+                    if (validators.size() > 1)
+                    {
+                        throw new IllegalArgumentException("TextChoice fields cannot have additional validators.");
+                    }
+                    fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
                 }
                 else
                 {
@@ -143,10 +142,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             if (!rangeValidators.isEmpty())
             {
                 fieldRow.setRangeValidators(rangeValidators);
-            }
-            if (null != textChoiceValidator)
-            {
-                fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
             }
         }
 

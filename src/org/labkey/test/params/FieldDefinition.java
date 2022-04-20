@@ -15,14 +15,15 @@
  */
 package org.labkey.test.params;
 
-import net.jodah.failsafe.internal.util.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.junit.Assert;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,7 +394,7 @@ public class FieldDefinition extends PropertyDescriptor
 
     public FieldDefinition setTextChoiceValues(List<String> values)
     {
-        Assert.isTrue(getType().equals(ColumnType.TextChoice), "Type is not set to 'ColumnType.TextChoice'.");
+        Assert.assertEquals("Invalid field type for text choice values.", ColumnType.TextChoice, getType());
         setValidators(List.of(new FieldDefinition.TextChoiceValidator(values)));
         return this;
     }
@@ -860,14 +861,14 @@ public class FieldDefinition extends PropertyDescriptor
      */
     public static class TextChoiceValidator extends FieldValidator<TextChoiceValidator>
     {
-        private List<String> _values;
+        private final List<String> _values;
 
         public TextChoiceValidator(List<String> values)
         {
             // The TextChoice validator only has a name and no description or message.
             // And the name is generated (not user defined).
             super("Text Choice Validator", "", "");
-            _values = values;
+            _values = Collections.unmodifiableList(values);
         }
 
         @Override

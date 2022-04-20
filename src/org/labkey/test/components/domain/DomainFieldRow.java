@@ -789,6 +789,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         WebElement button = Locator.button("Delete").findElement(this);
         WebDriverWrapper.waitFor(button::isEnabled, "'Delete' button is not enabled.", 1_000);
         button.click();
+        WebDriverWrapper.waitFor(()->!button.isDisplayed(), "Deleting TextChoice value did not complete.", 1_000);
         return this;
     }
 

@@ -1,21 +1,27 @@
 package org.labkey.test.tests;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.junit.LabKeyAssert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Category({Daily.class})
 public class TextChoiceSampleTypeTest extends BaseWebDriverTest
@@ -64,13 +71,19 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         portalHelper.exitAdminMode();
     }
 
+    @Before
+    public void beforeTest()
+    {
+        goToProjectHome();
+    }
+
     @Test
     public void testTextChoiceInSampleTypeDesigner()
     {
         String sampleTypeName = "Test_TC_In_Designer";
         String textChoiceFieldName = "TextChoice_Field_1";
 
-        // Intentionally have the list out of alphabetical order. This will help validate the list is ordered after saving.
+        // The list is intentionally out of alphabetical order. This will help validate the list is ordered after saving.
         List<String> expectedValues = new ArrayList<>();
         expectedValues.add("C");
         expectedValues.add("A");
@@ -79,7 +92,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         expectedValues.add("A string with spaces.");
         expectedValues.add("B");
 
-        // Identify a couple of values that will be used in samples.
+        // Identify a couple of TextChoice values that will be used in samples.
         List<String> valuesUsed = new ArrayList<>();
         valuesUsed.add(expectedValues.get(2));
         valuesUsed.add(expectedValues.get(4));
@@ -119,7 +132,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         List<String> actualValues = fieldRow.getTextChoiceValues();
 
-        // Sort only the original list, not the list returned.
+        // Sort only the original list, not the list returned from the UI.
         Collections.sort(expectedValues);
 
         checker().verifyEquals("Values for field not as expected.", expectedValues, actualValues);
@@ -149,7 +162,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         sampleTypeHelper.bulkImport(samples);
 
-        log(String.format("Edit the sample type again and validate that values '%s' are locked.", String.join(", ", valuesUsed)));
+        log(String.format("Edit the sample type again and validate that TextChoice values '%s' are locked.", String.join(", ", valuesUsed)));
 
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
@@ -219,11 +232,34 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
     }
 
+    final String STR_FIELD_NAME = "Str";
+
+    private TestDataGenerator createSampleType(String sampleTypeName, String sampleNamePrefix, String textChoiceFieldName, List<String> textChoiceValues)
+    {
+        log(String.format("Create a new sample type named '%s'.", sampleTypeName));
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
+        sampleTypeDefinition.setNameExpression(String.format("%s${genId}", sampleNamePrefix));
+
+        log(String.format("Add a TextChoice field named '%s'.", textChoiceFieldName));
+        FieldDefinition textChoiceField = new FieldDefinition(textChoiceFieldName, ColumnType.TextChoice);
+        textChoiceField.setTextChoiceValues(textChoiceValues);
+
+        sampleTypeDefinition.addField(textChoiceField);
+
+        log(String.format("Add a simple string field '%s' just because.", STR_FIELD_NAME));
+        FieldDefinition strField = new FieldDefinition(STR_FIELD_NAME, ColumnType.String);
+        sampleTypeDefinition.addField(strField);
+
+        return SampleTypeAPIHelper.createEmptySampleType(getCurrentContainerPath(), sampleTypeDefinition);
+
+    }
+
     @Test
     public void testUpdatingAndDeletingValuesInSampleType() throws IOException, CommandException
     {
-        String sampleTypeName = "TC_Value_Updates";
-        String textChoiceFieldName = "TextChoice_Field_1";
+        final String sampleTypeName = "TC_Value_Updates";
+        final String textChoiceFieldName = "TextChoice_Field_1";
+        final String namePrefix = "TCE_";
 
         // Some TextChoice values.
         List<String> expectedUnLockedValues = new ArrayList<>();
@@ -236,23 +272,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         expectedUnLockedValues.add("GG");
         expectedUnLockedValues.add("H");
 
-        final String namePrefix = "TCE_";
-        log(String.format("Create a new sample type named '%s'.", sampleTypeName));
-        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
-        sampleTypeDefinition.setNameExpression(String.format("%s${genId}", namePrefix));
-
-        log(String.format("Add a TextChoice field named '%s'.", textChoiceFieldName));
-        FieldDefinition textChoiceField = new FieldDefinition(textChoiceFieldName, ColumnType.TextChoice);
-        textChoiceField.setTextChoiceValues(expectedUnLockedValues);
-
-        sampleTypeDefinition.addField(textChoiceField);
-
-        final String strFieldName = "Str";
-        log(String.format("Add a simple string field '%s' just because.", strFieldName));
-        FieldDefinition strField = new FieldDefinition(strFieldName, ColumnType.String);
-        sampleTypeDefinition.addField(strField);
-
-        TestDataGenerator dataGenerator = SampleTypeAPIHelper.createEmptySampleType(getCurrentContainerPath(), sampleTypeDefinition);
+        TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, expectedUnLockedValues);
 
         log("Create some samples that have TextChoice values set.");
 
@@ -297,7 +317,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
             }
 
             sample.put("Name", sampleName);
-            sample.put(strFieldName, strFieldValue);
+            sample.put(STR_FIELD_NAME, strFieldValue);
 
             dataGenerator.addCustomRow(sample);
         }
@@ -318,7 +338,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         Collections.sort(expectedLockedValues);
         Collections.sort(actualValues);
 
-        checker().verifyEquals("Locked values not as expected.",
+        checker().verifyEquals("Locked values not as expected, cannot continue.",
                 expectedLockedValues, actualValues);
 
         log("Validate that the delete button is disabled for a locked sample.");
@@ -383,7 +403,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         // Let the helper verify the values. If a TextChoice value is not as expected this will assert and stop the test.
         sampleTypeHelper.verifyDataValues(expectedSamples);
 
-        log("Now, edit the sample type again and update a value to an existing value.");
+        log("Now, edit the sample type again and update a value to an already existing value.");
 
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
@@ -424,7 +444,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         updatePage.clickSave();
 
-        log("Now check that the TextChoice value was not updated.");
+        log("Check that the TextChoice value was not updated.");
 
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
@@ -437,6 +457,109 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         checker().verifyTrue(String.format("Expected value '%s' is not in the list of values.", valueToUpdate),
                 actualValues.contains(valueToUpdate));
 
+    }
+
+    @Test
+    public void testSetTextChoiceValueForSample() throws IOException, CommandException
+    {
+        final String sampleTypeName = "TC_Sample_Edit";
+        final String textChoiceFieldName = "TextChoice_Field";
+        final String textChoiceFieldCaption = "Text Choice Field";
+
+        final String namePrefix = "TCSM_";
+
+        // Some TextChoice values.
+        List<String> tcValues = new ArrayList<>();
+        tcValues.add("ÅÅ");
+        tcValues.add("BB");
+        tcValues.add("CC");
+
+        TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, tcValues);
+
+        log("Create some samples int the sample type. None of the samples will have a TextChoice value.");
+
+        List<String> availableSamples = new ArrayList<>();
+
+        for(int i = 1; i <= 5; i++)
+        {
+            Map<String, Object> sample = new HashMap<>();
+            String sampleName = String.format("%s%d", namePrefix, i);
+            sample.put("Name", sampleName);
+            sample.put(STR_FIELD_NAME, "This sample does not have a TextChoice value.");
+            dataGenerator.addCustomRow(sample);
+            availableSamples.add(sampleName);
+        }
+
+        dataGenerator.insertRows();
+
+        refresh();
+
+        String sample = availableSamples.get(0);
+        availableSamples.remove(0);
+
+        log(String.format("Edit the sample '%s' and validate TextChoice values are shown in the select for the field.", sample));
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        DataRegionTable samplesTable = sampleTypeHelper.goToSampleType(sampleTypeName)
+                .getSamplesDataRegionTable();
+
+        UpdateQueryRowPage updateSamplePage = samplesTable.clickEditRow(samplesTable.getRowIndex("Name", sample));
+
+        WebElement select = Locator.name(String.format("quf_%s", textChoiceFieldName)).findElement(getDriver());
+
+        List<WebElement> optionElements = Locator.tag("option").findElements(select);
+        List<String> options = optionElements.stream().map(el -> el.getAttribute("value")).collect(Collectors.toList());
+
+        // Remove the clear selection/empty option from the list.
+        options.remove("");
+
+        LabKeyAssert.assertEqualsSorted("Options for the '%s' field not as expected. Fatal error.", tcValues, options);
+
+        String expectedValue = tcValues.get(0);
+        updateSamplePage.setField(textChoiceFieldName, OptionSelect.SelectOption.textOption(expectedValue));
+
+        updateSamplePage.submit();
+
+        samplesTable = sampleTypeHelper.getSamplesDataRegionTable();
+        String actualValue = samplesTable.getRowDataAsMap("Name", sample).get(textChoiceFieldName);
+
+        checker().verifyEquals(String.format("Doesn't look like the text choice value of '%s' was set for sample '%s'.", expectedValue, sample),
+                expectedValue, actualValue);
+
+        log("Use import to update/set a TextChoice value.");
+        sample = availableSamples.get(0);
+        availableSamples.remove(0);
+
+        expectedValue = tcValues.get(1);
+        List<Map<String, String>> sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Name", sample, textChoiceFieldName, expectedValue));
+
+        sampleTypeHelper.mergeImport(sampleData);
+
+        samplesTable = sampleTypeHelper.getSamplesDataRegionTable();
+        actualValue = samplesTable.getRowDataAsMap("Name", sample).get(textChoiceFieldName);
+
+        checker().verifyEquals(String.format("Doesn't look like the text choice value of '%s' was set for sample '%s' after import/update.", expectedValue, sample),
+                expectedValue, actualValue);
+
+        log("Finally validate that an invalid TextChoice value used during sample import/update fails.");
+
+        sample = availableSamples.get(0);
+        availableSamples.remove(0);
+
+        String invalidValue = "ZZZZ";
+
+        sampleData = new ArrayList<>();
+        sampleData.add(Map.of("Name", sample, textChoiceFieldName, invalidValue));
+
+        sampleTypeHelper.mergeImportExpectingError(sampleData);
+
+        WebElement errorMsg = Locator.tagWithClass("div", "labkey-error").findWhenNeeded(getDriver());
+        waitFor(errorMsg::isDisplayed, "Error message was not shown.", 1_000);
+
+        checker().verifyEquals("Error message not as expected.",
+                String.format("Value '%s' for field '%s' is invalid.", invalidValue, textChoiceFieldCaption), errorMsg.getText());
     }
 
 }
