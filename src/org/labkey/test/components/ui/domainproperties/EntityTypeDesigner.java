@@ -81,6 +81,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return getThis();
     }
 
+    public boolean isNameFieldEnabled()
+    {
+        String disabledValue = Locator.tagWithId("input", "entity-name").findWhenNeeded(getDriver()).getAttribute("disabled");
+        return (null == disabledValue) || (!disabledValue.equalsIgnoreCase("true"));
+    }
+
     public String getNameExpression()
     {
         expandPropertiesPanel();
