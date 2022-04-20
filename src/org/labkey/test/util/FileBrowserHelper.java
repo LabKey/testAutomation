@@ -374,6 +374,33 @@ public class FileBrowserHelper extends WebDriverWrapper
         waitForElement(fileGridCell.withText(folderName));
     }
 
+    public void setDescription(String fileName, String description)
+    {
+        Window propWindow = editProperty(fileName);
+        setFormElement(Locator.name("Flag/Comment"), description);
+        propWindow.clickButton("Save", true);
+        _ext4Helper.waitForMaskToDisappear();
+    }
+
+    public String getFileDescription(String fileName)
+    {
+        List<String> fileList = getFileList();
+        int fileInd = fileList.indexOf(fileName);
+        if (fileInd > -1)
+        {
+            return getTexts(Locators.gridRow().childTag("td").position(7).findElements(getDriver())).get(fileInd);
+        }
+
+        return null;
+    }
+
+    public Window editProperty(String fileName)
+    {
+        selectFileBrowserItem(fileName);
+        clickFileBrowserButton(BrowserAction.EDIT_PROPERTIES);
+        return Window(getDriver()).withTitle("Extended File Properties").waitFor();
+    }
+
     public void addToolbarButton(String buttonId)
     {
         String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";

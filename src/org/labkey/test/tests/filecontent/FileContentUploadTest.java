@@ -159,9 +159,14 @@ public class FileContentUploadTest extends BaseWebDriverTest
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_1, true));
         _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, fileProperties, true);
 
-        log("move file");
+        log("test folder");
         final String folderName = "Test folder";
+        final String folderDescription = "TestFolderDesc";
         _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.setDescription(folderName, folderDescription);
+        assertEquals("Folder description is not as expected", folderDescription, _fileBrowserHelper.getFileDescription(folderName));
+
+        log("move file");
         _fileBrowserHelper.moveFile(filename, folderName);
 
         log("rename file");
