@@ -786,7 +786,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow deleteTextChoiceValue(String value)
     {
         selectTextChoiceValue(value);
-        WebElement button = Locator.button("Delete").findElement(this);
+        WebElement button = Locator.buttonContainingText("Delete").refindWhenNeeded(this);
         WebDriverWrapper.waitFor(button::isEnabled, "'Delete' button is not enabled.", 1_000);
         button.click();
         WebDriverWrapper.waitFor(()->!button.isDisplayed(), "Deleting TextChoice value did not complete.", 1_000);

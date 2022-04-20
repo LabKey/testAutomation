@@ -51,7 +51,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "TextChoice_Test";
+        return "TextChoice_SampleType_Test";
     }
 
     @BeforeClass
@@ -67,7 +67,6 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         portalHelper.enterAdminMode();
         portalHelper.addWebPart("Sample Types");
-        portalHelper.addWebPart("Assay List");
         portalHelper.exitAdminMode();
     }
 
@@ -77,6 +76,24 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    /**
+     * <p>
+     *     Test the TextChoice field in the sample type designer. Focus on creating the field and providing values.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Use the designer to add a TextChoice field.</li>
+     *         <li>Add values to the TextChoice field using the dialog.</li>
+     *         <li>Verify that the values are displayed in a sorted order.</li>
+     *         <li>Adding a duplicate value will be ignored.</li>
+     *         <li>Values that have been assigned are locked.</li>
+     *         <li>Searching for a value works as expected.</li>
+     *         <li>Convert a text field to a TextChoice field.</li>
+     *         <li>Validate that the converted field uses the existing text values as TextChoice values.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
     public void testTextChoiceInSampleTypeDesigner()
     {
@@ -117,10 +134,9 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         sampleTypeDefinition.addField(textChoiceField);
 
-        final String strFieldName = "Str";
-        log(String.format("Add a simple string field '%s' just because.", strFieldName));
-        FieldDefinition strField = new FieldDefinition(strFieldName, ColumnType.String);
-        sampleTypeDefinition.addField(strField);
+        final String textField = "txtField";
+        log(String.format("Add a text field '%s' that will be converted to a TextChoice field.", textField));
+        sampleTypeDefinition.addField(new FieldDefinition(textField, ColumnType.String));
 
         sampleTypeHelper.createSampleType(sampleTypeDefinition);
 
@@ -145,20 +161,16 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         checker().screenShotIfNewError("ST_Designer_Initial_Values_Not_Correct");
 
+        List<String> expectedConvertedValues = List.of("Apple", "Banana");
         log("Add some samples to the sample type and set the TextChoice field for some of the samples.");
         sampleTypeHelper.goToSampleType(sampleTypeName);
         List<Map<String, String>> samples = new ArrayList<>();
 
-        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(0),
-                strFieldName, String.format("Has a TextChoice field, and should be set to '%s'.", valuesUsed.get(0))));
-        samples.add(Map.of(textChoiceFieldName, "",
-                strFieldName, "No TextChoice value set for this sample."));
-        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1),
-                strFieldName, String.format("Also has a TextChoice field set to '%s'.", valuesUsed.get(1))));
-        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1),
-                strFieldName, String.format("Has a TextChoice value, '%s', already used by another sample.", valuesUsed.get(1))));
-        samples.add(Map.of(textChoiceFieldName, "",
-                strFieldName, "Also no TextChoice value set for this sample."));
+        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(0), textField, ""));
+        samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.get(0)));
+        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1), textField, ""));
+        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1), textField, ""));
+        samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.get(1)));
 
         sampleTypeHelper.bulkImport(samples);
 
@@ -180,7 +192,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 .withScreenshot("ST_Designer_Locked_Values_Error")
                 .verifyEquals("Locked values not as expected.", valuesUsed, lockedValues);
 
-        log(String.format("Add some more values to the list. Including the already existing value '%s'.", duplicateValue));
+        log(String.format("Add some more TextChoice values. Including the already existing value '%s'.", duplicateValue));
         List<String> newValues = new ArrayList<>();
         newValues.add("Q");
         newValues.add("R");
@@ -194,7 +206,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         expectedValues.addAll(newValues);
 
-        log(String.format("Validate that '%s' is only in the list once.", duplicateValue));
+        log(String.format("Validate the list of values is updated and that '%s' is only in the list once.", duplicateValue));
         actualValues = fieldRow.getTextChoiceValues();
 
         Collections.sort(expectedValues);
@@ -219,7 +231,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 .withScreenshot("ST_Designer_Duplicate_After_Save_Error")
                 .verifyEquals("List not as expected after adding new values and saving.", expectedValues, actualValues);
 
-        log(String.format("Finally validate that searching for '%s' returns the expected values.", searchValue));
+        log(String.format("Validate that searching for '%s' returns the expected values.", searchValue));
         actualValues = fieldRow.searchForTextChoiceValue(searchValue);
 
         Collections.sort(searchValuesExpected);
@@ -228,7 +240,28 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 .withScreenshot("ST_Designer_Search_Error")
                 .verifyEquals(String.format("Values found while searching for '%s' not as expected.", searchValue), searchValuesExpected, actualValues);
 
-        updatePage.clickCancel();
+        log(String.format("Change the text field '%s' to a TextChoice field.", textField));
+
+        fieldRow = updatePage.getFieldsPanel().getField(textField);
+        fieldRow = fieldRow.expand();
+
+        fieldRow.setType(ColumnType.TextChoice);
+
+        log("Validate that the field now has a TextChoice list and has the expected values, and they are locked.");
+
+        actualValues = fieldRow.getTextChoiceValues();
+
+        LabKeyAssert.assertEqualsSorted("Converting a text field to a TextChoice field did not populate the values list as expected.",
+                expectedConvertedValues, actualValues);
+
+        actualValues = fieldRow.getLockedTextChoiceValues();
+
+        LabKeyAssert.assertEqualsSorted("All of the converted values should show as locked, they do not.",
+                expectedConvertedValues, actualValues);
+
+        updatePage.clickSave();
+
+        log("Updating field should have worked.");
 
     }
 
@@ -254,6 +287,26 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
     }
 
+    /**
+     * <p>
+     *     Test the update and deleting of TextChoice values.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Validate assigned values are locked.</li>
+     *         <li>The delete button is disabled for locked values.</li>
+     *         <li>Delete an unlocked value.</li>
+     *         <li>Update a locked value and validate the update message</li>
+     *         <li>Validate that the updated value is shown on the samples overview page.</li>
+     *         <li>Update an unlocked value.</li>
+     *         <li>Updating a value to an existing value causes an error.</li>
+     *         <li>Updating/saving a changed sample type design does not update the TextChoice value if the 'Apply' button wasn't clicked.</li>
+     *     </ul>
+     * </p>
+     * @throws IOException Can be thrown by the create API call.
+     * @throws CommandException Can be thrown by the create API call.
+     */
     @Test
     public void testUpdatingAndDeletingValuesInSampleType() throws IOException, CommandException
     {
@@ -347,13 +400,27 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         checker().verifyFalse(String.format("Delete button is enabled for value '%s', it should not be.", value),
                 fieldRow.isTextChoiceDeleteButtonEnabled());
 
-        log("Validate that unused values are not locked.");
+        log("Validate that unused values are not locked and can be deleted.");
         value = expectedUnLockedValues.get(0);
         fieldRow.selectTextChoiceValue(value);
-        checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
-                fieldRow.isTextChoiceDeleteButtonEnabled());
 
-        checker().screenShotIfNewError("Edit_Values_Initial_Condition_Error");
+        if(checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
+                fieldRow.isTextChoiceDeleteButtonEnabled()))
+        {
+            fieldRow.deleteTextChoiceValue(value);
+            expectedUnLockedValues.remove(value);
+
+            actualValues = fieldRow.getTextChoiceValues();
+
+            checker().verifyFalse(String.format("TextChoice value '%s' should not be in the list of values.", value),
+                    actualValues.contains(value));
+        }
+        else
+        {
+            log("Delete button was not as expected for unlocked value, not going to test deleting a TextChoice value.");
+        }
+
+        checker().screenShotIfNewError("Edit_Values_Locked_Unlocked_Deleted_Error");
 
         log("Update a locked value and validate the status message.");
         String valueToUpdate = expectedLockedValues.get(1);
@@ -459,6 +526,22 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
     }
 
+    /**
+     * <p>
+     *     Validate the TextChoice values when editing/create a sample.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Use the UI to set the TextChoice value for a sample.</li>
+     *         <li>Verify that the options shown for a TextChoice field are as expected.</li>
+     *         <li>Use import to update a sample and set its TextChoice field.</li>
+     *         <li>Validate that if an invalid value is used in the import an error message is shown.</li>
+     *     </ul>
+     * </p>
+     * @throws IOException Can be thrown by the create API call.
+     * @throws CommandException Can be thrown by the create API call.
+     */
     @Test
     public void testSetTextChoiceValueForSample() throws IOException, CommandException
     {
