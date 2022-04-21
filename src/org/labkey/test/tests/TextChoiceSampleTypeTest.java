@@ -597,7 +597,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         // Remove the clear selection/empty option from the list.
         options.remove("");
 
-        LabKeyAssert.assertEqualsSorted("Options for the '%s' field not as expected. Fatal error.", tcValues, options);
+        LabKeyAssert.assertEqualsSorted(String.format("Options for the '%s' field not as expected. Fatal error.", textChoiceFieldName),
+                tcValues, options);
 
         String expectedValue = tcValues.get(0);
         updateSamplePage.setField(textChoiceFieldName, OptionSelect.SelectOption.textOption(expectedValue));
