@@ -146,7 +146,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         // confirm that search behaves the same way as a filter does
         grid.search("filtered_x");
-        grid.selectAllRows();
+        grid.selectAllOnPage(true);
         grid.clearSearch();
         assertThat(grid.getSelectedRows().size(), is(16));
 
