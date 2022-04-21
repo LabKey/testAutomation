@@ -1153,7 +1153,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCaseSensitivity()
+    public void testSampleTypeNames()
     {
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
@@ -1161,6 +1161,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         sampleHelper.createSampleType(new SampleTypeDefinition(CASE_INSENSITIVE_SAMPLE_TYPE));
 
+        log("Creating sample type with same name but different casing should fail");
         clickProject(PROJECT_NAME);
         List<String> errors = sampleHelper
                 .goToCreateNewSampleType()
@@ -1170,6 +1171,24 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_TYPE));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_TYPE));
+
+        log("Sample type can be renamed");
+        goToProjectHome();
+        final String anotherSampleType = "AnotherSampleType";
+        sampleHelper.createSampleType(new SampleTypeDefinition(anotherSampleType));
+
+        final String updatedSampleType = "UpdatedSampleType";
+        goToProjectHome();
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(anotherSampleType);
+        updatePage.setName(updatedSampleType).clickSave();
+
+        log("Sample type cannot be renamed to an existing name");
+        goToProjectHome();
+        updatePage = sampleHelper.goToEditSampleType(updatedSampleType);
+        updatePage.setName(CASE_INSENSITIVE_SAMPLE_TYPE.toUpperCase());
+        assertTrue("Sample type rename conflict error",
+                updatePage.clickSaveExpectingErrors().contains("A Sample Type with name 'CASEINSENSITIVESAMPLETYPE' already exists."));
+        updatePage.clickCancel();
     }
 
     @Test
