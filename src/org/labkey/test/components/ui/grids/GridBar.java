@@ -59,7 +59,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public File exportData(ExportType exportType)
     {
+        WebElement exportButton = getExportButton(exportType);
+        return getWrapper().doAndWaitForDownload(exportButton::click);
+    }
 
+    private WebElement getExportButton(ExportType exportType)
+    {
         WebElement downloadBtn = Locator.tagWithClass("span", "fa-download").findElement(this);
 
         if(!downloadBtn.isDisplayed())
@@ -67,8 +72,15 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        WebElement exportButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
-        return getWrapper().doAndWaitForDownload(exportButton::click);
+        return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
+    }
+
+    public TabSelectionExportDialog openExcelTabsModal()
+    {
+        WebElement exportButton = getExportButton(ExportType.EXCEL);
+        exportButton.click();
+
+        return new TabSelectionExportDialog(this.getDriver());
     }
 
     /**
