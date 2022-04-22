@@ -388,7 +388,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         int fileInd = fileList.indexOf(fileName);
         if (fileInd > -1)
         {
-            return getTexts(Locators.gridRow().childTag("td").position(7).findElements(getDriver())).get(fileInd);
+            return Locators.gridRow(fileName).childTag("td").position(7).findElement(getDriver()).getText();
         }
 
         return null;
