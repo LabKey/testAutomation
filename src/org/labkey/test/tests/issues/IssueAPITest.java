@@ -419,28 +419,35 @@ public class IssueAPITest extends BaseWebDriverTest
                 .setPriority(3L)
                 .setType("Defect");
 
-        var issueResponse= getIssueResponse( doIssueAction(issue));
-        assertEquals("should be assigned to guest", Long.valueOf(0), issueResponse.getAssignedTo());
-        assertEquals("should be open", "open", issueResponse.getStatus());
+        try
+        {
+            var issueResponse= getIssueResponse( doIssueAction(issue));
+            fail("should produce a validation error");
+        }
+        catch (CommandException ce)
+        {
+            assertEquals("Missing value for required property: assignedto", ce.getMessage());
+        }
     }
 
     @Test
     public void testIssueWithoutPri() throws Exception
     {
         IssueModel issue = new IssueModel()
+                .setAssignedTo(TEST_USER_ID)
                 .setTitle("test with no priority")
                 .setComment("should get a CommandException")
                 .setAction(IssueModel.IssueAction.insert)
                 .setType("Defect");
 
-        // revisit when  https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=44784 is resolved
-        try{
-            doIssueAction(issue);
-            fail("expect error if command is executed without required property priority");
-        }catch(CommandException success)
+        try
         {
-            assertThat(success.getMessage().toLowerCase(), containsString("data does not contain required field: priority"));
-            resetErrors();
+            var issueResponse= getIssueResponse( doIssueAction(issue));
+            fail("should produce a validation error");
+        }
+        catch (CommandException ce)
+        {
+            assertEquals("Missing value for required property: priority", ce.getMessage());
         }
     }
 
