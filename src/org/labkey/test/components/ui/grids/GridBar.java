@@ -5,6 +5,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -217,11 +218,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void clickButton(String buttonCaption)
     {
-        Locator.XPathLocator btnAsLink = Locator.tagWithClass("a", "btn").containing(buttonCaption);
-        if (btnAsLink.isDisplayed(this))
-            btnAsLink.findElement(this).click();
-        else
-            Locator.buttonContainingText(buttonCaption).waitForElement(this, 5_000).click();
+        BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000).click();
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
