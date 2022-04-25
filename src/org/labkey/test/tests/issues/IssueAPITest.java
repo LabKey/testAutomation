@@ -426,7 +426,7 @@ public class IssueAPITest extends BaseWebDriverTest
         }
         catch (CommandException ce)
         {
-            assertEquals("Missing value for required property: assignedto", ce.getMessage());
+            assertEquals("missing value for required property: assignedto", ce.getMessage().toLowerCase());
         }
     }
 
@@ -447,7 +447,7 @@ public class IssueAPITest extends BaseWebDriverTest
         }
         catch (CommandException ce)
         {
-            assertEquals("Missing value for required property: priority", ce.getMessage());
+            assertEquals("missing value for required property: priority", ce.getMessage().toLowerCase());
         }
     }
 
