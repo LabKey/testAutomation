@@ -54,6 +54,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
     public void remove()
     {
         String originalText = getText();
+        getWrapper().mouseOver(getComponentElement());
         getWrapper().mouseOver(elementCache().icon);
         WebDriverWrapper.waitFor(()-> isActive() && isClose(),
                 "the filter status item with text ["+getText()+"] did not become active", 500);
