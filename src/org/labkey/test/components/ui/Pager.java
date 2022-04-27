@@ -60,7 +60,6 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         if(currentPageSize != Integer.parseInt(pageSize))
         {
             _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(pageSize));
-            WebDriverWrapper.waitFor(()-> currentPageSize != getPageSize(), 1_000);
         }
         return this;
     }
