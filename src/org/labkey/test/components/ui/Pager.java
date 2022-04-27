@@ -59,7 +59,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         int currentPageSize = getPageSize();
         if(currentPageSize != Integer.parseInt(pageSize))
         {
-            _pagedComponent.doAndWaitForUpdate(() -> elementCache().pageSizeDropdown.clickSubMenu(pageSize));
+            _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(pageSize));
             WebDriverWrapper.waitFor(()-> currentPageSize != getPageSize(), 1_000);
         }
         return this;
@@ -67,7 +67,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public int getPageSize()                // only works on GridPanel
     {
-        return Integer.parseInt(elementCache().pageSizeDropdown.getButtonText());
+        return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
     }
 
     public Pager clickPrevious()
@@ -179,8 +179,6 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     {
         DropdownButtonGroup jumpToDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
                 .withButtonClass("current-page-dropdown").findWhenNeeded(this);
-        DropdownButtonGroup pageSizeDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
-                .withButtonClass("page-size-dropdown").findWhenNeeded(this);
 
         final Locator.XPathLocator pagingCountsSpan = Locator.tagWithClass("span", "pagination-info");
 
