@@ -58,20 +58,27 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
     }
 
     private static final String SAMPLE_TYPE = "TextChoice_Assay_Test_SampleType";
-    private static final String SAMPLE_TYPE_PREFIX = "TCA_";
 
-    private static List<String> availableSamples = new ArrayList<>();
+    private static final List<String> samples = Arrays.asList("S_1", "S_2", "S_3", "S_4", "S_5", "S_6", "S_7", "S_8", "S_9", "S_10");
 
     private static final String ASSAY_NAME = "Simple_TC_Assay";
+    private static final String ASSAY_RUN_ID = "The_One_And_Only_Run";
 
     private static final String BATCH_TC_FIELD = "Batch_TC_Field";
-    private static List<String> batchFieldValues = List.of("B1", "B2", "B3");
+    private static final List<String> batchFieldValues = List.of("B1", "B2", "B3");
+    private static final String BATCH_VALUE = "B2";
 
     private static final String RUN_TC_FIELD = "Run_TC_Field";
-    private static List<String> runFieldValues = List.of("RN1", "RN2", "RN3");
+    private static final List<String> runFieldValues = List.of("RN1", "RN2", "RN3", "RN4", "RN5");
+    private static List<String> unlockedRunFieldValues = new ArrayList<>(runFieldValues);
+    private static String currentRunValue;
 
     private static final String RESULT_TC_FIELD = "Result_TC_Field";
-    private static List<String> resultFieldValues = List.of("RS1", "RS2", "RS3");
+    private static final List<String> resultFieldValues = List.of("RS1", "RS2", "RS3", "RS4", "RS5", "RS6", "RS7", "RS8", "RS9", "RS10");
+    private static List<String> unlockedResultFieldValues = new ArrayList<>(resultFieldValues);
+
+    private static Map<String, String> currentResultRowData = new HashMap<>();
+
     private static final String SAMPLE_FIELD = "Sample";
 
     private void doSetup() throws IOException, CommandException
@@ -81,21 +88,40 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
 
         log(String.format("Create a new sample type named '%s' and insert some samples.", SAMPLE_TYPE));
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(SAMPLE_TYPE);
-        sampleTypeDefinition.setNameExpression(String.format("%s${genId}", SAMPLE_TYPE_PREFIX));
+        sampleTypeDefinition.setNameExpression("S_${genId}");
 
         TestDataGenerator dataGenerator = SampleTypeAPIHelper.createEmptySampleType(getCurrentContainerPath(), sampleTypeDefinition);
 
-        for (int index = 0; index < 10; index++)
+        for (String sample : samples)
         {
-            String sampleName = String.format("%s%d", SAMPLE_TYPE_PREFIX, index);
-            dataGenerator.addCustomRow(Map.of("Name", sampleName));
-            availableSamples.add(sampleName);
+            dataGenerator.addCustomRow(Map.of("Name", sample));
         }
 
         dataGenerator.insertRows();
 
-        log(String.format("Create an assay named '%s' and add the TextChoice fields.", ASSAY_NAME));
+        log(String.format("Create an assay named '%s' and add the TextChoice fields to batch, run and results.", ASSAY_NAME));
 
+        createAssayDesign();
+
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+
+        createAssayRun();
+
+        log("Add some web parts to make it easier to debug etc...");
+        goToProjectHome();
+        portalHelper.enterAdminMode();
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Assay List");
+        portalHelper.exitAdminMode();
+
+    }
+
+    // Rather than create a separate test to validate that a TextChoice field can be added to an assay design through
+    // the UI this test class will create a shared assay design and use the UI to add the TextChoice fields here in the
+    // setup. The TextChoiceSampleTypeTest.testTextChoiceInSampleTypeDesigner does more validation of creating a
+    // TextChoice field using the UI and there is no need to repeat that here.
+    private void createAssayDesign()
+    {
         goToManageAssays();
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", ASSAY_NAME)
                 .setDescription("Testing TextChoice fields.");
@@ -103,6 +129,7 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
         assayDesignerPage.setEditableRuns(true);
         assayDesignerPage.setEditableResults(true);
 
+        log(String.format("Add a TextChoice field named '%s' to the batch properties.", BATCH_TC_FIELD));
         DomainFormPanel domainFormPanel = assayDesignerPage.goToBatchFields();
         DomainFieldRow fieldRow = domainFormPanel.addField(BATCH_TC_FIELD);
         fieldRow.setType(FieldDefinition.ColumnType.TextChoice);
@@ -112,12 +139,14 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
         domainFormPanel.removeField("ParticipantVisitResolver");
         domainFormPanel.removeField("TargetStudy");
 
+        log(String.format("Add a TextChoice field named '%s' to the run properties.", RUN_TC_FIELD));
         fieldRow = assayDesignerPage.goToRunFields().addField(RUN_TC_FIELD);
         fieldRow.setType(FieldDefinition.ColumnType.TextChoice);
         fieldRow.setTextChoiceValues(runFieldValues);
 
         domainFormPanel = assayDesignerPage.goToResultsFields();
 
+        log(String.format("Add a TextChoice field named '%s' to the results.", RESULT_TC_FIELD));
         fieldRow = domainFormPanel.addField(RESULT_TC_FIELD);
         fieldRow.setType(FieldDefinition.ColumnType.TextChoice);
         fieldRow.setTextChoiceValues(resultFieldValues);
@@ -132,12 +161,68 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
 
         assayDesignerPage.clickSave();
 
-        log("Add some web parts to make it easier to debug etc...");
-        goToProjectHome();
-        portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.addWebPart("Assay List");
-        portalHelper.exitAdminMode();
+    }
+
+    private void createAssayRun()
+    {
+
+        DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
+        runTable.clickHeaderButtonAndWait("Import Data");
+
+        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
+        checker().withScreenshot("Assay_Edit_Run_Results_Batch_Field_Error")
+                .wrapAssertion(()->assertSelectOptions(batchLocator, batchFieldValues,
+                        String.format("Options for the batch field '%s' are not as expected.", BATCH_TC_FIELD)));
+
+        log(String.format("Set the batch field '%s' to '%s'.", BATCH_TC_FIELD, BATCH_VALUE));
+        WebElement select = batchLocator.findElement(getDriver());
+        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(BATCH_VALUE));
+
+        clickButton("Next");
+
+        log(String.format("Set the Assay ID to '%s'.", ASSAY_RUN_ID));
+
+        setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
+
+        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
+        checker().withScreenshot("Assay_Edit_Run_Results_Batch_Field_Error")
+                .wrapAssertion(()->assertSelectOptions(runLocator, runFieldValues, String.format("Options for the '%s' field not as expected.", RUN_TC_FIELD)));
+
+        currentRunValue = unlockedRunFieldValues.get(0);
+        unlockedRunFieldValues.remove(currentRunValue);
+
+        log(String.format("Set the run field '%s' to '%s'.", RUN_TC_FIELD, currentRunValue));
+        select = runLocator.findElement(getDriver());
+        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(currentRunValue));
+
+        StringBuilder resultsPasteText = new StringBuilder();
+        resultsPasteText.append(String.format("%s\t%s\n", SAMPLE_FIELD, RESULT_TC_FIELD));
+
+        int valueIndex = 0;
+        int count = 1;
+        for (String sample : samples)
+        {
+
+            String resultsValue = resultFieldValues.get(valueIndex);
+
+            if(count%2 == 0)
+                valueIndex++;
+
+            // If it hasn't already happened remove the value from the unlocked list.
+            unlockedResultFieldValues.remove(resultsValue);
+
+            resultsPasteText.append(String.format("%s\t%s\n", sample, resultsValue));
+
+            currentResultRowData.put(sample, resultsValue);
+
+            count++;
+        }
+
+        log("Paste in the results and save.");
+
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
+
+        clickButton("Save and Finish");
 
     }
 
@@ -145,14 +230,44 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
     public void beforeTest()
     {
         goToProjectHome();
+        goToManageAssays();
     }
 
+    /**
+     * Helper to set the Edit Runs and Edit Results fields.
+     *
+     * @param canEdit Set to true to make them editable, false otherwise.
+     */
+    private void setEditValues(boolean canEdit)
+    {
+        log(String.format("Setting the 'Edit Results' and 'Edit Runs' fields to %s.", canEdit));
+
+        _assayHelper.clickManageOption(true, "Edit assay design");
+        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+        assayDesignerPage.setEditableResults(canEdit);
+        assayDesignerPage.setEditableRuns(canEdit);
+        assayDesignerPage.clickSave();
+    }
+
+    /**
+     * Simple helper to identify the name of the select control on the page based on the field name. Some code some
+     * place is changing the first letter of the field name to lower case when naming the control.
+     *
+     * @param tcFieldName The TextChoice field name.
+     * @return The field name with the first letter lower case.
+     */
     private String getSelectControlName(String tcFieldName)
     {
-        String temp = tcFieldName.toLowerCase();
-        return temp.replace("_tc_field", "_TC_Field");
+        return Character.toLowerCase(tcFieldName.charAt(0)) + tcFieldName.substring(1);
     }
 
+    /**
+     * For a given TextChoice (UI) field assert that the options shown are as expected.
+     *
+     * @param selectLocator The locator for the selector.
+     * @param expectedOptions The expected list of options.
+     * @param failureMsg If they don't match use this as the failure message.
+     */
     private void assertSelectOptions(Locator selectLocator, List<String> expectedOptions, String failureMsg)
     {
         WebElement select = selectLocator.findElement(getDriver());
@@ -167,7 +282,14 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
 
     }
 
-    private void verifyRunResultsTable(Map<String, String> expectedRowData, String expectedBatchValue, String expectedRunValue)
+    /**
+     * For an assays results table verify the rows. The values for the batch and run TextChoice fields should be the same
+     * for all but the value for the result field will differ from row to row.
+     *
+     * @param expectedRowData A map with the sample id and the expected TextChoice value for the result.
+     * @param expectedRunValue Expected TextChoice value for the run field.
+     */
+    private void verifyRunResultsTable(Map<String, String> expectedRowData, String expectedRunValue)
     {
         DataRegionTable dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Data").find();
 
@@ -179,7 +301,7 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
 
             Map<String, String> expectedData = Map.of(SAMPLE_FIELD, entry.getKey(),
                     RESULT_TC_FIELD, entry.getValue(),
-                    String.format("Run/Batch/%s", BATCH_TC_FIELD), expectedBatchValue,
+                    String.format("Run/Batch/%s", BATCH_TC_FIELD), BATCH_VALUE,
                     String.format("Run/%s", RUN_TC_FIELD), expectedRunValue);
 
             checker().verifyEquals(String.format("Result row not as expected for sample '%s'.", entry.getKey()), expectedData, rowData);
@@ -187,145 +309,200 @@ public class TextChoiceAssayTest extends BaseWebDriverTest
 
     }
 
-    private String pickDifferentValue(String currentValue, List<String> possibleValues)
-    {
-        int index = possibleValues.indexOf(currentValue);
-        index = index != possibleValues.size() - 1 ? index + 1 : index - 1;
-        return possibleValues.get(index);
-    }
-
+    /**
+     * <p>
+     *     Validate that TextChoice fields can be set and updated in an assay run/result.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Test 'happy path' and set the TextChoice fields for an assay batch, run and results.</li>
+     *         <li>Will validate that the TextChoice fields for the run and results can be updated after the fact.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
     public void testEditRunAndResults()
     {
 
-        goToManageAssays();
-
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
 
         log("Make sure the 'Edit Runs' and 'Edit Results' options are checked.");
-        _assayHelper.clickManageOption(true, "Edit assay design");
-        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
-        assayDesignerPage.setEditableResults(true);
-        assayDesignerPage.setEditableRuns(true);
-        assayDesignerPage.clickSave();
-
-        log("Create a run and validate each of the TextChoice fields along the way.");
-
-        DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
-        runTable.clickHeaderButtonAndWait("Import Data");
-
-        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
-        checker().withScreenshot("Assay_Edit_Run_Results_Batch_Field_Error")
-                .wrapAssertion(()->assertSelectOptions(batchLocator, batchFieldValues,
-                        String.format("Options for the batch field '%s' are not as expected.", BATCH_TC_FIELD)));
-
-        String expectedBatchValue = batchFieldValues.get(0);
-
-        log(String.format("Set the batch field '%s' to '%s'.", BATCH_TC_FIELD, expectedBatchValue));
-        WebElement select = batchLocator.findElement(getDriver());
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(expectedBatchValue));
-
-        clickButton("Next");
-
-        String assayID = "Run_01";
-
-        log(String.format("Set the Assay ID to '%s'.", assayID));
-
-        setFormElement(Locator.tagWithName("input", "name"), assayID);
-
-        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
-        checker().withScreenshot("Assay_Edit_Run_Results_Batch_Field_Error")
-                .wrapAssertion(()->assertSelectOptions(runLocator, runFieldValues, String.format("Options for the '%s' field not as expected.", RUN_TC_FIELD)));
-
-        String expectedRunValue = runFieldValues.get(0);
-
-        log(String.format("Set the run field '%s' to '%s'.", RUN_TC_FIELD, expectedRunValue));
-        select = runLocator.findElement(getDriver());
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(expectedRunValue));
-
-        Map<String, String> expectedRowData = new HashMap<>();
-
-        StringBuilder resultsPasteText = new StringBuilder();
-        resultsPasteText.append(String.format("%s\t%s\n", SAMPLE_FIELD, RESULT_TC_FIELD));
-
-        int tcIndex = 0;
-        for (String sample : availableSamples)
-        {
-
-            if (tcIndex == resultFieldValues.size())
-                tcIndex = 0;
-
-            String resultsValue = resultFieldValues.get(tcIndex++);
-
-            resultsPasteText.append(String.format("%s\t%s\n", sample, resultsValue));
-
-            expectedRowData.put(sample, resultsValue);
-        }
-
-        log("Paste in the results and save.");
-
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
-
-        clickButton("Save and Finish");
-
-        log("Review the saved assay run data");
+        setEditValues(true);
 
         DataRegionTable dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
-        Map<String, String> rowData = dataRegionTable.getRowDataAsMap("Assay ID", assayID);
-
-        checker().verifyEquals(String.format("Value for the TextChoice field '%s' is not as expected.", RUN_TC_FIELD),
-                expectedRunValue, rowData.get(RUN_TC_FIELD));
-
-        checker().verifyEquals(String.format("Value for the TextChoice field '%s' is not as expected.", BATCH_TC_FIELD),
-                expectedBatchValue, rowData.get(String.format("Batch/%s", BATCH_TC_FIELD)));
-
-        clickAndWait(Locator.linkWithText(assayID));
-
-        verifyRunResultsTable(expectedRowData, expectedBatchValue, expectedRunValue);
-
-        log("Go back the to runs table and edit the TextChoice field for the run result.");
-
-        clickAndWait(Locator.linkWithText("view runs"));
-
-        dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
-        int rowIndex = dataRegionTable.getRowIndex("Assay ID", assayID);
+        int rowIndex = dataRegionTable.getRowIndex("Assay ID", ASSAY_RUN_ID);
         dataRegionTable.clickEditRow(rowIndex);
 
-        select = Locator.name(String.format("quf_%s", RUN_TC_FIELD)).findElement(getDriver());
+        WebElement select = Locator.name(String.format("quf_%s", RUN_TC_FIELD)).findElement(getDriver());
 
-        log(String.format("Run TextChoice value currently is '%s'.", expectedRunValue));
-        expectedRunValue = pickDifferentValue(expectedRunValue, runFieldValues);
-        log(String.format("Run TextChoice value will be updated to '%s'.", expectedRunValue));
+        String newRunValue = unlockedRunFieldValues.get(0);
+        unlockedRunFieldValues.remove(0);
 
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(expectedRunValue));
+        log(String.format("Update the Run TextChoice field from '%s' to '%s'.", currentRunValue, newRunValue));
 
+        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(newRunValue));
         clickButton("Submit");
 
         dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
-        rowData = dataRegionTable.getRowDataAsMap("Assay ID", assayID);
+        Map<String, String> rowData = dataRegionTable.getRowDataAsMap("Assay ID", ASSAY_RUN_ID);
 
-        checker().verifyEquals(String.format("Value for the TextChoice field '%s' is not as expected.", RUN_TC_FIELD),
-                expectedRunValue, rowData.get(RUN_TC_FIELD));
+        if(checker().withScreenshot("Run_Filed_Not_Updated")
+                .verifyEquals(String.format("Value for the TextChoice field '%s' is not as expected.", RUN_TC_FIELD),
+                        newRunValue, rowData.get(RUN_TC_FIELD)))
+        {
+            // If the run value was updated as expected save the new value as the current value.
+            currentRunValue = newRunValue;
+        }
 
-        clickAndWait(Locator.linkWithText(assayID));
+        clickAndWait(Locator.linkWithText(ASSAY_RUN_ID));
 
-        String sample = availableSamples.get(1);
+        String sample = samples.get(1);
         log(String.format("Edit the result for sample '%s'.", sample));
 
         dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Data").find();
         rowIndex = dataRegionTable.getRowIndex(SAMPLE_FIELD, sample);
         dataRegionTable.clickEditRow(rowIndex);
         select = Locator.name(String.format("quf_%s", RESULT_TC_FIELD)).findElement(getDriver());
-        String updatedResultValue = pickDifferentValue(expectedRowData.get(sample), resultFieldValues);
-        log(String.format("Result TextChoice value for sample '%s' will be changed from '%s' to '%s'.", sample, expectedRowData.get(sample), updatedResultValue));
+        String updatedResultValue = unlockedResultFieldValues.get(0);
+        log(String.format("Result TextChoice value for sample '%s' will be changed from '%s' to '%s'.", sample, currentResultRowData.get(sample), updatedResultValue));
         new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(updatedResultValue));
+
+        // Remove the update results value.
+        unlockedResultFieldValues.remove(updatedResultValue);
 
         clickAndWait(Locator.lkButton("Submit"));
 
-        expectedRowData.replace(sample, updatedResultValue);
+        currentResultRowData.replace(sample, updatedResultValue);
 
-        verifyRunResultsTable(expectedRowData, expectedBatchValue, expectedRunValue);
+        verifyRunResultsTable(currentResultRowData, currentRunValue);
 
+    }
+
+    @Test
+    public void testUpdateTextChoiceValues()
+    {
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+
+        log("Make sure the 'Edit Runs' and 'Edit Results' options are checked.");
+        setEditValues(true);
+
+        log("Edit the assay design and validate that the used TextChoice fields are locked but can be updated.");
+        _assayHelper.clickManageOption(true, "Edit assay design");
+        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+
+        log(String.format("Validate field '%s' in the batch properties.", BATCH_TC_FIELD));
+        DomainFieldRow fieldRow = assayDesignerPage.goToBatchFields().getField(BATCH_TC_FIELD);
+        fieldRow.expand();
+        List<String> actualValues = fieldRow.getLockedTextChoiceValues();
+
+        checker().verifyTrue(String.format("The batch value '%s' is not shown as locked. It should be.", BATCH_VALUE),
+                actualValues.contains(BATCH_VALUE));
+
+        checker().verifyFalse(String.format("The edit field text box should not be enabled for the batch value '%s'.", BATCH_VALUE),
+                fieldRow.isTextChoiceUpdateFieldEnabled(BATCH_VALUE));
+
+        checker().screenShotIfNewError("Batch_Field_Value_Error");
+
+        log(String.format("Update the value for field '%s' in the run properties.", RUN_TC_FIELD));
+        fieldRow = assayDesignerPage.goToRunFields().getField(RUN_TC_FIELD);
+        fieldRow.expand();
+        actualValues = fieldRow.getLockedTextChoiceValues();
+
+        checker().verifyTrue(String.format("The run value '%s' is not shown as locked. It should be.", currentRunValue),
+                actualValues.contains(currentRunValue));
+        checker().fatal()
+                .verifyTrue(String.format("The edit field text box should be enabled for the run value '%s', it is not. Fatal error.", currentRunValue),
+                        fieldRow.isTextChoiceUpdateFieldEnabled(currentRunValue));
+
+        String updatedRunValue = String.format("%s_updated", currentRunValue);
+
+        log(String.format("Update the TextChoice value '%s' to be '%s'.", currentRunValue, updatedRunValue));
+        String updateMsg = fieldRow.updateLockedTextChoiceValue(currentRunValue, updatedRunValue);
+
+        checker().verifyEquals("Update message not as expected.",
+                "1 row with value RN1 will be updated to RN1_updated on save.", updateMsg);
+
+        checker().screenShotIfNewError("Updating_Run_Field_Value_Error");
+
+        String originalResultValue = currentResultRowData.get(samples.get(2));
+
+        log(String.format("Update the value '%s' in the field '%s' in the results properties.", originalResultValue, RESULT_TC_FIELD));
+        fieldRow = assayDesignerPage.goToResultsFields().getField(RESULT_TC_FIELD);
+        fieldRow.expand();
+        actualValues = fieldRow.getLockedTextChoiceValues();
+
+        checker().verifyTrue(String.format("The result value '%s' is not shown as locked. It should be.", originalResultValue),
+                actualValues.contains(originalResultValue));
+        checker().fatal()
+                .verifyTrue(String.format("The edit field text box should be enabled for the result value '%s'. Fatal error.", originalResultValue),
+                        fieldRow.isTextChoiceUpdateFieldEnabled(originalResultValue));
+
+        String updatedResultValue = String.format("%s_updated", originalResultValue);
+
+        log(String.format("Update the TextChoice value '%s' to be '%s'.", originalResultValue, updatedResultValue));
+        updateMsg = fieldRow.updateLockedTextChoiceValue(originalResultValue, updatedResultValue);
+
+        checker().verifyEquals("Update message for result values not as expected.",
+                "2 rows with value RS2 will be updated to RS2_updated on save.", updateMsg);
+
+        checker().screenShotIfNewError("Updating_Run_Field_Value_Error");
+
+        assayDesignerPage.clickSave();
+
+        // If the save worked update the current values to the new values.
+        currentRunValue = updatedRunValue;
+        currentResultRowData.replace(samples.get(2), updatedResultValue);
+        currentResultRowData.replace(samples.get(3), updatedResultValue);
+
+        clickAndWait(Locator.linkWithText("view runs"));
+
+        DataRegionTable dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Runs").find();
+        Map<String, String> rowData = dataRegionTable.getRowDataAsMap("Assay ID", ASSAY_RUN_ID);
+
+        checker().withScreenshot("Update_Error")
+                .verifyEquals(String.format("Value for the TextChoice field '%s' is not as expected.", RUN_TC_FIELD),
+                        updatedRunValue, rowData.get(RUN_TC_FIELD));
+
+        clickAndWait(Locator.linkWithText(ASSAY_RUN_ID));
+
+        verifyRunResultsTable(currentResultRowData, updatedRunValue);
+
+    }
+
+    @Test
+    public void testLockedRunAndResults()
+    {
+
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+
+        log("Make sure the 'Edit Runs' and 'Edit Results' options are unchecked.");
+        setEditValues(false);
+
+        log("Edit the assay design and validate that the used TextChoice fields are locked but can not be updated.");
+        _assayHelper.clickManageOption(true, "Edit assay design");
+        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+
+        log(String.format("Check the '%s' field in the run properties.", RUN_TC_FIELD));
+        DomainFieldRow fieldRow = assayDesignerPage.goToRunFields().getField(RUN_TC_FIELD);
+        fieldRow.expand();
+
+        checker().withScreenshot("Run_Field_Edit_Enabled_Error")
+                .verifyFalse(String.format("The edit field text box should not be enabled for the run value '%s'.", currentRunValue),
+                        fieldRow.isTextChoiceUpdateFieldEnabled(currentRunValue));
+
+        fieldRow = assayDesignerPage.goToResultsFields().getField(RESULT_TC_FIELD);
+        fieldRow.expand();
+
+        for(String assignedResultValue : currentResultRowData.values())
+        {
+            checker().verifyFalse(String.format("The edit field text box should not be enabled for the result value '%s'.", assignedResultValue),
+                    fieldRow.isTextChoiceUpdateFieldEnabled(assignedResultValue));
+        }
+
+        checker().screenShotIfNewError("Result_Field_Edit_Enabled_Error");
+
+        assayDesignerPage.clickCancel();
     }
 
 }

@@ -657,6 +657,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     }
 
     /**
+     * Get a list of the values that are 'unlocked' for a TextChoice field. An unlocked value is one that has not been used.
+     *
+     * @return List of unlocked values.
+     */
+    public List<String> getUnlockedTextChoiceValues()
+    {
+        List<String> allChoices = getTextChoiceValues();
+        allChoices.removeAll(getLockedTextChoiceValues());
+        return allChoices;
+    }
+
+    /**
      * Enter a value into the search field for TextChoice values. If no values have been this will error with a
      * no-such-element exception.
      *
@@ -703,6 +715,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setUpdateTextChoiceValue(String updatedValue)
     {
+        WebDriverWrapper.waitFor(this::isTextChoiceUpdateFieldEnabled,
+                "The edit field for the TextChoice value did not become enabled in time.", 1_000);
         getWrapper().setFormElement(Locator.tagWithName("input", "value").findElement(this), updatedValue);
         return this;
     }
@@ -763,6 +777,33 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         updateValue(originalValue, newValue, true);
         WebElement alert = BootstrapLocators.infoBanner.waitForElement(this, 1_000);
         return alert.getText();
+    }
+
+    /**
+     * Select a TextChoice value and check if the edit field is enabled.
+     *
+     * @param value The TextChoice value to select.
+     * @return True if enabled, false otherwise.
+     */
+    public boolean isTextChoiceUpdateFieldEnabled(String value)
+    {
+        selectTextChoiceValue(value);
+        return isTextChoiceUpdateFieldEnabled();
+    }
+
+    /**
+     * Check if the edit field is enabled for the selected TextChoice value. A value must be selected.
+     *
+     * @return True if enabled, false otherwise.
+     */
+    public boolean isTextChoiceUpdateFieldEnabled()
+    {
+        WebElement updateField = Locator.tagWithName("input", "value").findWhenNeeded(this);
+
+        Assert.assertTrue("Update field is not visible, make sure a TextChoice value is selected.",
+                updateField.isDisplayed());
+
+        return updateField.isEnabled();
     }
 
     /**
