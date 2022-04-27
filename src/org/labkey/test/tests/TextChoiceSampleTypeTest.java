@@ -251,12 +251,12 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         actualValues = fieldRow.getTextChoiceValues();
 
-        LabKeyAssert.assertEqualsSorted("Converting a text field to a TextChoice field did not populate the values list as expected.",
+        LabKeyAssert.assertEqualsSorted("Converting a text field to a TextChoice field did not populate the values list as expected. Fatal error.",
                 expectedConvertedValues, actualValues);
 
         actualValues = fieldRow.getLockedTextChoiceValues();
 
-        LabKeyAssert.assertEqualsSorted("All of the converted values should show as locked, they do not.",
+        LabKeyAssert.assertEqualsSorted("All of the converted values should show as locked, they do not. Fatal error.",
                 expectedConvertedValues, actualValues);
 
         updatePage.clickSave();
@@ -391,7 +391,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         Collections.sort(expectedLockedValues);
         Collections.sort(actualValues);
 
-        checker().verifyEquals("Locked values not as expected, cannot continue.",
+        checker().verifyEquals("Locked values not as expected.",
                 expectedLockedValues, actualValues);
 
         log("Validate that the delete button is disabled for a locked sample.");
@@ -399,6 +399,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         fieldRow.selectTextChoiceValue(value);
         checker().verifyFalse(String.format("Delete button is enabled for value '%s', it should not be.", value),
                 fieldRow.isTextChoiceDeleteButtonEnabled());
+
+        checker().screenShotIfNewError("Edit_Values_Locked_Locked_Error");
 
         log("Validate that unused values are not locked and can be deleted.");
         value = expectedUnLockedValues.get(0);
@@ -608,8 +610,9 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         samplesTable = sampleTypeHelper.getSamplesDataRegionTable();
         String actualValue = samplesTable.getRowDataAsMap("Name", sample).get(textChoiceFieldName);
 
-        checker().verifyEquals(String.format("Doesn't look like the text choice value of '%s' was set for sample '%s'.", expectedValue, sample),
-                expectedValue, actualValue);
+        checker().withScreenshot("Set_Value_For_Sample_UI_Error")
+                .verifyEquals(String.format("Doesn't look like the text choice value of '%s' was set for sample '%s'.", expectedValue, sample),
+                        expectedValue, actualValue);
 
         log("Use import to update/set a TextChoice value.");
         sample = availableSamples.get(0);
@@ -624,8 +627,9 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         samplesTable = sampleTypeHelper.getSamplesDataRegionTable();
         actualValue = samplesTable.getRowDataAsMap("Name", sample).get(textChoiceFieldName);
 
-        checker().verifyEquals(String.format("Doesn't look like the text choice value of '%s' was set for sample '%s' after import/update.", expectedValue, sample),
-                expectedValue, actualValue);
+        checker().withScreenshot("Set_Value_For_Sample_Import_Error")
+                .verifyEquals(String.format("Doesn't look like the text choice value of '%s' was set for sample '%s' after import/update.", expectedValue, sample),
+                        expectedValue, actualValue);
 
         log("Finally validate that an invalid TextChoice value used during sample import/update fails.");
 
