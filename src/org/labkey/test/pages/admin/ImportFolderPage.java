@@ -66,6 +66,12 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         return this;
     }
 
+    public ImportFolderPage setValidateAllQueries(boolean value)
+    {
+        elementCache().validateQueriesCheckbox.set(value);
+        return this;
+    }
+
     public void clickImportFolder()
     {
         clickButton("Import Folder");

@@ -704,7 +704,7 @@
         "value" : "2000-04-01 00:00:00.000"
       },
       "Like" : {
-        "url" : "/labkey/HTTPApiVerifyProject/list-details.view?listId=1&pk=Gray",
+        "url" : "/labkey/HTTPApiVerifyProject/list-details.view?name=Test%20List&pk=Gray",
         "value" : "Black"
       },
       "Color" : {
