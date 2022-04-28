@@ -12,7 +12,7 @@ import java.util.Collection;
 
 public class TabSelectionExportDialog extends ModalDialog
 {
-    private static final String TITLE = "Select the Tabs to Export to Excel";
+    private static final String TITLE = "Select the Tabs to Export";
     public TabSelectionExportDialog(WebDriver driver)
     {
         super(new ModalDialogFinder(driver).withTitle(TITLE).waitFor().getComponentElement(), driver);
