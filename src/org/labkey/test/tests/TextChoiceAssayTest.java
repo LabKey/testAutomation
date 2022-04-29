@@ -53,11 +53,11 @@ public class TextChoiceAssayTest extends TextChoiceTest
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(getProjectName(), null);
 
-        createSampleType();
+        createDefaultSampleTypeWithTextChoice();
 
         log(String.format("Create an assay named '%s' and add the TextChoice fields to batch, run and results.", ASSAY_NAME));
 
-        createAssayDesign();
+        createDefaultAssayDesignWithTextChoice();
 
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
 
