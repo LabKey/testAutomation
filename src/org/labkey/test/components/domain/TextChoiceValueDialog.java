@@ -7,21 +7,41 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * This is the dialog that allows a user to enter the list of possible values for a TextChoice field.
+ */
 public class TextChoiceValueDialog extends ModalDialog
 {
     private DomainFieldRow _row;
 
+    /**
+     * Constructor with a field row and a finder.
+     *
+     * @param row The {@link DomainFieldRow} that contains the TextChoice field.
+     * @param finder A {@link ModalDialogFinder}. The caller constructs the condition for finding the dialog.
+     */
     public TextChoiceValueDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
         super(finder);
         _row = row;
     }
 
+    /**
+     * Constructor that only takes a {@link DomainFieldRow}. Dialog is found based on its title.
+     *
+     * @param row A {@link DomainFieldRow} that contains the TextChoice field.
+     */
     public TextChoiceValueDialog(DomainFieldRow row)
     {
         this(row, new ModalDialogFinder(row.getDriver()).withTitle(String.format("Add Text Choice Values for %s", row.getName())));
     }
 
+    /**
+     * Add the list of stings as possible values for a TrextChoice field.
+     *
+     * @param values List of string of possible values.
+     * @return This dialog.
+     */
     public TextChoiceValueDialog addValues(List<String> values)
     {
         String val = String.join("\n", values);
@@ -33,17 +53,32 @@ public class TextChoiceValueDialog extends ModalDialog
         return this;
     }
 
+    /**
+     * Get the value count text (e.g. '3 new values provided').
+     *
+     * @return The text displayed ont he dialog.
+     */
     public String getValueCountText()
     {
         return elementCache().valueCount.getText();
     }
 
+    /**
+     * Click the apply button.
+     *
+     * @return The {@link DomainFieldRow} that has the TextChoice field.
+     */
     public DomainFieldRow clickApply()
     {
         dismiss("Apply");
         return _row;
     }
 
+    /**
+     * Cancel out of the dialog.
+     *
+     * @return The {@link DomainFieldRow} that has the TextChoice field.
+     */
     public DomainFieldRow clickCancel()
     {
         dismiss("Cancel");

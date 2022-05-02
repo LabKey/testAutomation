@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Base class for the TextChoice fields. Contains some shared helper functions.
+ */
 public abstract class TextChoiceTest extends BaseWebDriverTest
 {
 
@@ -158,7 +161,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
     }
 
     /**
-     * Simple helper to identify the name of the select control on an assay page based on the field name. The name of the
+     * Simple helper to identify the name of the control on a page based on the field name. The name of the
      * control is the field but the first letter is lower case. This lets the test not worry about that.
      *
      * @param tcFieldName The TextChoice field name.
