@@ -178,7 +178,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid search(String searchTerm)
     {
-        getGridBar().searchFor(searchTerm);
+        doAndWaitForUpdate(()-> getGridBar().searchFor(searchTerm));
         return this;
     }
 
@@ -187,7 +187,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid clearSearch()
     {
-        getGridBar().clearSearch();
+        doAndWaitForUpdate(()-> getGridBar().clearSearch());
         return this;
     }
 
