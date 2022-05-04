@@ -36,6 +36,10 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     private static final String READER = "reader@permission.test";
     private static final String PROJECT_NAME_PC = "Folder by Project Creator";
     private static final String TEMPLATE_PROJECT = "Template project";
+    private static final String TEMPLATE_SUBFOLDER = "Subfolder for template project";
+    private static final String TEMPLATE_FOLDER_PERMISSION = "Data Management";
+
+    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     public static void setup()
@@ -54,11 +58,17 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(TEMPLATE_PROJECT, "Study");
         importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
+        _containerHelper.createSubfolder(TEMPLATE_PROJECT, TEMPLATE_PROJECT, TEMPLATE_SUBFOLDER, "Collaboration", null, true);
+
         _userHelper.createUser(PROJECT_CREATOR_USER, true, true);
         _userHelper.createUser(READER, true, true);
-        ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
-        permHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
-        permHelper.addMemberToRole(PROJECT_CREATOR_USER, "Folder Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
+
+        _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
+        _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Folder Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
+
+        goToProjectHome(TEMPLATE_PROJECT);
+       _permissionsHelper.createProjectGroup(TEMPLATE_FOLDER_PERMISSION, TEMPLATE_PROJECT);
+       _permissionsHelper.addUserToProjGroup(PROJECT_CREATOR_USER, TEMPLATE_PROJECT, TEMPLATE_FOLDER_PERMISSION);
     }
 
     @Override
@@ -149,6 +159,30 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         ManageListsGrid listsGrid = goToManageLists().getGrid();
         assertEquals("Incorrect lists copied from template", Arrays.asList("Lab Machines", "Reagents", "Technicians"), listsGrid.getListNames());
+    }
+
+    /*
+        Test coverage for Issue 45273: Importing groups during create from template can result in unauthorized exceptions
+     */
+    @Test
+    public void testCreateProjectByTemplateWithSubfolderAndPermission() throws CommandException, IOException
+    {
+        String containerId = ((APIContainerHelper) _containerHelper).getContainerId(TEMPLATE_PROJECT);
+        goToHome();
+        impersonate(PROJECT_CREATOR_USER);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", PROJECT_NAME_PC);
+        params.put("assignProjectAdmin", "true");
+        params.put("folderType", "Template");
+        params.put("templateSourceId", containerId);
+        params.put("templateIncludeSubfolders", "true");
+        params.put("templateWriterTypes", "Lists");
+        createProject(params);
+        stopImpersonating();
+
+        assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
+        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
+        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
     }
 
     private String createProject(Map<String, Object> params) throws IOException
