@@ -184,13 +184,10 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         List<String> lockedValues = fieldRow.getLockedTextChoiceValues();
 
-        // Sort the result from the UI, at this point more concerned about the values and not the order.
-        Collections.sort(lockedValues);
-        Collections.sort(valuesUsed);
 
         checker()
                 .withScreenshot("ST_Designer_Locked_Values_Error")
-                .verifyEquals("Locked values not as expected.", valuesUsed, lockedValues);
+                .wrapAssertion(() -> LabKeyAssert.assertEqualsSorted("Locked values not as expected.", valuesUsed, lockedValues));
 
         log(String.format("Add some more TextChoice values. Including the already existing value '%s'.", duplicateValue));
         List<String> newValues = new ArrayList<>();
