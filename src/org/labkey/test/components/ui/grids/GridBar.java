@@ -416,6 +416,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return this;
     }
 
+    public String getSearchExpression()
+    {
+        return elementCache().searchBox.get();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -492,6 +497,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         ALL,
         SAMPLES,
-        ALIQUOTS;
+        ALIQUOTS
     }
 }
