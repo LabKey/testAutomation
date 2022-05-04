@@ -1,15 +1,19 @@
 package org.labkey.test.tests;
 
+import org.labkey.junit.LabKeyAssert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Base class for the TextChoice fields. Contains some shared helper functions.
@@ -50,6 +55,8 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
     protected static final String ASSAY_NAME = "Simple_TC_Assay";
     protected static final String ASSAY_RUN_ID = "The_One_And_Only_Run";
 
+    // The value of the batch field is not changed after a run. The only way to update a batch value after a run is to
+    // delete the batch/run.
     protected static final String BATCH_TC_FIELD = "Batch_TC_Field";
     protected static final List<String> BATCH_FIELD_VALUES = List.of("B1", "B2", "B3");
     protected static final String BATCH_VALUE = BATCH_FIELD_VALUES.get(1);
@@ -161,15 +168,64 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
     }
 
     /**
-     * Simple helper to identify the name of the control on a page based on the field name. The name of the
-     * control is the field but the first letter is lower case. This lets the test not worry about that.
-     *
-     * @param tcFieldName The TextChoice field name.
-     * @return The field name with the first letter lower case.
+     * Simple helper to create a run for the default assay.
      */
-    protected String getSelectControlName(String tcFieldName)
+    protected Map<String, String> createAssayRun()
     {
-        return Character.toLowerCase(tcFieldName.charAt(0)) + tcFieldName.substring(1);
+        Map<String, String> assayResultRowData = new HashMap<>();
+
+        DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
+        runTable.clickHeaderButtonAndWait("Import Data");
+
+        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
+        assertSelectOptions(batchLocator, BATCH_FIELD_VALUES,
+                String.format("Options for the batch field '%s' are not as expected. Fatal error.", BATCH_TC_FIELD));
+
+        log(String.format("Set the batch field '%s' to '%s'.", BATCH_TC_FIELD, BATCH_VALUE));
+        WebElement select = batchLocator.findElement(getDriver());
+        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(BATCH_VALUE));
+
+        clickButton("Next");
+
+        log(String.format("Set the Assay ID to '%s'.", ASSAY_RUN_ID));
+
+        setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
+
+        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
+        assertSelectOptions(runLocator, RUN_FIELD_VALUES,
+                String.format("Options for the '%s' field not as expected. Fatal error.", RUN_TC_FIELD));
+
+        log(String.format("Set the run field '%s' to '%s'.", RUN_TC_FIELD, RUN_VALUE));
+        select = runLocator.findElement(getDriver());
+        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(RUN_VALUE));
+
+        StringBuilder resultsPasteText = new StringBuilder();
+        resultsPasteText.append(String.format("%s\t%s\n", RESULT_SAMPLE_FIELD, RESULT_TC_FIELD));
+
+        int valueIndex = 0;
+        int count = 1;
+        for (String sample : SAMPLES)
+        {
+
+            String resultsValue = RESULT_FIELD_VALUES.get(valueIndex);
+
+            if(count%2 == 0)
+                valueIndex++;
+
+            resultsPasteText.append(String.format("%s\t%s\n", sample, resultsValue));
+
+            assayResultRowData.put(sample, resultsValue);
+
+            count++;
+        }
+
+        log("Paste in the results and save.");
+
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
+
+        clickButton("Save and Finish");
+
+        return assayResultRowData;
     }
 
     /**
@@ -179,7 +235,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
      * @param expectedRowData A map with the sample id and the expected TextChoice value for the result.
      * @param expectedRunValue Expected TextChoice value for the run field.
      */
-    protected void verifyRunResultsTable(Map<String, String> expectedRowData, String expectedBatchValue, String expectedRunValue)
+    protected void verifyRunResultsTable(Map<String, String> expectedRowData, String expectedRunValue)
     {
         DataRegionTable dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Data").find();
 
@@ -191,12 +247,46 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
             Map<String, String> expectedData = Map.of(RESULT_SAMPLE_FIELD, entry.getKey(),
                     RESULT_TC_FIELD, entry.getValue(),
-                    String.format("Run/Batch/%s", BATCH_TC_FIELD), expectedBatchValue,
+                    String.format("Run/Batch/%s", BATCH_TC_FIELD), BATCH_VALUE,
                     String.format("Run/%s", RUN_TC_FIELD), expectedRunValue);
 
             checker().verifyEquals(String.format("Result row not as expected for sample '%s'.", entry.getKey()), expectedData, rowData);
         }
 
+    }
+
+    /**
+     * For a given TextChoice (UI) field on a run/result assert that the options shown are as expected. This is not the
+     * TextChoice field in the assay designer.
+     *
+     * @param selectLocator The locator for the selector.
+     * @param expectedOptions The expected list of options.
+     * @param failureMsg If they don't match use this as the failure message.
+     */
+    protected void assertSelectOptions(Locator selectLocator, List<String> expectedOptions, String failureMsg)
+    {
+        WebElement select = selectLocator.findElement(getDriver());
+
+        List<WebElement> optionElements = Locator.tag("option").findElements(select);
+        List<String> selectOptions = optionElements.stream().map(el -> el.getAttribute("value")).collect(Collectors.toList());
+
+        // Remove the clear selection/empty option from the list.
+        selectOptions.remove("");
+
+        LabKeyAssert.assertEqualsSorted(failureMsg, expectedOptions, selectOptions);
+
+    }
+
+    /**
+     * Simple helper to identify the name of the control on a page based on the field name. The name of the
+     * control is the field but the first letter is lower case. This lets the test not worry about that.
+     *
+     * @param tcFieldName The TextChoice field name.
+     * @return The field name with the first letter lower case.
+     */
+    protected String getSelectControlName(String tcFieldName)
+    {
+        return Character.toLowerCase(tcFieldName.charAt(0)) + tcFieldName.substring(1);
     }
 
 }

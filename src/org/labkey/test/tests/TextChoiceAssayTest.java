@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.junit.LabKeyAssert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Category({Daily.class})
 public class TextChoiceAssayTest extends TextChoiceTest
@@ -38,8 +36,6 @@ public class TextChoiceAssayTest extends TextChoiceTest
         TextChoiceAssayTest init = (TextChoiceAssayTest) getCurrentTest();
         init.doSetup();
     }
-
-    private static String currentBatchValue = BATCH_FIELD_VALUES.get(2);
 
     private static List<String> unusedRunFieldValues = new ArrayList<>(RUN_FIELD_VALUES);
     private static String currentRunValue;
@@ -100,62 +96,10 @@ public class TextChoiceAssayTest extends TextChoiceTest
     private void createAndValidateAssayRun()
     {
 
-        DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
-        runTable.clickHeaderButtonAndWait("Import Data");
+        currentRunValue = RUN_VALUE;
+        unusedRunFieldValues.remove(RUN_VALUE);
 
-        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
-        assertSelectOptions(batchLocator, BATCH_FIELD_VALUES,
-                String.format("Options for the batch field '%s' are not as expected. Fatal error.", BATCH_TC_FIELD));
-
-        log(String.format("Set the batch field '%s' to '%s'.", BATCH_TC_FIELD, currentBatchValue));
-        WebElement select = batchLocator.findElement(getDriver());
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(currentBatchValue));
-
-        clickButton("Next");
-
-        log(String.format("Set the Assay ID to '%s'.", ASSAY_RUN_ID));
-
-        setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
-
-        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
-        assertSelectOptions(runLocator, RUN_FIELD_VALUES,
-                String.format("Options for the '%s' field not as expected. Fatal error.", RUN_TC_FIELD));
-
-        currentRunValue = unusedRunFieldValues.get(0);
-        unusedRunFieldValues.remove(currentRunValue);
-
-        log(String.format("Set the run field '%s' to '%s'.", RUN_TC_FIELD, currentRunValue));
-        select = runLocator.findElement(getDriver());
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(currentRunValue));
-
-        StringBuilder resultsPasteText = new StringBuilder();
-        resultsPasteText.append(String.format("%s\t%s\n", RESULT_SAMPLE_FIELD, RESULT_TC_FIELD));
-
-        int valueIndex = 0;
-        int count = 1;
-        for (String sample : SAMPLES)
-        {
-
-            String resultsValue = RESULT_FIELD_VALUES.get(valueIndex);
-
-            if(count%2 == 0)
-                valueIndex++;
-
-            // If it hasn't already happened remove the value from the unused list.
-            unusedResultFiledValues.remove(resultsValue);
-
-            resultsPasteText.append(String.format("%s\t%s\n", sample, resultsValue));
-
-            currentResultRowData.put(sample, resultsValue);
-
-            count++;
-        }
-
-        log("Paste in the results and save.");
-
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
-
-        clickButton("Save and Finish");
+        currentResultRowData = createAssayRun();
 
         log("Validate that the run/results data is as expected.");
 
@@ -168,11 +112,11 @@ public class TextChoiceAssayTest extends TextChoiceTest
 
         checker().fatal()
                 .verifyEquals(String.format("Value for the batch TextChoice field '%s' is not as expected.", BATCH_TC_FIELD),
-                        currentBatchValue, rowData.get(String.format("Batch/%s", BATCH_TC_FIELD)));
+                        BATCH_VALUE, rowData.get(String.format("Batch/%s", BATCH_TC_FIELD)));
 
         clickAndWait(Locator.linkWithText(ASSAY_RUN_ID));
 
-        verifyRunResultsTable(currentResultRowData, currentBatchValue, currentRunValue);
+        verifyRunResultsTable(currentResultRowData, currentRunValue);
 
     }
 
@@ -190,28 +134,6 @@ public class TextChoiceAssayTest extends TextChoiceTest
         assayDesignerPage.setEditableResults(canEdit);
         assayDesignerPage.setEditableRuns(canEdit);
         assayDesignerPage.clickSave();
-    }
-
-    /**
-     * For a given TextChoice (UI) field on a run/result assert that the options shown are as expected. This is not the
-     * TextChoice field in the assay designer.
-     *
-     * @param selectLocator The locator for the selector.
-     * @param expectedOptions The expected list of options.
-     * @param failureMsg If they don't match use this as the failure message.
-     */
-    private void assertSelectOptions(Locator selectLocator, List<String> expectedOptions, String failureMsg)
-    {
-        WebElement select = selectLocator.findElement(getDriver());
-
-        List<WebElement> optionElements = Locator.tag("option").findElements(select);
-        List<String> selectOptions = optionElements.stream().map(el -> el.getAttribute("value")).collect(Collectors.toList());
-
-        // Remove the clear selection/empty option from the list.
-        selectOptions.remove("");
-
-        LabKeyAssert.assertEqualsSorted(failureMsg, expectedOptions, selectOptions);
-
     }
 
     /**
@@ -280,7 +202,7 @@ public class TextChoiceAssayTest extends TextChoiceTest
 
         currentResultRowData.replace(sample, updatedResultValue);
 
-        verifyRunResultsTable(currentResultRowData, currentBatchValue, currentRunValue);
+        verifyRunResultsTable(currentResultRowData, currentRunValue);
 
     }
 
@@ -315,11 +237,11 @@ public class TextChoiceAssayTest extends TextChoiceTest
         fieldRow.expand();
         List<String> actualValues = fieldRow.getLockedTextChoiceValues();
 
-        checker().verifyTrue(String.format("The batch value '%s' is not shown as locked. It should be.", currentBatchValue),
-                actualValues.contains(currentBatchValue));
+        checker().verifyTrue(String.format("The batch value '%s' is not shown as locked. It should be.", BATCH_VALUE),
+                actualValues.contains(BATCH_VALUE));
 
-        checker().verifyFalse(String.format("The edit field text box should not be enabled for the batch value '%s'.", currentBatchValue),
-                fieldRow.isTextChoiceUpdateFieldEnabled(currentBatchValue));
+        checker().verifyFalse(String.format("The edit field text box should not be enabled for the batch value '%s'.", BATCH_VALUE),
+                fieldRow.isTextChoiceUpdateFieldEnabled(BATCH_VALUE));
 
         checker().screenShotIfNewError("Batch_Field_Value_Error");
 
@@ -386,7 +308,7 @@ public class TextChoiceAssayTest extends TextChoiceTest
 
         clickAndWait(Locator.linkWithText(ASSAY_RUN_ID));
 
-        verifyRunResultsTable(currentResultRowData, currentBatchValue, updatedRunValue);
+        verifyRunResultsTable(currentResultRowData, updatedRunValue);
 
     }
 

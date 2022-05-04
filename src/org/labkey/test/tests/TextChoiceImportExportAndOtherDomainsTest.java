@@ -13,7 +13,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFormPanel;
-import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.issues.IssueListDefDataRegion;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.params.FieldDefinition;
@@ -22,13 +21,11 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +35,6 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
     private static final String ORIGINAL_PROJ_NAME = "TextChoice_Import_Export_Test";
     private static final String IMPORTED_PROJ_NAME = "Imported_TextChoice_Import_Export_Test";
-
-    private static Map<String, String> assayResultRowData = new HashMap<>();
 
     // List field name, values etc...
     private static final String LIST_NAME = "Simple_TC_List";
@@ -91,61 +86,6 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         portalHelper.addWebPart("Issue Definitions");
         portalHelper.addWebPart("Issues Summary");
         portalHelper.exitAdminMode();
-
-    }
-
-    /**
-     * Create a run for the assay.
-     */
-    protected void createAssayRun()
-    {
-
-        DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
-        runTable.clickHeaderButtonAndWait("Import Data");
-
-        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
-
-        log(String.format("Set the batch field '%s' to '%s'.", BATCH_TC_FIELD, BATCH_VALUE));
-        WebElement select = batchLocator.findElement(getDriver());
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(BATCH_VALUE));
-
-        clickButton("Next");
-
-        log(String.format("Set the Assay ID to '%s'.", ASSAY_RUN_ID));
-
-        setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
-
-        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
-
-        log(String.format("Set the run field '%s' to '%s'.", RUN_TC_FIELD, RUN_VALUE));
-        select = runLocator.findElement(getDriver());
-        new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(RUN_VALUE));
-
-        StringBuilder resultsPasteText = new StringBuilder();
-        resultsPasteText.append(String.format("%s\t%s\n", RESULT_SAMPLE_FIELD, RESULT_TC_FIELD));
-
-        int valueIndex = 0;
-        int count = 1;
-        for (String sample : SAMPLES)
-        {
-
-            String resultsValue = RESULT_FIELD_VALUES.get(valueIndex);
-
-            if(count%2 == 0)
-                valueIndex++;
-
-            resultsPasteText.append(String.format("%s\t%s\n", sample, resultsValue));
-
-            assayResultRowData.put(sample, resultsValue);
-
-            count++;
-        }
-
-        log("Paste in the results and save.");
-
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
-
-        clickButton("Save and Finish");
 
     }
 
@@ -290,7 +230,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
 
-        createAssayRun();
+        Map<String, String> assayResultRowData = createAssayRun();
 
         log("Create a list with a TextChoice field. The list will also be validated after import.");
         verifyTextChoiceInList();
@@ -359,7 +299,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         clickAndWait(Locator.linkWithText(ASSAY_RUN_ID));
 
-        verifyRunResultsTable(assayResultRowData, BATCH_VALUE, RUN_VALUE);
+        verifyRunResultsTable(assayResultRowData, RUN_VALUE);
 
         checker().screenShotIfNewError("Import_Results_Table_Error");
 

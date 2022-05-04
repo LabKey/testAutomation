@@ -184,7 +184,6 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         List<String> lockedValues = fieldRow.getLockedTextChoiceValues();
 
-
         checker()
                 .withScreenshot("ST_Designer_Locked_Values_Error")
                 .wrapAssertion(() -> LabKeyAssert.assertEqualsSorted("Locked values not as expected.", valuesUsed, lockedValues));
@@ -313,12 +312,12 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         // Some TextChoice values.
         List<String> expectedUnLockedValues = new ArrayList<>();
-        expectedUnLockedValues.add("ÅÅ");
+        expectedUnLockedValues.add("\u00C5\u00C5");
         expectedUnLockedValues.add("BB");
         expectedUnLockedValues.add("CC");
         expectedUnLockedValues.add("DD");
         expectedUnLockedValues.add("E E E");
-        expectedUnLockedValues.add("ƒƒ");
+        expectedUnLockedValues.add("\u0083\u0083");
         expectedUnLockedValues.add("GG");
         expectedUnLockedValues.add("H");
 
@@ -552,7 +551,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         // Some TextChoice values.
         List<String> tcValues = new ArrayList<>();
-        tcValues.add("ÅÅ");
+        tcValues.add("\u00C6\u00C6");
         tcValues.add("BB");
         tcValues.add("CC");
 
