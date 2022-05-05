@@ -180,10 +180,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid search(String searchTerm)
     {
         String currentSearchExp = getGridBar().getSearchExpression();
-        if (searchTerm.equals(currentSearchExp))
-            getGridBar().searchFor(searchTerm);
-        else
+        if (!searchTerm.equals(currentSearchExp))
             doAndWaitForUpdate(()-> getGridBar().searchFor(searchTerm));
+
         return this;
     }
 
@@ -193,10 +192,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid clearSearch()
     {
         String currentSearchExp = getGridBar().getSearchExpression();
-        if ("".equals(currentSearchExp))
-            getGridBar().clearSearch();
-        else
+        if (!currentSearchExp.isBlank())
             doAndWaitForUpdate(()-> getGridBar().clearSearch());
+
         return this;
     }
 

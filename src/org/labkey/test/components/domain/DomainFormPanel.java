@@ -120,6 +120,15 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 {
                     rangeValidators.add((FieldDefinition.RangeValidator) validator);
                 }
+                else if (validator instanceof FieldDefinition.TextChoiceValidator textChoiceValidator)
+                {
+                    // TextChoice is a field type; implemented using a special validator. TextChoice field cannot have other validators.
+                    if (validators.size() > 1)
+                    {
+                        throw new IllegalArgumentException("TextChoice fields cannot have additional validators.");
+                    }
+                    fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
+                }
                 else
                 {
                     throw new IllegalArgumentException("Validator not supported: " + validator.getClass().getName());

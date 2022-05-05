@@ -256,15 +256,21 @@ public class SampleTypeHelper extends WebDriverWrapper
                 .submit();
     }
 
+    public void bulkImportExpectingError(List<Map<String, String>> data, String importOption)
+    {
+        startTsvImport(data, importOption)
+                .submitExpectingError();
+    }
+
     public void mergeImport(List<Map<String, String>> data)
     {
         startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
                 .submit();
     }
 
-    public void bulkImportExpectingError(List<Map<String, String>> data, String importOption)
+    public void mergeImportExpectingError(List<Map<String, String>> data)
     {
-        startTsvImport(data, importOption)
+        startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
                 .submitExpectingError();
     }
 
