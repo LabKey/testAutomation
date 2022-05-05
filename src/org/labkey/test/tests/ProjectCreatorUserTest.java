@@ -179,8 +179,8 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         params.put("folderType", "Template");
         params.put("templateSourceId", containerId);
         params.put("templateIncludeSubfolders", "true");
-        params.put("templateWriterTypes", "Project-level groups and members");
-        params.put("templateWriterTypes", "Role assignments for users and groups");
+        params.put("templateWriterTypes", "Project-level groups and members,Role assignments for users and groups");
+//        params.put("templateWriterTypes", "Role assignments for users and groups");
         createProject(params);
         stopImpersonating();
 
