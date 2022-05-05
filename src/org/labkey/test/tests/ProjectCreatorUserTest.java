@@ -9,6 +9,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
@@ -16,6 +17,7 @@ import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
@@ -64,11 +67,11 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         _userHelper.createUser(READER, true, true);
 
         _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
-        _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Folder Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
+        _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
 
         goToProjectHome(TEMPLATE_PROJECT);
-       _permissionsHelper.createProjectGroup(TEMPLATE_FOLDER_PERMISSION, TEMPLATE_PROJECT);
-       _permissionsHelper.addUserToProjGroup(PROJECT_CREATOR_USER, TEMPLATE_PROJECT, TEMPLATE_FOLDER_PERMISSION);
+        _permissionsHelper.createProjectGroup(TEMPLATE_FOLDER_PERMISSION, TEMPLATE_PROJECT);
+        _permissionsHelper.addUserToProjGroup(PROJECT_CREATOR_USER, TEMPLATE_PROJECT, TEMPLATE_FOLDER_PERMISSION);
     }
 
     @Override
@@ -176,13 +179,15 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         params.put("folderType", "Template");
         params.put("templateSourceId", containerId);
         params.put("templateIncludeSubfolders", "true");
-        params.put("templateWriterTypes", "Lists");
+        params.put("templateWriterTypes", "Project-level groups and members");
+        params.put("templateWriterTypes", "Role assignments for users and groups");
         createProject(params);
         stopImpersonating();
 
         assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
-        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
-        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
+        WebElement projectTree = projectMenu().expandProjectFully(PROJECT_NAME_PC);
+        assertNotNull("No link to subfolder: /" + TEMPLATE_PROJECT + "/" + TEMPLATE_SUBFOLDER, Locator.linkWithText(TEMPLATE_SUBFOLDER).findElementOrNull(projectTree));
+        navBar().goToPermissionsPage().isUserInGroup(PROJECT_CREATOR_USER, TEMPLATE_FOLDER_PERMISSION, PermissionsHelper.PrincipalType.USER);
     }
 
     private String createProject(Map<String, Object> params) throws IOException
