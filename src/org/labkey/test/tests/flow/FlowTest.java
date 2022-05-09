@@ -531,7 +531,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Inline");
+                    .withDescendant(Locator.tag("span").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Inline");
         waitForElement(Locator.css(".labkey-flow-graph"));
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:", "(<APC-A>)");
@@ -567,7 +567,8 @@ public class FlowTest extends BaseFlowTest
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
+                .withDescendant(Locator.tag("span").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
+                .clickSubMenu(true, "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
@@ -605,7 +606,7 @@ public class FlowTest extends BaseFlowTest
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
-                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
+                    .withDescendant(Locator.tag("span").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
     }
