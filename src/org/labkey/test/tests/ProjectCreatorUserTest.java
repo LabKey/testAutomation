@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -12,11 +13,14 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -37,7 +41,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 {
     private static final String PROJECT_CREATOR_USER = "project_creator@permission.test";
     private static final String READER = "reader@permission.test";
-    private static final String PROJECT_NAME_PC = "Folder by Project Creator";
+    private static final String PROJECT_NAME_PC = "FolderByProjectCreator";
     private static final String TEMPLATE_PROJECT = "Template project";
     private static final String TEMPLATE_SUBFOLDER = "Subfolder for template project";
     private static final String TEMPLATE_FOLDER_PERMISSION = "Data Management";
@@ -171,6 +175,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     public void testCreateProjectByTemplateWithSubfolderAndPermission() throws CommandException, IOException
     {
         String containerId = ((APIContainerHelper) _containerHelper).getContainerId(TEMPLATE_PROJECT);
+
         goToHome();
         impersonate(PROJECT_CREATOR_USER);
         Map<String, Object> params = new HashMap<>();
@@ -179,15 +184,15 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         params.put("folderType", "Template");
         params.put("templateSourceId", containerId);
         params.put("templateIncludeSubfolders", "true");
-        params.put("templateWriterTypes", "Project-level groups and members,Role assignments for users and groups");
-//        params.put("templateWriterTypes", "Role assignments for users and groups");
-        createProject(params);
+        params.put("templateWriterTypes", "Role%20assignments%20for%20users%20and%20groups");
+        createProject(params, "Project-level%20groups%20and%20members");
         stopImpersonating();
 
         assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
         WebElement projectTree = projectMenu().expandProjectFully(PROJECT_NAME_PC);
         assertNotNull("No link to subfolder: /" + TEMPLATE_PROJECT + "/" + TEMPLATE_SUBFOLDER, Locator.linkWithText(TEMPLATE_SUBFOLDER).findElementOrNull(projectTree));
-        navBar().goToPermissionsPage().isUserInGroup(PROJECT_CREATOR_USER, TEMPLATE_FOLDER_PERMISSION, PermissionsHelper.PrincipalType.USER);
+        goToProjectHome(PROJECT_NAME_PC);
+        goToFolderPermissions().isUserInGroup(PROJECT_CREATOR_USER, TEMPLATE_FOLDER_PERMISSION, PermissionsHelper.PrincipalType.USER);
     }
 
     private String createProject(Map<String, Object> params) throws IOException
@@ -204,6 +209,25 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         }
 
         return "Success";
+    }
+
+    private void createProject(Map<String, Object> params, String additionalWriters)
+    {
+        String createProjectUrl = WebTestHelper.buildURL("admin", "createProject", params);
+        createProjectUrl = createProjectUrl.replace("view", "api");
+        createProjectUrl = createProjectUrl + "&templateWriterTypes=" + additionalWriters;
+        SimpleHttpRequest createProjectRequest = new SimpleHttpRequest(createProjectUrl, "POST");
+        createProjectRequest.copySession(getDriver());
+
+        try
+        {
+            SimpleHttpResponse response = createProjectRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
 
