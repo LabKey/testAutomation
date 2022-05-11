@@ -36,7 +36,10 @@ public class TabSelectionExportDialog extends ModalDialog
             {
                 String text = checkbox.getText();
                 if (!tabs.contains(text))
+                {
                     elementCache().getCheckBox(checkbox).check();
+                    missingTabs.remove(text);
+                }
                 else
                     elementCache().getCheckBox(checkbox).uncheck();
             }
