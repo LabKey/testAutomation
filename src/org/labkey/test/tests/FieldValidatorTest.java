@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -70,12 +71,12 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         log("Test upload data");
         _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), TEST_DATA_FAIL);
-        _listHelper.submitImportTsv_error(SEX_ERROR_MSG);
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        importDataPage.setText(TEST_DATA_FAIL);
+        importDataPage.submitExpectingError(SEX_ERROR_MSG);
         assertTextPresent(ID_ERROR_MSG, AGE_ERROR_MSG);
 
-        _listHelper.submitTsvData(TEST_DATA_PASS);
+        importDataPage.setText(TEST_DATA_PASS).submit();
         assertTextPresent("Ted", "Alice", "Bob");
 
         // ID regex validation

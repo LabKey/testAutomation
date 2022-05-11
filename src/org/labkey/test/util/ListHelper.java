@@ -24,6 +24,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -34,6 +35,7 @@ import org.openqa.selenium.WrapsDriver;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.tag;
@@ -60,57 +62,9 @@ public class ListHelper extends LabKeySiteWrapper
         return _wrapsDriver.getWrappedDriver();
     }
 
-    public void uploadCSVData(String listData)
-    {
-        clickImportData();
-        setFormElement(Locator.id("tsv3"), listData);
-        _extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
-        submitImportTsv_success();
-    }
-
     public void uploadData(String listData)
     {
-        clickImportData();
-        submitTsvData(listData);
-    }
-
-    public void submitTsvData(String listData)
-    {
-        setFormElement(Locator.id("tsv3"), listData);
-        submitImportTsv_success();
-    }
-
-    public void submitImportTsv_success()
-    {
-        clickButton("Submit");
-        waitForElement(Locator.css(".labkey-data-region"), 30000);
-    }
-
-    // null means any error
-    public void submitImportTsv_error(String error)
-    {
-        doAndWaitForPageSignal(() -> clickButton("Submit", 0),
-                IMPORT_ERROR_SIGNAL);
-        if (error != null)
-        {
-            String errors = String.join(", ", getTexts(Locators.labkeyError.findElements(getDriver())));
-            assertTrue("Didn't find expected error ['" + error + "'] in [" + errors + "]", errors.contains(error));
-        }
-    }
-
-    public void submitImportTsv_errors(List<String> errors)
-    {
-        doAndWaitForPageSignal(() -> clickButton("Submit", 0),
-                IMPORT_ERROR_SIGNAL);
-        if (errors == null || errors.isEmpty())
-            waitForElement(Locator.css(".labkey-error"));
-        else
-        {
-            for (String err : errors)
-            {
-                waitForElement(Locator.css(".labkey-error").containing(err));
-            }
-        }
+        clickImportData().setText(listData).submit();
     }
 
     @LogMethod
@@ -354,27 +308,28 @@ public class ListHelper extends LabKeySiteWrapper
         assertElementNotPresent(Locators.labkeyError);
     }
 
-    public void clickImportData()
+    public ImportDataPage clickImportData()
     {
-        if(isElementPresent(Locator.lkButton("Import Data")))
+        Optional<WebElement> importButton = Locator.lkButton("Import Data").findOptionalElement(getDriver());
+        if(importButton.isPresent())
         {
             // Probably at list-editListDefinition after creating a list
-            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+            clickAndWait(importButton.get());
+            return new ImportDataPage(getDriver());
         }
         else
         {
             // Importing from list data region
-            DataRegionTable list = DataRegionTable.DataRegion(getDriver()).find();
-            list.clickImportBulkData();
+            return DataRegionTable.DataRegion(getDriver()).find()
+                    .clickImportBulkData();
         }
-        waitForElement(Locator.id("tsv3"));
     }
 
     public void bulkImportData(String listData)
     {
-        clickImportData();
-        setFormElement(Locator.name("text"), listData);
-        submitImportTsv_success();
+        clickImportData()
+                .setText(listData)
+                .submit();
     }
 
     public boolean isMergeOptionPresent()

@@ -1066,8 +1066,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Importing some data...");
         _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(LIST_DATA);
+        _listHelper.clickImportData()
+                .setText(LIST_DATA)
+                .submit();
 
         log("Create list in subfolder to prevent query validation failure");
         createPeopleListInFolder(FOLDER_NAME);

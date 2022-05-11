@@ -24,6 +24,7 @@ import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -32,9 +33,18 @@ import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 {
+
+    public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
+
     public ImportDataPage(WebDriver driver)
     {
         super(driver);
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().uploadPanel));
     }
 
     public ImportDataPage setText(String text)
@@ -97,7 +107,8 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public String submitExpectingError()
     {
-        elementCache().getSubmitButton().click();
+        doAndWaitForPageSignal(() -> elementCache().getSubmitButton().click(),
+                IMPORT_ERROR_SIGNAL);
         clearCache();
         return waitForErrors();
     }

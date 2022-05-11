@@ -468,8 +468,9 @@ public class AuditLogTest extends BaseWebDriverTest
         if(null != tsvData)
         {
             _listHelper.goToList(listName);
-            _listHelper.clickImportData();
-            _listHelper.submitTsvData(tsvData);
+            _listHelper.clickImportData()
+                    .setText(tsvData)
+                    .submit();
         }
     }
 

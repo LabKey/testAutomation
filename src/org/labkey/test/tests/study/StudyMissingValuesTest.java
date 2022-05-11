@@ -10,6 +10,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.DatasetPropertiesPage;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -101,16 +102,17 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
 
         log("Import dataset data");
         clickAndWait(Locator.linkWithText(datasetName));
-        new DatasetPropertiesPage(getDriver())
+        ImportDataPage importDataPage = new DatasetPropertiesPage(getDriver())
                 .clickViewData()
                 .getDataRegion()
                 .clickImportBulkData();
 
-        setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
-        _listHelper.submitImportTsv_error(null);
+        importDataPage.setText(TEST_DATA_SINGLE_COLUMN_DATASET_BAD)
+                .submitExpectingError();
 
-        setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET);
-        _listHelper.submitImportTsv_success();
+        importDataPage.setText(TEST_DATA_SINGLE_COLUMN_DATASET)
+                .submit();
+
         validateSingleColumnData();
         testMvFiltering(List.of("Age with space", "Sex"));
 
@@ -129,12 +131,14 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         deleteDatasetData(1);
 
         log("Import dataset data with two mv columns");
-        DataRegion(getDriver()).find().clickImportBulkData();
+        importDataPage = DataRegion(getDriver()).find().clickImportBulkData();
 
-        setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
-        _listHelper.submitImportTsv_error("Value is not a valid missing value indicator: .Q");
+        importDataPage.setText(TEST_DATA_TWO_COLUMN_DATASET_BAD);
+        importDataPage.submitExpectingError("Value is not a valid missing value indicator: .Q");
 
-        _listHelper.submitTsvData(TEST_DATA_TWO_COLUMN_DATASET);
+        importDataPage.setText(TEST_DATA_TWO_COLUMN_DATASET);
+        importDataPage.submit();
+
         validateTwoColumnData("Dataset", "ParticipantId");
         testMvFiltering(List.of("Age with space", "Sex"));
 

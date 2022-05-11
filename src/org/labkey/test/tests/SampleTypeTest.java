@@ -1309,9 +1309,9 @@ public class SampleTypeTest extends BaseWebDriverTest
         String tsvString =
                 "Name\tKey\n" +
                 "2\t" + missingPk;
-        table.clickImportBulkData();
-        setFormElement(Locator.id("tsv3"), tsvString);
-        _listHelper.submitImportTsv_error("Value '" + missingPk + "' was not present in lookup target 'lists." + listName + "' for field '" + lookupColumnLabel + "'");
+        ImportDataPage importDataPage = table.clickImportBulkData();
+        importDataPage.setText(tsvString);
+        importDataPage.submitExpectingError("Value '" + missingPk + "' was not present in lookup target 'lists." + listName + "' for field '" + lookupColumnLabel + "'");
     }
 
     @Test
