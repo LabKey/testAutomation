@@ -1,11 +1,12 @@
 package org.labkey.test.tests.component;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
@@ -14,21 +15,16 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @Category({Daily.class})
 public class GridPanelTest extends BaseWebDriverTest
 {
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
 
     @BeforeClass
     public static void setupProject()
@@ -43,40 +39,40 @@ public class GridPanelTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
     }
 
+    TestDataGenerator sampleSetDataGenerator;
+
     @Test
-    public void testJumpToLastPage() throws Exception
+    public void testJumpToLastPage() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("grid_paging_samples").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(200);
         sampleSetDataGenerator.insertRows();
 
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         QueryGrid grid = testPage.getGridPanel("samples", "grid_paging_samples");
 
-        assertThat(grid.getGridBar().pager().start(), is(1));
-        assertThat(grid.getGridBar().pager().end(), is(20));
+        assertEquals(1, grid.getGridBar().pager().start());
+        assertEquals(20, grid.getGridBar().pager().end());
         grid.getGridBar().jumpToPage("Last Page");
-        assertThat(grid.getGridBar().getCurrentPage(), is(10));
-        assertThat(grid.getGridBar().pager().start(), is(181));
-        assertThat(grid.getGridBar().pager().end(), is(200));
+        assertEquals(10, grid.getGridBar().getCurrentPage());
+        assertEquals(181, grid.getGridBar().pager().start());
+        assertEquals(200, grid.getGridBar().pager().end());
 
         grid.getGridBar().jumpToPage("First Page");
-        assertThat(grid.getGridBar().getCurrentPage(), is(1));
-        assertThat(grid.getGridBar().pager().start(), is(1));
-        assertThat(grid.getGridBar().pager().end(), is(20));
+        assertEquals(1, grid.getGridBar().getCurrentPage());
+        assertEquals(1, grid.getGridBar().pager().start());
+        assertEquals(20, grid.getGridBar().pager().end());
 
-        // clean up domain after on success
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     @Test
-    public void testSelectPageSize() throws Exception
+    public void testSelectPageSize() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("grid_page_size_samples").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(200);
         sampleSetDataGenerator.insertRows();
 
@@ -84,43 +80,40 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "grid_page_size_samples");
 
         // assume default page size is 20
-        assertThat(grid.getGridBar().getCurrentPage(), is(1));
-        assertThat(grid.getGridBar().pager().start(), is(1));
-        assertThat(grid.getGridBar().pager().end(), is(20));
-        assertThat(grid.getGridBar().pager().total(), is(200));
+        assertEquals(1, grid.getGridBar().getCurrentPage());
+        assertEquals(1, grid.getGridBar().pager().start());
+        assertEquals(20, grid.getGridBar().pager().end());
+        assertEquals(200, grid.getGridBar().pager().total());
 
         // now set page size to equal 100
         grid.getGridBar().selectPageSize("100");
 
         // check to see that the pager thinks it's all true
-        assertThat(grid.getGridBar().getCurrentPage(), is(1));
-        assertThat(grid.getGridBar().pager().start(), is(1));
-        assertThat(grid.getGridBar().pager().end(), is(100));
-        assertThat(grid.getGridBar().pager().total(), is(200));
+        assertEquals(1, grid.getGridBar().getCurrentPage());
+        assertEquals(1, grid.getGridBar().pager().start());
+        assertEquals(100, grid.getGridBar().pager().end());
+        assertEquals(200, grid.getGridBar().pager().total());
         // but don't take the pager's word for it, count the visible rows in the grid
-        assertThat(grid.getRows().size(), is(100));
+        assertEquals(100, grid.getRows().size());
 
         // restore defaults
         grid.getGridBar().selectPageSize("20");
-        assertThat(grid.getGridBar().getCurrentPage(), is(1));
-        assertThat(grid.getGridBar().pager().start(), is(1));
-        assertThat(grid.getGridBar().pager().end(), is(20));
-        assertThat(grid.getGridBar().pager().total(), is(200));
+        assertEquals(1, grid.getGridBar().getCurrentPage());
+        assertEquals(1, grid.getGridBar().pager().start());
+        assertEquals(20, grid.getGridBar().pager().end());
+        assertEquals(200, grid.getGridBar().pager().total());
 
-        // clean up domain after on success
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     /**
      * regression coverage for issue 39011
-     * @throws Exception
      */
     @Test
-    public void testFilterSelections() throws Exception
+    public void testFilterSelections() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("filtered_grid_selection_samples").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(100);
         for (int i=0; i < 16; i++)  // add some rows with a description we can filter on
         {
@@ -139,33 +132,30 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.filterColumn("Desc Column", Filter.Operator.EQUAL, "used to test issue 39011");
         grid.selectAllRows();
         grid.removeColumnFilter("Desc Column");
-        assertThat(grid.getSelectedRows().size(), is(16));
+        assertEquals(16, grid.getSelectedRows().size());
 
         grid.clearAllSelections();
-        assertThat(grid.getSelectedRows().size(), is(0));
+        assertEquals(0, grid.getSelectedRows().size());
 
         // confirm that search behaves the same way as a filter does
         grid.search("filtered_x");
         grid.selectAllOnPage(true);
         grid.clearSearch();
-        assertThat(grid.getSelectedRows().size(), is(16));
+        assertEquals(16, grid.getSelectedRows().size());
 
-        // clean up domain after on success
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     /**
      * Tests select-all behavior for a sampletype that does not involve paging.
      * The component does not show the same set of controls if paging isn't necessary; this ensures that
      * the test-compontent wrapper handles that pathway appropriately
-     * @throws Exception
      */
     @Test
-    public void testSelectAllOnSinglePageSet() throws Exception
+    public void testSelectAllOnSinglePageSet() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("tiny_sampleset").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(5);
         for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
         {
@@ -183,18 +173,16 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.filterColumn("Desc Column", Filter.Operator.EQUAL, "used to test single-page filter selection");
         grid.selectAllRows();
 
-        assertThat(grid.getSelectionStatusCount(), is ("5 of 5 selected"));
+        assertEquals("5 of 5 selected", grid.getSelectionStatusCount());
 
-        // clean up domain after on success
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     @Test
-    public void testFilterInMultiPageSelectionSet() throws Exception
+    public void testFilterInMultiPageSelectionSet() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("filtered_grid_multipageselection_samples").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(60);
         for (int i=0; i < 64; i++)  // add some rows with a description we can filter on
         {
@@ -213,27 +201,25 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.filterColumn("Desc Column", Filter.Operator.EQUAL, "used to test issue 39011");
         grid.selectAllRows();
         grid.removeColumnFilter("Desc Column");
-        assertThat(grid.getSelectionStatusCount(), is("64 of 124 selected"));
+        assertEquals("64 of 124 selected", grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
-        assertThat(grid.getSelectedRows().size(), is(0));
+        assertEquals(0, grid.getSelectedRows().size());
 
         // confirm that search behaves the same way as a filter does
         grid.search("filtered_x");
         grid.selectAllRows();
         grid.clearSearch();
-        assertThat(grid.getSelectionStatusCount(), is("64 of 124 selected"));
+        assertEquals("64 of 124 selected", grid.getSelectionStatusCount());
 
-        // clean up domain after on success
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     @Test
-    public void testEmptyNotEmptyFilter() throws Exception
+    public void testEmptyNotEmptyFilter() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("empty_filter_test_set").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.addDataSupplier("descColumn", () -> null);
         sampleSetDataGenerator.generateRows(30);
         for (int i=0; i < 5; i++)  // add some rows with a descColumn we can filter on
@@ -249,34 +235,33 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "empty_filter_test_set");
 
         grid.filterColumn("Desc Column", Filter.Operator.ISBLANK, null);
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        assertEquals("1 - 20 of 30", grid.getGridBar().pager().summary());
         grid.removeColumnFilter("Desc Column");
 
         grid.filterColumn("String Column", Filter.Operator.CONTAINS,  "filtered_x");
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
+        assertEquals("1 - 5", grid.getGridBar().pager().summary());
         grid.removeColumnFilter("String Column");
 
         grid.filterColumn("String Column", Filter.Operator.DOES_NOT_CONTAIN, "filtered_x");
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        assertEquals("1 - 20 of 30", grid.getGridBar().pager().summary());
         grid.removeColumnFilter("String Column");
 
         grid.filterColumn("Sample Date", Filter.Operator.NONBLANK, null);
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
+        assertEquals("1 - 20 of 30", grid.getGridBar().pager().summary());
         grid.removeColumnFilter("Sample Date");
 
         grid.filterColumn("Sample Date", Filter.Operator.ISBLANK, null);
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 5"));
+        assertEquals("1 - 5", grid.getGridBar().pager().summary());
         grid.removeColumnFilter("Sample Date");
 
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     @Test
-    public void testDeselectOnePageWhenAllAreSelected() throws Exception
+    public void testDeselectOnePageWhenAllAreSelected() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("deselect_one_page_set").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(35);
         sampleSetDataGenerator.insertRows();
 
@@ -284,27 +269,26 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = testPage.getGridPanel("samples", "deselect_one_page_set");
 
         grid.selectAllRows();
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 35"));
-        assertThat("unexpected selection tally after select or filter action" +
+        assertEquals("1 - 20 of 35", grid.getGridBar().pager().summary());
+        assertEquals("unexpected selection tally after select or filter action" +
                 "likely https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171",
-                grid.getSelectionStatusCount(), is("35 of 35 selected"));
+                "35 of 35 selected", grid.getSelectionStatusCount());
 
         grid.getGridBar().jumpToPage("Last Page");
         grid.selectAllOnPage(false); // uncheck the checkbox
-        assertThat(grid.getSelectionStatusCount(), is("20 of 35 selected"));
+        assertEquals("20 of 35 selected", grid.getSelectionStatusCount());
 
         grid.getGridBar().jumpToPage("First Page");
-        assertThat(grid.getSelectionStatusCount(), is("20 of 35 selected"));
+        assertEquals("20 of 35 selected", grid.getSelectionStatusCount());
 
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     @Test
-    public void testRemoveFilterWithSelections() throws Exception
+    public void testRemoveFilterWithSelections() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("remove_filters_with_selections_set").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(30);
         for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
         {
@@ -320,28 +304,27 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.filterColumn("Int Column", Filter.Operator.NONBLANK);
 
         grid.selectAllRows();
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
-        assertThat(grid.getSelectionStatusCount(), is("30 of 30 selected"));
+        assertEquals("1 - 20 of 30", grid.getGridBar().pager().summary());
+        assertEquals("30 of 30 selected", grid.getSelectionStatusCount());
 
         grid.getGridBar().jumpToPage("Last Page");
         grid.selectAllOnPage(false); // uncheck the checkbox
-        assertThat(grid.getSelectionStatusCount(), is("20 of 30 selected"));
+        assertEquals("20 of 30 selected", grid.getSelectionStatusCount());
 
         grid.getGridBar().jumpToPage("First Page");
-        assertThat(grid.getSelectionStatusCount(), is("20 of 30 selected"));
+        assertEquals("20 of 30 selected", grid.getSelectionStatusCount());
 
         grid.removeColumnFilter("Int Column");
-        assertThat(grid.getSelectionStatusCount(), is("20 of 35 selected"));
+        assertEquals("20 of 35 selected", grid.getSelectionStatusCount());
 
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
     }
 
     @Test
-    public void testDeselectRecordsWithFilter() throws Exception
+    public void testDeselectRecordsWithFilter() throws IOException, CommandException
     {
         // create a sampleType domain to use in this case
         SampleTypeDefinition props = new SampleTypeDefinition("deselect_with_filter").setFields(standardTestSampleFields());
-        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(30);
         for (int i=0; i < 5; i++)  // add some rows with a description we can filter on
         {
@@ -357,19 +340,24 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.selectAllRows();
         grid.filterColumn("String Column", Filter.Operator.DOES_NOT_CONTAIN, "filtered_y");
 
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
-        assertThat(grid.getSelectionStatusCount(), is("30 of 30 selected"));
+        assertEquals("1 - 20 of 30", grid.getGridBar().pager().summary());
+        assertEquals("30 of 30 selected", grid.getSelectionStatusCount());
 
         grid.selectAllOnPage(false);
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 30"));
-        assertThat(grid.getSelectionStatusCount(), is("10 of 30 selected"));
+        assertEquals("1 - 20 of 30", grid.getGridBar().pager().summary());
+        assertEquals("10 of 30 selected", grid.getSelectionStatusCount());
 
         grid.removeColumnFilter("String Column");
-        assertThat(grid.getGridBar().pager().summary(), is("1 - 20 of 35"));
-        assertThat("https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171",
-                grid.getSelectionStatusCount(), is("15 of 35 selected"));
+        assertEquals("1 - 20 of 35", grid.getGridBar().pager().summary());
+        assertEquals("https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41171",
+                "15 of 35 selected", grid.getSelectionStatusCount());
 
-        sampleSetDataGenerator.deleteDomain(createDefaultConnection());
+    }
+
+    @After
+    public void afterTest() throws IOException, CommandException
+    {
+        sampleSetDataGenerator.getQueryHelper(createDefaultConnection()).deleteDomain();
     }
 
     protected List<FieldDefinition> standardTestSampleFields()
