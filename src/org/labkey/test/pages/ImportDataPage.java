@@ -167,7 +167,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         WebElement uploadFileFilePath = Locator.input("file").findWhenNeeded(uploadFileDiv);
 
         // Paste data
-        WebElement copyPastePanel = Locator.tagWithAttribute("div", "data-panel-name", "uploadFilePanel").findWhenNeeded(this);
+        WebElement copyPastePanel = Locator.tagWithAttribute("div", "data-panel-name", "copyPastePanel").findWhenNeeded(this);
         WebElement copyPasteDiv = Locator.byClass("panel-body").findWhenNeeded(copyPastePanel);
         WebElement copyPasteExpando = Locator.byClass("lk-import-expando").findWhenNeeded(copyPastePanel);
         WebElement pasteDataTextArea = Locator.tag("textarea").findWhenNeeded(copyPasteDiv);
