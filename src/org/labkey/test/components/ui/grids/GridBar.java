@@ -433,6 +433,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return elementCache().searchBox.get();
     }
 
+    public GridFilterModal getFilterDialog()
+    {
+        clickButton("Filters");
+        return new GridFilterModal(getDriver(), _queryGrid);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

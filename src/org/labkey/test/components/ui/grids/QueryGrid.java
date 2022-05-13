@@ -214,6 +214,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    public boolean hasSelectAllButton()
+    {
+        return elementCache().selectAllBtnLoc.findWhenNeeded(this).isDisplayed();
+    }
+
     /**
      *  Selects all rows in the target domain, including those on other pages, if there are any
      */
