@@ -228,7 +228,7 @@ public class TabTest extends SimpleModuleTest
         // Delete tab folder
         log("Container tab enhancements: delete tab folder type, recreate");
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
-        waitForText(STUDY_FOLDER_TAB_NAME);
+        waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(STUDY_FOLDER_TAB_NAME));
         clickButton("Delete", 2 * WAIT_FOR_PAGE);
         assertTextPresent("You are about to delete the following folder:");
         clickButton("Yes, delete all", 2 * WAIT_FOR_PAGE);
