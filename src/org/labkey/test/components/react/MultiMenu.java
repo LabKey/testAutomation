@@ -192,9 +192,7 @@ public class MultiMenu extends BootstrapMenu
 
     public String getButtonText()
     {
-        return Locator.tagWithClass("button", "current-page-dropdown")
-                .findElement(getComponentElement())
-                .getText();
+        return getComponentElement().getText();
     }
 
     public static abstract class Locators

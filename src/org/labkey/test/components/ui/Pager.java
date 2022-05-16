@@ -51,7 +51,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public int getCurrentPage()                 // only works on GridPanel
     {
-        return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
+        return Integer.parseInt(elementCache().currentPageButton.getText());
     }
 
     public Pager selectPageSize(String pageSize)    // only works on GridPanel
@@ -66,6 +66,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public int getPageSize()                // only works on GridPanel
     {
+        // TODO Fix This.
         return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
     }
 
@@ -184,6 +185,8 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     {
         MultiMenu jumpToDropdown = new MultiMenu.MultiMenuFinder(getDriver())
                 .withButtonClass("current-page-dropdown").findWhenNeeded(this);
+
+        WebElement currentPageButton = Locator.tagWithClass("button", "current-page-dropdown").refindWhenNeeded(this);
 
         final Locator.XPathLocator pagingCountsSpan = Locator.tagWithClass("span", "pagination-info");
 
