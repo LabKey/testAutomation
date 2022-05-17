@@ -147,18 +147,20 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         // Upload file
-        WebElement uploadFileDiv = Locator.id("uploadFileDiv2").findWhenNeeded(this);
-        WebElement uploadExpando = Locator.id("uploadFileDiv2Expando").findWhenNeeded(this);
+        WebElement uploadPanel = Locator.tagWithAttribute("div", "data-panel-name", "uploadFilePanel").findWhenNeeded(this);
+        WebElement uploadFileDiv = Locator.byClass("panel-body").findWhenNeeded(uploadPanel);
+        WebElement uploadExpando = Locator.byClass("lk-import-expando").findWhenNeeded(uploadPanel);
         WebElement uploadFileFilePath = Locator.input("file").findWhenNeeded(uploadFileDiv);
 
         // Paste data
-        WebElement copyPasteDiv = Locator.id("copypasteDiv1").findWhenNeeded(this);
-        WebElement copyPasteExpando = Locator.id("copyPasteDiv1Expando").findWhenNeeded(this);
+        WebElement copyPastePanel = Locator.tagWithAttribute("div", "data-panel-name", "copyPastePanel").findWhenNeeded(this);
+        WebElement copyPasteDiv = Locator.byClass("panel-body").findWhenNeeded(copyPastePanel);
+        WebElement copyPasteExpando = Locator.byClass("lk-import-expando").findWhenNeeded(copyPastePanel);
         WebElement pasteDataTextArea = Locator.tag("textarea").findWhenNeeded(copyPasteDiv);
-        ComboBox formatCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel("Format:").findWhenNeeded(this);
+        ComboBox formatCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel("Format:").findWhenNeeded(copyPastePanel);
 
         WebElement getExpandedPanel()
         {
