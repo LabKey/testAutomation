@@ -181,12 +181,18 @@ public class WikiLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("name"), WIKI_PAGE1_NAME);
         setFormElement(Locator.name("title"), WIKI_PAGE1_TITLE);
         setFormElement(Locator.name("body"), WIKI_PAGE1_CONTENT);
-        _wikiHelper.saveWikiPage();
+        log("body content1: " + getFormElement(Locator.name("body")));
+        _wikiHelper.saveWikiPage(); // next sus point: use save instead, and look at wiki body?
 
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
 
         log("Test adding content to linked but missing wiki.");
-        WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElement(getDriver());
+        WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElementOrNull(getDriver());
+        if (null == wikiLink) {
+            clickAndWait(Locator.linkWithText("Edit"));
+            log("body content2: " + getFormElement(Locator.name("body")));
+            assertTextPresent("!!!!!!!"); // fail and end test
+        }
         clickAndWait(wikiLink);
         assertEquals("Page title.", WIKI_PAGE2_NAME, getText(Locators.bodyTitle()));
         assertTextPresent("page has no content");
