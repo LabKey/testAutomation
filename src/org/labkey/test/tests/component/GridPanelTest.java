@@ -923,15 +923,17 @@ public class GridPanelTest extends BaseWebDriverTest
         QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
 
         int high = INT_MAX - 3;
+        int low = 3;
 
         GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
 
         filterDialog.selectField(FILTER_INT_COL);
 
-        log(String.format("Filter '%s' for values less than %d.", FILTER_INT_COL, high));
+        log(String.format("Filter '%s' for values greater than %d and less than %d.", FILTER_INT_COL, low, high));
 
         FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
-        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.LT, high));
+        expressionPanel.setFilters(new FilterExpressionPanel.Expression(Filter.Operator.GT, low),
+                new FilterExpressionPanel.Expression(Filter.Operator.LT, high));
 
         filterDialog.selectField(FILTER_STRING_COL);
 
@@ -961,6 +963,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         expectedValues = new ArrayList<>();
         expectedValues.add(String.format("%s < %d", FILTER_INT_COL, high));
+        expectedValues.add(String.format("%s > %d", FILTER_INT_COL, low));
         expectedValues.add(String.format("%s Contains One Of %s", FILTER_STRING_COL, oneOfFilter.replace(";", ", ")));
 
         List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
@@ -974,7 +977,7 @@ public class GridPanelTest extends BaseWebDriverTest
                 expectedValues, actualValues);
 
         checker().verifyEquals("Rows returned after filters applied not as expected.",
-                197, grid.getRecordCount());
+                146, grid.getRecordCount());
 
         checker().screenShotIfNewError("Filter_Pill_Error");
 
@@ -992,7 +995,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filterPill.remove();
 
         checker().verifyEquals("Rows returned after filter pill removed not as expected.",
-                270, grid.getRecordCount());
+                219, grid.getRecordCount());
 
         checker().screenShotIfNewError("Filter_Pill_Remove_Error");
 
@@ -1014,27 +1017,50 @@ public class GridPanelTest extends BaseWebDriverTest
         */
 
         expectedValues = new ArrayList<>();
+        expectedValues.add(FILTER_INT_COL);
         expectedValues.add(FILTER_STRING_COL);
 
         actualValues = filterDialog.getFilteredFields();
 
-        checker().verifyEquals(String.format("Only the '%s' field should be marked as filtered.", FILTER_STRING_COL),
+        Collections.sort(expectedValues);
+        Collections.sort(actualValues);
+
+        checker().verifyEquals(String.format("Both the '%s' and '%s' fields should be marked as filtered.", FILTER_INT_COL, FILTER_STRING_COL),
                 expectedValues, actualValues);
+
+        filterDialog.selectField(FILTER_INT_COL);
 
         expressionPanel = filterDialog.selectExpressionTab();
 
         WebElement panelElement = expressionPanel.getComponentElement();
         List<ReactSelect> filterTypes = new ReactSelect.ReactSelectFinder(getDriver()).findAll(panelElement);
 
-        checker().verifyEquals("Filter expression is not as expected.",
-                "Contains One Of", filterTypes.get(0).getValue());
+        checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_INT_COL),
+                "Is Greater Than", filterTypes.get(0).getValue());
 
         WebElement filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
 
-        checker().verifyEquals("The filter value is not as expected.",
+        checker().verifyEquals(String.format("The filter value for '%s' is not as expected.", FILTER_INT_COL),
+                Integer.toString(low), getFormElement(filterValues));
+
+        checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
+
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        expressionPanel = filterDialog.selectExpressionTab();
+
+        panelElement = expressionPanel.getComponentElement();
+        filterTypes = new ReactSelect.ReactSelectFinder(getDriver()).findAll(panelElement);
+
+        checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_STRING_COL),
+                "Contains One Of", filterTypes.get(0).getValue());
+
+        filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
+
+        checker().verifyEquals(String.format("The filter value for '%s' is not as expected.", FILTER_STRING_COL),
                 oneOfFilter, getFormElement(filterValues));
 
-        checker().screenShotIfNewError("Populated_Filter_Error");
+        checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
 
     }
 
