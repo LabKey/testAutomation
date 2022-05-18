@@ -8,23 +8,27 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.components.ui.grids.GridFilterModal;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Category({Daily.class})
@@ -41,11 +45,12 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final String FILTER_SAMPLE_TYPE = "Filter_SampleType";
     private static final int FILTER_SAMPLE_TYPE_SIZE = 300;
     private static final String FILTER_SAMPLE_PREFIX = "FST-";
+    private static final String FILTER_NAME_COL = "Name";
     private static final String FILTER_STRING_COL = "Str";
     private static final String FILTER_INT_COL = "Int";
     private static final String FILTER_EXTEND_CHAR_COL = "\u0106\u00D8\u0139";
 
-    // Various values used to populate Str filed for records. Also used in filtering/searching.
+    // Various values used to populate Str field for records. Also used in filtering/searching.
     private static final String EXTEND_RECORD_STRING = "\u01C5 \u01FC";
     private static final String EXTEND_RECORD_OTHER_STRING = "Not an extended value.";
 
@@ -63,6 +68,8 @@ public class GridPanelTest extends BaseWebDriverTest
 
     private static final String STARTS_WITH = "This will";
     private static final String ENDS_WITH = "page of data.";
+
+    private static List<String> charCombinations = new ArrayList<>();
 
     // Number of entries that have the NUMBER_STRING value.
     private static final int NUMBER_STRING_COUNT = 16;
@@ -94,6 +101,11 @@ public class GridPanelTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
         portalHelper.exitAdminMode();
 
+        // Create list of string that has the various combinations of the letters A, B, C & D
+        charCombinations = getCombinations("DCBA", 0);
+        // Remove the empty string option.
+        charCombinations.remove(0);
+
         createSmallSampleType();
 
         createFilterSampleType();
@@ -103,7 +115,13 @@ public class GridPanelTest extends BaseWebDriverTest
     // Don't care about the data in the rows so use random data.
     private void createSmallSampleType() throws IOException, CommandException
     {
-        SampleTypeDefinition props = new SampleTypeDefinition(SMALL_SAMPLE_TYPE).setFields(standardTestSampleFields());
+        SampleTypeDefinition props = new SampleTypeDefinition(SMALL_SAMPLE_TYPE)
+                .setFields(Arrays.asList(new FieldDefinition("descColumn", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
+                        new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
+                        new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean)));
+
         TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
         sampleSetDataGenerator.generateRows(SMALL_SAMPLE_TYPE_SIZE);
         sampleSetDataGenerator.insertRows();
@@ -120,10 +138,6 @@ public class GridPanelTest extends BaseWebDriverTest
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(FILTER_SAMPLE_TYPE).setFields(fields);
 
         TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDefinition);
-
-        List<String> allPossibleValues = getCombinations("DCBA", 0);
-        // Remove the empty string option.
-        allPossibleValues.remove(0);
 
         int fiveRecordCount = 0;
         int onePageCount = 0;
@@ -182,10 +196,10 @@ public class GridPanelTest extends BaseWebDriverTest
             }
             else
             {
-                if(allPossibleIndex == allPossibleValues.size())
+                if(allPossibleIndex == charCombinations.size())
                     allPossibleIndex = 0;
 
-                filterColValue = allPossibleValues.get(allPossibleIndex++);
+                filterColValue = charCombinations.get(allPossibleIndex++);
                 if(extendedCharCount < EXTEND_RECORD_COUNT)
                 {
                     extColValue = EXTEND_RECORD_STRING;
@@ -198,7 +212,7 @@ public class GridPanelTest extends BaseWebDriverTest
                 intValue = 1;
 
             sampleSetDataGenerator.addCustomRow(
-                    Map.of("Name", String.format("%s%d", FILTER_SAMPLE_PREFIX, sampleId++),
+                    Map.of(FILTER_NAME_COL, String.format("%s%d", FILTER_SAMPLE_PREFIX, sampleId++),
                             FILTER_INT_COL, intValue++,
                             FILTER_STRING_COL, filterColValue,
                             FILTER_EXTEND_CHAR_COL, extColValue));
@@ -646,20 +660,12 @@ public class GridPanelTest extends BaseWebDriverTest
 
         GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
 
-        log(String.format("Filter on the '%s' filed. This should only provide a 'Filter' tab.", FILTER_INT_COL));
+        log(String.format("Filter on the '%s' field. This should only provide a 'Filter' tab.", FILTER_INT_COL));
 
         filterDialog.selectField(FILTER_INT_COL);
 
-        try
-        {
-            filterDialog.selectFacetTab();
-
-            checker().error(String.format("There should be no 'Fields' tab for the '%s' field.", FILTER_INT_COL));
-        }
-        catch (NoSuchElementException expectedError)
-        {
-            log("Looks like there is no 'Fields' tab. This is as expected.");
-        }
+        checker().verifyFalse(String.format("There should be no 'Choose Values' tab for the '%s' field.", FILTER_INT_COL),
+                filterDialog.getTabText().contains("Choose Values"));
 
         log("Select the 'Filter' tab but only provide one condition when two are expected.");
 
@@ -686,14 +692,350 @@ public class GridPanelTest extends BaseWebDriverTest
 
     }
 
-    protected List<FieldDefinition> standardTestSampleFields()
+    /**
+     * <p>
+     *     Test interaction between the 'Filter' and 'Choose Value' tabs.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Validate that the list of values in the 'Choose Values' tab is, more or less, as expected when no filters are applied.</li>
+     *         <li>Apply a filter and validate that the list of values is as expected.</li>
+     *         <li>Apply an 'equals' filter and validate that the values is selected in the 'Choose Values' tab.</li>
+     *         <li>Select another value from the list and validate that the 'Filter' tab updates to a 'One of' filter.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testInteractionBetweenDialogTabs()
     {
-        return Arrays.asList(
-                new FieldDefinition("descColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
+
+        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+
+        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+
+        log(String.format("Select '%s' and get the list of values for the field before filtering.", FILTER_STRING_COL));
+
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        FilterFacetedPanel facetedPanel = filterDialog.selectFacetTab();
+
+        List<String> actualValues = facetedPanel.getAvailableValues();
+
+        int listSizeBefore = actualValues.size();
+
+        // Not going to validate all values, just a few that should indicate if the list is as expected.
+        List<String> expectedValues = Arrays.asList("[All]", "[blank]", "A", "B", ONE_PAGE_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING, NUMBER_STRING);
+
+        checker().fatal()
+                .verifyTrue(String.format("List of values to choose from for field '%s' not as expected before filtering. Fatal error.", FILTER_STRING_COL),
+                        actualValues.containsAll(expectedValues) && listSizeBefore == 22);
+
+        filterDialog.selectField(FILTER_NAME_COL);
+
+        // This should return samples named FST-10, and FST-100 - FST-109
+        String filteredNames = "-10";
+        log(String.format("Filter the '%s' to values that contain '%s'.", FILTER_NAME_COL, filteredNames));
+
+        FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.CONTAINS, filteredNames));
+
+        log("Apply the filter.");
+        filterDialog.confirm();
+
+        log(String.format("Open the dialog again and validate that the list of values to select from for '%s' is reduced.", FILTER_STRING_COL));
+        filterDialog = grid.getGridBar().getFilterDialog();
+
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        facetedPanel = filterDialog.selectFacetTab();
+        actualValues = facetedPanel.getAvailableValues();
+
+        expectedValues = Arrays.asList("[All]", "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
+
+        Collections.sort(actualValues);
+        Collections.sort(expectedValues);
+
+        checker().withScreenshot("Expected_Faceted_Values_Error")
+                .verifyEquals(String.format("List of values to choose from for field '%s' not as expected after the filter was applied.", FILTER_STRING_COL),
+                        expectedValues, actualValues);
+
+        log("Clear the filter.");
+
+        filterDialog.cancel();
+
+        grid.clearFilters();
+        grid.clearSearch();
+
+        log("Validate that applying a filter for a fields checks the values in the dialog.");
+
+        filterDialog = grid.getGridBar().getFilterDialog();
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        String firstFilterValue = charCombinations.get(0);
+
+        log(String.format("Filer '%s' to values equal to '%s'.", FILTER_STRING_COL, firstFilterValue));
+        expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.EQUAL, firstFilterValue));
+
+        log(String.format("Go to the 'Choose Value' tab and validate that '%s' is selected.", firstFilterValue));
+
+        facetedPanel = filterDialog.selectFacetTab();
+        actualValues = facetedPanel.getSelectedValues();
+        expectedValues = Arrays.asList(firstFilterValue);
+
+        checker().withScreenshot("Filtered_Value_Not_Selected")
+                .verifyEquals("The filtered value is not as expected.",
+                        expectedValues, actualValues);
+
+        String secondFilterValue = charCombinations.get(1);
+        log(String.format("Now select '%s' from the list and validate that the filter is updated.", secondFilterValue));
+        facetedPanel.checkValues(firstFilterValue, secondFilterValue);
+
+        expressionPanel = filterDialog.selectExpressionTab();
+
+        // There are no getters for the filters in the expression tab, and implementing them in the test component
+        // would be non-trivial. It is also unlikely that any functional tests outside this one would need to get the
+        // filters. Because of those two reasons this test will have some specific code to get various WebElements in the
+        // panel (filter values) and validate they have the expected text/values.
+
+        WebElement panelElement = expressionPanel.getComponentElement();
+        List<ReactSelect> filterTypes = new ReactSelect.ReactSelectFinder(getDriver()).findAll(panelElement);
+
+        checker().verifyEquals("The first filter expression is not as expected.",
+                "Equals One Of", filterTypes.get(0).getValue());
+
+        checker().verifyTrue("The second filter expression should be empty.",
+                filterTypes.get(1).getValue().isEmpty());
+
+        List<WebElement> filterValues = Locator.tagWithClass("input", "filter-expression__input").findElements(panelElement);
+
+        checker().verifyEquals("There should only be one filter value text box.",
+                1, filterValues.size());
+
+        checker().verifyEquals("The filter value is not as expected.",
+                String.format("%s;%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
+
+        checker().screenShotIfNewError("Updated_Filter_Error");
+
+        log("Apply the filter and validate.");
+        filterDialog.confirm();
+
+        checker().verifyEquals("Filter did not return the expected number of rows.",
+                26, grid.getRecordCount());
+
+    }
+
+    /**
+     * <p>
+     *     Validate that using filters with the search box works as expected.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Apply multiple filters to two columns.</li>
+     *         <li>Enter a valid search value in the search box (validate count).</li>
+     *         <li>Remove the filters, and validate search is still set.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testSearchAndFilter()
+    {
+
+        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+
+        int low = 4;
+        int high = INT_MAX - 3;
+
+        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+
+        filterDialog.selectField(FILTER_INT_COL);
+
+        log(String.format("Filter '%s' for values between %d and %d.", FILTER_INT_COL, low, high));
+
+        FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilters(new FilterExpressionPanel.Expression(Filter.Operator.GT, low),
+                new FilterExpressionPanel.Expression(Filter.Operator.LT, high));
+
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        filterDialog.selectFacetTab();
+
+        String oneOfFilter = "A;B;C";
+
+        log(String.format("Filter '%s' to have one of '%s'.", FILTER_STRING_COL, oneOfFilter));
+
+        expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.CONTAINS_ONE_OF, oneOfFilter));
+
+        filterDialog.confirm();
+
+        checker().verifyTrue("'Remove all' button should be visible when filters are applied.",
+                grid.hasRemoveAllButton());
+
+        checker().verifyEquals("Number of rows after filter applied not as expected.",
+                128, grid.getRecordCount());
+
+        checker().screenShotIfNewError("Initial_Filter_Error");
+
+        String searchString = "AB";
+
+        log(String.format("Set search value to '%s'.", searchString));
+
+        grid.getGridBar().searchFor(searchString);
+
+        checker().withScreenshot("Filter_With_Search_Error")
+                .verifyEquals("Number of rows after filter applied not as expected.",
+                        23, grid.getRecordCount());
+
+        log("Remove all of the filters.");
+
+        grid = grid.clickRemoveAllButton();
+
+        checker().verifyEquals("Search expression not as expected after clearing filters.",
+                searchString, grid.getGridBar().getSearchExpression());
+
+        checker().verifyEquals("Number of rows after filter were cleared not as expected.",
+                49, grid.getRecordCount());
+
+        checker().screenShotIfNewError("Search_With_Filters_Removed_Error");
+    }
+
+    /**
+     * <p>
+     *     Test the 'filter pills' that are shown above the grid.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Validate that filtered fields are marked in the dialog.</li>
+     *         <li>The pills show the filter selected.</li>
+     *         <li>Can remove the filter by clicking the 'x' on the pill.</li>
+     *         <li>Validate that clicking on a pill open the filter dialog with the expected values.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testFilterPills()
+    {
+
+        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+
+        int high = INT_MAX - 3;
+
+        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+
+        filterDialog.selectField(FILTER_INT_COL);
+
+        log(String.format("Filter '%s' for values less than %d.", FILTER_INT_COL, high));
+
+        FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.LT, high));
+
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        filterDialog.selectFacetTab();
+
+        String oneOfFilter = "A;B;C";
+
+        log(String.format("Filter '%s' to have one of '%s'.", FILTER_STRING_COL, oneOfFilter));
+
+        expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.CONTAINS_ONE_OF, oneOfFilter));
+
+        List<String> expectedValues = new ArrayList<>();
+        expectedValues.add(FILTER_INT_COL);
+        expectedValues.add(FILTER_STRING_COL);
+
+        List<String> actualValues = filterDialog.getFilteredFields();
+
+        Collections.sort(expectedValues);
+        Collections.sort(actualValues);
+
+        checker().withScreenshot("Filtered_Fields_Not_Marked")
+                .verifyEquals(String.format("The '%s' and '%s' fields are not marked as filtered.", FILTER_INT_COL, FILTER_STRING_COL),
+                expectedValues, actualValues);
+
+        filterDialog.confirm();
+
+        expectedValues = new ArrayList<>();
+        expectedValues.add(String.format("%s < %d", FILTER_INT_COL, high));
+        expectedValues.add(String.format("%s Contains One Of %s", FILTER_STRING_COL, oneOfFilter.replace(";", ", ")));
+
+        List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
+
+        actualValues = filterPills.stream().map(FilterStatusValue::getText).collect(Collectors.toList());
+
+        Collections.sort(expectedValues);
+        Collections.sort(actualValues);
+
+        checker().verifyEquals("Filter 'pills' not as expected.",
+                expectedValues, actualValues);
+
+        checker().verifyEquals("Rows returned after filters applied not as expected.",
+                197, grid.getRecordCount());
+
+        checker().screenShotIfNewError("Filter_Pill_Error");
+
+        FilterStatusValue filterPill;
+        if(filterPills.get(0).getText().contains(FILTER_INT_COL))
+        {
+            filterPill = filterPills.get(0);
+        }
+        else
+        {
+            filterPill = filterPills.get(1);
+        }
+
+        log(String.format("Remove the filter pill '%s'.", filterPill.getText()));
+        filterPill.remove();
+
+        checker().verifyEquals("Rows returned after filter pill removed not as expected.",
+                270, grid.getRecordCount());
+
+        checker().screenShotIfNewError("Filter_Pill_Remove_Error");
+
+        // Need to change the focus. After removing the first filter the mouse is in the same position which causes the
+        // next pill to get the 'x' icon and not be identified as a filter.
+        Locator.tagWithClass("div", "grid-panel__title").findElement(getDriver()).click();
+
+        filterPill = grid.getFilterStatusValues(false).get(0);
+
+        filterPill.getComponentElement().click();
+
+        filterDialog = new GridFilterModal(getDriver(), grid);
+
+        // TODO: Need to figure out how to get the active tab in the dialog.
+        /*
+        checker().withScreenshot("Default_Tab_Error")
+                .verifyEquals("Should have selected the 'Filter' tab.",
+                        "Filter", filterDialog.getActiveTab());
+        */
+
+        expectedValues = new ArrayList<>();
+        expectedValues.add(FILTER_STRING_COL);
+
+        actualValues = filterDialog.getFilteredFields();
+
+        checker().verifyEquals(String.format("Only the '%s' field should be marked as filtered.", FILTER_STRING_COL),
+                expectedValues, actualValues);
+
+        expressionPanel = filterDialog.selectExpressionTab();
+
+        WebElement panelElement = expressionPanel.getComponentElement();
+        List<ReactSelect> filterTypes = new ReactSelect.ReactSelectFinder(getDriver()).findAll(panelElement);
+
+        checker().verifyEquals("Filter expression is not as expected.",
+                "Contains One Of", filterTypes.get(0).getValue());
+
+        WebElement filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
+
+        checker().verifyEquals("The filter value is not as expected.",
+                oneOfFilter, getFormElement(filterValues));
+
+        checker().screenShotIfNewError("Populated_Filter_Error");
+
     }
 
     @Override

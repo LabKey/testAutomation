@@ -60,18 +60,22 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     public WebElement selectTab(String tabText)
     {
+        elementCache().findTab(tabText).click();
         WebElement panel = findPanelForTab(tabText);
-        if (!panel.isDisplayed())
-        {
-            elementCache().findTab(tabText).click();
-            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
-        }
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
         return panel;
     }
 
     public boolean isTabSelected(String tabText)
     {
         return Boolean.valueOf(elementCache().findTab(tabText).getAttribute("aria-selected"));
+    }
+
+    public List<String> getTabText()
+    {
+        List<WebElement> tabs = elementCache().findAllTabs();
+        return tabs
+                .stream().map(WebElement::getText).toList();
     }
 
     @Override

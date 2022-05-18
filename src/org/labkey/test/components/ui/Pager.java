@@ -66,8 +66,19 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public int getPageSize()                // only works on GridPanel
     {
-        // TODO Fix This.
-        return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
+        // Changing the jumpToDropdown button from the deprecated DropdownButtonGroup class to a MultiMenu type has changed
+        // the way that various text from the control is gathered. Getting the current page size now requires that the dropdown
+        // be expanded and the selected page size found in the list.
+
+        elementCache().jumpToDropdown.expand();
+
+        // Find the selected li element in the page size list (//div[@class='grid-panel__button-bar']//ul[contains(@aria-labelledby,'current-page-drop')]//li[@class='active'])
+        WebElement activeLi = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "current-page-drop").childTag("li").withAttribute("class", "active").findElement(this);
+
+        int size = Integer.parseInt(activeLi.getText());
+        elementCache().jumpToDropdown.collapse();
+
+        return size;
     }
 
     public boolean hasPaginationControls()
@@ -183,6 +194,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
+        // Was previously a DropdownButtonGroup type, which is a deprecated class.
         MultiMenu jumpToDropdown = new MultiMenu.MultiMenuFinder(getDriver())
                 .withButtonClass("current-page-dropdown").findWhenNeeded(this);
 

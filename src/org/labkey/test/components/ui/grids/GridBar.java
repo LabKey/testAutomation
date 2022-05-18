@@ -416,15 +416,24 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public GridBar searchFor(String searchStr)
     {
-        elementCache().searchBox.set(searchStr);
-        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        _queryGrid.doAndWaitForUpdate(()->
+        {
+            elementCache().searchBox.set(searchStr);
+            elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        });
         return this;
     }
 
     public GridBar clearSearch()
     {
-        elementCache().searchBox.set("");
-        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        if(!elementCache().searchBox.get().isEmpty())
+        {
+            _queryGrid.doAndWaitForUpdate(()->
+            {
+                elementCache().searchBox.set("");
+                elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+            });
+        }
         return this;
     }
 

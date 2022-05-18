@@ -214,6 +214,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    public boolean hasRemoveAllButton()
+    {
+        return elementCache().removeAllFilters.isDisplayed();
+    }
+
+    public QueryGrid clickRemoveAllButton()
+    {
+        doAndWaitForUpdate(()->elementCache().removeAllFilters.click());
+        return this;
+    }
+
     public boolean hasSelectAllButton()
     {
         return elementCache().selectAllBtnLoc.findWhenNeeded(this).isDisplayed();
@@ -340,6 +351,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel)
                     .stream().filter(FilterStatusValue::isFilter).toList();
         }
+
+        final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
