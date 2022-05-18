@@ -14,6 +14,8 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.remoteapi.query.TruncateTableCommand;
+import org.labkey.remoteapi.query.TruncateTableResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 
 import java.io.IOException;
@@ -104,6 +106,16 @@ public class QueryApiHelper
         DeleteRowsCommand cmd = new DeleteRowsCommand(_schema, _query);
         cmd.setRows(rowsToDelete);
         return cmd.execute(_connection, _containerPath);
+    }
+
+    /**
+     * Delete all rows in table
+     * @return response object
+     */
+    public TruncateTableResponse truncateTable() throws IOException, CommandException
+    {
+        TruncateTableCommand truncateCommand = new TruncateTableCommand(_schema, _query);
+        return truncateCommand.execute(_connection, _containerPath);
     }
 
     public DomainResponse getDomain() throws IOException, CommandException
