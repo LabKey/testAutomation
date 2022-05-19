@@ -13,7 +13,6 @@ import java.util.List;
 
 /*
  * Test wrapper for AttachmentCard in '@labkey/components'
- * TODO: reconcile with AttachmentCard.java
  */
 public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCache>
 {
@@ -51,6 +50,24 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         return elementCache().fileSize.getText();
     }
 
+    public String getIconSrc()
+    {
+        return elementCache().icon.getAttribute("src");
+    }
+
+    public ImageFileViewDialog viewImgFile()
+    {
+        String filename = getFileName();
+        elementCache().fileContent.click();
+        return new ImageFileViewDialog(getDriver(), filename);
+    }
+
+    public File clickOnNonImgFile()
+    {
+        return getWrapper()
+                .doAndWaitForDownload(() -> elementCache().fileContent.click(), 1)[0];
+    }
+
     public boolean canDownload()
     {
         elementCache().menu.openMenuTo();
@@ -66,15 +83,25 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
 
     public boolean canRemove()
     {
-        elementCache().menu.openMenuTo();
-        List<String> menuOptions = getWrapper().getTexts(elementCache().menu.findVisibleMenuItems());
-        return menuOptions.contains(REMOVE_ATTACHMENT);
+        return getRemoveOption() != null;
     }
 
     public void clickRemove()
     {
-        elementCache().menu.clickSubMenu(false, REMOVE_ATTACHMENT);
+        String remove = getRemoveOption();
+        if (remove == null)
+        {
+            throw new IllegalStateException("Unable to remove attachment/file");
+        }
+        elementCache().menu.clickSubMenu(false, remove);
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
+    }
+
+    private String getRemoveOption()
+    {
+        elementCache().menu.openMenuTo();
+        List<String> menuOptions = getWrapper().getTexts(elementCache().menu.findVisibleMenuItems());
+        return menuOptions.stream().filter(item -> item.startsWith("Remove ")).findFirst().orElse(null);
     }
 
     @Override
@@ -86,9 +113,13 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement fileSize = Locator.byClass("attachment-card__size").findWhenNeeded(this);
+        final WebElement icon = Locator.byClass("attachment-card__icon_img").findWhenNeeded(this);
         BootstrapMenu menu = BootstrapMenu.finder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "attachment-card__menu"))
                 .findWhenNeeded(this);
+        WebElement fileContent = Locator.tagWithClass("div", "attachment-card__content")
+                .refindWhenNeeded(this).withTimeout(4000);
+
     }
 
 

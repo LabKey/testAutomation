@@ -5,7 +5,10 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.ImageFileViewDialog;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -17,7 +20,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.util.TestLogger.log;
 
 public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 {
@@ -64,11 +66,6 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return this;
     }
 
-    public boolean hasTextInColumn(String column, String text)
-    {
-        return getRowMap().get(column).equals(text);
-    }
-
     /**
      * gets the cell at the specified index
      * use columnHeader, which computes the appropriate index
@@ -107,54 +104,36 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      * the HREF of the link.  (this is different from clickAndWait by virtue of not requiring
      * a page load event)
      */
-    public void clickLink(String text)
+    @LogMethod
+    public void clickLink(@LoggedParam String text)
     {
-        log("seeking link with text [" + text + "]");
         WebElement link = Locator.linkWithText(text).waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
-        log("found element with text [" + link.getText() + "]");
         String href = link.getAttribute("href");
         link.click();
-        log("waiting for url to be: [" + href + "]");
         WebDriverWrapper.waitFor(()-> getWrapper().getURL().toString().endsWith(href) &&
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link)), 1000);
+                ExpectedConditions.stalenessOf(link).apply(getDriver()), 1000);
     }
 
     public void clickLinkWithTitle(String text)
     {
-        log("seeking link with title [" + text + "]");
         WebElement link = Locator.linkWithTitle(text).waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
-        log("found element with title [" + text + "]");
         link.click();
     }
 
     /**
-     * finds a AttachmentCard specified filename, clicks it, and waits for the image to display in a modal
+     * finds a AttachmentCard in the specified column, clicks it, and waits for the image to display in a modal
      */
-    public ImageFileViewDialog clickImgFile(String filename)
+    public ImageFileViewDialog clickImgFile(String columnTitle)
     {
-        clickOnFile(filename);
-        log("waiting for image to display");
-        return new ImageFileViewDialog(getDriver(), filename);
-    }
-
-    public void clickOnFile(String filename)
-    {
-        log("seeking cell with filename [" + filename + "]");
-        WebElement filenameEl = elementCache().filenameLoc.containing(filename).waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
-        log("found element with filename [" + filename + "]");
-        filenameEl.click();
+        return elementCache().waitForAttachment(columnTitle).viewImgFile();
     }
 
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
      */
-    public File clickNonImgFile(String filename)
+    public File clickNonImgFile(String columnTitle)
     {
-        return getWrapper()
-                .doAndWaitForDownload(() -> {
-                    log("waiting for file to download");
-                    clickOnFile(filename);
-                }, 1)[0];
+        return elementCache().waitForAttachment(columnTitle).clickOnNonImgFile();
     }
 
     /**
@@ -218,7 +197,10 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
 
-        public Locator filenameLoc = Locator.tagWithClass("div", "attachment-card__name");
+        public AttachmentCard waitForAttachment(String columnTitle)
+        {
+            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(columnTitle));
+        }
     }
 
     public static class GridRowFinder extends WebDriverComponentFinder<GridRow, GridRowFinder>
