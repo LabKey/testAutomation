@@ -5,8 +5,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.FilterStatusValue;
@@ -20,6 +22,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -69,7 +72,8 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final String STARTS_WITH = "This will";
     private static final String ENDS_WITH = "page of data.";
 
-    private static List<String> charCombinations = new ArrayList<>();
+    private static final List<String> stringSetMembers = Arrays.asList("A", "B", "C", "D");
+    private static List<String> stringSets = new ArrayList<>();
 
     // Number of entries that have the NUMBER_STRING value.
     private static final int NUMBER_STRING_COUNT = 16;
@@ -101,10 +105,10 @@ public class GridPanelTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
         portalHelper.exitAdminMode();
 
-        // Create list of string that has the various combinations of the letters A, B, C & D
-        charCombinations = getCombinations("DCBA", 0);
-        // Remove the empty string option.
-        charCombinations.remove(0);
+        // Create list of strings that has the various sets of the letters A, B, C & D
+        stringSets = getAllSets(stringSetMembers, stringSetMembers.size() - 1);
+        // Remove the empty set.
+        stringSets.remove(0);
 
         createSmallSampleType();
 
@@ -196,10 +200,10 @@ public class GridPanelTest extends BaseWebDriverTest
             }
             else
             {
-                if(allPossibleIndex == charCombinations.size())
+                if(allPossibleIndex == stringSets.size())
                     allPossibleIndex = 0;
 
-                filterColValue = charCombinations.get(allPossibleIndex++);
+                filterColValue = stringSets.get(allPossibleIndex++);
                 if(extendedCharCount < EXTEND_RECORD_COUNT)
                 {
                     extColValue = EXTEND_RECORD_STRING;
@@ -223,28 +227,28 @@ public class GridPanelTest extends BaseWebDriverTest
 
     }
 
-    // Generate a list of string that has different combinations from the string value passed in.
-    // For example if values = 'ABC' this will return a list ['A', 'B', 'C', 'AB', 'AC', 'ABC', 'BC'].
-    // It treats 'BC' and 'CB' as equivalent and only one would be added.
-    private static List<String> getCombinations(String values, int index)
+    // Generate a list of string that has different combinations/sets from the list of strings passed in.
+    // For example if values = ['A', 'B', 'C'] this will return the list ['', 'A', 'B', 'C', 'AB', 'AC', 'ABC', 'BC'].
+    // This is all the sets of the characters from the list, including the empty set.
+    private static List<String> getAllSets(List<String> values, int index)
     {
-        List<String> allCombinations = new ArrayList<>();
-        if(index == values.length()) {
-            allCombinations.add("");
-            return allCombinations;
+        List<String> allSets = new ArrayList<>();
+        if(index < 0) {
+            allSets.add("");
+            return allSets;
         }
 
-        allCombinations = getCombinations(values, index + 1);
-        List<String> newCombinations = new ArrayList<>();
+        allSets = getAllSets(values, index - 1);
+        List<String> newSets = new ArrayList<>();
 
-        for (String allCombination : allCombinations)
+        for (String allCombination : allSets)
         {
-            newCombinations.add(allCombination + values.charAt(index));
+            newSets.add(allCombination + values.get(index));
         }
 
-        allCombinations.addAll(newCombinations);
+        allSets.addAll(newSets);
 
-        return allCombinations;
+        return allSets;
     }
 
     public QueryGrid beforeTest(String sampleType)
@@ -725,7 +729,7 @@ public class GridPanelTest extends BaseWebDriverTest
         int listSizeBefore = actualValues.size();
 
         // Not going to validate all values, just a few that should indicate if the list is as expected.
-        List<String> expectedValues = Arrays.asList("[All]", "[blank]", "A", "B", ONE_PAGE_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING, NUMBER_STRING);
+        List<String> expectedValues = Arrays.asList("[All]", "[blank]", stringSetMembers.get(0), stringSetMembers.get(1), ONE_PAGE_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING, NUMBER_STRING);
 
         checker().fatal()
                 .verifyTrue(String.format("List of values to choose from for field '%s' not as expected before filtering. Fatal error.", FILTER_STRING_COL),
@@ -751,6 +755,7 @@ public class GridPanelTest extends BaseWebDriverTest
         facetedPanel = filterDialog.selectFacetTab();
         actualValues = facetedPanel.getAvailableValues();
 
+        // Hard coding the string combinations (AB, AC, etc...) to make the code more readable.
         expectedValues = Arrays.asList("[All]", "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
 
         Collections.sort(actualValues);
@@ -772,7 +777,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filterDialog = grid.getGridBar().getFilterDialog();
         filterDialog.selectField(FILTER_STRING_COL);
 
-        String firstFilterValue = charCombinations.get(0);
+        String firstFilterValue = stringSets.get(0);
 
         log(String.format("Filer '%s' to values equal to '%s'.", FILTER_STRING_COL, firstFilterValue));
         expressionPanel = filterDialog.selectExpressionTab();
@@ -788,7 +793,7 @@ public class GridPanelTest extends BaseWebDriverTest
                 .verifyEquals("The filtered value is not as expected.",
                         expectedValues, actualValues);
 
-        String secondFilterValue = charCombinations.get(1);
+        String secondFilterValue = stringSets.get(1);
         log(String.format("Now select '%s' from the list and validate that the filter is updated.", secondFilterValue));
         facetedPanel.checkValues(firstFilterValue, secondFilterValue);
 
@@ -834,7 +839,7 @@ public class GridPanelTest extends BaseWebDriverTest
      *     This test will:
      *     <ul>
      *         <li>Apply multiple filters to two columns.</li>
-     *         <li>Enter a valid search value in the search box (validate count).</li>
+     *         <li>Enter a valid search value in the search box (validate count of the records in grid).</li>
      *         <li>Remove the filters, and validate search is still set.</li>
      *     </ul>
      * </p>
@@ -862,7 +867,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         filterDialog.selectFacetTab();
 
-        String oneOfFilter = "A;B;C";
+        String oneOfFilter = String.format("%s;%s;%s", stringSetMembers.get(0), stringSetMembers.get(1), stringSetMembers.get(2));
 
         log(String.format("Filter '%s' to have one of '%s'.", FILTER_STRING_COL, oneOfFilter));
 
@@ -879,7 +884,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         checker().screenShotIfNewError("Initial_Filter_Error");
 
-        String searchString = "AB";
+        String searchString = String.format("%s%s", stringSetMembers.get(0), stringSetMembers.get(1));
 
         log(String.format("Set search value to '%s'.", searchString));
 
@@ -939,7 +944,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         filterDialog.selectFacetTab();
 
-        String oneOfFilter = "A;B;C";
+        String oneOfFilter = String.format("%s;%s;%s", stringSetMembers.get(0), stringSetMembers.get(1), stringSetMembers.get(2));
 
         log(String.format("Filter '%s' to have one of '%s'.", FILTER_STRING_COL, oneOfFilter));
 
@@ -1000,7 +1005,7 @@ public class GridPanelTest extends BaseWebDriverTest
         checker().screenShotIfNewError("Filter_Pill_Remove_Error");
 
         // Need to change the focus. After removing the first filter the mouse is in the same position which causes the
-        // next pill to get the 'x' icon and not be identified as a filter.
+        // next pill to get the 'x' icon. This causes the next call to getFilterStatusValues to not recognize the pill as a filter.
         Locator.tagWithClass("div", "grid-panel__title").findElement(getDriver()).click();
 
         filterPill = grid.getFilterStatusValues(false).get(0);
@@ -1061,6 +1066,149 @@ public class GridPanelTest extends BaseWebDriverTest
                 oneOfFilter, getFormElement(filterValues));
 
         checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
+
+    }
+
+    /**
+     * Validate that the search field is the same as a contains filter.
+     */
+    @Test
+    public void testSearchSameAsContainsFilter()
+    {
+
+        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+
+        String searchString = "AB";
+
+        log(String.format("Set the search field to '%s'.", searchString));
+
+        grid.getGridBar().searchFor(searchString);
+
+        int expectedCount = 49;
+        int actualCount = grid.getRecordCount();
+
+        checker().withScreenshot("Search_Error")
+                .verifyEquals("Number of records returned from search not as expected.",
+                        expectedCount, actualCount);
+
+        log("Now validate same number returned with a contains filter.");
+
+        grid.getGridBar().clearSearch();
+
+        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+
+        filterDialog.selectField(FILTER_STRING_COL);
+
+        FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.CONTAINS, searchString));
+        filterDialog.confirm();
+
+        actualCount = grid.getRecordCount();
+
+        checker().withScreenshot("Filter_Contains_Error")
+                .verifyEquals("Number of records returned from filter contains not as expected.",
+                        expectedCount, actualCount);
+
+    }
+
+    /**
+     * <p>
+     *     Validate search woks on multiple columns and only on string columns.
+     * </p>
+     * <p>
+     *     This test will search for a number (12) and should get hits in the Str and Name columns but ignore the Int column.
+     * </p>
+     * @throws IOException Can be thrown by the call to getRows (used to identify samples that should not be returned.
+     * @throws CommandException Can be thrown by the call to getRows (used to identify samples that should not be returned.
+     */
+    @Test
+    public void testSearchAcrossColumns() throws IOException, CommandException
+    {
+
+        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+
+        String searchString = "12";
+
+        log(String.format("Set the search field to '%s'.", searchString));
+
+        grid.getGridBar().searchFor(searchString);
+
+        grid.getGridBar().pager().selectPageSize("40");
+
+        int expectedCount = 29;
+        int actualCount = grid.getRecordCount();
+
+        checker().verifyEquals("Number of records returned from search not as expected.",
+                expectedCount, actualCount);
+
+        log(String.format("Validate that the result set did not return a row where the search value was in the %s field.", FILTER_INT_COL));
+
+        List<String> actualIds = grid.getColumnDataAsText(FILTER_NAME_COL);
+
+        // These are two samples that have 12 in the Int column and nowhere else. They should not be returned.
+
+        QueryApiHelper queryHelper = new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getCurrentContainerPath(), TEST_SCHEMA, FILTER_SAMPLE_TYPE);
+
+        SelectRowsResponse selectResponse = queryHelper.selectRows(
+                Arrays.asList(FILTER_NAME_COL),
+                List.of(new Filter(FILTER_NAME_COL, searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
+                        new Filter(FILTER_STRING_COL, searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
+                        new Filter(FILTER_EXTEND_CHAR_COL, searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
+                        new Filter(FILTER_INT_COL, searchString, Filter.Operator.getOperator("EQUAL"))));
+
+        List<Map<String, Object>> rows = selectResponse.getRows();
+
+        boolean error = false;
+        StringBuilder errorMessage = new StringBuilder();
+        for(Map<String, Object> row : rows)
+        {
+            String id = row.get(FILTER_NAME_COL).toString();
+            if(actualIds.contains(id))
+            {
+                error = true;
+                errorMessage.append(String.format("Sample '%s' should not have been returned.\n", id));
+            }
+        }
+
+        checker().verifyFalse(errorMessage.toString(),
+                error);
+
+    }
+
+    /**
+     * Test that searching and filtering for extended characters works as expected. Will also validate filtering on a
+     * column name with extended characters.
+     */
+    @Test
+    public void testFilteringAndSearchingForExtendedCharacters()
+    {
+
+        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+
+        log(String.format("Search for '%s'.", EXTEND_RECORD_STRING));
+
+        grid.getGridBar().searchFor(EXTEND_RECORD_STRING);
+
+        checker().withScreenshot("Search_Extended_Error")
+                .verifyEquals(String.format("Number of records returned when searching for '%s' not as expected.", EXTEND_RECORD_STRING),
+                        EXTEND_RECORD_COUNT, grid.getRecordCount());
+
+        grid.getGridBar().clearSearch();
+
+        log(String.format("Filter the '%s' column for value '%s'.", FILTER_EXTEND_CHAR_COL, EXTEND_RECORD_STRING));
+
+        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+
+        filterDialog.selectField(FILTER_EXTEND_CHAR_COL);
+
+        FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.CONTAINS, EXTEND_RECORD_STRING));
+        filterDialog.confirm();
+
+        checker().withScreenshot("Filter_Extended_Error")
+                .verifyEquals(String.format("Number of records returned when filtering column '%s' for '%s' not as expected.",
+                                FILTER_EXTEND_CHAR_COL, EXTEND_RECORD_STRING),
+                        EXTEND_RECORD_COUNT, grid.getRecordCount());
 
     }
 
