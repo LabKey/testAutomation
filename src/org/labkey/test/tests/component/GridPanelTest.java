@@ -1,12 +1,14 @@
 package org.labkey.test.tests.component;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
@@ -29,7 +31,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
-import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +53,13 @@ public class GridPanelTest extends BaseWebDriverTest
 
     private static final int DEFAULT_PAGE_SIZE = 20;
 
+    // A sample type with a small number of rows. Used to test paging controls (lack of) when results are small and no
+    // filters are applied. Also used to test views (since that is a column centric feature).
     private static final String SMALL_SAMPLE_TYPE = "Small_SampleType";
-    private static final int SMALL_SAMPLE_TYPE_SIZE = 10;
+    private static final int SMALL_SAMPLE_TYPE_SIZE = DEFAULT_PAGE_SIZE - 2;
+    private static final String SMALL_SAMPLE_PREFIX = "SM-";
 
+    // A sample type with a larger number of fields. Used for filtering and searching.
     private static final String FILTER_SAMPLE_TYPE = "Filter_SampleType";
     private static final int FILTER_SAMPLE_TYPE_SIZE = 300;
     private static final String FILTER_SAMPLE_PREFIX = "FST-";
@@ -66,13 +72,19 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final String FILTER_BOOL_COL = "Bool";
     private static final String FILTER_DATE_COL = "Date";
 
+    // Column removed from default view.
+    private static final String REMOVED_FLAG_COLUMN = "Flag";
+
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
+    private static final String VIEW_DEFAULT = "Default";
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
     private static final String VIEW_FEWER_COLUMNS = "Fewer_Columns";
-    private static final String EXTRA_COLUMN = "Description";
-    private static final String REMOVED_COLUMN = FILTER_BOOL_COL;
+    private static final List<String> extraColumnsNames = Arrays.asList("IsAliquot", "GenId"); // Special case for adding the columns to the view and calling getRows api.
+    private static final List<String> extraColumnsHeaders = Arrays.asList("Is Aliquot", "Gen Id"); // The column headers as they appear in the UI and exported file.
+    private static final List<String> removedColumns = Arrays.asList(FILTER_BOOL_COL);
 
     // Various values used to populate Str field for records. Also used in filtering/searching.
+    // Note: Small_SampleType is populated with random data and will have none of these values.
     private static final String EXTEND_RECORD_STRING = "\u01C5 \u01FC";
     private static final String EXTEND_RECORD_OTHER_STRING = "Not an extended value.";
 
@@ -88,9 +100,6 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final int NUMBER_FOR_STRING = 1234;
     private static final String NUMBER_STRING = String.format("This string has numbers %d in it.", NUMBER_FOR_STRING);
 
-    private static final String STARTS_WITH = "This will";
-    private static final String ENDS_WITH = "page of data.";
-
     private static final List<String> stringSetMembers = Arrays.asList("A", "B", "C", "D");
     private static List<String> stringSets = new ArrayList<>();
 
@@ -105,6 +114,10 @@ public class GridPanelTest extends BaseWebDriverTest
 
     // Upper value to put into the Int column.
     private static final int INT_MAX = 15;
+
+    private static final String SELECTED_TEXT_FORMAT = "%d of %d selected";
+    private static final String ALL_OPTION = "[All]";
+    private static final String BLANK_OPTION = "[blank]";
 
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
@@ -132,10 +145,12 @@ public class GridPanelTest extends BaseWebDriverTest
         createSmallSampleType();
 
         createFilterSampleType();
+
     }
 
     // Create a small sample type that has one page of data by default (used in paging testing).
-    // Don't care about the data in the rows so use random data.
+    // This sample type will also have custom saved views.
+    // Not concerned about the data in the rows so use some random data.
     private void createSmallSampleType() throws IOException, CommandException
     {
         SampleTypeDefinition props = new SampleTypeDefinition(SMALL_SAMPLE_TYPE)
@@ -145,27 +160,53 @@ public class GridPanelTest extends BaseWebDriverTest
                         new FieldDefinition(FILTER_BOOL_COL, FieldDefinition.ColumnType.Boolean)));
 
         TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
-        sampleSetDataGenerator.generateRows(SMALL_SAMPLE_TYPE_SIZE);
+
+        // Add a few rows where the STR column is knowable.
+        int setIndex = 0;
+        for(int rowCount = 1; rowCount <= SMALL_SAMPLE_TYPE_SIZE; rowCount++)
+        {
+            if(setIndex == stringSets.size())
+                setIndex = 0;
+
+            sampleSetDataGenerator.addCustomRow(
+                    Map.of(FILTER_NAME_COL, String.format("%s%d", SMALL_SAMPLE_PREFIX, rowCount),
+                            FILTER_INT_COL, sampleSetDataGenerator.randomInt(1, INT_MAX),
+                            FILTER_STRING_COL, stringSets.get(setIndex++),
+                            FILTER_DATE_COL, sampleSetDataGenerator.randomDateString(DateUtils.addWeeks(new Date(), -25), new Date()),
+                            FILTER_BOOL_COL, sampleSetDataGenerator.randomBoolean())
+            );
+        }
+
         sampleSetDataGenerator.insertRows();
 
-        refresh();
-
-        waitAndClickAndWait(Locator.linkWithText(SMALL_SAMPLE_TYPE));
+        removeFlagColumnFromDefaultView(SMALL_SAMPLE_TYPE);
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        drtSamples.goToView(VIEW_DEFAULT);
+
+        log(String.format("Create the '%s' view for the '%s' sample type.", VIEW_EXTRA_COLUMNS, SMALL_SAMPLE_TYPE));
         CustomizeView cv = drtSamples.openCustomizeGrid();
-        cv.addColumn(EXTRA_COLUMN);
+        for(String columnName : extraColumnsNames)
+        {
+            cv.addColumn(columnName);
+        }
         cv.saveCustomView(VIEW_EXTRA_COLUMNS);
 
         // Revert to the default view.
-        drtSamples.goToView("Default");
+        drtSamples.goToView(VIEW_DEFAULT);
 
+        log(String.format("Create the '%s' view for the '%s' sample type.", VIEW_FEWER_COLUMNS, SMALL_SAMPLE_TYPE));
         cv = drtSamples.openCustomizeGrid();
-        cv.removeColumn(REMOVED_COLUMN);
+
+        for(String columnName : removedColumns)
+        {
+            cv.removeColumn(columnName);
+        }
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         goToProjectHome();
+
     }
 
     // Create a larger sample type that can be used for paging and filtering/searching tests.
@@ -262,6 +303,33 @@ public class GridPanelTest extends BaseWebDriverTest
 
         sampleSetDataGenerator.insertRows();
 
+        removeFlagColumnFromDefaultView(FILTER_SAMPLE_TYPE);
+
+    }
+
+    /**
+     * Helper to remove the 'Flag' column from the default view. It just gets in the way for some of the tests.
+     *
+     * @param sampleType Name of sample type.
+     */
+    private void removeFlagColumnFromDefaultView(String sampleType)
+    {
+        goToProjectHome();
+
+        refresh();
+
+        waitAndClickAndWait(Locator.linkWithText(sampleType));
+
+        log(String.format("Remove '%s' column form default view.", REMOVED_FLAG_COLUMN));
+
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
+        drtSamples.goToView(VIEW_DEFAULT);
+
+        CustomizeView cv = drtSamples.openCustomizeGrid();
+        cv.removeColumn(REMOVED_FLAG_COLUMN);
+        cv.saveDefaultView();
+
     }
 
     // Generate a list of string that has different combinations/sets from the list of strings passed in.
@@ -345,7 +413,7 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.getGridBar().jumpToPage("Last Page");
 
         checker()
-                .withScreenshot("Dropdown_Menu_Visible")
+                .withScreenshot("Last_Page_Dropdown_Menu_Visible")
                 .verifyFalse("After selecting 'Last Page' the dropdown menu is still visible, it should not be.",
                         isPagingMenuVisible());
 
@@ -422,7 +490,7 @@ public class GridPanelTest extends BaseWebDriverTest
         log("Check to see that the pager thinks it's all true.");
 
         checker()
-                .withScreenshot("Dropdown_Menu_Visible")
+                .withScreenshot("Larger_Page_Size_Dropdown_Menu_Visible")
                 .verifyFalse("After selecting a page size the dropdown menu is still visible, it should not be.",
                         isPagingMenuVisible());
 
@@ -452,7 +520,7 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.getGridBar().selectPageSize(Integer.toString(DEFAULT_PAGE_SIZE));
 
         checker()
-                .withScreenshot("Dropdown_Menu_Visible")
+                .withScreenshot("Smaller_page_Size_Dropdown_Menu_Visible")
                 .verifyFalse("After selecting a page size the dropdown menu is still visible, it should not be.",
                         isPagingMenuVisible());
 
@@ -505,7 +573,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         grid.selectAllRows();
 
-        expectedText = String.format("%1$d of %1$d selected", SMALL_SAMPLE_TYPE_SIZE);
+        expectedText = String.format(SELECTED_TEXT_FORMAT, SMALL_SAMPLE_TYPE_SIZE, SMALL_SAMPLE_TYPE_SIZE);
         actualText = grid.getSelectionStatusCount();
 
         checker().verifyEquals("Selected text count not as expected.",
@@ -540,8 +608,8 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.selectAllRows();
         grid.removeColumnFilter(FILTER_STRING_COL);
         checker().withScreenshot("Select_All_Button_Error")
-                .verifyEquals("Indicated number of selected rows not as expected after filter removed.",
-                        String.format("%d of %d selected", MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                .verifyEquals("Number of selected rows not as expected after filter removed.",
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
 
@@ -571,7 +639,7 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.removeColumnFilter(FILTER_STRING_COL);
         checker().withScreenshot("Select_All_On_Page_Error")
                 .verifyEquals("Using check box at top of grid did not select the expected samples.",
-                        String.format("%d of %d selected", DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
 
@@ -604,7 +672,8 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.selectAllOnPage(true);
         checker().withScreenshot("Select_All_On_Page_Error")
                 .verifyEquals("Using check box at top of grid did not select the expected samples.",
-                        String.format("%d of %d selected", DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE),
+                        grid.getSelectionStatusCount());
 
         log("Use the 'Select All' button to select all of the filtered rows.");
         checker().fatal()
@@ -612,36 +681,39 @@ public class GridPanelTest extends BaseWebDriverTest
 
         grid.selectAllRows();
         checker().withScreenshot("Select_All_Button_With_Some_Selected_Error")
-                .verifyEquals("Indicated number of selected rows not as expected after filter removed.",
-                        String.format("%1$d of %1$d selected", MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE), grid.getSelectionStatusCount());
+                .verifyEquals("Number of selected rows not as expected.",
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE),
+                        grid.getSelectionStatusCount());
 
         log("Remove the filter and validate that the selections persisted.");
         grid.removeColumnFilter(FILTER_STRING_COL);
 
         checker().withScreenshot("Select_After_Filter_Removed_Error")
-                .verifyEquals("Indicated number of selected rows not as expected after filter removed.",
-                        String.format("%d of %d selected", MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                .verifyEquals("Number of selected rows not as expected after filter removed.",
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE),
+                        grid.getSelectionStatusCount());
 
         log("Apply the filter again...");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
 
         checker().withScreenshot("Select_Filter_Reapplied_Error")
                 .verifyEquals("Indicated number of selected rows not as expected after filter was reapplied.",
-                        String.format("%1$d of %1$d selected", MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE),
+                        grid.getSelectionStatusCount());
 
         log("Unselect all of the rows on the first page.");
         grid.selectAllOnPage(false);
 
         checker().withScreenshot("Select_Clear_Page_Error")
                 .verifyEquals("Indicated number of selected rows not as expected after first page cleared.",
-                        String.format("%d of %d selected", (MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE) - DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, (MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE) - DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE), grid.getSelectionStatusCount());
 
         log("Remove the filter, and validate selection count.");
         grid.removeColumnFilter(FILTER_STRING_COL);
 
         checker().withScreenshot("Select_Remove_Page_Error")
                 .verifyEquals("Indicated number of selected rows not as expected after first page cleared and filter removed.",
-                        String.format("%d of %d selected", (MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE) - DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, (MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE) - DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
 
@@ -697,7 +769,7 @@ public class GridPanelTest extends BaseWebDriverTest
         List<Filter> filters = List.of(
                 new Filter(FILTER_INT_COL, low, Filter.Operator.getOperator("GREATER_THAN")),
                 new Filter(FILTER_INT_COL, high, Filter.Operator.getOperator("LESS_THAN_OR_EQUAL")));
-        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().withScreenshot("Multiple_Filters_One_Column_Error")
                 .verifyEquals("Number of records returned for filter not as expected.",
@@ -781,8 +853,8 @@ public class GridPanelTest extends BaseWebDriverTest
         List<String> actualValues = facetedPanel.getAvailableValues();
 
         List<String> expectedValues = new ArrayList<>();
-        expectedValues.add("[All]");
-        expectedValues.add("[blank]");
+        expectedValues.add(ALL_OPTION);
+        expectedValues.add(BLANK_OPTION);
         expectedValues.add(ONE_PAGE_STRING);
         expectedValues.add(FIVE_RECORD_STRING);
         expectedValues.add(MULTI_PAGE_STRING);
@@ -814,7 +886,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualValues = facetedPanel.getAvailableValues();
 
         // Hard coding the string combinations (AB, AC, etc...) to make the code more readable.
-        expectedValues = Arrays.asList("[All]", "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
+        expectedValues = Arrays.asList(ALL_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
 
         Collections.sort(actualValues);
         Collections.sort(expectedValues);
@@ -887,7 +959,7 @@ public class GridPanelTest extends BaseWebDriverTest
         List<Filter> filters = List.of(
                 new Filter(FILTER_STRING_COL, String.format("%s;%s", firstFilterValue, secondFilterValue),
                         Filter.Operator.getOperator("IN")));
-        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Filter did not return the expected number of rows.",
                 expectedCount, grid.getRecordCount());
@@ -947,7 +1019,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filters.add(new Filter(FILTER_STRING_COL, oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
         filters.add(new Filter(FILTER_INT_COL, low, Filter.Operator.getOperator("GREATER_THAN")));
         filters.add(new Filter(FILTER_INT_COL, high, Filter.Operator.getOperator("LESS_THAN")));
-        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Number of rows after filter applied not as expected.",
                 expectedCount, grid.getRecordCount());
@@ -962,7 +1034,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         // Because the search string is specific to the Str column a query can be used to get the expected count.
         filters.add(new Filter(FILTER_STRING_COL, searchString, Filter.Operator.getOperator("CONTAINS")));
-        expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().withScreenshot("Filter_With_Search_Error")
                 .verifyEquals("Number of rows after filter applied not as expected.",
@@ -978,7 +1050,7 @@ public class GridPanelTest extends BaseWebDriverTest
         // Again can use a query to get the expected number of rows from the search.
         filters = new ArrayList<>();
         filters.add(new Filter(FILTER_STRING_COL, searchString, Filter.Operator.getOperator("CONTAINS")));
-        expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Number of rows after filter were cleared not as expected.",
                 expectedCount, grid.getRecordCount());
@@ -1064,7 +1136,7 @@ public class GridPanelTest extends BaseWebDriverTest
                 new Filter(FILTER_INT_COL, low, Filter.Operator.getOperator("GREATER_THAN")),
                 new Filter(FILTER_INT_COL, high, Filter.Operator.getOperator("LESS_THAN")),
                 new Filter(FILTER_STRING_COL, oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
-        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Rows returned after filters applied not as expected.",
                 expectedCount, grid.getRecordCount());
@@ -1084,7 +1156,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filters = List.of(
                 new Filter(FILTER_INT_COL, low, Filter.Operator.getOperator("GREATER_THAN")),
                 new Filter(FILTER_STRING_COL, oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
-        expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Rows returned after filter pill removed not as expected.",
                 expectedCount, grid.getRecordCount());
@@ -1160,7 +1232,7 @@ public class GridPanelTest extends BaseWebDriverTest
      * Validate that the search field is the same as a contains filter.
      */
     @Test
-    public void testSearchSameAsContainsFilter() throws IOException, CommandException
+    public void testSearchIsSameAsContainsFilter() throws IOException, CommandException
     {
 
         QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
@@ -1175,7 +1247,7 @@ public class GridPanelTest extends BaseWebDriverTest
         // Identify how many rows should be returned.
         List<Filter> filters = List.of(
                 new Filter(FILTER_STRING_COL, searchString, Filter.Operator.getOperator("CONTAINS")));
-        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         int actualCount = grid.getRecordCount();
 
@@ -1210,8 +1282,8 @@ public class GridPanelTest extends BaseWebDriverTest
      * <p>
      *     This test will search for a number (12) and should get hits in the Str and Name columns but ignore the Int column.
      * </p>
-     * @throws IOException Can be thrown by the call to getRows (used to identify samples that should not be returned.
-     * @throws CommandException Can be thrown by the call to getRows (used to identify samples that should not be returned.
+     * @throws IOException Can be thrown by the call to getRows (used to identify samples that should not be returned).
+     * @throws CommandException Can be thrown by the call to getRows (used to identify samples that should not be returned).
      */
     @Test
     public void testSearchAcrossColumns() throws IOException, CommandException
@@ -1244,7 +1316,7 @@ public class GridPanelTest extends BaseWebDriverTest
                 new Filter(FILTER_STRING_COL, searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
                 new Filter(FILTER_EXTEND_CHAR_COL, searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
                 new Filter(FILTER_INT_COL, searchString, Filter.Operator.getOperator("EQUAL")));
-        List<Map<String, Object>> rows = getExpectedResults(FILTER_SAMPLE_TYPE, Arrays.asList(FILTER_NAME_COL), filters);
+        List<Map<String, Object>> rows = getExpectedResults(FILTER_SAMPLE_TYPE, null, Arrays.asList(FILTER_NAME_COL), filters);
 
         boolean error = false;
         StringBuilder errorMessage = new StringBuilder();
@@ -1295,7 +1367,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         List<Filter> filters = List.of(
                 new Filter(FILTER_EXTEND_CHAR_COL, EXTEND_RECORD_STRING, Filter.Operator.getOperator("EQUAL")));
-        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, filters).size();
+        int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().withScreenshot("Filter_Extended_Error")
                 .verifyEquals(String.format("Number of records returned when filtering column '%s' for '%s' not as expected.",
@@ -1307,9 +1379,10 @@ public class GridPanelTest extends BaseWebDriverTest
     /**
      * Validate that exporting with a filter applied only exports the filtered rows.
      * Validate that exporting when there are selected rows only exports the selected rows.
+     * Validate exporting a view has the appropriate columns.
      */
     @Test
-    public void testExportWithFilterAndSelection() throws IOException, CommandException
+    public void testExport() throws IOException, CommandException
     {
 
         QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
@@ -1320,7 +1393,7 @@ public class GridPanelTest extends BaseWebDriverTest
         List<String> columns = Arrays.asList(FILTER_NAME_COL, FILTER_STRING_COL, FILTER_INT_COL, FILTER_EXTEND_CHAR_COL);
         List<Filter> filters = List.of(
                 new Filter(FILTER_STRING_COL, MULTI_PAGE_STRING, Filter.Operator.getOperator("EQUAL")));
-        List<Map<String, Object>> expectedValues = getExpectedResults(FILTER_SAMPLE_TYPE, columns, filters);
+        List<Map<String, Object>> expectedValues = getExpectedResults(FILTER_SAMPLE_TYPE, null, columns, filters);
 
         File exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
@@ -1337,12 +1410,223 @@ public class GridPanelTest extends BaseWebDriverTest
 
         filters = List.of(
                 new Filter(FILTER_STRING_COL, ONE_PAGE_STRING, Filter.Operator.getOperator("EQUAL")));
-        expectedValues = getExpectedResults(FILTER_SAMPLE_TYPE, columns, filters);
+        expectedValues = getExpectedResults(FILTER_SAMPLE_TYPE, null, columns, filters);
 
         exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
         validateExportedData(exportedFile, expectedValues, columns);
 
+        log(String.format("Using sample type '%s' validate that if a view is selected the expected columns are exported.", SMALL_SAMPLE_TYPE));
+
+        grid = beforeTest(SMALL_SAMPLE_TYPE);
+
+        log(String.format("Select the '%s' view.", VIEW_EXTRA_COLUMNS));
+        grid.selectView(VIEW_EXTRA_COLUMNS);
+
+        exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
+
+        // The extra column added have spaces in the name so the column header in the exported file, so use the header values.
+        columns = new ArrayList<>(extraColumnsHeaders);
+        columns.add(FILTER_DATE_COL);
+        columns.add(FILTER_NAME_COL);
+        columns.add(FILTER_BOOL_COL);
+        columns.add(FILTER_STRING_COL);
+        columns.add(FILTER_INT_COL);
+        validateExportedColumnHeader(exportedFile, columns, new ArrayList<>());
+
+        log(String.format("Now select the '%s' view.", VIEW_FEWER_COLUMNS));
+        grid.selectView(VIEW_FEWER_COLUMNS);
+
+        exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
+
+        columns = new ArrayList<>();
+        columns.add(FILTER_DATE_COL);
+        columns.add(FILTER_NAME_COL);
+        columns.add(FILTER_STRING_COL);
+        columns.add(FILTER_INT_COL);
+        validateExportedColumnHeader(exportedFile, columns, removedColumns);
+
+    }
+
+    /**
+     * <p>
+     *     Test the filter dialog with different custom views.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Verify that available fields to filter are as expected when a view has extra fields.</li>
+     *         <li>Verify that available fields are as expected if a view has removed fields.</li>
+     *         <li>
+     *             Verify filtering on a field that is removed when a custom view is selected.
+     *             <ul>
+     *                 <li>Verify the filter is still applied.</li>
+     *                 <li>Verify that the removed field is not shown in the dialog.</li>
+     *             </ul>
+     *         </li>
+     *     </ul>
+     * </p>
+     * @throws IOException Can be thrown by the call to getRows.
+     * @throws CommandException Can be thrown by the call to getRows.
+     */
+    @Test
+    public void testFilterDialogWithViews() throws IOException, CommandException
+    {
+
+        QueryGrid grid = beforeTest(SMALL_SAMPLE_TYPE);
+
+        log(String.format("For sample type '%s' use view '%s'.", SMALL_SAMPLE_TYPE, VIEW_EXTRA_COLUMNS));
+
+        grid.selectView(VIEW_EXTRA_COLUMNS);
+
+        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+
+        List<String> actualList = filterDialog.getAvailableFields();
+
+        List<String> expectedList = new ArrayList<>(extraColumnsHeaders);
+        expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_STRING_COL);
+        expectedList.add(FILTER_INT_COL);
+        expectedList.add(FILTER_BOOL_COL);
+        expectedList.add(FILTER_DATE_COL);
+
+        checker().withScreenshot("View_Extra_Field_Error")
+                .verifyTrue(String.format("The fields listed in the dialog do not have expected values '%s'.", expectedList),
+                        actualList.containsAll(expectedList));
+
+        filterDialog.cancel();
+
+        log(String.format("Now use view '%s'.", VIEW_FEWER_COLUMNS));
+
+        grid.selectView(VIEW_FEWER_COLUMNS);
+
+        expectedList.removeAll(extraColumnsHeaders);
+        expectedList.removeAll(removedColumns);
+
+        filterDialog = grid.getGridBar().getFilterDialog();
+        actualList = filterDialog.getAvailableFields();
+
+        checker().verifyTrue(String.format("The fields listed in the dialog are not as expected. Expected '%s'.", expectedList),
+                        actualList.containsAll(expectedList));
+
+        for(String removedColumn : removedColumns)
+        {
+            checker().verifyFalse(String.format("The field '%s' is listed in the dialog, it should not be.", removedColumn),
+                    actualList.contains(removedColumn));
+        }
+
+        checker().screenShotIfNewError("View_Remove_Field_Error");
+
+        filterDialog.cancel();
+
+        log("Go back to default view. Filter on a column to be removed, then change view that does not include the column.");
+        grid.selectView(VIEW_DEFAULT);
+
+        log(String.format("Filter column '%s' to true.", FILTER_BOOL_COL));
+        grid.filterColumn(FILTER_BOOL_COL, Filter.Operator.EQUAL, true);
+
+        log(String.format("Change view to '%s' which should remove column '%s' from the grid.", VIEW_FEWER_COLUMNS, FILTER_BOOL_COL));
+        grid.selectView(VIEW_FEWER_COLUMNS);
+
+        // Get the expected sample id.
+        List<Filter> filters = List.of(new Filter(FILTER_BOOL_COL, true, Filter.Operator.getOperator("EQUAL")));
+        int expectedCount = getExpectedResults(SMALL_SAMPLE_TYPE, VIEW_FEWER_COLUMNS, null, filters).size();
+
+        checker().withScreenshot("View_Filtered_Removed_Column_Error")
+                .verifyEquals("Row count not as expected after view applied to column that is filtered.",
+                        expectedCount, grid.getRecordCount());
+
+        log("Validate the removed, but filtered column, does not appear in the dialog.");
+
+        filterDialog = grid.getGridBar().getFilterDialog();
+
+        actualList = filterDialog.getFilteredFields();
+
+        checker().verifyTrue("No fields should be shown as filtered.",
+                actualList.isEmpty());
+
+        expectedList = new ArrayList<>();
+        expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_INT_COL);
+        expectedList.add(FILTER_STRING_COL);
+        expectedList.add(FILTER_DATE_COL);
+
+        actualList = filterDialog.getAvailableFields();
+
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+
+        checker().verifyEquals("Available fields not as expected.",
+                expectedList, actualList);
+
+        // Build the list of expected values.
+        // Get the expected sample id.
+        filters = List.of(new Filter(FILTER_BOOL_COL, true, Filter.Operator.getOperator("EQUAL")));
+        List<Map<String, Object>> strValues = getExpectedResults(SMALL_SAMPLE_TYPE, VIEW_FEWER_COLUMNS, List.of(FILTER_STRING_COL), filters);
+
+        expectedList = new ArrayList<>();
+        for(Map<String, Object> row : strValues)
+        {
+            String value = row.get(FILTER_STRING_COL).toString();
+
+            if(!expectedList.contains(value))
+            {
+                expectedList.add(value);
+            }
+        }
+        expectedList.add(ALL_OPTION);
+
+        log(String.format("Validate that the list of values for the '%s' is as expected.", FILTER_STRING_COL));
+        filterDialog.selectField(FILTER_STRING_COL);
+        actualList = filterDialog.selectFacetTab().getAvailableValues();
+
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+
+        checker().verifyEquals("Values to choose from not as expected.",
+                expectedList, actualList);
+
+        checker().screenShotIfNewError("View_Filter_Dialog_Error");
+
+        filterDialog.cancel();
+
+        log(String.format("Change the view to '%s' and verify that the filter is still applied.", VIEW_EXTRA_COLUMNS));
+
+        grid.selectView(VIEW_EXTRA_COLUMNS);
+
+        List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
+        String expectedValue = String.format("%s = true", FILTER_BOOL_COL);
+        checker().withScreenshot("View_Filter_Pill_Error").verifyTrue(String.format("Filter pills not as expected. There should only be one with value of '%s'", expectedValue),
+                filterPills.size() == 1 && filterPills.get(0).getText().equals(expectedValue));
+
+        log("Validate the fields in the dialog.");
+
+        expectedList = new ArrayList<>(extraColumnsHeaders);
+        expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_STRING_COL);
+        expectedList.add(FILTER_INT_COL);
+        expectedList.add(FILTER_BOOL_COL);
+        expectedList.add(FILTER_DATE_COL);
+
+        filterDialog = grid.getGridBar().getFilterDialog();
+
+        actualList = filterDialog.getAvailableFields();
+
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+
+        checker().verifyEquals("List of available fields not as expected.",
+                expectedList, actualList);
+
+        expectedList = Arrays.asList(FILTER_BOOL_COL);
+        actualList = filterDialog.getFilteredFields();
+
+        checker().verifyEquals(String.format("List of filtered fields with view '%s' not as expected.", FILTER_BOOL_COL),
+                expectedList, actualList);
+
+        checker().screenShotIfNewError("View_Filter_With_Extra_Error");
+
+        filterDialog.cancel();
     }
 
     /**
@@ -1392,26 +1676,72 @@ public class GridPanelTest extends BaseWebDriverTest
     }
 
     /**
+     * Helper to validate the exported rows.
+     *
+     * @param exportedFile The exported csv/tsv file.
+     * @param expectedColumns A list of the columns that should be exported.
+     * @param expectedMissingColumns A list of columns that should not be exported.
+     * @throws IOException Can be thrown by the file reader.
+     */
+    private void validateExportedColumnHeader(File exportedFile, List<String> expectedColumns, List<String> expectedMissingColumns) throws IOException
+    {
+
+        try (CSVReader reader = new CSVReader(Readers.getReader(exportedFile), GridBar.ExportType.CSV.getSeparator()))
+        {
+
+            List<String[]> allRows = reader.readAll();
+
+            List<String> actualHeader = Arrays.asList(allRows.get(0));
+
+            checker().verifyTrue(String.format("Expected column headers '%s' not exported.", expectedColumns),
+                    actualHeader.containsAll(expectedColumns));
+
+            for(String missingColumn : expectedMissingColumns)
+            {
+                checker().verifyFalse(String.format("Column header '%s' was exported and it should not have been.", missingColumn),
+                        actualHeader.contains(missingColumn));
+            }
+
+        }
+
+    }
+
+    /**
      * Helper to try and avoid using 'magical values' when checking for expected results. This method lends its self to
      * tests that use filtering, it isn't as useful for search tests.
      *
      * @param sampleType Name of the sample type to query.
-     * @param columns The columns to return.
+     * @param viewName If not null apply a view to the query.
+     * @param columns The columns to return. If null will get only the Name column.
      * @param filters The list of filters to apply (this is why it is more aligned with filter tests)
      * @return The results from the query.
      * @throws IOException Can be thrown by the call to selectRows api.
      * @throws CommandException Can be thrown by the call to selectRows api.
      */
-    private List<Map<String, Object>> getExpectedResults(String sampleType, @Nullable List<String> columns, @Nullable List<Filter> filters) throws IOException, CommandException
+    private List<Map<String, Object>> getExpectedResults(String sampleType, @Nullable String viewName, @Nullable List<String> columns, @Nullable List<Filter> filters) throws IOException, CommandException
     {
+
+        SelectRowsCommand cmd = new SelectRowsCommand(TEST_SCHEMA, sampleType);
+
         // If no columns are given get only the Name column.
-        if(columns == null)
+        if(null == columns)
+        {
             columns = Arrays.asList(FILTER_NAME_COL);
+        }
 
-        QueryApiHelper queryHelper = new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getCurrentContainerPath(), TEST_SCHEMA, sampleType);
+        cmd.setColumns(columns);
 
-        SelectRowsResponse selectResponse = queryHelper.selectRows(
-                columns, filters);
+        if(null != filters)
+        {
+            cmd.setFilters(new ArrayList<>(filters));
+        }
+
+        if(null != viewName)
+        {
+            cmd.setViewName(viewName);
+        }
+
+        SelectRowsResponse selectResponse = cmd.execute(WebTestHelper.getRemoteApiConnection(), getCurrentContainerPath());
 
         return selectResponse.getRows();
     }
