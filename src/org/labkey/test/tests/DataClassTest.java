@@ -125,7 +125,7 @@ public class DataClassTest extends BaseWebDriverTest
     {
         clickAndWait(Locator.linkWithText(dataClassName));
         assertElementPresent(Locator.tagWithText("h3", dataClassName));
-        clickButton("Edit");
+        clickButton("Edit Data Class");
         return new CreateDataClassPage(getDriver());
     }
 

@@ -56,7 +56,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
      * Waits for initial state (empty filter card panel) or for search results grid to appear
      */
     @Override
-    protected void waitForReady()
+    public void waitForReady()
     {
         loadingWait().withMessage("Sample finder loading").until(wd -> !BootstrapLocators.loadingSpinner.existsIn(this) &&
                 (isEmptySearch() || elementCache().resultsGrid.getComponentElement().isDisplayed()));

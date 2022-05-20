@@ -5,6 +5,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -58,7 +59,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public File exportData(ExportType exportType)
     {
+        WebElement exportButton = getExportButton(exportType);
+        return getWrapper().doAndWaitForDownload(exportButton::click);
+    }
 
+    private WebElement getExportButton(ExportType exportType)
+    {
         WebElement downloadBtn = Locator.tagWithClass("span", "fa-download").findElement(this);
 
         if(!downloadBtn.isDisplayed())
@@ -66,8 +72,15 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        WebElement exportButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
-        return getWrapper().doAndWaitForDownload(exportButton::click);
+        return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
+    }
+
+    public TabSelectionExportDialog openExcelTabsModal()
+    {
+        WebElement exportButton = getExportButton(ExportType.EXCEL);
+        exportButton.click();
+
+        return new TabSelectionExportDialog(this.getDriver());
     }
 
     /**
@@ -217,7 +230,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void clickButton(String buttonCaption)
     {
-        Locator.buttonContainingText(buttonCaption).waitForElement(this, 5_000).click();
+        BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000).click();
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
@@ -415,6 +428,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return this;
     }
 
+    public String getSearchExpression()
+    {
+        return elementCache().searchBox.get();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -491,6 +509,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         ALL,
         SAMPLES,
-        ALIQUOTS;
+        ALIQUOTS
     }
 }
