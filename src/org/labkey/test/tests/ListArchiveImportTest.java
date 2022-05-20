@@ -69,7 +69,7 @@ public class ListArchiveImportTest extends BaseWebDriverTest
         final String listName = "People";
 
         log("Import list and test for expected validation error");
-        clickFolder(getProjectName());
+        goToProjectHome();
 
         goToManageLists().importListArchive(new ZipUtil(listArchive).tempZip());
 
