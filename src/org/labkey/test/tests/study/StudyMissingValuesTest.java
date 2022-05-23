@@ -134,7 +134,7 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         importDataPage = DataRegion(getDriver()).find().clickImportBulkData();
 
         importDataPage.setText(TEST_DATA_TWO_COLUMN_DATASET_BAD);
-        importDataPage.submitExpectingError("Value is not a valid missing value indicator: .Q");
+        importDataPage.submitExpectingErrorContaining("Value is not a valid missing value indicator: .Q");
 
         importDataPage.setText(TEST_DATA_TWO_COLUMN_DATASET);
         importDataPage.submit();

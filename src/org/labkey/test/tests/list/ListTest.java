@@ -252,16 +252,16 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test upload data");
         ImportDataPage importDataPage = _listHelper.clickImportData();
-        importDataPage.submitExpectingError("Form contains no data");
+        importDataPage.submitExpectingErrorContaining("Form contains no data");
 
         importDataPage.setText(TEST_FAIL);
-        importDataPage.submitExpectingError("No rows were inserted.");
+        importDataPage.submitExpectingErrorContaining("No rows were inserted.");
 
         importDataPage.setText(TEST_FAIL2);
-        importDataPage.submitExpectingError("Data does not contain required field: Color");
+        importDataPage.submitExpectingErrorContaining("Data does not contain required field: Color");
 
         importDataPage.setText(TEST_FAIL3);
-        importDataPage.submitExpectingError("Could not convert");
+        importDataPage.submitExpectingErrorContaining("Could not convert");
 
         importDataPage.setText(LIST_DATA);
         importDataPage.submit();

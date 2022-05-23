@@ -282,7 +282,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         ImportDataPage importDataPage = new ImportDataPage(getDriver());
         importDataPage.setText(tsvData);
-        importDataPage.submitExpectingError(AFTER_INSERT_ERROR);
+        importDataPage.submitExpectingErrorContaining(AFTER_INSERT_ERROR);
 
         //Check BeforeInsert event
         step = "BeforeInsert";

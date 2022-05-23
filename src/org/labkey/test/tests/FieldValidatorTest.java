@@ -73,7 +73,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
         _listHelper.goToList(LIST_NAME);
         ImportDataPage importDataPage = _listHelper.clickImportData();
         importDataPage.setText(TEST_DATA_FAIL);
-        importDataPage.submitExpectingError(SEX_ERROR_MSG);
+        importDataPage.submitExpectingErrorContaining(SEX_ERROR_MSG);
         assertTextPresent(ID_ERROR_MSG, AGE_ERROR_MSG);
 
         importDataPage.setText(TEST_DATA_PASS).submit();

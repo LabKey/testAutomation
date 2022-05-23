@@ -282,10 +282,10 @@ public class SpecimenTest extends SpecimenBaseTest
 
         ImportDataPage importDataPage = new ImportDataPage(getDriver());
         importDataPage.setText(SPECIMEN_IDS[0]);
-        importDataPage.submitExpectingError("Specimen " + SPECIMEN_IDS[0] + " is unavailable");
+        importDataPage.submitExpectingErrorContaining("Specimen " + SPECIMEN_IDS[0] + " is unavailable");
 
         importDataPage.setText(SPECIMEN_IDS[1]);
-        importDataPage.submitExpectingError( "Specimen " + SPECIMEN_IDS[1] + " is unavailable");
+        importDataPage.submitExpectingErrorContaining( "Specimen " + SPECIMEN_IDS[1] + " is unavailable");
 
         importDataPage.setText("AAA07XK5-04\nAAA07XK5-06\nAAA07XSF-03"); // add different ones
         importDataPage.submit();

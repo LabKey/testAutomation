@@ -17,6 +17,8 @@ package org.labkey.test.pages;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.components.ext4.Checkbox;
@@ -40,12 +42,12 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         super(driver);
     }
-
-    @Override
-    protected void waitForPage()
-    {
-        shortWait().until(ExpectedConditions.visibilityOf(elementCache().uploadPanel));
-    }
+//
+//    @Override
+//    protected void waitForPage()
+//    {
+//        shortWait().until(ExpectedConditions.visibilityOf(elementCache().uploadPanel));
+//    }
 
     public ImportDataPage setText(String text)
     {
@@ -95,6 +97,13 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         clickAndWait(elementCache().getSubmitButton());
         clearCache();
+        return this;
+    }
+
+    public ImportDataPage submitExpectingErrorContaining(String partialError)
+    {
+        String actualError = submitExpectingError();
+        MatcherAssert.assertThat("Import error message.", partialError, CoreMatchers.containsString(actualError));
         return this;
     }
 
@@ -160,6 +169,11 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
+        public ElementCache()
+        {
+            shortWait().until(ExpectedConditions.visibilityOf(uploadPanel));
+        }
+
         // Upload file
         WebElement uploadPanel = Locator.tagWithAttribute("div", "data-panel-name", "uploadFilePanel").findWhenNeeded(this);
         WebElement uploadFileDiv = Locator.byClass("panel-body").findWhenNeeded(uploadPanel);
