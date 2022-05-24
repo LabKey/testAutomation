@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -9,13 +10,18 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.SimpleHttpResponse;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,6 +31,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
@@ -34,8 +41,12 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 {
     private static final String PROJECT_CREATOR_USER = "project_creator@permission.test";
     private static final String READER = "reader@permission.test";
-    private static final String PROJECT_NAME_PC = "Folder by Project Creator";
+    private static final String PROJECT_NAME_PC = "FolderByProjectCreator";
     private static final String TEMPLATE_PROJECT = "Template project";
+    private static final String TEMPLATE_SUBFOLDER = "Subfolder for template project";
+    private static final String TEMPLATE_FOLDER_PERMISSION = "Data Management";
+
+    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     public static void setup()
@@ -54,11 +65,17 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(TEMPLATE_PROJECT, "Study");
         importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
+        _containerHelper.createSubfolder(TEMPLATE_PROJECT, TEMPLATE_PROJECT, TEMPLATE_SUBFOLDER, "Collaboration", null, true);
+
         _userHelper.createUser(PROJECT_CREATOR_USER, true, true);
         _userHelper.createUser(READER, true, true);
-        ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
-        permHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
-        permHelper.addMemberToRole(PROJECT_CREATOR_USER, "Folder Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
+
+        _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Creator", PermissionsHelper.MemberType.user, "/");
+        _permissionsHelper.addMemberToRole(PROJECT_CREATOR_USER, "Project Admin", PermissionsHelper.MemberType.user, TEMPLATE_PROJECT);
+
+        goToProjectHome(TEMPLATE_PROJECT);
+        _permissionsHelper.createProjectGroup(TEMPLATE_FOLDER_PERMISSION, TEMPLATE_PROJECT);
+        _permissionsHelper.addUserToProjGroup(PROJECT_CREATOR_USER, TEMPLATE_PROJECT, TEMPLATE_FOLDER_PERMISSION);
     }
 
     @Override
@@ -151,6 +168,33 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         assertEquals("Incorrect lists copied from template", Arrays.asList("Lab Machines", "Reagents", "Technicians"), listsGrid.getListNames());
     }
 
+    /*
+        Test coverage for Issue 45273: Importing groups during create from template can result in unauthorized exceptions
+     */
+    @Test
+    public void testCreateProjectByTemplateWithSubfolderAndPermission() throws CommandException, IOException
+    {
+        String containerId = ((APIContainerHelper) _containerHelper).getContainerId(TEMPLATE_PROJECT);
+
+        goToHome();
+        impersonate(PROJECT_CREATOR_USER);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", PROJECT_NAME_PC);
+        params.put("assignProjectAdmin", "true");
+        params.put("folderType", "Template");
+        params.put("templateSourceId", containerId);
+        params.put("templateIncludeSubfolders", "true");
+        params.put("templateWriterTypes", "Role%20assignments%20for%20users%20and%20groups");
+        createProject(params, "Project-level%20groups%20and%20members");
+        stopImpersonating();
+
+        assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
+        WebElement projectTree = projectMenu().expandProjectFully(PROJECT_NAME_PC);
+        assertNotNull("No link to subfolder: /" + TEMPLATE_PROJECT + "/" + TEMPLATE_SUBFOLDER, Locator.linkWithText(TEMPLATE_SUBFOLDER).findElementOrNull(projectTree));
+        goToProjectHome(PROJECT_NAME_PC);
+        goToFolderPermissions().isUserInGroup(PROJECT_CREATOR_USER, TEMPLATE_FOLDER_PERMISSION, PermissionsHelper.PrincipalType.USER);
+    }
+
     private String createProject(Map<String, Object> params) throws IOException
     {
         PostCommand<CommandResponse> command = new PostCommand<>("admin", "createProject");
@@ -165,6 +209,25 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         }
 
         return "Success";
+    }
+
+    private void createProject(Map<String, Object> params, String additionalWriters)
+    {
+        String createProjectUrl = WebTestHelper.buildURL("admin", "createProject", params);
+        createProjectUrl = createProjectUrl.replace("view", "api");
+        createProjectUrl = createProjectUrl + "&templateWriterTypes=" + additionalWriters;
+        SimpleHttpRequest createProjectRequest = new SimpleHttpRequest(createProjectUrl, "POST");
+        createProjectRequest.copySession(getDriver());
+
+        try
+        {
+            SimpleHttpResponse response = createProjectRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
 
