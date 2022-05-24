@@ -91,7 +91,6 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         final List<WebElement> tabs = new ArrayList<>();
         private final Locator.XPathLocator tabLoc = Locator.tag("a").withAttribute("role", "tab");
         final WebElement tabContent = Locator.xpath("./div").withClass("tab-content").findWhenNeeded(this);
-        final Map<String, WebElement> tabPanels = new HashMap<>();
 
         public ElementCache()
         {
@@ -129,23 +128,21 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
             return tabMap.get(tabText);
         }
 
+        // Tab panels can be updated and changed when flipping between tabs. Don't persist the panel element find it each time.
         WebElement findTabPanel(String tabText)
         {
-            if (!tabPanels.containsKey(tabText))
+            String panelId = findTab(tabText).getAttribute("aria-controls");
+            WebElement panelEl;
+            try
             {
-                String panelId = findTab(tabText).getAttribute("aria-controls");
-                WebElement panelEl;
-                try
-                {
-                    panelEl = Locator.id(panelId).findElement(tabContent);
-                }
-                catch (NoSuchElementException ex)
-                {
-                    throw new NoSuchElementException("Panel not found for tab : " + tabText, ex);
-                }
-                tabPanels.put(tabText, panelEl);
+                panelEl = Locator.id(panelId).findElement(tabContent);
             }
-            return tabPanels.get(tabText);
+            catch (NoSuchElementException ex)
+            {
+                throw new NoSuchElementException("Panel not found for tab : " + tabText, ex);
+            }
+
+            return panelEl;
         }
     }
 
