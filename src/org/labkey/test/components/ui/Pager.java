@@ -81,6 +81,20 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return size;
     }
 
+    /**
+     * Helper to see if the paging menu is visible.
+     * Basically this is to check issue 45451.
+     *
+     * @return True if the dropdown page menu is visible, false otherwise.
+     */
+    public boolean isPagingMenuVisible()
+    {
+        Locator dropMenuLocator = Locator.tagWithClass("ul", "dropdown-menu");
+        WebElement gridPanel = Locator.tagWithClass("div", "grid-panel__body").findElement(getDriver());
+        WebElement dropDownMenu = dropMenuLocator.findWhenNeeded(gridPanel);
+        return dropDownMenu.isDisplayed();
+    }
+
     public boolean hasPaginationControls()
     {
         return Locator.tagWithClass("div", "pagination-button-group")

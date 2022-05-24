@@ -378,20 +378,6 @@ public class GridPanelTest extends BaseWebDriverTest
     }
 
     /**
-     * Helper to see if the paging menu is visible.
-     * Basically this is to check issue 45451.
-     *
-     * @return True if the dropdown page menu is visible, false otherwise.
-     */
-    public boolean isPagingMenuVisible()
-    {
-        Locator dropMenuLocator = Locator.tagWithClass("ul", "dropdown-menu");
-        WebElement gridPanel = Locator.tagWithClass("div", "grid-panel__body").findElement(getDriver());
-        WebElement dropDownMenu = dropMenuLocator.findWhenNeeded(gridPanel);
-        return dropDownMenu.isDisplayed();
-    }
-
-    /**
      * Validate that using the 'First Page' and 'Last Page' navigation works as expected.
      */
     @Test
@@ -415,7 +401,7 @@ public class GridPanelTest extends BaseWebDriverTest
         checker()
                 .withScreenshot("Last_Page_Dropdown_Menu_Visible")
                 .verifyFalse("After selecting 'Last Page' the dropdown menu is still visible, it should not be.",
-                        isPagingMenuVisible());
+                        grid.getGridBar().pager().isPagingMenuVisible());
 
         int expectedNumOfPages = FILTER_SAMPLE_TYPE_SIZE / DEFAULT_PAGE_SIZE;
         checker().verifyEquals("Page number not as expected.",
@@ -434,7 +420,7 @@ public class GridPanelTest extends BaseWebDriverTest
         grid.getGridBar().jumpToPage("First Page");
 
         checker().verifyFalse("After selecting 'First Page' the dropdown menu is still visible, it should not be.",
-                isPagingMenuVisible());
+                grid.getGridBar().pager().isPagingMenuVisible());
 
         checker().verifyEquals("Page number not as expected.",
                 1, grid.getGridBar().getCurrentPage());
@@ -492,7 +478,7 @@ public class GridPanelTest extends BaseWebDriverTest
         checker()
                 .withScreenshot("Larger_Page_Size_Dropdown_Menu_Visible")
                 .verifyFalse("After selecting a page size the dropdown menu is still visible, it should not be.",
-                        isPagingMenuVisible());
+                        grid.getGridBar().pager().isPagingMenuVisible());
 
         checker().verifyTrue("After resize there are no paging control, there should be.",
                 grid.getGridBar().pager().hasPaginationControls());
@@ -522,7 +508,7 @@ public class GridPanelTest extends BaseWebDriverTest
         checker()
                 .withScreenshot("Smaller_page_Size_Dropdown_Menu_Visible")
                 .verifyFalse("After selecting a page size the dropdown menu is still visible, it should not be.",
-                        isPagingMenuVisible());
+                        grid.getGridBar().pager().isPagingMenuVisible());
 
         checker().verifyTrue("After resetting there are no paging control, there should be.",
                 grid.getGridBar().pager().hasPaginationControls());
