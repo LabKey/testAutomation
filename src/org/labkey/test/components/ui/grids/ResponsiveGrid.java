@@ -182,7 +182,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
         getWrapper().scrollIntoView(headerCell);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(headerCell));    //
+        getWrapper().scrollBy(0, 1); // First scroll fails sometimes
         getWrapper().scrollBy(0, 250);
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
