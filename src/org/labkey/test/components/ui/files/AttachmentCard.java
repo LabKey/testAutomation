@@ -42,7 +42,9 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
 
     public String getFileName()
     {
-        return getComponentElement().getAttribute("title");
+        String title = getComponentElement().getAttribute("title");
+        String[] filePath = title.split("/");
+        return filePath[filePath.length - 1];
     }
 
     public String getSize()
