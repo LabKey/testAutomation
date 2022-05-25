@@ -92,8 +92,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public T sortColumnAscending(String columnLabel)
     {
-        doAndWaitForUpdate(()->
-            sortColumn(columnLabel, SortDirection.ASC));
+        sortColumn(columnLabel, SortDirection.ASC);
         return getThis();
     }
 
@@ -104,8 +103,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public T sortColumnDescending(String columnLabel)
     {
-        doAndWaitForUpdate(()->
-            sortColumn(columnLabel, SortDirection.DESC));
+        sortColumn(columnLabel, SortDirection.DESC);
         return getThis();
     }
 
@@ -184,11 +182,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
         getWrapper().scrollIntoView(headerCell);
+        getWrapper().scrollBy(0, 1); // First scroll fails sometimes
         getWrapper().scrollBy(0, 250);
 
-        Locator.tagWithClass("span", "fa-chevron-circle-down")
-                .findElement(headerCell)
-                .click();
+        WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
+                .findElement(headerCell);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
+        toggle.click();
 
         WebElement menuItem = Locator.css("li > a").containing(menuText).findElement(headerCell);
         waitFor(()-> menuItem.isDisplayed(), 1000);
