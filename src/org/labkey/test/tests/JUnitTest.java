@@ -43,6 +43,7 @@ import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
+import org.labkey.test.SuiteBuilder;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -155,6 +156,7 @@ public class JUnitTest extends TestSuite
         if (categories.isEmpty())
             return new TestSuite();
 
+        final List<SuiteBuilder.SuiteInfo> suiteInfos = categories.stream().map(SuiteBuilder.SuiteInfo::new).toList();
         try
         {
             return _suite(testProps -> {
@@ -164,9 +166,10 @@ public class JUnitTest extends TestSuite
                     if (testCategories.contains(excludedCategory))
                         return false;
                 }
-                for (String suite : categories)
+                for (SuiteBuilder.SuiteInfo suiteInfo : suiteInfos)
                 {
-                    if (testCategories.contains(suite))
+                    if (testCategories.contains(suiteInfo.getName()) &&
+                            suiteInfo.getSubset() == suiteInfo.getSubsetCount()) // Only run in last shard for sharded suite
                         return true;
                 }
                 return testCategories.contains("smoke"); // Always run smoke tests

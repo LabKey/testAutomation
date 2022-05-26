@@ -247,29 +247,11 @@ public class SuiteBuilder
 
     public TestSet getTestSet(String suiteName)
     {
-        boolean optional = false;
-        if (suiteName.startsWith("?"))
-        {
-            optional = true;
-            suiteName = suiteName.substring(1);
-        }
-        // Support syntax for splitting up test suites
-        // e.g. "Daily[1/3]" to select the first third of tests in the Daily suite
-        int subset = 1;
-        int subsetCount = 1;
-        Pattern pattern = Pattern.compile("(.+)\\[(\\d+)/(\\d+)]");
-        Matcher matcher = pattern.matcher(suiteName);
-        if (matcher.matches())
-        {
-            subset = Integer.parseInt(matcher.group(2));
-            subsetCount = Integer.parseInt(matcher.group(3));
-            if (subset < 1 || subsetCount < 1 || subset > subsetCount)
-            {
-                throw new IllegalArgumentException("Invalid subsuite specification: " + suiteName);
-            }
+        SuiteInfo suiteInfo = new SuiteInfo(suiteName);
+        boolean optional = suiteInfo.isOptional();
+        int subset = suiteInfo.getSubset();
+        int subsetCount = suiteInfo.getSubsetCount();
 
-            suiteName = matcher.group(1);
-        }
         Set<Class<?>> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
 
         if (tests != null && _missingTests.containsKey(suiteName))
@@ -343,6 +325,68 @@ public class SuiteBuilder
                 msg.append("\n    ").append(suite).append(": ").append(requestedMissingTests.get(suite));
             }
             throw new IllegalArgumentException(msg.toString());
+        }
+    }
+
+    public static class SuiteInfo
+    {
+        private final String name;
+        private final int subset;
+        private final int subsetCount;
+        private final boolean optional;
+
+        public SuiteInfo(String suiteName)
+        {
+            if (suiteName.startsWith("?"))
+            {
+                optional = true;
+                suiteName = suiteName.substring(1);
+            }
+            else
+            {
+                optional = false;
+            }
+            // Support syntax for splitting up test suites
+            // e.g. "Daily[1/3]" to select the first third of tests in the Daily suite
+            Pattern pattern = Pattern.compile("(.+)\\[(\\d+)/(\\d+)]");
+            Matcher matcher = pattern.matcher(suiteName);
+            if (matcher.matches())
+            {
+                subset = Integer.parseInt(matcher.group(2));
+                subsetCount = Integer.parseInt(matcher.group(3));
+                if (subset < 1 || subsetCount < 1 || subset > subsetCount)
+                {
+                    throw new IllegalArgumentException("Invalid subsuite specification: " + suiteName);
+                }
+
+                name = matcher.group(1);
+            }
+            else
+            {
+                subset = 1;
+                subsetCount = 1;
+                name = suiteName;
+            }
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public int getSubset()
+        {
+            return subset;
+        }
+
+        public int getSubsetCount()
+        {
+            return subsetCount;
+        }
+
+        public boolean isOptional()
+        {
+            return optional;
         }
     }
 }
