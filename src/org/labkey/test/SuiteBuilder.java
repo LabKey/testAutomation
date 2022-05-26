@@ -251,6 +251,7 @@ public class SuiteBuilder
         boolean optional = suiteInfo.isOptional();
         int subset = suiteInfo.getSubset();
         int subsetCount = suiteInfo.getSubsetCount();
+        suiteName = suiteInfo.getName();
 
         Set<Class<?>> tests = _suites.getOrDefault(suiteName, optional ? Collections.emptySet() : null);
 
