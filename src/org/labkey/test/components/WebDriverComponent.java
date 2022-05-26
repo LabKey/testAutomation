@@ -86,10 +86,6 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             return super.waitFor(getDriver());
         }
 
-        /**
-         * @deprecated Use {@link #findOptional()}
-         */
-        @Deprecated
         public C findOrNull()
         {
             return super.findOrNull(getDriver());
