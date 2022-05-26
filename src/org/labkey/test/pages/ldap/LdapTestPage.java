@@ -59,10 +59,10 @@ public class LdapTestPage extends LabKeyPage<LdapTestPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement serverInput = Locator.id("server").refindWhenNeeded(this);
-        WebElement principalInput = Locator.id("principal").refindWhenNeeded(this);
-        WebElement passwordInput = Locator.id("password").refindWhenNeeded(this);
+        WebElement serverInput = Locator.id("server").refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement principalInput = Locator.id("principal").refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement passwordInput = Locator.id("password").refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        WebElement testBtn = Locator.lkButton("Test").refindWhenNeeded(this);
+        WebElement testBtn = Locator.lkButton("Test").refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 }
