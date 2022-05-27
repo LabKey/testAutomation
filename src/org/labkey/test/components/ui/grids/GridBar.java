@@ -416,6 +416,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public GridBar searchFor(String searchStr)
     {
+
+        clearSearch();
+
         _queryGrid.doAndWaitForUpdate(()->
         {
             elementCache().searchBox.set(searchStr);
@@ -442,7 +445,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return elementCache().searchBox.get();
     }
 
-    public GridFilterModal getFilterDialog()
+    public GridFilterModal openFilterDialog()
     {
         clickButton("Filters");
         return new GridFilterModal(getDriver(), _queryGrid);

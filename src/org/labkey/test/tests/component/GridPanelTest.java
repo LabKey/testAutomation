@@ -79,6 +79,7 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final String VIEW_DEFAULT = "Default";
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
     private static final String VIEW_FEWER_COLUMNS = "Fewer_Columns";
+    private static final String VIEW_FILTERED_COLUMN = "Filtered_Column";
     private static final List<String> extraColumnsNames = Arrays.asList("IsAliquot", "GenId"); // Special case for adding the columns to the view and calling getRows api.
     private static final List<String> extraColumnsHeaders = Arrays.asList("Is Aliquot", "Gen Id"); // The column headers as they appear in the UI and exported file.
     private static final List<String> removedColumns = Arrays.asList(FILTER_BOOL_COL);
@@ -204,6 +205,11 @@ public class GridPanelTest extends BaseWebDriverTest
             cv.removeColumn(columnName);
         }
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
+
+        log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
+        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of (example usage: a;b;c)", String.format("%1$s;%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        cv = drtSamples.openCustomizeGrid();
+        cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
         goToProjectHome();
 
@@ -774,7 +780,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         log(String.format("Filter on the '%s' field. This should only provide a 'Filter' tab.", FILTER_INT_COL));
 
@@ -828,7 +834,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         log(String.format("Select '%s' and get the list of values for the field before filtering.", FILTER_STRING_COL));
 
@@ -864,7 +870,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filterDialog.confirm();
 
         log(String.format("Open the dialog again and validate that the list of values to select from for '%s' is reduced.", FILTER_STRING_COL));
-        filterDialog = grid.getGridBar().getFilterDialog();
+        filterDialog = grid.getGridBar().openFilterDialog();
 
         filterDialog.selectField(FILTER_STRING_COL);
 
@@ -889,7 +895,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         log("Validate that applying a filter for a fields checks the values in the dialog.");
 
-        filterDialog = grid.getGridBar().getFilterDialog();
+        filterDialog = grid.getGridBar().openFilterDialog();
         filterDialog.selectField(FILTER_STRING_COL);
 
         String firstFilterValue = stringSets.get(0);
@@ -974,7 +980,7 @@ public class GridPanelTest extends BaseWebDriverTest
         int low = 4;
         int high = INT_MAX - 3;
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         filterDialog.selectField(FILTER_INT_COL);
 
@@ -1067,7 +1073,7 @@ public class GridPanelTest extends BaseWebDriverTest
         int high = INT_MAX - 3;
         int low = 3;
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         filterDialog.selectField(FILTER_INT_COL);
 
@@ -1245,7 +1251,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         grid.getGridBar().clearSearch();
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         filterDialog.selectField(FILTER_STRING_COL);
 
@@ -1343,7 +1349,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         log(String.format("Filter the '%s' column for value '%s'.", FILTER_EXTEND_CHAR_COL, EXTEND_RECORD_STRING));
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         filterDialog.selectField(FILTER_EXTEND_CHAR_COL);
 
@@ -1450,6 +1456,13 @@ public class GridPanelTest extends BaseWebDriverTest
      *                 <li>Verify that the removed field is not shown in the dialog.</li>
      *             </ul>
      *         </li>
+     *         <li>
+     *             Verify filter dialog with a custom view that is only a filter.
+     *             <ul>
+     *                 <li>Verify that the filed filtered by the view does not show as filtered in the dialog.</li>
+     *                 <li>Verify that the values to choose from are limited to the values filtered by the view.</li>
+     *             </ul>
+     *         </li>
      *     </ul>
      * </p>
      * @throws IOException Can be thrown by the call to getRows.
@@ -1465,7 +1478,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         grid.selectView(VIEW_EXTRA_COLUMNS);
 
-        GridFilterModal filterDialog = grid.getGridBar().getFilterDialog();
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
         List<String> actualList = filterDialog.getAvailableFields();
 
@@ -1489,7 +1502,7 @@ public class GridPanelTest extends BaseWebDriverTest
         expectedList.removeAll(extraColumnsHeaders);
         expectedList.removeAll(removedColumns);
 
-        filterDialog = grid.getGridBar().getFilterDialog();
+        filterDialog = grid.getGridBar().openFilterDialog();
         actualList = filterDialog.getAvailableFields();
 
         checker().verifyTrue(String.format("The fields listed in the dialog are not as expected. Expected '%s'.", expectedList),
@@ -1524,7 +1537,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         log("Validate the removed, but filtered column, does not appear in the dialog.");
 
-        filterDialog = grid.getGridBar().getFilterDialog();
+        filterDialog = grid.getGridBar().openFilterDialog();
 
         actualList = filterDialog.getFilteredFields();
 
@@ -1594,7 +1607,7 @@ public class GridPanelTest extends BaseWebDriverTest
         expectedList.add(FILTER_BOOL_COL);
         expectedList.add(FILTER_DATE_COL);
 
-        filterDialog = grid.getGridBar().getFilterDialog();
+        filterDialog = grid.getGridBar().openFilterDialog();
 
         actualList = filterDialog.getAvailableFields();
 
@@ -1613,6 +1626,37 @@ public class GridPanelTest extends BaseWebDriverTest
         checker().screenShotIfNewError("View_Filter_With_Extra_Error");
 
         filterDialog.cancel();
+
+        log("One more check: Select the view that is only a filter.");
+        grid.clearFilters();
+        grid.selectView(VIEW_FILTERED_COLUMN);
+
+        log("Open the filter dialog.");
+        filterDialog = grid.getGridBar().openFilterDialog();
+
+        log("Make sure no fields are shown as filtered.");
+        actualList = filterDialog.getFilteredFields();
+
+        checker().verifyTrue(String.format("The fields '%s' are shown as being filtered. They should not be.", actualList),
+                actualList.isEmpty());
+
+        log("Make sure the values to filter for are as expected.");
+        filterDialog.selectField(FILTER_STRING_COL);
+        actualList = filterDialog.selectFacetTab().getAvailableValues();
+
+        // Going to hard code the expected values rather try and be clever and figure them out.
+        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
+
+        Collections.sort(expectedList);
+        Collections.sort(actualList);
+
+        checker().verifyEquals("Values to choose from should only include those values filtered by the custom view.",
+                expectedList, actualList);
+
+        checker().screenShotIfNewError("View_With_Filter_Error");
+
+        filterDialog.cancel();
+
     }
 
     /**
