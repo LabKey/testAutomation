@@ -291,7 +291,8 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
-        assertElementPresent(Locator.id("table1").append(Locator.tag("td").withText("(2" + NBSP + "responses)")));
+
+        assertElementPresent(Locator.tag("td").withText("(2" + NBSP + "responses)"));
 
         log("Create fake user for permissions check");
         _permissionsHelper.enterPermissionsUI();
@@ -401,7 +402,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
-        assertElementPresent(Locator.id("table1").append(Locator.tag("td").withText("(2" + NBSP + "responses)")));
+        assertElementPresent(Locator.tag("td").withText("(2" + NBSP + "responses)"));
         clickProject(PROJECT_NAME);
         // We now show closed messages by default
         assertTextPresent(MSG2_TITLE);

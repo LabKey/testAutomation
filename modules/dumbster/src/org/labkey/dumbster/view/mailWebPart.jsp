@@ -58,7 +58,7 @@
     %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
 
 %>
-<script type="text/javascript">
+<script type="text/javascript" nonce="<%=getScriptNonce()%>">
 function toggleBody(id)
 {
     var el = Ext4.get(id);

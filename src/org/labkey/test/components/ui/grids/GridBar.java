@@ -5,14 +5,17 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -56,7 +59,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public File exportData(ExportType exportType)
     {
+        WebElement exportButton = getExportButton(exportType);
+        return getWrapper().doAndWaitForDownload(exportButton::click);
+    }
 
+    private WebElement getExportButton(ExportType exportType)
+    {
         WebElement downloadBtn = Locator.tagWithClass("span", "fa-download").findElement(this);
 
         if(!downloadBtn.isDisplayed())
@@ -64,12 +72,15 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         downloadBtn.click();
 
-        // QueryGridPanel (deprecated)
-        Locator.CssLocator queryGridButton = Locator.css("li > a > span").withClass(exportType.buttonCssClass());
-        // GridPanel
-        Locator.CssLocator gridPanelButton = Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass());
-        WebElement exportButton = Locator.CssLocator.union(queryGridButton, gridPanelButton).findElement(this);
-        return getWrapper().doAndWaitForDownload(exportButton::click);
+        return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
+    }
+
+    public TabSelectionExportDialog openExcelTabsModal()
+    {
+        WebElement exportButton = getExportButton(ExportType.EXCEL);
+        exportButton.click();
+
+        return new TabSelectionExportDialog(this.getDriver());
     }
 
     /**
@@ -219,7 +230,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void clickButton(String buttonCaption)
     {
-        Locator.buttonContainingText(buttonCaption).waitForElement(this, 5_000).click();
+        BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000).click();
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
@@ -403,6 +414,25 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     }
 
+    public GridBar searchFor(String searchStr)
+    {
+        elementCache().searchBox.set(searchStr);
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return this;
+    }
+
+    public GridBar clearSearch()
+    {
+        elementCache().searchBox.set("");
+        elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+        return this;
+    }
+
+    public String getSearchExpression()
+    {
+        return elementCache().searchBox.get();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -423,15 +453,15 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         protected final BootstrapMenu aliquotView = BootstrapMenu.finder(getDriver()).locatedBy(
                 Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
+
+        protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
     }
 
     protected static abstract class Locators
     {
         static public Locator.XPathLocator gridBar()
         {
-            // QueryGridModel grid uses query-grid-bar, QueryModel grid uses grid-panel__button-bar
-            return Locator.XPathLocator.union(Locator.tagWithClassContaining("div", "query-grid-bar"),
-                    Locator.tagWithClassContaining("div", "grid-panel__button-bar"));
+            return Locator.tagWithClassContaining("div", "grid-panel__button-bar");
         }
     }
 
@@ -479,6 +509,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         ALL,
         SAMPLES,
-        ALIQUOTS;
+        ALIQUOTS
     }
 }

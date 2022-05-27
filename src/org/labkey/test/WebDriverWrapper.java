@@ -1128,22 +1128,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    /**
-     * Open the specified URL in the browser. Might trigger a page load or a download.
-     * Intended for use by the crawler. See {@link Crawler}.beginAt()
-     * @param relativeURL URL to navigate to
-     * @param millis Max wait for page to load
-     * @param allowDownload 'true' to allow navigation or download. 'false' to expect a navigation
-     * @return array of downloaded files or null if navigation occurred
-     * @deprecated No longer needed by crawler
-     */
-    @Deprecated (since = "22.2")
-    public File[] beginAt(String relativeURL, int millis, boolean allowDownload)
-    {
-        beginAt(relativeURL, millis);
-        return null;
-    }
-
     public long goToURL(final URL url, int milliseconds)
     {
         return beginAt(url.toString(), milliseconds);

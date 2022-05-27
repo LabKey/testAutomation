@@ -56,10 +56,20 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     }
 
     @Override
+    protected void waitForReady()
+    {
+        waitForReady(elementCache());
+    }
+
+    /**
+     * @deprecated Passing in the ElementCache is unnecessary
+     * Move method body to {@link #waitForReady()} once there are no components overriding.
+     */
+    @Deprecated (since = "22.4")
     protected void waitForReady(ElementCache ec)
     {
-        ec.body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
-        WebDriverWrapper.waitFor(() -> ec.body.getText().length() > 0, "Modal dialog not ready", 2000);
+        elementCache().body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
+        WebDriverWrapper.waitFor(() -> elementCache().body.getText().length() > 0, "Modal dialog not ready", 2000);
     }
 
     @Override

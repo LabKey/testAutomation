@@ -27,6 +27,22 @@ public class MultiMenu extends BootstrapMenu
         super(driver, element);
     }
 
+    private WebElement getMenuList()
+    {
+        return Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
+    }
+
+    public WebElement getMenuItem(String text)
+    {
+        return Locator.tag("li").withChild(Locator.tagWithAttribute("a", "role", "menuitem")
+                .withText(text)).findElement(getMenuList());
+    }
+
+    public boolean isMenuItemDisabled(String text)
+    {
+        return getMenuItem(text).getAttribute("class").toLowerCase().contains("disabled");
+    }
+
     /**
      * Send in a list of menu text to click, they will be clicked in the order given.
      *
@@ -36,14 +52,13 @@ public class MultiMenu extends BootstrapMenu
     {
         expand();
 
-        WebElement menuList = Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
+        WebElement menuList = getMenuList();
 
         for (int i = 0; i < pathToAction.size(); i++)
         {
+            Assert.assertFalse("Menu item not enabled.", isMenuItemDisabled(pathToAction.get(i)));
 
-            WebElement menuItem = Locator.tag("li").withChild(Locator.tagWithAttribute("a", "role", "menuitem").withText(pathToAction.get(i))).findElement(menuList);
-
-            Assert.assertFalse("Menu item not enabled.", menuItem.getAttribute("class").toLowerCase().contains("disabled"));
+            WebElement menuItem = getMenuItem(pathToAction.get(i));
 
             if (i < pathToAction.size() - 1)
             {
@@ -222,12 +237,11 @@ public class MultiMenu extends BootstrapMenu
         }
 
         /**
-         * Looks for the export button using the fa-download class
-         * @return export menu utility
+         * Looks for a menu with an 'fa-*' icon instead of text
          */
-        public MultiMenuFinder exportButton()
+        public MultiMenuFinder withButtonIcon(String iconClass)
         {
-            _locator = Locators.menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withChild(Locator.byClass("fa-download")));
+            _locator = Locators.menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withChild(Locator.byClass(iconClass)));
             return this;
         }
 

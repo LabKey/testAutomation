@@ -20,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.BaseDomainDesigner;
@@ -79,7 +80,7 @@ public class DataClassTest extends BaseWebDriverTest
         goToProjectHome();
 
         log("Create an initial data class");
-        String name = "Name Already Exists Test";
+        final String name = "Name Already Exists Test";
         CreateDataClassPage createPage = goToCreateNewDataClass();
         createPage.setName(name).clickSave();
 
@@ -98,6 +99,34 @@ public class DataClassTest extends BaseWebDriverTest
                 "DataClass 'Name Already Exists Test' already exists."),
                 createPage.clickSaveExpectingErrors());
         createPage.clickCancel();
+
+        final String anotherName = "Another Name";
+        log("Try creating data class with a different name");
+        goToCreateNewDataClass().setName(anotherName).clickSave();
+
+        final String renamed = "Updated Name";
+        log("Renaming a data class to a new name");
+        CreateDataClassPage updatePage = goToDataClass(anotherName);
+        updatePage.setName(renamed).clickSave();
+        goToProjectHome();
+
+        log("Try renaming a data class to an existing name");
+        updatePage = goToDataClass(renamed);
+        updatePage = updatePage.setName(name);
+
+        assertEquals("Data class name conflict error", Arrays.asList(
+                        "DataClass 'Name Already Exists Test' already exists.",
+                        "Please correct errors in Name Already Exists Test before saving."),
+                updatePage.clickSaveExpectingErrors());
+        updatePage.clickCancel();
+    }
+
+    private CreateDataClassPage goToDataClass(String dataClassName)
+    {
+        clickAndWait(Locator.linkWithText(dataClassName));
+        assertElementPresent(Locator.tagWithText("h3", dataClassName));
+        clickButton("Edit Data Class");
+        return new CreateDataClassPage(getDriver());
     }
 
     @Test
@@ -187,7 +216,7 @@ public class DataClassTest extends BaseWebDriverTest
         domainFormPanel.addField(new FieldDefinition("Duplicate", FieldDefinition.ColumnType.Boolean));
         assertEquals("Data class unique field name error", Arrays.asList(
                 "The field name 'Duplicate' is already taken. Please provide a unique name for each field.",
-                "Please correct errors in Fields before saving."),
+                "Please correct errors in Unique Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 

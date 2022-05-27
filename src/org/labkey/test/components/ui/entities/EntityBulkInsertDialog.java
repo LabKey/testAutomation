@@ -320,10 +320,10 @@ public class EntityBulkInsertDialog extends ModalDialog
     }
 
     @Override
-    protected void waitForReady(ModalDialog.ElementCache ec)
+    protected void waitForReady()
     {
-        super.waitForReady(ec);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable( ((ElementCache)ec).addRowsButton ));
+        super.waitForReady();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable( elementCache().addRowsButton ));
     }
 
     @Override

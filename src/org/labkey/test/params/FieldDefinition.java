@@ -18,16 +18,24 @@ package org.labkey.test.params;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.junit.Assert;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FieldDefinition extends PropertyDescriptor
 {
+    private static final String SNOWMAN = "\u2603";
+    private static final String ANGSTROM = "\u00C5";
+    private static final String A_UMLAUT = "\u00E4";
+    // Non-alphanumeric characters supported for field names
+    public static final String TRICKY_CHARACTERS = "><&$,/%\\'}{][ \"" + SNOWMAN + ANGSTROM + A_UMLAUT;
+
     // for UI helpers
     private ColumnType _type;
     private LookupInfo _lookup;
@@ -384,6 +392,13 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public FieldDefinition setTextChoiceValues(List<String> values)
+    {
+        Assert.assertEquals("Invalid field type for text choice values.", ColumnType.TextChoice, getType());
+        setValidators(List.of(new FieldDefinition.TextChoiceValidator(values)));
+        return this;
+    }
+
     public enum RangeType
     {
         Equals("Equals", Filter.Operator.EQUAL),
@@ -431,7 +446,10 @@ public class FieldDefinition extends PropertyDescriptor
         VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
         VisitDate("Visit Date","dateTime","http://cpas.labkey.com/Study#VisitId",null),
         Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials")),
-        Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
+        Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null),
+        TextChoice("Text Choice", "string", "http://www.labkey.org/types#textChoice", null),
+        SMILES("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null),
+        ;
 
         private final String _label; // the display value in the UI for this kind of field
         private final String _rangeURI;     // the key used inside the API
@@ -463,7 +481,7 @@ public class FieldDefinition extends PropertyDescriptor
             return _conceptURI;
         }
 
-        protected LookupInfo getLookupInfo()
+        public LookupInfo getLookupInfo()
         {
             return _lookupInfo;
         }
@@ -474,7 +492,7 @@ public class FieldDefinition extends PropertyDescriptor
         LINEAR("Linear"),
         LOG("Log");
 
-        String _text;
+        private final String _text;
 
         ScaleType(String text)
         {
@@ -500,7 +518,7 @@ public class FieldDefinition extends PropertyDescriptor
         LAST_ENTERED("Last entered"),
         FIXED_NON_EDITABLE("Fixed value");
 
-        String _text;
+        private final String _text;
 
         DefaultType(String text)
         {
@@ -834,6 +852,49 @@ public class FieldDefinition extends PropertyDescriptor
         {
             return _secondRange;
         }
+    }
+
+    /**
+     * TextChoice is implemented using a validator, however it is more 'limited' in scope. The user does not name a TextChoice
+     * validator or add a description or error message. A TextChoice is a lot like a look-up field, but it is not linked
+     * to an external data source. The user only provides the list of (string) values that the field will display in the dropdown.
+     * Another difference is that there can only be one TextChoice on a field, whereas you can have multiple validators on a field.
+     */
+    public static class TextChoiceValidator extends FieldValidator<TextChoiceValidator>
+    {
+        private final List<String> _values;
+
+        public TextChoiceValidator(List<String> values)
+        {
+            // The TextChoice validator only has a name and no description or message.
+            // And the name is generated (not user defined).
+            super("Text Choice Validator", "", "");
+            _values = Collections.unmodifiableList(values);
+        }
+
+        @Override
+        protected TextChoiceValidator getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected String getType()
+        {
+            return "TextChoice";
+        }
+
+        @Override
+        protected String getExpression()
+        {
+            return String.join("|", _values);
+        }
+
+        public List<String> getValues()
+        {
+            return _values;
+        }
+
     }
 
 }

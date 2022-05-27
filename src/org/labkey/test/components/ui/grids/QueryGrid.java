@@ -4,17 +4,19 @@
  */
 package org.labkey.test.components.ui.grids;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.Panel;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
-import org.labkey.test.components.ui.OmniBox;
-import org.openqa.selenium.NoSuchElementException;
+import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,8 +24,8 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * The 'grid' element that contains two components.
- * <p>The first component is a grid header bar which contains the omni-box, the paging
- * controls, 'Select All' controls etc...
+ * <p>The first component is a grid header bar which contains the search input, the paging
+ * controls, 'Select All' controls, filter status display, etc...
  * </p>
  * <p>The second component is the responsive grid which is the grid data.</p>
  */
@@ -37,6 +39,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         super(element, driver);
         _queryGridPanel = element;
         _driver = driver;
+    }
+
+    protected QueryGrid(QueryGrid wrappedGrid)
+    {
+        this(wrappedGrid.getComponentElement(), wrappedGrid.getDriver());
     }
 
     @Override
@@ -111,32 +118,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
-    public boolean gridErrorMessagePresent()
-    {
-        try
-        {
-            WebElement alert = Locator.tagWithClass("div", "alert").findElement(this);
-            return alert.isDisplayed();
-        }
-        catch(NoSuchElementException nse)
-        {
-            return false;
-        }
-
-    }
-
-    public String getGridErrorMessage()
-    {
-        String errorMsg = "";
-
-        if(gridErrorMessagePresent())
-        {
-            errorMsg = Locator.tagWithClass("div", "alert").findElement(this).getText();
-        }
-
-        return errorMsg;
-    }
-
     // subcomponent getters
 
     public GridBar getGridBar()
@@ -144,9 +125,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().gridBar;
     }
 
-    public OmniBox getOmniBox()
+    public List<FilterStatusValue> getFilterStatusValues()
     {
-        return elementCache().omniBox;
+        return getFilterStatusValues(false);
+    }
+
+    public List<FilterStatusValue> getFilterStatusValues(boolean includeView)
+    {
+        if (includeView)
+            return elementCache().getAllFilterStatusValues();
+        else
+            return elementCache().getFilterStatusFilterValues();
     }
 
     // record count
@@ -171,7 +160,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     @Override
     public void doAndWaitForUpdate(Runnable func)
     {
-        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.findOptionalElement(this);
+        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.findOptionalElement(elementCache());
 
         func.run();
 
@@ -185,43 +174,43 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     // search, sort and filter methods
 
     /**
-     * searches the grid, from the omnibox and waits for the grid to refresh
+     * searches the grid, from the GridBar search input and waits for the grid to refresh
+     * if the searchTerm is different from the current searchTerm
      */
     public QueryGrid search(String searchTerm)
     {
-        getOmniBox().setSearch(searchTerm);
+        String currentSearchExp = getGridBar().getSearchExpression();
+        if (!searchTerm.equals(currentSearchExp))
+            doAndWaitForUpdate(()-> getGridBar().searchFor(searchTerm));
+
         return this;
     }
 
     /**
-     * Applies a sort to the grid via the omnibox and waits for the grid to refresh
+     * removes any search filter applied to the grid by removing the search term, which will update the grid
      */
-    public QueryGrid sortOn(String column, SortDirection direction)
+    public QueryGrid clearSearch()
     {
-        getOmniBox().setSort(column, direction);
+        String currentSearchExp = getGridBar().getSearchExpression();
+        if (!currentSearchExp.isBlank())
+            doAndWaitForUpdate(()-> getGridBar().clearSearch());
+
         return this;
     }
 
     /**
-     * Adds a filter expression to the table via the omnibox, and waits for the grid to update.
-     *
-     * @param columnName Name of the column to filter on.
-     * @param operator Enum value of the operator {@link OmniBox.FilterOperator}.
-     * @param value The value to compare to.
-     * @return The QueryGrid after the filter has been applied.
+     * clears grid filter expressions added by the user (i.e. from the filter modal)
      */
-    public QueryGrid filterOn(String columnName, OmniBox.FilterOperator operator, String value)
+    public QueryGrid clearFilters()
     {
-        getOmniBox().setFilter(columnName, operator, value);
-        return this;
-    }
+        List<FilterStatusValue> valueItems = elementCache().getFilterStatusFilterValues();
+        for (int i = valueItems.size() - 1 ; i >= 0; i--) // dismiss from the right first;
+        {
+            FilterStatusValue obValue = valueItems.get(i);
+            doAndWaitForUpdate(obValue::remove);
+        }
 
-    /**
-     * clears search, sort, and filter expressions via the omnibox
-     */
-    public QueryGrid clearSortsAndFilters()
-    {
-        getOmniBox().clearAll();
+        Assert.assertEquals("not all of the filter values were cleared", 0, elementCache().getFilterStatusFilterValues().size());
         return this;
     }
 
@@ -232,7 +221,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         if (isGridPanel())
         {
-            WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(this);
+            WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(elementCache());
             if (selectAllBtn.isDisplayed())
             {
                 doAndWaitForUpdate(selectAllBtn::click);
@@ -257,7 +246,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public boolean hasItemsSelected()
     {
-        return Locator.tagWithClass("span", "selection-status__count").existsIn(this);
+        return Locator.tagWithClass("span", "selection-status__count").existsIn(elementCache());
     }
 
     public String getSelectionStatusCount()
@@ -273,7 +262,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         {
             if (isGridPanel())
             {
-                WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(this);
+                WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(elementCache());
                 if (clearBtn.isDisplayed())
                 {
                     doAndWaitForUpdate(clearBtn::click);
@@ -297,13 +286,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     // select view
     public QueryGrid selectView(String viewName)
     {
-        WebElement viewBtn = Locator.tagWithClass("span", "fa-table").findElement(this);
-        viewBtn.click();
-
-        WebElement viewMenuItem = Locator.tagWithClass("ul", "dropdown-menu")
-                .child(Locator.tagWithText("li", viewName))
-                .findElement(this);
-        doAndWaitForUpdate(viewMenuItem::click);
+        doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
         return this;
     }
 
@@ -313,7 +296,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     private boolean isGridPanel()
     {
-        return elementCache().selectionStatusContainerLoc.existsIn(this);
+        return elementCache().selectionStatusContainerLoc.existsIn(elementCache());
     }
 
     @Override
@@ -331,7 +314,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
-        final OmniBox omniBox = new OmniBox.OmniBoxFinder(_driver, QueryGrid.this).findWhenNeeded(this);
+
+        final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonIcon("fa-table").findWhenNeeded(this);
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
@@ -339,6 +323,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
                 .child(Locator.tagContainingText("button", "Clear")));
 
+        final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
+
+        public List<FilterStatusValue> getAllFilterStatusValues()
+        {
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
+        }
+
+        public List<FilterStatusValue> getFilterStatusFilterValues()
+        {
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel)
+                    .stream().filter(FilterStatusValue::isFilter).toList();
+        }
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>

@@ -59,15 +59,14 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         int currentPageSize = getPageSize();
         if(currentPageSize != Integer.parseInt(pageSize))
         {
-            _pagedComponent.doAndWaitForUpdate(() -> elementCache().pageSizeDropdown.clickSubMenu(pageSize));
-            WebDriverWrapper.waitFor(()-> currentPageSize != getPageSize(), 1_000);
+            _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(pageSize));
         }
         return this;
     }
 
     public int getPageSize()                // only works on GridPanel
     {
-        return Integer.parseInt(elementCache().pageSizeDropdown.getButtonText());
+        return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
     }
 
     public Pager clickPrevious()
@@ -179,19 +178,14 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     {
         DropdownButtonGroup jumpToDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
                 .withButtonClass("current-page-dropdown").findWhenNeeded(this);
-        DropdownButtonGroup pageSizeDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
-                .withButtonClass("page-size-dropdown").findWhenNeeded(this);
 
-        final Locator.XPathLocator queryGridModelPagingCounts = Locator.tag("span").withAttribute("data-min");
-        final Locator.XPathLocator queryModelPagingCounts = Locator.tagWithClass("span", "pagination-info");
-        final Locator pagingCountsSpan = Locator.XPathLocator.union(queryGridModelPagingCounts, queryModelPagingCounts);
+        final Locator.XPathLocator pagingCountsSpan = Locator.tagWithClass("span", "pagination-info");
 
         WebElement prevButton()
         {
             return Locator.XPathLocator.union(
                     Locator.tagWithClass("button", "pagination-button--previous"),     // used in GridPanel
-                    Locator.tagWithClass("button", "pagination-buttons__prev"),     // used in ReportList
-                    Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-left"))) // used in QueryGridPanel, here for back-support
+                    Locator.tagWithClass("button", "pagination-buttons__prev"))     // used in ReportList
                     .findWhenNeeded(this);
         }
 
@@ -199,8 +193,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         {
             return Locator.XPathLocator.union(
                     Locator.tagWithClass("button", "pagination-button--next"), // used in GridPanel
-                    Locator.tagWithClass("button", "pagination-buttons__next"), // used in ReportList
-                    Locator.tag("button").withChild(Locator.tagWithClass("i", "fa fa-chevron-right")))
+                    Locator.tagWithClass("button", "pagination-buttons__next")) // used in ReportList
                     .findWhenNeeded(this);
         }
 
@@ -212,7 +205,6 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     {
         private final Locator.XPathLocator _baseLocator = Locator.XPathLocator.union(
                 Locator.tagWithClass("div", "pagination-buttons"),  // used in biologics report list
-                Locator.tagWithClass("span", "paging"),             // used in QueryGridPanel, here for backwards-support
                 Locator.tagWithClass("div", "lk-pagination"));      // used in GridPanel
         private final UpdatingComponent _pagedComponent;
 
