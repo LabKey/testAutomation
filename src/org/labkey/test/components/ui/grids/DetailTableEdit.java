@@ -6,10 +6,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.react.FilteringReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -65,7 +65,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public boolean isFieldEditable(String fieldCaption)
     {
         // TODO Could put a check here to see if a field is loading then return false, or wait.
-        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(elementCache().editPanel);
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
         return isEditableField(fieldValueElement);
     }
 
@@ -83,7 +83,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public String getReadOnlyField(String fieldCaption)
     {
-        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(elementCache().editPanel);
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
         return fieldValueElement.findElement(By.xpath("./div/*")).getText();
     }
 
@@ -95,7 +95,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public String getTextField(String fieldCaption)
     {
-        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(elementCache().editPanel);
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
         WebElement textElement = fieldValueElement.findElement(By.xpath("./div/div/*"));
         if(textElement.getTagName().equalsIgnoreCase("textarea"))
             return textElement.getText();
@@ -114,7 +114,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         if(isFieldEditable(fieldCaption))
         {
-            WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
+            WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
 
             WebElement editableElement = fieldValueElement.findElement(By.xpath("./div/div/*"));
             String elementType = editableElement.getTagName().toLowerCase().trim();
@@ -176,7 +176,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setBooleanField(String fieldCaption, boolean value)
     {
 
-        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption).findElement(getComponentElement());
+        WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
         Assert.assertTrue(String.format("Field '%s' is not editable and cannot be set.", fieldCaption), isEditableField(fieldValueElement));
 
         // The text used in the field caption and the value of the name attribute in the checkbox don't always have the same case.
@@ -217,10 +217,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     public FileUploadField getFileField(String fieldCaption)
     {
-        return elementCache()
-                .fileField(fieldCaption)
-                .timeout(4000)
-                .find(getComponentElement());
+        return elementCache().fileField(fieldCaption);
     }
 
     public DetailTableEdit setFileField(String fieldCaption, File file)
@@ -233,13 +230,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     public DetailTableEdit removeFileField(String fieldCaption)
     {
-        return removeFileField(fieldCaption, "file");
-    }
-
-    public DetailTableEdit removeFileField(String fieldCaption, String fileNoun)
-    {
-        getFileField(fieldCaption)
-                .removeFile(fileNoun);
+        getFileField(fieldCaption).removeFile();
 
         return this;
     }
@@ -397,15 +388,14 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         public WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
                 .findWhenNeeded(this);
 
-        public Locator fieldValue(String caption)
+        public WebElement fieldValue(String caption)
         {
-            return Locator.tagWithAttribute("td", "data-caption", caption);
+            return Locator.tagWithAttribute("td", "data-caption", caption).findElement(editPanel);
         }
 
-        public FileUploadField.FileUploadFieldFinder fileField(String caption)
+        public FileUploadField fileField(String caption)
         {
-            return new FileUploadField.FileUploadFieldFinder(getDriver())
-                    .withLabel(caption);
+            return new FileUploadField(fieldValue(caption), getDriver());
         }
 
         public Locator validationMsg = Locator.tagWithClass("span", "validation-message");

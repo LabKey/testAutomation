@@ -3,7 +3,7 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.ui.files.FileUploadField;
+import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.ImageFileViewDialog;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -123,30 +123,24 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         return tables.get(0);
     }
 
-    public FileUploadField getFileField(String fieldCaption)
+    public AttachmentCard getFileField(String fieldCaption)
     {
-        return elementCache()
-                .fileField(fieldCaption)
-                .timeout(4000)
-                .find(getComponentElement());
+        return elementCache().fileField(fieldCaption);
     }
 
     public String getFileName(String fieldCaption)
     {
-        return getFileField(fieldCaption)
-                .getAttachedFileName();
+        return getFileField(fieldCaption).getFileName();
     }
 
     public boolean isFileFieldBlank(String fieldCaption)
     {
-        return !getFileField(fieldCaption)
-                .hasAttachedFile();
+        return getFileField(fieldCaption) == null;
     }
 
     public File downloadFileField(String fieldCaption)
     {
-        return getFileField(fieldCaption)
-                .download();
+        return getFileField(fieldCaption).clickDownload();
     }
 
     public ImageFileViewDialog viewImgFile(String fieldCaption)
@@ -181,10 +175,14 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             return new DetailTable.DetailTableFinder(getDriver()).findAll(this);
         }
 
-        public FileUploadField.FileUploadFieldFinder fileField(String caption)
+        public WebElement findValueEl(String caption)
         {
-            return new FileUploadField.FileUploadFieldFinder(getDriver())
-                    .withLabel(caption);
+            return Locator.tagWithAttribute("td", "data-caption", caption).waitForElement(this, 4_000);
+        }
+
+        public AttachmentCard fileField(String caption)
+        {
+            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).findOrNull(findValueEl(caption));
         }
     }
 
