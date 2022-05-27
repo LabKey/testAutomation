@@ -448,6 +448,7 @@ public class FieldDefinition extends PropertyDescriptor
         Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials")),
         Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null),
         TextChoice("Text Choice", "string", "http://www.labkey.org/types#textChoice", null),
+        SMILES("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null),
         ;
 
         private final String _label; // the display value in the UI for this kind of field
@@ -491,7 +492,7 @@ public class FieldDefinition extends PropertyDescriptor
         LINEAR("Linear"),
         LOG("Log");
 
-        String _text;
+        private final String _text;
 
         ScaleType(String text)
         {
@@ -517,7 +518,7 @@ public class FieldDefinition extends PropertyDescriptor
         LAST_ENTERED("Last entered"),
         FIXED_NON_EDITABLE("Fixed value");
 
-        String _text;
+        private final String _text;
 
         DefaultType(String text)
         {

@@ -242,10 +242,6 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return component;
         }
 
-        /**
-         * @deprecated Use {@link #findOptional(SearchContext)}
-         */
-        @Deprecated
         public C findOrNull(S context)
         {
             return findOptional(context).orElse(null);
