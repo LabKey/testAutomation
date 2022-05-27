@@ -315,7 +315,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
 
-        final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonIcon("fa-table").findWhenNeeded(this);
+        final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Views").findWhenNeeded(this);
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
