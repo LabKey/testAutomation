@@ -5,11 +5,10 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.react.DropdownButtonGroup;
+import org.labkey.test.components.react.MultiMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -45,13 +44,14 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     public Pager jumpToPage(String jumpTo)      // only works on GridPanel
     {
         _pagedComponent.doAndWaitForUpdate(()->
-                elementCache().jumpToDropdown.clickSubMenu(jumpTo));
+                elementCache().jumpToDropdown.clickSubMenu(false, jumpTo));
+
         return this;
     }
 
     public int getCurrentPage()                 // only works on GridPanel
     {
-        return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
+        return Integer.parseInt(elementCache().currentPageButton.getText());
     }
 
     public Pager selectPageSize(String pageSize)    // only works on GridPanel
@@ -59,14 +59,46 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         int currentPageSize = getPageSize();
         if(currentPageSize != Integer.parseInt(pageSize))
         {
-            _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(pageSize));
+            _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(false, pageSize));
         }
         return this;
     }
 
     public int getPageSize()                // only works on GridPanel
     {
-        return Integer.parseInt(elementCache().jumpToDropdown.getButtonText());
+        // Changing the jumpToDropdown button from the deprecated DropdownButtonGroup class to a MultiMenu type has changed
+        // the way that various text from the control is gathered. Getting the current page size now requires that the dropdown
+        // be expanded and the selected page size found in the list.
+
+        elementCache().jumpToDropdown.expand();
+
+        // Find the selected li element in the page size list (//div[@class='grid-panel__button-bar']//ul[contains(@aria-labelledby,'current-page-drop')]//li[@class='active'])
+        WebElement activeLi = Locator.tagWithAttributeContaining("ul", "aria-labelledby", "current-page-drop").childTag("li").withAttribute("class", "active").findElement(this);
+
+        int size = Integer.parseInt(activeLi.getText());
+        elementCache().jumpToDropdown.collapse();
+
+        return size;
+    }
+
+    /**
+     * Helper to see if the paging menu is visible.
+     * Basically this is to check issue 45451.
+     *
+     * @return True if the dropdown page menu is visible, false otherwise.
+     */
+    public boolean isPagingMenuVisible()
+    {
+        Locator dropMenuLocator = Locator.tagWithClass("ul", "dropdown-menu");
+        WebElement gridPanel = Locator.tagWithClass("div", "grid-panel__body").findElement(getDriver());
+        WebElement dropDownMenu = dropMenuLocator.findWhenNeeded(gridPanel);
+        return dropDownMenu.isDisplayed();
+    }
+
+    public boolean hasPaginationControls()
+    {
+        return Locator.tagWithClass("div", "pagination-button-group")
+                .findWhenNeeded(getComponentElement()).isDisplayed();
     }
 
     public Pager clickPrevious()
@@ -176,8 +208,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        DropdownButtonGroup jumpToDropdown = new DropdownButtonGroup.DropdownButtonGroupFinder(getDriver())
+        // Was previously a DropdownButtonGroup type, which is a deprecated class.
+        MultiMenu jumpToDropdown = new MultiMenu.MultiMenuFinder(getDriver())
                 .withButtonClass("current-page-dropdown").findWhenNeeded(this);
+
+        WebElement currentPageButton = Locator.tagWithClass("button", "current-page-dropdown").refindWhenNeeded(this);
 
         final Locator.XPathLocator pagingCountsSpan = Locator.tagWithClass("span", "pagination-info");
 
