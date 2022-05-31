@@ -60,18 +60,22 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     public WebElement selectTab(String tabText)
     {
+        elementCache().findTab(tabText).click();
         WebElement panel = findPanelForTab(tabText);
-        if (!panel.isDisplayed())
-        {
-            elementCache().findTab(tabText).click();
-            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
-        }
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
         return panel;
     }
 
     public boolean isTabSelected(String tabText)
     {
         return Boolean.valueOf(elementCache().findTab(tabText).getAttribute("aria-selected"));
+    }
+
+    public List<String> getTabText()
+    {
+        List<WebElement> tabs = elementCache().findAllTabs();
+        return tabs
+                .stream().map(WebElement::getText).toList();
     }
 
     @Override
@@ -87,7 +91,6 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         final List<WebElement> tabs = new ArrayList<>();
         private final Locator.XPathLocator tabLoc = Locator.tag("a").withAttribute("role", "tab");
         final WebElement tabContent = Locator.xpath("./div").withClass("tab-content").findWhenNeeded(this);
-        final Map<String, WebElement> tabPanels = new HashMap<>();
 
         public ElementCache()
         {
@@ -125,23 +128,21 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
             return tabMap.get(tabText);
         }
 
+        // Tab panels can be updated and changed when flipping between tabs. Don't persist the panel element find it each time.
         WebElement findTabPanel(String tabText)
         {
-            if (!tabPanels.containsKey(tabText))
+            String panelId = findTab(tabText).getAttribute("aria-controls");
+            WebElement panelEl;
+            try
             {
-                String panelId = findTab(tabText).getAttribute("aria-controls");
-                WebElement panelEl;
-                try
-                {
-                    panelEl = Locator.id(panelId).findElement(tabContent);
-                }
-                catch (NoSuchElementException ex)
-                {
-                    throw new NoSuchElementException("Panel not found for tab : " + tabText, ex);
-                }
-                tabPanels.put(tabText, panelEl);
+                panelEl = Locator.id(panelId).findElement(tabContent);
             }
-            return tabPanels.get(tabText);
+            catch (NoSuchElementException ex)
+            {
+                throw new NoSuchElementException("Panel not found for tab : " + tabText, ex);
+            }
+
+            return panelEl;
         }
     }
 

@@ -47,7 +47,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     }
 
     /**
-     * Check all of the specified options. Should retain any existing selections.
+     * Check all the specified options. Should retain any existing selections.
      * @param values values to select
      */
     public void checkValues(String... values)
@@ -59,7 +59,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     }
 
     /**
-     * Unheck all of the specified options. Other existing selections should be unchanged.
+     * Uncheck all the specified options. Other existing selections should be unchanged.
      * @param values values to deselect
      */
     public void uncheckValues(String... values)
@@ -112,7 +112,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         }
 
         protected final WebElement selectedItemsSection =
-                Locator.byClass("filter-faceted__tags-value").findWhenNeeded(this);
+                Locator.byClass("filter-faceted__tags-div").findWhenNeeded(this);
 
         protected List<String> getSelectedValues()
         {

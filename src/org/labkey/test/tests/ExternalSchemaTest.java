@@ -304,7 +304,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     {
         log("** Trying to visit schema in container where it hasn't been configured");
         beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        assertTitleEquals("404: Error Page -- Could not find schema: Test");
+        assertTitleEquals("404: Error Page -- The specified schema does not exist");
     }
     
     void doTestViaForm()
