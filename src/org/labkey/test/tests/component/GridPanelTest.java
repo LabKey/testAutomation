@@ -1157,7 +1157,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         // Need to change the focus. After removing the first filter the mouse is in the same position which causes the
         // next pill to get the 'x' icon. This causes the next call to getFilterStatusValues to not recognize the pill as a filter.
-        Locator.tagWithClass("div", "grid-panel__title").findElement(getDriver()).click();
+        Locator.tagWithClass("input", "grid-panel__search-input").findElement(getDriver()).click();
 
         FilterStatusValue filterPill = grid.getFilterStatusValues(false).get(0);
 
