@@ -42,12 +42,6 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         super(driver);
     }
-//
-//    @Override
-//    protected void waitForPage()
-//    {
-//        shortWait().until(ExpectedConditions.visibilityOf(elementCache().uploadPanel));
-//    }
 
     public ImportDataPage setText(String text)
     {
