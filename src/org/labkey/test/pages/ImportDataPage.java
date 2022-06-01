@@ -103,7 +103,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     public ImportDataPage submitExpectingErrorContaining(String partialError)
     {
         String actualError = submitExpectingError();
-        MatcherAssert.assertThat("Import error message.", partialError, CoreMatchers.containsString(actualError));
+        MatcherAssert.assertThat("Import error message.", actualError, CoreMatchers.containsString(partialError));
         return this;
     }
 
