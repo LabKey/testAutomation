@@ -214,6 +214,22 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    public boolean hasRemoveAllButton()
+    {
+        return elementCache().removeAllFilters.isDisplayed();
+    }
+
+    public QueryGrid clickRemoveAllButton()
+    {
+        doAndWaitForUpdate(()->elementCache().removeAllFilters.click());
+        return this;
+    }
+
+    public boolean hasSelectAllButton()
+    {
+        return elementCache().selectAllBtnLoc.findWhenNeeded(this).isDisplayed();
+    }
+
     /**
      *  Selects all rows in the target domain, including those on other pages, if there are any
      */
@@ -315,7 +331,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
 
-        final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonIcon("fa-table").findWhenNeeded(this);
+        final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Views").findWhenNeeded(this);
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
@@ -335,6 +351,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel)
                     .stream().filter(FilterStatusValue::isFilter).toList();
         }
+
+        final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
