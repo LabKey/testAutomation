@@ -969,7 +969,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 for (String windowHandle : otherWindowHandles)
                 {
                     getDriver().switchTo().window(windowHandle);
-                    getArtifactCollector().dumpPageSnapshot(testName + "-" + windowHandle, "otherWindows");
+                    String windowName = StringUtils.trimToEmpty(executeScript("return window.name;", String.class));
+                    getArtifactCollector().dumpPageSnapshot(testName + "-" + (windowName.isEmpty() ? windowHandle : windowName), "otherWindows");
                 }
                 if (!otherWindowHandles.isEmpty())
                 {

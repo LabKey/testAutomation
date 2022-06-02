@@ -35,6 +35,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -279,17 +280,17 @@ public class TriggerScriptTest extends BaseWebDriverTest
         tsvData += caughtAfter.toDelimitedString(delimiter);
         tsvData += changedBefore.toDelimitedString(delimiter);
 
-        setFormElement(Locator.id("tsv3"), tsvData);
-        _listHelper.submitImportTsv_error(AFTER_INSERT_ERROR);
+        ImportDataPage importDataPage = new ImportDataPage(getDriver());
+        importDataPage.setText(tsvData);
+        importDataPage.submitExpectingErrorContaining(AFTER_INSERT_ERROR);
 
         //Check BeforeInsert event
         step = "BeforeInsert";
         log("** " + testName + " " + step + " Event");
-        Locator.id("tsv3").findElement(getDriver()).clear();
         tsvData = EmployeeRecord.getTsvHeaders();
         tsvData += changedBefore.toDelimitedString(delimiter);
-        setFormElement(Locator.id("tsv3"), tsvData);
-        _listHelper.submitImportTsv_success();
+        importDataPage.setText(tsvData);
+        importDataPage.submit();
 
         assertElementPresent(Locator.tagWithText("td","Importing TSV"));
         cleanUpListRows();
@@ -388,7 +389,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     @Ignore("Issue 25741: JS triggers for bulk import data (CSV or Excel) of datasets don't fire\n")
     @Test
-    //TODO: enable this test when Issue 25741 is resolved
     public void testDatasetImportTriggers() throws Exception
     {
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
@@ -424,7 +424,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         goToDataset(DATASET_NAME);
         clickButton("Import Data");
-        setFormElement(Locator.id("tsv3"), tsvData);
+        new ImportDataPage(getDriver())
+                .setText(tsvData)
+                .submit();
     }
 
     @Test
