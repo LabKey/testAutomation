@@ -63,7 +63,7 @@ public class ManageStudyPage extends LabKeyPage<ManageStudyPage.ElementCache>
 
     public DomainDesignerPage clickEditAdditionalProperties()
     {
-        waitAndClickAndWait(Locator.linkWithText("Define Custom Properties"));
+        waitAndClickAndWait(Locator.linkWithText("Define Custom Study Properties"));
         return new DomainDesignerPage(getDriver());
     }
 
