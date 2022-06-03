@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Wraps 'labkey-ui-component' defined in <code>public/QueryModel/GridFilterModal.tsx</code>
@@ -55,6 +56,15 @@ public class GridFilterModal extends ModalDialog
         return getWrapper().getTexts(elementCache().findFieldOptions());
     }
 
+    public List<String> getFilteredFields()
+    {
+        List<WebElement> filteredElements = Locator.byClass("list-group-item").withChild(
+                Locator.tagWithClass("span", "filter-modal__field_dot"))
+                .findElements(elementCache().fieldsSelectionPanel);
+
+        return filteredElements.stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
     /**
      * Select the filter expression tab for the current field.
      * @return panel for configuring the filter expression
@@ -62,7 +72,7 @@ public class GridFilterModal extends ModalDialog
     public FilterExpressionPanel selectExpressionTab()
     {
         elementCache().filterTabs.selectTab("Filter");
-        return elementCache().filterExpressionPanel;
+        return elementCache().filterExpressionPanel();
     }
 
     /**
@@ -72,7 +82,33 @@ public class GridFilterModal extends ModalDialog
     public FilterFacetedPanel selectFacetTab()
     {
         elementCache().filterTabs.selectTab("Choose values");
-        return elementCache().filterFacetedPanel;
+        return elementCache().filterFacetedPanel();
+    }
+
+    /**
+     * Get the text of the tabs that are shown.
+     *
+     * @return List of the tabs.
+     */
+    public List<String> getTabText()
+    {
+        return elementCache().filterTabs.getTabText();
+    }
+
+    public String getActiveTab()
+    {
+        String activeTab = "";
+
+        for(String tabText : getTabText())
+        {
+            if(elementCache().filterTabs.isTabSelected(tabText))
+            {
+                activeTab = tabText;
+                break;
+            }
+        }
+
+        return activeTab;
     }
 
     /**
@@ -144,11 +180,14 @@ public class GridFilterModal extends ModalDialog
         protected final WebElement filterPanel = Locator.byClass("filter-modal__col_filter_exp")
                 .findWhenNeeded(this);
         protected final Tabs filterTabs = new Tabs.TabsFinder(getDriver()).refindWhenNeeded(filterPanel);
-        protected final FilterExpressionPanel filterExpressionPanel =
-                new FilterExpressionPanel.FilterExpressionPanelFinder(getDriver()).refindWhenNeeded(filterPanel);
-        protected final FilterFacetedPanel filterFacetedPanel =
-                new FilterFacetedPanel.FilterFacetedPanelFinder(getDriver()).refindWhenNeeded(filterPanel);
-
+        protected final FilterExpressionPanel filterExpressionPanel()
+        {
+            return new FilterExpressionPanel.FilterExpressionPanelFinder(getDriver()).findWhenNeeded(filterPanel);
+        }
+        protected final FilterFacetedPanel filterFacetedPanel()
+        {
+            return new FilterFacetedPanel.FilterFacetedPanelFinder(getDriver()).findWhenNeeded(filterPanel);
+        }
         protected final WebElement submitButton = Locator.css(".modal-footer .btn-success").findWhenNeeded(this);
         protected final WebElement errorAlert = Locator.css(".modal-body .alert-danger").findWhenNeeded(this);
     }

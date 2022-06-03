@@ -100,8 +100,9 @@ public class HTTPApiTest extends BaseWebDriverTest
         waitForText("Like");
 
         log("Upload data");
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(LIST_DATA);
+        _listHelper.clickImportData()
+                .setText(LIST_DATA)
+                .submit();
     }
 
     @Test
