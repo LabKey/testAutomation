@@ -501,8 +501,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 ListHelper.ListColumnType.String, "GlobalPid",
                 new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
         _listHelper.goToList(STUDY_LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(STUDY_LIST_DATA);
+        _listHelper.clickImportData()
+                .setText(STUDY_LIST_DATA)
+                .submit();
 
         log("Create the linked schema to the study.");
         String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
@@ -644,8 +645,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("** Importing some data...");
         beginAt("/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/list-begin.view");
         _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(LIST_DATA);
+        _listHelper.clickImportData()
+                .setText(LIST_DATA)
+                .submit();
 
         log("** Applying metadata xml override to list...");
         beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");

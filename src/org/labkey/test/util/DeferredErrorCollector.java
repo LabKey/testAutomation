@@ -5,9 +5,11 @@ import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
+import org.labkey.junit.LabKeyAssert;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -228,6 +230,20 @@ public class DeferredErrorCollector
     public final boolean verifyNotEquals(String message, Object unexpected, Object actual)
     {
         return wrapAssertion(() -> Assert.assertNotEquals(message, unexpected, actual));
+    }
+
+    /**
+     * Sort the collections before checking to for equal. If not equal record an error message.
+     *
+     * @param message Message to show if check fails.
+     * @param expected The expected collection of objects.
+     * @param actual Actual collection of objects.
+     * @see LabKeyAssert#assertEqualsSorted(String, Collection, Collection)
+     * @return <code>true</code> if sorted collections are not equal
+     */
+    public final <T> boolean verifyEqualsSorted(String message, Collection<T> expected, Collection<T> actual)
+    {
+        return wrapAssertion(() -> LabKeyAssert.assertEqualsSorted(message, expected, actual));
     }
 
     /**
