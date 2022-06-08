@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -56,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -71,7 +73,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     private static final String DB_SCHEMA_NAME = "test";
     private static final String USER_SCHEMA_NAME = "Test";
     private static final String TABLE_NAME = "TestTable";
-    private SchemaHelper _schemaHelper = new SchemaHelper(this);
+    private final SchemaHelper _schemaHelper = new SchemaHelper(this);
 
     private static class Row
     {
@@ -254,11 +256,16 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         setEditable(PROJECT_NAME, false);
         doTestUneditable();
+        assertTrue("expect audit event for external schema creation",
+                getMatchingContainerAuditEvents(PROJECT_NAME, "External schema 'Test' created"));
+        assertTrue("expect audit event for external schema update",
+                getMatchingContainerAuditEvents(PROJECT_NAME, "External schema 'Test' updated"));
 
         // set up an additional db user schema in the sub-folder so we can check container perms
         ensureExternalSchema(PROJECT_NAME + "/" + FOLDER_NAME);
         setEditable(PROJECT_NAME, true);
         setEditable(PROJECT_NAME + "/" + FOLDER_NAME, true);
+        assertTrue(getMatchingContainerAuditEvents(PROJECT_NAME + "/" + FOLDER_NAME, "External schema 'Test' updated"));
 
         doTestViaForm();
         doTestViaJavaApi();
@@ -270,6 +277,15 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         String containerPath = PROJECT_NAME + "/" + FOLDER_NAME_2;
         ensureExternalSchema(containerPath);
         _schemaHelper.deleteSchema(containerPath, USER_SCHEMA_NAME);
+        assertTrue("expect audit event for schema deletion",
+                getMatchingContainerAuditEvents(containerPath, "External schema 'Test' deleted"));
+    }
+
+    boolean getMatchingContainerAuditEvents(String containerPath, String matchingComment)
+    {
+        var rows = executeSelectRowCommand("auditLog", "ContainerAuditEvent",
+                ContainerFilter.Current, containerPath, null).getRows();
+        return rows.stream().anyMatch(a-> a.get("_labkeyurl_container").toString().contains(containerPath) && a.get("comment").toString().equals(matchingComment));
     }
 
     void doTestUneditable()
@@ -446,7 +462,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         log("** Deleting via api: pks=" + join(",", pks) + "...");
         DeleteRowsCommand cmd = new DeleteRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Integer pk : pks)
-            cmd.addRow(Collections.singletonMap("RowId", (Object) pk));
+            cmd.addRow(Collections.singletonMap("RowId", pk));
         
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
