@@ -17,9 +17,9 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
     @Test
     public void testDefaultFolderTypeSetting()
     {
-        String newDefaultFolder = "Targeted MS";
+        String newDefaultFolder = "Assay";
 
-        log("Setting a new default folder type");
+        log(String.format("Setting a new default folder type to '%s'.", newDefaultFolder));
         FolderTypePages folderTypePage = goToAdminConsole().clickFolderType();
         String oldDefaultFolder = folderTypePage.getDefaultFolderType();
         folderTypePage.setDefaultFolderType(newDefaultFolder).clickSave();
@@ -30,9 +30,9 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
         log("Verifying the default folder type while project creation");
         goToCreateProject();
         checker().verifyTrue("Incorrect default folder type selected",
-                RadioButton.RadioButton().withLabel("Panorama").find(getDriver()).isSelected());
+                RadioButton.RadioButton().withLabel(newDefaultFolder).find(getDriver()).isSelected());
 
-        log("Rollback to the old default folder type");
+        log(String.format("Rollback to the old default folder type '%s'.", oldDefaultFolder));
         folderTypePage = goToAdminConsole().clickFolderType();
         folderTypePage.setDefaultFolderType(oldDefaultFolder).clickSave();
     }
