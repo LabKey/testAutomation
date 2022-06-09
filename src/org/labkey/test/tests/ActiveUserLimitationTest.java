@@ -85,7 +85,6 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
                 .saveExpectingErrors();
         assertEquals("Invalid error message", "userLimitLevel: Please enter a valid integer value\n" +
                 "userWarningLevel: Please enter a valid integer value", limitActiveUserPage.getErrorMessage());
-
     }
 
     @Test

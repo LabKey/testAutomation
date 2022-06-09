@@ -85,6 +85,7 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
     {
         return elementCache().errorMsg.getText();
     }
+
     public LimitActiveUserPage saveExpectingErrors()
     {
         elementCache().saveBtn.click();
@@ -122,6 +123,6 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
         protected final WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
         protected final WebElement cancelBtn = Locator.lkButton("Cancel").findWhenNeeded(this);
 
-        protected final WebElement errorMsg = Locator.tagWithClass("div","labkey-error").findWhenNeeded(this);
+        protected final WebElement errorMsg = Locator.tagWithClass("div", "labkey-error").findWhenNeeded(this);
     }
 }
