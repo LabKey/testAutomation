@@ -43,7 +43,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     public String getFileName()
     {
         String title = getComponentElement().getAttribute("title");
-        String[] filePath = title.split("/");
+        String[] filePath = title.split("[/\\\\]"); // '\' for Windows. '/' for MacOS and Linux
         return filePath[filePath.length - 1];
     }
 
