@@ -81,6 +81,16 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
         return this;
     }
 
+    public String getErrorMessage()
+    {
+        return elementCache().errorMsg.getText();
+    }
+    public LimitActiveUserPage saveExpectingErrors()
+    {
+        elementCache().saveBtn.click();
+        return this;
+    }
+
     public ShowAdminPage save()
     {
         clickAndWait(elementCache().saveBtn);
@@ -109,7 +119,9 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
         protected final Input userLimitLevel = Input.Input(Locator.id("userLimitLevel"), getDriver()).findWhenNeeded(this);
         protected final WebElement userLimitMessage = Locator.id("userLimitMessage").findWhenNeeded(this);
 
-        WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
-        WebElement cancelBtn = Locator.lkButton("Cancel").findWhenNeeded(this);
+        protected final WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
+        protected final WebElement cancelBtn = Locator.lkButton("Cancel").findWhenNeeded(this);
+
+        protected final WebElement errorMsg = Locator.tagWithClass("div","labkey-error").findWhenNeeded(this);
     }
 }

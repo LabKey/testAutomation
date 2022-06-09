@@ -66,6 +66,29 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     }
 
     @Test
+    public void validateLimitActiveUserPage()
+    {
+        log("Validating User limit < warning limit");
+        LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
+        limitActiveUserPage.userWarning("Yes").limitActiveUsers("Yes")
+                .setUserLimitLevel("99")
+                .setUserWarningLevel("100")
+                .saveExpectingErrors();
+
+        assertEquals("Invalid error message", "User limit level must be greater than or equal to user warning level.", limitActiveUserPage.getErrorMessage());
+
+        log("Validating user limit and warning limit is integer");
+        limitActiveUserPage = LimitActiveUserPage.beginAt(this);
+        limitActiveUserPage.limitActiveUsers("Yes").userWarning("Yes")
+                .setUserLimitLevel("99FA")
+                .setUserWarningLevel("GH90")
+                .saveExpectingErrors();
+        assertEquals("Invalid error message", "userLimitLevel: Please enter a valid integer value\n" +
+                "userWarningLevel: Please enter a valid integer value", limitActiveUserPage.getErrorMessage());
+
+    }
+
+    @Test
     public void testUserWarning()
     {
         String warningLevel = String.valueOf(getActiveUsers() + 2);
@@ -73,7 +96,9 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         limitActiveUserPage.userWarning("Yes").
                 limitActiveUsers("No").
                 setUserWarningLevel(warningLevel).
-                setUserWarningMessage("You have been warned..! ${WarningLevel} is the limit and currently server has ${ActiveUsers} users");
+                setUserLimitLevel("100").
+                setUserWarningMessage("You have been warned..! ${WarningLevel} is the limit and currently server has ${ActiveUsers} users. " +
+                        "You can add or reactivate ${RemainingUsers} more users.");
         limitActiveUserPage.save();
 
         log("User warning limit is not reached yet");
@@ -83,7 +108,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
 
         log("Verifying the message when user warning limit is reached");
         _userHelper.createUser(USER2);
-        String warningMsg = "You have been warned..! " + warningLevel + " is the limit and currently server has " + getActiveUsers() + " users";
+        String warningMsg = "You have been warned..! " + warningLevel + " is the limit and currently server has " + getActiveUsers() +
+                " users. You can add or reactivate " + (Integer.parseInt(warningLevel) - getActiveUsers()) + " more users.";
         goToSiteUsers();
         assertEquals("Incorrect warning banner message", warningMsg, getBannerText());
         assertTrue("User should have been created with warning message", isTextPresent(USER2));
@@ -141,6 +167,13 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         goToSiteUsers();
         assertTrue("Banner should be present", isBannerPresent());
         assertTrue("User should have been created with banner message", isTextPresent(USER2));
+
+        goToSiteUsers();
+        waitAndClickAndWait(Locator.linkWithText(USER1_DISPLAY_NAME));
+        clickButton("Edit");
+        uncheckCheckbox(Locator.name("quf_System"));
+        clickButton("Submit", 0);
+        assertEquals("Incorrect error message", "User limit has been reached so you can't clear the System field.", Locator.tagWithClass("font", "labkey-error").findElement(getDriver()).getText());
     }
 
     @Test
@@ -183,6 +216,32 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         waitForElement(Locator.tagWithText("span", "Reactivate"));
         clickButton("Reactivate");
         assertTrue("Missing error message", isTextPresent("Failed to activate user2: User limit has been reached so no more users can be reactivated on this deployment."));
+
+        goToSiteUsers();
+        assertTrue(USER1 + " should have been reactivated", isTextPresent(USER1));
+    }
+
+    @Test
+    public void testWarningAndUserLimitBothSet()
+    {
+        log("Setting both user limit and warning limit");
+        String limitLevel = String.valueOf(getActiveUsers() + 1);
+        LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
+        limitActiveUserPage.limitActiveUsers("Yes").
+                userWarning("Yes").
+                setUserLimitLevel(limitLevel).
+                setUserWarningLevel(limitLevel).
+                setUserLimitMessage("You cannot do this..!").
+                setUserWarningMessage("You have been warned..!");
+        limitActiveUserPage.save();
+
+        log("Create the user");
+        _userHelper.createUser(USER1);
+
+        log("Validating only user limit message is displayed");
+        goToSiteUsers();
+        assertEquals("Incorrect warning banner message", "You cannot do this..!", getBannerText());
+        assertTrue("User should have been created with warning message", isTextPresent(USER1));
     }
 
     private int getActiveUsers()
