@@ -5,12 +5,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
 import org.labkey.test.pages.user.ShowUsersPage;
+import org.labkey.test.util.TestLogger;
 
 import java.util.List;
 
@@ -131,11 +133,13 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         assertTrue("User should have been created with banner message", isTextPresent(USER1));
 
         log("Verifying the message when user limit is reached");
-        _userHelper.createUser(USER2, false, false);
+        CreateUserResponse response = _userHelper.createUser(USER2, false, false);
+        String errMsg = response.getParsedData().get("htmlErrors").toString();
         String warningMsg = "You cannot do this..! " + limitLevel + " is the limit and currently server has " + getActiveUsers() +
                 " users You can add or reactivate " + (Integer.parseInt(limitLevel) - getActiveUsers()) + " more users.";
         goToSiteUsers();
         assertEquals("Incorrect warning banner message", warningMsg, getBannerText());
+        assertTrue("User creation failed", errMsg.contains("User limit has been reached so no more users can be added to this deployment."));
         assertFalse("User should not have been created", isTextPresent(USER2));
     }
 
