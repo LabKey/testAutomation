@@ -70,7 +70,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     {
         log("Validating User limit < warning limit");
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.userWarning("Yes").limitActiveUsers("Yes")
+        limitActiveUserPage.userWarning(true).limitActiveUsers(true)
                 .setUserLimitLevel("99")
                 .setUserWarningLevel("100")
                 .saveExpectingErrors();
@@ -79,7 +79,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
 
         log("Validating user limit and warning limit is integer");
         limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.limitActiveUsers("Yes").userWarning("Yes")
+        limitActiveUserPage.limitActiveUsers(true).userWarning(true)
                 .setUserLimitLevel("99FA")
                 .setUserWarningLevel("GH90")
                 .saveExpectingErrors();
@@ -92,8 +92,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     {
         String warningLevel = String.valueOf(getActiveUsers() + 2);
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.userWarning("Yes").
-                limitActiveUsers("No").
+        limitActiveUserPage.userWarning(true).
+                limitActiveUsers(false).
                 setUserWarningLevel(warningLevel).
                 setUserLimitLevel("100").
                 setUserWarningMessage("You have been warned..! ${WarningLevel} is the limit and currently server has ${ActiveUsers} users. " +
@@ -119,8 +119,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     {
         String limitLevel = String.valueOf(getActiveUsers() + 1);
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.limitActiveUsers("Yes").
-                userWarning("No").
+        limitActiveUserPage.limitActiveUsers(true).
+                userWarning(false).
                 setUserLimitLevel(limitLevel).
                 setUserLimitMessage("You cannot do this..! ${LimitLevel} is the limit and currently server has ${ActiveUsers} users");
         limitActiveUserPage.save();
@@ -148,8 +148,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         log("Setting the limit same as current active user");
         String limitLevel = String.valueOf(getActiveUsers());
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.limitActiveUsers("Yes").
-                userWarning("No").
+        limitActiveUserPage.limitActiveUsers(true).
+                userWarning(false).
                 setUserLimitLevel(limitLevel).
                 setUserLimitMessage("You cannot do this..! ${LimitLevel} is the limit and currently server has ${ActiveUsers} users");
         limitActiveUserPage.save();
@@ -185,8 +185,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         log("Setting the limit same as current active user");
         String limitLevel = String.valueOf(getActiveUsers());
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.limitActiveUsers("Yes").
-                userWarning("No").
+        limitActiveUserPage.limitActiveUsers(true).
+                userWarning(false).
                 setUserLimitLevel(limitLevel).
                 setUserLimitMessage("You cannot do this..! ${LimitLevel} is the limit and currently server has ${ActiveUsers} users");
         limitActiveUserPage.save();
@@ -226,8 +226,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         log("Setting both user limit and warning limit");
         String limitLevel = String.valueOf(getActiveUsers() + 1);
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.limitActiveUsers("Yes").
-                userWarning("Yes").
+        limitActiveUserPage.limitActiveUsers(true).
+                userWarning(true).
                 setUserLimitLevel(limitLevel).
                 setUserWarningLevel(limitLevel).
                 setUserLimitMessage("You cannot do this..!").
@@ -259,8 +259,8 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     private void resetLimits()
     {
         LimitActiveUserPage limitActiveUserPage = LimitActiveUserPage.beginAt(this);
-        limitActiveUserPage.limitActiveUsers("No").
-                userWarning("No");
+        limitActiveUserPage.limitActiveUsers(false).
+                userWarning(false);
         limitActiveUserPage.save();
     }
 

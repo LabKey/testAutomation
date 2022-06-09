@@ -23,15 +23,17 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
         return new LimitActiveUserPage(wrapper.getDriver());
     }
 
-    public LimitActiveUserPage userWarning(String value)
+    public LimitActiveUserPage userWarning(boolean value)
     {
-        elementCache().userWarning.selectByVisibleText(value);
+        String setValue = value ? "Yes" : "No";
+        elementCache().userWarning.selectByVisibleText(setValue);
         return this;
     }
 
-    public LimitActiveUserPage limitActiveUsers(String value)
+    public LimitActiveUserPage limitActiveUsers(boolean value)
     {
-        elementCache().limitActiveUsers.selectByVisibleText(value);
+        String setValue = value ? "Yes" : "No";
+        elementCache().limitActiveUsers.selectByVisibleText(setValue);
         return this;
     }
 
