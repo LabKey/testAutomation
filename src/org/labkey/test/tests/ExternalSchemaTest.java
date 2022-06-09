@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,6 +41,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 import org.labkey.test.pages.query.InsertExternalSchemaPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SchemaHelper;
@@ -256,16 +258,14 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         setEditable(PROJECT_NAME, false);
         doTestUneditable();
-        assertTrue("expect audit event for external schema creation",
-                getMatchingContainerAuditEvents(PROJECT_NAME, "External schema 'Test' created"));
-        assertTrue("expect audit event for external schema update",
-                getMatchingContainerAuditEvents(PROJECT_NAME, "External schema 'Test' updated"));
+        assertContainerAuditEvents(PROJECT_NAME, "External schema 'Test' created");
+        assertContainerAuditEvents(PROJECT_NAME, "External schema 'Test' updated");
 
         // set up an additional db user schema in the sub-folder so we can check container perms
         ensureExternalSchema(PROJECT_NAME + "/" + FOLDER_NAME);
         setEditable(PROJECT_NAME, true);
         setEditable(PROJECT_NAME + "/" + FOLDER_NAME, true);
-        assertTrue(getMatchingContainerAuditEvents(PROJECT_NAME + "/" + FOLDER_NAME, "External schema 'Test' updated"));
+        assertContainerAuditEvents(PROJECT_NAME + "/" + FOLDER_NAME, "External schema 'Test' updated");
 
         doTestViaForm();
         doTestViaJavaApi();
@@ -277,15 +277,19 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         String containerPath = PROJECT_NAME + "/" + FOLDER_NAME_2;
         ensureExternalSchema(containerPath);
         _schemaHelper.deleteSchema(containerPath, USER_SCHEMA_NAME);
-        assertTrue("expect audit event for schema deletion",
-                getMatchingContainerAuditEvents(containerPath, "External schema 'Test' deleted"));
+        assertContainerAuditEvents(containerPath, "External schema 'Test' deleted");
     }
 
-    boolean getMatchingContainerAuditEvents(String containerPath, String matchingComment)
+    void assertContainerAuditEvents(String containerPath, String matchingComment)
     {
         var rows = executeSelectRowCommand("auditLog", "ContainerAuditEvent",
                 ContainerFilter.Current, containerPath, null).getRows();
-        return rows.stream().anyMatch(a-> a.get("_labkeyurl_container").toString().contains(containerPath) && a.get("comment").toString().equals(matchingComment));
+        boolean foundEvent = rows.stream().anyMatch(a-> a.get("_labkeyurl_container").toString().contains(containerPath) && a.get("comment").toString().equals(matchingComment));
+        if (!foundEvent)
+        {
+            ShowAuditLogPage.beginAt(this, containerPath, "ContainerAuditEvent");
+            Assert.fail("Event not found: " + matchingComment);
+        }
     }
 
     void doTestUneditable()
