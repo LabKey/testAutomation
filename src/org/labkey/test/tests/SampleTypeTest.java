@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -37,10 +38,13 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
@@ -51,6 +55,7 @@ import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TestUser;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -68,9 +73,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -83,6 +90,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     private static final String LOOKUP_FOLDER = "LookupSampleTypeFolder";
     private static final String CASE_INSENSITIVE_SAMPLE_TYPE = "CaseInsensitiveSampleType";
     private static final String LOWER_CASE_SAMPLE_TYPE = "caseinsensitivesampletype";
+    private static final TestUser USER_FOR_FILTERTEST = new TestUser("filter_user@sampletypetest.test");
 
     @Override
     public List<String> getAssociatedModules()
@@ -127,6 +135,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         // If you are debugging tests change this function to do nothing.
         // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
+        _userHelper.deleteUsers(false, USER_FOR_FILTERTEST.getEmail());
     }
 
     @Test
@@ -161,6 +170,50 @@ public class SampleTypeTest extends BaseWebDriverTest
         assertEquals("Number of samples not as expected", 3, sampleTypeHelper.getSampleCount());
 
         sampleTypeHelper.verifyDataValues(data);
+    }
+
+    @Test
+    public void testMeFilterOnSampleType()
+    {
+        USER_FOR_FILTERTEST.create(this)
+                .addPermission("Folder Administrator", getProjectName());
+        String sampleType = "meFilterSamples";
+        var domainDesigner = CreateSampleTypePage.beginAt(this, getProjectName());
+        domainDesigner.setName(sampleType)
+                .addField(new FieldDefinition("size", ColumnType.Integer))
+                .addField(new FieldDefinition("user", ColumnType.User));
+        var formatDialog = domainDesigner.getFieldsPanel().getField("user").clickConditionalFormatButton();
+        formatDialog.getOpenFormatPanel()
+                .setFirstCondition(Filter.Operator.EQUAL)
+                .setFirstValue("~me~")
+                .setFillColor("#F44E3B")    // red
+                .setBoldCheckbox(true);
+        formatDialog.clickApply();
+        domainDesigner.clickSave();
+
+        var sampleHelper = new SampleTypeHelper(this).goToSampleType(sampleType);
+
+        var insertPage = sampleHelper.getSamplesDataRegionTable().clickInsertNewRow();
+        insertPage.setField("Name", "me")
+                    .setField("size", 2)
+                    .setField("user", OptionSelect.SelectOption.textOption(getDisplayName()))
+                    .submit();
+        insertPage = sampleHelper.getSamplesDataRegionTable().clickInsertNewRow();
+        insertPage.setField("Name", "not me")
+                .setField("size", 3)
+                .setField("user", OptionSelect.SelectOption.textOption(USER_FOR_FILTERTEST.getUserDisplayName()))
+                .submit();
+
+        var meCell = Locator.tag("td").withChild(Locator.tagWithText("a", getDisplayName()))
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        var notMeCell = Locator.tag("td").withChild(Locator.tagWithText("a", USER_FOR_FILTERTEST.getUserDisplayName()))
+                .findElement(getDriver());
+        assertThat("expect custom format for me filter",
+                meCell.getAttribute("style"), containsString("background-color: rgb(244, 78, 59)"));
+        assertThat("expect custom format popup for me filter",
+                meCell.getAttribute("onmouseover"), containsString("Formatting applied because column = ~me~"));
+        assertEquals("expect cell for other user not to get custom format",
+                "", notMeCell.getAttribute("style"));
     }
 
     @Test
@@ -1441,7 +1494,7 @@ public class SampleTypeTest extends BaseWebDriverTest
             }
             else
             {
-                assertThat("Value of attachment column for row " + row + " not exported as expected.", exportedColumn.get(row).trim().toLowerCase(), CoreMatchers.containsString(filePath));
+                assertThat("Value of attachment column for row " + row + " not exported as expected.", exportedColumn.get(row).trim().toLowerCase(), containsString(filePath));
             }
             row++;
         }
