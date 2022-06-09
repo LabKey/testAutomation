@@ -76,6 +76,7 @@ import java.util.Set;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -208,12 +209,12 @@ public class SampleTypeTest extends BaseWebDriverTest
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         var notMeCell = Locator.tag("td").withChild(Locator.tagWithText("a", USER_FOR_FILTERTEST.getUserDisplayName()))
                 .findElement(getDriver());
-        assertThat("expect custom format for me filter",
-                meCell.getAttribute("style"), containsString("background-color: rgb(244, 78, 59)"));
+        assertEquals("expect custom format for me filter",
+                "rgb(244, 78, 59)", meCell.getCssValue("background-color"));
         assertThat("expect custom format popup for me filter",
                 meCell.getAttribute("onmouseover"), containsString("Formatting applied because column = ~me~"));
-        assertEquals("expect cell for other user not to get custom format",
-                "", notMeCell.getAttribute("style"));
+        assertNotEquals("expect cell for other user not to get custom format",
+                "rgb(244, 78, 59)", notMeCell.getCssValue("background-color"));
     }
 
     @Test
