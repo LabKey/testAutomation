@@ -105,7 +105,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -165,7 +164,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public ExtHelper _extHelper;
     public Ext4Helper _ext4Helper;
 
-    private final Stack<String> _locationStack = new Stack<>();
+    private Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
 
     static
@@ -463,7 +462,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Object o = executeScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
+            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o.toString());
 
         return (T) o;
     }
@@ -485,7 +484,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Object o = executeAsyncScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
+            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o.toString());
 
         return (T) o;
     }
@@ -2182,7 +2181,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             log("  File downloaded: " + newFile.getName());
         }
-        assertEquals("Wrong number of files downloaded to " + downloadDir, expectedFileCount, newFiles.length);
+        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
 
         if (getDriver() instanceof FirefoxDriver)
             Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
@@ -2209,7 +2208,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
                     return files != null && files.length == 0;
                 },
-                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_JAVASCRIPT);
+                "Temp files remain in download dir: " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
 
         MutableInt downloadSize = new MutableInt(-1);
         MutableInt stabilityDuration = new MutableInt(0);
@@ -2228,7 +2227,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     return stabilityDuration.getValue() > 5;
                 },
-                "File(s) didn't finish downloading to " + downloadDir, WAIT_FOR_PAGE);
+                "File(s) didn't finish downloading to " + downloadDir.toString(), WAIT_FOR_PAGE);
 
         return downloadDir.listFiles(newFileFilter);
     }
@@ -2458,9 +2457,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String elemText = loc.findElement(getDriver()).getText();
         if(elemText == null)
-            fail("The element at location " + loc + " contains no text! Expected '" + text + "'.");
+            fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
         if(!elemText.contains(text))
-            fail("The element at location '" + loc + "' contains '" + elemText + "'; expected '" + text + "'.");
+            fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
     }
 
     public boolean elementContains(Locator loc, String text)
@@ -2603,15 +2602,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void scrollTo(Integer x, Integer y)
     {
         executeScript("window.scrollTo(" + x.toString() +", " + y.toString() + ");");
-    }
-
-    public void scrollToMiddle(WebElement element)
-    {
-        String scrollYToMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
-                + "var elementTop = arguments[0].getBoundingClientRect().top;"
-                + "window.scrollBy(0, elementTop-(viewPortHeight/2));";
-
-       executeScript(scrollYToMiddle, element);
     }
 
     public void scrollToTop()
@@ -2822,7 +2812,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 y = toEl.getSize().getHeight() / 2;
                 break;
             default:
-                throw new IllegalArgumentException("Unexpected position: " + pos);
+                throw new IllegalArgumentException("Unexpected position: " + pos.toString());
         }
 
         Actions builder = new Actions(getDriver());
@@ -2872,7 +2862,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     @Deprecated public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
-        assertEquals(tableName + "." + row + "." + column + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
+        assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
     }
 
     /**
@@ -2884,7 +2874,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         for (String str : strs)
         {
-            assertTrue(tableName + "." + row + "." + column + " should contain '" + str + "' (actual value is " + cellText + ")", cellText.contains(str));
+            assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\' (actual value is " + cellText + ")", cellText.contains(str));
         }
     }
 
@@ -2897,7 +2887,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         for (String str : strs)
         {
-            assertFalse(tableName + "." + row + "." + column + " should not contain '" + str + "'", cellText.contains(str));
+            assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
         }
     }
 
@@ -3592,7 +3582,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (!"checkbox".equals(type))
         {
-            throw new IllegalArgumentException("Element not a checkbox: " + el + "\nTry Ext4Helper or ExtHelper.");
+            throw new IllegalArgumentException("Element not a checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
         }
 
         Boolean indeterminate = executeScript("return arguments[0].indeterminate;", Boolean.class, el);
@@ -3755,7 +3745,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (paramValue != null && decode)
         {
             paramValue = paramValue.replace("+", "%20");
-            paramValue = URLDecoder.decode(paramValue, StandardCharsets.UTF_8);
+            try
+            {
+                paramValue = URLDecoder.decode(paramValue, "UTF-8");
+            } catch(UnsupportedEncodingException ignore) {}
         }
 
         return paramValue;

@@ -180,9 +180,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
 
-        // scroll the header cell as much to the center of the viewport as possible; if it is at the bottom the menu
-        // fly-up can be problematic to automate, if to the top sometimes that puts it behind the navbar
-        getWrapper().scrollToMiddle(headerCell);
+        // scroll the header cell into view plus some extra vertical scroll to make sure the menu is visible
+        getWrapper().scrollIntoView(headerCell);
+        getWrapper().scrollBy(0, 1); // First scroll fails sometimes
+        getWrapper().scrollBy(0, 250);
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
