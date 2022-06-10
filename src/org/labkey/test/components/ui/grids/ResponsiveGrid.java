@@ -182,7 +182,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         // scroll the header cell as much to the center of the viewport as possible; if it is at the bottom the menu
         // fly-up can be problematic to automate, if to the top sometimes that puts it behind the navbar
-        getWrapper().scrollToMiddle(headerCell);
+        getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scroll X to visible if visible
+        getWrapper().scrollToMiddle(headerCell);    // scroll Y to middle of the viewport to prevent burying behind navbar
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
