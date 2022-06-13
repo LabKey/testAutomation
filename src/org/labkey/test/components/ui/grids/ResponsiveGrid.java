@@ -181,9 +181,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
-
-        // make sure grid headers are in the middle of the page
-        getWrapper().scrollToMiddle(getComponentElement());
+        getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
+        sleep(500);  //it would be nice to find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
+                         //  sleep here to give scrollToMiddle call below a better chance of firing
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
@@ -198,13 +198,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         else
             menuItem.click();
         waitFor(()-> !menuItem.isDisplayed(), 1000);
-    }
-
-    private boolean isElementWithinComponentRectangle(WebElement element)
-    {
-        var containerRect = getComponentElement().getRect();
-        var elementRect = element.getRect();
-        return elementRect.getX() > containerRect.getX();
     }
 
 
