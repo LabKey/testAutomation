@@ -182,10 +182,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
 
-        // scrollIntoView handles horizontal scrolling for cases where the header is non-interactable
-        getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
-        sleep(500);  // todo: find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
-                         //  sleep here to give scrollToMiddle call below a better chance of firing
+        // make sure grid headers are in the middle of the page
+        getWrapper().scrollToMiddle(getComponentElement());
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
