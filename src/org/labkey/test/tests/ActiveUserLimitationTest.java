@@ -58,6 +58,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
         _userHelper.deleteUsers(false, USER1, USER2, USER3);
+        resetLimits();
     }
 
     @Before
