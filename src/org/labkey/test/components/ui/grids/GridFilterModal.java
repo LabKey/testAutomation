@@ -41,7 +41,7 @@ public class GridFilterModal extends ModalDialog
     {
         WebElement fieldItem = elementCache().findFieldOption(fieldLabel);
         fieldItem.click();
-        Locator.byClass("filter-modal__col-sub-title").withText("Find values for " + fieldLabel)
+        Locator.byClass("field-modal__col-sub-title").withText("Find values for " + fieldLabel)
                 .waitForElement(elementCache().filterPanel, 10_000);
 
         return this;
