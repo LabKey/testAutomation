@@ -14,6 +14,7 @@ import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +33,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -179,14 +181,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
-
-        // scroll the header cell as much to the center of the viewport as possible; if it is at the bottom the menu
-        // fly-up can be problematic to automate, if to the top sometimes that puts it behind the navbar
-        getWrapper().scrollToMiddle(headerCell);
+        getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
+        sleep(500);  //it would be nice to find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
+                         //  sleep here to give scrollToMiddle call below a better chance of firing
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
+        getWrapper().scrollToMiddle(toggle);        // scroll the target vertically to the middle of the page
         toggle.click();
 
         WebElement menuItem = Locator.css("li > a").containing(menuText).findElement(headerCell);
@@ -197,6 +199,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             menuItem.click();
         waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
+
 
     /**
      * Check/uncheck row at index
