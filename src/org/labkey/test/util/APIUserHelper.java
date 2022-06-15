@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
@@ -118,7 +119,11 @@ public class APIUserHelper extends AbstractUserHelper
 
             if (verifySuccess)
             {
-                assertNotNull("User already exists: " + userName, response.getMessage());
+                if(response.getMessage() == null)
+                {
+                    TestLogger.error(response.getParsedData().get("htmlErrors").toString());
+                    Assert.fail("Not able to create the user " + userName + " because " + response.getParsedData().get("htmlErrors").toString());
+                }
                 assertEquals(userName, response.getEmail());
                 assertTrue("Invalid userId", response.getUserId() != null);
             }
