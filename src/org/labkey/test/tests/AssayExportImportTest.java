@@ -20,6 +20,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.InferDomainCommand;
+import org.labkey.remoteapi.domain.InferDomainResponse;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -31,6 +40,7 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
@@ -38,6 +48,7 @@ import org.labkey.test.util.PerlHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -113,7 +124,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
     }
 
-    private void createSimpleProjectAndAssay(String projectName, String assayName)
+    private void createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
     {
         final String PERL_SCRIPT = "modifyColumnInAssayRun.pl";
 
@@ -121,32 +132,36 @@ public class AssayExportImportTest extends BaseWebDriverTest
         _containerHelper.createProject(projectName, "Assay");
         goToProjectHome(projectName);
 
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
+        Connection cn = createDefaultConnection();
+        Protocol protocol = new GetProtocolCommand("General").execute(cn, projectName).getProtocol();
+        protocol.setName(assayName);
+        protocol.setProtocolTransformScripts(List.of(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT).getAbsolutePath()));
+        protocol.setSaveScriptFiles(true);
+        protocol.setEditableResults(true);
+        protocol.setEditableRuns(true);
 
-        assayDesignerPage.addTransformScript(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT));
-        assayDesignerPage.setSaveScriptData(true);
+        Map<String, Domain> domains = new HashMap<>();
+        protocol.getDomains().forEach(domain -> domains.put(domain.getName(), domain));
 
-        assayDesignerPage.setEditableResults(true);
-        assayDesignerPage.setEditableRuns(true);
+        Domain batchDomain = domains.get("Batch Fields");
+        batchDomain.getFields().add(new FieldDefinition("operatorEmail", ColumnType.String));
+        batchDomain.getFields().add(new FieldDefinition("instrument", ColumnType.String)
+                .setDescription("The diagnostic test instrument."));
 
-        assayDesignerPage.goToBatchFields()
-                .addField(new FieldDefinition("operatorEmail").setType(FieldDefinition.ColumnType.String))
-                .addField(new FieldDefinition("instrument").setType(FieldDefinition.ColumnType.String)
-                        .setDescription("The diagnostic test instrument."));
+        Domain runDomain = domains.get("Run Fields");
+        runDomain.getFields().add(new FieldDefinition("instrumentSetting", ColumnType.Integer)
+                .setDescription("The configuration setting on the instrument."));
 
-        assayDesignerPage.goToRunFields()
-                .addField(new FieldDefinition("instrumentSetting").setType(FieldDefinition.ColumnType.Integer)
-                        .setDescription("The configuration setting on the instrument."));
+        File inferFieldFile = new File(SAMPLE_DATA_LOCATION, RUN01_FILE);
+        InferDomainCommand inferDomainCommand = new InferDomainCommand(inferFieldFile, "Assay");
+        InferDomainResponse inferDomainResponse = inferDomainCommand.execute(cn, projectName);
+        List<PropertyDescriptor> inferredResultsFields = inferDomainResponse.getFields().stream()
+                .filter(f -> !f.getName().startsWith("column")).toList();
 
-        assayDesignerPage.goToResultsFields()
-                .removeAllFields(false)
-                .setInferFieldFile(new File(SAMPLE_DATA_LOCATION, RUN01_FILE))
-                .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
+        Domain resultsDomain = domains.get("Data Fields");
+        resultsDomain.setFields(inferredResultsFields);
 
-        assayDesignerPage.goToResultsFields()
-                .removeField("column5")
-                .removeField("column6");
-        assayDesignerPage.clickFinish();
+        new SaveProtocolCommand(protocol).execute(cn, projectName);
     }
 
     public void addNewField(String projectName, String assayName, String runId, FieldDefinition newField)
@@ -325,7 +340,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     }
 
     @Test
-    public void validateImportingFileUsingFilesWebPart()
+    public void validateImportingFileUsingFilesWebPart() throws Exception
     {
         final String OPERATOR_EMAIL_01 = "john.doe@AssayExportImport.test";
         final String INSTRUMENT_NAME_01 = "ABC Reader";
@@ -420,7 +435,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     }
 
     @Test
-    public void validateImportingFileUsingRunProperties()
+    public void validateImportingFileUsingRunProperties() throws Exception
     {
         final String OPERATOR_EMAIL_02 = "jane.doe@AssayExportImport.test";
         final String INSTRUMENT_NAME_02 = "XYZ Reader";
