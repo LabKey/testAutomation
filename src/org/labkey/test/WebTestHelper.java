@@ -16,6 +16,7 @@
 
 package org.labkey.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -258,27 +259,22 @@ public class WebTestHelper
         }
     }
 
+    /**
+     * Strip the context path off of the front of a relative URL. Will also remove leading slashes.
+     * @param url relative URL to the server under test
+     * @return Stripped URL
+     */
     public static String stripContextPath(String url)
     {
-        String root = getContextPath() + "/";
-        int rootLoc;
-        if(root.length() == 1)
+        String contextPath = getContextPath() + "/";
+        if (url.startsWith(contextPath))
         {
-            if(url.indexOf("//") > 0)
-                rootLoc = url.indexOf(root, url.indexOf("//")+2);
-            else
-                rootLoc = -1;
+            url = url.substring(contextPath.length());
         }
         else
         {
-            rootLoc = url.indexOf(root);
+            url = StringUtils.stripStart(url, "/");
         }
-
-        int endOfAction = url.indexOf("?");
-        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
-            url = url.substring(rootLoc + root.length());
-        else if (url.indexOf("/") == 0)
-            url = url.substring(1);
         return url;
     }
 

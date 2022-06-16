@@ -6,6 +6,7 @@ import org.labkey.test.WebTestHelper;
 import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class URLBuilder
     private final String _action;
     @Nullable private final String _containerPath;
 
-    private Map<String, ?> _query;
+    private Map<String, ?> _query = Collections.emptyMap();
     private String _resourcePath;
     private Map<String, ?> _secondaryQuery;
 
@@ -145,12 +146,13 @@ public class URLBuilder
     {
         if (params != null)
         {
+            url.append("?"); // We have a '?' after URLs even if there's no query
             boolean firstParam = true;
             for (Map.Entry<String, ?> param : params.entrySet())
             {
                 if (null != param.getKey())
                 {
-                    url.append(firstParam ? "?" : "&");
+                    url.append(firstParam ? "" : "&");
                     url.append(param.getKey());
                     if (null != param.getValue())
                     {

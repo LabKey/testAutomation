@@ -101,7 +101,6 @@ import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -1060,13 +1059,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return createDefaultConnection();
     }
 
-    public long beginAt(String relativeURL)
+    public long beginAt(String url)
     {
-        return beginAt(relativeURL, defaultWaitForPage);
+        return beginAt(url, defaultWaitForPage);
     }
 
-    public long beginAt(String relativeURL, int millis)
+    public long beginAt(String url, int millis)
     {
+        String relativeURL = url;
         if (relativeURL.startsWith(getBaseURL()))
             relativeURL = relativeURL.substring(getBaseURL().length());
         relativeURL = stripContextPath(relativeURL);
@@ -1079,13 +1079,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
             else
             {
                 logMessage = "Navigating to " + relativeURL;
-                if (relativeURL.charAt(0) != '/')
-                {
-                    relativeURL = "/" + relativeURL;
-                }
+                relativeURL = "/" + relativeURL;
             }
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
+            final boolean expectPageLoad = expectPageLoad(fullURL);
 
             long elapsedTime = doAndWaitForPageToLoad(() -> {
                 try
@@ -1096,7 +1094,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 {
                     throw new TestTimeoutException(ex); // Triggers thread dump.
                 }
-            }, millis);
+            }, expectPageLoad ? millis : 0);
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
@@ -1105,6 +1103,30 @@ public abstract class WebDriverWrapper implements WrapsDriver
         finally
         {
             log(logMessage); // log after navigation to
+        }
+    }
+
+    private boolean expectPageLoad(String destinationUrl)
+    {
+        String appAction = "app";
+        try
+        {
+            String currentUrl = getDriver().getCurrentUrl();
+            Crawler.ControllerActionId current = new Crawler.ControllerActionId(currentUrl);
+            Crawler.ControllerActionId destination = new Crawler.ControllerActionId(destinationUrl);
+
+            return !destinationUrl.contains("#") ||
+                    destinationUrl.contains("?#") != currentUrl.contains("?#") ||
+                    !current.getAction().equals(appAction) ||
+                    !destination.getAction().equals(appAction) ||
+                    !current.getController().equals(destination.getController()) ||
+                    !current.getFolder().equals(destination.getFolder());
+        }
+        catch (IllegalArgumentException bustedUrl)
+        {
+            // this will happen when the url looks like 'about:blank', or where there isn't a folder or action to
+            // parse from the URL
+            return true;
         }
     }
 
