@@ -24,10 +24,9 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class ActiveUserLimitationTest extends BaseWebDriverTest
 {
-    private static final String USER1 = "user1@activeuserlimitation.test";
-    private static final String USER1_DISPLAY_NAME = "user1";
-    private static final String USER2 = "user2@activeuserlimitation.test";
-    private static final String USER3 = "user3@activeuserlimitation.test";
+    private static final String USER1 = "limited_user1@activeuserlimitation.test";
+    private static final String USER2 = "limited_user2@activeuserlimitation.test";
+    private static final String USER3 = "limited_user3@activeuserlimitation.test";
 
     @BeforeClass
     public static void setupProject()
@@ -161,7 +160,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
 
         log("Marking previously created user as system user");
         goToSiteUsers();
-        waitAndClickAndWait(Locator.linkWithText(USER1_DISPLAY_NAME));
+        waitAndClickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(USER1)));
         clickButton("Edit");
         checkCheckbox(Locator.name("quf_System"));
         clickButton("Submit");
@@ -173,7 +172,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         assertTrue("User should have been created with banner message", isTextPresent(USER2));
 
         goToSiteUsers();
-        waitAndClickAndWait(Locator.linkWithText(USER1_DISPLAY_NAME));
+        waitAndClickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(USER1)));
         clickButton("Edit");
         uncheckCheckbox(Locator.name("quf_System"));
         clickButton("Submit", 0);
