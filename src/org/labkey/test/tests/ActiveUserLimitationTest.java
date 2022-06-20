@@ -218,7 +218,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         usersPage.getUsersTable().clickHeaderButton("Reactivate");
         waitForElement(Locator.tagWithText("span", "Reactivate"));
         clickButton("Reactivate");
-        assertTrue("Missing error message", isTextPresent("Failed to activate user2: User limit has been reached so no more users can be reactivated on this deployment."));
+        assertTrue("Missing error message", isTextPresent("Failed to activate limited user2: User limit has been reached so no more users can be reactivated on this deployment."));
 
         goToSiteUsers();
         assertTrue(USER1 + " should have been reactivated", isTextPresent(USER1));
