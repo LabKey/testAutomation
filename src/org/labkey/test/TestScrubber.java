@@ -22,6 +22,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
+import org.labkey.test.pages.core.admin.LimitActiveUserPage;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
@@ -57,6 +58,8 @@ public class TestScrubber extends ExtraSiteWrapper
             return;
         }
 
+        Connection connection = createDefaultConnection();
+
         try
         {
             // Get DB back in a good state after failed pipeline tools test.
@@ -86,7 +89,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection());
+            DatabaseAuthConfigureDialog.resetDbLoginConfig(connection);
         }
         catch (RuntimeException e)
         {
@@ -96,7 +99,7 @@ public class TestScrubber extends ExtraSiteWrapper
         try
         {
             // disable any/all secondary auth configurations
-            AuthenticationAPIUtils.deleteConfigurations("TestSecondary", createDefaultConnection());
+            AuthenticationAPIUtils.deleteConfigurations("TestSecondary", connection);
         }
         catch (RuntimeException e)
         {
@@ -124,10 +127,20 @@ public class TestScrubber extends ExtraSiteWrapper
         {
             disableFileUploadSetting();
         }
-        catch (RuntimeException e)
+        catch (Exception e)
         {
             TestLogger.error("Failed to re-enable file Upload after test", e);
         }
+
+        try
+        {
+            LimitActiveUserPage.resetUserLimits(connection);
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.error("Failed to reset active user limit after test", e);
+        }
+
     }
 
     @LogMethod(quiet = true)
@@ -171,14 +184,24 @@ public class TestScrubber extends ExtraSiteWrapper
         }
     }
 
-    private void disableFileUploadSetting()
+    private void disableFileUploadSetting() throws IOException, CommandException
     {
-        ConfigureFileSystemAccessPage fsaPage = ConfigureFileSystemAccessPage.beginAt(this);
-        Checkbox disableCheckBox = new Checkbox(Locator.input("fileUploadDisabled").findElementOrNull(getDriver()));
-        if (disableCheckBox.getComponentElement() != null && disableCheckBox.isChecked())
+        if (TestProperties.isTestRunningOnTeamCity())
         {
-            disableCheckBox.uncheck();
-            fsaPage.save();
+            PostCommand<CommandResponse> command = new PostCommand<>("admin", "filesSiteSettings");
+            // POST'ing without any parameters will enable upload without touching site level file root
+            command.execute(createDefaultConnection(), "/");
+        }
+        else
+        {
+            // Go through UI locally to avoid messing up user folders (experimental feature)
+            ConfigureFileSystemAccessPage fsaPage = ConfigureFileSystemAccessPage.beginAt(this);
+            Checkbox disableCheckBox = new Checkbox(Locator.input("fileUploadDisabled").findElementOrNull(getDriver()));
+            if (disableCheckBox.getComponentElement() != null && disableCheckBox.isChecked())
+            {
+                disableCheckBox.uncheck();
+                fsaPage.save();
+            }
         }
     }
 }
