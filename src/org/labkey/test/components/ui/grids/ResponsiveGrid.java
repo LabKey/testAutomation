@@ -181,6 +181,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         // Workaround for 45553: App Grid: Grid column menu does not scroll when page is scrolled.
         getWrapper().scrollIntoView(getComponentElement(), true);
+        getWrapper().scrollIntoView(headerCell, true);
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
