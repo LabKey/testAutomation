@@ -6,11 +6,11 @@ import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
-import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Allows tests to record non-fatal errors without failing the test immediately.
@@ -22,6 +22,7 @@ public class DeferredErrorCollector
     private int errorMark = 0;
 
     private final ArtifactCollector artifactCollector;
+    private final Supplier<String> screenshotPrefixSupplier;
     private final List<DeferredError> allErrors = new ArrayList<>();
     private final List<Class<? extends Throwable>> errorTypes = new ArrayList<>();
 
@@ -33,23 +34,17 @@ public class DeferredErrorCollector
     protected DeferredErrorCollector()
     {
         artifactCollector = null;
+        screenshotPrefixSupplier = () -> "";
     }
 
     /**
      * @param artifactCollector An {@link ArtifactCollector} to be used for screenshots
      */
-    public DeferredErrorCollector(ArtifactCollector artifactCollector)
+    public DeferredErrorCollector(ArtifactCollector artifactCollector, Supplier<String> screenshotPrefixSupplier)
     {
         this.artifactCollector = artifactCollector;
+        this.screenshotPrefixSupplier = screenshotPrefixSupplier;
         resetErrorTypes();
-    }
-
-    /**
-     * @param test A {@link BaseWebDriverTest} from which will provide an {@link ArtifactCollector}
-     */
-    public DeferredErrorCollector(@NotNull BaseWebDriverTest test)
-    {
-        this(test.getArtifactCollector());
     }
 
     /**
@@ -106,7 +101,7 @@ public class DeferredErrorCollector
      */
     public final DeferredErrorCollector withScreenshot()
     {
-        return withScreenshot("recordedError");
+        return withScreenshot("");
     }
 
     /**
@@ -158,11 +153,22 @@ public class DeferredErrorCollector
     {
         if (errorsSinceMark() > 0)
         {
-            final String s = artifactCollector.dumpPageSnapshot(screenshotName);
+            final String s = takeScreenShot(screenshotName);
             allErrors.get(allErrors.size() - 1).setScreenshotName(s);
             artifactCollector.reportTestMetadata(s);
         }
         setErrorMark();
+    }
+
+    /**
+     * Take a screenshot if any errors have been recorded since the last time {@link #setErrorMark()} was called.
+     * Then resets the error mark.
+     *
+     * @see #screenShotIfNewError(String)
+     */
+    public void screenShotIfNewError()
+    {
+        screenShotIfNewError("");
     }
 
     /**
@@ -392,15 +398,28 @@ public class DeferredErrorCollector
 
     /**
      * Take a screen shot and HTML dump of the current page.
-     * @deprecated Use {@link ArtifactCollector#dumpPageSnapshot(String)}
      *
-     * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
-     * @return The name of the file used. Basically the screenshotName parameter with a counter added to the end.
+     * @param screenshotIdentifier A string to identify screenshots; Will be included in screenshot filenames.
+     * @return The name of the file used. Basically the screenshotIdentifier parameter with a counter added to the end.
      */
-    @Deprecated (since = "22.2")
-    public String takeScreenShot(@NotNull String screenshotName)
+    public String takeScreenShot(@NotNull String screenshotIdentifier)
     {
-        return artifactCollector.dumpPageSnapshot(screenshotName);
+        StringBuilder screenshotName = new StringBuilder();
+        String screenshotPrefix = StringUtils.trimToEmpty(screenshotPrefixSupplier.get());
+        if (!screenshotIdentifier.startsWith(screenshotPrefix))
+        {
+            screenshotName.append(screenshotPrefix);
+            if (!screenshotIdentifier.isBlank())
+            {
+                screenshotName.append("_");
+            }
+        }
+        screenshotName.append(screenshotIdentifier);
+        if (screenshotName.isEmpty())
+        {
+            screenshotName.append("screenshot");
+        }
+        return artifactCollector.dumpPageSnapshot(screenshotName.toString());
     }
 
     public static class DeferredAssertionError extends AssertionError
@@ -450,9 +469,9 @@ abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     }
 
     @Override
-    public String takeScreenShot(@NotNull String screenshotName)
+    public String takeScreenShot(@NotNull String screenshotIdentifier)
     {
-        return wrappedCollector.takeScreenShot(screenshotName);
+        return wrappedCollector.takeScreenShot(screenshotIdentifier);
     }
 
     @Override

@@ -33,6 +33,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
@@ -200,7 +201,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public BaseWebDriverTest()
     {
         _artifactCollector = new ArtifactCollector(this);
-        _errorCollector = new DeferredErrorCollector(_artifactCollector);
+        _errorCollector = new DeferredErrorCollector(_artifactCollector, this::getTestName);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
 
@@ -673,6 +674,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public Timeout testTimeout()
     {
         return new Timeout(30, TimeUnit.MINUTES);
+    }
+
+    @Rule
+    public final TestName testName = new TestName();
+
+    @NotNull
+    public final String getTestName()
+    {
+        String methodName = testName.getMethodName();
+        if (methodName == null)
+        {
+            methodName = beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS;
+        }
+        return methodName;
     }
 
     @Rule
