@@ -3,8 +3,10 @@ package org.labkey.test.tests.list;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.data.xml.queryCustomView.FilterType;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.categories.Data;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
@@ -26,11 +28,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 
-@Category({})
-public class CrossfolderListTest extends BaseWebDriverTest
+@Category({Daily.class, Data.class, Hosting.class})
+public class CrossFolderListTest extends BaseWebDriverTest
 {
-    private static final TestUser FOLDER_A_ADMIN = new TestUser("folder_admin@crossfolderlisttest.test");
-    private static final TestUser FOLDER_A_READER = new TestUser("folder_reader@crossfolderlisttest.test");
     private static final String SUBFOLDER_A = "subA";
     private static String SUBFOLDER_A_PATH;
 
@@ -38,13 +38,12 @@ public class CrossfolderListTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        _userHelper.deleteUsers(afterTest, FOLDER_A_ADMIN.getEmail(), FOLDER_A_READER.getEmail());
     }
 
     @BeforeClass
     public static void setupProject()
     {
-        CrossfolderListTest init = (CrossfolderListTest) getCurrentTest();
+        CrossFolderListTest init = (CrossFolderListTest) getCurrentTest();
         init.doSetup();
     }
 
@@ -53,8 +52,6 @@ public class CrossfolderListTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_A);
         SUBFOLDER_A_PATH = getProjectName() + "/" + SUBFOLDER_A;
-        FOLDER_A_ADMIN.create(this);
-        FOLDER_A_READER.create(this);
     }
 
 
@@ -63,7 +60,7 @@ public class CrossfolderListTest extends BaseWebDriverTest
     {
         // define a list in the top folder, give it some random data
         String listName = "top_folder_list_for_subfolder_data";
-        ListDefinition listDef = makeListDef(listName, testFields());
+        ListDefinition listDef = createListDef(listName, testFields());
         var dGen = listDef.create(createDefaultConnection(), getProjectName());
         dGen.withGeneratedRows(3);
         dGen.insertRows();
@@ -93,7 +90,7 @@ public class CrossfolderListTest extends BaseWebDriverTest
     {
         // define a list in the top folder, give it some random data
         String listName = "top_folder_list_for_metadata";
-        ListDefinition listDef = makeListDef(listName, testFields());
+        ListDefinition listDef = createListDef(listName, testFields());
         var dGen = listDef.create(createDefaultConnection(), getProjectName());
         dGen.withGeneratedRows(2);
         dGen.insertRows();
@@ -134,7 +131,7 @@ public class CrossfolderListTest extends BaseWebDriverTest
     {
         // define a list in a subfolder, give it some random data
         String listName = "subfolder_list_for_metadata";
-        ListDefinition listDef = makeListDef(listName, testFields());
+        ListDefinition listDef = createListDef(listName, testFields());
         listDef.create(createDefaultConnection(), SUBFOLDER_A_PATH);
 
         // attempt to navigate to the list but in the project level
@@ -151,14 +148,14 @@ public class CrossfolderListTest extends BaseWebDriverTest
         String listName = "test_name_collision_list";
 
         // create a simple list in subfolder, insert some values, and grab a column's worth of data from it
-        ListDefinition listDef = makeListDef(listName, testFields());
+        ListDefinition listDef = createListDef(listName, testFields());
         var dGen = listDef.create(createDefaultConnection(), getProjectName());
         dGen.withGeneratedRows(2);
         dGen.insertRows();
         var topStrings = dGen.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
 
         // create another list with the same name at the project level, insert a little different data and capture the string values
-        ListDefinition listDef2 = makeListDef(listName, testFields());
+        ListDefinition listDef2 = createListDef(listName, testFields());
         var dgen2 = listDef2.create(createDefaultConnection(), SUBFOLDER_A_PATH);
         dgen2.withGeneratedRows(3);
         dgen2.insertRows();
@@ -177,7 +174,7 @@ public class CrossfolderListTest extends BaseWebDriverTest
                 new HashSet(bottomStrings), new HashSet(subfolderPage.getGrid().getColumnDataAsText("String Column")));
     }
 
-    private ListDefinition makeListDef(String listName, List<FieldDefinition> listColumns)
+    private ListDefinition createListDef(String listName, List<FieldDefinition> listColumns)
     {
         ListDefinition listDef = new IntListDefinition(listName, "Key");
         listDef.setFields(listColumns);
@@ -197,7 +194,7 @@ public class CrossfolderListTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "CrossfolderListTest Project";
+        return "CrossFolderListTest Project";
     }
 
     @Override
