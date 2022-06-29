@@ -79,6 +79,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
@@ -282,7 +283,18 @@ public class WebTestHelper
         return url;
     }
 
-    public enum DatabaseType {PostgreSQL, MicrosoftSQLServer}
+    public enum DatabaseType
+    {
+        PostgreSQL("postgres", "pg"),
+        MicrosoftSQLServer("sqlserver", "mssql", "jtds");
+
+        private final Set<String> typeNames;
+
+        DatabaseType(String... typeNames)
+        {
+            this.typeNames = Set.of(typeNames);
+        }
+    }
 
     public static DatabaseType getDatabaseType()
     {
@@ -291,10 +303,10 @@ public class WebTestHelper
         if (null == databaseType)
             throw new IllegalStateException("Can't determine database type: databaseType property is not set");
 
-        if ("postgres".equals(databaseType) || "pg".equals(databaseType))
+        if (DatabaseType.PostgreSQL.typeNames.contains(databaseType))
             return DatabaseType.PostgreSQL;
 
-        if ("sqlserver".equals(databaseType) || "mssql".equals(databaseType))
+        if (DatabaseType.MicrosoftSQLServer.typeNames.contains(databaseType))
             return DatabaseType.MicrosoftSQLServer;
 
         throw new IllegalStateException("Unknown database type: " + databaseType);
