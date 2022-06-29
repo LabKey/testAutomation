@@ -2,6 +2,7 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -13,10 +14,11 @@ import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.admin.ImportFolderPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +31,11 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
 {
-    private final static String SAMPLE_TYPE_PROJECT = "Sample Types Project";
+    private final static String SAMPLE_TYPE_PROJECT = "Sample Type Project";
     private final static String SAMPLE_TYPE = "Samples";
-    private final static String STUDY_EXPORT = "Export Study Test Project";
-    private final static String STUDY_IMPORT = "Import Study Test Project";
+    private final static String LINKED_STUDY = "Target Study Project";
+    private final static String IMPORT_PROJECT = "Import Test Project";
+    private static TestDataGenerator SAMPLE_GENERATOR;
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
@@ -50,38 +53,30 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
         return SAMPLE_TYPE_PROJECT;
     }
 
-    private void doSetup()
+    private void doSetup() throws IOException, CommandException
     {
         _containerHelper.createProject(getProjectName(), null);
 
-        _containerHelper.createProject(STUDY_EXPORT, "Study");
+        _containerHelper.createProject(LINKED_STUDY, "Study");
         _studyHelper.startCreateStudy()
                 .setTimepointType(StudyHelper.TimepointType.VISIT)
                 .createStudy();
+        String containerId = ((APIContainerHelper) _containerHelper).getContainerId(LINKED_STUDY);
 
-        _containerHelper.createProject(STUDY_IMPORT, "Study");
-        _studyHelper.startCreateStudy()
-                .setTimepointType(StudyHelper.TimepointType.VISIT)
-                .createStudy();
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        log("Creating sample types");
+        SAMPLE_GENERATOR = new SampleTypeDefinition(SAMPLE_TYPE)
+                .setAutoLinkDataToStudy(containerId)
+                .setFields(List.of(
+                        new FieldDefinition("VisitID", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("Date", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("ParticipantID", FieldDefinition.ColumnType.Subject)))
+                .create(createDefaultConnection(), SAMPLE_TYPE_PROJECT);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         new PortalHelper(getDriver()).addBodyWebPart("Sample Types");
 
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-        log("Creating sample types");
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE)
-                .setAutoLinkDataToStudy("/" + STUDY_EXPORT)
-                .setFields(List.of(
-                        new FieldDefinition("VisitID", FieldDefinition.ColumnType.VisitId),
-                        new FieldDefinition("Date", FieldDefinition.ColumnType.VisitDate),
-                        new FieldDefinition("ParticipantID", FieldDefinition.ColumnType.Subject))));
-
-        goToProjectHome(STUDY_IMPORT);
-        new PortalHelper(getDriver()).addBodyWebPart("Datasets");
-
-        goToProjectHome(STUDY_EXPORT);
-        new PortalHelper(getDriver()).addBodyWebPart("Datasets");
+        _containerHelper.createProject(IMPORT_PROJECT, "Study");
     }
 
     /*
@@ -109,25 +104,27 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
                 .exportToBrowserAsZipFile();
 
         log("Navigate into the destination folder and import there");
-        goToProjectHome(STUDY_IMPORT);
-        ImportFolderPage.beginAt(this, STUDY_IMPORT)
+        goToProjectHome(IMPORT_PROJECT);
+        ImportFolderPage.beginAt(this, IMPORT_PROJECT)
                 .selectLocalZipArchive()
                 .chooseFile(exportArchive)
                 .clickImportFolder();
         waitForPipelineJobsToFinish(1);
 
-        goToProjectHome(STUDY_IMPORT);
+        goToProjectHome(IMPORT_PROJECT);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE));
         DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        checker().verifyEquals("Incorrect Columns in imported sample type", Arrays.asList("Name", "Flag", "Visit ID", "Date", "Participant ID", "Linked to Export Study Test Project Study"), table.getColumnLabels());
+        checker().verifyEquals("Incorrect Columns in imported sample type", Arrays.asList("Name", "Flag", "Visit ID", "Date", "Participant ID",
+                "Linked to " + LINKED_STUDY + " Study"), table.getColumnLabels());
 
         clickAndWait(Locator.linkWithText("linked"));
-        checker().verifyEquals("Linked to wrong study", STUDY_EXPORT, getCurrentProject());
+        checker().verifyEquals("Linked to wrong study", LINKED_STUDY, getCurrentProject());
     }
 
     /*
         TODO : Test coverage for Issue 45711: Imported study has additional columns in dataset compare to exported study
      */
+    @Ignore
     @Test
     public void testImportLinkedStudyFolder()
     {
@@ -144,8 +141,8 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, afterTest);
-        _containerHelper.deleteProject(STUDY_EXPORT, afterTest);
-        _containerHelper.deleteProject(STUDY_IMPORT, afterTest);
+        _containerHelper.deleteProject(LINKED_STUDY, afterTest);
+        _containerHelper.deleteProject(IMPORT_PROJECT, afterTest);
 
     }
 }
