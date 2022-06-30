@@ -54,6 +54,11 @@ public class RadioButton extends Checkbox
             return super.locatedBy(Locator.radioButtonByName(name));
         }
 
+        public SimpleComponentFinder<RadioButton> withValue(String value)
+        {
+            return super.locatedBy(Locator.radioButton().withAttribute("value", value));
+        }
+
         public SimpleComponentFinder<RadioButton> withNameAndValue(String name, String value)
         {
             return super.locatedBy(Locator.radioButtonByNameAndValue(name, value));

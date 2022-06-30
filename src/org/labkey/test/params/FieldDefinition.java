@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
+import org.labkey.api.exp.query.ExpSchema;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
@@ -41,6 +42,7 @@ public class FieldDefinition extends PropertyDescriptor
     private LookupInfo _lookup;
     private String _principalConceptSearchSourceOntology;
     private String _principalConceptSearchExpression;
+    private ExpSchema.DerivationDataScopeType _aliquotOption;
 
     // Stash validator collection to avoid having to convert back from JSON Maps
     private List<FieldValidator<?>> _validators;
@@ -397,6 +399,16 @@ public class FieldDefinition extends PropertyDescriptor
         Assert.assertEquals("Invalid field type for text choice values.", ColumnType.TextChoice, getType());
         setValidators(List.of(new FieldDefinition.TextChoiceValidator(values)));
         return this;
+    }
+
+    public ExpSchema.DerivationDataScopeType getAliquotOption()
+    {
+        return _aliquotOption;
+    }
+
+    public void setAliquotOption(ExpSchema.DerivationDataScopeType aliquotOption)
+    {
+        _aliquotOption = aliquotOption;
     }
 
     public enum RangeType
