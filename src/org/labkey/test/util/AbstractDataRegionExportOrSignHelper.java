@@ -21,8 +21,8 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.EnumSelect;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -189,20 +189,27 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
 
     protected class Elements extends Component.ElementCache
     {
-        protected final WebElement navTabs = new LazyWebElement(Locator.css("ul.nav-tabs"), this);
-        protected final WebElement excelTab = new LazyWebElement(Locator.linkWithText("Excel"), navTabs);
+        protected final WebElement navTabs = Locator.css("ul.nav-tabs").findWhenNeeded(this);
+        protected final WebElement excelTab = Locator.linkWithText("Excel").findWhenNeeded(navTabs);
         protected RadioButton findExcelFileTypeRadio(ExcelFileType type)
         {
             return new RadioButton(type.getRadioLocator().findElement(this));
         }
         protected EnumSelect<ColumnHeaderType> excelFileTypeSelect = EnumSelect(Locator.name("xls_header_type"), ColumnHeaderType.class).findWhenNeeded(this);
 
-        protected final WebElement textTab = new LazyWebElement(Locator.linkWithText("Text"), navTabs);
+        protected final WebElement textTab = Locator.linkWithText("Text").findWhenNeeded(navTabs);
         protected EnumSelect<TextSeparator> delimiterSelect = EnumSelect(Locator.name("delim"), TextSeparator.class).findWhenNeeded(this);
         protected EnumSelect<TextQuote> quoteSelect = EnumSelect(Locator.name("quote"), TextQuote.class).findWhenNeeded(this);
         protected EnumSelect<ColumnHeaderType> columnHeaderSelect = EnumSelect(Locator.name("txt_header_type"), ColumnHeaderType.class).findWhenNeeded(this);
 
-        protected final WebElement scriptTab = new LazyWebElement(Locator.linkWithText("Script"), navTabs);
+        protected final WebElement scriptTab = Locator.linkWithText("Script").findWhenNeeded(navTabs);
+
+        protected final WebElement xarTab = Locator.linkWithText("XAR").findWhenNeeded(navTabs);
+        protected EnumSelect<XarLsidOutputType> xarLsidOutputTypeSelect =
+                EnumSelect(Locator.name("lsidOutputType"), XarLsidOutputType.class).findWhenNeeded(this);
+        protected EnumSelect<XarExportType> xarExportTypeSelect =
+                EnumSelect(Locator.name("exportType"), XarExportType.class).findWhenNeeded(this);
+        protected final Input xarFileNameInput = Input.Input(Locator.name("xarFileName"), getDriver()).findWhenNeeded(this);
 
         private WebElement findActiveTab()
         {
@@ -212,6 +219,11 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
         Checkbox exportSelectedCheckbox()
         {
             return new Checkbox(Locator.css("input[value=exportSelected]").findElement(findActiveTab()));
+        }
+
+        protected WebElement findExportButton()
+        {
+            return Locator.tag("a").withClasses("labkey-button", "primary").findElement(findActiveTab());
         }
 
         protected WebElement findExportButton(String buttonText)
@@ -256,5 +268,18 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
         {
             return _description;
         }
+    }
+
+    public enum XarLsidOutputType
+    {
+        ABSOLUTE,
+        FOLDER_RELATIVE,
+        PARTIAL_FOLDER_RELATIVE
+    }
+
+    public enum XarExportType
+    {
+        BROWSER_DOWNLOAD,
+        PIPELINE_FILE
     }
 }

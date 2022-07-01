@@ -8,6 +8,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.TextSearcher;
@@ -316,6 +317,13 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     {
         clickAndWait(elementCache().showGridButton);
         return new PipelineStatusTable(getDriver());
+    }
+
+    @LogMethod
+    public FileBrowserHelper clickBrowseFiles()
+    {
+        clickAndWait(elementCache().browseFilesButton);
+        return new FileBrowserHelper(getDriver());
     }
 
     public List<WebElement> getSplitJobLinks()
