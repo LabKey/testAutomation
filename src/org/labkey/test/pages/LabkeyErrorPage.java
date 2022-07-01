@@ -53,7 +53,8 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement errorHeading = Locator.tagWithClass("div", "labkey-error-heading").findWhenNeeded(this);
+        WebElement errorHeading = Locator.tagWithClass("div", "labkey-error-heading")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement errorSubHeading = Locator.tagWithClass("div", "labkey-error-subheading").findWhenNeeded(this);
         WebElement errorInstruction = Locator.tagWithClass("div", " labkey-error-instruction").index(1).findWhenNeeded(this);
         WebElement errorImage = Locator.tagWithAttributeContaining("*","alt","LabKey Error").findWhenNeeded(this);

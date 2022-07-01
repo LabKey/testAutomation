@@ -20,6 +20,8 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     public DatabaseAuthConfigureDialog(LoginConfigRow row)
     {
         super(getFinder("Configure Database Authentication", row.getDriver()));
+        oldExpiration = getPasswordExpiration();
+        oldStrength = getPasswordStrength();
     }
 
     private static ModalDialogFinder getFinder(String title, WebDriver driver)
@@ -37,7 +39,6 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
 
     public DatabaseAuthConfigureDialog setPasswordStrength(PasswordStrength newStrength)
     {
-        currentStrength = newStrength;
         if (getPasswordStrength().equals(newStrength))
             return this;
 
@@ -54,7 +55,6 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     public DatabaseAuthConfigureDialog setPasswordExpiration(PasswordExpiration expiration)
     {
         elementCache().passwordExpirationSelect.selectOption(expiration);
-        currentExpiration = expiration;
         return this;
     }
 
@@ -66,11 +66,6 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     @Override
     public LoginConfigRow clickApply()
     {
-        if (oldExpiration == null)
-            oldExpiration = currentExpiration;
-        if (oldStrength == null)
-            oldStrength = currentStrength;
-
         Locator.findAnyElement("Finish or Apply button", this,
                 Locators.dismissButton("Finish"), Locators.dismissButton("Apply")).click();
         waitForClose(4);
@@ -99,6 +94,8 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
             try
             {
                 postCommand.execute(connection, "/");
+                oldStrength = null;
+                oldExpiration = null;
             }
             catch (IOException | CommandException e)
             {
@@ -120,9 +117,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     }
 
     private static PasswordStrength oldStrength = null;
-    private PasswordStrength currentStrength = null;
     private static PasswordExpiration oldExpiration = null;
-    private PasswordExpiration currentExpiration = null;
 
     @Override
     protected DatabaseAuthConfigureDialog getThis()
@@ -144,7 +139,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
 
     protected class ElementCache extends AuthDialogBase.ElementCache
     {
-        OptionSelect passwordExpirationSelect = new OptionSelect(Locator.tagWithName("select", "expiration")
+        OptionSelect<PasswordExpiration> passwordExpirationSelect = new OptionSelect<>(Locator.tagWithName("select", "expiration")
                 .findWhenNeeded(this).withTimeout(2000));
 
         WebElement strongButton = Locator.button("Strong").refindWhenNeeded(this).withTimeout(4000);
