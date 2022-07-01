@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
@@ -88,12 +89,11 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        samplesTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "Blood");
-        setFormElement(Locator.name("quf_VisitID"), "1");
-        setFormElement(Locator.name("quf_Date"), now);
-        setFormElement(Locator.name("quf_ParticipantID"), "P1");
-        clickButton("Submit");
+        samplesTable.clickInsertNewRow().update(Map.of(
+                "Name", "Blood",
+                "VisitID", "1",
+                "Date", now,
+                "ParticipantID", "P1"));
 
         log("Export the Sample type folder");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
