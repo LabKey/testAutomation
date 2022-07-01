@@ -1043,17 +1043,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setAliquotOption(ExpSchema.DerivationDataScopeType option)
     {
+        expand();
         elementCache().aliquotOption(option).check();
         return this;
     }
 
     public RadioButton getAliquotOptionRadioButton(ExpSchema.DerivationDataScopeType option)
     {
+        expand();
         return elementCache().aliquotOption(option);
     }
 
     public ExpSchema.DerivationDataScopeType getSelectedAliquotOption()
     {
+        expand();
         for (ExpSchema.DerivationDataScopeType option : ExpSchema.DerivationDataScopeType.values())
         {
             if (elementCache().aliquotOption(option).isChecked())
@@ -1064,6 +1067,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public boolean hasAliquotOptionWarning()
     {
+        expand();
         return getWrapper().isElementPresent(elementCache().aliquotWarningAlert);
     }
 
