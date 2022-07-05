@@ -878,7 +878,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    public static final Pattern ERROR_PATTERN = Pattern.compile("^ERROR", Pattern.MULTILINE);
+    public static final Pattern ERROR_PATTERN = Pattern.compile("^(ERROR|FATAL)", Pattern.MULTILINE);
 
     public void checkErrors()
     {
