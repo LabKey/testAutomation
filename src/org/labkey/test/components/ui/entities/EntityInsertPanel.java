@@ -196,7 +196,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public boolean hasUpdateDataOption()
     {
-        return elementCache().updateDataCheckbox.isDisplayed();
+        return elementCache().updateDataCheckBoxLocator.existsIn(this);
     }
 
     private FileUploadPanel fileUploadPanel()
@@ -426,10 +426,11 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
 
-        WebElement updateCheckboxElem = Locator.tag("div")
+        Locator updateDataCheckBoxLocator = Locator.tag("div")
                 .withChild(Locator.tagWithClass("span", "entity-mergeoption-checkbox"))
-                .child("input").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        Checkbox updateDataCheckbox = new Checkbox(updateCheckboxElem);
+            .child("input");
+        Checkbox updateDataCheckbox = new Checkbox(updateDataCheckBoxLocator.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
 
         WebElement formatString = Locator.tagWithClass("div","file-form-formats")
