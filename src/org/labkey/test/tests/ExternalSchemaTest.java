@@ -18,11 +18,13 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -39,6 +41,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 import org.labkey.test.pages.query.InsertExternalSchemaPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SchemaHelper;
@@ -56,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -71,7 +75,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     private static final String DB_SCHEMA_NAME = "test";
     private static final String USER_SCHEMA_NAME = "Test";
     private static final String TABLE_NAME = "TestTable";
-    private SchemaHelper _schemaHelper = new SchemaHelper(this);
+    private final SchemaHelper _schemaHelper = new SchemaHelper(this);
 
     private static class Row
     {
@@ -254,11 +258,14 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         setEditable(PROJECT_NAME, false);
         doTestUneditable();
+        assertContainerAuditEvents(PROJECT_NAME, "External schema 'Test' created");
+        assertContainerAuditEvents(PROJECT_NAME, "External schema 'Test' updated");
 
         // set up an additional db user schema in the sub-folder so we can check container perms
         ensureExternalSchema(PROJECT_NAME + "/" + FOLDER_NAME);
         setEditable(PROJECT_NAME, true);
         setEditable(PROJECT_NAME + "/" + FOLDER_NAME, true);
+        assertContainerAuditEvents(PROJECT_NAME + "/" + FOLDER_NAME, "External schema 'Test' updated");
 
         doTestViaForm();
         doTestViaJavaApi();
@@ -270,6 +277,19 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         String containerPath = PROJECT_NAME + "/" + FOLDER_NAME_2;
         ensureExternalSchema(containerPath);
         _schemaHelper.deleteSchema(containerPath, USER_SCHEMA_NAME);
+        assertContainerAuditEvents(containerPath, "External schema 'Test' deleted");
+    }
+
+    void assertContainerAuditEvents(String containerPath, String matchingComment)
+    {
+        var rows = executeSelectRowCommand("auditLog", "ContainerAuditEvent",
+                ContainerFilter.Current, containerPath, null).getRows();
+        boolean foundEvent = rows.stream().anyMatch(a-> a.get("_labkeyurl_container").toString().contains(containerPath) && a.get("comment").toString().equals(matchingComment));
+        if (!foundEvent)
+        {
+            ShowAuditLogPage.beginAt(this, containerPath, "ContainerAuditEvent");
+            Assert.fail("Event not found: " + matchingComment);
+        }
     }
 
     void doTestUneditable()
@@ -304,7 +324,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     {
         log("** Trying to visit schema in container where it hasn't been configured");
         beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        assertTitleEquals("404: Error Page -- Could not find schema: Test");
+        assertTitleEquals("404: Error Page -- The specified schema does not exist");
     }
     
     void doTestViaForm()
@@ -446,7 +466,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         log("** Deleting via api: pks=" + join(",", pks) + "...");
         DeleteRowsCommand cmd = new DeleteRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Integer pk : pks)
-            cmd.addRow(Collections.singletonMap("RowId", (Object) pk));
+            cmd.addRow(Collections.singletonMap("RowId", pk));
         
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());

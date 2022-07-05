@@ -381,13 +381,13 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         log("begin import analysis wizard");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Import FlowJo Workspace Analysis"));
-        assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
+        assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
     }
 
     @LogMethod
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
-        assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
+        assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
         _fileBrowserHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }

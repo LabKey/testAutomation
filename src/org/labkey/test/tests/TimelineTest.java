@@ -175,8 +175,7 @@ public class TimelineTest extends BaseWebDriverTest
         }
 
         _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(data.toString());
+        _listHelper.clickImportData().setText(data.toString()).submit();
         for (String[] rowData : TEST_DATA)
         {
             // check that all the data is in the grid (skipping the key column at index 0)

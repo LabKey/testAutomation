@@ -46,12 +46,6 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
     public QueryMetadataEditorPage clickSave()
     {
         elementCache().saveButton.click();
-        return this;
-    }
-
-    public QueryMetadataEditorPage clickSaveAndWaitForSuccess()
-    {
-        clickSave();
         WebDriverWrapper.waitFor(()->  Locator.tagWithClass("div", "alert-success")
                         .containingIgnoreCase("Save Successful").existsIn(this),
                 "Expected success message did not appear in time", WAIT_FOR_JAVASCRIPT);

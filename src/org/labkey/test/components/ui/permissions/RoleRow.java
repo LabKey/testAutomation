@@ -28,7 +28,7 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
     {
         if (!isExpanded())
         {
-            elementCache().rowToggle.click();
+            elementCache().rowContainer.click();
         }
     }
 
@@ -91,8 +91,7 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
 
     protected class ElementCache extends WebDriverComponent<RoleRow.ElementCache>.ElementCache
     {
-        final WebElement rowContainer = Locator.byClass("container-expandable-icononly").findWhenNeeded(this);
-        final WebElement rowToggle = Locator.byClass("container-expandable-child__chevron").findWhenNeeded(this);
+        final WebElement rowContainer = Locator.byClass("container-expandable-grey").findWhenNeeded(this);
         final WebElement assignmentsRow = Locator.byClass("permissions-assignments-row").findWhenNeeded(this);
         final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
                 .setOptionLocator(ReactSelect.Locators.option::startsWith);

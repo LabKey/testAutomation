@@ -1,6 +1,9 @@
 package org.labkey.test.tests;
 
-import org.apache.http.HttpStatus;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,18 +16,19 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
-import org.labkey.test.util.SimpleHttpRequest;
-import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +50,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     private static final String TEMPLATE_SUBFOLDER = "Subfolder for template project";
     private static final String TEMPLATE_FOLDER_PERMISSION = "Data Management";
 
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     public static void setup()
@@ -92,7 +96,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCreateProjectByProjectCreator() throws IOException, CommandException
+    public void testCreateProjectByProjectCreator() throws IOException
     {
         log("Project Creator creating the project with admin permission");
         goToHome();
@@ -128,7 +132,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCreateProjectByReader() throws IOException, CommandException
+    public void testCreateProjectByReader() throws IOException
     {
         log("Verifying Reader creating the project fails");
         goToHome();
@@ -184,8 +188,8 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         params.put("folderType", "Template");
         params.put("templateSourceId", containerId);
         params.put("templateIncludeSubfolders", "true");
-        params.put("templateWriterTypes", "Role%20assignments%20for%20users%20and%20groups");
-        createProject(params, "Project-level%20groups%20and%20members");
+        params.put("templateWriterTypes", List.of("Role assignments for users and groups", "Project-level groups and members"));
+        createProject(params);
         stopImpersonating();
 
         assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
@@ -197,8 +201,35 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
     private String createProject(Map<String, Object> params) throws IOException
     {
-        PostCommand<CommandResponse> command = new PostCommand<>("admin", "createProject");
-        command.setParameters(params);
+        // CreateProjectAction is not a real API action, so we POST form data not JSON
+        PostCommand<CommandResponse> command = new PostCommand<>("admin", "createProject")
+        {
+            @Override
+            protected HttpUriRequest createRequest(URI uri)
+            {
+                List<BasicNameValuePair> postData = new ArrayList<>();
+
+                params.forEach((k, v) -> {
+                    // Expand any collections into multiple individual params
+                    if (v instanceof Collection<?> col)
+                        col.forEach(val -> postData.add(new BasicNameValuePair(k, String.valueOf(val))));
+                    else
+                        postData.add(new BasicNameValuePair(k, String.valueOf(v)));
+                });
+
+                try
+                {
+                    HttpPost request = new HttpPost(uri);
+                    request.setEntity(new UrlEncodedFormEntity(postData));
+                    return request;
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+
         try
         {
             command.execute(getRemoteApiConnection(), "/");
@@ -210,26 +241,6 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         return "Success";
     }
-
-    private void createProject(Map<String, Object> params, String additionalWriters)
-    {
-        String createProjectUrl = WebTestHelper.buildURL("admin", "createProject", params);
-        createProjectUrl = createProjectUrl.replace("view", "api");
-        createProjectUrl = createProjectUrl + "&templateWriterTypes=" + additionalWriters;
-        SimpleHttpRequest createProjectRequest = new SimpleHttpRequest(createProjectUrl, "POST");
-        createProjectRequest.copySession(getDriver());
-
-        try
-        {
-            SimpleHttpResponse response = createProjectRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     @Override
     public List<String> getAssociatedModules()

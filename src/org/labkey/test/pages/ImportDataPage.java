@@ -17,6 +17,8 @@ package org.labkey.test.pages;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.components.ext4.Checkbox;
@@ -24,6 +26,7 @@ import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -32,6 +35,9 @@ import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 {
+
+    public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
+
     public ImportDataPage(WebDriver driver)
     {
         super(driver);
@@ -88,6 +94,13 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return this;
     }
 
+    public ImportDataPage submitExpectingErrorContaining(String partialError)
+    {
+        String actualError = submitExpectingError();
+        MatcherAssert.assertThat("Import error message.", actualError, CoreMatchers.containsString(partialError));
+        return this;
+    }
+
     public ImportDataPage submitExpectingError(String error)
     {
         String actualError = submitExpectingError();
@@ -97,7 +110,8 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public String submitExpectingError()
     {
-        elementCache().getSubmitButton().click();
+        doAndWaitForPageSignal(() -> elementCache().getSubmitButton().click(),
+                IMPORT_ERROR_SIGNAL);
         clearCache();
         return waitForErrors();
     }
@@ -149,6 +163,11 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
+        public ElementCache()
+        {
+            shortWait().until(ExpectedConditions.visibilityOf(uploadPanel));
+        }
+
         // Upload file
         WebElement uploadPanel = Locator.tagWithAttribute("div", "data-panel-name", "uploadFilePanel").findWhenNeeded(this);
         WebElement uploadFileDiv = Locator.byClass("panel-body").findWhenNeeded(uploadPanel);

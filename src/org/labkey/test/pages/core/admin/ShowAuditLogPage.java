@@ -27,6 +27,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
+import java.util.Map;
 
 public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
 {
@@ -43,6 +44,12 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
     public static ShowAuditLogPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("audit", containerPath, "showAuditLog"));
+        return new ShowAuditLogPage(driver.getDriver());
+    }
+
+    public static ShowAuditLogPage beginAt(WebDriverWrapper driver, String containerPath, String eventType)
+    {
+        driver.beginAt(WebTestHelper.buildURL("audit", containerPath, "showAuditLog", Map.of("view", eventType)));
         return new ShowAuditLogPage(driver.getDriver());
     }
 

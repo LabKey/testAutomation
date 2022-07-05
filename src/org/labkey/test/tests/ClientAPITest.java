@@ -1441,7 +1441,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         command = new Command<>("query", "selectRows.api");
         // Check that an valid container with bogus parameters also does the right thing for selectRows
-        expectedProps.put("exception", "Could not find schema: ");
+        expectedProps.put("exception", "The specified schema does not exist");
         cn = getConnection(true);
         runCommand(cn, command, "application/json", "application/json", 404, expectedProps);
 
