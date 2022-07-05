@@ -408,6 +408,7 @@ public class FieldDefinition extends PropertyDescriptor
 
     public void setAliquotOption(ExpSchema.DerivationDataScopeType aliquotOption)
     {
+        super.setDerivationDataScope(aliquotOption.name());
         _aliquotOption = aliquotOption;
     }
 
