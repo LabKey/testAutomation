@@ -605,13 +605,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public List<Pair<String, Map<String, String>>> getLinkAddresses()
     {
         String js = """
-                var i;
+                var i, j;
                 var addresses = new Array();
                 var links = window.document.links;
                 for (i = 0; i < links.length; i++) {
                     if (links[i].href && links[i].href != '#') {
-                        addresses.push({href: links[i].href});
-                        // addresses.push({href: links[i].href, attributes: links[i].attributes});
+                        //addresses.push({href: links[i].href});
+                        var link = {href: links[i].href};
+                        var attributes = new Array();
+                        for (j = 0; j < links[i].attributes.length; j++)
+                        {
+                            // WebDriver can't pass back attributes 'NamedNodeMap'
+                            let a = links[i].attributes[j];
+                            attributes.push({name: a.name, value: a.value});
+                        }
+                        addresses.push({href: links[i].href, attributes: attributes});
                     }
                 }
                 return addresses;
@@ -630,10 +638,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (null != link)
             {
                 Map<String, String> attributes = new HashMap<>();
-                Map<String, Object> rawAttributes = (Map<String, Object>) entry.get("attributes");
+                List<Map<String, Object>> rawAttributes = (List<Map<String, Object>>) entry.get("attributes");
                 if (rawAttributes != null)
                 {
-                    rawAttributes.forEach((key, value) -> attributes.put(key, (String) value));
+                    rawAttributes.forEach(att -> attributes.put((String) att.get("name"), (String) att.get("value")));
                 }
 
                 links.add(Pair.of(link, attributes));
