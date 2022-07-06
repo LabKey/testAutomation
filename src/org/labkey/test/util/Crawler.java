@@ -834,7 +834,7 @@ public class Crawler
     @LogMethod
     public void validatePage(@LoggedParam String url)
     {
-        crawlLink(new UrlToCheck(null, url, -1));
+        crawlLink(new UrlToCheck(null, url, 0));
     }
 
     /**
@@ -1032,6 +1032,7 @@ public class Crawler
                                 List<String> rel = Arrays.asList(StringUtils.trimToEmpty(attributes.get("rel")).split(" +"));
                                 if (target.equals("_blank"))
                                 {
+                                    // Issue 40708: Create automated tests to look for anchor tags with link to an outside server
                                     MatcherAssert.assertThat(String.format("Bad 'rel' attribute for link to %s. On Page: %s", href, actualUrl),
                                             rel, CoreMatchers.hasItems("noopener", "noreferrer"));
                                 }
