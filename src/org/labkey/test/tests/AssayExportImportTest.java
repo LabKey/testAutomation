@@ -48,6 +48,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PerlHelper;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -608,7 +609,6 @@ public class AssayExportImportTest extends BaseWebDriverTest
         final String assayName = SIMPLE_ASSAY_FOR_EXPORT;
         final String instrumentSetting = "456";
         final String commentPrefix = "This is a comment for run to be exported via XAR. This is for run: ";
-        final String xarName = "exportedRuns.xar";
 
         int assayId = createSimpleProjectAndAssay(exportProject, assayName).intValue();
 
@@ -638,20 +638,23 @@ public class AssayExportImportTest extends BaseWebDriverTest
         run4.setProperties(Maps.of("instrumentSetting", instrumentSetting));
         run4.execute(cn, exportProject);
 
-        log("Now export the run.");
-
         List<String> runColumns = Arrays.asList("adjustedM1", "M2");
         Map<String, List<String>> run01ColumnData = getRunColumnData(ASSAY_PROJECT_FOR_EXPORT_04, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, runColumns);
         runColumns = Arrays.asList("adjustedM1", "M1");
         Map<String, List<String>> run04ColumnData = getRunColumnData(ASSAY_PROJECT_FOR_EXPORT_04, SIMPLE_ASSAY_FOR_EXPORT, RUN04_NAME, runColumns);
         goToManageAssays();
 
+        log("Now export the run.");
+        final String toPipelineXarName = "toPipeline.xar";
+
         clickAndWait(Locator.linkWithText(assayName));
         DataRegionTable runsTable = DataRegionTable.DataRegion(getDriver()).find();
         runsTable.checkAllOnPage();
         DataRegionExportHelper exportPanel = runsTable.expandExportPanel();
-        File xarFile = exportPanel.exportXar(ABSOLUTE, xarName);
-        exportPanel.exportXarToPipeline(PARTIAL_FOLDER_RELATIVE, xarName)
+        File absoluteXarFile = exportPanel.exportXar(ABSOLUTE, "absolute.xar");
+        File folderRelativeXarFile = exportPanel.exportXar(FOLDER_RELATIVE, "folderRelative.xar");
+        File partialRelativeXarFile = exportPanel.exportXar(PARTIAL_FOLDER_RELATIVE, "partialRelative.xar");
+        exportPanel.exportXarToPipeline(FOLDER_RELATIVE, toPipelineXarName)
                 .waitForComplete();
 
         log("Delete runs.");
@@ -662,35 +665,27 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         log("Reimport runs into same project.");
         goToModule("FileContent");
-        _fileBrowserHelper.importFile("/exportedXars/" + xarName, "Import Experiment");
-        waitForServerErrors(2);
-        // TODO: Check imported runs
-        // Issue 44815: Add test automation coverage for exporting runs to XAR via "Write to exportedXARs directory in pipeline"
-//        clickAndWait(Locator.linkWithText(assayName));
-//        waitForElement(Locator.linkWithText(RUN01_NAME));
-//
-//        compareRunColumnsWithExpected(exportProject, assayName, RUN01_NAME, run01ColumnData);
-//        compareRunColumnsWithExpected(exportProject, assayName, RUN04_NAME, run04ColumnData);
+        _fileBrowserHelper.importFile("/exportedXars/" + toPipelineXarName, "Import Experiment");
+        goToDataPipeline();
+        waitForPipelineJobsToComplete(2, true);
+        checkExpectedErrors(2);
 
-        log("Import runs into a new project");
+        // Issue 45830: Malformed XAR when exporting assay runs with "PARTIAL_FOLDER_RELATIVE" LSIDs
+        log("Import runs (partial relative LSID) into a new project");
         _containerHelper.createProject(importProject, "Assay");
         goToProjectHome(importProject);
         goToModule("FileContent");
-        _fileBrowserHelper.uploadFile(xarFile);
-        _fileBrowserHelper.importFile(xarName, "Import Experiment");
-        waitForServerErrors(2);
-        // TODO: Check imported runs
-        // Issue 44815: Add test automation coverage for exporting runs to XAR via "Write to exportedXARs directory in pipeline"
-//        clickAndWait(Locator.linkWithText(assayName));
-//        waitForElement(Locator.linkWithText(RUN01_NAME));
-//
-//        compareRunColumnsWithExpected(exportProject, assayName, RUN01_NAME, run01ColumnData);
-//        compareRunColumnsWithExpected(exportProject, assayName, RUN04_NAME, run04ColumnData);
+        _fileBrowserHelper.uploadFile(partialRelativeXarFile);
+        _fileBrowserHelper.importFile(partialRelativeXarFile.getName(), "Import Experiment");
+        PipelineStatusTable pipelineStatusTable = goToDataPipeline();
+        waitForPipelineJobsToComplete(1, true);
+        checkExpectedErrors(2);
+        pipelineStatusTable.deleteAllPipelineJobs();
 
-        // TODO: Remove remaining checks?
-        _containerHelper.deleteProject(exportProject);
+        log("Import runs (folder relative LSID) into a new project");
         goToModule("FileContent");
-        _fileBrowserHelper.importFile(xarName, "Import Experiment");
+        _fileBrowserHelper.uploadFile(folderRelativeXarFile);
+        _fileBrowserHelper.importFile(folderRelativeXarFile.getName(), "Import Experiment");
         goToDataPipeline();
         waitForPipelineJobsToComplete(1, false);
         goToManageAssays()
@@ -701,9 +696,4 @@ public class AssayExportImportTest extends BaseWebDriverTest
         compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
     }
 
-    private void waitForServerErrors(int errorCount)
-    {
-        shortWait().until(wd -> getServerErrorCount() == errorCount);
-        checkExpectedErrors(errorCount);
-    }
 }
