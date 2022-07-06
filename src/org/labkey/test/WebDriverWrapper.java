@@ -601,35 +601,56 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Pair<String, Map<String, String>>> getLinkAddresses()
     {
-        return getLinkAddresses(false);
+        String js = """
+                getLinkAddresses = function () {
+                    var i, j;
+                    var addresses = new Array();
+                    var links = window.document.links;
+                    for (i = 0; i < links.length; i++) {
+                        if (links[i].href && links[i].href != '#') {
+                            addresses.push({href: links[i].href});
+                            // addresses.push({href: links[i].href, attributes: links[i].attributes});
+                        }
+                    }
+                    return addresses;
+                };
+                return getLinkAddresses();
+                """;
+
+        List<Map<String, Object>> linksWithAttributes = (List<Map<String, Object>>) executeScript(js);
+        List<Pair<String, Map<String, String>>> links = new ArrayList<>();
+        for (Map<String, Object> entry : linksWithAttributes)
+        {
+            String link = (String) entry.get("href");
+            if (link.contains("#"))
+            {
+                link = link.substring(0, link.indexOf("#"));
+            }
+            link = trimToNull(link);
+            if (null != link)
+            {
+                Map<String, String> attributes = new HashMap<>();
+                Map<String, Object> rawAttributes = (Map<String, Object>) entry.get("attributes");
+                if (rawAttributes != null)
+                {
+                    rawAttributes.forEach((key, value) -> attributes.put(key, (String) value));
+                }
+
+                links.add(Pair.of(link, attributes));
+            }
+        }
+
+        return links;
     }
 
     public List<String> getFormAddresses()
     {
-        return getLinkAddresses(true).stream().map(Pair::getLeft).collect(Collectors.toList());
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<Pair<String, Map<String, String>>> getLinkAddresses(boolean includeForms)
-    {
-        String js = ("""
-                getLinkAddresses = function () {
-                    var i, j;
-                    var addresses = new Array();
-                """) +
-                (!includeForms ?
-                """
-                    var links = window.document.links;
-                    for (i = 0; i < links.length; i++) {
-                        if (links[i].href && links[i].href != '#') {
-                            addresses.push({href: links[i].href, attributes: links[i].attributes});
-                        }
-                    }
-                """
-                : // includeForms
-                """
+        String js = """
+                var i, j;
+                var addresses = new Array();
                     var forms = window.document.forms;
                     for (i = 0; i < forms.length ; i++) {
                         var action = forms[i].getAttribute('action'); // raw attribute value
@@ -651,36 +672,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                 and = '&';
                             }
                         }
-                        addresses.push({href: forms[i].href, attributes: forms[i].attributes});
+                        addresses.push(action);
                     }
-                """) +
-                ("""
-                    return addresses;
-                };
-                return getLinkAddresses();
-                """);
+                return addresses;
+                """;
 
-        List<Map<String, Object>> linksWithAttributes = (List<Map<String, Object>>) executeScript(js);
-        List<Pair<String, Map<String, String>>> links = new ArrayList<>();
-        for (Map<String, Object> entry : linksWithAttributes)
-        {
-            String link = (String) entry.get("href");
-            if (link.contains("#"))
-            {
-                link = link.substring(0, link.indexOf("#"));
-            }
-            link = trimToNull(link);
-            if (null != link)
-            {
-                Map<String, String> attributes = new HashMap<>();
-                Map<String, Object> rawAttributes = (Map<String, Object>) entry.get("attributes");
-                rawAttributes.forEach((key, value) -> attributes.put(key, (String) value));
-
-                links.add(Pair.of(link, attributes));
-            }
-        }
-
-        return links;
+        return (List<String>) executeScript(js);
     }
 
     public String getCurrentRelativeURL()
