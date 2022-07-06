@@ -605,19 +605,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public List<Pair<String, Map<String, String>>> getLinkAddresses()
     {
         String js = """
-                getLinkAddresses = function () {
-                    var i, j;
-                    var addresses = new Array();
-                    var links = window.document.links;
-                    for (i = 0; i < links.length; i++) {
-                        if (links[i].href && links[i].href != '#') {
-                            addresses.push({href: links[i].href});
-                            // addresses.push({href: links[i].href, attributes: links[i].attributes});
-                        }
+                var i;
+                var addresses = new Array();
+                var links = window.document.links;
+                for (i = 0; i < links.length; i++) {
+                    if (links[i].href && links[i].href != '#') {
+                        addresses.push({href: links[i].href});
+                        // addresses.push({href: links[i].href, attributes: links[i].attributes});
                     }
-                    return addresses;
-                };
-                return getLinkAddresses();
+                }
+                return addresses;
                 """;
 
         List<Map<String, Object>> linksWithAttributes = (List<Map<String, Object>>) executeScript(js);
