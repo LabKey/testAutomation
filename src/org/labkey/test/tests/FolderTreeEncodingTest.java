@@ -66,7 +66,7 @@ public class FolderTreeEncodingTest extends BaseWebDriverTest
     @Test
     public void testPermissionsPageFolderTree()
     {
-        // Issue 45079: with double encoding, the folder selection in the folder tree will fail
+        // Issue 45079: Double encoding at the root of the permissions page folder tree
         PermissionsPage page = goToFolderPermissions();
         page = page.selectFolder(CHILD_CONTAINER);
         page.selectFolder(getProjectName());
@@ -75,7 +75,7 @@ public class FolderTreeEncodingTest extends BaseWebDriverTest
     @Test
     public void testAdminFileDirectoriesFolderTree()
     {
-        // Issue 45802: with double encoding, the folder selection in the folder tree will fail
+        // Issue 45802: Double encoded folder names in Files -> File Directories list box
         ConfigureFileSystemAccessPage page = goToAdminConsole().clickFiles();
         page.selectFolder(getProjectName());
     }
