@@ -77,6 +77,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
     private static final String VIEW_DEFAULT = "Default";
+    private static final String VIEW_DEFAULT_APP = "My Default";
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
     private static final String VIEW_FEWER_COLUMNS = "Fewer_Columns";
     private static final String VIEW_FILTERED_COLUMN = "Filtered_Column";
@@ -1519,7 +1520,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filterDialog.cancel();
 
         log("Go back to default view. Filter on a column to be removed, then change view that does not include the column.");
-        grid.selectView(VIEW_DEFAULT);
+        grid.selectView(VIEW_DEFAULT_APP);
 
         log(String.format("Filter column '%s' to true.", FILTER_BOOL_COL));
         grid.filterColumn(FILTER_BOOL_COL, Filter.Operator.EQUAL, true);
