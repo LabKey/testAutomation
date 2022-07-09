@@ -73,11 +73,11 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         //goto l and feel
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         //confirm Enable discussion enabled checked
-        Checkbox enableDiscussionCheckbox = projectSettingsPage.getEnableDiscussionCheckbox();
-        assertEquals("Enable Discussion should be checked.", true, enableDiscussionCheckbox.isChecked());
+        Checkbox discussionEnabledCheckbox = projectSettingsPage.getDiscussionEnabledCheckbox();
+        assertEquals("Enable Discussion should be checked.", true, discussionEnabledCheckbox.isChecked());
 
         //un-check Enabled
-        enableDiscussionCheckbox.uncheck();
+        discussionEnabledCheckbox.uncheck();
         projectSettingsPage.save();
 
         //Confirm Discussion link is not present
