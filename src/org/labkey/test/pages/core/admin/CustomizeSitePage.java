@@ -70,7 +70,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public String getBaseServerURL()
+    public String getBaseServerUrl()
     {
         return elementCache().baseServerURL.get();
     }
