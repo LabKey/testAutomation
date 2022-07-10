@@ -64,7 +64,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public CustomizeSitePage setBaseServerURL(String value)
+    public CustomizeSitePage setBaseServerUrl(String value)
     {
         elementCache().baseServerURL.set(value);
         return this;
