@@ -64,15 +64,15 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public CustomizeSitePage setBaseServerUrl(String value)
+    public CustomizeSitePage setBaseServerURL(String value)
     {
-        elementCache().baseServerUrl.set(value);
+        elementCache().baseServerURL.set(value);
         return this;
     }
 
-    public String getBaseServerUrl()
+    public String getBaseServerURL()
     {
-        return elementCache().baseServerUrl.get();
+        return elementCache().baseServerURL.get();
     }
 
     public CustomizeSitePage setContainerRelativeUrl(boolean enable)
@@ -210,7 +210,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
         // Site URLs
         protected final Input defaultDomain = Input(Locator.id("defaultDomain"), getDriver()).findWhenNeeded(this);
-        protected final Input baseServerUrl = Input(Locator.id("baseServerUrl"), getDriver()).findWhenNeeded(this);
+        protected final Input baseServerURL = Input(Locator.id("baseServerURL"), getDriver()).findWhenNeeded(this);
         protected final Checkbox containerRelativeUrl = Checkbox(Locator.id("useContainerRelativeURL")).findWhenNeeded(this);
 
         // Usage Reporting
