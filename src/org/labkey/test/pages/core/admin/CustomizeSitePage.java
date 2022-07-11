@@ -210,7 +210,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
         // Site URLs
         protected final Input defaultDomain = Input(Locator.id("defaultDomain"), getDriver()).findWhenNeeded(this);
-        protected final Input baseServerUrl = Input(Locator.id("baseServerUrl"), getDriver()).findWhenNeeded(this);
+        protected final Input baseServerUrl = Input(Locator.id("baseServerURL"), getDriver()).findWhenNeeded(this);
         protected final Checkbox containerRelativeUrl = Checkbox(Locator.id("useContainerRelativeURL")).findWhenNeeded(this);
 
         // Usage Reporting
