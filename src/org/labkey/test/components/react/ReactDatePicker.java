@@ -1,5 +1,6 @@
 package org.labkey.test.components.react;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -49,6 +50,18 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         set(value, true);
     }
 
+    // use keyboard input to set year, month. then use picker to select day and time
+    // value must be of "yyyy-MM-dddd" or "yyyy-MM-dddd hh:ss" format
+    public void select(String value)
+    {
+        set("", false);
+        String[] dateParts = getParsedDateParts(value);
+        set(dateParts[0], false); // use keyboard input to set year and month
+        elementCache().datePickerDateCell(dateParts[1]).click(); // use calendar ui to select day
+        if (!StringUtils.isEmpty(dateParts[2])) // use timepicker to select time
+            clickTime(dateParts[2]);
+    }
+
     public void clear()
     {
         set("");
@@ -77,6 +90,34 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         }
     }
 
+    /**
+     * Parse "2022-07-11 08:30" to ["2022-07", "11", "8:30 AM"]
+     * @param fullDateStr
+     * @return
+     */
+    private String[] getParsedDateParts(String fullDateStr)
+    {
+        String[] parts = fullDateStr.split(" ") ;
+        String[] dayParts = parts[0].split("-");
+        String yearMon = dayParts[0] + "-" + dayParts[1];
+        String dayPart = dayParts[2];
+        String timePart = parts.length > 1 ? parts[1] : "";
+        if (!StringUtils.isEmpty(timePart))
+        {
+            String[] timeParts = timePart.split(":");
+            String amPM = "AM";
+            int hour = Integer.parseInt(timeParts[0]);
+            if (hour > 12)
+            {
+                amPM = "PM";
+                hour -= 12;
+            }
+            timePart = hour + ":" + timeParts[1] + " " + amPM;
+        }
+
+        return new String[]{yearMon, dayPart, timePart};
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -101,6 +142,21 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
             return Locator.tagWithClass("li", "react-datepicker__time-list-item").withText(text)
                     .findElement(timeList);
         }
+
+        /**
+         * Return the date cell div of react datepicker
+         * @param day '01', '02', ... '31'
+         * @return
+         */
+        WebElement datePickerDateCell(String day)
+        {
+            return datePickerDateLoc(day).findElement(popup);
+        }
+    }
+
+    static Locator.XPathLocator datePickerDateLoc(String datePart)
+    {
+        return Locator.tagWithClass("div", "react-datepicker__day--0" + datePart);
     }
 
     public static class ReactDateInputFinder extends WebDriverComponentFinder<ReactDatePicker, ReactDateInputFinder>
