@@ -85,6 +85,12 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return new MapNetworkDrivePage(getDriver());
     }
 
+    public ConfigureFileSystemAccessPage selectFolder(String folderName)
+    {
+        click(Locator.tagWithText("span", folderName).withClass("x4-tree-node-text"));
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
