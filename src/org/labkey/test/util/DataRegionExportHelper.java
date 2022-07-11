@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +113,28 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public PipelineStatusDetailsPage exportXarToPipeline(XarLsidOutputType lsidType, String xarName)
+    {
+        startExportXar(lsidType, XarExportType.PIPELINE_FILE, xarName);
+        getWrapper().clickAndWait(elementCache().findExportButton());
+        return new PipelineStatusDetailsPage(getWrapper());
+    }
+
+    public File exportXar(XarLsidOutputType lsidType, String xarName)
+    {
+        startExportXar(lsidType, XarExportType.BROWSER_DOWNLOAD, xarName);
+        return getWrapper().clickAndWaitForDownload(elementCache().findExportButton());
+    }
+
+    private void startExportXar(XarLsidOutputType lsidType, XarExportType exportType, String xarName)
+    {
+        expandPanel();
+        elementCache().xarTab.click();
+        elementCache().xarLsidOutputTypeSelect.set(lsidType);
+        elementCache().xarExportTypeSelect.set(exportType);
+        elementCache().xarFileNameInput.set(xarName);
     }
 
     public AbstractDataRegionExportOrSignHelper expandExportPanel()
