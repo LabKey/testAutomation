@@ -86,17 +86,17 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
     public void enableHelp(boolean enable)
     {
         if (enable)
-            checkCheckbox(elementCache().enableHelpChk);
+            checkCheckbox(elementCache().helpMenuEnabledChk);
         else
-            uncheckCheckbox(elementCache().enableHelpChk);
+            uncheckCheckbox(elementCache().helpMenuEnabledChk);
     }
 
     public void enableObjectLevelDiscussions(boolean enable)
     {
         if (enable)
-            checkCheckbox(elementCache().enableDiscussionChk);
+            checkCheckbox(elementCache().discussionEnabledChk);
         else
-            uncheckCheckbox(elementCache().enableDiscussionChk);
+            uncheckCheckbox(elementCache().discussionEnabledChk);
     }
 
     public void setLogoLink(String link)
@@ -254,8 +254,8 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         WebElement showNavForAdmin = Locator.xpath("//input[@name='folderDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
         WebElement showAppNavAlways = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
         WebElement showAppNavForAdmin = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
-        WebElement enableHelpChk = Locator.name("enableHelpMenu").findWhenNeeded(this);
-        WebElement enableDiscussionChk = Locator.name("enableDiscussion").findWhenNeeded(this);
+        WebElement helpMenuEnabledChk = Locator.name("helpMenuEnabled").findWhenNeeded(this);
+        WebElement discussionEnabledChk = Locator.name("discussionEnabled").findWhenNeeded(this);
         WebElement logoLinkTxt = Locator.inputByNameContaining("logoHref").findWhenNeeded(this);
         WebElement supportLinkTxt = Locator.inputByNameContaining("reportAProblemPath").findWhenNeeded(this);
         WebElement supportEmailTxt = Locator.inputByNameContaining("supportEmail").findWhenNeeded(this);
