@@ -55,12 +55,12 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
 
     public boolean isLimitEnabled()
     {
-        return elementCache().limitActiveUsers.getFirstSelectedOption().getAttribute("value").equals("1");
+        return elementCache().userLimit.getFirstSelectedOption().getAttribute("value").equals("1");
     }
 
     public LimitActiveUserPage enableUserLimit(boolean enable)
     {
-        elementCache().limitActiveUsers.selectByValue(enable ? "1" : "0");
+        elementCache().userLimit.selectByValue(enable ? "1" : "0");
         return this;
     }
 
@@ -141,7 +141,7 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
         protected final Input userWarningLevel = Input.Input(Locator.id("userWarningLevel"), getDriver()).findWhenNeeded(this);
         protected final WebElement userWarningMessage = Locator.id("userWarningMessage").findWhenNeeded(this);
 
-        protected final Select limitActiveUsers = new Select(Locator.id("limitActiveUsers").findWhenNeeded(this));
+        protected final Select userLimit = new Select(Locator.id("userLimit").findWhenNeeded(this));
         protected final Input userLimitLevel = Input.Input(Locator.id("userLimitLevel"), getDriver()).findWhenNeeded(this);
         protected final WebElement userLimitMessage = Locator.id("userLimitMessage").findWhenNeeded(this);
 
@@ -166,7 +166,7 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
         final boolean userWarning;
         final String userWarningLevel;
         final String userWarningMessage;
-        final boolean limitActiveUsers;
+        final boolean userLimit;
         final String userLimitLevel;
         final String userLimitMessage;
 
@@ -175,7 +175,7 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
             userWarning = activeUserPage.isWarningEnabled();
             userWarningLevel = activeUserPage.getUserWarningLevel();
             userWarningMessage = activeUserPage.getUserWarningMessage();
-            limitActiveUsers = activeUserPage.isLimitEnabled();
+            userLimit = activeUserPage.isLimitEnabled();
             userLimitLevel = activeUserPage.getUserLimitLevel();
             userLimitMessage = activeUserPage.getUserLimitMessage();
         }
@@ -186,7 +186,7 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
             json.put("userWarning", userWarning);
             json.put("userWarningLevel", userWarningLevel);
             json.put("userWarningMessage", userWarningMessage);
-            json.put("limitActiveUsers", limitActiveUsers);
+            json.put("userLimit", userLimit);
             json.put("userLimitLevel", userLimitLevel);
             json.put("userLimitMessage", userLimitMessage);
             return json;
