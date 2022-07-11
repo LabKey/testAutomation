@@ -1,10 +1,12 @@
 package org.labkey.test.components.ui.grids;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.ReactDatePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -271,6 +273,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return new ArrayList<>(Arrays.asList(unPopulatedRows, populatedRows));
     }
 
+    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet)
+    {
+        setCellValue(columnNameToSearch, valueToSearch, columnNameToSet, valueToSet, false);
+    }
+
     /**
      * <p>
      *     For a given column, 'columnNameToSet', set the cell in the row if value in column 'columnNameToSearch'
@@ -289,8 +296,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param valueToSearch The value to check for in 'columnNameToSearch' to see if the row should be updated.
      * @param columnNameToSet The column to update in a row.
      * @param valueToSet The new value to put into column 'columnNameToSet'.
+     * @param useDatePicker For date field, use datepicker instead of keyboard
      */
-    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet)
+    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet, boolean useDatePicker)
     {
         List<Map<String, String>> gridData = getGridData();
         int index = 0;
@@ -299,11 +307,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             if (rowData.get(columnNameToSearch).equals(valueToSearch))
             {
-                setCellValue(index, columnNameToSet, valueToSet);
+                setCellValue(index, columnNameToSet, valueToSet, useDatePicker);
                 break;
             }
             index++;
         }
+    }
+
+    public void setCellValue(int row, String columnName, Object value)
+    {
+        setCellValue(row, columnName, value, false);
     }
 
     /**
@@ -318,8 +331,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param row Index of the row (0 based).
      * @param columnName Name of the column to update.
      * @param value If the cell is a lookup, value should be List.of(value(s))
+     * @param useDatePicker For date field, use datepicker instead of keyboard, only works with yyyy-MM-dd format
      */
-    public void setCellValue(int row, String columnName, Object value)
+    public void setCellValue(int row, String columnName, Object value, boolean useDatePicker)
     {
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
@@ -351,10 +365,26 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // Treat the object being sent in as a string.
             // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
 
-            WebElement inputCell = elementCache().inputCell();
-            inputCell.clear();
+            if (useDatePicker)
+            {
+                ReactDatePicker datePicker = elementCache().datePicker();
+                datePicker.set("", false);
+                String[] dateParts = getParsedDateParts((String) value);
+                datePicker.set(dateParts[0], false); // use keyboard input to set year and month
+                elementCache().datePickerDateCell(dateParts[1]).click(); // use calendar ui to select day
+                if (!StringUtils.isEmpty(dateParts[2])) // use timepicker to select time
+                    datePicker.clickTime(dateParts[2]);
 
-            inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
+                WebElement inputCell = elementCache().inputCell();
+                inputCell.sendKeys(Keys.RETURN);
+            }
+            else
+            {
+                WebElement inputCell = elementCache().inputCell();
+                inputCell.clear();
+                inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
+            }
+
             getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
@@ -364,6 +394,34 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
         }
+    }
+
+    /**
+     * Parse "2022-07-11 08:30" to ["2022-07", "11", "8:30 AM"]
+     * @param fullDateStr
+     * @return
+     */
+    private String[] getParsedDateParts(String fullDateStr)
+    {
+        String[] parts = fullDateStr.split(" ") ;
+        String[] dayParts = parts[0].split("-");
+        String yearMon = dayParts[0] + "-" + dayParts[1];
+        String dayPart = dayParts[2];
+        String timePart = parts.length > 1 ? parts[1] : "";
+        if (!StringUtils.isEmpty(timePart))
+        {
+            String[] timeParts = timePart.split(":");
+            String amPM = "AM";
+            int hour = Integer.parseInt(timeParts[0]);
+            if (hour > 12)
+            {
+                amPM = "PM";
+                hour -= 12;
+            }
+            timePart = hour + ":" + timeParts[1] + " " + amPM;
+        }
+
+        return new String[]{yearMon, dayPart, timePart};
     }
 
     /**
@@ -754,6 +812,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return ReactSelect.finder(getDriver()).find(getComponentElement());
         }
 
+        public ReactDatePicker datePicker()
+        {
+            return new ReactDatePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(getComponentElement());
+        }
+
+        /**
+         * Return the date cell div of react datepicker
+         * @param day '01', '02', ... '31'
+         * @return
+         */
+        public WebElement datePickerDateCell(String day)
+        {
+            return Locators.datePickerDate(day).findElement(getComponentElement());
+        }
+
     }
 
     protected abstract static class Locators
@@ -778,6 +851,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static Locator.XPathLocator itemElement(String text)
         {
             return Locator.tagContainingText("span", text).withClass("btn-primary");
+        }
+
+        static Locator.XPathLocator datePickerDate(String datePart)
+        {
+            return Locator.tagWithClass("div", "react-datepicker__day--0" + datePart);
         }
 
     }
