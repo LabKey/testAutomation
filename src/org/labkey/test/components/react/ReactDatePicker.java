@@ -15,6 +15,9 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
     private final WebDriver _driver;
     private final WebElement _el;
 
+    private static final String YMD = "\\d{4}-\\d{2}-\\d{2}";
+    private static final String YMDHS = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}";
+
     protected ReactDatePicker(WebElement element, WebDriver driver)
     {
         _el = element;
@@ -50,16 +53,27 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         set(value, true);
     }
 
-    // use keyboard input to set year, month. then use picker to select day and time
-    // value must be of "yyyy-MM-dddd" or "yyyy-MM-dddd hh:ss" format
-    public void select(String value)
+
+    /**
+     * use keyboard input to set year, month. then use picker to select day and time
+     * @param value date or datetime string
+     * @return false if date string is not one of "yyyy-MM-dddd" or "yyyy-MM-dddd hh:ss" format
+     */
+    public boolean select(String value)
     {
-        set("", false);
-        String[] dateParts = getParsedDateParts(value);
-        set(dateParts[0], false); // use keyboard input to set year and month
-        elementCache().datePickerDateCell(dateParts[1]).click(); // use calendar ui to select day
-        if (!StringUtils.isEmpty(dateParts[2])) // use timepicker to select time
-            clickTime(dateParts[2]);
+        if (value.matches(YMD) || value.matches(YMDHS))
+        {
+            set("", false);
+            String[] dateParts = getParsedDateParts(value);
+            set(dateParts[0], false); // use keyboard input to set year and month
+            elementCache().datePickerDateCell(dateParts[1]).click(); // use calendar ui to select day
+            if (!StringUtils.isEmpty(dateParts[2])) // use timepicker to select time
+                clickTime(dateParts[2]);
+
+            return true;
+        }
+
+        return false;
     }
 
     public void clear()

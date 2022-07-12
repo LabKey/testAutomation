@@ -364,15 +364,20 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // Treat the object being sent in as a string.
             // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
 
+            boolean isUnsupportedDateFormat = false;
             if (useDatePicker)
             {
                 ReactDatePicker datePicker = elementCache().datePicker();
-                datePicker.select((String) value);
+                isUnsupportedDateFormat = !datePicker.select((String) value);
 
-                WebElement inputCell = elementCache().inputCell();
-                inputCell.sendKeys(Keys.RETURN);
+                if (!isUnsupportedDateFormat)
+                {
+                    WebElement inputCell = elementCache().inputCell();
+                    inputCell.sendKeys(Keys.RETURN);
+                }
             }
-            else
+
+            if (isUnsupportedDateFormat || !useDatePicker)
             {
                 WebElement inputCell = elementCache().inputCell();
                 inputCell.clear();
