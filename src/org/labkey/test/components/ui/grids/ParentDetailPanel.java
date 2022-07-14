@@ -1,13 +1,18 @@
 package org.labkey.test.components.ui.grids;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.ui.entities.ParentEntityEditPanel;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /*
@@ -55,6 +60,19 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         return elementCache().optionalEditBtn().isPresent();
     }
 
+    public Map<String, ResponsiveGrid> getParentDetailsPanelGrids()
+    {
+        Map detailsGridMap = new HashMap();
+        for (String parentType : getParentTypes())
+            detailsGridMap.put(parentType, getParentsGridFor(parentType));
+        return detailsGridMap;
+    }
+
+    public boolean hasParentTypes()
+    {
+        return getParentTypes().size() > 0;
+    }
+
     public List<String> getParentTypes()
     {
         return getWrapper().getTexts(elementCache().gridParentTypesLinks());
@@ -63,7 +81,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
     /*
         gets the details table for the given parent/source type
      */
-    public DetailTable detailTableFor(String type)
+    public DetailTable getDetailTableForType(String type)
     {
         return elementCache().detailTableFor(type);
     }
@@ -76,7 +94,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         return elementCache().responsiveGridFor(type);
     }
 
-    public ParentDetailPanelEdit clickEdit()
+    public ParentEntityEditPanel clickEdit()
     {
         String title = title();
         if (!isEditable())
@@ -85,8 +103,37 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         var editBtn = elementCache().editBtn;
         editBtn.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(editBtn));
-        return new ParentDetailPanelEdit.ParentDetailPanelEditFinder(getDriver()).withTitle("Editing " + title)
-                .waitFor();
+        return new ParentEntityEditPanel.ParentEntityEditPanelFinder(getDriver()).waitFor();
+    }
+
+
+    @Override
+    protected void waitForReady()
+    {
+        WebDriverWrapper.waitFor(()-> {
+                    if(BootstrapLocators.loadingSpinner.findWhenNeeded(this).isDisplayed())
+                    {
+                        return false;   // any spinner being present means the control is not ready
+                    }
+                    else
+                    {
+                        List<DetailTable> detailTables = new DetailTable.DetailTableFinder(getDriver()).findAll(this);
+                        if (detailTables.size() == 0)
+                            return false;
+
+                        // at least one detailtable exists, each with some value in it
+                        for (DetailTable table : detailTables)
+                        {
+                            table.waitForReady();
+
+                            // each table must show an indicator of having no source or parent types, or have a linked parent/source type
+                            if (table.getTableData().values().isEmpty())
+                                return false;
+                        }
+                        return true;
+                    }
+                },
+                "the component did not become ready in time", 4000);
     }
 
     @Override
