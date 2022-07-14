@@ -11,6 +11,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Map;
 
@@ -37,6 +38,33 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("reports", containerPath, "runReport", Map.of("reportId", reportId)));
         return new ScriptReportPage(webDriverWrapper.getDriver());
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        String activeTab = Locator.byClass("x4-tab-top-active").waitForElement(getDriver(), 10_000).getText();
+        switch (activeTab)
+        {
+            case "Report" ->
+                    waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
+            case "Source" ->
+                    shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.byClass("reportSource")));
+        }
+    }
+
+    public ScriptReportPage clickSourceTab()
+    {
+        waitAndClick(Ext4Helper.Locators.tab("Source"));
+        waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), WAIT_FOR_PAGE);
+        return this;
+    }
+
+    public ScriptReportPage setReportSource(String source)
+    {
+        clickSourceTab();
+        setCodeEditorValue("script-report-editor", source);
+        return this;
     }
 
     public String saveReport(String name, boolean isSaveAs, int wait)
@@ -119,12 +147,6 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         waitFor(() -> checkbox.isChecked() == checked, 1000);
     }
 
-    public void clickSourceTab()
-    {
-        waitAndClick(Ext4Helper.Locators.tab("Source"));
-        waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), WAIT_FOR_PAGE);
-    }
-
     public void ensureFieldSetExpanded(String name)
     {
         if (name != null)
@@ -138,10 +160,17 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         }
     }
 
-    public void clickReportTab()
+    public ScriptReportPage clickReportTab()
     {
         waitAndClick(Ext4Helper.Locators.tab("Report"));
         waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        return this;
+    }
+
+    public WebElement findReportView()
+    {
+        clickReportTab();
+        return Locator.byClass("reportView").findElement(getDriver());
     }
 
     @NotNull
