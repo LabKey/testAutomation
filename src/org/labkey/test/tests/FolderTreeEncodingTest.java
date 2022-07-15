@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
@@ -68,8 +69,8 @@ public class FolderTreeEncodingTest extends BaseWebDriverTest
     {
         // Issue 45079: Double encoding at the root of the permissions page folder tree
         PermissionsPage page = goToFolderPermissions();
-        page = page.selectFolder(CHILD_CONTAINER);
-        page.selectFolder(getProjectName());
+        isElementPresent(Locator.linkWithText(CHILD_CONTAINER).withClass("x4-tree-node-text"));
+        isElementPresent(Locator.linkWithText(getProjectName()).withClass("x4-tree-node-text"));
     }
 
     @Test
