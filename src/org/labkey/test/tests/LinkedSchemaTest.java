@@ -821,6 +821,26 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
+    @Test
+    public void testAuditTableLinkedSchema()
+    {
+        String linkedSchemaName = "auditTableLinkedSchema";
+        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        String targetContainerPath = "/" + getProjectName() + "/" + TARGET_FOLDER;
+
+        log("Create the linked schema on auditlog");
+        _schemaHelper.createLinkedSchema(targetContainerPath, linkedSchemaName, sourceContainerPath, null, "auditLog", null, null);
+
+        log("Verify the content is visible via schema");
+        goToSchemaBrowser();
+        DataRegionTable table = viewQueryData(linkedSchemaName, "ContainerAuditEvent");
+        assertEquals("Incorrect number of rows in ContainerAuditEvent", 1 , table.getDataRowCount());
+
+        goToSchemaBrowser();
+        table =   viewQueryData(linkedSchemaName, "ListAuditEvent");
+        assertEquals("Incorrect number of rows in ListAuditEvent", 6 , table.getDataRowCount());
+    }
+
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
     {
         goToSchemaBrowser();
