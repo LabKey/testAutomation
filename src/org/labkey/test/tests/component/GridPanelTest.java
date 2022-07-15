@@ -334,7 +334,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.removeColumn(REMOVED_FLAG_COLUMN);
-        cv.saveDefaultView();
+        cv.saveCustomView("", true);
 
     }
 
