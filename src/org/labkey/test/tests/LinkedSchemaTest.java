@@ -821,6 +821,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
+    /*
+        Test coverage : Issue 45347: Audit table data not available in linked schema
+     */
     @Test
     public void testAuditTableLinkedSchema()
     {
