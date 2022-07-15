@@ -834,11 +834,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("Verify the content is visible via schema");
         goToSchemaBrowser();
         DataRegionTable table = viewQueryData(linkedSchemaName, "ContainerAuditEvent");
-        assertEquals("Incorrect number of rows in ContainerAuditEvent", 1 , table.getDataRowCount());
+        assertEquals("Incorrect number of rows in ContainerAuditEvent", 1, table.getDataRowCount());
 
         goToSchemaBrowser();
-        table =   viewQueryData(linkedSchemaName, "ListAuditEvent");
-        assertEquals("Incorrect number of rows in ListAuditEvent", 6 , table.getDataRowCount());
+        table = viewQueryData(linkedSchemaName, "ListAuditEvent");
+        assertEquals("Incorrect number of rows in ListAuditEvent", 6, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
