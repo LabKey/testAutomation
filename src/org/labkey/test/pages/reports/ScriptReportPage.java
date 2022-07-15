@@ -1,6 +1,5 @@
 package org.labkey.test.pages.reports;
 
-import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -167,18 +166,10 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         return this;
     }
 
-    public WebElement findReportView()
+    public WebElement findReportElement()
     {
         clickReportTab();
         return Locator.byClass("reportView").findElement(getDriver());
-    }
-
-    @NotNull
-    public String getReportText()
-    {
-        Locator l = Locator.xpath("//div[@class='reportView']//pre");
-        waitForElement(l);
-        return getText(l).replaceAll(" +", " ");
     }
 
     @Override

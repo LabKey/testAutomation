@@ -320,7 +320,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 }
                 else if ("DEBUG".equalsIgnoreCase(test.getType()))
                 {
-                    String reportText = _rReportHelper.getReportPage().getReportText();
+                    String reportText = _rReportHelper.getReportText();
                     TestLogger.log("Report Output:\n" + reportText);
                 }
                 TestLogger.decreaseIndent();

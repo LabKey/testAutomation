@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -137,9 +138,17 @@ public class RReportHelper
         _test.setCodeEditorValue("script-report-editor", script);
         clickReportTab();
 
-        String html = getReportPage().getReportText();
+        String html = getReportText();
 
         return checkScriptOutput(html, expectedLines, failOnError);
+    }
+
+    @NotNull
+    public String getReportText()
+    {
+        Locator l = Locator.xpath("//div[@class='reportView']//pre");
+        _test.waitForElement(l);
+        return _test.getText(l).replaceAll(" +", " ");
     }
 
     public boolean executeScriptDirectly(String script, String expectedLines) throws IOException
