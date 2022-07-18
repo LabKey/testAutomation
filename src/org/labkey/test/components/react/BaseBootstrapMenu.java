@@ -87,7 +87,7 @@ public abstract class BaseBootstrapMenu extends WebDriverComponent<BaseBootstrap
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public final WebElement toggleAnchor = getToggleLocator().findWhenNeeded(getComponentElement());
+        public final WebElement toggleAnchor = getToggleLocator().refindWhenNeeded(getComponentElement());
 
         public WebElement findOpenMenu()
         {
