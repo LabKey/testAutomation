@@ -841,11 +841,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "ListAuditEvent");
-        assertEquals("Incorrect number of rows in ListAuditEvent", 6, table.getDataRowCount());
+        assertEquals("Incorrect number of rows in ListAuditEvent", 5, table.getDataRowCount());
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
-        assertEquals("Incorrect number of rows in DomainAuditEvent", 40, table.getDataRowCount());
+        assertEquals("Incorrect number of rows in DomainAuditEvent", 38, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
