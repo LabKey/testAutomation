@@ -33,24 +33,13 @@ public class SaveSampleFinderViewModal extends ModalDialog
 
     public void clickSave()
     {
-        clickSave(false);
+        dismiss("Save");
     }
 
-    public String clickSave(boolean hasError)
+    public String clickSaveExpectingError()
     {
         elementCache().saveBtn.click();
-        if (!hasError)
-        {
-            waitForClose();
-            return null;
-        }
         return getErrorMsg();
-    }
-
-    public void clickCancel()
-    {
-        elementCache().cancelButton.click();
-        waitForClose();
     }
 
     public String getErrorMsg()

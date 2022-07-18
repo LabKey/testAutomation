@@ -29,8 +29,6 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         {
             editIcon.click();
         }
-        clearElementCache();
-        elementCache(); // waitForReady
     }
 
     public void deleteView(String viewName)
@@ -40,8 +38,6 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         {
             deleteIcon.click();
         }
-        clearElementCache();
-        elementCache(); // waitForReady
     }
 
     public void deleteAllViews()
@@ -124,8 +120,7 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public void clickDone()
     {
-        elementCache().doneBtn.click();
-        waitForClose();
+        dismiss("Done editing");
     }
 
     public String getErrorMsg()
@@ -147,12 +142,9 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        WebElement errorMsg = Locator.tagWithClassContaining("div", "alert-danger").findWhenNeeded(getComponentElement());
+        WebElement errorMsg = Locator.tagWithClassContaining("div", "alert-danger").refindWhenNeeded(getComponentElement());
 
-        WebElement nameInput = Locator.tag("input").findWhenNeeded(getComponentElement());
+        WebElement nameInput = Locator.tag("input").refindWhenNeeded(getComponentElement());
 
-        WebElement doneBtn = Locator.tagWithClassContaining("button", "btn-default")
-                .withText("Done editing")
-                .findWhenNeeded(getComponentElement());
     }
 }
