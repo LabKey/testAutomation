@@ -25,8 +25,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.list.ManageListsGrid;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.list.GridPage;
-import org.labkey.test.pages.list.ListBeginPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -91,7 +91,7 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
 
     private void recreateList() throws Exception
     {
-        final ManageListsGrid manageListsGrid = ListBeginPage.beginAt(this, getProjectName()).getGrid();
+        final ManageListsGrid manageListsGrid = BeginPage.beginAt(this, getProjectName()).getGrid();
         if (manageListsGrid.getDataRowCount() > 0)
         {
             manageListsGrid.checkAll();

@@ -40,7 +40,7 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
-import org.labkey.test.pages.list.ListBeginPage;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
@@ -934,10 +934,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new AssayBeginPage(getDriver());
     }
 
-    public ListBeginPage goToManageLists()
+    public BeginPage goToManageLists()
     {
         clickAdminMenuItem("Manage Lists");
-        return new ListBeginPage(getDriver());
+        return new BeginPage(getDriver());
     }
 
     public void goToCreateProject()

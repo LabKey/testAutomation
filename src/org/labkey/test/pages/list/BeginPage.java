@@ -23,25 +23,25 @@ import org.openqa.selenium.WebDriver;
 
 import java.io.File;
 
-public class ListBeginPage extends LabKeyPage<ListBeginPage.ElementCache>
+public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
 {
-    public ListBeginPage(WebDriver driver)
+    public BeginPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ListBeginPage beginAt(WebDriverWrapper driver)
+    public static BeginPage beginAt(WebDriverWrapper driver)
     {
         return beginAt(driver, driver.getCurrentContainerPath());
     }
 
-    public static ListBeginPage beginAt(WebDriverWrapper driver, String containerPath)
+    public static BeginPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("list", containerPath, "begin"));
-        return new ListBeginPage(driver.getDriver());
+        return new BeginPage(driver.getDriver());
     }
 
-    public ListBeginPage importListArchive(File listArchive)
+    public BeginPage importListArchive(File listArchive)
     {
         return getGrid()
                 .clickImportArchive()

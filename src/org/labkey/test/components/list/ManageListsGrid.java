@@ -16,9 +16,9 @@
 package org.labkey.test.components.list;
 
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.ImportListArchivePage;
-import org.labkey.test.pages.list.ListBeginPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 
@@ -50,10 +50,10 @@ public class ManageListsGrid extends DataRegionTable
             clickHeaderButton("Export List Archive"));
     }
 
-    public ListBeginPage deleteSelectedLists()
+    public BeginPage deleteSelectedLists()
     {
         deleteSelectedRows();
-        return new ListBeginPage(getDriver());
+        return new BeginPage(getDriver());
     }
 
     public List<String> getListNames()

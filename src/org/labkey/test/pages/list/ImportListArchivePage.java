@@ -48,10 +48,10 @@ public class ImportListArchivePage extends LabKeyPage<ImportListArchivePage.Elem
         return this;
     }
 
-    public ListBeginPage clickImport()
+    public BeginPage clickImport()
     {
         clickAndWait(elementCache().importButton);
-        return new ListBeginPage(getDriver());
+        return new BeginPage(getDriver());
     }
 
     @Override
