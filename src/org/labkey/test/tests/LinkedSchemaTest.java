@@ -828,13 +828,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     public void testAuditTableLinkedSchema()
     {
         String linkedSchemaName = "auditTableLinkedSchema";
-        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
         String targetContainerPath = "/" + getProjectName() + "/" + TARGET_FOLDER;
 
         log("Create the linked schema on auditlog");
         _schemaHelper.createLinkedSchema(targetContainerPath, linkedSchemaName, sourceContainerPath, null, "auditLog", null, null);
 
-        log("Verify the content is visible via schema");
+        log("Verify the content is visible via linked schema");
         goToSchemaBrowser();
         DataRegionTable table = viewQueryData(linkedSchemaName, "ContainerAuditEvent");
         assertEquals("Incorrect number of rows in ContainerAuditEvent", 1, table.getDataRowCount());
@@ -842,6 +842,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "ListAuditEvent");
         assertEquals("Incorrect number of rows in ListAuditEvent", 6, table.getDataRowCount());
+
+        goToSchemaBrowser();
+        table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
+        assertEquals("Incorrect number of rows in DomainAuditEvent", 40, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
