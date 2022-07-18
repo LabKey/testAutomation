@@ -3153,7 +3153,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
-        WebElement el = l.waitForElement(getDriver(), waitFor);
+        WebElement el = new WebDriverWait(getDriver(), Duration.ofMillis(waitFor))
+                .until(ExpectedConditions.elementToBeClickable(l));
         try
         {
             clickAndWait(el, waitForPageToLoad);
