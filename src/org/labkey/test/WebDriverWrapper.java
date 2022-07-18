@@ -40,7 +40,7 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
-import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.pages.list.ListBeginPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
@@ -101,7 +101,6 @@ import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -935,10 +934,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new AssayBeginPage(getDriver());
     }
 
-    public BeginPage goToManageLists()
+    public ListBeginPage goToManageLists()
     {
         clickAdminMenuItem("Manage Lists");
-        return new BeginPage(getDriver());
+        return new ListBeginPage(getDriver());
     }
 
     public void goToCreateProject()

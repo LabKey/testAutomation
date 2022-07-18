@@ -37,7 +37,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.FolderManagementFolderTree;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.ReorderFoldersPage;
-import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.pages.list.ListBeginPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
@@ -231,8 +231,8 @@ public class FolderTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText("HIV Test Results"));
         waitForText("Contains up to one row of HIV Test Results data for each Participant/Date combination.", "Positive", "Negative");
 
-        final BeginPage beginPage = goToManageLists();
-        beginPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
+        final ListBeginPage listBeginPage = goToManageLists();
+        listBeginPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
         verifyLinksWithText("Lab Machines", "Reagents", "Technicians");
     }
 
