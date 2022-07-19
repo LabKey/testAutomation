@@ -598,7 +598,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         for (String item : column)
             assertEquals("Background subtraction should be true for all runs.", "true", item);
 
-        DataRegionTable.DataRegion(getDriver()).find().clickRowDetails(0);
+        runTable.clickRowDetails(0);
         waitForElement(Locator.css(".plate-summary-grid"));
 
         DataRegionTable detailsTable = new CrosstabDataRegion("AntigenStats", this);
