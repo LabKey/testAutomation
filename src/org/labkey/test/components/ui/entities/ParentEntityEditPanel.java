@@ -363,7 +363,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         {
             int selCount = selectParent.getSelections().size();
             selectParent.typeAheadSelect(id);
-            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount, 500);
+            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount,
+                    String.format("Did not successfully add parent %s from %s.", id, typeName), 500);
         }
 
         return this;
@@ -424,6 +425,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public ParentEntityEditPanel removeParent(String parentEntity, String parentId)
     {
         getParent(parentEntity).removeSelection(parentId);
+
+        WebDriverWrapper.waitFor(()->!getParent(parentEntity).getSelections().contains(parentId),
+                String.format("Parent %s / %s was not removed.", parentEntity, parentId), 500);
+
         return this;
     }
 
