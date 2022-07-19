@@ -101,7 +101,6 @@ import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -3176,8 +3175,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
-        WebElement el = new WebDriverWait(getDriver(), Duration.ofMillis(waitFor))
-                .until(ExpectedConditions.elementToBeClickable(l));
+        WebElement el = l.waitForElement(getDriver(), waitFor);
+        new WebDriverWait(getDriver(), Duration.ofMillis(waitFor))
+                .until(ExpectedConditions.elementToBeClickable(el));
         try
         {
             clickAndWait(el, waitForPageToLoad);
