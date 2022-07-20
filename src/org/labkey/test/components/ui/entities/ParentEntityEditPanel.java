@@ -427,8 +427,15 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         WebDriverWrapper.waitFor(()->
                 {
-                    getParent(parentEntity).removeSelection(parentId);
-                    return !getParent(parentEntity).getSelections().contains(parentId);
+                    try
+                    {
+                        getParent(parentEntity).removeSelection(parentId);
+                        return !getParent(parentEntity).getSelections().contains(parentId);
+                    }
+                    catch (NoSuchElementException nse)
+                    {
+                        return true;
+                    }
                 },
                 String.format("Parent %s / %s was not removed.", parentEntity, parentId), 1_000);
 
