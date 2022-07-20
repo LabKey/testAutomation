@@ -1,5 +1,6 @@
 package org.labkey.test.pages.reports;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -7,6 +8,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -62,8 +64,14 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
     public ScriptReportPage setReportSource(String source)
     {
         clickSourceTab();
-        setCodeEditorValue("script-report-editor", source);
+        getEditor().setCodeMirrorValue(source);
         return this;
+    }
+
+    @NotNull
+    public CodeMirrorHelper getEditor()
+    {
+        return new CodeMirrorHelper(this, "script-report-editor");
     }
 
     public String saveReport(String name, boolean isSaveAs, int wait)
