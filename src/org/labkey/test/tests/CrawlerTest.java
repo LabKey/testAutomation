@@ -95,6 +95,28 @@ public class CrawlerTest extends BaseWebDriverTest
         }
     }
 
+    // Crawler should flag external links without the correct 'rel' attribute
+    // https://www.labkey.org/home/Developer/issues/Secure/issues-details.view?issueId=40708
+    @Test
+    public void testExternalLink() throws Exception
+    {
+
+        Crawler crawler = new Crawler(this, Duration.ofSeconds(30), true);
+        try
+        {
+            String externalLinkPage = WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "externalLink");
+            crawler.validatePage(externalLinkPage);
+            Assert.fail("Crawler should have found bad external link. Crawled:\n" + String.join("\n", crawler.getUrlsVisited()));
+        }
+        catch (AssertionError expectedError)
+        {
+            if (!expectedError.getMessage().contains("Bad 'rel' attribute"))
+            {
+                throw expectedError;
+            }
+        }
+    }
+
     @Test
     public void testCrawler() throws Exception
     {
