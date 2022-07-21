@@ -259,6 +259,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         removeBtn.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
 
+        waitFor(()->!getSelections().contains(value), String.format("Failed to remove selection '%s'.", value), WAIT_FOR_JAVASCRIPT);
+
         return getThis();
     }
 
