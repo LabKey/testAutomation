@@ -841,7 +841,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "ListAuditEvent");
-        checker().verifyEquals("Incorrect number of rows in ListAuditEvent", 6, table.getDataRowCount());
+        table.setFilter("listname", "Equals", "Technicians");
+        checker().verifyEquals("Incorrect number of rows in ListAuditEvent", 2, table.getDataRowCount());
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
