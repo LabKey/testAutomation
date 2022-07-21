@@ -363,6 +363,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         {
             int selCount = selectParent.getSelections().size();
             selectParent.typeAheadSelect(id);
+
+            // Validate that the parents were indeed added.
             WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount,
                     String.format("Did not successfully add parent %s from %s.", id, typeName), 1_000);
         }
@@ -426,7 +428,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
 
         // The ReactSelect does not always reliably remove a selected item. If it did not successfully do it on the first
-        // try, try again until it is gone or the time limit is met.
+        // try, try again until it is gone or the time limit is hit.
         WebDriverWrapper.waitFor(()->
                 {
                     // Guard against react selector being in a 'Loading...' state.
