@@ -361,15 +361,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         for (String id : parentIds)
         {
-//            int selCount = selectParent.getSelections().size();
             selectParent.typeAheadSelect(id);
-
-//            // Original:
-//            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount, 500);
-//
-//            // Change:
-//            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount,
-//                    String.format("Did not successfully add parent %s from %s.", id, typeName), 1_000);
         }
 
         return this;
@@ -430,23 +422,6 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public ParentEntityEditPanel removeParent(String parentEntity, String parentId)
     {
         getParent(parentEntity).removeSelection(parentId);
-
-//        // The ReactSelect does not always reliably remove a selected item. If it did not successfully do it on the first
-//        // try, try again until it is gone or the time limit is hit.
-//        WebDriverWrapper.waitFor(()->
-//                {
-//                    // Guard against react selector being in a 'Loading...' state.
-//                    WebDriverWrapper.waitFor(()->getParent(parentEntity).getComponentElement().isDisplayed(),
-//                            String.format("Selector for parents from '%s' is not visible.", parentEntity), 1_000);
-//
-//                    // Remove the parent.
-//                    getParent(parentEntity).removeSelection(parentId);
-//
-//                    // Verify that the parent has been removed.
-//                    return !getParent(parentEntity).getSelections().contains(parentId);
-//                },
-//                String.format("Parent %s / %s was not removed.", parentEntity, parentId), 1_000);
-
         return this;
     }
 

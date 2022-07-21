@@ -15,6 +15,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -28,7 +30,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         super(element, driver);
     }
 
-    static public SearchingReactSelectFinder finder(WebDriver driver)
+    public static SearchingReactSelectFinder finder(WebDriver driver)
     {
         return new SearchingReactSelectFinder(driver);
     }
@@ -53,8 +55,11 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         scrollIntoView();
         open();
 
-        var elementToClick = ReactSelect.Locators.options.containing(optionText);
-        var elementToWaitFor = getValueLabelLocator().containing(selectedOptionLabel);
+        // Will be used later to check that value was added.
+        List<String> expectedSelections = new ArrayList<>(getSelections());
+        expectedSelections.add(value);
+
+        var elementToClick = BaseReactSelect.Locators.options.containing(optionText);
 
         List<WebElement> options = setFilter(value);
 
@@ -100,8 +105,9 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
 
-        WebDriverWrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
-                () -> "Expected selection [" + elementToWaitFor.getLoggableDescription() + "] was not found. Selected value(s) are:" + getSelections(),
+        // Sometimes adding a new selection will replace an existing selection. Check to make sure that doesn't happen.
+        WebDriverWrapper.waitFor(()-> new HashSet<>(getSelections()).containsAll(expectedSelections),
+                String.format("Selections not as expected after addin '%s'. Expected: %s Actual: %s", value, expectedSelections, getSelections()),
                 WAIT_FOR_JAVASCRIPT);
 
         close();
@@ -167,8 +173,8 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         long filterStart = System.currentTimeMillis();
         WebDriverWrapper.waitFor(()-> {
             List<WebElement> options = elementCache().getOptions();
-            return options.size() > 0 &&
-                    !isLoading() || options.stream().anyMatch((a)-> a.getText().contains(value));
+            return !options.isEmpty() &&
+                    !isLoading() || options.stream().anyMatch(a-> a.getText().contains(value));
         }, WAIT_FOR_JAVASCRIPT);
         long elapsed = System.currentTimeMillis() - filterStart;
         getWrapper().log("It took [" + elapsed + "] msec to filter options (seeking {"+value+"}) in filtering select");
