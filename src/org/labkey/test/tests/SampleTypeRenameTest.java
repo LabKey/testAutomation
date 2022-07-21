@@ -64,11 +64,8 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
 
     private void doSetup() throws IOException, CommandException
     {
-        PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
-        portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.exitAdminMode();
+        new PortalHelper(this).addWebPart("Sample Types");
 
         log(String.format("Create sample type named '%s' with fields '%s' and '%s'.", SAMPLE_TYPE_NAME_INITIAL, FIELD_INT, FIELD_STR));
 
