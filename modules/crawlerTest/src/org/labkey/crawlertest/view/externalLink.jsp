@@ -1,5 +1,6 @@
+<%
 /*
- * Copyright (c) 2008-2019 LabKey Corporation
+ * Copyright (c) 2022 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+%>
+<%@ page extends="org.labkey.api.jsp.JspBase" %>
 
-package org.labkey.test;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
-public interface WebTest
-{
-    String getResponseText();
-    int getResponseCode();
-
-    /**
-     * Navigate directly to a page
-     * @param url Absolute or relative URL
-     * @return Page load time in ms
-     */
-    long beginAt(String url);
-    URL getURL() throws MalformedURLException;
-    List<String> getAssociatedModules();
-}
+<div id="crawlerTestDiv"><a href="https://labkey.org" target="_blank">External Link</a></div>

@@ -58,6 +58,12 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         return new PermissionsPage(driver.getDriver());
     }
 
+    @Override
+    protected void waitForPage()
+    {
+        waitForElement(Locator.tag("table").withAttributeContaining("id", "labkey-principalcombo-"));
+    }
+
     public void clickSaveAndFinish()
     {
         clickAndWait(elementCache().saveAndFinishButton);
