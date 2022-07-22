@@ -258,12 +258,10 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         WebElement removeBtn = Locators.removeMultiSelectValueButton(value).findWhenNeeded(getComponentElement());
         removeBtn.click();
 
-        // Move the mouse away from the selected item.
-        getWrapper().mouseOver(Locators.selectContainer());
-
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
 
         // Validate that the selected item really was removed.
+        WebDriverWrapper.sleep(500);
         waitFor(()->!getSelections().contains(value), String.format("Failed to remove selection '%s'.", value), WAIT_FOR_JAVASCRIPT);
 
         return getThis();
