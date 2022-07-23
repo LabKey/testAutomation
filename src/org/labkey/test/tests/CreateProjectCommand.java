@@ -10,33 +10,74 @@ import org.labkey.remoteapi.PostCommand;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class CreateProjectCommand extends PostCommand<CommandResponse>
 {
-    private final Map<String, Object> _params;
+    private String _name;
+    private String _folderType;
+    private boolean _assignProjectAdmin = false;
+    private String _templateSourceId;
+    private boolean _templateIncludeSubfolders = false;
+    private List<String> _templateWriterTypes = List.of();
 
-    public CreateProjectCommand(Map<String, Object> params)
+    public CreateProjectCommand()
     {
         super("admin", "createProject");
-        _params = params;
+    }
+
+    public CreateProjectCommand setName(String name)
+    {
+        _name = name;
+        return this;
+    }
+
+    public CreateProjectCommand setFolderType(String folderType)
+    {
+        _folderType = folderType;
+        return this;
+    }
+
+    public CreateProjectCommand setAssignProjectAdmin(boolean assignProjectAdmin)
+    {
+        _assignProjectAdmin = assignProjectAdmin;
+        return this;
+    }
+
+    public CreateProjectCommand setTemplateSourceId(String templateSourceId)
+    {
+        _templateSourceId = templateSourceId;
+        return this;
+    }
+
+    public CreateProjectCommand setTemplateIncludeSubfolders(boolean templateIncludeSubfolders)
+    {
+        _templateIncludeSubfolders = templateIncludeSubfolders;
+        return this;
+    }
+
+    public CreateProjectCommand setTemplateWriterTypes(String... templateWriterTypes)
+    {
+        _templateWriterTypes = List.of(templateWriterTypes);
+        return this;
     }
 
     @Override
     protected HttpUriRequest createRequest(URI uri)
     {
-        // CreateProjectAction is not a real API action, so we POST form data not JSON
-        List<BasicNameValuePair> postData = new ArrayList<>();
+        // CreateProjectAction is not a real API action, so we POST form data instead of JSON
 
-        _params.forEach((k, v) -> {
-            // Expand any collections into multiple individual params
-            if (v instanceof Collection<?> col)
-                col.forEach(val -> postData.add(new BasicNameValuePair(k, String.valueOf(val))));
-            else
-                postData.add(new BasicNameValuePair(k, String.valueOf(v)));
-        });
+        List<BasicNameValuePair> postData = new ArrayList<>();
+        postData.add(new BasicNameValuePair("name", _name));
+        postData.add(new BasicNameValuePair("folderType", _folderType));
+        postData.add(new BasicNameValuePair("assignProjectAdmin", Boolean.toString(_assignProjectAdmin)));
+
+        if ("Template".equals(_folderType))
+        {
+            postData.add(new BasicNameValuePair("templateSourceId", _templateSourceId));
+            postData.add(new BasicNameValuePair("templateIncludeSubfolders", Boolean.toString(_templateIncludeSubfolders)));
+            _templateWriterTypes.forEach(type -> postData.add(new BasicNameValuePair("templateWriterTypes", type)));
+        }
 
         try
         {
