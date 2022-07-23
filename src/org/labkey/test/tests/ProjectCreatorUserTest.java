@@ -1,17 +1,11 @@
 package org.labkey.test.tests;
 
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -24,11 +18,7 @@ import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,34 +191,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
     private String createProject(Map<String, Object> params) throws IOException
     {
-        // CreateProjectAction is not a real API action, so we POST form data not JSON
-        PostCommand<CommandResponse> command = new PostCommand<>("admin", "createProject")
-        {
-            @Override
-            protected HttpUriRequest createRequest(URI uri)
-            {
-                List<BasicNameValuePair> postData = new ArrayList<>();
-
-                params.forEach((k, v) -> {
-                    // Expand any collections into multiple individual params
-                    if (v instanceof Collection<?> col)
-                        col.forEach(val -> postData.add(new BasicNameValuePair(k, String.valueOf(val))));
-                    else
-                        postData.add(new BasicNameValuePair(k, String.valueOf(v)));
-                });
-
-                try
-                {
-                    HttpPost request = new HttpPost(uri);
-                    request.setEntity(new UrlEncodedFormEntity(postData));
-                    return request;
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
+        CreateProjectCommand command = new CreateProjectCommand(params);
 
         try
         {
