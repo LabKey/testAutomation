@@ -1,4 +1,4 @@
-package org.labkey.test.tests;
+package org.labkey.remoteapi.admin;
 
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
