@@ -170,7 +170,10 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
     public ScriptReportPage clickReportTab()
     {
         waitAndClick(Ext4Helper.Locators.tab("Report"));
-        waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        // Report view should appear quickly
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "reportView")));
+        // Actual report might take a while to load
+        _ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_PAGE);
         return this;
     }
 
