@@ -230,6 +230,7 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
             return _isCheckbox;
         }
 
+        @Override
         public String getSection()
         {
             return _fieldSet;
