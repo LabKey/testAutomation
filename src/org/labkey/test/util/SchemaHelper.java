@@ -126,6 +126,11 @@ public class SchemaHelper
             _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
 
             // There are multiple Ext form elements on this row, so the label for the actual combo box is empty
+            if (!_test._ext4Helper.getComboBoxOptions("").contains(sourceSchemaName))
+            {
+                _test._ext4Helper.checkCheckbox(Locator.ehrCheckboxWithLabel("Show System Schemas"));
+            }
+
             _test._ext4Helper.selectComboBoxItem("", sourceSchemaName);
 
             if(_queryLoadTimeOut > 0)

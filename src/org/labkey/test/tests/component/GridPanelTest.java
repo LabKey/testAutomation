@@ -338,7 +338,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.removeColumn(REMOVED_FLAG_COLUMN);
-        cv.saveDefaultView();
+        cv.saveCustomView("", true);
 
     }
 
@@ -1523,7 +1523,7 @@ public class GridPanelTest extends BaseWebDriverTest
         filterDialog.cancel();
 
         log("Go back to default view. Filter on a column to be removed, then change view that does not include the column.");
-        grid.selectView(VIEW_DEFAULT_MODIFIED);
+        grid.selectView(VIEW_DEFAULT);
 
         log(String.format("Filter column '%s' to true.", FILTER_BOOL_COL));
         grid.filterColumn(FILTER_BOOL_COL, Filter.Operator.EQUAL, true);

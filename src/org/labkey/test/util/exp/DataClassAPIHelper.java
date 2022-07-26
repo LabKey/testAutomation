@@ -33,7 +33,7 @@ public class DataClassAPIHelper
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException("Failed to create sample type.", e);
+            throw new RuntimeException("Failed to create DataClass.", e);
         }
     }
 

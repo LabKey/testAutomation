@@ -69,6 +69,21 @@ public class CrawlerTestController extends SpringActionController
         { }
     }
 
+    @RequiresPermission(ReadPermission.class)
+    public class ExternalLinkAction extends SimpleViewAction<Object>
+    {
+        @Override
+        public ModelAndView getView(Object form, BindException errors)
+        {
+            getPageConfig().setTitle("External link test page");
+            return new JspView<>("/org/labkey/crawlertest/view/externalLink.jsp");
+        }
+
+        @Override
+        public void addNavTrail(NavTree root)
+        { }
+    }
+
     public static class InjectForm
     {
         private String _inject;

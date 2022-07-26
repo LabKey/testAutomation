@@ -58,9 +58,19 @@ public class BootstrapMenu extends BaseBootstrapMenu
         return elementCache().findVisibleMenuItems();
     }
 
+    public List<WebElement> findVisibleMenuItemsWithCls(String cls)
+    {
+        return elementCache().findVisibleMenuItemsWithClass(cls);
+    }
+
     protected WebElement findVisibleMenuItemOrNull(String text)
     {
         return elementCache().findVisibleMenuItemOrNull(text);
+    }
+
+    protected WebElement findDisabledMenuItemOrNull(String text)
+    {
+        return elementCache().findDisabledMenuItemOrNull(text);
     }
 
     protected WebElement findVisibleMenuItem(String text)
@@ -142,6 +152,11 @@ public class BootstrapMenu extends BaseBootstrapMenu
             return Locator.xpath("./li/a").findElements(findVisibleMenuPanel()); /* direct children of the currently-open menu or submenu */
         }
 
+        public List<WebElement> findVisibleMenuItemsWithClass(String cls)
+        {
+            return Locator.xpath("./li[contains(@class, '" + cls + "')]/a").findElements(findVisibleMenuPanel()); /* direct children of the currently-open menu or submenu */
+        }
+
         protected WebElement findVisibleMenuItem(String text)
         {
             return Locator.xpath("./li/a").withText(text).findElement(findVisibleMenuPanel());
@@ -150,6 +165,12 @@ public class BootstrapMenu extends BaseBootstrapMenu
         protected WebElement findVisibleMenuItemOrNull(String text)
         {
             return Locator.xpath("./li/a").withText(text).findElementOrNull(findVisibleMenuPanel());
+        }
+
+        protected WebElement findDisabledMenuItemOrNull(String text)
+        {
+            Locator.XPathLocator loc=  Locator.xpath("./li/a").withText(text).parent().withClass("disabled");
+            return loc.findElementOrNull(findVisibleMenuPanel());
         }
     }
 
