@@ -16,6 +16,7 @@
 
 package org.labkey.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -285,42 +286,51 @@ public class WebTestHelper
 
     public enum DatabaseType
     {
-        PostgreSQL("org.postgresql.Driver"),
-        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds.jdbc.Driver");
+        PostgreSQL("org.postgresql.Driver", "pg", "postgres"),
+        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds.jdbc.Driver", "mssql", "sqlserver");
 
-        private static final Map<String, DatabaseType> DRIVER_CLASS_NAME_MAP = new HashMap<>();
+        private static final Map<String, DatabaseType> DATABASE_TYPE_MAP;
 
         static
         {
+            Map<String, DatabaseType> tempMap = new HashMap<>();
             Arrays.stream(values())
-                .forEach(dt -> Arrays.stream(dt._driverClassNames)
-                    .forEach(name -> DRIVER_CLASS_NAME_MAP.put(name, dt)));
+                .forEach(dt -> Arrays.stream(dt._typeKeys)
+                    .forEach(name -> tempMap.put(name, dt)));
+            DATABASE_TYPE_MAP = Collections.unmodifiableMap(tempMap);
         }
 
-        private final String[] _driverClassNames;
+        private final String[] _typeKeys;
 
-        DatabaseType(String... driverClassNames)
+        DatabaseType(String... typeKeys)
         {
-            _driverClassNames = driverClassNames;
+            _typeKeys = typeKeys;
         }
 
         static @Nullable DatabaseType get(String driverClassName)
         {
-            return DRIVER_CLASS_NAME_MAP.get(driverClassName);
+            return DATABASE_TYPE_MAP.get(driverClassName);
         }
     }
 
     public static DatabaseType getDatabaseType()
     {
-        String driverClassName = getServerProperty("jdbcDriverClassName");
+        String typeKey = getServerProperty("databaseType");
+        if (StringUtils.isBlank(typeKey))
+        {
+            // Use driver class name from 'config.properties' if 'databaseType' isn't specified
+            typeKey = getServerProperty("jdbcDriverClassName");
+        }
 
-        if (null == driverClassName)
-            throw new IllegalStateException("Can't determine database type: jdbcDriverClassName property is not set");
+        if (StringUtils.isBlank(typeKey))
+        {
+            throw new IllegalStateException("Can't determine database type: Neither 'jdbcDriverClassName' nor 'databaseType' property is not set");
+        }
 
-        DatabaseType dt = DatabaseType.get(driverClassName);
+        DatabaseType dt = DatabaseType.get(typeKey);
 
         if (null == dt)
-            throw new IllegalStateException("Unknown database type: " + driverClassName);
+            throw new IllegalStateException("Unknown database type: " + typeKey);
 
         return dt;
     }
