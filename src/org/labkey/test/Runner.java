@@ -424,16 +424,15 @@ public class Runner extends TestSuite
             {
                 List<Class<?>> interfaces = ClassUtils.getAllInterfaces(testClass);
                 WebTestHelper.DatabaseType databaseType = WebTestHelper.getDatabaseType();
-                String databaseVersion = WebTestHelper.getDatabaseVersion();
                 String osName = System.getProperty("os.name", "<unknown>");
                 if (interfaces.contains(PostgresOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.PostgreSQL)
                 {
-                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
                     continue;
                 }
                 else if (interfaces.contains(SqlserverOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.MicrosoftSQLServer)
                 {
-                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
                     continue;
                 }
 
