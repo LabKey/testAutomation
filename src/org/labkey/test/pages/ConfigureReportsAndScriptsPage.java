@@ -88,6 +88,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         editEngineWindow.clickButton("Submit", 0);
         acceptAlert();
         editEngineWindow.waitForClose();
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     @LogMethod
