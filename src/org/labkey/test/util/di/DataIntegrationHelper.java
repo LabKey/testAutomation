@@ -103,6 +103,12 @@ public class DataIntegrationHelper
         return response;
     }
 
+    /** Queues and waits up to one minute for the job to finish */
+    public RunTransformResponse runTransformAndWait(@LoggedParam String transformId) throws CommandException, IOException
+    {
+        return runTransformAndWait(transformId, 60_000);
+    }
+
     @LogMethod
     public RunTransformResponse runTransformAndWait(@LoggedParam String transformId, int msTimeout) throws CommandException, IOException
     {

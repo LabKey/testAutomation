@@ -6,6 +6,7 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.ui.grids.TabbedGridPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -13,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +126,16 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         return elementCache().findFilterCards();
     }
 
+    public SavedSearchesMenu getSaveSearchMenu()
+    {
+        return new SavedSearchesMenu(elementCache().savedViewsMenu.getComponentElement(), getDriver(), elementCache().saveViewsDropdown);
+    }
+
+    public BootstrapMenu getSaveSearchDropdownBtn()
+    {
+        return elementCache().saveViewDropdownBtn;
+    }
+
     /**
      * Waiter that will wait for the search results to load. This is a hook for perf tests to support longer waits.
      * @return WebDriverWait to be used by {@link #waitForReady()}
@@ -133,7 +145,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         return getWrapper().shortWait();
     }
 
-    private boolean isEmptySearch()
+    public boolean isEmptySearch()
     {
         return Locator.css(".filter-cards.empty").isDisplayed(this);
     }
@@ -189,7 +201,111 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         }
 
         final TabbedGridPanel resultsGrid = new TabbedGridPanel.TabbedGridPanelFinder(getDriver()).findWhenNeeded(this);
+
+        final BootstrapMenu savedViewsMenu = BootstrapMenu.finder(getDriver()).locatedBy(
+                Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").parent()).findWhenNeeded(this);
+
+        final BootstrapMenu saveViewDropdownBtn = BootstrapMenu.finder(getDriver()).locatedBy(
+                Locator.tagWithAttributeContaining("button", "id", "save-finderview-dropdown").parent()).findWhenNeeded(this);
+
+        final WebElement saveViewsDropdown = Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").findWhenNeeded(this);
+
     }
+
+    public class SavedSearchesMenu  extends BootstrapMenu
+    {
+        final static String SAVE_MENU_OPTION = "Save as custom search";
+        final static String MANGE_MENU_OPTION = "Manage saved searches";
+
+        private WebElement _dropdownEl;
+        SavedSearchesMenu(WebElement componentElement, WebDriver driver, WebElement dropdownEl)
+        {
+            super(driver, componentElement);
+            _dropdownEl = dropdownEl;
+        }
+
+        public String getTitle()
+        {
+            return _dropdownEl.getText();
+        }
+
+        public SaveSampleFinderViewModal clickSaveAs()
+        {
+            clickSubMenu(false, SAVE_MENU_OPTION);
+            return new SaveSampleFinderViewModal(getDriver());
+        }
+
+        public ManageSampleFinderViewsModal clickManage()
+        {
+            clickSubMenu(false, MANGE_MENU_OPTION);
+            return new ManageSampleFinderViewsModal(getDriver());
+        }
+
+        public boolean isDisabled()
+        {
+            return !_dropdownEl.isEnabled();
+        }
+
+        public boolean isSaveEnabled()
+        {
+            WebElement disabledEl = findDisabledMenuItemOrNull(SAVE_MENU_OPTION);
+            if (disabledEl == null)
+                return findVisibleMenuItemOrNull(SAVE_MENU_OPTION) != null;
+            return false;
+        }
+
+        public boolean isManageEnabled()
+        {
+            WebElement disabledEl = findDisabledMenuItemOrNull(MANGE_MENU_OPTION);
+            if (disabledEl == null)
+                return findVisibleMenuItemOrNull(MANGE_MENU_OPTION) != null;
+            return false;
+        }
+
+        public String getSelectedView()
+        {
+            List<WebElement> views = getViewsWithCls("active");
+            if (views.size() > 0)
+                return views.get(0).getText();
+
+            return null;
+        }
+
+        public String getLastSearchedView()
+        {
+            List<WebElement> views = getViewsWithCls("session-finder-view");
+            if (views.size() > 0)
+                return views.get(0).getText();
+
+            return null;
+        }
+
+        public List<String> getSavedViews()
+        {
+            List<String> viewNames = new ArrayList<>();
+            getViewsWithCls("saved-finder-view").forEach(el -> viewNames.add(el.getText()));
+            return viewNames;
+        }
+
+        public List<WebElement> getViewsWithCls(String cls)
+        {
+            expand();
+            return findVisibleMenuItemsWithCls(cls);
+        }
+
+        public void clickView(String viewName)
+        {
+            clickSubMenu(false, viewName);
+            clearElementCache();
+            elementCache(); // waitForReady
+        }
+
+        public void clickLastSearchedView()
+        {
+            clickView(getLastSearchedView());
+        }
+    }
+
 
     /**
      * Represents a single filter card. Don't expose outside this class because its lifecycle is confusing

@@ -285,7 +285,9 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
     public StudySecurityPage setDatasetPermissions(String groupName, String datasetName, String role)
     {
         int position = getGroupColumnIndex(groupName);
-        selectOptionByText(elementCache().datasetPermissionSelect(datasetName, position), role);
+        WebElement selectElement = elementCache().datasetPermissionSelect(datasetName, position);
+        scrollToMiddle(selectElement);
+        selectOptionByText(selectElement, role);
         return this;
     }
 

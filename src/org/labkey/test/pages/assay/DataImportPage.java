@@ -16,26 +16,19 @@
 package org.labkey.test.pages.assay;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
-
-public class DataImportPage extends LabKeyPage<DataImportPage.Elements>
+/**
+ * Import page for test assay upload page (miniassay module)
+ */
+public class DataImportPage extends LabKeyPage
 {
     public DataImportPage(WebDriver driver)
     {
         super(driver);
-    }
-
-    public void insertTsvData(String data)
-    {
-        setFormElement(elementCache().inputTsvField, data);
-        clickButton("Submit");
     }
 
     public void uploadFile(File dataFile)
@@ -46,34 +39,9 @@ public class DataImportPage extends LabKeyPage<DataImportPage.Elements>
         waitForElement(Locator.linkWithText(dataFile.getName()));   // the link will be in a dataRegion below
     }
 
-    public File downloadTemplate()
-    {
-        return clickAndWaitForDownload(elementCache().downloadTemplateButton);
-    }
-
     public DataImportPage setField(String fieldId, String value)
     {
         setFormElement(Locator.id(fieldId), value);
         return this;
-    }
-
-    @Override
-    protected Elements newElementCache()
-    {
-        return new Elements();
-    }
-
-    public class Elements extends LabKeyPage.ElementCache
-    {
-
-        final RadioButton uploadFileButton = new RadioButton(
-                new LazyWebElement(Locator.radioButtonById("FileUpload"), this));
-        final WebElement inputTsvField = new LazyWebElement(Locator.xpath(".//textarea[@id='tsv3']"), this);
-
-        //final WebElement formatSelect = new LazyWebElement(Locator.xpath("//[]"))
-        final WebElement importByAltKeyCheckbox = new LazyWebElement(Locator.checkboxByName("importLookupByAlternateKey"), this);
-        final WebElement downloadTemplateButton = new LazyWebElement(Locator.lkButton("Download Template"), this);
-        final WebElement submitButton = new LazyWebElement(Locator.lkButton("Submit"), this);
-        final WebElement cancelButton = new LazyWebElement(Locator.lkButton("Cancel"), this);
     }
 }

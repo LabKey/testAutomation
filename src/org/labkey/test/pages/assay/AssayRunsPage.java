@@ -22,6 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentRunTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -53,7 +54,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     public DataRegionTable getTable()
     {
-        return DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor(getDriver());
+        return new ExperimentRunTable("Runs", this);
     }
 
     public AssayDataPage clickAssayIdLink(String assayId)

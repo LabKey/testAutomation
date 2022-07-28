@@ -20,6 +20,16 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.assay.GetProtocolCommand;
+import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.InferDomainCommand;
+import org.labkey.remoteapi.domain.InferDomainResponse;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -30,22 +40,29 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
+import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.ArtifactCollector;
+import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PerlHelper;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.*;
+
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 12)
+@BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class AssayExportImportTest extends BaseWebDriverTest
 {
     private final String ASSAY_PROJECT_FOR_EXPORT_01 = "Assay_Project_For_Export_ByFilesWebPart";
@@ -54,15 +71,17 @@ public class AssayExportImportTest extends BaseWebDriverTest
     private final String ASSAY_PROJECT_FOR_IMPORT_02 = "Assay_Project_For_Import_ByFile";
     private final String ASSAY_PROJECT_FOR_EXPORT_03 = "Assay_Project_For_Export_ByApi";
     private final String ASSAY_PROJECT_FOR_IMPORT_03 = "Assay_Project_For_Import_ByApi";
+    private final String ASSAY_PROJECT_FOR_EXPORT_04 = "Assay_Project_For_Export_Xar";
+    private final String ASSAY_PROJECT_FOR_IMPORT_04 = "Assay_Project_For_Import_Xar";
 
     private final String SIMPLE_ASSAY_FOR_EXPORT = "AssayForExport";
 
     private static final File SAMPLE_DATA_LOCATION = TestFileUtils.getSampleData("AssayImportExport");
 
-    private final String RUN01_FILE = "GenericAssay_Run1.xls";
-    private final String RUN02_FILE = "GenericAssay_Run2.xls";
-    private final String RUN03_FILE = "GenericAssay_Run3.xls";
-    private final String RUN04_FILE = "GenericAssay_Run4.xls";
+    private final File RUN01_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run1.xls");
+    private final File RUN02_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run2.xls");
+    private final File RUN03_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run3.xls");
+    private final File RUN04_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run4.xls");
 
     private final String RUN01_NAME = "Run01";
     private final String RUN02_NAME = "Run02";
@@ -96,6 +115,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
         _containerHelper.deleteProject(ASSAY_PROJECT_FOR_IMPORT_02, afterTest);
         _containerHelper.deleteProject(ASSAY_PROJECT_FOR_EXPORT_03, afterTest);
         _containerHelper.deleteProject(ASSAY_PROJECT_FOR_IMPORT_03, afterTest);
+        _containerHelper.deleteProject(ASSAY_PROJECT_FOR_EXPORT_04, false);
+        _containerHelper.deleteProject(ASSAY_PROJECT_FOR_IMPORT_04, false);
     }
 
     @BeforeClass
@@ -113,49 +134,54 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
     }
 
-    private void createSimpleProjectAndAssay(String projectName, String assayName)
+    @LogMethod
+    private Long createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
     {
         final String PERL_SCRIPT = "modifyColumnInAssayRun.pl";
 
-        log("Create a simple Assay project.");
+        log("Create a project named: '" + projectName + "' with an assay named: '" + assayName + "'.");
+
         _containerHelper.createProject(projectName, "Assay");
         goToProjectHome(projectName);
 
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
+        Connection cn = createDefaultConnection();
+        Protocol protocol = new GetProtocolCommand("General").execute(cn, projectName).getProtocol();
+        protocol.setName(assayName);
+        protocol.setProtocolTransformScripts(List.of(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT).getAbsolutePath()));
+        protocol.setSaveScriptFiles(true);
+        protocol.setEditableResults(true);
+        protocol.setEditableRuns(true);
 
-        assayDesignerPage.addTransformScript(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT));
-        assayDesignerPage.setSaveScriptData(true);
+        Map<String, Domain> domains = new HashMap<>();
+        protocol.getDomains().forEach(domain -> domains.put(domain.getName(), domain));
 
-        assayDesignerPage.setEditableResults(true);
-        assayDesignerPage.setEditableRuns(true);
+        Domain batchDomain = domains.get("Batch Fields");
+        batchDomain.getFields().add(new FieldDefinition("operatorEmail", ColumnType.String));
+        batchDomain.getFields().add(new FieldDefinition("instrument", ColumnType.String)
+                .setDescription("The diagnostic test instrument."));
 
-        assayDesignerPage.goToBatchFields()
-                .addField(new FieldDefinition("operatorEmail").setType(FieldDefinition.ColumnType.String))
-                .addField(new FieldDefinition("instrument").setType(FieldDefinition.ColumnType.String)
-                        .setDescription("The diagnostic test instrument."));
+        Domain runDomain = domains.get("Run Fields");
+        runDomain.getFields().add(new FieldDefinition("instrumentSetting", ColumnType.Integer)
+                .setDescription("The configuration setting on the instrument."));
 
-        assayDesignerPage.goToRunFields()
-                .addField(new FieldDefinition("instrumentSetting").setType(FieldDefinition.ColumnType.Integer)
-                        .setDescription("The configuration setting on the instrument."));
+        InferDomainCommand inferDomainCommand = new InferDomainCommand(RUN01_FILE, "Assay");
+        InferDomainResponse inferDomainResponse = inferDomainCommand.execute(cn, projectName);
+        List<PropertyDescriptor> inferredResultsFields = inferDomainResponse.getFields().stream()
+                .filter(f -> !f.getName().startsWith("column")).toList();
 
-        assayDesignerPage.goToResultsFields()
-                .removeAllFields(false)
-                .setInferFieldFile(new File(SAMPLE_DATA_LOCATION, RUN01_FILE))
-                .addField(new FieldDefinition("adjustedM1").setType(FieldDefinition.ColumnType.Integer));
+        List<PropertyDescriptor> resultsFields = new ArrayList<>(inferredResultsFields);
+        resultsFields.add(new FieldDefinition("adjustedM1", FieldDefinition.ColumnType.Integer));
+        domains.get("Data Fields").setFields(resultsFields);
 
-        assayDesignerPage.goToResultsFields()
-                .removeField("column5")
-                .removeField("column6");
-        assayDesignerPage.clickFinish();
+        return new SaveProtocolCommand(protocol).execute(cn, projectName).getProtocol().getProtocolId();
     }
 
-    public void addNewField(String projectName, String assayName, String runId, FieldDefinition newField)
+    public void addNewField(String projectName, String assayName, FieldDefinition newField)
     {
         log("Modify the assay design to include a new field named '" + newField.getName() + "'.");
 
         goToProjectHome(projectName);
         clickAndWait(Locator.linkWithText(assayName));
-        waitForElement(Locator.linkWithText(runId));
         click(Locator.linkWithText("Manage assay design"));
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
 
@@ -287,10 +313,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
         return columnValues;
     }
 
-    private boolean compareRunColumnsWithExpected(String projectName, String assayName, String runId, Map<String, List<String>> expectedColumns)
+    private void compareRunColumnsWithExpected(String projectName, String assayName, String runId, Map<String, List<String>> expectedColumns)
     {
-        boolean pass = true;
-
         log("Going to assay '" + assayName + "' in project '" + projectName + "' and going to compare values in run '" + runId + "'.");
         goToProjectHome(projectName);
         clickAndWait(Locator.linkWithText(assayName));
@@ -304,43 +328,29 @@ public class AssayExportImportTest extends BaseWebDriverTest
         {
             log("Getting the data for column '" + columnName + "'.");
             List<String> currentColumn = drt.getColumnDataAsText(columnName);
-            if(!currentColumn.equals(expectedColumns.get(columnName)))
-            {
-                pass = false;
-                log("************** The data in column '" + columnName + "' was not as expected. **************");
-            }
+            checker().verifyEquals("Wrong imported data in column " + columnName, expectedColumns.get(columnName), currentColumn);
         }
 
-        // If the data isn't as expected
-        if(!pass)
-        {
-            log("Take a snapshot of the failed run data.");
-            ArtifactCollector af = new ArtifactCollector(this);
-            af.dumpPageSnapshot("FailedImportData_" + runId, null);
-        }
+        checker().screenShotIfNewError("FailedImportData_" + runId);
 
         goToProjectHome(projectName);
-
-        return pass;
     }
 
     @Test
-    public void validateImportingFileUsingFilesWebPart()
+    public void validateImportingFileUsingFilesWebPart() throws Exception
     {
         final String OPERATOR_EMAIL_01 = "john.doe@AssayExportImport.test";
         final String INSTRUMENT_NAME_01 = "ABC Reader";
         final String INSTRUMENT_SETTING_01 = "456";
         final String COMMENT_BASIC_01 = "This is a comment for run where the data was imported by the FileWeb Part. This is for run: ";
 
-        log("Create a project named: '" + ASSAY_PROJECT_FOR_EXPORT_01 + "' with an assay named: '" + SIMPLE_ASSAY_FOR_EXPORT + "'.");
-
         createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT);
 
         List<File> runFiles = Arrays.asList(
-                new File(SAMPLE_DATA_LOCATION, RUN01_FILE),
-                new File(SAMPLE_DATA_LOCATION, RUN02_FILE),
-                new File(SAMPLE_DATA_LOCATION, RUN03_FILE),
-                new File(SAMPLE_DATA_LOCATION, RUN04_FILE));
+                RUN01_FILE,
+                RUN02_FILE,
+                RUN03_FILE,
+                RUN04_FILE);
 
         Map<String, String> batchProperties = new HashMap<>();
         batchProperties.put("operatorEmail", OPERATOR_EMAIL_01);
@@ -356,7 +366,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         populateAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, runFiles, batchProperties, runProperties);
 
         log("Add a new field that has a missing value indicator.");
-        addNewField(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, new FieldDefinition("missingValue").setType(FieldDefinition.ColumnType.String).setMvEnabled(true));
+        addNewField(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, new FieldDefinition("missingValue", FieldDefinition.ColumnType.String).setMvEnabled(true));
 
         log("Set some of the missing value indicators in run '" + RUN01_NAME + "'.");
         Map<Integer, Map<String, String>> rowFieldValues = new HashMap<>();
@@ -412,30 +422,26 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN01_NAME));
 
-        boolean pass = compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, run01ColumnData);
-        pass = compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN04_NAME, run04ColumnData) && pass;
-
-        Assert.assertTrue("The imported columns were not as expected. See log for details.", pass);
+        compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, run01ColumnData);
+        compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN04_NAME, run04ColumnData);
 
     }
 
     @Test
-    public void validateImportingFileUsingRunProperties()
+    public void validateImportingFileUsingRunProperties() throws Exception
     {
         final String OPERATOR_EMAIL_02 = "jane.doe@AssayExportImport.test";
         final String INSTRUMENT_NAME_02 = "XYZ Reader";
         final String INSTRUMENT_SETTING_02 = "890";
         final String COMMENT_BASIC_02 = "This is a comment for run where the data was imported in the Run Details. This is for run: ";
 
-        log("Create a project named: '" + ASSAY_PROJECT_FOR_EXPORT_02 + "' with an assay named: '" + SIMPLE_ASSAY_FOR_EXPORT + "'.");
-
         createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT);
 
         List<File> runFiles = Arrays.asList(
-                new File(SAMPLE_DATA_LOCATION, RUN01_FILE),
-                new File(SAMPLE_DATA_LOCATION, RUN02_FILE),
-                new File(SAMPLE_DATA_LOCATION, RUN03_FILE),
-                new File(SAMPLE_DATA_LOCATION, RUN04_FILE));
+                RUN01_FILE,
+                RUN02_FILE,
+                RUN03_FILE,
+                RUN04_FILE);
 
         Map<String, String> batchProperties = new HashMap<>();
         batchProperties.put("operatorEmail", OPERATOR_EMAIL_02);
@@ -451,7 +457,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         populateAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, false, runFiles, batchProperties, runProperties);
 
         log("Add a new field that has a missing value indicator.");
-        addNewField(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN02_NAME, new FieldDefinition("missingValue").setType(FieldDefinition.ColumnType.String).setMvEnabled(true));
+        addNewField(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, new FieldDefinition("missingValue", FieldDefinition.ColumnType.String).setMvEnabled(true));
 
         log("Set some of the missing value indicators in run '" + RUN02_NAME + "'.");
         Map<Integer, Map<String, String>> rowFieldValues = new HashMap<>();
@@ -517,10 +523,9 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN01_NAME));
 
-        boolean pass = compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN02_NAME, run02ColumnData);
-        pass = compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN03_NAME, run03ColumnData) && pass;
+        compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN02_NAME, run02ColumnData);
+        compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN03_NAME, run03ColumnData);
 
-        Assert.assertTrue("The imported columns were not as expected. See log for details.", pass);
     }
 
     private void createGeneralAssayWithoutTransform(String assayName)
@@ -535,7 +540,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         assayDesignerPage.goToResultsFields()
                 .removeAllFields(false)
-                .setInferFieldFile(new File(SAMPLE_DATA_LOCATION, RUN01_FILE));
+                .setInferFieldFile(RUN01_FILE);
         assayDesignerPage.clickFinish();
     }
 
@@ -572,10 +577,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         goToProjectHome(ASSAY_PROJECT_FOR_EXPORT_03);
 
-        goToFolderManagement().goToPane("tabexport");
-        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS).precedingSibling("input").findElement(getDriver())).check();
-        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
-        File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
+        ExportFolderPage exportFolderPage = goToFolderManagement().goToExportTab();
+        exportFolderPage.includeExperimentsAndRuns(true);
+        exportFolderPage.includeFiles(true);
+        File exportedFolderFile = exportFolderPage.exportToBrowserAsZipFile();
 
         log("Create a simple Assay project as the import target.");
         _containerHelper.createProject(ASSAY_PROJECT_FOR_IMPORT_03, "Assay");
@@ -589,8 +594,106 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(runName));
 
-        Assert.assertTrue("The imported columns were not as expected. See log for details.",
-                compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_03, SIMPLE_ASSAY_FOR_EXPORT, runName, runColumnData));
+        compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_03, SIMPLE_ASSAY_FOR_EXPORT, runName, runColumnData);
 
     }
+
+    /**
+     * Issue 43802: Export runs to XAR via "Write to exportedXARs directory in pipeline" fails with error
+     */
+    @Test
+    public void testExportXarToPipeline() throws Exception
+    {
+        final String exportProject = ASSAY_PROJECT_FOR_EXPORT_04;
+        final String importProject = ASSAY_PROJECT_FOR_IMPORT_04;
+        final String assayName = SIMPLE_ASSAY_FOR_EXPORT;
+        final String instrumentSetting = "456";
+        final String commentPrefix = "This is a comment for run to be exported via XAR. This is for run: ";
+
+        int assayId = createSimpleProjectAndAssay(exportProject, assayName).intValue();
+
+        Connection cn = createDefaultConnection();
+
+        ImportRunCommand run1 = new ImportRunCommand(assayId, RUN01_FILE);
+        run1.setName(RUN01_NAME);
+        run1.setComment(commentPrefix + RUN01_NAME);
+        run1.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run1.execute(cn, exportProject);
+
+        ImportRunCommand run2 = new ImportRunCommand(assayId, RUN02_FILE);
+        run2.setName(RUN02_NAME);
+        run2.setComment(commentPrefix + RUN02_NAME);
+        run2.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run2.execute(cn, exportProject);
+
+        ImportRunCommand run3 = new ImportRunCommand(assayId, RUN03_FILE);
+        run3.setName(RUN03_NAME);
+        run3.setComment(commentPrefix + RUN03_NAME);
+        run3.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run3.execute(cn, exportProject);
+
+        ImportRunCommand run4 = new ImportRunCommand(assayId, RUN04_FILE);
+        run4.setName(RUN04_NAME);
+        run4.setComment(commentPrefix + RUN04_NAME);
+        run4.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run4.execute(cn, exportProject);
+
+        List<String> runColumns = Arrays.asList("adjustedM1", "M2");
+        Map<String, List<String>> run01ColumnData = getRunColumnData(ASSAY_PROJECT_FOR_EXPORT_04, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, runColumns);
+        runColumns = Arrays.asList("adjustedM1", "M1");
+        Map<String, List<String>> run04ColumnData = getRunColumnData(ASSAY_PROJECT_FOR_EXPORT_04, SIMPLE_ASSAY_FOR_EXPORT, RUN04_NAME, runColumns);
+        goToManageAssays();
+
+        log("Now export the run.");
+        final String toPipelineXarName = "toPipeline.xar";
+
+        clickAndWait(Locator.linkWithText(assayName));
+        DataRegionTable runsTable = DataRegionTable.DataRegion(getDriver()).find();
+        runsTable.checkAllOnPage();
+        DataRegionExportHelper exportPanel = runsTable.expandExportPanel();
+        File absoluteXarFile = exportPanel.exportXar(ABSOLUTE, "absolute.xar");
+        File folderRelativeXarFile = exportPanel.exportXar(FOLDER_RELATIVE, "folderRelative.xar");
+        File partialRelativeXarFile = exportPanel.exportXar(PARTIAL_FOLDER_RELATIVE, "partialRelative.xar");
+        exportPanel.exportXarToPipeline(FOLDER_RELATIVE, toPipelineXarName)
+                .waitForComplete();
+
+        log("Delete runs.");
+        AssayRunsPage assayRunsPage = goToManageAssays().clickAssay(assayName);
+        DataRegionTable runsGrid = assayRunsPage.getTable();
+        runsGrid.checkAllOnPage();
+        runsGrid.deleteSelectedRows();
+
+        log("Reimport runs into same project.");
+        goToModule("FileContent");
+        _fileBrowserHelper.importFile("/exportedXars/" + toPipelineXarName, "Import Experiment");
+        goToDataPipeline();
+        waitForPipelineJobsToComplete(2, true);
+        checkExpectedErrors(2);
+
+        // Issue 45830: Malformed XAR when exporting assay runs with "PARTIAL_FOLDER_RELATIVE" LSIDs
+        log("Import runs (partial relative LSID) into a new project");
+        _containerHelper.createProject(importProject, "Assay");
+        goToProjectHome(importProject);
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(partialRelativeXarFile);
+        _fileBrowserHelper.importFile(partialRelativeXarFile.getName(), "Import Experiment");
+        PipelineStatusTable pipelineStatusTable = goToDataPipeline();
+        waitForPipelineJobsToComplete(1, true);
+        checkExpectedErrors(2);
+        pipelineStatusTable.deleteAllPipelineJobs();
+
+        log("Import runs (folder relative LSID) into a new project");
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(folderRelativeXarFile);
+        _fileBrowserHelper.importFile(folderRelativeXarFile.getName(), "Import Experiment");
+        goToDataPipeline();
+        waitForPipelineJobsToComplete(1, false);
+        goToManageAssays()
+                .clickAssay(assayName)
+                .clickAssayIdLink(RUN01_NAME);
+
+        compareRunColumnsWithExpected(importProject, assayName, RUN01_NAME, run01ColumnData);
+        compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
+    }
+
 }

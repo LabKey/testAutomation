@@ -878,7 +878,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    public static final Pattern ERROR_PATTERN = Pattern.compile("^ERROR", Pattern.MULTILINE);
+    public static final Pattern ERROR_PATTERN = Pattern.compile("^(ERROR|FATAL)", Pattern.MULTILINE);
 
     public void checkErrors()
     {
@@ -896,7 +896,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             while (iterator.hasNext())
             {
                 String line = iterator.next();
-                if (line.startsWith("ERROR") && !line.endsWith("Additional exception info:"))
+                if ((line.startsWith("ERROR") || line.startsWith("FATAL")) && !line.endsWith("Additional exception info:"))
                 {
                     TestLogger.error(line);
                     if (iterator.hasNext())

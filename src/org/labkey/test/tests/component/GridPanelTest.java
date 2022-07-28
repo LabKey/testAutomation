@@ -76,7 +76,8 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final String REMOVED_FLAG_COLUMN = "Flag";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
-    private static final String VIEW_DEFAULT = "Default";
+    private static final String VIEW_DEFAULT = "Default"; // In LKS the default view, even if modified is always named 'Default'.
+    private static final String VIEW_DEFAULT_MODIFIED = "My Default"; // If you change the default view the menu item in the grid changes.
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
     private static final String VIEW_FEWER_COLUMNS = "Fewer_Columns";
     private static final String VIEW_FILTERED_COLUMN = "Filtered_Column";
@@ -180,6 +181,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         sampleSetDataGenerator.insertRows();
 
+        // This modifies the default view of the grid. As a result the default view is now labeled "My Default" in the grid menu.
         removeFlagColumnFromDefaultView(SMALL_SAMPLE_TYPE);
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
@@ -309,12 +311,14 @@ public class GridPanelTest extends BaseWebDriverTest
 
         sampleSetDataGenerator.insertRows();
 
+        // This modifies the default view of the grid. As a result the default view is now labeled "My Default" in the grid menu.
         removeFlagColumnFromDefaultView(FILTER_SAMPLE_TYPE);
 
     }
 
     /**
-     * Helper to remove the 'Flag' column from the default view. It just gets in the way for some of the tests.
+     * Helper to remove the 'Flag' column from the default view. It just gets in the way for some tests, and is easier
+     * to remove it.
      *
      * @param sampleType Name of sample type.
      */
@@ -334,7 +338,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.removeColumn(REMOVED_FLAG_COLUMN);
-        cv.saveDefaultView();
+        cv.saveCustomView("", true);
 
     }
 

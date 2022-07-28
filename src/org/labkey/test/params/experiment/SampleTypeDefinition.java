@@ -32,9 +32,10 @@ public class SampleTypeDefinition extends DomainProps
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
     private Set<String> _dataParentAliases = new HashSet<>();
 
-    // Currently these values are only used by the SampleManager module.
+    // Currently, these values are only used by the SampleManager module.
     private MetricUnit _inventoryMetricUnit;
     private String _labelColor;
+    private String _aliquotNameExpression;
 
     public SampleTypeDefinition(String name)
     {
@@ -115,6 +116,17 @@ public class SampleTypeDefinition extends DomainProps
     protected SampleTypeDefinition setLabelColor(String color)
     {
         _labelColor = color;
+        return this;
+    }
+
+    protected String getAliquotNameExpression()
+    {
+        return _aliquotNameExpression;
+    }
+
+    protected SampleTypeDefinition setAliquotNameExpression(String aliquotNameExpression)
+    {
+        _aliquotNameExpression = aliquotNameExpression;
         return this;
     }
 
@@ -236,6 +248,10 @@ public class SampleTypeDefinition extends DomainProps
         if (getLabelColor() != null)
         {
             options.put("labelColor", getLabelColor());
+        }
+        if(getAliquotNameExpression() != null)
+        {
+            options.put("aliquotNameExpression", getAliquotNameExpression());
         }
         return options;
     }

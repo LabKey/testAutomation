@@ -45,7 +45,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";
     private static final String DATE_TIME_FORMAT_INJECTION = "yyyy-MM-dd HH:mm'" + INJECT_CHARS + "'";
-    private Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
+    private static final Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
 
     @Override
     //this project will remain unaltered and copy every property from the site.
@@ -109,7 +109,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
         //change global settings to exclude help link
         goToSiteLookAndFeel();
-        click(Locator.checkboxByName("enableHelpMenu"));
+        click(Locator.checkboxByName("helpMenuEnabled"));
         clickButtonContainingText("Save");
 
 
@@ -119,7 +119,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
         //change proj 2 to exclude both help and support
         goToProjectSettings(getProjectAlteredName());
-        uncheckCheckbox(Locator.checkboxByName("enableHelpMenu"));
+        uncheckCheckbox(Locator.checkboxByName("helpMenuEnabled"));
         clickButtonContainingText("Save");
 
         //assert help link itself gone
@@ -150,7 +150,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         goToSiteLookAndFeel();
-        checkCheckbox(Locator.checkboxByName("enableHelpMenu"));
+        checkCheckbox(Locator.checkboxByName("helpMenuEnabled"));
         clickButtonContainingText("Save");
 
         _containerHelper.deleteProject(getProjectName(), afterTest);

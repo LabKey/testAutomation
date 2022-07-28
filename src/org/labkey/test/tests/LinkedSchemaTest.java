@@ -501,8 +501,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 ListHelper.ListColumnType.String, "GlobalPid",
                 new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
         _listHelper.goToList(STUDY_LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(STUDY_LIST_DATA);
+        _listHelper.clickImportData()
+                .setText(STUDY_LIST_DATA)
+                .submit();
 
         log("Create the linked schema to the study.");
         String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
@@ -644,8 +645,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         log("** Importing some data...");
         beginAt("/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/list-begin.view");
         _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData();
-        _listHelper.submitTsvData(LIST_DATA);
+        _listHelper.clickImportData()
+                .setText(LIST_DATA)
+                .submit();
 
         log("** Applying metadata xml override to list...");
         beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");
@@ -817,6 +819,34 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertEquals("Unexpected number of rows", 2, table.getDataRowCount());
         assertEquals("Adam", table.getDataAsText(0, "Crazy " + D_PEOPLE_METADATA_TITLE));
         assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
+    }
+
+    /*
+        Test coverage : Issue 45347: Audit table data not available in linked schema
+     */
+    @Test
+    public void testAuditTableLinkedSchema()
+    {
+        String linkedSchemaName = "auditTableLinkedSchema";
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+        String targetContainerPath = "/" + getProjectName() + "/" + TARGET_FOLDER;
+
+        log("Create the linked schema on auditlog");
+        _schemaHelper.createLinkedSchema(targetContainerPath, linkedSchemaName, sourceContainerPath, null, "auditLog", null, null);
+
+        log("Verify the content is visible via linked schema");
+        goToSchemaBrowser();
+        DataRegionTable table = viewQueryData(linkedSchemaName, "ContainerAuditEvent");
+        checker().verifyEquals("Incorrect number of rows in ContainerAuditEvent", 1, table.getDataRowCount());
+
+        goToSchemaBrowser();
+        table = viewQueryData(linkedSchemaName, "ListAuditEvent");
+        table.setFilter("listname", "Equals", "Technicians");
+        checker().verifyEquals("Incorrect number of rows in ListAuditEvent", 2, table.getDataRowCount());
+
+        goToSchemaBrowser();
+        table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
+        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 38, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)

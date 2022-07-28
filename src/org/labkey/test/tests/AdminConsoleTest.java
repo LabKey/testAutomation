@@ -57,7 +57,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
     {
         goToAdminConsole().clickSiteSettings();
         waitForElement(Locator.name("showRibbonMessage"));
-        Locator.name("ribbonMessageHtml").findElement(getDriver()).clear();
+        Locator.name("ribbonMessage").findElement(getDriver()).clear();
 
         WebElement checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
 
@@ -77,7 +77,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         if (!("true".equals(checkbox.getAttribute("checked"))))
             click(Locator.checkboxByName("showRibbonMessage"));
 
-        setFormElement(Locator.name("ribbonMessageHtml"), html);
+        setFormElement(Locator.name("ribbonMessage"), html);
         clickButton("Save");
 
         Locator ribbon = Locator.tagWithClass("div", "alert alert-warning").containing("READ ME!!!");

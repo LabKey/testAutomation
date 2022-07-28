@@ -83,6 +83,12 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
+    public ExportFolderPage includeSampleTypeAndDataClasses(boolean checked)
+    {
+        elementCache().sampleTypeAndDataClasses.set(checked);
+        return this;
+    }
+
     public ExportFolderPage includeFiles(boolean checked)
     {
         elementCache().includeFilesCheckbox.set(checked);
@@ -193,6 +199,8 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
                 .findWhenNeeded(getDriver());
 
         public final Checkbox roleAssighmentsCheckbox = exportItemCheckbox(ROLE_ASSIGNMENTS);
+
+        public final Checkbox sampleTypeAndDataClasses = exportItemCheckbox(SAMPLE_TYPES_AND_DATA_CLASSES);
 
         public final Checkbox includeFilesCheckbox = exportItemCheckbox(FILES);
 

@@ -1,33 +1,26 @@
 package org.labkey.test.tests;
 
-import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.admin.CreateProjectCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
-import org.labkey.test.util.SimpleHttpRequest;
-import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,7 +39,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     private static final String TEMPLATE_SUBFOLDER = "Subfolder for template project";
     private static final String TEMPLATE_FOLDER_PERMISSION = "Data Management";
 
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     public static void setup()
@@ -92,16 +85,16 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCreateProjectByProjectCreator() throws IOException, CommandException
+    public void testCreateProjectByProjectCreator() throws IOException
     {
         log("Project Creator creating the project with admin permission");
         goToHome();
         impersonate(PROJECT_CREATOR_USER);
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", PROJECT_NAME_PC);
-        params.put("assignProjectAdmin", "true");
-        params.put("folderType", "Collaboration");
-        createProject(params);
+        CreateProjectCommand command = new CreateProjectCommand()
+            .setName(PROJECT_NAME_PC)
+            .setAssignProjectAdmin(true)
+            .setFolderType("Collaboration");
+        createProject(command);
         stopImpersonating();
 
         log("Verifying the permissions");
@@ -115,11 +108,11 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         log("Project Creator creating the project without admin permission");
         goToHome();
         impersonate(PROJECT_CREATOR_USER);
-        params = new HashMap<>();
-        params.put("name", PROJECT_NAME_PC);
-        params.put("assignProjectAdmin", "false");
-        params.put("folderType", "Collaboration");
-        createProject(params);
+        command = new CreateProjectCommand()
+            .setName(PROJECT_NAME_PC)
+            .setAssignProjectAdmin(false)
+            .setFolderType("Collaboration");
+        createProject(command);
         stopImpersonating();
 
         log("Verifying the permissions");
@@ -128,16 +121,16 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCreateProjectByReader() throws IOException, CommandException
+    public void testCreateProjectByReader() throws IOException
     {
         log("Verifying Reader creating the project fails");
         goToHome();
         impersonate(READER);
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", PROJECT_NAME_PC);
-        params.put("assignProjectAdmin", "false");
-        params.put("folderType", "Collaboration");
-        String response = createProject(params);
+        CreateProjectCommand command = new CreateProjectCommand()
+            .setName(PROJECT_NAME_PC)
+            .setAssignProjectAdmin(false)
+            .setFolderType("Collaboration");
+        String response = createProject(command);
         stopImpersonating();
 
         assertEquals("Should not be able to create the project", "403 : Forbidden", response);
@@ -150,13 +143,14 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         String containerId = ((APIContainerHelper) _containerHelper).getContainerId(TEMPLATE_PROJECT);
         goToHome();
         impersonate(PROJECT_CREATOR_USER);
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", PROJECT_NAME_PC);
-        params.put("assignProjectAdmin", "true");
-        params.put("folderType", "Template");
-        params.put("templateSourceId", containerId);
-        params.put("templateWriterTypes", "Lists");
-        createProject(params);
+        CreateProjectCommand command = new CreateProjectCommand()
+            .setName(PROJECT_NAME_PC)
+            .setAssignProjectAdmin(true)
+            .setFolderType("Template")
+            .setTemplateSourceId(containerId)
+            .setTemplateIncludeSubfolders(true)
+            .setTemplateWriterTypes("Lists");
+        createProject(command);
         stopImpersonating();
 
         goToProjectHome(PROJECT_NAME_PC);
@@ -178,14 +172,14 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         goToHome();
         impersonate(PROJECT_CREATOR_USER);
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", PROJECT_NAME_PC);
-        params.put("assignProjectAdmin", "true");
-        params.put("folderType", "Template");
-        params.put("templateSourceId", containerId);
-        params.put("templateIncludeSubfolders", "true");
-        params.put("templateWriterTypes", "Role%20assignments%20for%20users%20and%20groups");
-        createProject(params, "Project-level%20groups%20and%20members");
+        CreateProjectCommand command = new CreateProjectCommand()
+            .setName(PROJECT_NAME_PC)
+            .setAssignProjectAdmin(true)
+            .setFolderType("Template")
+            .setTemplateSourceId(containerId)
+            .setTemplateIncludeSubfolders(true)
+            .setTemplateWriterTypes("Role assignments for users and groups", "Project-level groups and members");
+        createProject(command);
         stopImpersonating();
 
         assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
@@ -195,10 +189,8 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         goToFolderPermissions().isUserInGroup(PROJECT_CREATOR_USER, TEMPLATE_FOLDER_PERMISSION, PermissionsHelper.PrincipalType.USER);
     }
 
-    private String createProject(Map<String, Object> params) throws IOException
+    private String createProject(CreateProjectCommand command) throws IOException
     {
-        PostCommand<CommandResponse> command = new PostCommand<>("admin", "createProject");
-        command.setParameters(params);
         try
         {
             command.execute(getRemoteApiConnection(), "/");
@@ -210,26 +202,6 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         return "Success";
     }
-
-    private void createProject(Map<String, Object> params, String additionalWriters)
-    {
-        String createProjectUrl = WebTestHelper.buildURL("admin", "createProject", params);
-        createProjectUrl = createProjectUrl.replace("view", "api");
-        createProjectUrl = createProjectUrl + "&templateWriterTypes=" + additionalWriters;
-        SimpleHttpRequest createProjectRequest = new SimpleHttpRequest(createProjectUrl, "POST");
-        createProjectRequest.copySession(getDriver());
-
-        try
-        {
-            SimpleHttpResponse response = createProjectRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     @Override
     public List<String> getAssociatedModules()

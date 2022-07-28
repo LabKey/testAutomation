@@ -16,6 +16,8 @@
 
 package org.labkey.test.tests.list;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -42,6 +44,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
+import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
@@ -227,9 +230,9 @@ public class ListTest extends BaseWebDriverTest
         table.checkAllOnPage();
         table.deleteSelectedRows();
         // load test data
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), LIST_DATA2);
-        submitImportTsv();
+        _listHelper.clickImportData()
+                .setText(LIST_DATA2)
+                .submit();
     }
 
     @LogMethod
@@ -248,19 +251,20 @@ public class ListTest extends BaseWebDriverTest
             .clickSave();
 
         log("Test upload data");
-        _listHelper.clickImportData();
-        submitImportTsv("Form contains no data");
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        importDataPage.submitExpectingErrorContaining("Form contains no data");
 
-        setFormElement(Locator.id("tsv3"), TEST_FAIL);
-        submitImportTsv("No rows were inserted.");
+        importDataPage.setText(TEST_FAIL);
+        importDataPage.submitExpectingErrorContaining("No rows were inserted.");
 
-        setFormElement(Locator.id("tsv3"), TEST_FAIL2);
-        submitImportTsv("Data does not contain required field: Color");
+        importDataPage.setText(TEST_FAIL2);
+        importDataPage.submitExpectingErrorContaining("Data does not contain required field: Color");
 
-        setFormElement(Locator.id("tsv3"), TEST_FAIL3);
-        submitImportTsv("Could not convert");
-        setFormElement(Locator.id("tsv3"), LIST_DATA);
-        submitImportTsv();
+        importDataPage.setText(TEST_FAIL3);
+        importDataPage.submitExpectingErrorContaining("Could not convert");
+
+        importDataPage.setText(LIST_DATA);
+        importDataPage.submit();
 
         log("Check upload worked correctly");
         assertTextPresent(
@@ -1403,18 +1407,6 @@ public class ListTest extends BaseWebDriverTest
         return sb.toString();
     }
 
-
-    void submitImportTsv(String error)
-    {
-        _listHelper.submitImportTsv_error(error);
-    }
-
-    void submitImportTsv()
-    {
-        _listHelper.submitImportTsv_success();
-    }
-
-
     void createList(String name, List<FieldDefinition> cols, String[][] data)
     {
         log("Add List -- " + name);
@@ -1427,14 +1419,19 @@ public class ListTest extends BaseWebDriverTest
 
     private void setListImportAsTestDataField(String data, String... expectedErrors)
     {
-        setFormElement(Locator.name("text"), data);
+        ImportDataPage importDataPage = new ImportDataPage(getDriver());
+        importDataPage.setText(data);
         if (expectedErrors.length == 0)
         {
-            submitImportTsv();
+            importDataPage.submit();
         }
         else
         {
-            _listHelper.submitImportTsv_errors(Arrays.asList(expectedErrors));
+            String errors = importDataPage.submitExpectingError();
+            for (String expectedError : expectedErrors)
+            {
+                MatcherAssert.assertThat("Import errors", errors, CoreMatchers.containsString(expectedError));
+            }
         }
 
     }

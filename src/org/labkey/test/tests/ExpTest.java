@@ -173,7 +173,7 @@ public class ExpTest extends BaseWebDriverTest
         domainRow.setType(FieldDefinition.ColumnType.Lookup).setFromSchema("exp").setFromTargetTable("dataCustomQuery" + " (Integer)");
 
         // Save it
-        designerPage.clickSaveAndWaitForSuccess();
+        designerPage.clickSave();
         designerPage.viewData();
 
         // Customize the view to add the newly joined column

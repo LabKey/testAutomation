@@ -16,6 +16,7 @@
 
 package org.labkey.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -73,6 +74,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -282,22 +284,55 @@ public class WebTestHelper
         return url;
     }
 
-    public enum DatabaseType {PostgreSQL, MicrosoftSQLServer}
+    public enum DatabaseType
+    {
+        PostgreSQL("org.postgresql.Driver", "pg", "postgres"),
+        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds.jdbc.Driver", "mssql", "sqlserver");
+
+        private static final Map<String, DatabaseType> DATABASE_TYPE_MAP;
+
+        static
+        {
+            Map<String, DatabaseType> tempMap = new HashMap<>();
+            Arrays.stream(values())
+                .forEach(dt -> Arrays.stream(dt._typeKeys)
+                    .forEach(name -> tempMap.put(name, dt)));
+            DATABASE_TYPE_MAP = Collections.unmodifiableMap(tempMap);
+        }
+
+        private final String[] _typeKeys;
+
+        DatabaseType(String... typeKeys)
+        {
+            _typeKeys = typeKeys;
+        }
+
+        static @Nullable DatabaseType get(String driverClassName)
+        {
+            return DATABASE_TYPE_MAP.get(driverClassName);
+        }
+    }
 
     public static DatabaseType getDatabaseType()
     {
-        String databaseType = getServerProperty("databaseType");
+        String typeKey = getServerProperty("databaseType");
+        if (StringUtils.isBlank(typeKey))
+        {
+            // Use driver class name from 'config.properties' if 'databaseType' isn't specified
+            typeKey = getServerProperty("jdbcDriverClassName");
+        }
 
-        if (null == databaseType)
-            throw new IllegalStateException("Can't determine database type: databaseType property is not set");
+        if (StringUtils.isBlank(typeKey))
+        {
+            throw new IllegalStateException("Can't determine database type: Neither 'jdbcDriverClassName' nor 'databaseType' property is not set");
+        }
 
-        if ("postgres".equals(databaseType) || "pg".equals(databaseType))
-            return DatabaseType.PostgreSQL;
+        DatabaseType dt = DatabaseType.get(typeKey);
 
-        if ("sqlserver".equals(databaseType) || "mssql".equals(databaseType))
-            return DatabaseType.MicrosoftSQLServer;
+        if (null == dt)
+            throw new IllegalStateException("Unknown database type: " + typeKey);
 
-        throw new IllegalStateException("Unknown database type: " + databaseType);
+        return dt;
     }
 
     private static String getServerProperty(String property)
@@ -321,11 +356,6 @@ public class WebTestHelper
             }
         }
         return val;
-    }
-
-    public static String getDatabaseVersion()
-    {
-        return getServerProperty("databaseVersion");
     }
 
     public static String getBaseUrlWithoutContextPath()

@@ -101,10 +101,10 @@ import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -164,7 +164,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public ExtHelper _extHelper;
     public Ext4Helper _ext4Helper;
 
-    private Stack<String> _locationStack = new Stack<>();
+    private final Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
 
     static
@@ -462,7 +462,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Object o = executeScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o.toString());
+            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
 
         return (T) o;
     }
@@ -484,7 +484,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Object o = executeAsyncScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o.toString());
+            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
 
         return (T) o;
     }
@@ -600,53 +600,35 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public List<String> getLinkAddresses()
+    @SuppressWarnings("unchecked")
+    public List<Pair<String, Map<String, String>>> getLinkAddresses()
     {
-        return getLinkAddresses(false);
-    }
+        String js = """
+                var i, j;
+                var addresses = new Array();
+                var links = window.document.links;
+                for (i = 0; i < links.length; i++) {
+                    if (links[i].href && links[i].href != '#') {
+                        //addresses.push({href: links[i].href});
+                        var link = {href: links[i].href};
+                        var attributes = new Array();
+                        for (j = 0; j < links[i].attributes.length; j++)
+                        {
+                            // WebDriver can't pass back attributes 'NamedNodeMap'
+                            let a = links[i].attributes[j];
+                            attributes.push({name: a.name, value: a.value});
+                        }
+                        addresses.push({href: links[i].href, attributes: attributes});
+                    }
+                }
+                return addresses;
+                """;
 
-    public List<String> getFormAddresses()
-    {
-        return getLinkAddresses(true);
-    }
-
-    private List<String> getLinkAddresses(boolean includeForms)
-    {
-        String js = "getLinkAddresses = function () {\n" +
-                "        var i, j;\n" +
-                "        var addresses = new Array();\n" +
-                (!includeForms ?
-                "        var links = window.document.links;\n" +
-                "        for (i = 0; i < links.length; i++) {\n" +
-                "          if (links[i].href && links[i].href != '#') addresses.push(links[i].href);\n" +
-                "        }\n"
-                : // includeForms
-                "        var forms = window.document.forms;\n" +
-                "        for (i = 0; i < forms.length ; i++) {\n" +
-                "          var action = forms[i].getAttribute('action');\n" +   // raw attribute value
-                "          if (action === 'begin' || action === '#') continue;\n" +
-                "          if ((action === '' || action == undefined) && LABKEY.ActionURL.getAction() === 'begin') continue;" +
-                "          action = forms[i].action || window.location.href;\n" +
-                "          if (typeof action !== 'string') continue;\n" +
-                "          var and = '&';\n" +
-                "          if (action.indexOf('?')==-1) and = '?';\n" + // No parameters in action, start query string
-                "          for (j=0 ; j<forms[i].elements.length ; j++) {\n" +
-                "            if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') {\n" +
-                "              action += and + forms[i].elements[j].name + '=' + (forms[i].elements[j].value || '');\n" +
-                "              and = '&';\n" +
-                "            }\n" +
-                "          }\n" +
-                "          addresses.push(action);\n" +
-                "        }\n"
-                ) +
-                "        return addresses;\n" +
-                "};\n" +
-                "return getLinkAddresses();";
-        @SuppressWarnings("unchecked")
-        List<String> linkArray = (ArrayList<String>) executeScript(js);
-        ArrayList<String> links = new ArrayList<>();
-        for (String link : linkArray)
+        List<Map<String, Object>> linksWithAttributes = (List<Map<String, Object>>) executeScript(js);
+        List<Pair<String, Map<String, String>>> links = new ArrayList<>();
+        for (Map<String, Object> entry : linksWithAttributes)
         {
+            String link = (String) entry.get("href");
             if (link.contains("#"))
             {
                 link = link.substring(0, link.indexOf("#"));
@@ -654,11 +636,52 @@ public abstract class WebDriverWrapper implements WrapsDriver
             link = trimToNull(link);
             if (null != link)
             {
-                links.add(link);
+                Map<String, String> attributes = new HashMap<>();
+                List<Map<String, Object>> rawAttributes = (List<Map<String, Object>>) entry.get("attributes");
+                if (rawAttributes != null)
+                {
+                    rawAttributes.forEach(att -> attributes.put((String) att.get("name"), (String) att.get("value")));
+                }
+
+                links.add(Pair.of(link, attributes));
             }
         }
 
         return links;
+    }
+
+    public List<String> getFormAddresses()
+    {
+        String js = """
+                var i, j;
+                var addresses = new Array();
+                    var forms = window.document.forms;
+                    for (i = 0; i < forms.length ; i++) {
+                        var action = forms[i].getAttribute('action'); // raw attribute value
+                        if (action === 'begin' || action === '#' ||
+                          ((action === '' || action == undefined) && LABKEY.ActionURL.getAction() === 'begin')) {
+                            continue;
+                        }
+                        action = forms[i].action || window.location.href;
+                        if (typeof action !== 'string') {
+                            continue;
+                        }
+                        var and = '&';
+                        if (action.indexOf('?')==-1) {
+                            and = '?';// No parameters in action, start query string
+                        }
+                        for (j=0 ; j<forms[i].elements.length ; j++) {
+                            if (forms[i].elements[j].name && forms[i].elements[j].name!='X-LABKEY-CSRF') {
+                                action += and + forms[i].elements[j].name + '=' + (forms[i].elements[j].value || '');
+                                and = '&';
+                            }
+                        }
+                        addresses.push(action);
+                    }
+                return addresses;
+                """;
+
+        return (List<String>) executeScript(js);
     }
 
     public String getCurrentRelativeURL()
@@ -2181,7 +2204,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             log("  File downloaded: " + newFile.getName());
         }
-        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
+        assertEquals("Wrong number of files downloaded to " + downloadDir, expectedFileCount, newFiles.length);
 
         if (getDriver() instanceof FirefoxDriver)
             Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
@@ -2208,7 +2231,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
                     return files != null && files.length == 0;
                 },
-                "Temp files remain in download dir: " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
+                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_JAVASCRIPT);
 
         MutableInt downloadSize = new MutableInt(-1);
         MutableInt stabilityDuration = new MutableInt(0);
@@ -2227,7 +2250,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     return stabilityDuration.getValue() > 5;
                 },
-                "File(s) didn't finish downloading to " + downloadDir.toString(), WAIT_FOR_PAGE);
+                "File(s) didn't finish downloading to " + downloadDir, WAIT_FOR_PAGE);
 
         return downloadDir.listFiles(newFileFilter);
     }
@@ -2457,9 +2480,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String elemText = loc.findElement(getDriver()).getText();
         if(elemText == null)
-            fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
+            fail("The element at location " + loc + " contains no text! Expected '" + text + "'.");
         if(!elemText.contains(text))
-            fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
+            fail("The element at location '" + loc + "' contains '" + elemText + "'; expected '" + text + "'.");
     }
 
     public boolean elementContains(Locator loc, String text)
@@ -2602,6 +2625,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void scrollTo(Integer x, Integer y)
     {
         executeScript("window.scrollTo(" + x.toString() +", " + y.toString() + ");");
+    }
+
+    public void scrollToMiddle(WebElement element)
+    {
+        String scrollYToMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
+                + "var elementTop = arguments[0].getBoundingClientRect().top;"
+                + "window.scrollBy(0, elementTop-(viewPortHeight/2));";
+
+       executeScript(scrollYToMiddle, element);
     }
 
     public void scrollToTop()
@@ -2812,7 +2844,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 y = toEl.getSize().getHeight() / 2;
                 break;
             default:
-                throw new IllegalArgumentException("Unexpected position: " + pos.toString());
+                throw new IllegalArgumentException("Unexpected position: " + pos);
         }
 
         Actions builder = new Actions(getDriver());
@@ -2862,7 +2894,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     @Deprecated public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
-        assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
+        assertEquals(tableName + "." + row + "." + column + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
     }
 
     /**
@@ -2874,7 +2906,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         for (String str : strs)
         {
-            assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\' (actual value is " + cellText + ")", cellText.contains(str));
+            assertTrue(tableName + "." + row + "." + column + " should contain '" + str + "' (actual value is " + cellText + ")", cellText.contains(str));
         }
     }
 
@@ -2887,7 +2919,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         for (String str : strs)
         {
-            assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
+            assertFalse(tableName + "." + row + "." + column + " should not contain '" + str + "'", cellText.contains(str));
         }
     }
 
@@ -3143,7 +3175,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
-        WebElement el = l.waitForElement(getDriver(), waitFor);
+        WebElement el = new WebDriverWait(getDriver(), Duration.ofMillis(waitFor))
+                .until(ExpectedConditions.elementToBeClickable(l));
         try
         {
             clickAndWait(el, waitForPageToLoad);
@@ -3582,7 +3615,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (!"checkbox".equals(type))
         {
-            throw new IllegalArgumentException("Element not a checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
+            throw new IllegalArgumentException("Element not a checkbox: " + el + "\nTry Ext4Helper or ExtHelper.");
         }
 
         Boolean indeterminate = executeScript("return arguments[0].indeterminate;", Boolean.class, el);
@@ -3745,10 +3778,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (paramValue != null && decode)
         {
             paramValue = paramValue.replace("+", "%20");
-            try
-            {
-                paramValue = URLDecoder.decode(paramValue, "UTF-8");
-            } catch(UnsupportedEncodingException ignore) {}
+            paramValue = URLDecoder.decode(paramValue, StandardCharsets.UTF_8);
         }
 
         return paramValue;

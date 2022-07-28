@@ -46,9 +46,9 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         elementCache().saveButton.click();
     }
 
-    public Checkbox getEnableDiscussionCheckbox()
+    public Checkbox getDiscussionEnabledCheckbox()
     {
-        return elementCache().enableDiscussion;
+        return elementCache().discussionEnabled;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        protected final Checkbox enableDiscussion = Checkbox.Checkbox(Locator.name("enableDiscussion")).findWhenNeeded(this);
+        protected final Checkbox discussionEnabled = Checkbox.Checkbox(Locator.name("discussionEnabled")).findWhenNeeded(this);
         protected final WebElement saveButton = findButton("Save");
     }
 }
