@@ -194,11 +194,19 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         {
             saveWindow.shareCheckbox.check();
         }
+        else
+        {
+            saveWindow.shareCheckbox.uncheck();
+        }
 
         if (inherit)
         {
             saveWindow.inheritCheckbox.check();
             // TODO: select folder to save custom view into
+        }
+        else
+        {
+            saveWindow.inheritCheckbox.uncheck();
         }
 
         if (name != null)

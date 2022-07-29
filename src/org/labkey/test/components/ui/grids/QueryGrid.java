@@ -5,13 +5,18 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -307,6 +312,50 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
+     * Get the Edit Status text shown in the header. If no status is shown an empty string is returned.
+     *
+     * @return The edit status text.
+     */
+    public String getEditAlertText()
+    {
+        WebElement editAlert = Locator.tagWithClass("span", "view-edit-alert").findWhenNeeded(elementCache().panelHeader());
+
+        if(editAlert.isDisplayed())
+            return editAlert.getText();
+        else
+            return "";
+
+    }
+
+    /**
+     * Click the Undo button in the header. Will wait for the grid to update.
+     *
+     * @return This grid.
+     */
+    public QueryGrid clickUndo()
+    {
+        WebElement undoButton = Locator.buttonContainingText("Undo").findElement(elementCache().panelHeader());
+
+        // Wait for the grid to update.
+        doAndWaitForUpdate(undoButton::click);
+
+        return this;
+    }
+
+    /**
+     * Click the Save button. Will show a {@link SaveViewDialog}.
+     *
+     * @return A {@link SaveViewDialog}
+     */
+    public SaveViewDialog clickSave()
+    {
+        WebElement saveButton = Locator.buttonContainingText("Save").findElement(elementCache().panelHeader());
+        saveButton.click();
+
+        return new SaveViewDialog(getDriver());
+    }
+
+    /**
      * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
      * use this to test which one so we can fork behavior until QGP is gone
      */
@@ -353,6 +402,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         }
 
         final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
+
+        // The panel header element which will contain the Save and Undo buttons.
+        public WebElement panelHeader()
+        {
+            return getComponentElement().findElement(By.xpath("preceding-sibling::div[contains(@class,'panel-heading')]"));
+        }
+
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
@@ -391,4 +447,104 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return _locator;
         }
     }
+
+    /**
+     * Dialog that will allow a user to save a grid view.
+     */
+    public static class SaveViewDialog extends ModalDialog
+    {
+        private final Input viewNameInput = Input.Input(Locator.name("gridViewName"), getDriver())
+                .findWhenNeeded(this);
+
+        Checkbox checkbox = new Checkbox(Locator.input("setDefaultView").findWhenNeeded(this));
+
+        public SaveViewDialog(WebDriver driver)
+        {
+            super(new ModalDialogFinder(driver).withTitle("Save Grid View"));
+        }
+
+        /**
+         * Set the view name.
+         *
+         * @param viewName View name.
+         * @return This dialog.
+         */
+        public SaveViewDialog setViewName(String viewName)
+        {
+            viewNameInput.set(viewName);
+            return this;
+        }
+
+        /**
+         * Get the value of the View Name field.
+         *
+         * @return Value of View Name field.
+         */
+        public String getViewName()
+        {
+            return viewNameInput.get();
+        }
+
+        /**
+         * Check if the View Name field is enabled. It should be disabled if the 'Make default for all' checkbox is checked.
+         *
+         * @return True if enabled, false otherwise.
+         */
+        public boolean isViewNameEnabled()
+        {
+            return viewNameInput.getComponentElement().isEnabled();
+        }
+
+        /**
+         * Check or uncheck the 'Make default view' checkbox.
+         *
+         * @param checked True to check, false to uncheck.
+         * @return This dialog.
+         */
+        public SaveViewDialog setMakeDefaultForAll(boolean checked)
+        {
+            if(checked)
+            {
+                checkbox.check();
+            }
+            else
+            {
+                checkbox.uncheck();
+            }
+
+            return this;
+        }
+
+        /**
+         * Get the checked status of the 'Make default for all' checkbox.
+         *
+         * @return True if it is checked, false otherwise.
+         */
+        public boolean isMakeDefaultForAllChecked()
+        {
+            return checkbox.isChecked();
+        }
+
+        /**
+         * Save the view.
+         */
+        public void saveView()
+        {
+            dismiss("Save", 1);
+        }
+
+        /**
+         * Click the 'Save' button but expect an error.
+         *
+         * @return The text of the error banner.
+         */
+        public String saveViewExpectingError()
+        {
+            dismiss("Save", 0);
+            WebElement errorEl = BootstrapLocators.errorBanner.waitForElement(this, 5000);
+            return errorEl.getText();
+        }
+
+    }
+
 }
