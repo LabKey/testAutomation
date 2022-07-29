@@ -155,14 +155,16 @@ public class ExtHelper
         return elements.get(index).getSize().height;        
     }
 
+    @Deprecated (since = "22.7")
     public void setCodeMirrorValue(String id, String value)
     {
-        new CodeMirrorHelper(_test).setCodeMirrorValue(id, value);
+        new CodeMirrorHelper(_test, id).setCodeMirrorValue(value);
     }
 
+    @Deprecated (since = "22.7")
     public String getCodeMirrorValue(String id)
     {
-        return new CodeMirrorHelper(_test).getCodeMirrorValue(id);
+        return new CodeMirrorHelper(_test, id).getCodeMirrorValue();
     }
 
     /**
