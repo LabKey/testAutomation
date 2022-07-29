@@ -23,6 +23,8 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,6 +82,11 @@ import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v85.log.Log;
+import org.openqa.selenium.devtools.v85.log.model.LogEntry;
+import org.openqa.selenium.devtools.v85.runtime.model.ConsoleAPICalled;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
@@ -89,6 +96,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -131,11 +139,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.openqa.selenium.devtools.v85.runtime.Runtime;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.junit.Assert.assertEquals;
@@ -171,7 +179,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         // Eliminate noise from org.openqa.selenium.remote.ProtocolHandshake and org.openqa.selenium.interactions.Actions
         if (!isWebDriverLoggingEnabled())
-            Logger.getLogger("org.openqa.selenium").setLevel(Level.WARNING);
+            Logger.getLogger("org.openqa.selenium").setLevel(java.util.logging.Level.WARNING);
     }
 
     public WebDriverWrapper()
@@ -393,6 +401,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (newWebDriver != null)
         {
+            newWebDriver = new Augmenter().augment(newWebDriver);
+            DevTools devTools = ((HasDevTools) newWebDriver).getDevTools();
+            devTools.createSession();
+            devTools.send(Log.enable());
+            devTools.addListener(Log.entryAdded(), BrowserConsoleLog::log);
+
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getBrowserVersion();
@@ -442,6 +456,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         }
         System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+    }
+
+    protected void enableConsoleLogCapture(boolean enable)
+    {
+
     }
 
     public boolean isFirefox()
@@ -3920,5 +3939,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         waitFor(() -> count == loc.findElements(getDriver()).size(), wait);
         assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
+    }
+}
+
+class BrowserConsoleLog
+{
+    private static final Map<LogEntry.Level, Level> LOG_ENTRY_LEVELS = Map.of(
+            LogEntry.Level.VERBOSE, Level.DEBUG,
+            LogEntry.Level.INFO, Level.INFO,
+            LogEntry.Level.WARNING, Level.WARN,
+            LogEntry.Level.ERROR, Level.ERROR
+    );
+
+    static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(BrowserConsoleLog.class);
+
+    static void log(LogEntry logEntry)
+    {
+        LOGGER.log(LOG_ENTRY_LEVELS.get(logEntry.getLevel()), logEntry.getText());
     }
 }

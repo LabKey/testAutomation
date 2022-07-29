@@ -192,6 +192,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.logging.debug"));
     }
 
+    public static boolean isConsoleLogEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.devtools.console.log"));
+    }
+
     public static boolean isPrimaryUserAppAdmin()
     {
         return "true".equals(System.getProperty("webtest.primary.app.admin"));
