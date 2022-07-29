@@ -122,7 +122,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _rReportHelper.clickSourceTab();
 
         int expectedLineCount = reportSource.split("\n").length;
-        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, new CodeMirrorHelper(this).getLineCount("script-report-editor"));
+        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, new CodeMirrorHelper(this, "script-report-editor").getLineCount());
 
         return saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }

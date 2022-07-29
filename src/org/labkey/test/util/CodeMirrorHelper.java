@@ -21,35 +21,49 @@ import org.openqa.selenium.JavascriptException;
 public class CodeMirrorHelper
 {
     private final WebDriverWrapper wrapper;
+    private final String editorId;
 
-    public CodeMirrorHelper(WebDriverWrapper wrapper)
+    public CodeMirrorHelper(WebDriverWrapper wrapper, String editorId)
     {
         this.wrapper = wrapper;
+        this.editorId = editorId;
     }
 
-    public void setCodeMirrorValue(String id, String value)
+    @Deprecated (since = "22.7")
+    public CodeMirrorHelper(WebDriverWrapper wrapper)
     {
-        waitForCodeMirrorInstance(id);
+        this(wrapper, null);
+    }
+
+    public void setCodeMirrorValue(String value)
+    {
+        waitForCodeMirrorInstance(editorId);
         String script = getCodeMirrorPrefix() +
                 "getCodeMirrorInstance(arguments[0]).setValue(arguments[1]);";
-        wrapper.executeScript(script, id, value);
+        wrapper.executeScript(script, editorId, value);
     }
 
-    public String getCodeMirrorValue(String id)
+    public String getCodeMirrorValue()
     {
-        waitForCodeMirrorInstance(id);
+        waitForCodeMirrorInstance(editorId);
         String script = getCodeMirrorPrefix() +
                 "return getCodeMirrorInstance(arguments[0]).getValue();";
-        return wrapper.executeScript(script, String.class, id);
+        return wrapper.executeScript(script, String.class, editorId);
     }
 
-    public int getLineCount(String id)
+    public int getLineCount()
     {
-        waitForCodeMirrorInstance(id);
+        waitForCodeMirrorInstance(editorId);
         String script = getCodeMirrorPrefix() +
                 "var cm = getCodeMirrorInstance(arguments[0]);\n" +
                 "return cm.lineCount();";
-        return wrapper.executeScript(script, Long.class, id).intValue();
+        return wrapper.executeScript(script, Long.class, editorId).intValue();
+    }
+
+    @Deprecated (since = "22.7")
+    public int getLineCount(String id)
+    {
+        return new CodeMirrorHelper(wrapper, id).getLineCount();
     }
 
     private void waitForCodeMirrorInstance(String id)

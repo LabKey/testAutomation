@@ -10,7 +10,9 @@ import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Allows tests to record non-fatal errors without failing the test immediately.
@@ -19,12 +21,14 @@ import java.util.List;
  */
 public class DeferredErrorCollector
 {
-    private int errorMark = 0;
+    private static final Set<Class<? extends Throwable>> defaultRecordableErrorTypes =
+            Set.of(AssertionError.class);
 
     private final ArtifactCollector artifactCollector;
     private final List<DeferredError> allErrors = new ArrayList<>();
-    private final List<Class<? extends Throwable>> errorTypes = new ArrayList<>();
+    private final Set<Class<? extends Throwable>> errorTypes = new HashSet<>();
 
+    private int errorMark = 0;
     private FatalErrorCollector _fatalErrorCollector;
 
     /**
@@ -58,7 +62,7 @@ public class DeferredErrorCollector
     public void resetErrorTypes()
     {
         errorTypes.clear();
-        errorTypes.add(AssertionError.class);
+        errorTypes.addAll(defaultRecordableErrorTypes);
     }
 
     /**
