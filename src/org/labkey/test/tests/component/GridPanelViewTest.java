@@ -2,8 +2,10 @@ package org.labkey.test.tests.component;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ui.grids.CustomizeGridDialog;
 import org.labkey.test.components.ui.grids.QueryGrid;
@@ -23,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
 {
 
