@@ -79,14 +79,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
+import org.openqa.selenium.bidi.BiDi;
+import org.openqa.selenium.bidi.log.BaseLogEntry;
+import org.openqa.selenium.bidi.log.GenericLogEntry;
+import org.openqa.selenium.bidi.log.Log;
+import org.openqa.selenium.bidi.log.LogEntry;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.DevToolsException;
-import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v85.log.Log;
-import org.openqa.selenium.devtools.v85.log.model.LogEntry;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
@@ -344,10 +344,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
 
-                    FirefoxOptions capabilities = new FirefoxOptions();
-                    capabilities.setProfile(profile);
-                    capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
-                    capabilities.addPreference("--log", "WARN");
+                    FirefoxOptions firefoxOptions = new FirefoxOptions();
+                    firefoxOptions.setProfile(profile);
+                    firefoxOptions.setLogLevel(FirefoxDriverLogLevel.WARN);
+                    firefoxOptions.addPreference("--log", "WARN");
+                    firefoxOptions.setCapability("webSocketUrl", true);
 
                     String browserPath = System.getProperty("selenium.firefox.binary", "");
                     FirefoxBinary binary;
@@ -365,8 +366,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
                         binary.addCommandLineOptions("--headless");
                     }
-                    capabilities.setBinary(binary);
-                    FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
+                    firefoxOptions.setBinary(binary);
 
                     newDriverService = GeckoDriverService.createDefaultService();
                     try
@@ -391,6 +391,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html", rethrow);
                         }
                     }
+                    BiDi biDi = ((FirefoxDriver) newWebDriver).getBiDi();
+                    biDi.addListener(Log.entryAdded(), BrowserConsoleLog::log);
                 }
                 break;
             }
@@ -400,19 +402,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (newWebDriver != null)
         {
-            try
-            {
-                newWebDriver = new Augmenter().augment(newWebDriver);
-                DevTools devTools = ((HasDevTools) newWebDriver).getDevTools();
-                devTools.createSession();
-                devTools.send(Log.enable());
-                devTools.addListener(Log.entryAdded(), BrowserConsoleLog::log);
-            }
-            catch (DevToolsException ex)
-            {
-                TestLogger.warn("Failed to enable browser log collection", ex);
-            }
-
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getBrowserVersion();
@@ -462,11 +451,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         }
         System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
-    }
-
-    protected void enableConsoleLogCapture(boolean enable)
-    {
-
     }
 
     public boolean isFirefox()
@@ -3950,17 +3934,37 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
 class BrowserConsoleLog
 {
-    private static final Map<LogEntry.Level, Level> LOG_ENTRY_LEVELS = Map.of(
-            LogEntry.Level.VERBOSE, Level.DEBUG,
-            LogEntry.Level.INFO, Level.INFO,
-            LogEntry.Level.WARNING, Level.WARN,
-            LogEntry.Level.ERROR, Level.ERROR
+    // TODO: BaseLogEntry.LogLevel isn't public
+    private static final Map<String, Level> LOG_ENTRY_LEVELS = Map.of(
+            "debug", Level.DEBUG,
+            "info", Level.INFO,
+            "warning", Level.WARN,
+            "error", Level.ERROR
     );
 
     static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(BrowserConsoleLog.class);
 
-    static void log(LogEntry logEntry)
+    static void log(LogEntry bidiLogEntry)
     {
-        LOGGER.log(LOG_ENTRY_LEVELS.get(logEntry.getLevel()), "[" + logEntry.getSource() + "] " + logEntry.getText());
+        if (bidiLogEntry.getConsoleLogEntry().isPresent())
+        {
+            log(bidiLogEntry.getConsoleLogEntry().get());
+        }
+        else if (bidiLogEntry.getGenericLogEntry().isPresent())
+        {
+            log(bidiLogEntry.getGenericLogEntry().get());
+        }
+        else if (bidiLogEntry.getJavascriptLogEntry().isPresent())
+        {
+            log(bidiLogEntry.getJavascriptLogEntry().get());
+        }
+    }
+
+    static void log(GenericLogEntry logEntry)
+    {
+        String type = logEntry.getType();
+        String prefix = type != null ? "[" + type + "] " : "";
+        Level logLevel = LOG_ENTRY_LEVELS.get(String.valueOf(logEntry.getLevel()));
+        LOGGER.log(logLevel == null ? Level.INFO : logLevel, prefix + logEntry.getText());
     }
 }
