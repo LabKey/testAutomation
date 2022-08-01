@@ -406,7 +406,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         // The panel header element which will contain the Save and Undo buttons.
         public WebElement panelHeader()
         {
-            return getComponentElement().findElement(By.xpath("preceding-sibling::div[contains(@class,'panel-heading')]"));
+            return Locator.xpath("preceding-sibling::div[contains(@class,'panel-heading')]").findElement(this);
         }
 
     }
@@ -503,15 +503,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
          */
         public SaveViewDialog setMakeDefaultForAll(boolean checked)
         {
-            if(checked)
-            {
-                checkbox.check();
-            }
-            else
-            {
-                checkbox.uncheck();
-            }
-
+            checkbox.set(checked);
             return this;
         }
 

@@ -12,6 +12,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,15 +54,7 @@ public class CustomizeGridDialog extends ModalDialog
      */
     public CustomizeGridDialog setShowAll(boolean checked)
     {
-        if(checked)
-        {
-            elementCache().checkbox.check();
-        }
-        else
-        {
-            elementCache().checkbox.uncheck();
-        }
-
+        elementCache().checkbox.set(checked);
         return this;
     }
 
@@ -82,26 +76,54 @@ public class CustomizeGridDialog extends ModalDialog
      */
     public List<String> getAvailableFields()
     {
-        List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().availableFieldsPanel());
+        List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().availableFieldsPanel);
         return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     /**
-     * Add a top level field to the 'Shown in Grid' list.
+     * Add a field to the 'Shown in Grid' list. If more than one value is passed in it is assumed to be an expandable path.
      *
-     * @param fieldName The name of the field.
+     * @param fieldName Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public CustomizeGridDialog addAvailableFieldToGrid(String fieldName)
+    public CustomizeGridDialog addAvailableFieldToGrid(String... fieldName)
     {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(elementCache().availableFieldsPanel(), fieldName);
+        StringBuilder fieldKey = new StringBuilder();
 
-        Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, fieldName),
+        Iterator<String> iterator = Arrays.stream(fieldName).iterator();
+
+        while(iterator.hasNext())
+        {
+            fieldKey.append(iterator.next().replace(" ", ""));
+
+            // If this isn't the last item in the collection don't expand it or add a "/" to the expected data-fieldkey value.
+            if(iterator.hasNext())
+            {
+                expandOrCollapseByFieldKey(fieldKey.toString(), true);
+                fieldKey.append("/");
+            }
+
+        }
+
+        return addFieldByFieldKeyToGrid(fieldKey.toString());
+    }
+
+    /**
+     * Add a field to the 'Shown in Grid' list. Use the data-fieldkey value to identify the item.
+     *
+     * @param fieldKey The value in the data-fieldkay attribute for the row.
+     * @return This dialog.
+     */
+    private CustomizeGridDialog addFieldByFieldKeyToGrid(String fieldKey)
+    {
+        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
+
+        Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, fieldKey),
                 listItem.isDisplayed());
 
         WebElement addIcon = Locator.tagWithClass("div", "view-field__action")
                 .withChild(Locator.tagWithClass("i", "fa-plus"))
-                        .findElement(listItem);
+                .findElement(listItem);
 
         addIcon.click();
 
@@ -109,55 +131,30 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
-     * Add a nested field to the 'Shown in Grid' list. You must provide the list of parent fields.
+     * Expand a field or a hierarchy of fields. If a single field is passed in only it will be expanded. If multiple values
+     * are passed in it is assumed to be a path and all fields will be expanded to the last field.
      *
-     * @param parentFields The list of parent fields to first expand.
-     * @param fieldName The field to add.
+     * @param fields The list of fields to expand.
      * @return This dialog.
      */
-    public CustomizeGridDialog addAvailableFieldToGrid(List<String> parentFields, String fieldName)
+    public CustomizeGridDialog expandAvailableFields(String... fields)
     {
         StringBuilder fieldKey = new StringBuilder();
 
-        for(String field : parentFields)
+        Iterator<String> iterator = Arrays.stream(fields).iterator();
+
+        while(iterator.hasNext())
         {
-            fieldKey.append(field.replace(" ", ""));
+            fieldKey.append(iterator.next().replace(" ", ""));
+
             expandOrCollapseByFieldKey(fieldKey.toString(), true);
-            fieldKey.append("/");
-        }
 
-        fieldKey.append(fieldName);
+            // If this isn't the last item in the collection don't add a "/" to the expected data-fieldkey value.
+            if(iterator.hasNext())
+            {
+                fieldKey.append("/");
+            }
 
-        return addAvailableFieldToGrid(fieldKey.toString());
-    }
-
-    /**
-     * Expand a top level field in the 'Available Fields' panel.
-     *
-     * @param fieldName The field to expand.
-     * @return This dialog.
-     */
-    public CustomizeGridDialog expandAvailableField(String fieldName)
-    {
-        expandOrCollapseByFieldKey(fieldName.replace(" ",""), true);
-        return this;
-    }
-
-    /**
-     * Expand a hierarchy of fields.
-     *
-     * @param parentFields The list of fields to expand.
-     * @return This dialog.
-     */
-    public CustomizeGridDialog expandAvailableFieldsTo(List<String> parentFields)
-    {
-        StringBuilder fieldKey = new StringBuilder();
-
-        for(String field : parentFields)
-        {
-            fieldKey.append(field.replace(" ", ""));
-            expandOrCollapseByFieldKey(fieldKey.toString(), true);
-            fieldKey.append("/");
         }
 
         return this;
@@ -183,20 +180,12 @@ public class CustomizeGridDialog extends ModalDialog
      */
     private void expandOrCollapseByFieldKey(String fieldKey, boolean expand)
     {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(elementCache().availableFieldsPanel(), fieldKey);
+        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
 
         Assert.assertTrue(String.format("Field with data-fieldkey attribute '%s' is not visible in the 'Available Fields' panel.", fieldKey),
                 listItem.isDisplayed());
 
-        String iconClass;
-        if(expand)
-        {
-            iconClass = "fa-plus-square";
-        }
-        else
-        {
-            iconClass = "fa-minus-square";
-        }
+        String iconClass = expand ? "fa-plus-square" : "fa-minus-square";
 
         WebElement expandIcon = Locator.tagWithClass("div", "field-expand-icon")
                 .withChild(Locator.tagWithClass("i", iconClass))
@@ -222,7 +211,7 @@ public class CustomizeGridDialog extends ModalDialog
      */
     public List<String> getShownInGridLabels()
     {
-        List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().shownInGridPanel());
+        List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().shownInGridPanel);
         return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
@@ -350,7 +339,7 @@ public class CustomizeGridDialog extends ModalDialog
                 .perform();
 
         WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed() &&
-                        elementCache().getListItemElement(elementCache().shownInGridPanel(), newFieldLabel).isDisplayed(),
+                        elementCache().getListItemElement(elementCache().shownInGridPanel, newFieldLabel).isDisplayed(),
                 String.format("New field label '%s' is not in the list.", newFieldLabel), 500);
 
         return this;
@@ -383,7 +372,7 @@ public class CustomizeGridDialog extends ModalDialog
 
     private List<WebElement> getShownInGridListItems(String fieldLabel)
     {
-        List<WebElement> listItems = elementCache().getListItemElements(elementCache().shownInGridPanel(), fieldLabel);
+        List<WebElement> listItems = elementCache().getListItemElements(elementCache().shownInGridPanel, fieldLabel);
 
         Assert.assertFalse(String.format(FIELD_NOT_IN_GRID, fieldLabel),
                 listItems.isEmpty());
@@ -428,6 +417,10 @@ public class CustomizeGridDialog extends ModalDialog
     {
         protected final Locator contentPanelLocator = Locator.byClass("field-modal__col-content");
 
+        protected WebElement availableFieldsPanel = contentPanelLocator.index(0).findWhenNeeded(this);
+
+        protected WebElement shownInGridPanel = contentPanelLocator.index(1).findWhenNeeded(this);
+
         // This is present to items in both panels.
         protected final Locator listItemName = Locator.tagWithClass("div", "field-name");
 
@@ -443,17 +436,7 @@ public class CustomizeGridDialog extends ModalDialog
 
         // The 'pencil' to edit a label. Only in the Shown in Grid panel.
         protected final WebElement fieldLabelEdit = Locator.tagWithClass("input", "form-control")
-                .refindWhenNeeded(shownInGridPanel());
-
-        protected WebElement availableFieldsPanel()
-        {
-            return contentPanelLocator.findElements(this).get(0);
-        }
-
-        protected WebElement shownInGridPanel()
-        {
-            return contentPanelLocator.findElements(this).get(1);
-        }
+                .refindWhenNeeded(shownInGridPanel);
 
         // Will get all the list items that match the fieldName.
         protected List<WebElement> getListItemElements(WebElement panel, String fieldName)
@@ -473,11 +456,11 @@ public class CustomizeGridDialog extends ModalDialog
 
         // The data-fieldkey attribute is only present in items in the Available Fields panel.
         // Similar value to field-name (no spaces, but casing is the same). For child fields it will contain the parent path.
-        protected WebElement getListItemElementByFieldKey(WebElement panel, String fieldKey)
+        protected WebElement getListItemElementByFieldKey(String fieldKey)
         {
             return Locator.tagWithClass("div", "list-group-item")
                     .withAttribute("data-fieldkey", fieldKey)
-                    .findElement(panel);
+                    .findElement(availableFieldsPanel);
         }
 
         // Get the displayed names/lables of list items in the given panel.

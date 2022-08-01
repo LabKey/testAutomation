@@ -116,7 +116,7 @@ public class GridPanelBaseTest extends BaseWebDriverTest
      * @param sampleType The sample type used to populate the grid.
      * @return A queryGrid object.
      */
-    protected QueryGrid initQueryGrid(String sampleType)
+    protected QueryGrid beginAtQueryGrid(String sampleType)
     {
         QueryGrid grid = CoreComponentsTestPage.beginAt(this, getProjectName())
                 .getGridPanel(TEST_SCHEMA, sampleType);

@@ -305,7 +305,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testFirstAndLastPageNavigation()
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Check default paging values.");
         checker().verifyEquals("Start row number on first page not as expected.",
@@ -371,7 +371,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectPageSize()
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate paging with defaults.");
 
@@ -466,7 +466,7 @@ public class GridPanelTest extends GridPanelBaseTest
     @Test
     public void testSinglePageOfData()
     {
-        QueryGrid grid = initQueryGrid(SMALL_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(SMALL_SAMPLE_TYPE);
 
         String expectedText = String.format("1 - %d", SMALL_SAMPLE_TYPE_SIZE);
         String actualText = grid.getGridBar().pager().summary();
@@ -504,7 +504,7 @@ public class GridPanelTest extends GridPanelBaseTest
     @Test
     public void testSelectAllButtonWithFilteredResults()
     {
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate that the 'Select All' button works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -538,7 +538,7 @@ public class GridPanelTest extends GridPanelBaseTest
     @Test
     public void testSelectAllOnPageWithFilteredResults()
     {
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate the select all check box at the top of the gird works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -570,7 +570,7 @@ public class GridPanelTest extends GridPanelBaseTest
     @Test
     public void testSelectOnPageAndSelectAllButton()
     {
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Filter grid to multiple pages.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -632,7 +632,7 @@ public class GridPanelTest extends GridPanelBaseTest
     @Test
     public void testIsBlankAndIsNotBlankFilter()
     {
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Filter grid to only rows with blank entries.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.ISBLANK);
@@ -663,7 +663,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testMultipleFiltersOnOneColumn() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         int low = INT_MAX - 3;
         int high = INT_MAX;
@@ -693,7 +693,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testFilterErrorAndFilterOnlyTab()
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
@@ -747,7 +747,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testInteractionBetweenDialogTabs() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
@@ -890,7 +890,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSearchAndFilter() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         int low = 4;
         int high = INT_MAX - 3;
@@ -983,7 +983,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testFilterPills() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         int high = INT_MAX - 3;
         int low = 3;
@@ -1142,7 +1142,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSearchIsSameAsContainsFilter() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         // Set search string to 'AB'.
         String searchString = stringSetMembers.get(0) + stringSetMembers.get(1);
@@ -1196,7 +1196,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSearchAcrossColumns() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         // Something of a "magic number". A search for 12 will find values in sample name and the Str column.
         String searchString = "12";
@@ -1250,7 +1250,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testFilteringAndSearchingForExtendedCharacters() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log(String.format("Search for '%s'.", EXTEND_RECORD_STRING));
 
@@ -1292,7 +1292,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testExport() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Filter the grid and validate only the filtered results are exported.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -1325,7 +1325,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         log(String.format("Using sample type '%s' validate that if a view is selected the expected columns are exported.", SMALL_SAMPLE_TYPE));
 
-        grid = initQueryGrid(SMALL_SAMPLE_TYPE);
+        grid = beginAtQueryGrid(SMALL_SAMPLE_TYPE);
 
         log(String.format("Select the '%s' view.", VIEW_EXTRA_COLUMNS));
         grid.selectView(VIEW_EXTRA_COLUMNS);
@@ -1387,7 +1387,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testFilterDialogWithViews() throws IOException, CommandException
     {
 
-        QueryGrid grid = initQueryGrid(SMALL_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(SMALL_SAMPLE_TYPE);
 
         log(String.format("For sample type '%s' use view '%s'.", SMALL_SAMPLE_TYPE, VIEW_EXTRA_COLUMNS));
 
