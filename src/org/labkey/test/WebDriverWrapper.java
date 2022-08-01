@@ -338,7 +338,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setAssumeUntrustedCertificateIssuer(false);
 
                     FirefoxOptions capabilities = new FirefoxOptions();
-                    capabilities.setCapability(FirefoxDriver.Capability.PROFILE, profile);
+                    capabilities.setProfile(profile);
                     capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
                     capabilities.addPreference("--log", "WARN");
 
@@ -358,7 +358,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
                         binary.addCommandLineOptions("--headless");
                     }
-                    capabilities.setCapability(FirefoxDriver.Capability.BINARY, binary);
+                    capabilities.setBinary(binary);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
 
                     newDriverService = GeckoDriverService.createDefaultService();

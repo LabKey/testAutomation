@@ -14,7 +14,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
-import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -68,7 +68,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         WebElement downloadBtn = Locator.tagWithClass("span", "fa-download").findElement(this);
 
         if(!downloadBtn.isDisplayed())
-            throw new ElementNotVisibleException("File export button is not visible.");
+            throw new ElementNotInteractableException("File export button is not visible.");
 
         downloadBtn.click();
 

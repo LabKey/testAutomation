@@ -31,6 +31,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -436,8 +437,8 @@ public class DataReportsTest extends ReportTest
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         _rReportHelper.clickSourceTab();
-        _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
-        _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
+        _rReportHelper.selectOption(ScriptReportPage.StandardReportOption.shareReport);
+        _rReportHelper.selectOption(ScriptReportPage.StandardReportOption.runInPipeline);
         saveReport(R_SCRIPTS[1]);
 
         log("Check that R script worked");
@@ -542,7 +543,7 @@ public class DataReportsTest extends ReportTest
         DataRegionTable.DataRegion(getDriver()).find().goToReport( reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         _rReportHelper.clickSourceTab();
-        _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
+        _rReportHelper.clearOption(ScriptReportPage.StandardReportOption.showSourceTab);
         resaveReport();
 
         impersonateRole("Reader");
@@ -582,9 +583,9 @@ public class DataReportsTest extends ReportTest
 
         if (share)
         {
-            _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
+            _rReportHelper.selectOption(ScriptReportPage.StandardReportOption.shareReport);
             if (shareSource)
-                _rReportHelper.selectOption(RReportHelper.ReportOption.showSourceTab);
+                _rReportHelper.selectOption(ScriptReportPage.StandardReportOption.showSourceTab);
         }
 
         saveReport(name);

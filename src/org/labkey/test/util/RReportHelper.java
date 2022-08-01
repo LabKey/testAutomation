@@ -23,12 +23,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Checkbox;
-import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineConfig;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage.EngineType;
 import org.labkey.test.pages.admin.RConfigurationPage;
+import org.labkey.test.pages.reports.ScriptReportPage;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -40,31 +40,52 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
-import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
-import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class RReportHelper
 {
     public static final String RDOCKER = "RDocker";
 
-    public enum ReportOption {
-        shareReport("Make this report available to all users", null, true),
-        showSourceTab("Show source tab to all users", null, true),
-        runInPipeline("Run this report in the background as a pipeline job", null, true),
+    public enum ReportOption implements ScriptReportPage.ReportOption
+    {
+        @Deprecated (since = "22.7")
+        shareReport(ScriptReportPage.StandardReportOption.shareReport),
         knitrNone("None" + Locator.NBSP, "Knitr Options", false),
         knitrHtml("Html" + Locator.NBSP, "Knitr Options", false),
         knitrMarkdown("Markdown" + Locator.NBSP, "Knitr Options", false);
 
-        public String _label;
-        public boolean _isCheckbox;
-        public String _fieldSet;
+        public final String _label;
+        public final boolean _isCheckbox;
+        public final String _fieldSet;
 
-        ReportOption(String label, String fieldSet, boolean isCheckbox)
+        ReportOption(String label, String section, boolean isCheckbox)
         {
             _label = label;
-            _fieldSet = fieldSet;
+            _fieldSet = section;
             _isCheckbox = isCheckbox;
+        }
+
+        ReportOption(ScriptReportPage.StandardReportOption option)
+        {
+            this(option.getLabel(), option.getSection(), option.isCheckbox());
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return _label;
+        }
+
+        @Override
+        public boolean isCheckbox()
+        {
+            return _isCheckbox;
+        }
+
+        @Override
+        public String getSection()
+        {
+            return _fieldSet;
         }
     }
 
@@ -410,15 +431,14 @@ public class RReportHelper
         return new ProcessHelper(getRScriptExecutable(), "-e", scriptContents).getProcessOutput().trim();
     }
 
+    public ScriptReportPage getReportPage()
+    {
+        return new ScriptReportPage(_test.getDriver());
+    }
+
     public void saveReport(String name, boolean isSaveAs, int wait)
     {
-        WebElement saveButton = Ext4Helper.Locators.ext4Button(isSaveAs ? "Save As" : "Save").findElement(_test.getDriver());
-        _test.scrollIntoView(saveButton, true);
-        _test.clickAndWait(saveButton, wait);
-        if (null != name)
-        {
-            saveReportWithName(name, isSaveAs);
-        }
+        getReportPage().saveReport(name, isSaveAs, wait);
     }
 
     /**
@@ -426,92 +446,47 @@ public class RReportHelper
      */
     public void saveReportWithName(String name, boolean isSaveAs)
     {
-        saveReportWithName(name, isSaveAs, false);
+        getReportPage().saveReportWithName(name, isSaveAs);
     }
 
     public void saveReportWithName(String name, boolean isSaveAs, boolean isExternal)
     {
-        String windowTitle;
-        if (isExternal)
-        {
-            windowTitle = "Create New Report";
-        }
-        else
-        {
-            windowTitle = isSaveAs ? "Save Report As" : "Save Report";
-        }
-
-        Window<?> window = new Window<>(windowTitle, _test.getWrappedDriver());
-        WebElement nameInput = Locator.xpath("//input[contains(@class, 'x4-form-field')]").findElement(window);
-        _test.setFormElement(nameInput, name);
-        _test.waitForFormElementToEqual(nameInput, name); // Make sure it sticks
-        if (isExternal)
-            window.clickButton("OK", 0);
-        else
-            window.clickButton("OK");
+        getReportPage().saveReportWithName(name, isSaveAs, isExternal);
     }
 
     public void saveReport(String name)
     {
-        saveReport(name, false, 0);
+        getReportPage().saveReport(name);
     }
 
     public void saveAsReport(String name)
     {
-        saveReport(name, true, 0);
+        getReportPage().saveAsReport(name);
     }
 
-    public void selectOption(ReportOption option)
+    public void selectOption(ScriptReportPage.ReportOption option)
     {
-        _selectOption(option, true);
+        getReportPage().selectOption(option);
     }
 
-    public void clearOption(ReportOption option)
+    public void clearOption(ScriptReportPage.ReportOption option)
     {
-        _selectOption(option, false);
-    }
-
-    private void _selectOption(ReportOption option, boolean checked)
-    {
-        ensureFieldSetExpanded(option._fieldSet);
-        Checkbox checkbox;
-        if (option._isCheckbox)
-        {
-            checkbox = Ext4Checkbox().withLabel(option._label).waitFor(_test.getDriver());
-        }
-        else
-        {
-            if (!checked)
-                throw new IllegalArgumentException("Can't uncheck a radio button");
-            checkbox = RadioButton().withLabel(option._label).waitFor(_test.getDriver());
-        }
-        checkbox.set(checked);
-        _test.waitFor(() -> checkbox.isChecked() == checked, 1000);
+        getReportPage().clearOption(option);
     }
 
     public void clickReportTab()
     {
-        _test.waitAndClick(Ext4Helper.Locators.tab("Report"));
-        _test.waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        getReportPage().clickReportTab();
     }
 
     public void clickSourceTab()
     {
-        _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
-        _test.waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), WAIT_FOR_PAGE);
+        getReportPage().clickSourceTab();
     }
 
     public void ensureFieldSetExpanded(String name)
     {
-        if (name != null)
-        {
-            Locator fieldSet = Locator.xpath("//fieldset").withClass("x4-fieldset-collapsed").withDescendant(Locator.xpath("//div").withClass("x4-fieldset-header-text").containing(name)).append("//div/img");
-
-            if (_test.isElementPresent(fieldSet))
-            {
-                _test.click(fieldSet);
-            }
-        }
+        getReportPage().ensureFieldSetExpanded(name);
     }
 
     /**
@@ -538,7 +513,7 @@ public class RReportHelper
         DataRegion(_test.getDriver()).find().goToReport("Create R Report");
 
         if (shareView)
-            selectOption(RReportHelper.ReportOption.shareReport);
+            selectOption(ScriptReportPage.StandardReportOption.shareReport);
 
         saveReport(name);
     }
@@ -561,7 +536,7 @@ public class RReportHelper
         _test.setCodeEditorValue("script-report-editor", reportSource);
 
         if (shareView)
-            selectOption(RReportHelper.ReportOption.shareReport);
+            selectOption(ScriptReportPage.StandardReportOption.shareReport);
 
         rReportHelper.saveReport(reportName);
         _test.waitForText(reportName);

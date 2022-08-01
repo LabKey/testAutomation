@@ -33,6 +33,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -289,7 +290,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         String reportName = folder + "-BackgroundReport";
         DataRegionTable table = new DataRegionTable("query", this);
         table.goToReport("Create R Report");
-        _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
+        _RReportHelper.selectOption(ScriptReportPage.StandardReportOption.runInPipeline);
         _RReportHelper.saveReport(reportName);
 
         log("** Executing background R script");
