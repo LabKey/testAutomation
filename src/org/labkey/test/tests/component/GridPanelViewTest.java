@@ -25,6 +25,12 @@ import java.util.Map;
 
 public class GridPanelViewTest extends GridPanelBaseTest
 {
+
+    // Sample type used to validate default views. It is just easier to have a separate sample type where the default views are changed.
+    private static final String DEFAULT_VIEW_SAMPLE_TYPE = "Default_View_SampleType";
+    private static final int DEFAULT_VIEW_SAMPLE_TYPE_SIZE = 10;
+    private static final String DEFAULT_VIEW_SAMPLE_PREFIX = "DFT-";
+
     // A sample type that will be used to validate shared views.
     private static final String VIEW_SAMPLE_TYPE = "View_SampleType";
     private static final int VIEW_SAMPLE_TYPE_SIZE = 100;
@@ -76,23 +82,38 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         // Create a sample type that will validate views can be saved and shared. Primarily interested in the views not
         // with complex filtering scenarios.
-        SampleTypeDefinition props = new SampleTypeDefinition(VIEW_SAMPLE_TYPE)
-                .setFields(Arrays.asList(new FieldDefinition(COL_INT, FieldDefinition.ColumnType.Integer),
-                        new FieldDefinition(COL_STRING, FieldDefinition.ColumnType.String)));
+        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(COL_INT, FieldDefinition.ColumnType.Integer),
+                new FieldDefinition(COL_STRING, FieldDefinition.ColumnType.String));
+
+        createSampleType(VIEW_SAMPLE_TYPE, VIEW_SAMPLE_PREFIX, VIEW_SAMPLE_TYPE_SIZE, fields);
+
+        createSampleType(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_VIEW_SAMPLE_PREFIX, DEFAULT_VIEW_SAMPLE_TYPE_SIZE, fields);
+
+        _userHelper.createUser(OTHER_USER, true,false);
+        setInitialPassword(OTHER_USER, OTHER_PW);
+        new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, "Folder Administrator", PermissionsHelper.MemberType.user, getProjectName());
+
+    }
+
+    private void createSampleType(String sampleTypeName, String samplePrefix, int numOfSamples, List<FieldDefinition> fields) throws IOException, CommandException
+    {
+
+        SampleTypeDefinition props = new SampleTypeDefinition(sampleTypeName)
+                .setFields(fields);
 
         TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
 
         int sampleId = 1;
         int allPossibleIndex = 0;
 
-        while (sampleId <= VIEW_SAMPLE_TYPE_SIZE)
+        while (sampleId <= numOfSamples)
         {
 
             if(allPossibleIndex == stringSets.size())
                 allPossibleIndex = 0;
 
             sampleSetDataGenerator.addCustomRow(
-                    Map.of(COL_NAME, String.format("%s%d", VIEW_SAMPLE_PREFIX, sampleId++),
+                    Map.of(COL_NAME, String.format("%s%d", samplePrefix, sampleId++),
                             COL_INT, sampleId,
                             COL_STRING, stringSets.get(allPossibleIndex++)));
 
@@ -100,12 +121,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         sampleSetDataGenerator.insertRows();
 
-        removeFlagColumnFromDefaultView(VIEW_SAMPLE_TYPE);
-
-        _userHelper.createUser(OTHER_USER, true,false);
-        setInitialPassword(OTHER_USER, OTHER_PW);
-        new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, "Folder Administrator", PermissionsHelper.MemberType.user, getProjectName());
-
+        removeFlagColumnFromDefaultView(sampleTypeName);
     }
 
     private void resetDefaultView(String sampleTypeName, List<String> columns)
@@ -130,14 +146,14 @@ public class GridPanelViewTest extends GridPanelBaseTest
     @Test
     public void testDefaultViewFromLKS()
     {
-        resetDefaultView(VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
 
         goToProjectHome();
 
-        waitAndClickAndWait(Locator.linkWithText(VIEW_SAMPLE_TYPE));
+        waitAndClickAndWait(Locator.linkWithText(DEFAULT_VIEW_SAMPLE_TYPE));
 
         log(String.format("In LabKey Server, for sample type '%s' remove '%s' column form default view, but don't share the default view.",
-                VIEW_SAMPLE_TYPE, COL_STRING));
+                DEFAULT_VIEW_SAMPLE_TYPE, COL_STRING));
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
@@ -175,11 +191,11 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public void testDefaultViewFromGrid()
     {
 
-        resetDefaultView(VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
 
-        log(String.format("For sample type '%s' remove the '%s' column using the column header menu.", VIEW_SAMPLE_TYPE, COL_INT));
+        log(String.format("For sample type '%s' remove the '%s' column using the column header menu.", DEFAULT_VIEW_SAMPLE_TYPE, COL_INT));
 
-        QueryGrid grid = beginAtQueryGrid(VIEW_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
         grid.hideColumn(COL_INT);
 
@@ -251,7 +267,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private void validateViewMenuAndGridColumns(List<String> expectedMenuItems, List<String> expectedColumns)
     {
 
-        QueryGrid grid = beginAtQueryGrid(VIEW_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
         List<String> actualValues;
 
@@ -290,6 +306,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public void testTestComponentChanges()
     {
         goToProjectHome();
+
+        resetDefaultView(VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
 
         QueryGrid grid = beginAtQueryGrid(VIEW_SAMPLE_TYPE);
 
