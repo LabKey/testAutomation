@@ -3955,6 +3955,7 @@ class BrowserConsoleLog
 
     static void log(LogEntry logEntry)
     {
-        LOGGER.log(LOG_ENTRY_LEVELS.get(logEntry.getLevel()), logEntry.getText());
+        String msgPrefix = logEntry.getSource() == null ? "" : "[" + logEntry.getSource() + "] ";
+        LOGGER.log(LOG_ENTRY_LEVELS.get(logEntry.getLevel()), msgPrefix + logEntry.getText());
     }
 }
