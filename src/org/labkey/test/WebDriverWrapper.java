@@ -83,10 +83,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.devtools.v85.log.Log;
 import org.openqa.selenium.devtools.v85.log.model.LogEntry;
-import org.openqa.selenium.devtools.v85.runtime.model.ConsoleAPICalled;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
@@ -143,7 +143,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.openqa.selenium.devtools.v85.runtime.Runtime;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.junit.Assert.assertEquals;
@@ -401,11 +400,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (newWebDriver != null)
         {
-            newWebDriver = new Augmenter().augment(newWebDriver);
-            DevTools devTools = ((HasDevTools) newWebDriver).getDevTools();
-            devTools.createSession();
-            devTools.send(Log.enable());
-            devTools.addListener(Log.entryAdded(), BrowserConsoleLog::log);
+            try
+            {
+                newWebDriver = new Augmenter().augment(newWebDriver);
+                DevTools devTools = ((HasDevTools) newWebDriver).getDevTools();
+                devTools.createSession();
+                devTools.send(Log.enable());
+                devTools.addListener(Log.entryAdded(), BrowserConsoleLog::log);
+            }
+            catch (DevToolsException ex)
+            {
+                TestLogger.warn("Failed to enable browser log collection", ex);
+            }
 
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
