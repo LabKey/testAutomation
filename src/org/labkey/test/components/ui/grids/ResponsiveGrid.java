@@ -122,8 +122,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         Optional<WebElement> colHeaderIcon = Locator.XPathLocator.union(
-                Locator.tagWithClass("span", "fa-sort-amount-asc"),
-                Locator.tagWithClass("span", "fa-sort-amount-desc")
+                Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-asc"),
+                Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-desc")
         ).findOptionalElement(headerCell);
         return colHeaderIcon.isPresent();
 
@@ -175,6 +175,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         clickColumnMenuItem(columnLabel, "Remove filter", true);
         return getThis();
+    }
+
+    public boolean hasColumnFilterIcon(String columnLabel)
+    {
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        Optional<WebElement> colHeaderIcon = Locator.tagWithClass("span", "grid-panel__col-header-icon")
+                .withClass("fa-filter")
+                .findOptionalElement(headerCell);
+        return colHeaderIcon.isPresent();
+
     }
 
     /**

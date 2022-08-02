@@ -111,21 +111,38 @@ public class GridPanelBaseTest extends BaseWebDriverTest
     }
 
     /**
-     * Make sure there are no filters or search values persisted for the given sample type.
+     * Go to core-components.view page for the given project. Then select the QueryGrid (GridPanel) component. Clear any
+     * selections, filters or search values that are present.
      *
      * @param sampleType The sample type used to populate the grid.
      * @return A queryGrid object.
      */
     protected QueryGrid beginAtQueryGrid(String sampleType)
     {
+        return beginAtQueryGrid(sampleType, true);
+    }
+
+    /**
+     * Go to core-components.view page for the given project. Then select the QueryGrid (GridPanel) component.
+     *
+     * @param sampleType The sample type used to populate the grid.
+     * @param clearFilters Clear any filters. If the default view has been changed to use a filter the filter pill will
+     *                     be shown. Setting this to true will clear the filter, and as a result will mark the current
+     *                     default view as changed.
+     * @return A queryGrid object.
+     */
+    protected QueryGrid beginAtQueryGrid(String sampleType, boolean clearFilters)
+    {
         QueryGrid grid = CoreComponentsTestPage.beginAt(this, getProjectName())
                 .getGridPanel(TEST_SCHEMA, sampleType);
 
-        // Selections can persist, clear them.
         grid.clearAllSelections();
 
-        // Searches and filter values shouldn't persist, but clear them just to be safe.
-        grid.clearFilters();
+        if(clearFilters)
+        {
+            grid.clearFilters();
+        }
+
         grid.clearSearch();
 
         return grid;

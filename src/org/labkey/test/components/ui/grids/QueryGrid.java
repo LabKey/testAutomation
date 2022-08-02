@@ -343,6 +343,16 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
+     * Is the 'Undo' button visible on the grid.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isUndoButtonVisible()
+    {
+        return Locator.buttonContainingText("Undo").findWhenNeeded(elementCache().panelHeader()).isDisplayed();
+    }
+
+    /**
      * Click the Save button. Will show a {@link SaveViewDialog}.
      *
      * @return A {@link SaveViewDialog}
@@ -353,6 +363,16 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         saveButton.click();
 
         return new SaveViewDialog(getDriver());
+    }
+
+    /**
+     * Is the 'Save' button visible on the grid.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isSaveButtonVisible()
+    {
+        return Locator.buttonContainingText("Save").findWhenNeeded(elementCache().panelHeader()).isDisplayed();
     }
 
     /**
