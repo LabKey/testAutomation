@@ -882,7 +882,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualValues = facetedPanel.getAvailableValues();
 
         // Hard coding the string combinations (AB, AC, etc...) to make the code more readable.
-        expectedValues = Arrays.asList(ALL_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
+        expectedValues = Arrays.asList(ALL_OPTION, BLANK_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
 
         Collections.sort(actualValues);
         Collections.sort(expectedValues);
@@ -1578,6 +1578,7 @@ public class GridPanelTest extends BaseWebDriverTest
             }
         }
         expectedList.add(ALL_OPTION);
+        expectedList.add(BLANK_OPTION);
 
         log(String.format("Validate that the list of values for the '%s' is as expected.", FILTER_STRING_COL));
         filterDialog.selectField(FILTER_STRING_COL);
@@ -1649,7 +1650,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualList = filterDialog.selectFacetTab().getAvailableValues();
 
         // Going to hard code the expected values rather try and be clever and figure them out.
-        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
+        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, BLANK_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
 
         Collections.sort(expectedList);
         Collections.sort(actualList);
