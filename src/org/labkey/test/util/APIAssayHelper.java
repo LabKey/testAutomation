@@ -31,6 +31,8 @@ import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveProtocolCommand;
+import org.labkey.remoteapi.domain.InferDomainCommand;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Row;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -275,7 +277,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         cmd.execute(_test.createDefaultConnection(), "/" + projectPath);
     }
 
-    public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws Exception
+    public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws IOException, CommandException
     {
         Connection connection = _test.createDefaultConnection();
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
@@ -327,4 +329,9 @@ public class APIAssayHelper extends AbstractAssayHelper
         return String.valueOf(resp.getRows().get(0).get("Lsid"));
     }
 
+    public List<PropertyDescriptor> inferFieldsFromFile(File file, String containerPath) throws IOException, CommandException
+    {
+        return new InferDomainCommand(file, "Assay").execute(_test.createDefaultConnection(), containerPath)
+                .getFields();
+    }
 }

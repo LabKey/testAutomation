@@ -26,7 +26,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -122,7 +122,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
                 {
                     _extHelper.clickExtTab("Choose Filters");
                 }
-                catch (NoSuchElementException ignore) { }
+                catch (WebDriverException ignore) { }
                 WebElement comboArrow = Locator.css(".x-form-arrow-trigger")
                         .findElement( Locator.tagWithClass("div", "x-form-item").withPredicate(Locator.xpath("./label").withText("Filter Type:")).findElement(filterDialog));
                 comboArrow.click();

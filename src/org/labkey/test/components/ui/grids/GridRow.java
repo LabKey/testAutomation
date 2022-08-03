@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -163,7 +164,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         if (_rowMap == null)
         {
-            _rowMap = new HashMap<>();
+            _rowMap = new CaseInsensitiveHashMap<>();
             List<String> columns = _grid.getColumnNames();
             List<String> rowCellTexts = getTexts();
             for (int i = 0; i < columns.size(); i++)

@@ -81,7 +81,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setRequiredField(fieldDefinition.getRequired());
         if (fieldDefinition.getLookupValidatorEnabled() != null)
             fieldRow.setLookupValidatorEnabled(fieldDefinition.getLookupValidatorEnabled());
-
+        if (fieldDefinition.getAliquotOption() != null)
+            fieldRow.setAliquotOption(fieldDefinition.getAliquotOption());
         // ontology-specific
         if (fieldDefinition.getSourceOntology() != null)
             fieldRow.setSelectedOntology(fieldDefinition.getSourceOntology());

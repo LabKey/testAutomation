@@ -168,12 +168,6 @@ public class DataRegionTable extends DataRegion
         return getCustomizeView();
     }
 
-    public DataRegionTable closeCustomizeGrid()
-    {
-        getCustomizeView().closePanel();
-        return this;
-    }
-
     protected DataRegionExportHelper getExportPanel()
     {
         if (_exportHelper == null)
@@ -181,9 +175,10 @@ public class DataRegionTable extends DataRegion
         return _exportHelper;
     }
 
-    public AbstractDataRegionExportOrSignHelper expandExportPanel()
+    public DataRegionExportHelper expandExportPanel()
     {
-        return _exportHelper.expandExportPanel();
+        getExportPanel().expandExportPanel();
+        return getExportPanel();
     }
 
     public static DataRegionFinder DataRegion(WebDriver driver)

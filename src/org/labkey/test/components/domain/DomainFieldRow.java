@@ -2,6 +2,7 @@ package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.labkey.api.exp.query.ExpSchema;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -1040,6 +1041,41 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public DomainFieldRow setAliquotOption(ExpSchema.DerivationDataScopeType option)
+    {
+        expand();
+        elementCache().aliquotOption(option).check();
+        return this;
+    }
+
+    public RadioButton getAliquotOptionRadioButton(ExpSchema.DerivationDataScopeType option)
+    {
+        expand();
+        return elementCache().aliquotOption(option);
+    }
+
+    public ExpSchema.DerivationDataScopeType getSelectedAliquotOption()
+    {
+        expand();
+        for (ExpSchema.DerivationDataScopeType option : ExpSchema.DerivationDataScopeType.values())
+        {
+            if (elementCache().aliquotOption(option).isChecked())
+                return option;
+        }
+        return null;
+    }
+
+    public boolean hasAliquotOptionWarning()
+    {
+        expand();
+        return getWrapper().isElementPresent(elementCache().aliquotWarningAlert);
+    }
+
+    public String getAliquotOptionWarning()
+    {
+        return elementCache().aliquotWarningAlert.findElement(this).getText();
+    }
+
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row").withoutClass("domain-floating-hdr");
@@ -1140,6 +1176,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .withText("Expected Vocabulary");
         Locator.XPathLocator selectConceptBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
                 .withText("Select Concept");
+
+        Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
         public Locator.XPathLocator getCharScaleInputLocForRow(int rowIndex)
         {
@@ -1268,5 +1306,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
                     Locator.button("Add Format"), Locator.button("Edit Formats"));
         }
+
+        public RadioButton aliquotOption(ExpSchema.DerivationDataScopeType option)
+        {
+            return new RadioButton.RadioButtonFinder().withValue(option.name()).find(this);
+        }
+
+
     }
 }

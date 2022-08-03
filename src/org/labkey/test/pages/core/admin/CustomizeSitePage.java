@@ -165,9 +165,9 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public CustomizeSitePage setRibbonMessageHtml(String value)
+    public CustomizeSitePage setRibbonMessage(String html)
     {
-        elementCache().ribbonMessageHtml.set(value);
+        elementCache().ribbonMessage.set(html);
         return this;
     }
 
@@ -189,9 +189,9 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public CustomizeSitePage setXFrameOptions(XFrameOptions value)
+    public CustomizeSitePage setXFrameOption(XFrameOption value)
     {
-        elementCache().XFrameOptions.selectByValue(value.name());
+        elementCache().XFrameOption.selectByValue(value.name());
         return this;
     }
 
@@ -210,7 +210,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
         // Site URLs
         protected final Input defaultDomain = Input(Locator.id("defaultDomain"), getDriver()).findWhenNeeded(this);
-        protected final Input baseServerUrl = Input(Locator.id("baseServerUrl"), getDriver()).findWhenNeeded(this);
+        protected final Input baseServerUrl = Input(Locator.id("baseServerURL"), getDriver()).findWhenNeeded(this);
         protected final Checkbox containerRelativeUrl = Checkbox(Locator.id("useContainerRelativeURL")).findWhenNeeded(this);
 
         // Usage Reporting
@@ -248,7 +248,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
         // Ribbon Bar
         protected final Checkbox showRibbonMessage = Checkbox(Locator.id("showRibbonMessage")).findWhenNeeded(this);
-        protected final Input ribbonMessageHtml = Input(Locator.id("ribbonMessageHtml"), getDriver()).findWhenNeeded(this);
+        protected final Input ribbonMessage = Input(Locator.id("ribbonMessage"), getDriver()).findWhenNeeded(this);
 
         // Site Admin Mode
         protected final Checkbox adminOnlyMode = Checkbox(Locator.id("adminOnlyMode")).findWhenNeeded(this);
@@ -256,7 +256,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
         // HTTP Security Settings
         protected final Select CSRFCheck = Select(Locator.id("CSRFCheck")).findWhenNeeded(this);
-        protected final Select XFrameOptions = Select(Locator.id("XFrameOptions")).findWhenNeeded(this);
+        protected final Select XFrameOption = Select(Locator.id("XFrameOption")).findWhenNeeded(this);
     }
 
     public enum ReportingLevel
@@ -269,7 +269,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         POST, ADMINONLY
     }
 
-    public enum XFrameOptions
+    public enum XFrameOption
     {
         SAMEORIGIN, ALLOW
     }

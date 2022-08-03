@@ -76,7 +76,8 @@ public class GridPanelTest extends BaseWebDriverTest
     private static final String REMOVED_FLAG_COLUMN = "Flag";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
-    private static final String VIEW_DEFAULT = "Default";
+    private static final String VIEW_DEFAULT = "Default"; // In LKS the default view, even if modified is always named 'Default'.
+    private static final String VIEW_DEFAULT_MODIFIED = "My Default"; // If you change the default view the menu item in the grid changes.
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
     private static final String VIEW_FEWER_COLUMNS = "Fewer_Columns";
     private static final String VIEW_FILTERED_COLUMN = "Filtered_Column";
@@ -180,6 +181,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         sampleSetDataGenerator.insertRows();
 
+        // This modifies the default view of the grid. As a result the default view is now labeled "My Default" in the grid menu.
         removeFlagColumnFromDefaultView(SMALL_SAMPLE_TYPE);
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
@@ -309,12 +311,14 @@ public class GridPanelTest extends BaseWebDriverTest
 
         sampleSetDataGenerator.insertRows();
 
+        // This modifies the default view of the grid. As a result the default view is now labeled "My Default" in the grid menu.
         removeFlagColumnFromDefaultView(FILTER_SAMPLE_TYPE);
 
     }
 
     /**
-     * Helper to remove the 'Flag' column from the default view. It just gets in the way for some of the tests.
+     * Helper to remove the 'Flag' column from the default view. It just gets in the way for some tests, and is easier
+     * to remove it.
      *
      * @param sampleType Name of sample type.
      */
@@ -334,7 +338,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.removeColumn(REMOVED_FLAG_COLUMN);
-        cv.saveDefaultView();
+        cv.saveCustomView("", true);
 
     }
 
@@ -878,7 +882,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualValues = facetedPanel.getAvailableValues();
 
         // Hard coding the string combinations (AB, AC, etc...) to make the code more readable.
-        expectedValues = Arrays.asList(ALL_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
+        expectedValues = Arrays.asList(ALL_OPTION, BLANK_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
 
         Collections.sort(actualValues);
         Collections.sort(expectedValues);
@@ -1574,6 +1578,7 @@ public class GridPanelTest extends BaseWebDriverTest
             }
         }
         expectedList.add(ALL_OPTION);
+        expectedList.add(BLANK_OPTION);
 
         log(String.format("Validate that the list of values for the '%s' is as expected.", FILTER_STRING_COL));
         filterDialog.selectField(FILTER_STRING_COL);
@@ -1645,7 +1650,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualList = filterDialog.selectFacetTab().getAvailableValues();
 
         // Going to hard code the expected values rather try and be clever and figure them out.
-        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
+        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, BLANK_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
 
         Collections.sort(expectedList);
         Collections.sort(actualList);

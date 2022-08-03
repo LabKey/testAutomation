@@ -52,7 +52,16 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public ReactSelect targetEntityTypeSelect()
     {
-        return ReactSelect.finder(getDriver()).withName("targetEntityType").waitFor();
+        // Which tabs are available and selected can vary so try finding the visible react select
+        ReactSelect firstTabSelect = ReactSelect.finder(getDriver()).withName("targetEntityType").index(0).waitFor();
+        if (firstTabSelect.getComponentElement().isDisplayed())
+        {
+            return firstTabSelect;
+        }
+        else
+        {
+            return ReactSelect.finder(getDriver()).withName("targetEntityType").index(1).waitFor();
+        }
     }
 
     private ReactSelect parentEntityTypeSelect(String label)
@@ -185,6 +194,11 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
+    public boolean hasUpdateDataOption()
+    {
+        return elementCache().updateDataCheckBoxLocator.existsIn(this);
+    }
+
     private FileUploadPanel fileUploadPanel()
     {
         return new FileUploadPanel.FileUploadPanelFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
@@ -275,6 +289,22 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return modeSelectListItem("from File").withClass("active").findOptionalElement(this).isPresent() &&
                 optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
+    }
+
+    public boolean hasFileUpload()
+    {
+        return modeSelectListItem("from File").findOptionalElement(this).isPresent();
+    }
+
+    public boolean hasGridCreate()
+    {
+        return modeSelectListItem("from Grid").findOptionalElement(this).isPresent();
+    }
+
+    public String getFormats()
+    {
+        String[] parts = elementCache().formatString.getText().split(": ");
+        return parts.length > 1 ? parts[1] : null;
     }
 
     protected boolean isElementVisible(WebElement element)
@@ -396,11 +426,15 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
 
-        WebElement updateCheckboxElem = Locator.tag("div")
+        Locator updateDataCheckBoxLocator = Locator.tag("div")
                 .withChild(Locator.tagWithClass("span", "entity-mergeoption-checkbox"))
-                .child("input").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        Checkbox updateDataCheckbox = new Checkbox(updateCheckboxElem);
+            .child("input");
+        Checkbox updateDataCheckbox = new Checkbox(updateDataCheckBoxLocator.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
+
+        WebElement formatString = Locator.tagWithClass("div","file-form-formats")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     public static class EntityInsertPanelFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, EntityInsertPanelFinder>

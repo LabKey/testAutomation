@@ -423,24 +423,20 @@ public class Runner extends TestSuite
             if (test == null)
             {
                 List<Class<?>> interfaces = ClassUtils.getAllInterfaces(testClass);
-                String databaseType = System.getProperty("databaseType");
-                String databaseVersion = System.getProperty("databaseVersion");
+                WebTestHelper.DatabaseType databaseType = WebTestHelper.getDatabaseType();
                 String osName = System.getProperty("os.name", "<unknown>");
-                if (!StringUtils.isEmpty(databaseType)) // Prefer to run illegal tests vs missing coverage when databaseType isn't set
+                if (interfaces.contains(PostgresOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.PostgreSQL)
                 {
-                    if (interfaces.contains(PostgresOnlyTest.class) && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
-                    {
-                        LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
-                        continue;
-                    }
-                    else if (interfaces.contains(SqlserverOnlyTest.class) && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType) || "SQLEXPRESS".equals(databaseType)))
-                    {
-                        LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
-                        continue;
-                    }
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
+                    continue;
+                }
+                else if (interfaces.contains(SqlserverOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.MicrosoftSQLServer)
+                {
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
+                    continue;
                 }
 
-                if(interfaces.contains(DevModeOnlyTest.class) && !"true".equals(System.getProperty("devMode")))
+                if(interfaces.contains(DevModeOnlyTest.class) && !TestProperties.isDevModeEnabled())
                 {
                     LOG.warn("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
                     continue;
@@ -919,7 +915,6 @@ public class Runner extends TestSuite
         boolean skipLeakCheck = "false".equals(System.getProperty("memCheck"));
         boolean disableAssertions = "true".equals(System.getProperty("disableAssertions"));
         boolean cleanOnly = "true".equals(System.getProperty("cleanOnly"));
-        boolean skipClean = "false".equals(System.getProperty("clean"));
         boolean shuffleTests = "true".equals(System.getProperty("shuffleTests"));
         boolean testRecentlyFailed = "true".equals(System.getProperty("testRecentlyFailed"));
         boolean testNewAndModified = "true".equals(System.getProperty("testNewAndModified"));
@@ -931,11 +926,6 @@ public class Runner extends TestSuite
         if (StringUtils.trimToEmpty(removeFromSuite).contains("."))
         {
             throw new IllegalArgumentException("It looks like you are trying to prevent an individual test method from executing. That is not currently supported. removeFromSuite=" + removeFromSuite);
-        }
-
-        if (cleanOnly && skipClean)
-        {
-            throw new IllegalArgumentException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
         }
 
         if (!skipLeakCheck && disableAssertions)

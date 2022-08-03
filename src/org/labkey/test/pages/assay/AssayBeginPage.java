@@ -1,5 +1,6 @@
 package org.labkey.test.pages.assay;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
@@ -33,6 +34,12 @@ public class AssayBeginPage extends LabKeyPage<AssayBeginPage.ElementCache>
     public DataRegionTable getAssayList()
     {
         return elementCache().assaysList;
+    }
+
+    public AssayRunsPage clickAssay(String assayName)
+    {
+        clickAndWait(Locator.linkWithText(assayName));
+        return new AssayRunsPage(getDriver());
     }
 
     public ChooseAssayTypePage clickNewAssayDesign()
@@ -74,7 +81,7 @@ public class AssayBeginPage extends LabKeyPage<AssayBeginPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         public DataRegionTable assaysList = DataRegionTable.DataRegion(getDriver()).withName("AssayList").waitFor();
     }

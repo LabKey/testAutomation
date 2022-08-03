@@ -15,7 +15,7 @@
  */
 package org.labkey.test.pages;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -74,7 +74,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     public void setSiteDefault(String engineName)
     {
         log("Ensure " + engineName + " is the site default engine");
-        editEngine(engineName);
+        EditEngineWindow editEngineWindow = editEngine(engineName);
         Locator.XPathLocator defaultCheckbox = Locator.id("editEngine_default-inputEl");
         if (_ext4Helper.isChecked(defaultCheckbox))
         {
@@ -85,8 +85,9 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         }
         log("Change site default engine to " + engineName);
         _ext4Helper.checkCheckbox(defaultCheckbox);
-        click(Locator.linkWithText("Submit"));
+        editEngineWindow.clickButton("Submit", 0);
         acceptAlert();
+        editEngineWindow.waitForClose();
         _ext4Helper.waitForMaskToDisappear();
     }
 
@@ -107,13 +108,12 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             mouseOver(menuItem);
             menuItem.click(); // Retry for unresponsive button
         }
-        Window window = Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
-        engineConfig.configureEngine(type,window, this);
+        EditEngineWindow configWindow = new EditEngineWindow();
+        engineConfig.configureEngine(configWindow);
 
         String language = getFormElement(Locator.id("editEngine_languageName-inputEl"));
 
-        clickButton("Submit", 0);
-        waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
+        configWindow.submit();
         waitForElement(Locators.enginesGridRowForLanguage(language));
     }
 
@@ -218,13 +218,21 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     }
 
     @LogMethod(quiet = true)
-    public void editEngine(@LoggedParam String engineName)
+    public EditEngineWindow editEngine(@LoggedParam String engineName)
     {
         selectEngineNamed(engineName);
 
         clickButton("Edit", 0);
 
-        Window(getDriver()).withTitle(EDIT_WINDOW_TITLE).waitFor();
+        return new EditEngineWindow();
+    }
+
+    @LogMethod(quiet = true)
+    public void updateEngine(@LoggedParam EngineConfig engineConfig)
+    {
+        EditEngineWindow editEngineWindow = editEngine(engineConfig.getName());
+        engineConfig.configureEngine(editEngineWindow);
+        editEngineWindow.submit();
     }
 
     private void deleteSelectedEngine(WebElement selectedEngineRow)
@@ -363,33 +371,26 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         {
             _outputFileNameInput.set(outputFileName);
         }
+
+        public void submit()
+        {
+            clickButton("Submit", true);
+        }
     }
 
     public enum EngineType
     {
         PERL,
-        REMOTE_R
-            {
-                @Override
-                public String toString()
-                {
-                    return "Remote R";
-                }
-            },
+        DOCKER_REPORT, // IPYNB
+        REMOTE_R,
         R,
         EXTERNAL,
-        R_DOCKER
-                {
-                    @Override
-                    public String toString()
-                    {
-                        return "R Docker";
-                    }
-                };
+        R_DOCKER,
+        ;
 
         public String toString()
         {
-            return StringUtils.capitalize(name().toLowerCase());
+            return WordUtils.capitalize(name().toLowerCase().replace("_", " "));
         }
     }
 
@@ -502,15 +503,21 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
             return this;
         }
 
-        public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
+        public void configureEngine(EditEngineWindow configWindow)
         {
             for (Map.Entry<Locator, String> entry : getConfigMap().entrySet())
             {
                 if (entry.getValue() != null)
                 {
-                    wrapper.setFormElement(entry.getKey(), entry.getValue());
+                    configWindow.getWrapper().setFormElement(entry.getKey(), entry.getValue());
                 }
             }
+        }
+
+        @Override
+        public String toString()
+        {
+            return getName() != null ? getName() : getClass().getSimpleName();
         }
     }
 
@@ -635,18 +642,18 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         }
 
         @Override
-        public void configureEngine(EngineType type, Window configWindow, WebDriverWrapper wrapper)
+        public void configureEngine(EditEngineWindow configWindow)
         {
             // need to set the change password checkbox
-            wrapper._ext4Helper.checkCheckbox(Locator.id("editEngine_changePassword-inputEl"));
-            super.configureEngine(type, configWindow, wrapper);
+            configWindow.getWrapper()._ext4Helper.checkCheckbox(Locator.id("editEngine_changePassword-inputEl"));
+            super.configureEngine(configWindow);
 
-            wrapper.log("Configuring the path mapping");
-            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(0));
-            Locator.name("remoteURI").findElement(wrapper.getDriver()).sendKeys(_remoteReportsTemp);
+            TestLogger.debug("Configuring the path mapping");
+            configWindow.getWrapper().click(Locator.tagWithClassContaining("td", "remoteURI").index(0));
+            Locator.name("remoteURI").findElement(configWindow.getWrapper().getDriver()).sendKeys(_remoteReportsTemp);
 
-            wrapper.click(Locator.tagWithClassContaining("td", "remoteURI").index(1));
-            Locator.name("remoteURI").findElement(wrapper.getDriver()).sendKeys(_remoteDate);
+            configWindow.getWrapper().click(Locator.tagWithClassContaining("td", "remoteURI").index(1));
+            Locator.name("remoteURI").findElement(configWindow.getWrapper().getDriver()).sendKeys(_remoteDate);
         }
     }
 
