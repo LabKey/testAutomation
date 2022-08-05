@@ -16,14 +16,15 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -132,15 +133,69 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public List<FilterStatusValue> getFilterStatusValues()
     {
-        return getFilterStatusValues(false);
+        return elementCache().getFilterStatusFilterValues();
     }
 
-    public List<FilterStatusValue> getFilterStatusValues(boolean includeView)
+    /**
+     * Get the text of the filter(s).
+     *
+     * @return List of text filters.
+     */
+    public List<String> getFilterStatusValuesText()
     {
-        if (includeView)
-            return elementCache().getAllFilterStatusValues();
-        else
-            return elementCache().getFilterStatusFilterValues();
+        return getFilterStatusValues()
+                .stream().map(FilterStatusValue::getText)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a map of the filters. Use the filter text as the key, the filter element will be the value.
+     * It is possible, but rare, to have two or more filters with the exact same text. For example columns labels could
+     * be changed to be identical (and the same filter is applied). If that happens any filters after the first one will
+     * have a sequential number attached to their key value.
+     *
+     * @return Map of filters. Filter text is key.
+     */
+    public Map<String, FilterStatusValue> getMapOfFilterStatusValues()
+    {
+        Map<String, FilterStatusValue> filterMap = new HashMap<>();
+        Map<String, Integer> filterCount = new HashMap<>();
+
+        List<FilterStatusValue> filters = getFilterStatusValues();
+
+        for(FilterStatusValue fsv : filters)
+        {
+            String filterText = fsv.getText();
+
+            // Check if this filter text has already been saved. If it has, avoid a duplicate key error by adding a
+            // number to key value for the next entry.
+            if(filterCount.containsKey(filterText))
+            {
+                int count = filterCount.get(filterText) + 1;
+                filterText = String.format("%s_%d", filterText, count);
+                filterCount.replace(filterText, count);
+            }
+            else
+            {
+                filterCount.put(filterText, 1);
+            }
+
+            filterMap.put(filterText, fsv);
+        }
+
+        return filterMap;
+    }
+
+    /**
+     * Find a filter by the text displayed and remove it. Will wait for the grid to refresh before returning.
+     *
+     * @param filterText The text of the filter to remove.
+     * @return This grid.
+     */
+    public QueryGrid removeFilter(String filterText)
+    {
+        doAndWaitForUpdate(()->getMapOfFilterStatusValues().get(filterText).remove());
+        return this;
     }
 
     // record count
@@ -353,16 +408,25 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
-     * Click the Save button. Will show a {@link SaveViewDialog}.
+     * Click the Save (View) button in the grid header. If the grid is showing the default view clicking save will show
+     * a {@link SaveViewDialog}, otherwise clicking save will save to the view currently applied to the grid.
      *
-     * @return A {@link SaveViewDialog}
+     * @param expectSaveDialog Indicate if a 'Save View' dialog is expected.
+     * @return A {@link SaveViewDialog} or null if a saved dialog is not expected.
      */
-    public SaveViewDialog clickSave()
+    public SaveViewDialog clickSave(boolean expectSaveDialog)
     {
         WebElement saveButton = Locator.buttonContainingText("Save").findElement(elementCache().panelHeader());
         saveButton.click();
 
-        return new SaveViewDialog(getDriver());
+        if(expectSaveDialog)
+        {
+            return new SaveViewDialog(getDriver(), this);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /**
@@ -410,15 +474,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
 
-        public List<FilterStatusValue> getAllFilterStatusValues()
-        {
-            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
-        }
-
         public List<FilterStatusValue> getFilterStatusFilterValues()
         {
-            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel)
-                    .stream().filter(FilterStatusValue::isFilter).toList();
+            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
         }
 
         final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
@@ -473,14 +531,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public static class SaveViewDialog extends ModalDialog
     {
+        QueryGrid grid;
+
         private final Input viewNameInput = Input.Input(Locator.name("gridViewName"), getDriver())
                 .findWhenNeeded(this);
 
         Checkbox checkbox = new Checkbox(Locator.input("setDefaultView").findWhenNeeded(this));
 
-        public SaveViewDialog(WebDriver driver)
+        public SaveViewDialog(WebDriver driver, QueryGrid grid)
         {
             super(new ModalDialogFinder(driver).withTitle("Save Grid View"));
+            this.grid = grid;
         }
 
         /**

@@ -4,13 +4,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.components.ui.grids.CustomizeGridDialog;
 import org.labkey.test.components.ui.grids.GridFilterModal;
 import org.labkey.test.components.ui.grids.QueryGrid;
+import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -25,6 +29,7 @@ import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +39,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     // Sample type used to validate default views. It is just easier to have a separate sample type where the default views are changed.
     private static final String DEFAULT_VIEW_SAMPLE_TYPE = "Default_View_SampleType";
-    private static final int DEFAULT_VIEW_SAMPLE_TYPE_SIZE = 10;
+    private static final int DEFAULT_VIEW_SAMPLE_TYPE_SIZE = 30;
     private static final String DEFAULT_VIEW_SAMPLE_PREFIX = "DFT-";
 
     // A sample type that will be used to validate shared views.
@@ -44,8 +49,16 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     // Column names.
     private static final String COL_NAME = "Name";
-    private static final String COL_STRING = "Str";
+    private static final String COL_STRING1 = "Str1";
+    private static final String COL_STRING2 = "Str2";
     private static final String COL_INT = "Int";
+    private static final String COL_BOOL = "Bool";
+
+    private static final List<String> DEFAULT_COLUMNS = Arrays.asList(COL_NAME, COL_INT, COL_STRING1, COL_STRING2, COL_BOOL);
+    private static Map<String, Integer> defaultColumnState = new HashMap<>();
+    private static final int ICONS_NONE = 0;
+    private static final int ICONS_SORT = 1;
+    private static final int ICONS_FILTER = 2;
 
     private static final String OTHER_USER = "other_user@grid.panel.test";
     private static final String OTHER_PW = "S0meP@ssW0rd"; // Hardcoded password because it makes it easier to manually debug.
@@ -55,6 +68,10 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     private static final String EDITED_ALERT = "EDITED";
     private static final String UPDATED_ALERT = "UPDATED";
+
+    // Keep track of any custom views that may have been created.
+    private static List<String> savedViews = new ArrayList<>();
+
 
     @Override
     protected String getProjectName()
@@ -89,7 +106,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
         // Create a sample type that will validate views can be saved and shared. Primarily interested in the views not
         // with complex filtering scenarios.
         List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(COL_INT, FieldDefinition.ColumnType.Integer),
-                new FieldDefinition(COL_STRING, FieldDefinition.ColumnType.String));
+                new FieldDefinition(COL_STRING1, FieldDefinition.ColumnType.String),
+                new FieldDefinition(COL_STRING2, FieldDefinition.ColumnType.String),
+                new FieldDefinition(COL_BOOL, FieldDefinition.ColumnType.Boolean));
 
         createSampleType(VIEW_SAMPLE_TYPE, VIEW_SAMPLE_PREFIX, VIEW_SAMPLE_TYPE_SIZE, fields);
 
@@ -111,6 +130,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         int sampleId = 1;
         int allPossibleIndex = 0;
+        int memIndex = 0;
 
         while (sampleId <= numOfSamples)
         {
@@ -118,11 +138,18 @@ public class GridPanelViewTest extends GridPanelBaseTest
             if(allPossibleIndex == stringSets.size())
                 allPossibleIndex = 0;
 
+            if(memIndex == stringSetMembers.size())
+                memIndex = 0;
             sampleSetDataGenerator.addCustomRow(
-                    Map.of(COL_NAME, String.format("%s%d", samplePrefix, sampleId++),
+                    Map.of(COL_NAME, String.format("%s%d", samplePrefix, sampleId),
                             COL_INT, sampleId,
-                            COL_STRING, stringSets.get(allPossibleIndex++)));
+                            COL_STRING1, stringSets.get(allPossibleIndex),
+                            COL_STRING2, stringSetMembers.get(memIndex),
+                            COL_BOOL, sampleId % 2 == 0));
 
+            allPossibleIndex++;
+            memIndex++;
+            sampleId++;
         }
 
         sampleSetDataGenerator.insertRows();
@@ -130,6 +157,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
         removeFlagColumnFromDefaultView(sampleTypeName);
     }
 
+    /**
+     * Helper function that will reset the default view of a grid. It will also remove any sorts or filters on the columns.
+     *
+     * @param sampleTypeName Name of the sample type with the default view to change.
+     * @param columns The columns to show in the default view.
+     */
     private void resetDefaultView(String sampleTypeName, List<String> columns)
     {
         log(String.format("Set the default view for '%s' to have these columns: '%s'", sampleTypeName, columns));
@@ -146,123 +179,150 @@ public class GridPanelViewTest extends GridPanelBaseTest
             cv.addColumn(columnName);
         }
 
+        log("Clear any filters that may have been applied.");
+        cv.clearFilters();
+
+        log("Clear any sorts that may have been applied.");
+        cv.clearSorts();
+
         cv.saveCustomView("", true);
+
+        defaultColumnState = new HashMap<>();
+        for(String columnName : columns)
+        {
+            defaultColumnState.put(columnName, ICONS_NONE);
+        }
+
     }
 
+    /**
+     * <p>
+     *     Simple test to validate the 'My Default' menu option.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Modify the default view for a sample type in LabKey Server.</li>
+     *         <li>Save the default view, but do not make it public (default for all).</li>
+     *         <li>Validate in the App grid that 'My Default' is shown under the Views menu.</li>
+     *         <li>Validate that other users se no change to the default view.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
-    public void testDefaultViewFromLKS()
+    public void testMyDefaultView()
     {
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
+        String screenShotID = "testMyDefaultView";
+
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         goToProjectHome();
 
         waitAndClickAndWait(Locator.linkWithText(DEFAULT_VIEW_SAMPLE_TYPE));
 
-        log(String.format("In LabKey Server for sample type '%s' remove '%s' column form default view.",
-                DEFAULT_VIEW_SAMPLE_TYPE, COL_STRING));
+        String columnToRemove = COL_INT;
+
+        log(String.format("In LabKey Server for sample type '%s' remove '%s' column from the default view.",
+                DEFAULT_VIEW_SAMPLE_TYPE, columnToRemove));
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         drtSamples.goToView(VIEW_DEFAULT);
 
         CustomizeView cv = drtSamples.openCustomizeGrid();
-        cv.removeColumn(COL_STRING);
+        cv.removeColumn(columnToRemove);
 
-        log(String.format("Don't save the view yet, leave it in an '%s' state.", EDITED_ALERT));
-
-        cv.clickViewGrid();
-
-        log("View the app grid and validate header and columns are as expected.");
+        log("Do not share this default view with everyone.");
+        cv.saveCustomView("", false);
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
-
-        validateGridHeader(grid, EDITED_ALERT, true);
-
-        checker().screenShotIfNewError("Grid_Alert_Button_Error");
-
-        log("Validate that the menu for the grid has not changed but the columns have.");
-        List<String> expectedMenuItems = Arrays.asList(VIEW_DEFAULT, VIEW_CUSTOMIZE, VIEW_MANAGE, VIEW_SAVE);
-        List<String> expectedColumns = Arrays.asList(COL_NAME, COL_INT);
-
-        validateViewMenuAndGridColumns(expectedMenuItems, expectedColumns);
-
-        log("Go back to LabKey Server and save the default view but don't make it default for everyone.");
-
-        goToProjectHome();
-
-        waitAndClickAndWait(Locator.linkWithText(DEFAULT_VIEW_SAMPLE_TYPE));
-
-        sampleHelper = new SampleTypeHelper(this);
-        drtSamples = sampleHelper.getSamplesDataRegionTable();
-        drtSamples.goToView(VIEW_DEFAULT);
-
-        cv = drtSamples.openCustomizeGrid();
-
-        cv.saveCustomView("", false);
 
         log(String.format("Verify that '%s' is in the views menu and '%s' is not.",
                 VIEW_DEFAULT_MODIFIED, VIEW_DEFAULT));
 
-        expectedMenuItems = Arrays.asList(VIEW_DEFAULT_MODIFIED, VIEW_CUSTOMIZE, VIEW_MANAGE, VIEW_SAVE);
-        expectedColumns = Arrays.asList(COL_NAME, COL_INT);
+        List<String> expectedMenuItems = new ArrayList<>();
+        expectedMenuItems.addAll(List.of(VIEW_DEFAULT_MODIFIED, VIEW_CUSTOMIZE, VIEW_MANAGE, VIEW_SAVE));
+        expectedMenuItems.addAll(savedViews);
 
-        validateViewMenuAndGridColumns(expectedMenuItems, expectedColumns);
+        log(String.format("Verify that column '%s' is removed.", columnToRemove));
+        Map<String, Integer> expectedColumns = new HashMap<>(defaultColumnState);
+        expectedColumns.remove(columnToRemove);
 
-        log(String.format("Impersonate '%s' and validate that the 'View' menu and default view have not changed.", OTHER_USER));
+        // Now actually do the verification.
+        validateViewMenu(screenShotID, grid, expectedMenuItems);
+        validateGridColumns(screenShotID, grid, expectedColumns);
+
+        log(String.format("Impersonate '%s' and validate that the 'View' menu and default view of the grid is not changed.", OTHER_USER));
 
         impersonate(OTHER_USER);
 
         goToProjectHome();
 
+        grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
         expectedMenuItems = Arrays.asList(VIEW_DEFAULT, VIEW_CUSTOMIZE, VIEW_MANAGE, VIEW_SAVE);
-        expectedColumns = Arrays.asList(COL_NAME, COL_INT, COL_STRING);
 
-        validateViewMenuAndGridColumns(expectedMenuItems, expectedColumns);
+        validateViewMenu(screenShotID, grid, expectedMenuItems);
+        validateGridColumns(screenShotID, grid, defaultColumnState);
 
         stopImpersonating();
 
     }
 
+    /**
+     * <p>
+     *     Use remove column to validate the view dirty bit is flipped.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>In the default view remove a column, validate that a view change is detected.</li>
+     *         <li>Click 'Undo' and validate that the column is returned.</li>
+     *         <li>Remove the column from the default view and save as default for everyone.</li>
+     *         <li>Impersonate another user and validate default view is missing the expected column.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
-    public void testDefaultViewRemoveColumnFromAppGrid()
+    public void testRemoveColumnForView()
     {
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
+        final String screenShotPrefix = "testRemoveColumnForView";
 
-        log(String.format("For sample type '%s' remove the '%s' column using the column header menu.", DEFAULT_VIEW_SAMPLE_TYPE, COL_INT));
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+
+        String columnToRemove = COL_BOOL;
+        log(String.format("For sample type '%s' remove the '%s' column using the column header menu.", DEFAULT_VIEW_SAMPLE_TYPE, columnToRemove));
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
-        grid.hideColumn(COL_INT);
+        grid.hideColumn(columnToRemove);
 
         log("Validate panel header is as expected and the column is indeed hidden.");
 
-        validateGridHeader(grid, EDITED_ALERT, true);
+        validateGridHeader(screenShotPrefix, grid, EDITED_ALERT, true);
 
-        checker().verifyEqualsSorted(String.format("Column '%s' is still visible.", COL_INT),
-                Arrays.asList(COL_NAME, COL_STRING), grid.getColumnNames());
+        Map<String, Integer> expectedColumns = new HashMap<>(defaultColumnState);
+        expectedColumns.remove(columnToRemove);
 
-        checker().screenShotIfNewError("Hide_Column_Edited_Error");
+        validateGridColumns(screenShotPrefix, grid, expectedColumns);
 
         log(String.format("Validate that 'Undo' puts the column back and removes the '%s' label as well as the buttons.", EDITED_ALERT));
 
         grid = grid.clickUndo();
 
-        validateGridHeader(grid, "", false);
+        validateGridHeader(screenShotPrefix, grid, "", false);
 
-        // If the column wasn't replaced cannot really continue with the test.
+        // If the grid columns are not as expected after Undo don't continue with the test.
         checker().fatal()
-                .verifyEqualsSorted(String.format("Column '%s' is still not visible. Fatal error", COL_INT),
-                        Arrays.asList(COL_NAME, COL_STRING, COL_INT), grid.getColumnNames());
+                .verifyTrue("Grid columns were not as expected. Fatal error.",
+                        validateGridColumns(screenShotPrefix, grid, defaultColumnState));
 
-        checker().screenShotIfNewError("Undo_Hide_Column_Edited_Error");
+        log(String.format("Hide the '%s' column again and this time save it as default.", columnToRemove));
 
-        log(String.format("Hide the '%s' column again and this time save it as default.", COL_INT));
-
-        grid = grid.hideColumn(COL_INT);
+        grid = grid.hideColumn(columnToRemove);
 
         log("Validate the 'Save View' dialog.");
-        QueryGrid.SaveViewDialog saveViewDialog = grid.clickSave();
+        QueryGrid.SaveViewDialog saveViewDialog = grid.clickSave(true);
 
         checker().verifyTrue(String.format("The 'View Name' field should be empty. It contains '%s'.", saveViewDialog.getViewName()),
                 saveViewDialog.getViewName().isEmpty());
@@ -270,162 +330,488 @@ public class GridPanelViewTest extends GridPanelBaseTest
         checker().verifyFalse("The 'Make default' checkbox should not be checked.",
                 saveViewDialog.isMakeDefaultForAllChecked());
 
-        checker().screenShotIfNewError("Save_View_Dialog_Defaults_Error");
+        checker().screenShotIfNewError("testDefaultViewRemoveColumn_Save_View_Dialog_Defaults_Error");
 
         saveViewDialog.setMakeDefaultForAll(true);
 
         checker().verifyFalse("Setting 'Default for all' should disable the name field, it did not.",
                 saveViewDialog.isViewNameEnabled());
 
-        checker().screenShotIfNewError("Save_View_Dialog_Set_Error");
+        checker().screenShotIfNewError("testDefaultViewRemoveColumnFromAppGrid_Save_View_Dialog_Set_Error");
 
         saveViewDialog.saveView();
 
-        validateGridHeader(grid, UPDATED_ALERT, false);
+        validateGridHeader(screenShotPrefix, grid, UPDATED_ALERT, false);
 
         log("Verify that view menu and columns are as expected.");
         List<String> expectedMenuItems = Arrays.asList(VIEW_DEFAULT, VIEW_CUSTOMIZE, VIEW_MANAGE, VIEW_SAVE);
-        List<String> expectedColumns = Arrays.asList(COL_NAME, COL_STRING);
-
-        validateViewMenuAndGridColumns(expectedMenuItems, expectedColumns);
+        validateViewMenu(screenShotPrefix, grid, expectedMenuItems);
+        validateGridColumns(screenShotPrefix, grid, expectedColumns);
 
         log(String.format("Impersonate '%s' and validate the 'View' menu and default view are as expected.", OTHER_USER));
 
         impersonate(OTHER_USER);
 
         goToProjectHome();
+        grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
-        validateViewMenuAndGridColumns(expectedMenuItems, expectedColumns);
+        validateViewMenu(screenShotPrefix, grid, expectedMenuItems);
+        validateGridColumns(screenShotPrefix, grid, expectedColumns);
 
         stopImpersonating();
     }
 
+    /**
+     * Validate filter pills and column headers for the default view.
+     * @see GridPanelViewTest#testColumnHeaderAndFilterPill(String, String)
+     */
     @Test
-    public void testDefaultViewFilterColumnFromAppGrid()
+    public void testColumnHeaderAndFilterPillDefaultView()
+    {
+        testColumnHeaderAndFilterPill("testColumnHeaderAndFilterPillDefaultView", "");
+    }
+
+    /**
+     * Validate filter pills and column headers for a saved custom view.
+     * @see GridPanelViewTest#testColumnHeaderAndFilterPill(String, String)
+     */
+    @Test
+    public void testColumnHeaderAndFilterPillCustomView()
+    {
+        testColumnHeaderAndFilterPill("testColumnHeaderAndFilterPillCustomView", "Test_Columns_And_Pills_View");
+    }
+
+    /**
+     * <p>
+     *     For a view validate that the column header and filter pills are correct and have the correct icons.
+     * </p>
+     * <p>
+     *     For the view provided this test will:
+     *     <ul>
+     *         <li>Filter one column and sort another without saving the view.</li>
+     *         <li>Validate icons at the top of the grid columns.</li>
+     *         <li>Validate filter pills and that they are not locked.</li>
+     *         <li>Save the view, and validate filter pills are locked.</li>
+     *         <li>Reload the page and validate the filter pills and column headers.</li>
+     *         <li>Impersonate another user and validate the Views menu, filter pills and column headers (should not be present for saved view).</li>
+     *     </ul>
+     * </p>
+     * @param testName The name of the test, used for the screenshot prefix.
+     * @param viewName What to name the saved view. If empty string will be default view.
+     */
+    public void testColumnHeaderAndFilterPill(String testName, String viewName)
     {
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
-
-        log(String.format("For sample type '%s' filter the '%s' then save as default view.", DEFAULT_VIEW_SAMPLE_TYPE, COL_STRING));
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
         int rows = grid.getRows().size();
 
+        String colToFilter = COL_STRING1;
+        String colToSort = COL_STRING2;
+
+        log(String.format("For sample type '%s' filter column '%s' and sort column '%s'.", DEFAULT_VIEW_SAMPLE_TYPE, colToFilter, colToSort));
+
         GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
-        filterDialog.selectField(COL_STRING);
+
+        filterDialog.selectField(colToFilter);
         FilterFacetedPanel facetedPanel = filterDialog.selectFacetTab();
+
         facetedPanel.uncheckValues("[All]");
         facetedPanel.checkValues(stringSets.get(0), stringSets.get(2));
+        String expectedPillText = String.format("%s Equals One Of %s, %s", colToFilter, stringSets.get(0), stringSets.get(2));
+
         filterDialog.confirm();
 
-        grid.sortColumn(COL_STRING, SortDirection.ASC);
+        grid.sortColumn(colToSort, SortDirection.ASC);
+
+        Map<String, Integer> expectedColumns = new HashMap<>(defaultColumnState);
+        expectedColumns.replace(colToFilter, ICONS_FILTER);
+        expectedColumns.replace(colToSort, ICONS_SORT);
 
         log("Validate the icons in the column header.");
+        validateGridColumns("validateColumnHeaderAndFilterPill", grid, expectedColumns);
 
-        checker().verifyTrue(String.format("Column '%s' does not have the filter icon.", COL_STRING),
-                grid.hasColumnFilterIcon(COL_STRING));
+        log("Validate filter pill is shown and is not locked.");
+        Map<String, Boolean> expectedFilters = Map.of(expectedPillText, false);
 
-        checker().verifyTrue(String.format("Column '%s' does not have the sort icon.", COL_STRING),
-                grid.hasColumnSortIcon(COL_STRING));
+        validateFilterPills(testName, grid, expectedFilters);
 
-        checker().fatal()
-                .verifyTrue("Doesn't look like filtering worked. Row count is not changed as expected. Fatal error.",
-                        grid.getRows().size() < rows);
+        QueryGrid.SaveViewDialog saveViewDialog;
 
-        log("Validate filter pill is shown.");
+        if(viewName.isEmpty())
+        {
+            log("Save as default view (for everyone).");
+            grid.getGridBar().doMenuAction("Views", Arrays.asList("Save Grid View"));
+            saveViewDialog = new QueryGrid.SaveViewDialog(getDriver(), grid);
+            saveViewDialog.setMakeDefaultForAll(true);
+        }
+        else
+        {
+            log(String.format("Save as custom view '%s'.", viewName));
+            grid.getGridBar().doMenuAction("Views", Arrays.asList("Save Grid View"));
+            saveViewDialog = new QueryGrid.SaveViewDialog(getDriver(), grid);
+            saveViewDialog.setViewName(viewName);
+            saveViewDialog.setMakeDefaultForAll(false);
 
-        checker().verifyTrue("Filter pills shown are not as expected.",
-                grid.getFilterStatusValues().size() == 1 &&
-                        grid.getFilterStatusValues().get(0).getText().equals("Str Equals One Of A, AB"));
-
-        checker().screenShotIfNewError("Default_View_Column_Filter_Error");
-
-        log("Save as default view (for everyone).");
-        grid.getGridBar().doMenuAction("Views", Arrays.asList("Save Grid View"));
-
-        QueryGrid.SaveViewDialog saveViewDialog = new QueryGrid.SaveViewDialog(getDriver());
-
-        saveViewDialog.setMakeDefaultForAll(true);
-
-        log("Validate filter pill is shown after saving as default view.");
-
-        checker().withScreenshot("Filter_Pill_Default_Error")
-                .verifyTrue("Filter pills shown are not as expected.",
-                        grid.getFilterStatusValues().size() == 1
-                                && grid.getFilterStatusValues().get(0).getText().equals("Str Equals One Of A, AB"));
+            savedViews.add(viewName);
+        }
 
         saveViewDialog.saveView();
 
-        log(String.format("Impersonate '%s' and validate icons in the columns for default view.", OTHER_USER));
+        log("Refresh the page and validate icons from the view.");
+        refresh();
 
-        impersonate(OTHER_USER);
+        if(viewName.isEmpty())
+        {
+            // If this is the default view do not clear the filters after refresh, it will just cause complexity.
+            grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE, false);
+        }
+        else
+        {
+            grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE, true);
 
-        goToProjectHome();
+            log(String.format("Select the view '%s' from the menu.", viewName));
+            grid.getGridBar().doMenuAction("Views", Arrays.asList(viewName));
+        }
 
-        grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE, false);
+        // Pill should now be locked.
+        expectedFilters = Map.of(expectedPillText, true);
+        validateFilterPills(testName, grid, expectedFilters);
 
-        checker().verifyTrue(String.format("Column '%s' does not have the filter icon.", COL_STRING),
-                grid.hasColumnFilterIcon(COL_STRING));
+        if(viewName.isEmpty())
+        {
+            log(String.format("Impersonate '%s' and validate icons in the columns for default view.", OTHER_USER));
 
-        checker().verifyTrue(String.format("Column '%s' does not have the sort icon.", COL_STRING),
-                grid.hasColumnSortIcon(COL_STRING));
+            impersonate(OTHER_USER);
 
-        checker().verifyTrue("Doesn't look like filtering worked. Row count is not changed as expected.",
-                grid.getRows().size() < rows);
+            goToProjectHome();
 
-        checker().verifyTrue("Filter pills shown are not as expected.",
-                grid.getFilterStatusValues().size() == 1 &&
-                        grid.getFilterStatusValues().get(0).getText().equals("Str Equals One Of A, AB"));
+            grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE, false);
 
-        checker().screenShotIfNewError("Default_View_Column_Filter_Other_User_Error");
+            validateGridColumns("validateColumnHeaderAndFilterPill", grid, expectedColumns);
 
-        stopImpersonating();
+            checker().verifyTrue("Doesn't look like filtering was applied. Row count is not changed as expected.",
+                    grid.getRows().size() < rows);
+
+            validateFilterPills(testName, grid, expectedFilters);
+
+            stopImpersonating();
+        }
+        else
+        {
+            log(String.format("Impersonate '%s' and validate custom view is not in the menu and default view is unchanged.", OTHER_USER));
+
+            impersonate(OTHER_USER);
+
+            goToProjectHome();
+
+            grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE, false);
+
+            List<String> expectedMenuItems = Arrays.asList(VIEW_DEFAULT, VIEW_CUSTOMIZE, VIEW_MANAGE, VIEW_SAVE);
+
+            validateViewMenu(testName, grid, expectedMenuItems);
+            validateGridColumns(testName, grid, defaultColumnState);
+
+            checker().verifyEquals("Row count in default view not as expected.",
+                    rows, grid.getRows().size());
+
+            stopImpersonating();
+        }
 
     }
 
-    private void validateViewMenuAndGridColumns(List<String> expectedMenuItems, List<String> expectedColumns)
+    /**
+     * Test modifying filters used to make a custom/named view.
+     * @see GridPanelViewTest#testEditView(String, String)
+     */
+    @Test
+    public void testEditCustomView()
     {
+        testEditView("testEditCustomView", "Edit_Filter_Custom_View");
+    }
+
+    /**
+     * Test modifying filters used in the default view.
+     * @see GridPanelViewTest#testEditView(String, String)
+     */
+    @Test
+    public void testEditDefaultView()
+    {
+        testEditView("testEditDefaultView", "");
+    }
+
+    /**
+     * <p>
+     *     Modify an existing view.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a view with two filtered columns.</li>
+     *         <li>Remove one of the filters and validate grid view is in edited mode (dirty bit flipped).</li>
+     *         <li>Validate 'Undo'.</li>
+     *         <li>Add a new condition, a sort of a third column, to the view.</li>
+     *         <li>Change one of the existing filters.</li>
+     *         <li>Save the view.</li>
+     *         <li>Change the sort order of the third column and verify dirty bit flipped.</li>
+     *     </ul>
+     * </p>
+     * @param testName The name of the test, used for the screenshot prefix.
+     * @param viewName What to name the saved view. If empty string will be default view.
+     */
+    private void testEditView(String testName, String viewName)
+    {
+
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+
+        String filterCol1 = COL_STRING1;
+        String filterValue1 = stringSetMembers.get(2);
+        String expectedFilter1Text = String.format("%s Contains %s", filterCol1, filterValue1);
+
+        String filterCol2 = COL_BOOL;
+        String expectedFilter2Text = String.format("%s = true", filterCol2);
+
+        Map<String, Boolean> expectedFilterPills = new HashMap<>();
+        expectedFilterPills.put(expectedFilter1Text, true);
+        expectedFilterPills.put(expectedFilter2Text, true);
+
+        log(String.format("For sample type '%s' filter columns '%s' and '%s' column.", DEFAULT_VIEW_SAMPLE_TYPE, filterCol1, filterCol2));
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
-        List<String> actualValues;
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
-        boolean menuError = false;
+        log(String.format("Filter field '%s' for value '%s'.", filterCol1, filterValue1));
+        filterDialog.selectField(filterCol1);
+        FilterExpressionPanel expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.CONTAINS, filterValue1));
 
-        if(!expectedMenuItems.isEmpty())
+        log(String.format("Filter field '%s' for 'true'.", filterCol2));
+        filterDialog.selectField(filterCol2);
+        expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.EQUAL, true));
+
+        filterDialog.confirm();
+
+        QueryGrid.SaveViewDialog saveViewDialog;
+
+        if(viewName.isEmpty())
         {
-            actualValues = grid.getGridBar().getMenuText("Views");
+            log("Save as default view.");
+            grid.getGridBar().doMenuAction("Views", List.of("Save Grid View"));
+            saveViewDialog = new QueryGrid.SaveViewDialog(getDriver(), grid);
+            saveViewDialog.setMakeDefaultForAll(true);
+            saveViewDialog.saveView();
+        }
+        else
+        {
 
-            if(!checker().verifyEqualsSorted("Items under 'Views' menu not as expected.",
-                    expectedMenuItems, actualValues))
+            // Issue: 46019 Cannot save a grid view if a non-string column is filtered. Only happens on components page (core-components.view).
+
+            log(String.format("Save view as '%s'.", viewName));
+            grid.getGridBar().doMenuAction("Views", List.of("Save Grid View"));
+            saveViewDialog = new QueryGrid.SaveViewDialog(getDriver(), grid);
+            saveViewDialog.setMakeDefaultForAll(false);
+            saveViewDialog.setViewName(viewName);
+            saveViewDialog.saveView();
+
+            savedViews.add(viewName);
+        }
+
+        int rowCount = grid.getRows().size();
+
+        log("Now that the filters have been save as a view validate filter pills.");
+        validateFilterPills(testName, grid, expectedFilterPills);
+
+        log(String.format("Remove the filter '%s' and validate grid is now in '%s' mode.", expectedFilter1Text, EDITED_ALERT));
+        grid.removeFilter(expectedFilter1Text);
+
+        validateGridHeader(testName, grid, EDITED_ALERT, true);
+
+        checker().verifyTrue("Filter was removed but number of rows in grid did not increase.",
+                grid.getRows().size() > rowCount);
+
+        // Use different screenshot name based on view type.
+        checker().screenShotIfNewError(viewName.isEmpty() ?
+                String.format("%s_Remove_Filter_Default_Error", testName) :
+                String.format("%s_Remove_Filter_Custom_View_Error", testName));
+
+        log("Validate 'Undo' resets as expected.");
+
+        grid.clickUndo();
+
+        log("Validate filter pills go back to expected state.");
+        validateFilterPills(testName, grid, expectedFilterPills);
+
+        log("Validate header has no edit status or buttons after 'Undo'.");
+        validateGridHeader(testName, grid, "", false);
+
+        checker().verifyEquals("Number of rows after clicking 'Undo' not as expected'.",
+                rowCount, grid.getRows().size());
+
+        checker().screenShotIfNewError(viewName.isEmpty() ?
+                String.format("%s_Undo_Remove_Filter_Default_Error", testName) :
+                String.format("%s_Undo_Remove_Filter_Custom_Error", testName));
+
+        log("Modify the view.");
+
+        String sortColumn = COL_INT;
+        log(String.format("Add a new condition by sorting the '%s' column.", sortColumn));
+        grid.sortColumn(sortColumn, SortDirection.ASC);
+
+        log(String.format("Modify an existing filter. Change '%s' to FALSE.", filterCol2));
+
+        // To update a filter that has been applied by a view the filter must first be removed, then added back with the changes.
+        grid.removeFilter(expectedFilter2Text);
+
+        filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(filterCol2);
+        expressionPanel = filterDialog.selectExpressionTab();
+        expressionPanel.setFilter(new FilterExpressionPanel.Expression(Filter.Operator.EQUAL, false));
+        filterDialog.confirm();
+
+        expectedFilter2Text = String.format("%s = false", filterCol2);
+
+        checker().verifyEqualsSorted("Filter pills not as expected after modifying existing filters.",
+                List.of(expectedFilter1Text, expectedFilter2Text), grid.getFilterStatusValuesText());
+
+        validateGridHeader(testName, grid, EDITED_ALERT, true);
+
+        checker().screenShotIfNewError(String.format("%s_Modify_Existing_Error", testName));
+
+        checker().fatal()
+                .verifyTrue("Changes did not trigger the dirty bit for the view. Fatal error.",
+                        validateGridHeader(testName, grid, EDITED_ALERT, true));
+
+        log("Save the changes.");
+
+        if(viewName.isEmpty())
+        {
+            saveViewDialog = grid.clickSave(true);
+
+            log("Verify that view name is empty and 'default checkbox' is checked.");
+
+            checker().verifyTrue(String.format("Value of view name is not empty. Contains '%s'.", saveViewDialog.getViewName()),
+                    saveViewDialog.getViewName().isEmpty());
+
+            // The default checkbox is not checked by default. Maybe a bug?
+            log("Checking the 'Default for all' checkbox.");
+            saveViewDialog.setMakeDefaultForAll(true);
+
+            saveViewDialog.saveView();
+        }
+        else
+        {
+            grid.clickSave(false);
+
+            log("Because this is already a saved view verify that no save dialog is shown.");
+
+            sleep(1_000);
+            if(!checker().verifyFalse("Looks like a modal dialog was shown after clicking the locked filter pill.",
+                    isElementPresent(Locator.tagWithClass("div", "modal-dialog"))))
             {
-                menuError = true;
+                saveViewDialog = new QueryGrid.SaveViewDialog(getDriver(), grid);
+                checker().screenShotIfNewError(String.format("%s_Unexpected_Save_View_Dialog", testName));
+
+                // If the save view dialog unexpectedly popped up try and save the view.
+                if(saveViewDialog.getViewName().isEmpty())
+                    saveViewDialog.setViewName(viewName);
+
+                saveViewDialog.setMakeDefaultForAll(false);
+
+                saveViewDialog.saveView();
             }
+
         }
 
-        if(!expectedColumns.isEmpty())
-        {
-            actualValues = grid.getColumnNames();
+        log(String.format("Verify that changing the sort order of column '%s' causes the grid view to go to '%s'.",
+                sortColumn, EDITED_ALERT));
 
-            checker().verifyEqualsSorted("Displayed columns not as expected.",
-                    expectedColumns, actualValues);
-        }
+        grid.sortColumn(sortColumn, SortDirection.DESC);
 
-        if(menuError)
-        {
-            // Menu items were not as expected so expand Views menu for the screenshot.
-            grid.getGridBar().doMenuAction("Views", new ArrayList<>());
-        }
-
-        checker().screenShotIfNewError("Views_Menu_Column_Error");
+        validateGridHeader(testName, grid, EDITED_ALERT, true);
     }
 
-    private void validateGridHeader(QueryGrid grid, String alertText, boolean hasSaveAndUndoButtons)
+    /**
+     * Helper to validate the 'Views' menu.
+     *
+     * @param screenShotPrefix A string to put at the start of the screenshot name (if taken).
+     * @param grid A reference to the QueryGrid.
+     * @param expectedMenuItems A list of the expected menu items.
+     * @return True if no errors, false otherwise.
+     */
+    private boolean validateViewMenu(String screenShotPrefix, QueryGrid grid, List<String> expectedMenuItems)
     {
+
+        List<String> actualValues = grid.getGridBar().getMenuText("Views");
+
+        return checker().withScreenshot(String.format("%s_Views_Menu_Error", screenShotPrefix))
+                .verifyEqualsSorted("Items under 'Views' menu not as expected.",
+                        expectedMenuItems, actualValues);
+
+    }
+
+    /**
+     * Helper to validate the columns in the grid.
+     *
+     * @param screenShotPrefix A string to put at the start of the screenshot name (if taken).
+     * @param grid A reference to the QueryGrid.
+     * @param expectedColumns A map of the expected columns. Key is the column label. The value indicates which icons, if any, should be present for the column.
+     * @return True if no errors, false otherwise.
+     */
+    private boolean validateGridColumns(String screenShotPrefix, QueryGrid grid, Map<String, Integer> expectedColumns)
+    {
+        checker().setErrorMark();
+
+        List<String> actualColumns = grid.getColumnNames();
+
+        checker().verifyEqualsSorted("Grid columns not as expected.",
+                expectedColumns.keySet(), actualColumns);
+
+        for(Map.Entry<String, Integer> entry : expectedColumns.entrySet())
+        {
+
+            if(actualColumns.contains(entry.getKey()))
+            {
+                if((entry.getValue() & 1) != 0)
+                {
+                    checker().verifyTrue(String.format("Column '%s' does not have the sorted icon.", entry.getKey()),
+                            grid.hasColumnSortIcon(entry.getKey()));
+                }
+
+                if((entry.getValue() & 2) != 0)
+                {
+                    checker().verifyTrue(String.format("Column '%s' does not have the filtered icon.", entry.getKey()),
+                            grid.hasColumnFilterIcon(entry.getKey()));
+                }
+
+            }
+
+        }
+
+        checker().screenShotIfNewError(String.format("%s_Views_Menu_Column_Error", screenShotPrefix));
+
+        return checker().errorsSinceMark() == 0;
+    }
+
+    /**
+     * Helper to validate the view edit controls at the top of the grid panel.
+     *
+     * @param screenShotPrefix A string to put at the start of the screenshot name (if taken).
+     * @param grid A reference to the QueryGrid.
+     * @param alertText Expected alert text. Empty string if none is expected.
+     * @param hasSaveAndUndoButtons If the buttons are expected.
+     * @return True if no errors, false otherwise.
+     */
+    private boolean validateGridHeader(String screenShotPrefix, QueryGrid grid, String alertText, boolean hasSaveAndUndoButtons)
+    {
+        checker().setErrorMark();
+
         String actualText = grid.getEditAlertText();
 
-        if(alertText != null && !alertText.isEmpty())
+        if(!alertText.isEmpty())
         {
             checker().verifyEquals(String.format("Grid panel header does not show '%s' edit status.", alertText),
                     alertText, actualText);
@@ -453,6 +839,68 @@ public class GridPanelViewTest extends GridPanelBaseTest
                     grid.isUndoButtonVisible());
         }
 
+        checker().screenShotIfNewError(String.format("%s_Grid_Header_Error", screenShotPrefix));
+
+        return checker().errorsSinceMark() == 0;
+    }
+
+    /**
+     * Helper to validate the filter pills at the top of the grid.
+     *
+     * @param screenShotPrefix A string to put at the start of the screenshot name (if taken).
+     * @param grid A reference to the QueryGrid.
+     * @param expectedFiltersAndState A map of the expected filter pills. Key is the text of the expected filter pills. Value is true if the pill is expected to be locked.
+     * @return True if no errors, false otherwise.
+     */
+    private boolean validateFilterPills(String screenShotPrefix, QueryGrid grid, Map<String, Boolean> expectedFiltersAndState)
+    {
+
+        checker().setErrorMark();
+
+        List<String> expectedFilters = new ArrayList<>(expectedFiltersAndState.keySet());
+
+        checker().withScreenshot(String.format("%s_Filter_Pill_Default_Error", screenShotPrefix))
+                .verifyTrue("Expected filter pills are not present.",
+                        grid.getFilterStatusValuesText().containsAll(expectedFilters));
+
+        Map<String, FilterStatusValue> actualFilters = grid.getMapOfFilterStatusValues();
+
+        for(Map.Entry<String, Boolean> entry : expectedFiltersAndState.entrySet())
+        {
+            if(actualFilters.containsKey(entry.getKey()))
+            {
+
+                checker().verifyEquals(String.format("State of filter pill '%s' not as expected. Expected lock state: %s.",
+                        entry.getKey(), entry.getValue()), entry.getValue(), actualFilters.get(entry.getKey()).isLocked());
+
+                if(actualFilters.get(entry.getKey()).isLocked())
+                {
+
+                    log(String.format("Validate clicking locked filter pill '%s' does not show the filter dialog.", entry.getKey()));
+
+                    actualFilters.get(entry.getKey()).getComponentElement().click();
+                    sleep(1_000);
+
+                    // If there is a dialog, call to checker() returns false, then try to remove the dialog.
+                    if (!checker().withScreenshot(String.format("%s_Filter_Pill_Dialog_Error", screenShotPrefix))
+                            .verifyFalse("Looks like a modal dialog was shown after clicking the locked filter pill.",
+                                    isElementPresent(Locator.tagWithClass("div", "modal-dialog"))))
+                    {
+                        new ModalDialog.ModalDialogFinder(getDriver()).find().dismiss();
+                    }
+
+                }
+            }
+            else
+            {
+                // Don't need to record an error here. The missing filter pill would have been caught with the checker
+                // call that all the filter pills are as expected.
+                log(String.format("Filter pill with text '%s' is not present. Cannot verify icon or state.", entry.getKey()));
+            }
+
+        }
+
+        return checker().errorsSinceMark() == 0;
     }
 
     // Just a temporary test to make sure the changes to the test components are working as expected.
@@ -461,7 +909,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(VIEW_SAMPLE_TYPE, Arrays.asList(COL_NAME, COL_STRING, COL_INT));
+        resetDefaultView(VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_SAMPLE_TYPE);
 
@@ -469,7 +917,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         {
             log(String.format("Column '%s' is visible, hide it in the default view so insertion can be tested.", COL_INT));
             grid.hideColumn(COL_INT);
-            grid.clickSave().setMakeDefaultForAll(true).saveView();
+            grid.clickSave(true).setMakeDefaultForAll(true).saveView();
         }
 
         CustomizeGridDialog customizeModal = grid.insertColumn();

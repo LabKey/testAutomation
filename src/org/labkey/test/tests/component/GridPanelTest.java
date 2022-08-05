@@ -725,7 +725,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         checker().withScreenshot("Unexpected_Filter_Error")
                 .verifyTrue("It looks like there are filters applied after canceling out of the dialog.",
-                        grid.getFilterStatusValues(true).isEmpty());
+                        grid.getFilterStatusValues().isEmpty());
 
     }
 
@@ -1029,7 +1029,7 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedValues.add(String.format("%s > %d", FILTER_INT_COL, low));
         expectedValues.add(String.format("%s Contains One Of %s", FILTER_STRING_COL, oneOfFilter.replace(";", ", ")));
 
-        List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
+        List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
 
         actualValues = filterPills.stream().map(FilterStatusValue::getText).collect(Collectors.toList());
 
@@ -1074,7 +1074,7 @@ public class GridPanelTest extends GridPanelBaseTest
         // next pill to get the 'x' icon. This causes the next call to getFilterStatusValues to not recognize the pill as a filter.
         Locator.tagWithClass("input", "grid-panel__search-input").findElement(getDriver()).click();
 
-        FilterStatusValue filterPill = grid.getFilterStatusValues(false).get(0);
+        FilterStatusValue filterPill = grid.getFilterStatusValues().get(0);
 
         filterPill.getComponentElement().click();
 
@@ -1509,7 +1509,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         grid.selectView(VIEW_EXTRA_COLUMNS);
 
-        List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
+        List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
         String expectedValue = String.format("%s = true", FILTER_BOOL_COL);
         checker().withScreenshot("View_Filter_Pill_Error").verifyTrue(String.format("Filter pills not as expected. There should only be one with value of '%s'", expectedValue),
                 filterPills.size() == 1 && filterPills.get(0).getText().equals(expectedValue));
