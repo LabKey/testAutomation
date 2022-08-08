@@ -1917,7 +1917,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (msWait > 0)
         {
-            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
+            getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
                     TestLogger.log().trace("beforePageLoad - " + listener.getClass().getSimpleName());
@@ -1934,7 +1934,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             waitForPageToLoad(toBeStale, loadTimer);
             getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
-            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
+            getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
                     TestLogger.log().trace("afterPageLoad - " + listener.getClass().getSimpleName());
@@ -1982,17 +1982,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return actionWarnings.asMap();
     }
 
-    private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
+    private static final WeakHashMap<Class<? extends WebDriverWrapper>, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
 
     public void addPageLoadListener(PageLoadListener listener)
     {
-        _pageLoadListeners.putIfAbsent(getDriver(), Collections.newSetFromMap(new WeakHashMap<>()));
-        _pageLoadListeners.get(getDriver()).add(listener);
+        getPageLoadListeners().add(listener);
     }
 
     protected void clearPageLoadListeners()
     {
-        _pageLoadListeners.get(getDriver()).clear();
+        getPageLoadListeners().clear();
+    }
+
+    private Set<PageLoadListener> getPageLoadListeners()
+    {
+        _pageLoadListeners.putIfAbsent(this.getClass(), Collections.newSetFromMap(new WeakHashMap<>()));
+        return _pageLoadListeners.get(this.getClass());
     }
 
     /**
