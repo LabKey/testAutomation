@@ -1990,6 +1990,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         _pageLoadListeners.get(getDriver()).add(listener);
     }
 
+    protected void clearPageLoadListeners()
+    {
+        _pageLoadListeners.get(getDriver()).clear();
+    }
+
     /**
      * Interface for classes that want to be notified of page loads (e.g. to clear a cache)
      * Not guarianteed to work flawlessly. It depends on tests using {@linkplain #doAndWaitForPageToLoad(Runnable)}
