@@ -81,6 +81,38 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
+     * Check to see if the field listed is shown as added, has a checkmark, in the 'Available Fields' panel.
+     *
+     * @param fieldName Can be an individual field or a path to a nested field.
+     * @return True if row has the checkmark, false otherwise.
+     */
+    public boolean isAvailableFieldAddedToGrid(String... fieldName)
+    {
+        StringBuilder fieldKey = new StringBuilder();
+
+        Iterator<String> iterator = Arrays.stream(fieldName).iterator();
+
+        while(iterator.hasNext())
+        {
+            fieldKey.append(iterator.next().replace(" ", ""));
+
+            // If this isn't the last item in the collection don't expand it or add a "/" to the expected data-fieldkey value.
+            if(iterator.hasNext())
+            {
+                if(!isFieldKeyExpanded(fieldKey.toString()))
+                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
+
+                fieldKey.append("/");
+            }
+
+        }
+
+        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey.toString());
+
+        return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
+    }
+
+    /**
      * Add a field to the 'Shown in Grid' list. If more than one value is passed in it is assumed to be an expandable path.
      *
      * @param fieldName Either an individual field or the path to a field to add.
@@ -99,7 +131,10 @@ public class CustomizeGridDialog extends ModalDialog
             // If this isn't the last item in the collection don't expand it or add a "/" to the expected data-fieldkey value.
             if(iterator.hasNext())
             {
-                expandOrCollapseByFieldKey(fieldKey.toString(), true);
+                // If the field is already expanded don't try to expand it.
+                if(!isFieldKeyExpanded(fieldKey.toString()))
+                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
+
                 fieldKey.append("/");
             }
 
@@ -109,7 +144,7 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
-     * Add a field to the 'Shown in Grid' list. Use the data-fieldkey value to identify the item.
+     * Private helper to add a field to the 'Shown in Grid' list. Use the data-fieldkey value to identify the item.
      *
      * @param fieldKey The value in the data-fieldkay attribute for the row.
      * @return This dialog.
@@ -173,7 +208,7 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
-     * Helper function that will expand or collapse a row in the 'Available Fields' panel.
+     * Private helper function that will expand or collapse a row in the 'Available Fields' panel.
      *
      * @param fieldKey The data-fieldkey value of the field to expand.
      * @param expand True to expand false to collapse.
@@ -202,6 +237,22 @@ public class CustomizeGridDialog extends ModalDialog
 
         expandIcon.click();
 
+    }
+
+    /**
+     * Private helper to see if the row with the given data-fieldkey value has a checkmark or not.
+     *
+     * @param fieldKey The data-fieldkey value of the row/field to check.
+     * @return True if row is expanded.
+     */
+    private boolean isFieldKeyExpanded(String fieldKey)
+    {
+        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
+
+        // As long as there is no plus/expand icon then this field is expanded.
+        return   !Locator.tagWithClass("div", "field-expand-icon")
+                .withChild(Locator.tagWithClass("i", "fa-plus-square"))
+                .findWhenNeeded(listItem).isDisplayed();
     }
 
     /**
@@ -463,7 +514,7 @@ public class CustomizeGridDialog extends ModalDialog
                     .findElement(availableFieldsPanel);
         }
 
-        // Get the displayed names/lables of list items in the given panel.
+        // Get the displayed names/labels of list items in the given panel.
         protected List<WebElement> getListItemNameElements(WebElement panel)
         {
             return listItemName.findElements(panel);

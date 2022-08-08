@@ -29,6 +29,7 @@ import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +39,14 @@ public class GridPanelViewTest extends GridPanelBaseTest
 {
 
     // Sample type used to validate default views. It is just easier to have a separate sample type where the default views are changed.
-    private static final String DEFAULT_VIEW_SAMPLE_TYPE = "Default_View_SampleType";
+    private static final String DEFAULT_VIEW_SAMPLE_TYPE = "View_SampleType";
     private static final int DEFAULT_VIEW_SAMPLE_TYPE_SIZE = 30;
-    private static final String DEFAULT_VIEW_SAMPLE_PREFIX = "DFT-";
+    private static final String DEFAULT_VIEW_SAMPLE_PREFIX = "VIEW-";
 
     // A sample type that will be used to validate shared views.
-    private static final String VIEW_SAMPLE_TYPE = "View_SampleType";
-    private static final int VIEW_SAMPLE_TYPE_SIZE = 100;
-    private static final String VIEW_SAMPLE_PREFIX = "VST-";
+    private static final String VIEW_DIALOG_ST = "Test_View_Dialog_SampleType";
+    private static final int VIEW_DIALOG_ST_SIZE = 100;
+    private static final String VIEW_DIALOG_ST_PREFIX = "DLG-";
 
     // Column names.
     private static final String COL_NAME = "Name";
@@ -110,7 +111,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 new FieldDefinition(COL_STRING2, FieldDefinition.ColumnType.String),
                 new FieldDefinition(COL_BOOL, FieldDefinition.ColumnType.Boolean));
 
-        createSampleType(VIEW_SAMPLE_TYPE, VIEW_SAMPLE_PREFIX, VIEW_SAMPLE_TYPE_SIZE, fields);
+        createSampleType(VIEW_DIALOG_ST, VIEW_DIALOG_ST_PREFIX, VIEW_DIALOG_ST_SIZE, fields);
 
         createSampleType(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_VIEW_SAMPLE_PREFIX, DEFAULT_VIEW_SAMPLE_TYPE_SIZE, fields);
 
@@ -161,7 +162,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * Helper function that will reset the default view of a grid. It will also remove any sorts or filters on the columns.
      *
      * @param sampleTypeName Name of the sample type with the default view to change.
-     * @param columns The columns to show in the default view.
+     * @param columns The columns to show in the default view. Will be added in the order of the list.
      */
     private void resetDefaultView(String sampleTypeName, List<String> columns)
     {
@@ -174,6 +175,17 @@ public class GridPanelViewTest extends GridPanelBaseTest
         drtSamples.goToView(VIEW_DEFAULT);
         CustomizeView cv = drtSamples.openCustomizeGrid();
 
+        // Remove everything but the Name field before adding back.
+        for(String columnName : columns)
+        {
+            if(!columnName.equals(COL_NAME))
+                cv.removeColumn(columnName);
+        }
+
+        cv.saveCustomView("", true);
+
+        // Adding back in the order of the list sent in.
+        cv = drtSamples.openCustomizeGrid();
         for(String columnName : columns)
         {
             cv.addColumn(columnName);
@@ -903,94 +915,242 @@ public class GridPanelViewTest extends GridPanelBaseTest
         return checker().errorsSinceMark() == 0;
     }
 
-    // Just a temporary test to make sure the changes to the test components are working as expected.
+    /**
+     * <p>
+     *     Test that adding a field/column to grid puts it in the expected position.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Add a field to a grid in a specific location.</li>
+     *         <li>Validate added icons (checkmarks) in Available Fields panel on the dialog.</li>
+     *         <li>Validate expected column is highlighted in the 'Shown in Grid' panel in the dialog.</li>
+     *         <li>Adding a field puts the field in the expected location in the dialog and in the grid.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
-    public void testTestComponentChanges()
+    public void testFieldInsertionOrder()
     {
         goToProjectHome();
 
-        resetDefaultView(VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
-        QueryGrid grid = beginAtQueryGrid(VIEW_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
-        if(grid.getColumnNames().contains(COL_INT))
+        // Removing the column and then testing the removal is redundant with other tests, however it will be used to
+        // validate other parts of the dialog that is not covered in other tests.
+        String columnToAdd = COL_INT;
+        log(String.format("Use the grid menu to hide column '%s'.", columnToAdd));
+        grid.hideColumn(columnToAdd);
+        grid.clickSave(true).setMakeDefaultForAll(true).saveView();
+
+        List<String> expectedFields = new ArrayList<>(DEFAULT_COLUMNS);
+        expectedFields.remove(columnToAdd);
+
+        Map<String, Integer> expectedColumns = new HashMap<>(defaultColumnState);
+        expectedColumns.remove(columnToAdd);
+
+        checker().fatal()
+                .verifyTrue("Columns not as expected need this to pass for the other test. Fatal error.",
+                        validateGridColumns("Dialog_Test", grid, expectedColumns));
+
+        String selectedColumn = COL_STRING2;
+        log(String.format("Click the grid menu above column '%s' and validate that insertion happens to the right of the column.", selectedColumn));
+        CustomizeGridDialog customizeModal = grid.insertColumn(selectedColumn);
+
+        log("Validate that the 'Available Fields' and 'Shown in Grid' panels are as expected.");
+
+        checker().verifyEquals(String.format("Column '%s' should be selected in the dialog, it is not.", selectedColumn),
+                selectedColumn, customizeModal.getSelectedShownInGridLabel());
+
+        checker().verifyEqualsSorted("Field displayed in 'Show in Grid' panel not as expected.",
+                expectedFields, customizeModal.getShownInGridLabels());
+
+        for (String field : expectedFields)
         {
-            log(String.format("Column '%s' is visible, hide it in the default view so insertion can be tested.", COL_INT));
-            grid.hideColumn(COL_INT);
-            grid.clickSave(true).setMakeDefaultForAll(true).saveView();
+            checker().verifyTrue(String.format("Field '%s' is not shown as already added in the 'Available Fields' panel.", field),
+                    customizeModal.isAvailableFieldAddedToGrid(field));
         }
 
-        CustomizeGridDialog customizeModal = grid.insertColumn();
+        checker().verifyFalse(String.format("Field '%s' should not be shown as already added in the 'Available Fields' panel.", columnToAdd),
+                customizeModal.isAvailableFieldAddedToGrid(columnToAdd));
 
-        log(String.format("Is 'Update' button enabled? %s", customizeModal.isUpdateGridEnabled()));
+        log(String.format("Add field '%s'.", columnToAdd));
+        customizeModal.addAvailableFieldToGrid(columnToAdd);
 
-        log("Available Fields: " + customizeModal.getAvailableFields());
-        log("Fields in Grid: " + customizeModal.getShownInGridLabels());
-        log("Is 'Show all' checked: " + customizeModal.isShowAllChecked());
+        checker().verifyTrue(String.format("Field '%s' should now be shown as added in the 'Available Fields' panel, it does not.", columnToAdd),
+                customizeModal.isAvailableFieldAddedToGrid(columnToAdd));
+
+        log("Validate that the order of the fields in the 'Shown in Grid' column are as expected.");
+        expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL);
+        checker().verifyEquals(String.format("After adding '%s' fields displayed in 'Show in Grid' panel not as expected.", columnToAdd),
+                expectedFields, customizeModal.getShownInGridLabels());
+
+        checker().screenShotIfNewError("InsertionOrder_Customize_Dialog_Error");
+        customizeModal.clickUpdateGrid();
+
+        log(String.format("Validate that the order of the fields in the grid, specifically that '%s' is after '%s'.", columnToAdd, selectedColumn));
+        List<String> columns = grid.getColumnNames();
+        checker().verifyTrue("Order of column headers in grid is not as expected.",
+                Collections.indexOfSubList(columns, Arrays.asList(selectedColumn, columnToAdd)) >= 0);
+
+    }
+
+    /**
+     * <p>
+     *     Test the 'Show all' checkbox, editing a label and clicking the 'Undo' button.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Validate that a hidden field is shown as available after checking the 'Show all' check box.</li>
+     *         <li>Will expand and add a sub field from the newly visible field. The field will have the same label, 'Name', as a field already added to the grid.</li>
+     *         <li>Validate that clicking the 'Undo' button removes the new field.</li>
+     *         <li>Add the field again, change the label.</li>
+     *         <li>Validate the updated label is shown in the grid.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShowAllLabelEditAndUndo()
+    {
+        goToProjectHome();
+
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
+
+        grid.getGridBar().doMenuAction("Views", List.of("Customize Grid View"));
+        CustomizeGridDialog customizeModal = new CustomizeGridDialog(getDriver(), grid);
+
+        checker().verifyFalse("The 'Update' button is enabled, it should not be.",
+                customizeModal.isUpdateGridEnabled());
+
+        checker().verifyFalse("The 'Undo edits' button is enabled, it should not be.",
+                customizeModal.isUndoEditsEnabled());
+
+        log("Validate that using the menu to open the dialog results in no fields being selected in the 'Shown in Grid' panel.");
+        checker().verifyTrue(String.format("Field '%s' is selected in the 'Shown in Grid' panel, there should be no selected fields.", customizeModal.getSelectedShownInGridLabel()),
+                customizeModal.getSelectedShownInGridLabel().isEmpty());
+
+        if (!checker().verifyFalse("The 'Show all system and user-defined fields' should not be checked.",
+                customizeModal.isShowAllChecked()))
+        {
+            log("Uncheck the 'Show all' option.");
+            customizeModal.setShowAll(false);
+        }
+
+        String materialIDField = "Material Source Id";
+        log(String.format("Validate that field '%s' is not visible before checking 'Show all'.", materialIDField));
+
+        List<String> actualFields = customizeModal.getAvailableFields();
+
+        checker().fatal()
+                .verifyFalse(String.format("Field '%s' is already present in 'Available Fields' panel. Fatal error.", materialIDField),
+                        actualFields.contains(materialIDField));
+
+        log(String.format("Check 'Show all' and validate that '%s' is now listed.", materialIDField));
+
         customizeModal.setShowAll(true);
-        log("Available Fields with 'Show all' checked: " + customizeModal.getAvailableFields());
 
-        log(String.format("Add field '%s'.", COL_INT));
-        customizeModal.addAvailableFieldToGrid(COL_INT);
+        actualFields = customizeModal.getAvailableFields();
 
-        String fieldName = "Sample Set";
-        log(String.format("Expand field '%s'.", fieldName));
-        customizeModal.expandAvailableFields(fieldName);
-        log("Available Fields after expanding): " + customizeModal.getAvailableFields());
-        log(String.format("Collapse field '%s'.", fieldName));
-        customizeModal.collapseAvailableField(fieldName);
-        log("Available Fields after collapsing): " + customizeModal.getAvailableFields());
+        checker().verifyTrue(String.format("Field '%s' is not present in 'Available Fields' panel, it should be.", materialIDField),
+                actualFields.contains(materialIDField));
 
-        fieldName = "Email";
-        log(String.format("Add nested field '%s'.", fieldName));
-        customizeModal.addAvailableFieldToGrid("Sample Set", "Created By", "Created By", fieldName);
+        log(String.format("Expand field '%s'.", materialIDField));
+        customizeModal.expandAvailableFields(materialIDField);
 
-        log("'Shown in Grid' before remove: " + customizeModal.getShownInGridLabels());
-        customizeModal.removeShownInGridLabel(COL_INT);
-        log("'Shown in Grid' after remove: " + customizeModal.getShownInGridLabels());
+        String materialNameField = "Name";
+        log(String.format("Select the '%s' field under '%s' and add it to the grid.", materialNameField, materialIDField));
+        customizeModal.addAvailableFieldToGrid(materialIDField, materialNameField);
 
-        customizeModal.addAvailableFieldToGrid(COL_INT);
+        List<String> expectedFields = new ArrayList<>(DEFAULT_COLUMNS);
+        expectedFields.add(materialNameField);
 
-        String newFieldLabel = String.format("My New Label %s", COL_INT);
+        log("Because no fields should be selected validate this field is added to the end of the list.");
+        checker().verifyEquals(String.format("Position of field '%s' is not as expected in the dialog.", materialNameField),
+                expectedFields, customizeModal.getShownInGridLabels());
 
-        log("'Shown in Grid' before rename: " + customizeModal.getShownInGridLabels());
-        customizeModal.updateFieldLabel(COL_INT, newFieldLabel);
-        log("'Shown in Grid' after rename: " + customizeModal.getShownInGridLabels());
+        checker().screenShotIfNewError("ShowAll_Label_Edit_Dialog_Error");
 
-        log(String.format("Now is 'Update' button enabled? %s", customizeModal.isUpdateGridEnabled()));
+        if(checker().verifyTrue("The 'Undo edits' button is not enabled it should be.", customizeModal.isUndoEditsEnabled()))
+        {
+            log("Undo the edits.");
+            customizeModal.clickUndoEdits();
+            expectedFields = new ArrayList<>(DEFAULT_COLUMNS);
+            if(checker().verifyEquals("After clicking 'Undo edits' fields in 'Shown in Grid' dialog not as expected.",
+                    expectedFields, customizeModal.getShownInGridLabels()))
+            {
+                log(String.format("Add field '%s / %s' back.", materialIDField, materialNameField));
+                customizeModal.addAvailableFieldToGrid(materialIDField, materialNameField);
+            }
+
+        }
+        else
+        {
+            checker().screenShotIfNewError("Undo_Edit_Button_Error");
+        }
+
+        String newFieldLabel = String.format("My New Label %s", materialNameField);
+        log(String.format("Change the label of the field '%s' to '%s'.", materialNameField, newFieldLabel));
+
+        // Adding the 'Material Source Id / Name' field creates two fields with the label 'Name' in the 'Shown in Grid' panel, make sure the expected one is updated.
+        customizeModal.updateFieldLabel(materialNameField, 1, newFieldLabel);
+
+        checker().fatal().verifyTrue("'Update' button is not enabled, cannot save changes. Fatal error.",
+                customizeModal.isUpdateGridEnabled());
 
         customizeModal.clickUpdateGrid();
 
-        log("Columns: " + grid.getColumnNames());
+        log("Validate that the grid shows the new field with the updated label.");
 
-        log(String.format("Select menu from column '%s' and validate that field label is highlighted in the dialog.", newFieldLabel));
+        checker().verifyTrue(String.format("Did not find the field labeled '%s' in the grid.", newFieldLabel),
+                grid.getColumnNames().contains(newFieldLabel));
 
-        customizeModal = grid.insertColumn(newFieldLabel);
+    }
 
-        log("Active field: " + customizeModal.getSelectedShownInGridLabel());
+    @Test
+    public void testSaveViewDialog()
+    {
+        goToProjectHome();
 
-        log(String.format("Is undo enabled? %s", customizeModal.isUndoEditsEnabled()));
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
-        String nextNewFieldLabel = newFieldLabel + "Something More";
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
-        log(String.format("Update field '%s'.", newFieldLabel));
+        grid.getGridBar().doMenuAction("Views", List.of("Customize Grid View"));
+        CustomizeGridDialog customizeModal = new CustomizeGridDialog(getDriver(), grid);
 
-        customizeModal.updateFieldLabel(newFieldLabel, nextNewFieldLabel);
+        String fieldRemoved1 = COL_INT;
 
-        log(String.format("Now is undo enabled? %s", customizeModal.isUndoEditsEnabled()));
+        log(String.format("Remove field '%s' using the dialog.", fieldRemoved1));
 
-        log(String.format("Fields before undo: %s", customizeModal.getShownInGridLabels()));
+        customizeModal.removeShownInGridLabel(fieldRemoved1).clickUpdateGrid();
 
-        log("Undo the edits.");
-        customizeModal.clickUndoEdits();
+        QueryGrid.SaveViewDialog saveViewDialog = grid.clickSave(true);
+        String viewName1 = String.format("No %s", fieldRemoved1);
+        saveViewDialog.setViewName(viewName1);
+        saveViewDialog.saveView();
 
-        log(String.format("Fields after undo: %s", customizeModal.getShownInGridLabels()));
+        log(String.format("Go back to '%s' and create a new view.", VIEW_DEFAULT));
 
-        log(String.format("Now remove the '%s' field from the grid.", newFieldLabel));
+        grid.getGridBar().doMenuAction("Views", List.of(VIEW_DEFAULT));
 
-        customizeModal.removeShownInGridLabel(newFieldLabel).clickUpdateGrid();
+        grid.getGridBar().doMenuAction("Views", List.of("Customize Grid View"));
+        customizeModal = new CustomizeGridDialog(getDriver(), grid);
 
-        log("Columns after removing field: " + grid.getColumnNames());
+        String fieldRemoved2 = COL_STRING2;
+
+        log(String.format("Remove field '%s' using the dialog.", fieldRemoved2));
+
+        customizeModal.removeShownInGridLabel(fieldRemoved2).clickUpdateGrid();
+
+        saveViewDialog = grid.clickSave(true);
+        String viewName2 = String.format("No %s", fieldRemoved2);
+        saveViewDialog.setViewName(viewName2);
+        saveViewDialog.saveView();
 
     }
 
