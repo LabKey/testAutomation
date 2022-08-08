@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Cross Container Test</name>
+    <description>Perform ETL across containers</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target</description>
+            <source sourceContainerPath="/ETLTestProject/ETL1" schemaName="lists" queryName="ListA">
+                <sourceColumns>
+                    <column>xKey</column>
+                    <column>Field1</column>
+                    <column>EntityId</column>
+                </sourceColumns>
+            </source>
+            <destination schemaName="lists" queryName="ListB" targetOption="merge"/>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified">
+        <deletedRowsSource sourceContainerPath="/ETLTestProject/ETL1" schemaName="auditLog" queryName="listDeletedRows"
+                           deletedSourceKeyColumnName="ListItemEntityId" timestampColumnName="created" targetKeyColumnName="EntityId"/>
+    </incrementalFilter>
+</etl>
