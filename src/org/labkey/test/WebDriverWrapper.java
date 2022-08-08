@@ -1982,7 +1982,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return actionWarnings.asMap();
     }
 
-    private static final WeakHashMap<Class<? extends WebDriverWrapper>, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
+    private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
 
     public void addPageLoadListener(PageLoadListener listener)
     {
@@ -1996,8 +1996,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private Set<PageLoadListener> getPageLoadListeners()
     {
-        _pageLoadListeners.putIfAbsent(this.getClass(), Collections.newSetFromMap(new WeakHashMap<>()));
-        return _pageLoadListeners.get(this.getClass());
+        _pageLoadListeners.putIfAbsent(getDriver(), Collections.newSetFromMap(new WeakHashMap<>()));
+        return _pageLoadListeners.get(getDriver());
     }
 
     /**
