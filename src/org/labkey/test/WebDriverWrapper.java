@@ -3238,7 +3238,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if ("file".equals(inputType))
         {
-            log("WARNING: Please use File object to set file input");
+            TestLogger.warn("Please use a File object to set file input");
             setFormElement(el, new File(text));
             return;
         }
@@ -3257,11 +3257,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (StringUtils.isEmpty(text))
         {
-            input.clear();
+            actionClear(input);
         }
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            input.clear();
+            actionClear(input); // Some inputs swallow standard 'WebElement.clear' in certain cases
             if (!waitFor(()-> input.getDomProperty("value").length() == 0, 500))
             {
                 TestLogger.warn("Failed to clear input: " + input);
@@ -3374,7 +3374,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 setHtml5NumberInput(input, value);
                 break;
             default:
-                log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'.", inputType));
+                TestLogger.warn(String.format("No special handling defined for HTML5 input type = '%s'.", inputType));
                 setInput(input, value);
         }
     }

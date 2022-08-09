@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.html;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -24,6 +25,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 public class Input extends WebDriverComponent<Component<?>.ElementCache> implements FormItem<String>
 {
@@ -88,12 +91,59 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
     @Override
     public void set(String value)
     {
+        set(value, true);
+    }
+
+    public void set(String value, boolean validateValue)
+    {
+        WebDriverWrapper.waitFor(()-> getComponentElement().isEnabled(), "Input is not enabled.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+
         getWrapper().setFormElement(getComponentElement(), value);
+//        int tryCount = retry ? 0 : 4;
+//        while (!strip(value).equals(strip(get())) && tryCount < 5)
+//        {
+//            getComponentElement().clear();
+//            getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
+//
+//            if (!value.contains("\n") && !value.contains("\t"))
+//            {
+//                getComponentElement().sendKeys(value);
+//                getWrapper().waitFor(() -> strip(get()).equals(strip(value)), 1000);
+//            }
+//            else // sendKeys times out with very long values; work around follows
+//            {
+//                getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.focus);
+//                getWrapper().setFormElementJS(getComponentElement(), value);
+//                getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.change);
+//            }
+//            new FluentWait<>(this).withTimeout(Duration.ofMillis(tryCount * 250)); // pause progressively as trycount goes up
+//            tryCount++;
+//            getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
+//        }
+        if (validateValue)
+            assertEquals("Set failed", StringUtils.trim(value), StringUtils.trim(get())); // Fail fast when react select gets out of sync somehow
+    }
+
+    public void setWithPaste(String value)
+    {
+        getWrapper().actionClear(getComponentElement());
+        getWrapper().actionPaste(getComponentElement(), value);
+        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.change);
     }
 
     public void blur()
     {
         getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
+    }
+
+    /**
+     * removes newlines, tabs, other non-space, non-comma, other chars
+     * @param value
+     * @return
+     */
+    private String strip(String value)
+    {
+        return value.replace("\n", "").replaceAll("[^a-zA-Z0-9.,\\s+]", "");
     }
 
     protected void assertElementType(WebElement el)
