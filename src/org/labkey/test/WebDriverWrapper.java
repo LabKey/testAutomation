@@ -3262,19 +3262,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             actionClear(input); // Some inputs swallow standard 'WebElement.clear' in certain cases
-            if (!waitFor(()-> input.getDomProperty("value").length() == 0, 500))
+            if (!waitFor(()-> getFormElement(input).length() == 0, 500))
             {
                 TestLogger.warn("Failed to clear input: " + input);
             }
             input.sendKeys(text);
-            if (!waitFor(()-> input.getDomProperty("value").equals(text), 500))
+            if (!waitFor(()-> getFormElement(input).equals(text), 500))
             {
                 TestLogger.warn("Failed to set input: " + input);
             }
         }
         else
         {
-            setFormElementJS(input, text);
+            actionClear(input);
+            actionPaste(input, text);
         }
 
         try
@@ -3298,6 +3299,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String osName = System.getProperty("os.name");
         Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        scrollIntoView(input);
         new Actions(getDriver())
             .keyDown(cmdKey)
             .sendKeys(input, "a")                        // select all
@@ -3331,6 +3333,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else
         {
+            scrollIntoView(input);
             new Actions(getDriver())
                     .keyDown(cmdKey)
                     .sendKeys(input, "v")       // paste the contents of the clipboard into the input
