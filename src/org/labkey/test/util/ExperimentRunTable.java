@@ -54,8 +54,8 @@ public class ExperimentRunTable extends DataRegionTable
     {
         doAndWaitForUpdate(() ->
         {
-            clickHeaderButtonAndWait("Delete");
-            getWrapper().clickAndWait(Locator.lkButton("Confirm Delete"));
+            clickHeaderButton("Delete");
+            getWrapper().clickAndWait(Locator.linkWithText("Yes, Delete"));
         });
     }
 
