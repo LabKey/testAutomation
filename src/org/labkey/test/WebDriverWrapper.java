@@ -3280,9 +3280,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         try
         {
-            String elementClass = input.getAttribute("class");
-            if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-                fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+            fireEvent(input, SeleniumEvent.change);
+            fireEvent(input, SeleniumEvent.blur);
         }
         catch(StaleElementReferenceException stale)
         {
