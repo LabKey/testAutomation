@@ -956,7 +956,8 @@ public class Crawler
         _urlsChecked.add(stripQueryParams(relativeURL));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
-        String originMessage = origin != null ? "\nOriginating page: " + origin : "";
+        String originMessage = (origin != null ? "\nOriginating page: " + origin : "") +
+                "\nTarget Page: " + relativeURL;
 
         try
         {
@@ -973,6 +974,10 @@ public class Crawler
             if (navigated) // These checks were already performed if navigation didn't occur
             {
                 actualUrl = _test.getURL();
+                if (!actualUrl.toString().endsWith(relativeURL))
+                {
+                    originMessage = originMessage + "\nRedirected to: " + actualUrl;
+                }
 
                 int code = _test.getResponseCode();
 
@@ -1102,7 +1107,7 @@ public class Crawler
             throw new RuntimeException(e);
         }
 
-        if (actualUrl != null && urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
         {
             TestLogger.increaseIndent();
             try
@@ -1382,7 +1387,7 @@ public class Crawler
         {
             List<String> additionalParams = new ArrayList<>(_dictionary.keySet());
             additionalParams.removeAll(_parametersInjected.get(actionId)); // Don't repeat injection attempts
-            additionalParams.removeAll(in.stream().map(Map.Entry::getKey).collect(Collectors.toList())); // Don't add duplicate params
+            additionalParams.removeAll(in.stream().map(Map.Entry::getKey).toList()); // Don't add duplicate params
             Collections.shuffle(additionalParams);
 
             for (int i = 0; i < additionalParams.size() && ret.size() < 10; i++)

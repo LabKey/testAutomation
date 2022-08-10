@@ -275,7 +275,7 @@ public class ScatterPlotTest extends GenericChartsTest
         pulseField.setDimension(true);
         datasetDesignerPage.clickSave();
 
-        waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
+        waitForText("APX-1: Abbreviated Physical Exam", "Dataset Properties");
 
         navigateToFolder(getProjectName(), getFolderName());
         ChartTypeDialog chartTypeDialog = clickAddChart("study", QUERY_APX_1);

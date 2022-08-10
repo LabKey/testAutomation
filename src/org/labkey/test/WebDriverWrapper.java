@@ -1926,7 +1926,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (msWait > 0)
         {
-            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
+            getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
                     TestLogger.log().trace("beforePageLoad - " + listener.getClass().getSimpleName());
@@ -1943,7 +1943,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             waitForPageToLoad(toBeStale, loadTimer);
             getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
-            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
+            getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
                     TestLogger.log().trace("afterPageLoad - " + listener.getClass().getSimpleName());
@@ -1995,8 +1995,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void addPageLoadListener(PageLoadListener listener)
     {
-        _pageLoadListeners.putIfAbsent(getDriver(), Collections.newSetFromMap(new WeakHashMap<>()));
-        _pageLoadListeners.get(getDriver()).add(listener);
+        getPageLoadListeners().add(listener);
+    }
+
+    protected void clearPageLoadListeners()
+    {
+        getPageLoadListeners().clear();
+    }
+
+    private Set<PageLoadListener> getPageLoadListeners()
+    {
+        return _pageLoadListeners.computeIfAbsent(getDriver(), k -> Collections.newSetFromMap(new WeakHashMap<>()));
     }
 
     /**

@@ -1063,6 +1063,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         disablePageUnloadEvents();
 
+        clearPageLoadListeners();
+
         ensureSignedInAsPrimaryTestUser();
 
         checkQueries();
