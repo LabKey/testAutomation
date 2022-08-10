@@ -1996,8 +1996,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private Set<PageLoadListener> getPageLoadListeners()
     {
-        _pageLoadListeners.putIfAbsent(getDriver(), Collections.newSetFromMap(new WeakHashMap<>()));
-        return _pageLoadListeners.get(getDriver());
+        return _pageLoadListeners.computeIfAbsent(getDriver(), k -> Collections.newSetFromMap(new WeakHashMap<>()));
     }
 
     /**
