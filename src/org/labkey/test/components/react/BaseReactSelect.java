@@ -147,19 +147,19 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     {
         scrollIntoView();
         open();
-        getWrapper().setFormElement(elementCache().input, value);
-        WebElement foundElement;
+        elementCache().input.clear();
+        elementCache().input.sendKeys(value);
         try
         {
             var optionElement = ReactSelect.Locators.options.containing(value);
-            foundElement = optionElement.waitForElement(elementCache().selectMenu, 4000);
+            optionElement.waitForElement(elementCache().selectMenu, 4000);
             elementCache().input.clear();
+            return true;
         }
         catch (NoSuchElementException nse)
         {
             return false;
         }
-        return foundElement != null;
     }
 
     /* waits until the currently selected 'value' equals or contains the specified string */

@@ -3292,7 +3292,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             fireEvent(input, SeleniumEvent.change);
-            fireEvent(input, SeleniumEvent.blur);
         }
         catch(StaleElementReferenceException stale)
         {
