@@ -3249,10 +3249,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             TestLogger.warn("Please use a File object to set file input");
             setFormElement(el, new File(text));
-            return;
         }
-
-        if (isHtml5InputTypeSupported(inputType))
+        else if (el.getTagName().equals("select"))
+        {
+            selectOptionImproperly(el, text);
+        }
+        else if (isHtml5InputTypeSupported(inputType))
         {
             setHtml5Input(el, inputType, text);
         }
@@ -3268,7 +3270,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             actionClear(input);
         }
-        else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
+        else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             actionClear(input); // Some inputs swallow standard 'WebElement.clear' in certain cases
             if (!waitFor(()-> getFormElement(input).length() == 0, 500))
@@ -3466,22 +3468,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if ("select".equals(el.getTagName()))
         {
-            try
-            {
-                selectOptionByText(el,text);
-                log("WARNING: Use selectOptionByText(..) instead of setFormElement(..) for select inputs");
-            }
-            catch (NoSuchElementException x)
-            {
-                selectOptionByValue(el,text);
-                log("WARNING: Use selectOptionByValue(..) instead of setFormElement(..) for select inputs");
-            }
+            selectOptionImproperly(el, text);
         }
         else
         {
             executeScript("arguments[0].value = arguments[1]", el, text);
         }
         fireEvent(el, SeleniumEvent.change);
+    }
+
+    private void selectOptionImproperly(WebElement el, String text)
+    {
+        try
+        {
+            selectOptionByText(el, text);
+            log("WARNING: Use selectOptionByText(..) instead of setFormElement(..) for select elements");
+        }
+        catch (NoSuchElementException x)
+        {
+            selectOptionByValue(el, text);
+            log("WARNING: Use selectOptionByValue(..) instead of setFormElement(..) for select elements");
+        }
     }
 
     public void setInput(Locator loc, List<File> files)
