@@ -447,7 +447,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             String headerText = elementCache().panelHeader().getText();
             headerText = headerText.contains(alertText) ? headerText.substring(alertText.length()) : headerText;
             String buttonText = "Undo\nSave";
-            viewName = headerText.contains(buttonText) ? headerText.substring(0, headerText.indexOf(buttonText)) : headerText;
+            headerText = headerText.contains(buttonText) ? headerText.substring(0, headerText.indexOf(buttonText)) : headerText;
+            String appButtonText = "UndoSave";
+            viewName = headerText.contains(appButtonText) ? headerText.substring(0, headerText.indexOf(appButtonText)) : headerText;
         }
         else
         {

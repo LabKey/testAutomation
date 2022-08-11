@@ -314,6 +314,22 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
+     * Remove all the labels from the grid.
+     *
+     * @param labels List of labels to remove.
+     * @return This dialog.
+     */
+    public CustomizeGridDialog removeShownInGridLabels(List<String> labels)
+    {
+        for(String label : labels)
+        {
+            removeShownInGridLabel(label, 0);
+        }
+
+        return this;
+    }
+
+    /**
      * Remove the given label from the 'Shown in Grid' list.
      *
      * @param label The label to remove.
