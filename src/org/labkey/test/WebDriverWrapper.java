@@ -3268,11 +3268,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (StringUtils.isEmpty(text))
         {
-            actionClear(input);
+            input.clear();
         }
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            actionClear(input); // Some inputs swallow standard 'WebElement.clear' in certain cases
+            input.clear();
             if (!waitFor(()-> getFormElement(input).length() == 0, 500))
             {
                 TestLogger.warn("Failed to clear input: " + input);
@@ -3285,13 +3285,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else
         {
-            actionClear(input);
-            actionPaste(input, text);
+            setFormElementJS(input, text);
         }
 
         try
         {
-            fireEvent(input, SeleniumEvent.change);
             String elementClass = input.getAttribute("class");
             if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
                 fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
