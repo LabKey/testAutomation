@@ -5,14 +5,10 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
@@ -359,11 +355,49 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
 
-    // select view
+    /**
+     * Select a view from the 'Views' menu.
+     *
+     * @param viewName Name of the view to select.
+     * @return This grid.
+     */
     public QueryGrid selectView(String viewName)
     {
         doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
         return this;
+    }
+
+    /**
+     * Customize the view. Use the 'Customize Grid VIew' menu option.
+     *
+     * @return A {@link CustomizeGridDialog}.
+     */
+    public CustomizeGridDialog customizeView()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Customize Grid View");
+        return new CustomizeGridDialog(getDriver(), this);
+    }
+
+    /**
+     * Save the grid view. Use the 'Save Grid View' menu option which will always show the save dialog.
+     *
+     * @return A {@link SaveGridViewDialog}.
+     */
+    public SaveGridViewDialog saveView()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
+        return new SaveGridViewDialog(getDriver(), this);
+    }
+
+    /**
+     * Open a {@link ManageGridViewsDialog}. Use the 'Manage Saved Views' menu option.
+     *
+     * @return A {@link ManageGridViewsDialog}.
+     */
+    public ManageGridViewsDialog manageViews()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Manage Saved Views");
+        return new ManageGridViewsDialog(getDriver(), this);
     }
 
     /**
@@ -373,6 +407,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public String getEditAlertText()
     {
+
+        // Not sure how reliable this will be. It is possible that the automation can cause two statuses to show up, the
+        // 'EDITED' status and the 'SAVED' status can be there at the same time. May need to add a check in the save button
+        // and save menu code.
+        // If two alerts are show, this will grab the first which may disappear after it's display status is checked but
+        // before the text is gathered.
+        // The 'SAVED' status will fade away slowly (by design). It is possible, but less likely, that it will disappear after
+        // the call to isDisplayed but before the getText.
         WebElement editAlert = Locator.tagWithClass("span", "view-edit-alert").findWhenNeeded(elementCache().panelHeader());
 
         if(editAlert.isDisplayed())
@@ -383,11 +425,44 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
+     * Get the name of the current view. The name is in the panel header. If there is no panel header then the view is
+     * the default view and an empty string is returned.
+     *
+     * @return The name of the grid view from the header. Empty string if no header (default view).
+     */
+    public String getViewName()
+    {
+        String viewName;
+
+        // Unfortunately the view name in the header is not in a separate element. Getting the text from the panel header
+        // will result in the edit alert text and button text being included.
+        // There is a possible issue if the alert text is 'UPDATED'. This text will fade out and may return a -1 when
+        // calling headerText.indexOf(alertText). Trying to minimize that by first getting the alert text then the header text.
+        //
+        // If this proves to be unreliable it might be easier/safer to return the panel header text and let the test do
+        // a .contains() on it to see if it has the expected header.
+        if(elementCache().panelHeader().isDisplayed())
+        {
+            String alertText = getEditAlertText();
+            String headerText = elementCache().panelHeader().getText();
+            headerText = headerText.contains(alertText) ? headerText.substring(alertText.length()) : headerText;
+            String buttonText = "Undo\nSave";
+            viewName = headerText.contains(buttonText) ? headerText.substring(0, headerText.indexOf(buttonText)) : headerText;
+        }
+        else
+        {
+            viewName = "";
+        }
+
+        return viewName.trim();
+    }
+
+    /**
      * Click the Undo button in the header. Will wait for the grid to update.
      *
      * @return This grid.
      */
-    public QueryGrid clickUndo()
+    public QueryGrid clickUndoButton()
     {
         WebElement undoButton = Locator.buttonContainingText("Undo").findElement(elementCache().panelHeader());
 
@@ -409,24 +484,38 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * Click the Save (View) button in the grid header. If the grid is showing the default view clicking save will show
-     * a {@link SaveViewDialog}, otherwise clicking save will save to the view currently applied to the grid.
+     * a {@link SaveGridViewDialog}, otherwise clicking save will save the changes to the view currently applied to the grid.
      *
-     * @param expectSaveDialog Indicate if a 'Save View' dialog is expected.
-     * @return A {@link SaveViewDialog} or null if a saved dialog is not expected.
+     * @param expectSaveDialog Indicate if a 'Save View' dialog is expected. Should only happen if you are saving the default view.
+     * @return A {@link SaveGridViewDialog} or null if a saved dialog is not expected.
      */
-    public SaveViewDialog clickSave(boolean expectSaveDialog)
+    public SaveGridViewDialog clickSaveButton(boolean expectSaveDialog)
     {
         WebElement saveButton = Locator.buttonContainingText("Save").findElement(elementCache().panelHeader());
         saveButton.click();
 
         if(expectSaveDialog)
         {
-            return new SaveViewDialog(getDriver(), this);
+            return new SaveGridViewDialog(getDriver(), this);
         }
         else
         {
             return null;
         }
+    }
+
+    /**
+     * Click the 'Save as...' drop down button menu option to change the view name. The 'Save as...' option will not be
+     * visible if the default view is being changed.
+     *
+     * @return A {@link SaveGridViewDialog}
+     */
+    public SaveGridViewDialog clickSaveAsButton()
+    {
+        BootstrapMenu bootstrapMenu = new BootstrapMenu(getDriver(), elementCache().panelHeader());
+        bootstrapMenu.clickSubMenu(false, "Save as...");
+
+        return new SaveGridViewDialog(getDriver(), this);
     }
 
     /**
@@ -481,10 +570,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
 
-        // The panel header element which will contain the Save and Undo buttons.
+        // The panel header element which will contain the edit status text, the view name and the Save & Undo buttons.
+        // If this is the default view this will not be present.
         public WebElement panelHeader()
         {
-            return Locator.xpath("preceding-sibling::div[contains(@class,'panel-heading')]").findElement(this);
+            return Locator.xpath("preceding-sibling::div[contains(@class,'panel-heading')]").findWhenNeeded(this);
         }
 
     }
@@ -524,100 +614,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         {
             return _locator;
         }
-    }
-
-    /**
-     * Dialog that will allow a user to save a grid view.
-     */
-    public static class SaveViewDialog extends ModalDialog
-    {
-        QueryGrid grid;
-
-        private final Input viewNameInput = Input.Input(Locator.name("gridViewName"), getDriver())
-                .findWhenNeeded(this);
-
-        Checkbox checkbox = new Checkbox(Locator.input("setDefaultView").findWhenNeeded(this));
-
-        public SaveViewDialog(WebDriver driver, QueryGrid grid)
-        {
-            super(new ModalDialogFinder(driver).withTitle("Save Grid View"));
-            this.grid = grid;
-        }
-
-        /**
-         * Set the view name.
-         *
-         * @param viewName View name.
-         * @return This dialog.
-         */
-        public SaveViewDialog setViewName(String viewName)
-        {
-            viewNameInput.set(viewName);
-            return this;
-        }
-
-        /**
-         * Get the value of the View Name field.
-         *
-         * @return Value of View Name field.
-         */
-        public String getViewName()
-        {
-            return viewNameInput.get();
-        }
-
-        /**
-         * Check if the View Name field is enabled. It should be disabled if the 'Make default for all' checkbox is checked.
-         *
-         * @return True if enabled, false otherwise.
-         */
-        public boolean isViewNameEnabled()
-        {
-            return viewNameInput.getComponentElement().isEnabled();
-        }
-
-        /**
-         * Check or uncheck the 'Make default view' checkbox.
-         *
-         * @param checked True to check, false to uncheck.
-         * @return This dialog.
-         */
-        public SaveViewDialog setMakeDefaultForAll(boolean checked)
-        {
-            checkbox.set(checked);
-            return this;
-        }
-
-        /**
-         * Get the checked status of the 'Make default for all' checkbox.
-         *
-         * @return True if it is checked, false otherwise.
-         */
-        public boolean isMakeDefaultForAllChecked()
-        {
-            return checkbox.isChecked();
-        }
-
-        /**
-         * Save the view.
-         */
-        public void saveView()
-        {
-            dismiss("Save", 1);
-        }
-
-        /**
-         * Click the 'Save' button but expect an error.
-         *
-         * @return The text of the error banner.
-         */
-        public String saveViewExpectingError()
-        {
-            dismiss("Save", 0);
-            WebElement errorEl = BootstrapLocators.errorBanner.waitForElement(this, 5000);
-            return errorEl.getText();
-        }
-
     }
 
 }
