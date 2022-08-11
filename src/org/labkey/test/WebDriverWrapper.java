@@ -3292,6 +3292,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             fireEvent(input, SeleniumEvent.change);
+            String elementClass = input.getAttribute("class");
+            if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
+                fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
         }
         catch(StaleElementReferenceException stale)
         {
@@ -3510,9 +3513,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setDropZone(WebElement dropZone, List<File> files)
     {
-        // Remove class so that WebDriver can interact with concealed form element
-        executeScript("arguments[0].setAttribute('class', '');arguments[0].setAttribute('style', '');", dropZone);
-        shortWait().until(ExpectedConditions.elementToBeClickable(dropZone)); // Takes a moment for DOM to update
         setInput(dropZone, files);
     }
 

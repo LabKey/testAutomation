@@ -82,7 +82,7 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
     @Override
     public String get()
     {
-        return getWrapper().getFormElement(getComponentElement());
+        return getComponentElement().getDomProperty("value");
     }
 
     @Override

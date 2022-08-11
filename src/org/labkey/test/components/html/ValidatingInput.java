@@ -4,7 +4,6 @@
  */
 package org.labkey.test.components.html;
 
-import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -31,7 +30,11 @@ public class ValidatingInput extends Input
         super.set(value);
 
         if (validateValue)
-            assertEquals("Set failed", StringUtils.trim(value), StringUtils.trim(get())); // Fail fast when react select gets out of sync somehow
+            assertEquals("Set failed", strip(value), strip(get())); // Fail fast when react select gets out of sync somehow
     }
 
+    private String strip(String value) // removes newlines, tabs, other non-space, non-comma, other chars
+    {
+        return value.replace("\n", "").replaceAll("[^a-zA-Z0-9.,\\s+]", "");
+    }
 }
