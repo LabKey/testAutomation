@@ -66,7 +66,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final int ICONS_FILTER = 2;
 
     private static final String OTHER_USER = "other_user@grid.panel.test";
-    private static final String OTHER_PW = "S0meP@ssW0rd"; // Hardcoded password because it makes it easier to manually debug.
 
     private static final List<String> stringSetMembers = Arrays.asList("A", "B", "C");
     private static List<String> stringSets = new ArrayList<>();
@@ -79,6 +78,11 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     // Using the core-components.view adds 'GridPanel - ' to the panel header. Need to take that into account .
     private static final String PANEL_VIEW_NAME_PREFIX = "GridPanel - %s";
+
+    // Tests that need to be written:
+    // Validate "Save As..." from the grid save button.
+    // Validate views that are locked, or in some other way, cannot be updates in the manage views dialog.
+    // ???
 
     @Override
     protected String getProjectName()
@@ -122,7 +126,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
         createSampleType(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_VIEW_SAMPLE_PREFIX, DEFAULT_VIEW_SAMPLE_TYPE_SIZE, fields);
 
         _userHelper.createUser(OTHER_USER, true,false);
-        setInitialPassword(OTHER_USER, OTHER_PW);
         new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, "Folder Administrator", PermissionsHelper.MemberType.user, getProjectName());
 
     }
@@ -1213,11 +1216,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
         stopImpersonating();
 
     }
-
-    // Tests that need to be written:
-    // Validate "Save As..." from the grid save button.
-    // Validate views that are locked, or in some other way, cannot be updates in the manage views dialog.
-    // ???
 
     /**
      * Helper to validate the 'Views' menu.
