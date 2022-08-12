@@ -5,6 +5,20 @@
             <!-- p=priority d=datetime t=thread m=message n=newline -->
             <PatternLayout pattern="%-5p %d{ABSOLUTE} %maxLen{%c{1}%notEmpty{ - %X{testLogContext}}}{36} : %X{testLogIndent}%m%n" />
         </Console>
+
+        <RollingFile name="LABKEY_TEST"
+                     fileName="${sys:labkey.log.home}/labkey_test.log"
+                     append="true"
+                     bufferedIO="false"
+                     filePattern="${sys:labkey.log.home}/labkey_test.%i.log">
+            <!-- p=priority c=category d=datetime t=thread m=message n=newline -->
+            <PatternLayout pattern="%-5p %d{ABSOLUTE} %maxLen{%c{1}%notEmpty{ - %X{testLogContext}}}{36} : %X{testLogIndent}%m%n" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy fileIndex="min" />
+        </RollingFile>
+
     </Appenders>
     <Loggers>
         <Root level="ERROR">
@@ -13,6 +27,7 @@
 
         <Logger name="org.labkey.test" additivity="false" level="INFO">
             <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LABKEY_TEST"/>
         </Logger>
 
         <Logger name="NoOpLogger" level="OFF" additivity="false"/>
