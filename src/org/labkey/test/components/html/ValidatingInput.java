@@ -29,8 +29,11 @@ public class ValidatingInput extends Input
 
         super.set(value);
 
-        if (validateValue)
+        if (validateValue && !strip(value).equals(strip(get())))
+        {
+            super.set(value); // Retry once
             assertEquals("Set failed", strip(value), strip(get())); // Fail fast when react select gets out of sync somehow
+        }
     }
 
     private String strip(String value) // removes newlines, tabs, other non-space, non-comma, other chars
