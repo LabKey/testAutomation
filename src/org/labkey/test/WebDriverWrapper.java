@@ -3250,17 +3250,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
             TestLogger.warn("Please use a File object to set file input");
             setFormElement(el, new File(text));
         }
-        else if (el.getTagName().equals("select"))
-        {
-            selectOptionImproperly(el, text);
-        }
-        else if (isHtml5InputTypeSupported(inputType))
-        {
-            setHtml5Input(el, inputType, text);
-        }
         else
         {
-            setInput(el, text);
+            String tagName = el.getTagName();
+            if (tagName.equals("select"))
+            {
+                selectOptionImproperly(el, text);
+            }
+            else if (tagName.equals("input") || tagName.equals("textarea"))
+            {
+                if (isHtml5InputTypeSupported(inputType))
+                {
+                    setHtml5Input(el, inputType, text);
+                }
+                else
+                {
+                    setInput(el, text);
+                }
+            }
+            else
+            {
+                throw new IllegalArgumentException("Invalid element: " + el);
+            }
         }
     }
 
