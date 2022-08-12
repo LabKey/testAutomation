@@ -363,7 +363,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid selectView(String viewName)
     {
-        doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
+        String currentView = getViewName();
+
+        // Clicking the view already shown will not cause a refresh of the grid.
+        if(!currentView.equalsIgnoreCase(viewName))
+            doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
+
         return this;
     }
 
