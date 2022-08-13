@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.settings.AppProps;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -78,8 +77,10 @@ public class ContainerContextTest extends BaseWebDriverTest
     private static final String COLOR = "Red";
     private static final String MANUFACTURER = "Toyota";
     private static final String MODEL = "Prius C";
-    private RReportHelper _RReportHelper = new RReportHelper(this);
-    private PortalHelper _portalHelper = new PortalHelper(this);
+
+    private final RReportHelper _RReportHelper = new RReportHelper(this);
+    private final PortalHelper _portalHelper = new PortalHelper(this);
+    private String _questionMark = null;
 
     @Override
     protected String getProjectName()
@@ -128,6 +129,8 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
         _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+
+        _questionMark = ExperimentalFeaturesHelper.getQuestionMark(createDefaultConnection());
     }
 
     @Test
@@ -630,11 +633,10 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (hasContainer)
             {
                 href = dr.getHref(i, "Folder");
-                String questionMark = ExperimentalFeaturesHelper.isExperimentalFeatureEnabled(AppProps.EXPERIMENTAL_NO_QUESTION_MARK_URL) ? "" : "?";
 
                 log("  Folder column href = " + href);
-                expectedHref = "/project/" + workbookContainer + "/begin.view" + questionMark;
-                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view" + questionMark;
+                expectedHref = "/project/" + workbookContainer + "/begin.view" + _questionMark;
+                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view" + _questionMark;
 
                 assertTrue("Expected and actual container column URL differ:\n" +
                     "Expected container: " + workbookContainer + "\n" +
