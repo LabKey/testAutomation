@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.settings.AppProps;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -37,6 +38,7 @@ import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -618,9 +620,9 @@ public class ContainerContextTest extends BaseWebDriverTest
                 {
                     log("  Parent test column href = " + href);
                     assertTrue("Expected and actual parent test column URL differ:\n" +
-                            "Expected: " + expectedHref + "\n" +
-                            "Actual:   " + href,
-                            (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        "Expected: " + expectedHref + "\n" +
+                        "Actual:   " + href,
+                        (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
                 }
             }
 
@@ -628,15 +630,16 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (hasContainer)
             {
                 href = dr.getHref(i, "Folder");
+                String questionMark = ExperimentalFeaturesHelper.isExperimentalFeatureEnabled(AppProps.EXPERIMENTAL_NO_QUESTION_MARK_URL) ? "" : "?";
 
                 log("  Folder column href = " + href);
-                expectedHref = "/project/" + workbookContainer + "/begin.view?";
-                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view?";
+                expectedHref = "/project/" + workbookContainer + "/begin.view" + questionMark;
+                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view" + questionMark;
 
                 assertTrue("Expected and actual container column URL differ:\n" +
-                        "Expected container: " + workbookContainer + "\n" +
-                        "Actual URL        : " + href,
-                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                    "Expected container: " + workbookContainer + "\n" +
+                    "Actual URL        : " + href,
+                    href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
             }
 
             log("");
@@ -648,125 +651,125 @@ public class ContainerContextTest extends BaseWebDriverTest
     @LogMethod
     private String insertEmissionTest(String workbookId, String suffix, int vehicleId, String parentRowId) throws IOException, CommandException
     {
-            Connection cn = WebTestHelper.getRemoteApiConnection();
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
-            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
-            Map<String, Object> rowMap = new HashMap<>();
-            rowMap.put("name", "EmissionTest" + suffix);
-            rowMap.put("vehicleId", vehicleId);
+        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
+        Map<String, Object> rowMap = new HashMap<>();
+        rowMap.put("name", "EmissionTest" + suffix);
+        rowMap.put("vehicleId", vehicleId);
 
-            if (parentRowId != null)
-                rowMap.put("ParentTest", parentRowId);
+        if (parentRowId != null)
+            rowMap.put("ParentTest", parentRowId);
 
-            rowMap.put("result", false);
+        rowMap.put("result", false);
 
-            insertCmd.addRow(rowMap);
-            SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
-            Map<String, Object> row = response.getRows().get(0);
-            Long rowId = (Long)row.get("RowId");
-            return rowId.toString();
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
+        Map<String, Object> row = response.getRows().get(0);
+        Long rowId = (Long)row.get("RowId");
+        return rowId.toString();
     }
 
     @LogMethod
     private void deleteVehicleRecords() throws IOException, CommandException
     {
-            log("deleting records from vehicle schema that may have been created by this test");
-            Connection cn = WebTestHelper.getRemoteApiConnection();
+        log("deleting records from vehicle schema that may have been created by this test");
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
-            SelectRowsCommand sr0 = new SelectRowsCommand("vehicle", "EmissionTest");
-            SelectRowsResponse resp0 = sr0.execute(cn, getProjectName());
+        SelectRowsCommand sr0 = new SelectRowsCommand("vehicle", "EmissionTest");
+        SelectRowsResponse resp0 = sr0.execute(cn, getProjectName());
 
-            if (resp0.getRowCount().intValue() > 0)
+        if (resp0.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "EmissionTest");
+            for (Map<String, Object> row : resp0.getRows())
             {
-                DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "EmissionTest");
-                for (Map<String, Object> row : resp0.getRows())
-                {
-                    del.addRow(row);
-                }
-                del.execute(cn, getProjectName());
+                del.addRow(row);
             }
+            del.execute(cn, getProjectName());
+        }
 
-            SelectRowsCommand sr1 = new SelectRowsCommand("vehicle", "vehicles");
-            SelectRowsResponse resp1 = sr1.execute(cn, getProjectName());
+        SelectRowsCommand sr1 = new SelectRowsCommand("vehicle", "vehicles");
+        SelectRowsResponse resp1 = sr1.execute(cn, getProjectName());
 
-            if (resp1.getRowCount().intValue() > 0)
+        if (resp1.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "vehicles");
+            for (Map<String, Object> row : resp1.getRows())
             {
-                DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "vehicles");
-                for (Map<String, Object> row : resp1.getRows())
-                {
-                    del.addRow(row);
-                }
-                del.execute(cn, getProjectName());
+                del.addRow(row);
             }
+            del.execute(cn, getProjectName());
+        }
 
-            SelectRowsCommand sr2 = new SelectRowsCommand("vehicle", "models");
-            sr2.addFilter(new Filter("name", MODEL));
-            SelectRowsResponse resp2 = sr2.execute(cn, getProjectName());
+        SelectRowsCommand sr2 = new SelectRowsCommand("vehicle", "models");
+        sr2.addFilter(new Filter("name", MODEL));
+        SelectRowsResponse resp2 = sr2.execute(cn, getProjectName());
 
-            if (resp2.getRowCount().intValue() > 0)
-            {
-                DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
-                del2.addRow(Maps.of("rowid", resp2.getRows().get(0).get("rowid")));
-                del2.execute(cn, getProjectName());
-            }
-
-            SelectRowsCommand sr = new SelectRowsCommand("vehicle", "manufacturers");
-            sr.addFilter(new Filter("name", MANUFACTURER));
-            SelectRowsResponse resp = sr.execute(cn, getProjectName());
-
-            if (resp.getRowCount().intValue() > 0)
-            {
-                DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
-                del1.addRow(Maps.of("rowid", resp.getRows().get(0).get("rowid")));
-                del1.execute(cn, getProjectName());
-            }
-
-            DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
-            del2.addRow(Maps.of("name", COLOR + "!"));
+        if (resp2.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
+            del2.addRow(Maps.of("rowid", resp2.getRows().get(0).get("rowid")));
             del2.execute(cn, getProjectName());
+        }
+
+        SelectRowsCommand sr = new SelectRowsCommand("vehicle", "manufacturers");
+        sr.addFilter(new Filter("name", MANUFACTURER));
+        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+
+        if (resp.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
+            del1.addRow(Maps.of("rowid", resp.getRows().get(0).get("rowid")));
+            del1.execute(cn, getProjectName());
+        }
+
+        DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
+        del2.addRow(Maps.of("name", COLOR + "!"));
+        del2.execute(cn, getProjectName());
     }
 
     @LogMethod
     private int createRequiredRecords() throws IOException, CommandException
     {
-            deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
+        deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
 
-            Connection cn = WebTestHelper.getRemoteApiConnection();
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
-            //look like we need to create this too
-            InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");
-            insertCmd0.addRow(Maps.of("Name", COLOR, "Hex", "#FF0000"));
-            insertCmd0.execute(cn, getProjectName());
+        //look like we need to create this too
+        InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");
+        insertCmd0.addRow(Maps.of("Name", COLOR, "Hex", "#FF0000"));
+        insertCmd0.execute(cn, getProjectName());
 
-            //then create manufacturer
-            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
-            Map<String,Object> rowMap = new HashMap<>();
-            rowMap.put("name", MANUFACTURER);
-            insertCmd.addRow(rowMap);
-            SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
+        //then create manufacturer
+        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+        Map<String,Object> rowMap = new HashMap<>();
+        rowMap.put("name", MANUFACTURER);
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
 
-            //then create model
-            InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
-            rowMap = new HashMap<>();
-            rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
-            rowMap.put("name", MODEL);
-            insertCmd2.addRow(rowMap);
-            SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
+        //then create model
+        InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
+        rowMap = new HashMap<>();
+        rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
+        rowMap.put("name", MODEL);
+        insertCmd2.addRow(rowMap);
+        SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
 
-            InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
-            rowMap = new HashMap<>();
-            rowMap.put("Color", COLOR + "!");
-            rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
-            rowMap.put("ModelYear", 2050);
-            rowMap.put("Milage", 2);
-            rowMap.put("LastService", new Date());
+        InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
+        rowMap = new HashMap<>();
+        rowMap.put("Color", COLOR + "!");
+        rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
+        rowMap.put("ModelYear", 2050);
+        rowMap.put("Milage", 2);
+        rowMap.put("LastService", new Date());
 
-            insertCmd3.addRow(rowMap);
-            SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
+        insertCmd3.addRow(rowMap);
+        SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
 
-            Map<String, Object> row = response.getRows().get(0);
-            Long rowId = (Long)row.get("RowId");
-            return rowId.intValue();
+        Map<String, Object> row = response.getRows().get(0);
+        Long rowId = (Long)row.get("RowId");
+        return rowId.intValue();
     }
 
     @Override

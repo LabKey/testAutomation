@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.api.settings.AppProps;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -67,5 +68,8 @@ public class ExperimentalFeaturesHelper
         }
     }
 
-
+    public static boolean isExperimentalFeatureEnabled(String feature)
+    {
+        return AppProps.getInstance().isExperimentalFeatureEnabled(feature);
+    }
 }
