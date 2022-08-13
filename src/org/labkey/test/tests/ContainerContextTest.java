@@ -80,7 +80,6 @@ public class ContainerContextTest extends BaseWebDriverTest
 
     private final RReportHelper _RReportHelper = new RReportHelper(this);
     private final PortalHelper _portalHelper = new PortalHelper(this);
-    private String _questionMark = null;
 
     @Override
     protected String getProjectName()
@@ -129,8 +128,6 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
         _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
-
-        _questionMark = ExperimentalFeaturesHelper.getQuestionMark(createDefaultConnection());
     }
 
     @Test
@@ -635,8 +632,10 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getHref(i, "Folder");
 
                 log("  Folder column href = " + href);
-                expectedHref = "/project/" + workbookContainer + "/begin.view" + _questionMark;
-                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view" + _questionMark;
+                expectedHref = "/project/" + workbookContainer + "/begin.view";
+                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view";
+                log("  expectedHref = " + expectedHref);
+                log("  expectedContainerRelativeHref = " + expectedContainerRelativeHref);
 
                 assertTrue("Expected and actual container column URL differ:\n" +
                     "Expected container: " + workbookContainer + "\n" +

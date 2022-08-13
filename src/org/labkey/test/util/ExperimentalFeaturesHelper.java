@@ -86,8 +86,8 @@ public class ExperimentalFeaturesHelper
         }
     }
 
-    public static String getQuestionMark(Connection cn)
+    public static boolean isNoQuestionMarkMode(Connection cn)
     {
-        return isExperimentalFeatureEnabled(cn, AppProps.EXPERIMENTAL_NO_QUESTION_MARK_URL) ? "" : "?";
+        return isExperimentalFeatureEnabled(cn, AppProps.EXPERIMENTAL_NO_QUESTION_MARK_URL);
     }
 }
