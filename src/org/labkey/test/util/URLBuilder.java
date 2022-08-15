@@ -143,7 +143,7 @@ public class URLBuilder
 
     private void appendQueryString(StringBuilder url, Map<String, ?> params)
     {
-        if (params != null)
+        if (params != null && !params.isEmpty())
         {
             boolean firstParam = true;
             for (Map.Entry<String, ?> param : params.entrySet())
@@ -160,6 +160,10 @@ public class URLBuilder
                     firstParam = false;
                 }
             }
+        }
+        else if (!WebTestHelper.isNoQuestionMarkUrl())
+        {
+            url.append("?");
         }
     }
 }

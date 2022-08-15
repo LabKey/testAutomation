@@ -579,6 +579,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         log("Server is running.");
         WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
+        WebTestHelper.setNoQuestionMarkUrl(ExperimentalFeaturesHelper.isNoQuestionMarkMode(createDefaultConnection()));
     }
 
     @LogMethod
