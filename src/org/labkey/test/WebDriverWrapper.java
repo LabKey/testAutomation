@@ -3297,6 +3297,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else
         {
             setFormElementJS(input, text);
+            input.sendKeys(" ", Keys.BACK_SPACE); // 'change' event isn't always sufficient
         }
 
         try
