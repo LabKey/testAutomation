@@ -28,10 +28,12 @@ public class ValidatingInput extends Input
         WebDriverWrapper.waitFor(()-> getComponentElement().isEnabled(), "Input is not enabled.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 
         super.set(value);
+        blur();
 
         if (validateValue && !strip(value).equals(strip(get())))
         {
             super.set(value); // Retry once
+            blur();
             assertEquals("Set failed", strip(value), strip(get())); // Fail fast when react select gets out of sync somehow
         }
     }
