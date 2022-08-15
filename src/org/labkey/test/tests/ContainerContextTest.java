@@ -35,14 +35,15 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 
@@ -70,7 +71,6 @@ public class ContainerContextTest extends BaseWebDriverTest
     protected static final String TEST_ASSAY_B = "Test Assay B";
     protected static final String TEST_ASSAY_DESC_B = "Description for assay B";
 
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
 
     private static final String COLOR = "Red";
@@ -130,38 +130,38 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testListLookupURL()
+    public void testListLookupURL() throws Exception
     {
+        Connection conn = createDefaultConnection();
+
         log("** Creating lookup target list in sub-folder");
-        goToProjectHome();
-        FieldDefinition[] lookupTargetCols = {
+        List<FieldDefinition> lookupTargetCols = List.of(
             new FieldDefinition("LookupName", FieldDefinition.ColumnType.String).setDescription("Lookup Name"),
             new FieldDefinition("LookupAge", FieldDefinition.ColumnType.Integer).setDescription("Lookup Age").setURL("fake/action.view?key=${Key}")
-        };
+        );
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
-        _listHelper.createList(getProjectName() + "/" + SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
+        TestDataGenerator subfolderDgen = new IntListDefinition(lookupTargetListName, LIST_KEY_NAME).setFields(lookupTargetCols)
+                .create(conn, getProjectName() + "/" + SUB_FOLDER_A);
 
         log("** Insert row into lookup target list");
-        goToProjectHome();
-        clickFolder(SUB_FOLDER_A);
-        clickAndWait(Locator.linkWithText(lookupTargetListName));
-        _listHelper.insertNewRow(Maps.of(
+        subfolderDgen.addCustomRow(Maps.of(
                 "LookupName", "MyLookupItem1",
                 "LookupAge", "100"
         ));
-        _listHelper.insertNewRow(Maps.of(
+        subfolderDgen.addCustomRow(Maps.of(
                 "LookupName", "MyLookupItem2",
                 "LookupAge", "200"
         ));
+        subfolderDgen.insertRows(conn);
 
         log("** Creating list with lookup to list in sub-folder");
         goToProjectHome();
-        FieldDefinition[] cols = {
+        List<FieldDefinition> cols = List.of(
             new FieldDefinition("MyName", FieldDefinition.ColumnType.String).setDescription("My Name"),
-            new FieldDefinition("ListLookup", new FieldDefinition.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.Integer)).setDescription("List Lookup"),
-        };
+            new FieldDefinition("ListLookup", new FieldDefinition.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.Integer)).setDescription("List Lookup")
+        );
         String lookupSourceListName = "Project-LookupSource-List";
-        _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        new IntListDefinition(lookupSourceListName, LIST_KEY_NAME).setFields(cols).create(conn, getProjectName());
 
         log("** Insert row into list");
         goToProjectHome();
@@ -199,9 +199,10 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href.contains(getProjectName() + "/" + SUB_FOLDER_A) && href.contains("fake") && href.contains("action.view?key=2"));
     }
 
+    // TODO: Move this to 'CAVDStudyTest'
     // Issue 15610: viscstudieslist - URLs generated from lookups are broken
     @Test
-    public void testIssue15610()
+    public void testIssue15610() throws Exception
     {
         log("** Creating study in " + SUB_FOLDER_A);
         goToProjectHome();
@@ -220,10 +221,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickButton("Create Study");
 
         log("** Creating list with lookup to viscstudies.studies");
-        FieldDefinition[] cols = {
-            new FieldDefinition("StudyLookup", new FieldDefinition.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)).setDescription("Study Lookup"),
-        };
-        _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        List<FieldDefinition> cols = List.of(
+            new FieldDefinition("StudyLookup", new FieldDefinition.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)).setDescription("Study Lookup")
+        );
+        new IntListDefinition("Issue15610-List", LIST_KEY_NAME).setFields(cols)
+                .create(createDefaultConnection(), getProjectName());
 
         log("** Inserting row into list");
         goToProjectHome();
@@ -250,7 +252,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
     // Issue 15751: Pipeline job list generates URLs without correct container
     @Test
-    public void testIssue15751()
+    public void testIssue15751() throws Exception
     {
         log("** Create pipeline jobs");
         insertJobIntoSubFolder(SUB_FOLDER_A);
@@ -272,16 +274,15 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    public void insertJobIntoSubFolder(String folder)
+    public void insertJobIntoSubFolder(String folder) throws Exception
     {
-        goToProjectHome();
-
         log("** Creating list in folder '" + folder + "'");
-        ListHelper.ListColumn[] cols = {
-            new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name")
-        };
+        List<FieldDefinition> cols = List.of(
+            new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription("Name")
+        );
         String listName = folder + "-Issue15751-List";
-        _listHelper.createList(getProjectName() + "/" + folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        new IntListDefinition(listName, LIST_KEY_NAME).setFields(cols)
+                .create(createDefaultConnection(), getProjectName() + "/" + folder);
 
         log("** Creating background R script");
         goToProjectHome();
