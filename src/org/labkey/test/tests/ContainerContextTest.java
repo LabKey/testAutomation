@@ -37,7 +37,6 @@ import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -634,8 +633,6 @@ public class ContainerContextTest extends BaseWebDriverTest
                 log("  Folder column href = " + href);
                 expectedHref = "/project/" + workbookContainer + "/begin.view";
                 expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view";
-                log("  expectedHref = " + expectedHref);
-                log("  expectedContainerRelativeHref = " + expectedContainerRelativeHref);
 
                 assertTrue("Expected and actual container column URL differ:\n" +
                     "Expected container: " + workbookContainer + "\n" +
