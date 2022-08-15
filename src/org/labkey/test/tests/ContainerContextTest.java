@@ -559,7 +559,6 @@ public class ContainerContextTest extends BaseWebDriverTest
             String workbookContainer = EscapeUtil.encode(getProjectName()) + "/" + workbookIds[i];
             String href;
             String expectedHref;
-            String expectedContainerRelativeHref;
 
             // update link
             if (hasUpdate)
@@ -567,14 +566,13 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getUpdateHref(i);
                 log("  [edit] column href = " + href);
 
-                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
-                expectedHref = "/query/" + workbookContainer + "/updateQueryRow.view" + rest;
-                expectedContainerRelativeHref = "/" + workbookContainer + "/query-updateQueryRow.view" + rest;
+                expectedHref = WebTestHelper.buildRelativeUrl("query", workbookContainer, "updateQueryRow",
+                        Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", emissionIds[i]));
 
                 assertTrue("Expected and actual [edit] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual  : " + href,
-                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        href != null && (href.contains(expectedHref)));
             }
 
             // details link
@@ -583,36 +581,35 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getDetailsHref(i);
                 log("  [details] column href = " + href);
 
-                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
-                expectedHref = "/query/" + workbookContainer + "/" + detailsAction + rest;
-                expectedContainerRelativeHref = "/" + workbookContainer + "/query-" + detailsAction + rest;
+                expectedHref = WebTestHelper.buildRelativeUrl("query", workbookContainer, detailsAction,
+                        Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", emissionIds[i]));
 
                 assertTrue("Expected and actual [details] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual:   " + href,
-                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        href != null && (href.contains(expectedHref)));
             }
 
             // vehicle link
             href = dr.getHref(i, "Vehicle Id");
             log("  Vehicle column href = " + href);
 
-            expectedHref = "/simpletest/" + getProjectName() + "/vehicle.view?rowid=" + vehicleId;
-            expectedContainerRelativeHref = "/" + getProjectName() + "/simpletest-vehicle.view?rowid=" + vehicleId;
+            expectedHref = WebTestHelper.buildRelativeUrl("simpletest", getProjectName(), "vehicle",
+                    Maps.of("rowid", vehicleId));
 
             assertTrue("Expected and actual Vehicle column URL differ:\n" +
                     "Expected: " + expectedHref + "\n" +
                     "Actual:   " + href,
-                    href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                    href != null && (href.contains(expectedHref)));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
             if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
             {
                 String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
                 String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/" + parentTestWorkbookId;
-                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + parentRowIds[i];
-                expectedHref = "/query/" + parentTestContainer + "/" + parentDetailsAction + rest;
-                expectedContainerRelativeHref = "/" + parentTestContainer + "/query-" + parentDetailsAction + rest;
+                expectedHref = WebTestHelper.buildRelativeUrl("query", parentTestContainer, parentDetailsAction,
+                        Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", parentRowIds[i]));
+
 
                 href = dr.getHref(i, "Parent Test");
                 if (href != null)
@@ -621,7 +618,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                     assertTrue("Expected and actual parent test column URL differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual:   " + href,
-                        (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        (href.contains(expectedHref)));
                 }
             }
 
@@ -631,13 +628,12 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getHref(i, "Folder");
 
                 log("  Folder column href = " + href);
-                expectedHref = "/project/" + workbookContainer + "/begin.view";
-                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view";
+                expectedHref = WebTestHelper.buildRelativeUrl("project", workbookContainer, "begin");
 
                 assertTrue("Expected and actual container column URL differ:\n" +
                     "Expected container: " + workbookContainer + "\n" +
                     "Actual URL        : " + href,
-                    href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                    href != null && (href.contains(expectedHref)));
             }
 
             log("");
