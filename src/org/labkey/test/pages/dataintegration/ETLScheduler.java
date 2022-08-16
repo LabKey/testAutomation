@@ -136,6 +136,24 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
             return elementCache().schedule.getText();
         }
 
+        public boolean enabledIconDisplayed()
+        {
+            return elementCache().enabledIcon.isDisplayed();
+        }
+        public String getTooltipText()
+        {
+            if (elementCache().enabledIcon.isDisplayed())
+            {
+                return elementCache().enabledIcon.getAttribute("title");
+            }
+
+            return null;
+        }
+        public String getEnabledBy()
+        {
+            return elementCache().enabledBy.getText();
+        }
+
         public String getLastStatus()
         {
             return elementCache().lastStatus.getText();
@@ -237,16 +255,18 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
             private final int SCHEDULE = 3;
             private final int ENABLED = 4;
 //            private final int VERBOSE_LOGGING = 5;
-            private final int LAST_STATUS = 5;
-            private final int LAST_RUN = 6;
-            private final int LAST_CHECKED = 7;
+            private final int ENABLED_BY = 5;
+            private final int LAST_STATUS = 6;
+            private final int LAST_RUN = 7;
+            private final int LAST_CHECKED = 8;
 
             WebElement name = new LazyWebElement(Locator.css("td:nth-of-type(" + NAME + ")"), this);
             WebElement sourceModule = new LazyWebElement(Locator.css("td:nth-of-type(" + SOURCE_MODULE + ")"), this);
             WebElement schedule = new LazyWebElement(Locator.css("td:nth-of-type(" + SCHEDULE + ")"), this);
             WebElement enabledCheckbox = new LazyWebElement(Locator.css("td:nth-of-type(" + ENABLED + ") input[type=checkbox]"), this);
-//            WebElement verboseLoggingCheckbox = new LazyWebElement(Locator.css("td:nth-of-type(" + VERBOSE_LOGGING + ") input[type=checkbox]"), this);
+            WebElement enabledIcon = new LazyWebElement(Locator.byClass("fa fa-info-circle"), this);
             WebElement lastStatus = new LazyWebElement(Locator.css("td:nth-of-type(" + LAST_STATUS + ")"), this);
+            WebElement enabledBy = new LazyWebElement(Locator.css("td:nth-of-type(" + ENABLED_BY + ")"), this);
             WebElement lastRun = new LazyWebElement(Locator.css("td:nth-of-type(" + LAST_RUN + ")"), this);
             WebElement lastChecked = new LazyWebElement(Locator.css("td:nth-of-type(" + LAST_CHECKED + ")"), this);
 

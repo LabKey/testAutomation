@@ -9,5 +9,6 @@
             </procedure>
         </transform>
     </transforms>
-    <incrementalFilter className="RunFilterStrategy" runTableSchema="etltest" runTable="Transfer" pkColumnName="Rowid" />
+    <incrementalFilter className="RunFilterStrategy" runTableSchema="etltest" runTable="Transfer" pkColumnName="Rowid"
+                       runTableContainerPath="/ETLTestProject"/>
 </etl>
