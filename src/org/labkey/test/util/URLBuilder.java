@@ -123,6 +123,10 @@ public class URLBuilder
             url.append(".view");
 
         appendQueryString(url, _query);
+        if (!WebTestHelper.isNoQuestionMarkUrl() && Maps.isBlank(_query))
+        {
+            url.append("?");
+        }
 
         if (!StringUtils.isBlank(_resourcePath))
         {
@@ -143,7 +147,7 @@ public class URLBuilder
 
     private void appendQueryString(StringBuilder url, Map<String, ?> params)
     {
-        if (params != null && !params.isEmpty())
+        if (!Maps.isBlank(params))
         {
             boolean firstParam = true;
             for (Map.Entry<String, ?> param : params.entrySet())
@@ -160,10 +164,6 @@ public class URLBuilder
                     firstParam = false;
                 }
             }
-        }
-        else if (!WebTestHelper.isNoQuestionMarkUrl())
-        {
-            url.append("?");
         }
     }
 }
