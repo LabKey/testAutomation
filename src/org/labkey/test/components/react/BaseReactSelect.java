@@ -6,6 +6,7 @@ package org.labkey.test.components.react;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -255,16 +256,27 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
         scrollIntoView();
 
-        WebElement removeBtn = Locators.removeMultiSelectValueButton(value).findWhenNeeded(getComponentElement());
-        removeBtn.click();
-
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
+        attemptRemove(value);
 
         // Validate that the selected item really was removed.
         WebDriverWrapper.sleep(500);
-        waitFor(()->!getSelections().contains(value), String.format("Failed to remove selection '%s'.", value), WAIT_FOR_JAVASCRIPT);
+        if (getSelections().contains(value))
+        {
+            String msg = String.format("Failed to remove selection '%s'.", value);
+            TestLogger.warn(msg + ": retrying");
+            attemptRemove(value);
+            Assert.assertFalse(msg, getSelections().contains(value));
+        }
 
         return getThis();
+    }
+
+    private void attemptRemove(String value)
+    {
+        WebElement removeBtn = Locators.removeMultiSelectValueButton(value).findElement(getComponentElement());
+        removeBtn.click();
+
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
     }
 
     public boolean hasSelection()
