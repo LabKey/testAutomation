@@ -366,6 +366,10 @@ public class WebTestHelper
         return getBaseUrlWithoutContextPath() + getContextPath();
     }
 
+    /**
+     * Gets the configured context path for the server under test
+     * @return context path with a leading slash -or- blank for a server with 'ROOT' context
+     */
     public static String getContextPath()
     {
         synchronized (SERVER_LOCK)
@@ -382,9 +386,10 @@ public class WebTestHelper
                 else
                     LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
 
-                if ("/".equals(_contextPath))
+                _contextPath = StringUtils.strip(_contextPath, "/ ");
+                if (!_contextPath.isEmpty())
                 {
-                    _contextPath = "";
+                    _contextPath = "/" + _contextPath;
                 }
             }
             return _contextPath;
