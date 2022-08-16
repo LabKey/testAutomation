@@ -3255,7 +3255,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             String tagName = el.getTagName();
             if (tagName.equals("select"))
             {
-                selectOptionImproperly(el, text);
+                selectOption(el, text);
             }
             else if (tagName.equals("input") || tagName.equals("textarea"))
             {
@@ -3480,27 +3480,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if ("select".equals(el.getTagName()))
         {
-            selectOptionImproperly(el, text);
+            selectOption(el, text);
         }
         else
         {
             executeScript("arguments[0].value = arguments[1]", el, text);
         }
         fireEvent(el, SeleniumEvent.change);
-    }
-
-    private void selectOptionImproperly(WebElement el, String text)
-    {
-        try
-        {
-            selectOptionByText(el, text);
-            log("WARNING: Use selectOptionByText(..) instead of setFormElement(..) for select elements");
-        }
-        catch (NoSuchElementException x)
-        {
-            selectOptionByValue(el, text);
-            log("WARNING: Use selectOptionByValue(..) instead of setFormElement(..) for select elements");
-        }
     }
 
     public void setInput(Locator loc, List<File> files)
@@ -3517,13 +3503,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeScript("arguments[0].value = '';", el);
         List<String> filePaths = files.stream().map(File::getAbsolutePath).collect(Collectors.toList());
         String fileNames = String.join("\n", filePaths);
-        log(fileNames);
+        TestLogger.debug(fileNames);
         el.sendKeys(fileNames);
-    }
-
-    public void setDropZone(WebElement dropZone, List<File> files)
-    {
-        setInput(dropZone, files);
     }
 
     /**
@@ -3711,9 +3692,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return checkBoxLocator.findElement(getDriver()).isSelected();
     }
 
-    public boolean isChecked(WebElement checkBoxLocator)
+    /**
+     * @deprecated Use {@link WebElement#isSelected()}
+     */
+    @Deprecated (since = "22.9")
+    public boolean isChecked(WebElement checkBox)
     {
-        return null != checkBoxLocator.getAttribute("checked");
+        return checkBox.isSelected();
+    }
+
+    /**
+     * Try to select option by text or value.
+     */
+    private void selectOption(WebElement el, String text)
+    {
+        try
+        {
+            selectOptionByText(el, text);
+        }
+        catch (NoSuchElementException x)
+        {
+            selectOptionByValue(el, text);
+        }
     }
 
     public void selectOptionByValue(Locator locator, String value)
