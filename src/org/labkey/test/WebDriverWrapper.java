@@ -1129,21 +1129,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     * Navigating within an app will not trigger a page load.
+     * Compare current page URL with destination to determine whether to expect a page load.
+     */
     private boolean expectPageLoad(String destinationUrl)
     {
         String appAction = "app";
         try
         {
             String currentUrl = getDriver().getCurrentUrl();
-            Crawler.ControllerActionId current = new Crawler.ControllerActionId(currentUrl);
-            Crawler.ControllerActionId destination = new Crawler.ControllerActionId(destinationUrl);
+            String destinationAction = new Crawler.ControllerActionId(destinationUrl).getAction();
+            String currentSansHash = currentUrl.split("#", 2)[0];
+            String destinationSansHash = destinationUrl.split("#", 2)[0];
 
-            return !destinationUrl.contains("#") ||
-                    destinationUrl.contains("?#") != currentUrl.contains("?#") ||
-                    !current.getAction().equals(appAction) ||
-                    !destination.getAction().equals(appAction) ||
-                    !current.getController().equals(destination.getController()) ||
-                    !current.getFolder().equals(destination.getFolder());
+            return !destinationAction.equals(appAction) ||
+                    destinationUrl.length() == destinationSansHash.length() || // Will always navigate if there is no hash
+                    !destinationSansHash.equals(currentSansHash);
         }
         catch (IllegalArgumentException bustedUrl)
         {
@@ -1153,6 +1155,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     * @deprecated Use {@link #beginAt(String, int)}
+     */
+    @Deprecated (since = "22.9")
     public long goToURL(final URL url, int milliseconds)
     {
         return beginAt(url.toString(), milliseconds);
@@ -3778,22 +3784,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String suffix = "";
         if (currentURL.contains("#"))
         {
-            String[] parts = currentURL.split("#");
+            String[] parts = currentURL.split("#", 2);
             currentURL = parts[0];
             // There might not be anything after the '#'
             suffix = "#" + (parts.length > 1 ? parts[1] : "");
         }
         if (!currentURL.contains(parameter))
         {
+            final String paramSep;
             if (currentURL.contains("?"))
             {
                 if (currentURL.indexOf("?") == currentURL.length() - 1)
-                    beginAt(currentURL.concat(parameter + suffix), mils);
+                    paramSep = "";
                 else
-                    beginAt(currentURL.concat("&" + parameter + suffix), mils);
+                    paramSep = "&";
             }
             else
-                beginAt(currentURL.concat("?" + parameter + suffix), mils);
+                paramSep = "?";
+
+            beginAt(currentURL + paramSep + parameter + suffix, mils);
         }
     }
 

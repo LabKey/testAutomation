@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -109,9 +110,10 @@ public class URLBuilder
         return this;
     }
 
-    public URLBuilder setAppResourcePath(String... pathParts)
+    public URLBuilder setAppResourcePath(Object... pathParts)
     {
-        List<String> encodedParts = Arrays.stream(pathParts).map(EscapeUtil::encode).collect(Collectors.toList());
+        List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull)
+                .map(String::valueOf).map(EscapeUtil::encode).collect(Collectors.toList());
         _resourcePath = "/" + String.join("/", encodedParts);
         return this;
     }
