@@ -200,16 +200,14 @@ public class ManageGridViewsDialog extends ModalDialog
     protected class ElementCache extends ModalDialog.ElementCache
     {
 
-        protected final Locator viewRowLocator = Locator.tagWithClass("div", "row");
-
         protected List<WebElement> viewRows()
         {
-            return viewRowLocator.findElements(this);
+            return Locator.tagWithClass("div", "row").childTag("div").withClass("col-xs-8").findElements(this);
         }
 
         protected WebElement viewRow(String viewName)
         {
-            return viewRowLocator.withText(viewName).findElement(this);
+            return Locator.tagWithText("div", viewName).parent("div").withClass("row").findElement(this);
         }
 
         protected final WebElement viewNameInput = Locator.tagWithName("input", "gridViewName")
