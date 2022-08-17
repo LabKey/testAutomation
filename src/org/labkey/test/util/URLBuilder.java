@@ -137,6 +137,7 @@ public class URLBuilder
 
     /**
      * Build a relative URL. That is to say, excluding the server's host name, port, or context path.
+     * Will have a leading slash.
      * @return built URL
      */
     public String buildRelativeURL()
