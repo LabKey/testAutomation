@@ -50,6 +50,8 @@ public class URLBuilder
     private String _resourcePath;
     private Map<String, ?> _secondaryQuery;
 
+    private boolean _questionMarkUrl = !WebTestHelper.isNoQuestionMarkUrl();
+
     public URLBuilder(String controller, String action, @Nullable String containerPath)
     {
         _controller = controller;
@@ -65,6 +67,15 @@ public class URLBuilder
     public URLBuilder setQuery(Map<String, ?> query)
     {
         _query = query;
+        return this;
+    }
+
+    /**
+     * Override the setting for whether to always include a '?' on URLs
+     */
+    public URLBuilder setQuestionMarkUrl(boolean questionMarkUrl)
+    {
+        _questionMarkUrl = questionMarkUrl;
         return this;
     }
 
@@ -123,6 +134,10 @@ public class URLBuilder
             url.append(".view");
 
         appendQueryString(url, _query);
+        if (_questionMarkUrl && Maps.isBlank(_query))
+        {
+            url.append("?");
+        }
 
         if (!StringUtils.isBlank(_resourcePath))
         {
@@ -143,7 +158,7 @@ public class URLBuilder
 
     private void appendQueryString(StringBuilder url, Map<String, ?> params)
     {
-        if (params != null)
+        if (!Maps.isBlank(params))
         {
             boolean firstParam = true;
             for (Map.Entry<String, ?> param : params.entrySet())

@@ -6,7 +6,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
+public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.ElementCache>
 {
     final WebElement _el;
     final WebDriver _driver;
@@ -44,21 +44,11 @@ public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
         return !getComponentElement().getAttribute("class").contains("off");
     }
 
-    @Override
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
-
-    protected class ElementCache extends WebDriverComponent.ElementCache
-    {
-    }
-
-
     public static class ToggleButtonFinder extends WebDriverComponentFinder<ToggleButton, ToggleButtonFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "toggle");
+        private static final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "toggle");
         private String _state = null;
+        private String _containerClass = null;
 
         public ToggleButtonFinder(WebDriver driver)
         {
@@ -71,6 +61,12 @@ public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
             return this;
         }
 
+        public ToggleButtonFinder withContainerClass(String containerClass)
+        {
+            _containerClass = containerClass;
+            return  this;
+        }
+
         @Override
         protected ToggleButton construct(WebElement el, WebDriver driver)
         {
@@ -80,10 +76,17 @@ public class ToggleButton extends WebDriverComponent<ToggleButton.ElementCache>
         @Override
         protected Locator locator()
         {
+            Locator.XPathLocator locator = _baseLocator;
+            if (_containerClass != null)
+            {
+                locator = Locator.tagWithClassContaining("div", _containerClass).descendant(locator);
+            }
             if (_state != null)
-                return _baseLocator.withDescendant(Locator.tagWithText("span", _state));
-            else
-                return _baseLocator;
+            {
+                locator = locator.withDescendant(Locator.tagWithText("span", _state));
+            }
+
+            return locator;
         }
     }
 }

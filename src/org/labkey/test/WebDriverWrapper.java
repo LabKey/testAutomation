@@ -3247,18 +3247,31 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if ("file".equals(inputType))
         {
-            log("WARNING: Please use File object to set file input");
+            TestLogger.warn("Please use a File object to set file input");
             setFormElement(el, new File(text));
-            return;
-        }
-
-        if (isHtml5InputTypeSupported(inputType))
-        {
-            setHtml5Input(el, inputType, text);
         }
         else
         {
-            setInput(el, text);
+            String tagName = el.getTagName();
+            if (tagName.equals("select"))
+            {
+                selectOption(el, text);
+            }
+            else if (tagName.equals("input") || tagName.equals("textarea"))
+            {
+                if (isHtml5InputTypeSupported(inputType))
+                {
+                    setHtml5Input(el, inputType, text);
+                }
+                else
+                {
+                    setInput(el, text);
+                }
+            }
+            else
+            {
+                throw new IllegalArgumentException("Invalid element: " + el);
+            }
         }
     }
 
@@ -3268,15 +3281,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             input.clear();
         }
-        else if (!input.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
+        else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             input.clear();
-            if (!waitFor(()-> input.getDomProperty("value").length() == 0, 500))
+            if (!waitFor(()-> getFormElement(input).length() == 0, 500))
             {
                 TestLogger.warn("Failed to clear input: " + input);
             }
             input.sendKeys(text);
-            if (!waitFor(()-> input.getDomProperty("value").equals(text), 500))
+            if (!waitFor(()-> getFormElement(input).equals(text), 500))
             {
                 TestLogger.warn("Failed to set input: " + input);
             }
@@ -3284,6 +3297,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else
         {
             setFormElementJS(input, text);
+            input.sendKeys(" ", Keys.BACK_SPACE); // 'change' event isn't always sufficient
         }
 
         try
@@ -3307,6 +3321,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String osName = System.getProperty("os.name");
         Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        scrollIntoView(input);
         new Actions(getDriver())
             .keyDown(cmdKey)
             .sendKeys(input, "a")                        // select all
@@ -3340,6 +3355,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else
         {
+            scrollIntoView(input);
             new Actions(getDriver())
                     .keyDown(cmdKey)
                     .sendKeys(input, "v")       // paste the contents of the clipboard into the input
@@ -3383,7 +3399,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 setHtml5NumberInput(input, value);
                 break;
             default:
-                log(String.format("WARNING: No special handling defined for HTML5 input type = '%s'.", inputType));
+                TestLogger.warn(String.format("No special handling defined for HTML5 input type = '%s'.", inputType));
                 setInput(input, value);
         }
     }
@@ -3464,16 +3480,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if ("select".equals(el.getTagName()))
         {
-            try
-            {
-                selectOptionByText(el,text);
-                log("WARNING: Use selectOptionByText(..) instead of setFormElement(..) for select inputs");
-            }
-            catch (NoSuchElementException x)
-            {
-                selectOptionByValue(el,text);
-                log("WARNING: Use selectOptionByValue(..) instead of setFormElement(..) for select inputs");
-            }
+            selectOption(el, text);
         }
         else
         {
@@ -3496,16 +3503,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeScript("arguments[0].value = '';", el);
         List<String> filePaths = files.stream().map(File::getAbsolutePath).collect(Collectors.toList());
         String fileNames = String.join("\n", filePaths);
-        log(fileNames);
+        TestLogger.debug(fileNames);
         el.sendKeys(fileNames);
-    }
-
-    public void setDropZone(WebElement dropZone, List<File> files)
-    {
-        // Remove class so that WebDriver can interact with concealed form element
-        executeScript("arguments[0].setAttribute('class', '');arguments[0].setAttribute('style', '');", dropZone);
-        shortWait().until(ExpectedConditions.elementToBeClickable(dropZone)); // Takes a moment for DOM to update
-        setInput(dropZone, files);
     }
 
     /**
@@ -3693,9 +3692,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return checkBoxLocator.findElement(getDriver()).isSelected();
     }
 
-    public boolean isChecked(WebElement checkBoxLocator)
+    /**
+     * @deprecated Use {@link WebElement#isSelected()}
+     */
+    @Deprecated (since = "22.9")
+    public boolean isChecked(WebElement checkBox)
     {
-        return null != checkBoxLocator.getAttribute("checked");
+        return checkBox.isSelected();
+    }
+
+    /**
+     * Try to select option by text or value.
+     */
+    private void selectOption(WebElement el, String text)
+    {
+        try
+        {
+            selectOptionByText(el, text);
+        }
+        catch (NoSuchElementException x)
+        {
+            selectOptionByValue(el, text);
+        }
     }
 
     public void selectOptionByValue(Locator locator, String value)
