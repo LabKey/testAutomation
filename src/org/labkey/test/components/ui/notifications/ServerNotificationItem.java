@@ -166,7 +166,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
      */
     public void clickViewLink()
     {
-        String currentUrl = getDriver().getCurrentUrl().toLowerCase();
+        String currentUrl = getDriver().getCurrentUrl().toLowerCase().replace("app.view?#/", "app.view#/");
         String targetUrl = elementCache().link.getAttribute("href").toLowerCase();
 
         elementCache().link.click();

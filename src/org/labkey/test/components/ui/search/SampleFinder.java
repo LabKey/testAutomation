@@ -142,7 +142,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
      */
     protected WebDriverWait loadingWait()
     {
-        return getWrapper().shortWait();
+        return getWrapper().longWait();
     }
 
     public boolean isEmptySearch()
