@@ -1433,7 +1433,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
-    private final String subfolderPath = WebTestHelper.buildRelativeUrl("project", getProjectName() + "/" + FOLDER_NAME, "begin");
+    private final String subfolderPath = "/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?";
 
     private final static String GET_MODULEP_PROPS_SCRIPT = "library('Rlabkey')\n" +
             "baseUrl = labkey.url.base\n" +
