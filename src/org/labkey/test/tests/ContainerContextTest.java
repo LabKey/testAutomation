@@ -122,7 +122,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _RReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModules(Arrays.asList("simpletest"/*, "ViscStudies"*/));
+        _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
         _portalHelper.doInAdminMode(ph -> {
             ph.addWebPart("Workbooks");
             ph.addWebPart("Lists");
