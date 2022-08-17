@@ -122,11 +122,15 @@ public class ContainerContextTest extends BaseWebDriverTest
         _RReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
-        _portalHelper.addWebPart("Workbooks");
-
-        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
-        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+        _containerHelper.enableModules(Arrays.asList("simpletest"/*, "ViscStudies"*/));
+        _portalHelper.doInAdminMode(ph -> {
+            ph.addWebPart("Workbooks");
+            ph.addWebPart("Lists");
+            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+            ph.addWebPart("Lists");
+            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+            ph.addWebPart("Lists");
+        });
     }
 
     @Test
