@@ -58,9 +58,9 @@ public class BootstrapMenu extends BaseBootstrapMenu
         return elementCache().findVisibleMenuItems();
     }
 
-    public List<WebElement> findVisibleMenuItemsWithCls(String cls)
+    public List<WebElement> findVisibleMenuItemsWithClass(String classValue)
     {
-        return elementCache().findVisibleMenuItemsWithClass(cls);
+        return elementCache().findVisibleMenuItemsWithClass(classValue);
     }
 
     protected WebElement findVisibleMenuItemOrNull(String text)

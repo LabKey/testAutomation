@@ -98,7 +98,7 @@ public class ManageGridViewsDialog extends ModalDialog
     {
         Assert.assertTrue(String.format("View named '%s' cannot be deleted.", viewName), canViewBeDeleted(viewName));
 
-        Locator.tagWithClass("i", "fa-trash-o").findWhenNeeded(elementCache().viewRow(viewName)).click();
+        Locator.tagWithClass("i", "fa-trash-o").findElement(elementCache().viewRow(viewName)).click();
 
         return this;
     }
@@ -121,6 +121,56 @@ public class ManageGridViewsDialog extends ModalDialog
     public ManageGridViewsDialog clickDeleteYesButton()
     {
         elementCache().deleteYesButton.click();
+        return this;
+    }
+
+    /**
+     * Click the 'Revert' text for the default view. If default view has not been changed this will have no affect.
+     * Note: This is only available in the app, not from the core-components.view page.
+     *
+     * @return This dialog.
+     */
+    public ManageGridViewsDialog revertDefaultView()
+    {
+        WebElement tag = elementCache().revertDefault;
+
+        if(tag.isDisplayed())
+        {
+            elementCache().revertDefault.click();
+        }
+        return this;
+    }
+
+    /**
+     * Check if the 'Revert' text for the default view has the 'clickable-text' class.
+     * Note: This is only available in the app, not from the core-components.view page.
+     *
+     * @return True if 'Revert' is clickable, false otherwise.
+     */
+    public boolean canDefaultBeReverted()
+    {
+        WebElement tag = elementCache().revertDefault;
+
+        if(tag.isDisplayed())
+        {
+            return tag.getAttribute("class").equalsIgnoreCase("clickable-text");
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Make the selected view the default view for the grid.
+     * Note: This is only available in the app, not from the core-components.view page.
+     *
+     * @param viewName The name of the view to make default.
+     * @return This dialog.
+     */
+    public ManageGridViewsDialog makeViewDefault(String viewName)
+    {
+        Locator.tagWithText("span", "Make default").findElement(elementCache().viewRow(viewName)).click();
+
         return this;
     }
 
@@ -170,5 +220,7 @@ public class ManageGridViewsDialog extends ModalDialog
 
         protected final WebElement deleteYesButton = Locator.button("Yes").refindWhenNeeded(this);
         protected final WebElement deleteNoButton = Locator.button("No").refindWhenNeeded(this);
+
+        protected final WebElement revertDefault = Locator.tagWithText("span", "Revert").refindWhenNeeded(this);
     }
 }

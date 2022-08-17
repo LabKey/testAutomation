@@ -406,6 +406,24 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
+     * If there are no saved views and the default view has not been changed the Manage Saved Views menu item will not be enabled.
+     *
+     * @return True if 'Manage Saved Views' menu item is enabled, false otherwise.
+     */
+    public boolean isManageViewsEnabled()
+    {
+        List<WebElement> menuItems = elementCache().viewMenu.findVisibleMenuItemsWithClass("disabled");
+        for(WebElement menuItem : menuItems)
+        {
+            // Why does menuItem.getText() return an empty string here?
+            if(menuItem.getAttribute("text").contains("Manage Saved Views"))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the Edit Status text shown in the header. If no status is shown an empty string is returned.
      *
      * @return The edit status text.
