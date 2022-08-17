@@ -37,6 +37,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Quotes;
 
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -481,7 +482,12 @@ public abstract class Locator extends By
 
     public WebElement waitForElement(final SearchContext context, final int msTimeout)
     {
-        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(Duration.ofMillis(msTimeout));
+        return waitForElement(context, Duration.ofMillis(msTimeout));
+    }
+
+    public WebElement waitForElement(final SearchContext context, final Duration timeout)
+    {
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(timeout);
 
         return waitForElement(wait);
     }
@@ -945,35 +951,7 @@ public abstract class Locator extends By
      */
     public static String xq(String value)
     {
-        if (!value.contains("'")) {
-            return "'" + value + "'";
-        } else if (!value.contains("\"")) {
-            return '"' + value + '"';
-        } else {
-            StringBuilder result = new StringBuilder("concat(");
-            while (true) {
-                int apos = value.indexOf("'");
-                int quot = value.indexOf('"');
-                if (apos < 0) {
-                    result.append("'").append(value).append("'");
-                    break;
-                } else if (quot < 0) {
-                    result.append('"').append(value).append('"');
-                    break;
-                } else if (quot < apos) {
-                    String part = value.substring(0, apos);
-                    result.append("'").append(part).append("'");
-                    value = value.substring(part.length());
-                } else {
-                    String part = value.substring(0, quot);
-                    result.append('"').append(part).append('"');
-                    value = value.substring(part.length());
-                }
-                result.append(',');
-            }
-            result.append(')');
-            return result.toString();
-        }
+        return Quotes.escape(value);
     }
 
     public static String cq(String value)
