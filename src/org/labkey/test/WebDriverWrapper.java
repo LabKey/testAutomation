@@ -700,6 +700,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
             TestLogger.warn("Expected URL to begin with " + baseURL + ", but found " + urlString);
             return null;
         }
+        // Strip '?' if no query
+        if (urlString.contains("#"))
+        {
+            urlString = urlString.replace("?#", "#");
+        }
+        else
+        {
+            urlString = StringUtils.stripEnd(urlString, "?");
+        }
         return urlString.substring(baseURL.length());
     }
 
