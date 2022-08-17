@@ -604,6 +604,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         setServerDebugLogging();
         setExperimentalFlags();
 
+        if (!TestProperties.isPrimaryUserAppAdmin())
+        {
+            WebTestHelper.setNoQuestionMarkUrl(ExperimentalFeaturesHelper.isNoQuestionMarkMode(createDefaultConnection()));
+        }
+
         // Start logging JS errors.
         resumeJsErrorChecker();
 

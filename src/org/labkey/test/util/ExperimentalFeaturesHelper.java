@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.api.settings.AppProps;
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -48,7 +50,7 @@ public class ExperimentalFeaturesHelper
         parameters.put("feature", feature);
         parameters.put("enabled", enable);
 
-        PostCommand command = new PostCommand("admin", "experimentalFeature");
+        PostCommand<CommandResponse> command = new PostCommand<>("admin", "experimentalFeature");
         command.setParameters(parameters);
         try
         {
@@ -67,5 +69,25 @@ public class ExperimentalFeaturesHelper
         }
     }
 
+    public static boolean isExperimentalFeatureEnabled(Connection cn, String feature)
+    {
+        Command<CommandResponse> command = new Command<>("admin", "experimentalFeature");
+        command.setParameters(new HashMap<>(Map.of("feature", feature)));
+        try
+        {
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
 
+            return (Boolean)response.get("enabled");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Error retrieving experimental feature '" + feature + "'.", e);
+        }
+    }
+
+    public static boolean isNoQuestionMarkMode(Connection cn)
+    {
+        return isExperimentalFeatureEnabled(cn, AppProps.EXPERIMENTAL_NO_QUESTION_MARK_URL);
+    }
 }
