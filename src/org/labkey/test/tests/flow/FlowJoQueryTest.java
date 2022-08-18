@@ -33,12 +33,10 @@ import org.labkey.test.util.LogMethod;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * This test tests uploading a FlowJo workspace that has results calculated in it, but no associated FCS files.
@@ -101,20 +99,11 @@ public class FlowJoQueryTest extends BaseFlowTest
         goToFlowDashboard();
         importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false);
 
-        int runId = -1;
+        int runId;
         String currentURL = getCurrentRelativeURL();
-        Pattern p = Pattern.compile(".*runId=([0-9]+).*$");
-        Matcher m = p.matcher(currentURL);
-        if (m.matches())
-        {
-            String runIdStr = m.group(1);
-            runId = Integer.parseInt(runIdStr);
-            log("mini-fcs.xml runId = " + runId);
-        }
-        else
-        {
-            fail("Failed to match runId pattern for url: " + currentURL);
-        }
+        runId = Integer.parseInt(Objects.requireNonNull(getUrlParam("runId"),
+                "Failed to match runId pattern for url: " + currentURL));
+        log("mini-fcs.xml runId = " + runId);
         assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
 
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
