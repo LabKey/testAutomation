@@ -86,7 +86,7 @@ public class CustomizeGridDialog extends ModalDialog
      * @param fieldName Can be an individual field or a path to a nested field.
      * @return True if row has the checkmark, false otherwise.
      */
-    public boolean isAvailableFieldAddedToGrid(String... fieldName)
+    public boolean isAvailableFieldAdded(String... fieldName)
     {
         StringBuilder fieldKey = new StringBuilder();
 
@@ -118,7 +118,7 @@ public class CustomizeGridDialog extends ModalDialog
      * @param fieldName Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public CustomizeGridDialog addAvailableFieldToGrid(String... fieldName)
+    public CustomizeGridDialog addAvailableField(String... fieldName)
     {
         StringBuilder fieldKey = new StringBuilder();
 
@@ -256,22 +256,22 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
-     * Get the list of labels in the 'Shown in Grid' panel.
+     * Get the list of columns in the 'Shown in Grid' panel.
      *
-     * @return The list of labels from the 'Shown in Grid' panel.
+     * @return The list of columns from the 'Shown in Grid' panel.
      */
-    public List<String> getShownInGridLabels()
+    public List<String> getShownInGridColumns()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().shownInGridPanel);
         return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     /**
-     * Get the label that is selected in the 'Sown in Grid' panel. If no label is selected an empty string is returned.
+     * Get the column that is selected in the 'Sown in Grid' panel. If no column is selected an empty string is returned.
      *
-     * @return Text of selected label. Empty string if none is selected.
+     * @return Text of selected column. Empty string if none is selected.
      */
-    public String getSelectedShownInGridLabel()
+    public String getSelectedShownInGridColumn()
     {
         WebElement active = Locator.tagWithClass("div", "list-group-item")
                 .withClass("active")
@@ -288,108 +288,129 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
-     * Click on a label in the 'Shown in Grid' panel. Fields added from the Available Fields panel will be added
-     * underneath the selected label in the Shown in Grid panel.
+     * Click on a column in the 'Shown in Grid' panel. Fields added from the Available Fields panel will be added
+     * underneath the selected column in the Shown in Grid panel.
      *
-     * @param label The label to click on.
+     * @param column The column name to click on.
      * @return This dialog.
      */
-    public CustomizeGridDialog selectShownInGridLabel(String label)
+    public CustomizeGridDialog selectShownInGridColumn(String column)
     {
-        return selectShownInGridLabel(label, 0);
+        return selectShownInGridColumn(column, 0);
     }
 
     /**
-     * Click on a label in the 'Shown in Grid' panel. If multiple labels have the same value the index parameter will
+     * Click on a column in the 'Shown in Grid' panel. If multiple columns have the same name the index parameter will
      * identify which one to click on.
      *
-     * @param label The label to click on.
-     * @param index If multiple labels have the same value this will identify which one to click.
+     * @param column The column to click on.
+     * @param index If multiple columns have the same name this will identify which one to click.
      * @return This dialog.
      */
-    public CustomizeGridDialog selectShownInGridLabel(String label, int index)
+    public CustomizeGridDialog selectShownInGridColumn(String column, int index)
     {
-        getShownInGridListItems(label).get(index).click();
+        getShownInGridListItems(column).get(index).click();
         return this;
     }
 
     /**
-     * Remove all the labels from the grid.
+     * Remove all the columns with the given name from the grid.
      *
-     * @param labels List of labels to remove.
+     * @param columns List of columns to remove.
      * @return This dialog.
      */
-    public CustomizeGridDialog removeShownInGridLabels(List<String> labels)
+    public CustomizeGridDialog removeColumns(List<String> columns)
     {
-        for(String label : labels)
+        for(String column : columns)
         {
-            removeShownInGridLabel(label, 0);
+            removeColumn(column, 0);
         }
 
         return this;
     }
 
     /**
-     * Remove the given label from the 'Shown in Grid' list.
+     * Remove the given column from the 'Shown in Grid' list.
      *
-     * @param label The label to remove.
+     * @param column The column to remove.
      * @return This dialog.
      */
-    public CustomizeGridDialog removeShownInGridLabel(String label)
+    public CustomizeGridDialog removeColumn(String column)
     {
-        return removeShownInGridLabel(label, 0);
+        return removeColumn(column, 0);
     }
 
     /**
-     * Remove the given label from the 'Shown in Grid' list. If multiple labels have the same value the index parameter
+     * Remove the given column from the 'Shown in Grid' list. If multiple columns have the same value the index parameter
      * will identify which one to remove.
      *
-     * @param label The label to remove.
-     * @param index If multiple labels have the same value this identifies which one to remove.
+     * @param column The column to remove.
+     * @param index If multiple columns have the same value this identifies which one to remove.
      * @return This dialog.
      */
-    public CustomizeGridDialog removeShownInGridLabel(String label, int index)
+    public CustomizeGridDialog removeColumn(String column, int index)
     {
-        WebElement listItem = getShownInGridListItems(label).get(index);
+        WebElement listItem = getShownInGridListItems(column).get(index);
         WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
         removeIcon.click();
 
         WebDriverWrapper.waitFor(()->!removeIcon.isDisplayed(),
-                String.format("Field with label '%s' was not removed from list.", label), 500);
+                String.format("Column '%s' was not removed from list.", column), 500);
 
         return this;
     }
 
     /**
-     * Update the given label to a new value.
+     * Remove all the columns in the 'SHown in Grid' panel.
      *
-     * @param currentFieldLabel The label to be updated.
-     * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public CustomizeGridDialog updateFieldLabel(String currentFieldLabel, String newFieldLabel)
+    public CustomizeGridDialog clearColumns()
     {
-        return updateFieldLabel(currentFieldLabel, 0, newFieldLabel);
+        List<WebElement> allItems = elementCache().getListItemElements(elementCache().shownInGridPanel);
+
+        for(WebElement listItem : allItems)
+        {
+            WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+            removeIcon.click();
+        }
+
+        WebDriverWrapper.waitFor(()-> getShownInGridColumns().isEmpty(),
+                "Did not remove all of the 'Shown in Grid' columns.", 500);
+
+        return this;
     }
 
     /**
-     * Update the given label to a new value. If there are multiple labels with the same value in the list the index
-     * parameter identifies which one to update.
+     * Update the given column to a new value.
      *
-     * @param currentFieldLabel The label to be updated.
-     * @param index If multiple labels have the save value this identifies which one in the list to update.
-     * @param newFieldLabel The new value to set the label to.
+     * @param currentColumnLabel The column to be updated.
+     * @param newColumnLabel The new value to set the column label to.
      * @return This dialog.
      */
-    public CustomizeGridDialog updateFieldLabel(String currentFieldLabel, int index, String newFieldLabel)
+    public CustomizeGridDialog setColumnLabel(String currentColumnLabel, String newColumnLabel)
+    {
+        return setColumnLabel(currentColumnLabel, 0, newColumnLabel);
+    }
+
+    /**
+     * Update the given column to a new label. If there are multiple columnss with the same label in the list the index
+     * parameter identifies which one to update.
+     *
+     * @param currentColumnLabel The column to be updated.
+     * @param index If multiple columns have the save label this identifies which one in the list to update.
+     * @param newColumnLabel The new value to set the column label to.
+     * @return This dialog.
+     */
+    public CustomizeGridDialog setColumnLabel(String currentColumnLabel, int index, String newColumnLabel)
     {
 
-        WebElement listItem = getShownInGridListItems(currentFieldLabel).get(index);
+        WebElement listItem = getShownInGridListItems(currentColumnLabel).get(index);
         WebElement updateIcon = Locator.tagWithClass("span", "edit-inline-field__toggle").findWhenNeeded(listItem);
         updateIcon.click();
 
-        WebDriverWrapper.waitFor(()->elementCache().fieldLabelEdit.isDisplayed(),
-                String.format("Input for field with label '%s' was not shown.", currentFieldLabel), 1_500);
+        WebDriverWrapper.waitFor(()->elementCache().columnLabelEdit.isDisplayed(),
+                String.format("Input for column '%s' was not shown.", currentColumnLabel), 1_500);
 
         // Unfortunately using setFormElement doesn't work in this case. That method calls WebElement.clear which clears
         // the current text but also causes the focus to the input control to be lost. When the focus is lost the input
@@ -401,13 +422,13 @@ public class CustomizeGridDialog extends ModalDialog
                 .keyDown(Keys.SHIFT)
                 .sendKeys(Keys.HOME)
                 .keyUp(Keys.SHIFT)
-                .sendKeys(newFieldLabel)
+                .sendKeys(newColumnLabel)
                 .sendKeys(Keys.TAB)
                 .perform();
 
-        WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed() &&
-                        elementCache().getListItemElement(elementCache().shownInGridPanel, newFieldLabel).isDisplayed(),
-                String.format("New field label '%s' is not in the list.", newFieldLabel), 500);
+        WebDriverWrapper.waitFor(()->!elementCache().columnLabelEdit.isDisplayed() &&
+                        elementCache().getListItemElement(elementCache().shownInGridPanel, newColumnLabel).isDisplayed(),
+                String.format("New column label '%s' is not in the list.", newColumnLabel), 500);
 
         return this;
     }
@@ -437,11 +458,11 @@ public class CustomizeGridDialog extends ModalDialog
                 .contains("disabled-action-text");
     }
 
-    private List<WebElement> getShownInGridListItems(String fieldLabel)
+    private List<WebElement> getShownInGridListItems(String columnLabel)
     {
-        List<WebElement> listItems = elementCache().getListItemElements(elementCache().shownInGridPanel, fieldLabel);
+        List<WebElement> listItems = elementCache().getListItemElements(elementCache().shownInGridPanel, columnLabel);
 
-        Assert.assertFalse(String.format(FIELD_NOT_IN_GRID, fieldLabel),
+        Assert.assertFalse(String.format(FIELD_NOT_IN_GRID, columnLabel),
                 listItems.isEmpty());
 
         return listItems;
@@ -501,8 +522,8 @@ public class CustomizeGridDialog extends ModalDialog
         protected final WebElement updateGridButton = Locator.button("Update Grid")
                 .findWhenNeeded(this);
 
-        // The 'pencil' to edit a label. Only in the Shown in Grid panel.
-        protected final WebElement fieldLabelEdit = Locator.tagWithClass("input", "form-control")
+        // The 'pencil' to edit a column label. Only in the Shown in Grid panel.
+        protected final WebElement columnLabelEdit = Locator.tagWithClass("input", "form-control")
                 .refindWhenNeeded(shownInGridPanel);
 
         // Will get all the list items that match the fieldName.
@@ -526,7 +547,7 @@ public class CustomizeGridDialog extends ModalDialog
         protected WebElement getListItemElementByFieldKey(String fieldKey)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withAttribute("data-fieldkey", fieldKey)
+                    .withAttributeIgnoreCase("data-fieldkey", fieldKey)
                     .findElement(availableFieldsPanel);
         }
 
@@ -536,6 +557,11 @@ public class CustomizeGridDialog extends ModalDialog
             return listItemName.findElements(panel);
         }
 
+        // Get the list-item web element for the given panel.
+        protected List<WebElement> getListItemElements(WebElement panel)
+        {
+            return Locator.tagWithClass("div", "list-group-item").findElements(panel);
+        }
     }
 
 }

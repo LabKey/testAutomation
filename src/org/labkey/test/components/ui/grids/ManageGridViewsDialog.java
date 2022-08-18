@@ -89,7 +89,7 @@ public class ManageGridViewsDialog extends ModalDialog
     }
 
     /**
-     * Delete the given view.
+     * Delete the given view, wait for confirm.
      *
      * @param viewName The name of the view to delete.
      * @return This dialog.
@@ -100,6 +100,19 @@ public class ManageGridViewsDialog extends ModalDialog
 
         Locator.tagWithClass("i", "fa-trash-o").findElement(elementCache().viewRow(viewName)).click();
 
+        return this;
+    }
+
+    /**
+     * Delete the view and confirm (click 'Yes' button).
+     *
+     * @param viewName Name pf view to delete.
+     * @return This dialog.
+     */
+    public ManageGridViewsDialog deleteViewAndConfirm(String viewName)
+    {
+        deleteView(viewName)
+                .confirmDelete();
         return this;
     }
 
@@ -118,7 +131,7 @@ public class ManageGridViewsDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public ManageGridViewsDialog clickDeleteYesButton()
+    public ManageGridViewsDialog confirmDelete()
     {
         elementCache().deleteYesButton.click();
         return this;

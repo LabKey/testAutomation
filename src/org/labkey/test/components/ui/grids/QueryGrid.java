@@ -395,6 +395,21 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
+     * Use the grid menu to save a view with the given name. View will not be default or
+     * shared with sub folders.
+     *
+     * @param viewName The name to save the view as.
+     */
+    public void saveView(String viewName)
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
+        SaveGridViewDialog dialog = new SaveGridViewDialog(getDriver(), this);
+        dialog.setMakeDefault(false)
+                .setViewName(viewName)
+                .saveView();
+    }
+
+    /**
      * Open a {@link ManageGridViewsDialog}. Use the 'Manage Saved Views' menu option.
      *
      * @return A {@link ManageGridViewsDialog}.

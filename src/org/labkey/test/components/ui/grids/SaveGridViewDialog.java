@@ -59,9 +59,9 @@ public class SaveGridViewDialog extends ModalDialog
      * @param checked True to check, false to uncheck.
      * @return This dialog.
      */
-    public SaveGridViewDialog setMakeDefaultForAll(boolean checked)
+    public SaveGridViewDialog setMakeDefault(boolean checked)
     {
-        elementCache().checkbox.set(checked);
+        elementCache().makeDefault.set(checked);
         return this;
     }
 
@@ -70,9 +70,51 @@ public class SaveGridViewDialog extends ModalDialog
      *
      * @return True if it is checked, false otherwise.
      */
-    public boolean isMakeDefaultForAllChecked()
+    public boolean isMakeDefaultChecked()
     {
-        return elementCache().checkbox.isChecked();
+        return elementCache().makeDefault.isChecked();
+    }
+
+    /**
+     * Is the 'Make default for all'' checkbox visible.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isMakeDefaultVisible()
+    {
+        return elementCache().makeDefault.isDisplayed();
+    }
+
+    /**
+     * Check or uncheck the 'Make this grid available in child folders' checkbox.
+     *
+     * @param checked True to check, false to uncheck.
+     * @return This dialog.
+     */
+    public SaveGridViewDialog setMakeAvailable(boolean checked)
+    {
+        elementCache().makeAvailable.set(checked);
+        return this;
+    }
+
+    /**
+     * Get the checked status of the 'Make this grid available in child folders' checkbox.
+     *
+     * @return True if it is checked, false otherwise.
+     */
+    public boolean istMakeAvailableChecked()
+    {
+        return elementCache().makeAvailable.isChecked();
+    }
+
+    /**
+     * Is the 'Make this grid available in child folders' checkbox visible.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isMakeAvailableVisible()
+    {
+        return elementCache().makeAvailable.isDisplayed();
     }
 
     /**
@@ -113,7 +155,8 @@ public class SaveGridViewDialog extends ModalDialog
         protected final Input viewNameInput = Input.Input(Locator.name("gridViewName"), getDriver())
                 .findWhenNeeded(this);
 
-        protected Checkbox checkbox = new Checkbox(Locator.input("setDefaultView").findWhenNeeded(this));
+        protected Checkbox makeDefault = new Checkbox(Locator.input("setDefaultView").findWhenNeeded(this));
+        protected Checkbox makeAvailable = new Checkbox(Locator.input("setInherit").findWhenNeeded(this));
 
     }
 
