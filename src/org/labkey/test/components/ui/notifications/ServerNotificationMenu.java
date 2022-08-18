@@ -130,11 +130,13 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(this).isDisplayed(),
                 "List container did not render.", 500);
 
-        WebElement listContainer = notificationsContainerLocator.findElement(this);
-        Locator notificationListLocator = Locator.tagWithClass("ul", "server-notifications-listing");
+        // Find again (lambda requires a final reference to the component).
+        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(this);
 
         // It may be a moment before any notifications show up.
-        WebDriverWrapper.waitFor(()-> notificationListLocator.findWhenNeeded(listContainer).isDisplayed(),
+        WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing")
+                        .refindWhenNeeded(listContainer)
+                        .isDisplayed(),
                 "There are no notifications in the drop down.", 1_000);
 
         // Just wait for a moment in case the list is slow to update with the most recent notification.
