@@ -134,18 +134,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         Locator notificationListLocator = Locator.tagWithClass("ul", "server-notifications-listing");
 
         // It may be a moment before any notifications show up.
-        WebDriverWrapper.waitFor(()->
-
-                {
-                    try
-                    {
-                        return notificationListLocator.findElement(listContainer).isDisplayed();
-                    }
-                    catch (NoSuchElementException | StaleElementReferenceException exception)
-                    {
-                        return false;
-                    }
-                },
+        WebDriverWrapper.waitFor(()-> notificationListLocator.findWhenNeeded(listContainer).isDisplayed(),
                 "There are no notifications in the drop down.", 1_000);
 
         // Just wait for a moment in case the list is slow to update with the most recent notification.
