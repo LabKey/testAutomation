@@ -437,6 +437,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         dialog.saveView();
     }
 
+    public void saveViewAsDefault()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
+        new SaveGridViewDialog(getDriver(), this)
+                .setMakeDefault(true)
+                .saveView();
+    }
+
     /**
      * Open a {@link ManageGridViewsDialog}. Use the 'Manage Saved Views' menu option.
      *
