@@ -684,7 +684,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      * @param columnValue      value to look for
      * @param tableName        DataRegionTable name
      * @param deleteButtonText text that appears in delete confirmation when not in an alert.
-     * @param expectPageLoad
+     * @param expectPageLoad indicates whether confirming deletion will result in a page load or not
      */
     private void deleteSingleRowViaUI(String columnName, String columnValue, String tableName, String deleteButtonText, boolean expectPageLoad)
     {
