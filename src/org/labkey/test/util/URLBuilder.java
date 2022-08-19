@@ -8,6 +8,7 @@ import org.seleniumhq.jetty9.util.URIUtil;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
@@ -64,6 +65,12 @@ public class URLBuilder
         this(controller, action, "/");
     }
 
+    /**
+     * Appends a secondary query to the URL. That is to say, a query that appears AFTER the resource path.
+     * If a resource path is not specified, an exception will be thrown with building the URL.
+     * @param query URL query parameters. 'null' values will be included as valueless parameters.
+     * @return this builder
+     */
     public URLBuilder setQuery(Map<String, ?> query)
     {
         _query = query;
@@ -72,6 +79,7 @@ public class URLBuilder
 
     /**
      * Override the setting for whether to always include a '?' on URLs
+     * The default setting is controlled by the server's 'noQuestionMarkUrl' experimental feature
      */
     public URLBuilder setQuestionMarkUrl(boolean questionMarkUrl)
     {
@@ -79,30 +87,59 @@ public class URLBuilder
         return this;
     }
 
-    public URLBuilder setAppResourcePath(String... pathParts)
+    /**
+     * Parts to be combined into an app path. Will replace any existing resource path.<br>
+     * e.g. <code>setAppResourcePath("workbook", 5)</code> will append "#/workbook/5" to the built URL
+     * @param pathParts Most likely strings or Integers
+     * @return this builder
+     */
+    public URLBuilder setAppResourcePath(Object... pathParts)
     {
-        List<String> encodedParts = Arrays.stream(pathParts).map(EscapeUtil::encode).collect(Collectors.toList());
+        List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
+                .map(EscapeUtil::encode).collect(Collectors.toList());
         _resourcePath = "/" + String.join("/", encodedParts);
         return this;
     }
 
+    /**
+     * Append a resource path to the URL.<br>
+     * e.g. <code>setResourcePath("marker")</code> will append "#marker" to the built URL
+     *
+     * @param resourcePath resource path to be appended. Will not be encoded or checked for validity.
+     * @return this builder
+     */
     public URLBuilder setResourcePath(String resourcePath)
     {
         _resourcePath = resourcePath;
         return this;
     }
 
+    /**
+     * Appends a secondary query to the URL. That is to say, a query that appears AFTER the resource path.
+     * If a resource path is not specified, an exception will be thrown with building the URL.
+     * @param secondaryQuery URL query parameters. 'null' values will be included as valueless parameters.
+     * @return this builder
+     */
     public URLBuilder setSecondaryQuery(Map<String, ?> secondaryQuery)
     {
         _secondaryQuery = secondaryQuery;
         return this;
     }
 
+    /**
+     * Build the full URL
+     * @return built URL
+     */
     public String buildURL()
     {
         return getBaseURL() + buildRelativeURL();
     }
 
+    /**
+     * Build a relative URL. That is to say, excluding the server's host name, port, or context path.
+     * Will have a leading slash.
+     * @return built URL
+     */
     public String buildRelativeURL()
     {
         StringBuilder url = new StringBuilder();
