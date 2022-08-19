@@ -257,7 +257,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private void verifyAPIKeysTablePresence(boolean isAdmin)
     {
-        beginAt(new URLBuilder("query", "begin", getProjectName()).setResourcePath("sbh-ssp-core").buildURL());
+        beginAt(new URLBuilder("query", "begin", getProjectName()).setFragment("sbh-ssp-core").buildURL());
         waitForElement(Locator.tagWithClass("span", "labkey-link").withText("Containers"));
         Locator apiTableLoc = Locator.tagWithClass("span", "labkey-link").withText(APIKEYS_TABLE);
         assertEquals(isAdmin, isElementPresent(apiTableLoc));

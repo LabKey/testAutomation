@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.WebTestHelper;
 import org.seleniumhq.jetty9.util.URIUtil;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class URLBuilder
     @Nullable private final String _containerPath;
 
     private Map<String, ?> _query;
-    private String _resourcePath;
+    private String _fragment;
     private Map<String, ?> _secondaryQuery;
 
     private boolean _questionMarkUrl = !WebTestHelper.isNoQuestionMarkUrl();
@@ -66,8 +67,9 @@ public class URLBuilder
     }
 
     /**
-     * Appends a secondary query to the URL. That is to say, a query that appears AFTER the resource path.
-     * If a resource path is not specified, an exception will be thrown with building the URL.
+     * Appends the specified parameters to the URL.
+     * Note: Names and values will not be encoded. Use {@link java.net.URLEncoder#encode(String, Charset)} if encoding
+     * is needed (usually only necessary for comparing URLs)
      * @param query URL query parameters. 'null' values will be included as valueless parameters.
      * @return this builder
      */
@@ -88,35 +90,39 @@ public class URLBuilder
     }
 
     /**
-     * Parts to be combined into an app path. Will replace any existing resource path.<br>
-     * e.g. <code>setAppResourcePath("workbook", 5)</code> will append "#/workbook/5" to the built URL
-     * @param pathParts Most likely strings or Integers
+     * Append the app path as a URL fragment. Parts will be encoded and joined.<br>
+     * e.g. <code>setAppResourcePath("workbook", 5)</code> will append "#/workbook/5" to the built URL.<br>
+     * Note: Will replace any previously set fragment.
+     *
+     * @param pathParts Parts to be combined into an app path. Most likely strings and/or Integers
      * @return this builder
+     * @see #setFragment(String)
      */
     public URLBuilder setAppResourcePath(Object... pathParts)
     {
         List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
                 .map(EscapeUtil::encode).collect(Collectors.toList());
-        _resourcePath = "/" + String.join("/", encodedParts);
+        setFragment("/" + String.join("/", encodedParts));
         return this;
     }
 
     /**
-     * Append a resource path to the URL.<br>
+     * Append a fragment to the URL.<br>
      * e.g. <code>setResourcePath("marker")</code> will append "#marker" to the built URL
      *
-     * @param resourcePath resource path to be appended. Will not be encoded or checked for validity.
+     * @param fragment resource path to be appended. Will not be encoded or checked for validity.
      * @return this builder
      */
-    public URLBuilder setResourcePath(String resourcePath)
+    public URLBuilder setFragment(String fragment)
     {
-        _resourcePath = resourcePath;
+        _fragment = fragment;
         return this;
     }
 
     /**
-     * Appends a secondary query to the URL. That is to say, a query that appears AFTER the resource path.
-     * If a resource path is not specified, an exception will be thrown with building the URL.
+     * Appends a secondary query to the URL. That is to say, a query that appears AFTER the resource path.<br>
+     * If a resource path is not specified, an exception will be thrown when building the URL.
+     *
      * @param secondaryQuery URL query parameters. 'null' values will be included as valueless parameters.
      * @return this builder
      */
@@ -128,6 +134,7 @@ public class URLBuilder
 
     /**
      * Build the full URL
+     *
      * @return built URL
      */
     public String buildURL()
@@ -138,6 +145,7 @@ public class URLBuilder
     /**
      * Build a relative URL. That is to say, excluding the server's host name, port, or context path.
      * Will have a leading slash.
+     *
      * @return built URL
      */
     public String buildRelativeURL()
@@ -176,13 +184,13 @@ public class URLBuilder
             url.append("?");
         }
 
-        if (!StringUtils.isBlank(_resourcePath))
+        if (!StringUtils.isBlank(_fragment))
         {
-            if (!_resourcePath.startsWith("#"))
+            if (!_fragment.startsWith("#"))
             {
                 url.append("#");
             }
-            url.append(_resourcePath);
+            url.append(_fragment);
             appendQueryString(url, _secondaryQuery);
         }
         else if (_secondaryQuery != null && !_secondaryQuery.isEmpty())

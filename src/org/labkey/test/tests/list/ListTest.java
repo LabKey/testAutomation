@@ -1483,8 +1483,9 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertEquals("Wrong action", new Crawler.ControllerActionId("junit", "echoForm"), new Crawler.ControllerActionId(getCurrentRelativeURL()));
-            assertEquals("Wrong container", PROJECT_VERIFY, getCurrentContainerPath());
+            Crawler.ControllerActionId actualAction = new Crawler.ControllerActionId(getCurrentRelativeURL());
+            assertEquals("Wrong action", new Crawler.ControllerActionId("junit", "echoForm"), actualAction);
+            assertEquals("Wrong container", PROJECT_VERIFY, actualAction.getFolder());
         }
         popLocation();
     }
