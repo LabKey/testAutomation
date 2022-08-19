@@ -402,11 +402,39 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public void saveView(String viewName)
     {
+        saveView(viewName, false);
+    }
+
+    /**
+     * Use the grid menu to save a view with the given name. View will not be default or
+     * shared with sub folders.
+     *
+     * @param viewName The name to save the view as.
+     * @param makeAvailable Make the view available to sub folders.
+     */
+    public void saveView(String viewName, boolean makeAvailable)
+    {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
         SaveGridViewDialog dialog = new SaveGridViewDialog(getDriver(), this);
         dialog.setMakeDefault(false)
-                .setViewName(viewName)
-                .saveView();
+                .setViewName(viewName);
+
+        if(makeAvailable)
+        {
+            Assert.assertTrue("The option to make view available to sub folders is not present on the dialog.",
+                    dialog.isMakeAvailableVisible());
+
+            dialog.setMakeAvailable(true);
+        }
+        else
+        {
+            // If setting 'Make available' to false no need to assert control is present. If the option isn't present
+            // the view will not be visible to sub folders by default.
+            if(dialog.isMakeAvailableVisible())
+                dialog.setMakeAvailable(false);
+        }
+
+        dialog.saveView();
     }
 
     /**
