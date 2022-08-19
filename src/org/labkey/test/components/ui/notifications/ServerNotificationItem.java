@@ -172,9 +172,9 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
         elementCache().link.click();
 
         // Check if currently on the target page.
-        if(!currentUrl.contains(targetUrl))
+        if(!currentUrl.equals(targetUrl))
         {
-            WebDriverWrapper.waitFor(()->!getDriver().getCurrentUrl().toLowerCase().contains(currentUrl),
+            WebDriverWrapper.waitFor(()->!getDriver().getCurrentUrl().toLowerCase().equals(currentUrl),
                     "Clicking the 'View' link in the notification did not navigate in time.", 5_000);
         }
 

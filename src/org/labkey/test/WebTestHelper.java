@@ -271,27 +271,22 @@ public class WebTestHelper
         }
     }
 
+    /**
+     * Strip the context path off of the front of a relative URL. Will also remove leading slashes.
+     * @param url relative URL to the server under test
+     * @return Stripped URL
+     */
     public static String stripContextPath(String url)
     {
-        String root = getContextPath() + "/";
-        int rootLoc;
-        if(root.length() == 1)
+        String contextPath = getContextPath() + "/";
+        if (url.startsWith(contextPath))
         {
-            if(url.indexOf("//") > 0)
-                rootLoc = url.indexOf(root, url.indexOf("//")+2);
-            else
-                rootLoc = -1;
+            url = url.substring(contextPath.length());
         }
         else
         {
-            rootLoc = url.indexOf(root);
+            url = StringUtils.stripStart(url, "/");
         }
-
-        int endOfAction = url.indexOf("?");
-        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
-            url = url.substring(rootLoc + root.length());
-        else if (url.indexOf("/") == 0)
-            url = url.substring(1);
         return url;
     }
 
@@ -382,6 +377,10 @@ public class WebTestHelper
         return getBaseUrlWithoutContextPath() + getContextPath();
     }
 
+    /**
+     * Gets the configured context path for the server under test
+     * @return context path with a leading slash -or- blank for a server with 'ROOT' context
+     */
     public static String getContextPath()
     {
         synchronized (SERVER_LOCK)
@@ -398,9 +397,10 @@ public class WebTestHelper
                 else
                     LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
 
-                if ("/".equals(_contextPath))
+                _contextPath = StringUtils.strip(_contextPath, "/ ");
+                if (!_contextPath.isEmpty())
                 {
-                    _contextPath = "";
+                    _contextPath = "/" + _contextPath;
                 }
             }
             return _contextPath;
