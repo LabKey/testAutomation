@@ -691,7 +691,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable(tableName, this);
         int rowId = drt.getRowIndex(columnName, columnValue);
         drt.checkCheckbox(rowId);
-        doAndMaybeWaitForPageToLoad(1000, () ->
+        doAndMaybeWaitForPageToLoad(defaultWaitForPage, () ->
         {
             drt.clickHeaderButton("Delete");
             Alert alert = getAlertIfPresent();
