@@ -697,10 +697,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
             Alert alert = getAlertIfPresent();
             if (alert != null)
                 alert.accept();
-            else if (expectPageLoad)
-                clickButton(deleteButtonText);
             else
-                click(Locator.linkWithText(deleteButtonText));
+                clickButton(deleteButtonText, expectPageLoad ? defaultWaitForPage : 0);
             return expectPageLoad;
         });
     }
