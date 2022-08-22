@@ -272,22 +272,33 @@ public class WebTestHelper
     }
 
     /**
-     * Strip the context path off of the front of a relative URL. Will also remove leading slashes.
-     * @param url relative URL to the server under test
-     * @return Stripped URL
+     * Strip the base URL or context path off of the front of a URL. Will also remove leading slashes.
+     * @param url Absolute or relative URL to the server under test
+     * @return Relative URL
      */
-    public static String stripContextPath(String url)
+    public static String makeRelativeUrl(String url)
     {
+        if (url.startsWith("http://") || url.startsWith("https://"))
+        {
+            if (url.startsWith(getBaseURL()))
+            {
+                return url.substring(getBaseURL().length());
+            }
+            else
+            {
+                throw new IllegalArgumentException("URL does not appear to target server under test: " + url);
+            }
+        }
+
         String contextPath = getContextPath() + "/";
         if (url.startsWith(contextPath))
         {
-            url = url.substring(contextPath.length());
+            return url.substring(contextPath.length());
         }
         else
         {
-            url = StringUtils.stripStart(url, "/");
+            return StringUtils.stripStart(url, "/");
         }
-        return url;
     }
 
     public enum DatabaseType
