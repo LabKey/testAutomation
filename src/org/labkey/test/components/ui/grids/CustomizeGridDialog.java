@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Wraps EntityFieldFilterModal.tsx in UI components.
+ * Wraps CustomizeGridViewModal.tsx in UI components.
  */
-public class CustomizeGridDialog extends ModalDialog
+public class CustomizeGridViewDialog extends ModalDialog
 {
     private final UpdatingComponent linkedComponent;
 
