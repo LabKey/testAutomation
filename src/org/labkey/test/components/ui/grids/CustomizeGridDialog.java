@@ -39,8 +39,7 @@ public class CustomizeGridDialog extends ModalDialog
     {
         WebDriverWrapper.waitFor(()->
                 {
-                    WebElement spinner = BootstrapLocators.loadingSpinner.findWhenNeeded(this);
-                    return !spinner.isDisplayed() &&
+                    return !BootstrapLocators.loadingSpinner.isDisplayed(this) &&
                             elementCache().contentPanelLocator.findElements(this).size() == 2;
                 },
                 "Customize Grid dialog did not render in time.", 1_500);
