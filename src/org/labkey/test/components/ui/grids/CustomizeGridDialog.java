@@ -46,10 +46,10 @@ public class CustomizeGridDialog extends ModalDialog
     }
 
     /**
-     * Check or uncheck the 'Show all system and user-defined fields' checkbox checked?
+     * Check or uncheck the 'Show all system and user-defined fields' checkbox.
      *
      * @param checked Set to true to check the box, false to uncheck it.
-     * @return True if checked false otherwise.
+     * @return This dialog
      */
     public CustomizeGridDialog setShowAll(boolean checked)
     {
