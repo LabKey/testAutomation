@@ -34,6 +34,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
@@ -49,7 +50,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
-import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -1483,8 +1483,7 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertEquals("Wrong action", new Crawler.ControllerActionId("junit", "echoForm"), new Crawler.ControllerActionId(getCurrentRelativeURL()));
-            assertEquals("Wrong container", PROJECT_VERIFY, getCurrentContainerPath());
+            assertTrue(getCurrentRelativeURL(false).contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
     }
