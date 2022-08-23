@@ -147,8 +147,7 @@ import static org.junit.Assert.fail;
 import static org.labkey.test.Locator.tag;
 import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.TestProperties.isWebDriverLoggingEnabled;
-import static org.labkey.test.WebTestHelper.getBaseURL;
-import static org.labkey.test.WebTestHelper.stripContextPath;
+import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
@@ -1114,9 +1113,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long beginAt(String relativeURL, int millis)
     {
-        if (relativeURL.startsWith(getBaseURL()))
-            relativeURL = relativeURL.substring(getBaseURL().length());
-        relativeURL = stripContextPath(relativeURL);
+        relativeURL = makeRelativeUrl(relativeURL);
         String logMessage = "";
 
         try
