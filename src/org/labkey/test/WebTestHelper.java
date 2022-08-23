@@ -282,23 +282,22 @@ public class WebTestHelper
         {
             if (url.startsWith(getBaseURL()))
             {
-                return url.substring(getBaseURL().length());
+                url = url.substring(getBaseURL().length());
             }
             else
             {
                 throw new IllegalArgumentException("URL does not appear to target server under test: " + url);
             }
         }
-
-        String contextPath = getContextPath() + "/";
-        if (url.startsWith(contextPath))
-        {
-            return url.substring(contextPath.length());
-        }
         else
         {
-            return StringUtils.stripStart(url, "/");
+            String contextPath = getContextPath();
+            if (url.startsWith(contextPath))
+            {
+                url = url.substring(contextPath.length());
+            }
         }
+        return StringUtils.stripStart(url, "/");
     }
 
     public enum DatabaseType
