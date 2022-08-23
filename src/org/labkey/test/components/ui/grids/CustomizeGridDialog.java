@@ -37,11 +37,8 @@ public class CustomizeGridDialog extends ModalDialog
     @Override
     protected void waitForReady()
     {
-        WebDriverWrapper.waitFor(()->
-                {
-                    return !BootstrapLocators.loadingSpinner.isDisplayed(this) &&
-                            elementCache().contentPanelLocator.findElements(this).size() == 2;
-                },
+        WebDriverWrapper.waitFor(()-> !BootstrapLocators.loadingSpinner.isDisplayed(this) &&
+                            elementCache().contentPanelLocator.findElements(this).size() == 2,
                 "Customize Grid dialog did not render in time.", 1_500);
     }
 
@@ -49,7 +46,7 @@ public class CustomizeGridDialog extends ModalDialog
      * Check or uncheck the 'Show all system and user-defined fields' checkbox checked?
      *
      * @param checked Set to true to check the box, false to uncheck it.
-     * @return True if checked false otherwise.
+     * @return This dialog.
      */
     public CustomizeGridDialog setShowAll(boolean checked)
     {
