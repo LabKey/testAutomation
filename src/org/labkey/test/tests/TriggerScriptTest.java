@@ -231,7 +231,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check BeforeDelete Event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
-        deleteSingleRowViaUI("Company", "Inserting Single", "query");
+        deleteSingleRowViaUI("Company", "Inserting Single", "query", "Confirm Delete", true);
         assertTextPresent(BEFORE_DELETE_ERROR);
         clickButton("Back");
 
@@ -253,7 +253,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check AfterDelete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
-        deleteSingleRowViaUI("Company", BEFORE_UPDATE_COMPANY, "query");
+        deleteSingleRowViaUI("Company", BEFORE_UPDATE_COMPANY, "query", "Confirm Delete", true);
         assertTextPresent(AFTER_DELETE_ERROR);
         clickButton("Back");
         //Verify validation error prevented delete
@@ -381,7 +381,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         GoToDataUI goToDataset = () -> goToDataset(DATASET_NAME);
 
-        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true);
+        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, "Confirm Delete", true);
 
         //For some reason these only get logged for datasets...
         checkExpectedErrors(6);
@@ -446,7 +446,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToDataClass = () -> goToDataClass(DATA_CLASSES_NAME);
 
         setupDataClass();
-        doIndividualTriggerTest("query", goToDataClass, "Name", false);
+        doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
     }
 
 
@@ -558,7 +558,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Execute a set of tests against a datatype and preset trigger script
      */
-    private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate)
+    private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate, String deleteButtonText, boolean expectPageLoad)
     {
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
         String updateField = COUNTRY_FIELD; //Field updated by trigger script
@@ -604,7 +604,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check previous step prepared row for delete
         pushLocation();
         assertElementPresent(Locator.tagWithText("td", "BeforeDelete"));
-        deleteSingleRowViaUI(flagField, step, dataRegionName);
+        deleteSingleRowViaUI(flagField, step, dataRegionName, deleteButtonText, expectPageLoad);
         assertTextPresent(BEFORE_DELETE_ERROR);
         popLocation();
         //Verify validation error prevented delete
@@ -630,7 +630,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         pushLocation();
-        deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName);
+        deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName, deleteButtonText, expectPageLoad);
         assertTextPresent(AFTER_DELETE_ERROR);
         popLocation();
         //Verify validation error prevented delete
@@ -679,23 +679,27 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     /**
      * delete single record via the table UI
-     * @param columnName Column to look at
-     * @param columnValue value to look for
-     * @param tableName DataRegionTable name
+     *
+     * @param columnName       Column to look at
+     * @param columnValue      value to look for
+     * @param tableName        DataRegionTable name
+     * @param deleteButtonText text that appears in delete confirmation when not in an alert.
+     * @param expectPageLoad indicates whether confirming deletion will result in a page load or not
      */
-    private void deleteSingleRowViaUI(String columnName, String columnValue, String tableName)
+    private void deleteSingleRowViaUI(String columnName, String columnValue, String tableName, String deleteButtonText, boolean expectPageLoad)
     {
         DataRegionTable drt = new DataRegionTable(tableName, this);
         int rowId = drt.getRowIndex(columnName, columnValue);
         drt.checkCheckbox(rowId);
-        doAndWaitForPageToLoad(() ->
+        doAndMaybeWaitForPageToLoad(defaultWaitForPage, () ->
         {
             drt.clickHeaderButton("Delete");
             Alert alert = getAlertIfPresent();
             if (alert != null)
                 alert.accept();
             else
-                clickButton("Confirm Delete");
+                clickButton(deleteButtonText, expectPageLoad ? defaultWaitForPage : 0);
+            return expectPageLoad;
         });
     }
 
