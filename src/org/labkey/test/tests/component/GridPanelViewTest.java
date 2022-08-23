@@ -223,7 +223,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      *         <li>Modify the default view for a sample type in LabKey Server.</li>
      *         <li>Save the default view, but do not make it public (default for all).</li>
      *         <li>Validate in the App grid that 'My Default' is shown under the Views menu.</li>
-     *         <li>Validate that other users se no change to the default view.</li>
+     *         <li>Validate that other users see no change to the default view.</li>
      *     </ul>
      * </p>
      */
