@@ -79,8 +79,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.labkey.test.WebTestHelper.getBaseURL;
-import static org.labkey.test.WebTestHelper.stripContextPath;
+import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 
 public class Crawler
 {
@@ -656,10 +655,9 @@ public class Crawler
             _action = action;
         }
 
-        public ControllerActionId(@NotNull String rootRelativeURL)
+        public ControllerActionId(@NotNull String url)
         {
-            rootRelativeURL = stripQueryParams(stripHash(rootRelativeURL));
-            rootRelativeURL = WebTestHelper.stripContextPath(rootRelativeURL);
+            String rootRelativeURL = WebTestHelper.makeRelativeUrl(stripQueryParams(stripHash(url)));
 
             if (rootRelativeURL.startsWith("_webdav/"))
             {
@@ -852,9 +850,7 @@ public class Crawler
                 .replace("]", "%5D")
                 .replace("{", "%7B")
                 .replace("}", "%7D");
-        if (relativeUrl.startsWith(getBaseURL()))
-            relativeUrl = relativeUrl.substring(getBaseURL().length());
-        relativeUrl = stripContextPath(relativeUrl);
+        relativeUrl = makeRelativeUrl(relativeUrl);
         String logMessage = "";
         Mutable<File[]> downloadedFiles = new MutableObject<>();
 
