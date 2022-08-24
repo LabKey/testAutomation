@@ -201,27 +201,27 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridDialog}. This will click the first column
+     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridViewDialog}. This will click the first column
      * in the grid.
-     * @return A {@link CustomizeGridDialog}
+     * @return A {@link CustomizeGridViewDialog}
      */
-    public CustomizeGridDialog insertColumn()
+    public CustomizeGridViewDialog insertColumn()
     {
         return insertColumn(getColumnNames().get(0));
     }
 
     /**
-     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridDialog}. This will use the given column to
+     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridViewDialog}. This will use the given column to
      * get the menu. This should insert the column after (to the right) of this column.
      *
      * @param columnLabel The column to get the menu from.
-     * @return A {@link CustomizeGridDialog}
+     * @return A {@link CustomizeGridViewDialog}
      */
-    public CustomizeGridDialog insertColumn(String columnLabel)
+    public CustomizeGridViewDialog insertColumn(String columnLabel)
     {
         // Because this is going to show the customize grid dialog don't wait for a grid update. the dialog will wait for the update.
         clickColumnMenuItem(columnLabel, "Insert Column", false);
-        return new CustomizeGridDialog(getDriver(), this);
+        return new CustomizeGridViewDialog(getDriver(), this);
     }
 
     protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)

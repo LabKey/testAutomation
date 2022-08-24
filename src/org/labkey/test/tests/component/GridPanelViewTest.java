@@ -11,11 +11,11 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.labkey.test.components.ui.grids.CustomizeGridDialog;
+import org.labkey.test.components.ui.grids.CustomizeGridViewDialog;
 import org.labkey.test.components.ui.grids.GridFilterModal;
-import org.labkey.test.components.ui.grids.ManageGridViewsDialog;
+import org.labkey.test.components.ui.grids.ManageViewsDialog;
 import org.labkey.test.components.ui.grids.QueryGrid;
-import org.labkey.test.components.ui.grids.SaveGridViewDialog;
+import org.labkey.test.components.ui.grids.SaveViewDialog;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
@@ -340,24 +340,24 @@ public class GridPanelViewTest extends GridPanelBaseTest
         grid = grid.hideColumn(columnToRemove);
 
         log("Validate the 'Save View' dialog.");
-        SaveGridViewDialog saveGridViewDialog = grid.clickSaveButton(true);
+        SaveViewDialog saveViewDialog = grid.clickSaveButton(true);
 
-        checker().verifyTrue(String.format("The 'View Name' field should be empty. It contains '%s'.", saveGridViewDialog.getViewName()),
-                saveGridViewDialog.getViewName().isEmpty());
+        checker().verifyTrue(String.format("The 'View Name' field should be empty. It contains '%s'.", saveViewDialog.getViewName()),
+                saveViewDialog.getViewName().isEmpty());
 
         checker().verifyFalse("The 'Make default' checkbox should not be checked.",
-                saveGridViewDialog.isMakeDefaultChecked());
+                saveViewDialog.isMakeDefaultChecked());
 
         checker().screenShotIfNewError("testDefaultViewRemoveColumn_Save_View_Dialog_Defaults_Error");
 
-        saveGridViewDialog.setMakeDefault(true);
+        saveViewDialog.setMakeDefault(true);
 
         checker().verifyFalse("Setting 'Default for all' should disable the name field, it did not.",
-                saveGridViewDialog.isViewNameEnabled());
+                saveViewDialog.isViewNameEnabled());
 
         checker().screenShotIfNewError("testDefaultViewRemoveColumnFromAppGrid_Save_View_Dialog_Set_Error");
 
-        saveGridViewDialog.saveView();
+        saveViewDialog.saveView();
 
         validateGridHeader(screenShotPrefix, grid, UPDATED_ALERT, false);
 
@@ -456,25 +456,25 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         validateFilterPills(testName, grid, expectedFilters);
 
-        SaveGridViewDialog saveGridViewDialog;
+        SaveViewDialog saveViewDialog;
 
         if(viewName.isEmpty())
         {
             log("Save as default view (for everyone).");
-            saveGridViewDialog = grid.saveView();
-            saveGridViewDialog.setMakeDefault(true);
+            saveViewDialog = grid.saveView();
+            saveViewDialog.setMakeDefault(true);
         }
         else
         {
             log(String.format("Save as custom view '%s'.", viewName));
-            saveGridViewDialog = grid.saveView();
-            saveGridViewDialog.setViewName(viewName);
-            saveGridViewDialog.setMakeDefault(false);
+            saveViewDialog = grid.saveView();
+            saveViewDialog.setViewName(viewName);
+            saveViewDialog.setMakeDefault(false);
 
             savedViewsForDefaultSampleType.add(viewName);
         }
 
-        saveGridViewDialog.saveView();
+        saveViewDialog.saveView();
 
         log("Refresh the page and validate icons from the view.");
         refresh();
@@ -611,13 +611,13 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         filterDialog.confirm();
 
-        SaveGridViewDialog saveGridViewDialog;
+        SaveViewDialog saveViewDialog;
 
         if(viewName.isEmpty())
         {
             log("Save as default view.");
-            saveGridViewDialog = grid.saveView();
-            saveGridViewDialog.setMakeDefault(true)
+            saveViewDialog = grid.saveView();
+            saveViewDialog.setMakeDefault(true)
                     .saveView();
         }
         else
@@ -626,8 +626,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
             // Issue: 46019 Cannot save a grid view if a non-string column is filtered. Only happens on components page (core-components.view).
 
             log(String.format("Save view as '%s'.", viewName));
-            saveGridViewDialog = grid.saveView();
-            saveGridViewDialog.setMakeDefault(false)
+            saveViewDialog = grid.saveView();
+            saveViewDialog.setMakeDefault(false)
                     .setViewName(viewName)
                     .saveView();
 
@@ -703,18 +703,18 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         if(viewName.isEmpty())
         {
-            saveGridViewDialog = grid.clickSaveButton(true);
+            saveViewDialog = grid.clickSaveButton(true);
 
             log("Verify that view name is empty and 'default checkbox' is checked.");
 
-            checker().verifyTrue(String.format("Value of view name is not empty. Contains '%s'.", saveGridViewDialog.getViewName()),
-                    saveGridViewDialog.getViewName().isEmpty());
+            checker().verifyTrue(String.format("Value of view name is not empty. Contains '%s'.", saveViewDialog.getViewName()),
+                    saveViewDialog.getViewName().isEmpty());
 
             // The default checkbox is not checked by default. Maybe a bug?
             log("Checking the 'Default for all' checkbox.");
-            saveGridViewDialog.setMakeDefault(true);
+            saveViewDialog.setMakeDefault(true);
 
-            saveGridViewDialog.saveView();
+            saveViewDialog.saveView();
         }
         else
         {
@@ -726,14 +726,14 @@ public class GridPanelViewTest extends GridPanelBaseTest
             if(!checker().verifyFalse("Looks like a modal dialog was shown after clicking the locked filter pill.",
                     isElementPresent(Locator.tagWithClass("div", "modal-dialog"))))
             {
-                saveGridViewDialog = new SaveGridViewDialog(getDriver(), grid);
+                saveViewDialog = new SaveViewDialog(getDriver(), grid);
                 checker().screenShotIfNewError(String.format("%s_Unexpected_Save_View_Dialog", testName));
 
                 // If the save view dialog unexpectedly popped up try and save the view.
-                if(saveGridViewDialog.getViewName().isEmpty())
-                    saveGridViewDialog.setViewName(viewName);
+                if(saveViewDialog.getViewName().isEmpty())
+                    saveViewDialog.setViewName(viewName);
 
-                saveGridViewDialog.setMakeDefault(false)
+                saveViewDialog.setMakeDefault(false)
                         .saveView();
             }
 
@@ -748,31 +748,31 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         // Save the view otherwise it will have (edited) as a title.
         log("Validate that using 'Save View' from the menu populates the view name field in the dialog.");
-        saveGridViewDialog = grid.saveView();
+        saveViewDialog = grid.saveView();
 
         if(viewName.isEmpty())
         {
             checker().withScreenshot(String.format("%s_Default_Dialog_Error", testName))
-                    .verifyTrue(String.format("For the default view the view name filed in the save view dialog should be empty, it contains '%s'.", saveGridViewDialog.getViewName()),
-                            saveGridViewDialog.getViewName().isEmpty());
+                    .verifyTrue(String.format("For the default view the view name filed in the save view dialog should be empty, it contains '%s'.", saveViewDialog.getViewName()),
+                            saveViewDialog.getViewName().isEmpty());
 
             // In the core-components.view page the checkbox is not checked by default.
             log("Checking 'Make default for all'.");
-            saveGridViewDialog.setMakeDefault(true);
+            saveViewDialog.setMakeDefault(true);
 
         }
         else
         {
             if (!checker().withScreenshot(String.format("%s_Name_Missing_Error", testName))
-                    .verifyEquals("The view name filed in the save view dialog was not populated as expected.", viewName, saveGridViewDialog.getViewName()))
+                    .verifyEquals("The view name filed in the save view dialog was not populated as expected.", viewName, saveViewDialog.getViewName()))
             {
                 log("View name was not set int he save dialog, need to set it.");
-                saveGridViewDialog.setViewName(viewName);
+                saveViewDialog.setViewName(viewName);
             }
         }
 
         log("Save the view.");
-        saveGridViewDialog.saveView();
+        saveViewDialog.saveView();
 
     }
 
@@ -800,12 +800,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Hide column '%s' in sample type '%s'.", hideCol, DEFAULT_VIEW_SAMPLE_TYPE));
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
         grid.hideColumn(hideCol);
-        SaveGridViewDialog saveGridViewDialog = grid.saveView();
+        SaveViewDialog saveViewDialog = grid.saveView();
 
         String trickyViewName = String.format("My View %s", TRICKY_CHARACTERS);
         log(String.format("Save the view name as '%s'.", trickyViewName));
 
-        saveGridViewDialog.setViewName(trickyViewName)
+        saveViewDialog.setViewName(trickyViewName)
                 .saveView();
 
         // Add this view name to the list of views.
@@ -819,14 +819,14 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         List<String> expectedValues = new ArrayList<>(savedViewsForDefaultSampleType);
         expectedValues.add(String.format("%s View (shared)", VIEW_DEFAULT));
-        ManageGridViewsDialog manageGridViewsDialog = grid.manageViews();
-        List<String> actualValues = manageGridViewsDialog.getViewNames();
+        ManageViewsDialog manageViewsDialog = grid.manageViews();
+        List<String> actualValues = manageViewsDialog.getViewNames();
 
         checker().withScreenshot("Tricky_Name_Manage_Error")
                 .verifyEqualsSorted("List of views in manage dialog not as expected.",
                         expectedValues, actualValues);
 
-        manageGridViewsDialog.dismiss();
+        manageViewsDialog.dismiss();
     }
 
     /**
@@ -873,7 +873,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         String selectedColumn = COL_STRING2;
         log(String.format("Click the grid menu above column '%s' and validate that insertion happens to the right of the column.", selectedColumn));
-        CustomizeGridDialog customizeModal = grid.insertColumn(selectedColumn);
+        CustomizeGridViewDialog customizeModal = grid.insertColumn(selectedColumn);
 
         log("Validate that the 'Available Fields' and 'Shown in Grid' panels are as expected.");
 
@@ -937,7 +937,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
-        CustomizeGridDialog customizeModal = grid.customizeView();
+        CustomizeGridViewDialog customizeModal = grid.customizeView();
 
         checker().verifyFalse("The 'Update' button is enabled, it should not be.",
                 customizeModal.isUpdateGridEnabled());
@@ -973,9 +973,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         checker().verifyTrue(String.format("Field '%s' is not present in 'Available Fields' panel, it should be.", materialIDField),
                 actualFields.contains(materialIDField));
-
-        log(String.format("Expand field '%s'.", materialIDField));
-        customizeModal.expandAvailableFields(materialIDField);
 
         String materialNameField = "Name";
         log(String.format("Select the '%s' field under '%s' and add it to the grid.", materialNameField, materialIDField));
@@ -1052,7 +1049,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
-        CustomizeGridDialog customizeModal = grid.customizeView();
+        CustomizeGridViewDialog customizeModal = grid.customizeView();
 
         String fieldRemoved1 = COL_INT;
 
@@ -1062,8 +1059,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         String viewName1 = String.format("No %s", fieldRemoved1);
         log(String.format("Use the 'Save' button on the grid to save the view as '%s'.", viewName1));
-        SaveGridViewDialog saveGridViewDialog = grid.clickSaveButton(true);
-        saveGridViewDialog.setViewName(viewName1)
+        SaveViewDialog saveViewDialog = grid.clickSaveButton(true);
+        saveViewDialog.setViewName(viewName1)
                 .saveView();
 
         log(String.format("Go back to '%s' and create a new view.", VIEW_DEFAULT));
@@ -1079,11 +1076,11 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         String viewName2 = String.format("No %s", fieldRemoved2);
         log(String.format("Use the menu to save the view as '%s'. This is now the current view.", viewName2));
-        saveGridViewDialog = grid.saveView();
-        saveGridViewDialog.setViewName(viewName2)
+        saveViewDialog = grid.saveView();
+        saveViewDialog.setViewName(viewName2)
                 .saveView();
 
-        ManageGridViewsDialog manageViewsDialog = grid.manageViews();
+        ManageViewsDialog manageViewsDialog = grid.manageViews();
 
         List<String> expectedValues = new ArrayList<>(List.of(String.format("%s View (shared)", VIEW_DEFAULT), viewName1, viewName2));
         List<String> actualValues = manageViewsDialog.getViewNames();
@@ -1136,7 +1133,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                         "Permanently remove this view?", manageViewsDialog.getDeleteConfirmationText());
 
         log("Check that clicking 'No' does not change the view names.");
-        manageViewsDialog.clickDeleteNoButton();
+        manageViewsDialog.cancelDelete();
         expectedValues = new ArrayList<>(List.of(String.format("%s View (shared)", VIEW_DEFAULT), viewName1, newViewName2));
         actualValues = manageViewsDialog.getViewNames();
         checker().withScreenshot("Delete_No_Error")
@@ -1164,9 +1161,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Validate saving a view with an existing views name causes an error (case insensitive).");
         grid.hideColumn(COL_BOOL);
-        saveGridViewDialog = grid.saveView();
-        saveGridViewDialog.setViewName(viewName1.toLowerCase());
-        String errorMsg = saveGridViewDialog.saveViewExpectingError();
+        saveViewDialog = grid.saveView();
+        saveViewDialog.setViewName(viewName1.toLowerCase());
+        String errorMsg = saveViewDialog.saveViewExpectingError();
 
         checker().withScreenshot("Duplicate_View_Name_Error")
                 .verifyEquals("Error message when saving a duplicate name is not as expected.",
@@ -1175,8 +1172,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         String viewName3 = "No Bool";
         log(String.format("Change view name to something new, '%s' and validate save works as expected.", viewName3));
-        saveGridViewDialog.setViewName(viewName3);
-        saveGridViewDialog.saveView();
+        saveViewDialog.setViewName(viewName3);
+        saveViewDialog.saveView();
 
         checker().withScreenshot("New_View_Name_Error")
                 .verifyEquals("View name in panel header not as expected.",
@@ -1200,9 +1197,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log(String.format("Validate that this user can save a view with the same name '%s' as used by another user.", viewName1));
         grid.hideColumn(fieldRemoved1);
-        saveGridViewDialog = grid.saveView();
-        saveGridViewDialog.setViewName(viewName1);
-        saveGridViewDialog.saveView();
+        saveViewDialog = grid.saveView();
+        saveViewDialog.setViewName(viewName1);
+        saveViewDialog.saveView();
 
         manageViewsDialog = grid.manageViews();
         expectedValues.add(viewName1);
@@ -1274,9 +1271,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         }
 
-        checker().screenShotIfNewError(String.format("%s_Views_Menu_Column_Error", screenShotPrefix));
-
-        return checker().errorsSinceMark() == 0;
+        // If there was a failure screenShotIfNewError will return true (indicating there was an error).
+        return checker().screenShotIfNewError(String.format("%s_Views_Menu_Column_Error", screenShotPrefix));
     }
 
     /**
@@ -1322,9 +1318,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
                     grid.isUndoButtonVisible());
         }
 
-        checker().screenShotIfNewError(String.format("%s_Grid_Header_Error", screenShotPrefix));
-
-        return checker().errorsSinceMark() == 0;
+        // If there was a failure screenShotIfNewError will return true (indicating there was an error).
+        return checker().screenShotIfNewError(String.format("%s_Grid_Header_Error", screenShotPrefix));
     }
 
     /**

@@ -11,11 +11,11 @@ import org.openqa.selenium.WebElement;
 /**
  * Dialog used to save a grid view in an app.
  */
-public class SaveGridViewDialog extends ModalDialog
+public class SaveViewDialog extends ModalDialog
 {
     QueryGrid grid;
 
-    public SaveGridViewDialog(WebDriver driver, QueryGrid grid)
+    public SaveViewDialog(WebDriver driver, QueryGrid grid)
     {
         super(new ModalDialogFinder(driver).withTitle("Save Grid View"));
         this.grid = grid;
@@ -27,7 +27,7 @@ public class SaveGridViewDialog extends ModalDialog
      * @param viewName View name.
      * @return This dialog.
      */
-    public SaveGridViewDialog setViewName(String viewName)
+    public SaveViewDialog setViewName(String viewName)
     {
         elementCache().viewNameInput.set(viewName);
         return this;
@@ -59,7 +59,7 @@ public class SaveGridViewDialog extends ModalDialog
      * @param checked True to check, false to uncheck.
      * @return This dialog.
      */
-    public SaveGridViewDialog setMakeDefault(boolean checked)
+    public SaveViewDialog setMakeDefault(boolean checked)
     {
         elementCache().makeDefault.set(checked);
         return this;
@@ -91,7 +91,7 @@ public class SaveGridViewDialog extends ModalDialog
      * @param checked True to check, false to uncheck.
      * @return This dialog.
      */
-    public SaveGridViewDialog setMakeAvailable(boolean checked)
+    public SaveViewDialog setMakeAvailable(boolean checked)
     {
         elementCache().makeAvailable.set(checked);
         return this;

@@ -13,16 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Dialog used to manage saved views.
+ * Dialog used to manage saved views. Wraps ManageViewsModal.tsx in UI components.
  */
-public class ManageGridViewsDialog extends ModalDialog
+public class ManageViewsDialog extends ModalDialog
 {
-    QueryGrid grid;
 
-    public ManageGridViewsDialog(WebDriver driver, QueryGrid grid)
+    public ManageViewsDialog(WebDriver driver)
     {
         super(new ModalDialogFinder(driver).withTitle("Manage Saved Views"));
-        this.grid = grid;
     }
 
     /**
@@ -64,7 +62,7 @@ public class ManageGridViewsDialog extends ModalDialog
      * @param newName The new name.
      * @return This dialog.
      */
-    public ManageGridViewsDialog changeViewName(String currentName, String newName)
+    public ManageViewsDialog changeViewName(String currentName, String newName)
     {
         Assert.assertTrue(String.format("View named '%s' is not editable.", currentName), canViewNameBeChanged(currentName));
 
@@ -94,7 +92,7 @@ public class ManageGridViewsDialog extends ModalDialog
      * @param viewName The name of the view to delete.
      * @return This dialog.
      */
-    public ManageGridViewsDialog deleteView(String viewName)
+    public ManageViewsDialog deleteView(String viewName)
     {
         Assert.assertTrue(String.format("View named '%s' cannot be deleted.", viewName), canViewBeDeleted(viewName));
 
@@ -109,7 +107,7 @@ public class ManageGridViewsDialog extends ModalDialog
      * @param viewName Name pf view to delete.
      * @return This dialog.
      */
-    public ManageGridViewsDialog deleteViewAndConfirm(String viewName)
+    public ManageViewsDialog deleteViewAndConfirm(String viewName)
     {
         deleteView(viewName)
                 .confirmDelete();
@@ -130,10 +128,22 @@ public class ManageGridViewsDialog extends ModalDialog
      * Click the 'Yes' button when asked to delete a button.
      *
      * @return This dialog.
+     *
      */
-    public ManageGridViewsDialog confirmDelete()
+    public ManageViewsDialog confirmDelete()
     {
         elementCache().deleteYesButton.click();
+        return this;
+    }
+
+    /**
+     * Click 'No' button to not delete a button.
+     *
+     * @return This dialog.
+     */
+    public ManageViewsDialog cancelDelete()
+    {
+        elementCache().deleteNoButton.click();
         return this;
     }
 
@@ -143,7 +153,7 @@ public class ManageGridViewsDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public ManageGridViewsDialog revertDefaultView()
+    public ManageViewsDialog revertDefaultView()
     {
         WebElement tag = elementCache().revertDefault;
 
@@ -180,21 +190,10 @@ public class ManageGridViewsDialog extends ModalDialog
      * @param viewName The name of the view to make default.
      * @return This dialog.
      */
-    public ManageGridViewsDialog makeViewDefault(String viewName)
+    public ManageViewsDialog makeViewDefault(String viewName)
     {
         Locator.tagWithText("span", "Make default").findElement(elementCache().viewRow(viewName)).click();
 
-        return this;
-    }
-
-    /**
-     * Click 'No' button to not delete a button.
-     *
-     * @return This dialog.
-     */
-    public ManageGridViewsDialog clickDeleteNoButton()
-    {
-        elementCache().deleteNoButton.click();
         return this;
     }
 

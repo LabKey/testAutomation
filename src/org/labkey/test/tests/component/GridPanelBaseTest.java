@@ -76,10 +76,7 @@ public class GridPanelBaseTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
 
         // Add the 'Sample Types' web part. It is easier when debugging etc...
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.exitAdminMode();
+        new PortalHelper(this).addWebPart("Sample Types");
     }
 
     /**
@@ -106,7 +103,7 @@ public class GridPanelBaseTest extends BaseWebDriverTest
         cv.removeColumn(REMOVED_FLAG_COLUMN);
 
         // This will save the changes to the default view for everyone. The view menu option will remain as "Default"
-        cv.saveCustomView("", true);
+        cv.saveDefaultView();
 
     }
 

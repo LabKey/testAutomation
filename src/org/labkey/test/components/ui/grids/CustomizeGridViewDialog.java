@@ -27,7 +27,7 @@ public class CustomizeGridViewDialog extends ModalDialog
     private static final String FIELD_NOT_AVAILABLE = "Field name '%s' is not visible in the 'Available Fields' list.";
     private static final String FIELD_NOT_IN_GRID = "Field with label '%s' is not visible in the 'Shown in Grid' list.";
 
-    public CustomizeGridDialog(WebDriver driver, UpdatingComponent linkedComponent)
+    public CustomizeGridViewDialog(WebDriver driver, UpdatingComponent linkedComponent)
     {
         super(new ModalDialogFinder(driver));
         this.linkedComponent = linkedComponent;
@@ -48,7 +48,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param checked Set to true to check the box, false to uncheck it.
      * @return This dialog
      */
-    public CustomizeGridDialog setShowAll(boolean checked)
+    public CustomizeGridViewDialog setShowAll(boolean checked)
     {
         elementCache().checkbox.set(checked);
         return this;
@@ -84,27 +84,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      */
     public boolean isAvailableFieldAdded(String... fieldName)
     {
-        StringBuilder fieldKey = new StringBuilder();
-
-        Iterator<String> iterator = Arrays.stream(fieldName).iterator();
-
-        while(iterator.hasNext())
-        {
-            fieldKey.append(iterator.next().replace(" ", ""));
-
-            // If this isn't the last item in the collection don't expand it or add a "/" to the expected data-fieldkey value.
-            if(iterator.hasNext())
-            {
-                if(!isFieldKeyExpanded(fieldKey.toString()))
-                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
-
-                fieldKey.append("/");
-            }
-
-        }
-
-        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey.toString());
-
+        WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldName));
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
     }
 
@@ -114,29 +94,9 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldName Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public CustomizeGridDialog addAvailableField(String... fieldName)
+    public CustomizeGridViewDialog addAvailableField(String... fieldName)
     {
-        StringBuilder fieldKey = new StringBuilder();
-
-        Iterator<String> iterator = Arrays.stream(fieldName).iterator();
-
-        while(iterator.hasNext())
-        {
-            fieldKey.append(iterator.next().replace(" ", ""));
-
-            // If this isn't the last item in the collection don't expand it or add a "/" to the expected data-fieldkey value.
-            if(iterator.hasNext())
-            {
-                // If the field is already expanded don't try to expand it.
-                if(!isFieldKeyExpanded(fieldKey.toString()))
-                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
-
-                fieldKey.append("/");
-            }
-
-        }
-
-        return addFieldByFieldKeyToGrid(fieldKey.toString());
+        return addFieldByFieldKeyToGrid(expandAvailableFields(fieldName));
     }
 
     /**
@@ -145,7 +105,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldKey The value in the data-fieldkay attribute for the row.
      * @return This dialog.
      */
-    private CustomizeGridDialog addFieldByFieldKeyToGrid(String fieldKey)
+    private CustomizeGridViewDialog addFieldByFieldKeyToGrid(String fieldKey)
     {
         WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
 
@@ -168,7 +128,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fields The list of fields to expand.
      * @return This dialog.
      */
-    public CustomizeGridDialog expandAvailableFields(String... fields)
+    private String expandAvailableFields(String... fields)
     {
         StringBuilder fieldKey = new StringBuilder();
 
@@ -178,17 +138,19 @@ public class CustomizeGridViewDialog extends ModalDialog
         {
             fieldKey.append(iterator.next().replace(" ", ""));
 
-            expandOrCollapseByFieldKey(fieldKey.toString(), true);
-
-            // If this isn't the last item in the collection don't add a "/" to the expected data-fieldkey value.
+            // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
             {
+                // If the field is already expanded don't try to expand it.
+                if(!isFieldKeyExpanded(elementCache().getListItemElementByFieldKey(fieldKey.toString())))
+                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
+
                 fieldKey.append("/");
             }
 
         }
 
-        return this;
+        return fieldKey.toString();
     }
 
     /**
@@ -197,7 +159,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldName Name of the field to collapse.
      * @return This dialog.
      */
-    public CustomizeGridDialog collapseAvailableField(String fieldName)
+    public CustomizeGridViewDialog collapseAvailableField(String fieldName)
     {
         expandOrCollapseByFieldKey(fieldName.replace(" ", ""), false);
         return this;
@@ -211,7 +173,12 @@ public class CustomizeGridViewDialog extends ModalDialog
      */
     private void expandOrCollapseByFieldKey(String fieldKey, boolean expand)
     {
+
         WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
+
+        // Check to see if row is already in the desired state. If so don't do anything.
+        if((expand && isFieldKeyExpanded(listItem) || (!expand && !isFieldKeyExpanded(listItem))))
+            return;
 
         Assert.assertTrue(String.format("Field with data-fieldkey attribute '%s' is not visible in the 'Available Fields' panel.", fieldKey),
                 listItem.isDisplayed());
@@ -236,15 +203,13 @@ public class CustomizeGridViewDialog extends ModalDialog
     }
 
     /**
-     * Private helper to see if the row with the given data-fieldkey value has a checkmark or not.
+     * Private helper to see if the row has been expanded.
      *
-     * @param fieldKey The data-fieldkey value of the row/field to check.
+     * @param listItem A web element of the row/field to check.
      * @return True if row is expanded.
      */
-    private boolean isFieldKeyExpanded(String fieldKey)
+    private boolean isFieldKeyExpanded(WebElement listItem)
     {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
-
         // As long as there is no plus/expand icon then this field is expanded.
         return   !Locator.tagWithClass("div", "field-expand-icon")
                 .withChild(Locator.tagWithClass("i", "fa-plus-square"))
@@ -290,7 +255,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param column The column name to click on.
      * @return This dialog.
      */
-    public CustomizeGridDialog selectShownInGridColumn(String column)
+    public CustomizeGridViewDialog selectShownInGridColumn(String column)
     {
         return selectShownInGridColumn(column, 0);
     }
@@ -303,7 +268,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param index If multiple columns have the same name this will identify which one to click.
      * @return This dialog.
      */
-    public CustomizeGridDialog selectShownInGridColumn(String column, int index)
+    public CustomizeGridViewDialog selectShownInGridColumn(String column, int index)
     {
         getShownInGridListItems(column).get(index).click();
         return this;
@@ -315,7 +280,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param columns List of columns to remove.
      * @return This dialog.
      */
-    public CustomizeGridDialog removeColumns(List<String> columns)
+    public CustomizeGridViewDialog removeColumns(List<String> columns)
     {
         for(String column : columns)
         {
@@ -331,7 +296,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param column The column to remove.
      * @return This dialog.
      */
-    public CustomizeGridDialog removeColumn(String column)
+    public CustomizeGridViewDialog removeColumn(String column)
     {
         return removeColumn(column, 0);
     }
@@ -344,7 +309,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param index If multiple columns have the same value this identifies which one to remove.
      * @return This dialog.
      */
-    public CustomizeGridDialog removeColumn(String column, int index)
+    public CustomizeGridViewDialog removeColumn(String column, int index)
     {
         WebElement listItem = getShownInGridListItems(column).get(index);
         WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
@@ -361,7 +326,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public CustomizeGridDialog clearColumns()
+    public CustomizeGridViewDialog clearColumns()
     {
         List<WebElement> allItems = elementCache().getListItemElements(elementCache().shownInGridPanel);
 
@@ -384,7 +349,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param newColumnLabel The new value to set the column label to.
      * @return This dialog.
      */
-    public CustomizeGridDialog setColumnLabel(String currentColumnLabel, String newColumnLabel)
+    public CustomizeGridViewDialog setColumnLabel(String currentColumnLabel, String newColumnLabel)
     {
         return setColumnLabel(currentColumnLabel, 0, newColumnLabel);
     }
@@ -398,7 +363,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param newColumnLabel The new value to set the column label to.
      * @return This dialog.
      */
-    public CustomizeGridDialog setColumnLabel(String currentColumnLabel, int index, String newColumnLabel)
+    public CustomizeGridViewDialog setColumnLabel(String currentColumnLabel, int index, String newColumnLabel)
     {
 
         WebElement listItem = getShownInGridListItems(currentColumnLabel).get(index);
@@ -413,12 +378,9 @@ public class CustomizeGridViewDialog extends ModalDialog
         // goes away. Need to do update the control using the selenium actions.
 
         // Select the current text, type in the new value then change focus (tab) to commit the change.
+        getWrapper().actionClear(elementCache().columnLabelEdit);
         Actions replaceCurrentText = new Actions(getDriver());
-        replaceCurrentText.sendKeys(Keys.END)
-                .keyDown(Keys.SHIFT)
-                .sendKeys(Keys.HOME)
-                .keyUp(Keys.SHIFT)
-                .sendKeys(newColumnLabel)
+        replaceCurrentText.sendKeys(newColumnLabel)
                 .sendKeys(Keys.TAB)
                 .perform();
 
@@ -434,7 +396,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public CustomizeGridDialog clickUndoEdits()
+    public CustomizeGridViewDialog clickUndoEdits()
     {
         elementCache().undoEditsButton.click();
         return this;

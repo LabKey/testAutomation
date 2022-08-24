@@ -33,8 +33,8 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
  */
 public class QueryGrid extends ResponsiveGrid<QueryGrid>
 {
-    final private WebDriver _driver;
-    final private WebElement _queryGridPanel;
+    private final WebDriver _driver;
+    private final WebElement _queryGridPanel;
 
     private QueryGrid(WebElement element, WebDriver driver)
     {
@@ -375,23 +375,23 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     /**
      * Customize the view. Use the 'Customize Grid VIew' menu option.
      *
-     * @return A {@link CustomizeGridDialog}.
+     * @return A {@link CustomizeGridViewDialog}.
      */
-    public CustomizeGridDialog customizeView()
+    public CustomizeGridViewDialog customizeView()
     {
         elementCache().viewMenu.clickSubMenu(false, "Customize Grid View");
-        return new CustomizeGridDialog(getDriver(), this);
+        return new CustomizeGridViewDialog(getDriver(), this);
     }
 
     /**
      * Save the grid view. Use the 'Save Grid View' menu option which will always show the save dialog.
      *
-     * @return A {@link SaveGridViewDialog}.
+     * @return A {@link SaveViewDialog}.
      */
-    public SaveGridViewDialog saveView()
+    public SaveViewDialog saveView()
     {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
-        return new SaveGridViewDialog(getDriver(), this);
+        return new SaveViewDialog(getDriver(), this);
     }
 
     /**
@@ -415,7 +415,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public void saveView(String viewName, boolean makeAvailable)
     {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
-        SaveGridViewDialog dialog = new SaveGridViewDialog(getDriver(), this);
+        SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
         dialog.setMakeDefault(false)
                 .setViewName(viewName);
 
@@ -453,7 +453,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public void saveViewAsDefault(boolean makeAvailable)
     {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
-        SaveGridViewDialog dialog = new SaveGridViewDialog(getDriver(), this);
+        SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
         dialog.setMakeDefault(true);
 
         if(makeAvailable)
@@ -475,14 +475,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
-     * Open a {@link ManageGridViewsDialog}. Use the 'Manage Saved Views' menu option.
+     * Open a {@link ManageViewsDialog}. Use the 'Manage Saved Views' menu option.
      *
-     * @return A {@link ManageGridViewsDialog}.
+     * @return A {@link ManageViewsDialog}.
      */
-    public ManageGridViewsDialog manageViews()
+    public ManageViewsDialog manageViews()
     {
         elementCache().viewMenu.clickSubMenu(false, "Manage Saved Views");
-        return new ManageGridViewsDialog(getDriver(), this);
+        return new ManageViewsDialog(getDriver());
     }
 
     /**
@@ -589,22 +589,23 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     /**
      * Click the Save (View) button in the grid header. If the grid is showing the default view clicking save will show
-     * a {@link SaveGridViewDialog}, otherwise clicking save will save the changes to the view currently applied to the grid.
+     * a {@link SaveViewDialog}, otherwise clicking save will save the changes to the view currently applied to the grid.
      *
      * @param expectSaveDialog Indicate if a 'Save View' dialog is expected. Should only happen if you are saving the default view.
-     * @return A {@link SaveGridViewDialog} or null if a saved dialog is not expected.
+     * @return A {@link SaveViewDialog} or null if a saved dialog is not expected.
      */
-    public SaveGridViewDialog clickSaveButton(boolean expectSaveDialog)
+    public SaveViewDialog clickSaveButton(boolean expectSaveDialog)
     {
         WebElement saveButton = Locator.buttonContainingText("Save").findElement(elementCache().panelHeader());
         saveButton.click();
 
         if(expectSaveDialog)
         {
-            return new SaveGridViewDialog(getDriver(), this);
+            return new SaveViewDialog(getDriver(), this);
         }
         else
         {
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(saveButton));
             return null;
         }
     }
@@ -613,14 +614,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * Click the 'Save as...' drop down button menu option to change the view name. The 'Save as...' option will not be
      * visible if the default view is being changed.
      *
-     * @return A {@link SaveGridViewDialog}
+     * @return A {@link SaveViewDialog}
      */
-    public SaveGridViewDialog clickSaveAsButton()
+    public SaveViewDialog clickSaveAsButton()
     {
         BootstrapMenu bootstrapMenu = new BootstrapMenu(getDriver(), elementCache().panelHeader());
         bootstrapMenu.clickSubMenu(false, "Save as...");
 
-        return new SaveGridViewDialog(getDriver(), this);
+        return new SaveViewDialog(getDriver(), this);
     }
 
     /**
@@ -630,7 +631,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public boolean isSaveButtonVisible()
     {
-        return Locator.buttonContainingText("Save").findWhenNeeded(elementCache().panelHeader()).isDisplayed();
+        return Locator.buttonContainingText("Save").isDisplayed(elementCache().panelHeader());
     }
 
     /**

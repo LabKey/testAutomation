@@ -154,7 +154,17 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     public void saveDefaultView()
     {
-        saveCustomView("");
+        saveDefaultView(true);
+    }
+
+    /**
+     * Can save the view as a default view that is private (shared=false) or default for everyone (shared=true).
+     *
+     * @param shared True to make default for everyone, false for a private default view.
+     */
+    public void saveDefaultView(boolean shared)
+    {
+        saveCustomView("", shared);
     }
 
     public void saveCustomView()
