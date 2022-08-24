@@ -1165,7 +1165,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             String destinationSansHash = destinationUrl.split("#", 2)[0];
 
             return !destinationAction.equals(appAction) ||
-                    destinationUrl.length() == destinationSansHash.length() || // Will always navigate if there is no hash
+                    !destinationUrl.contains("#") || // Will always navigate if there is no hash
                     !destinationSansHash.equals(currentSansHash);
         }
         catch (IllegalArgumentException bustedUrl)
