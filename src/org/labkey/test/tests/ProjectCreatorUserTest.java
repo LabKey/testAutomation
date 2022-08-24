@@ -13,6 +13,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.list.ManageListsGrid;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
@@ -154,9 +155,9 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         stopImpersonating();
 
         goToProjectHome(PROJECT_NAME_PC);
-        assertTrue(projectMenu().projectLinkExists(PROJECT_NAME_PC));
-        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
-        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
+        PermissionsPage permissionsPage = navBar().goToPermissionsPage();
+        permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
+        permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
 
         ManageListsGrid listsGrid = goToManageLists().getGrid();
         assertEquals("Incorrect lists copied from template", Arrays.asList("Lab Machines", "Reagents", "Technicians"), listsGrid.getListNames());
