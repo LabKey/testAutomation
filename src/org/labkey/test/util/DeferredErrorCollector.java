@@ -156,21 +156,20 @@ public class DeferredErrorCollector
      * Then resets the error mark.
      *
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
-     * @return True if a screenshot was not taken (i.e. no error was generated), false if there was an error and screenshot was taken.
+     * @return True if a screenshot was taken, false otherwise.
      * @see #takeScreenShot(String)
      */
     public boolean screenShotIfNewError(@NotNull String screenshotName)
     {
-        boolean noError = true;
         if (errorsSinceMark() > 0)
         {
             final String s = artifactCollector.dumpPageSnapshot(screenshotName);
             allErrors.get(allErrors.size() - 1).setScreenshotName(s);
             artifactCollector.reportTestMetadata(s);
-            noError = false;
+            setErrorMark();
+            return true;
         }
-        setErrorMark();
-        return noError;
+        return false;
     }
 
     /**

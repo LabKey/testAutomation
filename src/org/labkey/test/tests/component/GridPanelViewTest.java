@@ -1271,8 +1271,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         }
 
-        // If there was a failure screenShotIfNewError will return false (indicating there was an error).
-        return checker().screenShotIfNewError(String.format("%s_Views_Menu_Column_Error", screenShotPrefix));
+        // If there was a failure screenShotIfNewError will return true (it took a screenshot), so need to 'not' the return value.
+        return !checker().screenShotIfNewError(String.format("%s_Views_Menu_Column_Error", screenShotPrefix));
     }
 
     /**
@@ -1318,8 +1318,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
                     grid.isUndoButtonVisible());
         }
 
-        // If there was a failure screenShotIfNewError will return false (indicating there was an error).
-        return checker().screenShotIfNewError(String.format("%s_Grid_Header_Error", screenShotPrefix));
+        // If there was a failure screenShotIfNewError will return true (it took a screenshot), so need to 'not' the return value.
+        return !checker().screenShotIfNewError(String.format("%s_Grid_Header_Error", screenShotPrefix));
     }
 
     /**

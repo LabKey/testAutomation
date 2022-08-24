@@ -635,6 +635,43 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
+     * This will clear any selections, filters and search terms currently applied to the grid, and then apply the default
+     * view. If revertDefaultView is true it will revert the default view before applying it.
+     *
+     * @param revertDefaultView If true will revert the default view, if false will apply the default view with any
+     *                          modifications it might have.
+     * @return This grid.
+     */
+    public QueryGrid resetToDefaultState(boolean revertDefaultView)
+    {
+
+        // Unfortunately cannot just apply the 'Default' view to reset. For example if filters have been applied to the
+        // grid, and it is the default view, selecting the 'Default' view from the menu is a no-op and will not clear
+        // any filters.
+        clearFilters();
+        clearSearch();
+
+        // Apply the default view. This should restore any columns that have been hidden.
+        if(revertDefaultView && isManageViewsEnabled())
+        {
+            // If there are views to be managed it is possible the default view was changed.
+            manageViews().revertDefaultView().dismiss();
+        }
+
+        selectView("Default");
+
+        // If after selecting the 'Default' view there is still a 'Undo' button visible it means the current view is the
+        // default view that has been modified but not saved.
+        if(isUndoButtonVisible())
+            clickUndoButton();
+
+        // Save clearing the selection for the last.
+        clearAllSelections();
+
+        return this;
+    }
+
+    /**
      * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
      * use this to test which one so we can fork behavior until QGP is gone
      */

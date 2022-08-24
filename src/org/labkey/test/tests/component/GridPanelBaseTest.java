@@ -133,14 +133,14 @@ public class GridPanelBaseTest extends BaseWebDriverTest
         QueryGrid grid = CoreComponentsTestPage.beginAt(this, getProjectName())
                 .getGridPanel(TEST_SCHEMA, sampleType);
 
-        grid.clearAllSelections();
-
         if(clearFilters)
         {
             grid.clearFilters();
         }
 
         grid.clearSearch();
+
+        grid.clearAllSelections();
 
         return grid;
     }
