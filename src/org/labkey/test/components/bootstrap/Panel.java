@@ -97,7 +97,8 @@ public abstract class Panel<EC extends ElementCache> extends WebDriverComponent<
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withChild(Locator.byClass("panel-heading").withText(_title));
+                // Using .containing because panels that have a grid that has been updated/modified will have additional text in the header.
+                return _baseLocator.withChild(Locator.byClass("panel-heading").containing(_title));
             else
                 return _baseLocator;
         }
