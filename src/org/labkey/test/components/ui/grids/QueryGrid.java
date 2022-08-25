@@ -322,10 +322,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     public String getSelectionStatusCount()
-    {   // note: this element is only present when some number of rows in the set are selected
-        WebElement selectionStatus = Locator.tagWithClass("span", "selection-status__count")
-                .waitForElement(this, 4000);
-        return selectionStatus.getText();
+    {
+        // note: this element is only present when some number of rows in the set are selected
+        Optional<WebElement> selectionStatus = Locator.tagWithClass("span", "selection-status__count")
+                .findOptionalElement(this);
+        return selectionStatus.map(WebElement::getText).orElse(null);
     }
 
     public QueryGrid clearAllSelections()
