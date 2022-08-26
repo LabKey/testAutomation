@@ -72,10 +72,7 @@ public class ManageViewsDialog extends ModalDialog
                 String.format("View name input for view '%s' did not show up in time.", currentName), 500);
 
         // Clear the current name.
-        elementCache().viewNameInput.clear();
-
-        // Make sure focus is on the control (is this needed?)
-        elementCache().viewNameInput.click();
+        getWrapper().actionClear(elementCache().viewNameInput);
 
         Actions replaceCurrentText = new Actions(getDriver());
         replaceCurrentText
