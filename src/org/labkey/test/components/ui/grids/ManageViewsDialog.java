@@ -71,11 +71,14 @@ public class ManageViewsDialog extends ModalDialog
         WebDriverWrapper.waitFor(()->elementCache().viewNameInput.isDisplayed(),
                 String.format("View name input for view '%s' did not show up in time.", currentName), 500);
 
+        // Clear the current name.
+        elementCache().viewNameInput.clear();
+
+        // Make sure focus is on the control (is this needed?)
+        elementCache().viewNameInput.click();
+
         Actions replaceCurrentText = new Actions(getDriver());
-        replaceCurrentText.sendKeys(Keys.END)
-                .keyDown(Keys.SHIFT)
-                .sendKeys(Keys.HOME)
-                .keyUp(Keys.SHIFT)
+        replaceCurrentText
                 .sendKeys(newName)
                 .sendKeys(Keys.TAB)
                 .perform();
