@@ -229,7 +229,8 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(importProjects[5], "Inherited Imported Subfolder");
         importFolder("Inherited Imported Subfolder", inheritedPermsZip);
         clickFolder("Inherited Imported Subfolder");
-        _permissionsHelper.assertPermissionsInherited();
+        assertTrue("Permissions not inherited for folder: " + getCurrentContainerPath(),
+                _permissionsHelper.isPermissionsInherited());
     }
 
     private void importFolder(String folderName, String zipFileName)
