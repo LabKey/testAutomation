@@ -357,14 +357,24 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         fileUploadPanel().uploadFile(file);
     }
 
+    private WebElement getFileUploadTab()
+    {
+        return modeSelectListItem("from File")
+                .waitForElement(this, 2000);
+    }
+
     public FileUploadPanel showFileUpload()
     {
         if (!isFileUploadVisible())
         {
-            var toggle = modeSelectListItem("from File")
-                    .waitForElement(this, 2000);
+            var toggle = getFileUploadTab();
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
             toggle.click();
+
+            // This component may remount so get the toggle again and verify it has rendered as clickable
+            toggle = getFileUploadTab();
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
+            
             clearElementCache();
             WebDriverWrapper.waitFor(()-> isFileUploadVisible(),
                     "the file upload panel did bot become visible", 2000);
