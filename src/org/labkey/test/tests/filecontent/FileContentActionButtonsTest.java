@@ -22,18 +22,22 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper.BrowserAction;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -187,6 +191,57 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
         resetToDefaultToolbar();
         waitForElement(BrowserAction.UP.getButtonIconLocator());
+    }
+
+    @Test
+    public void testActionsWithVariousCharsInFileName()
+    {
+        goToProjectHome();
+        goToModule("FileContent");
+        Set<String> expectedFolders = new HashSet<>();
+        String uploadFileName = "pdf_sample_with+%$@+%%+#-+=.pdf";
+        String renamedFile = "pdf_sample_with+%$@+%%+#-+=_!@+%.pdf";
+        String fileDescription = "sample pdf";
+
+        String folderName1 = "test_~!@#$%()-_=+Folder~!@#$%()-_=+_Ž";
+        log("Creating folder: " + folderName1);
+        expectedFolders.add(folderName1);
+        _fileBrowserHelper.createFolder(folderName1);
+
+        String folderName2 = "+Folder~!@#$%()-_=+_";
+        log("Creating folder: " + folderName2);
+        expectedFolders.add(folderName2);
+        _fileBrowserHelper.createFolder(folderName2);
+
+        Set<String> folders = new HashSet<>(_fileBrowserHelper.getFileList());
+        assertEquals("Didn't create expected folders", expectedFolders, folders);
+
+        log("Uploading file '" + uploadFileName + "' to " + folderName1);
+        _fileBrowserHelper.selectFileBrowserItem(folderName1 + "/");
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
+
+        log("Moving file '" + uploadFileName + "' to " + folderName2);
+        _fileBrowserHelper.moveFile("/" + folderName1 + "/" + uploadFileName, folderName2);
+
+        log("Renaming file '" + uploadFileName + "' to '" + renamedFile + "'");
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderName2 + "/");
+        _fileBrowserHelper.renameFile("/" + folderName2 + "/" + uploadFileName, renamedFile);
+
+        log("Downloading file '" + renamedFile + "'");
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderName2 + "/" + renamedFile);
+        File download = _fileBrowserHelper.downloadSelectedFiles();
+        assertEquals(renamedFile, download.getName());
+
+        log("Setting description " + fileDescription + " for '" + renamedFile + "'");
+        _fileBrowserHelper.setDescription(renamedFile, fileDescription);
+        assertEquals("Folder description is not as expected", fileDescription, _fileBrowserHelper.getFileDescription(renamedFile));
+
+        log("Deleting '" + renamedFile + "'");
+        _fileBrowserHelper.deleteFile(renamedFile);
+        assertFalse("Unable to delete file '" + renamedFile + "'", _fileBrowserHelper.fileIsPresent(renamedFile));
+
+        log("Drag and Drop '" + uploadFileName + "'");
+        _fileBrowserHelper.dragDropUpload(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
     }
 
     private void assertActionsAvailable(BrowserAction... actions)
