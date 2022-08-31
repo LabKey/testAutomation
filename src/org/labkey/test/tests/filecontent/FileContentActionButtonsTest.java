@@ -202,6 +202,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         String uploadFileName = "pdf_sample_with+%$@+%%+#-+=.pdf";
         String renamedFile = "pdf_sample_with+%$@+%%+#-+=_!@+%.pdf";
         String fileDescription = "sample pdf";
+        String uploadFolderName = "fileTypes";
 
         String folderName1 = "test_~!@#$%()-_=+Folder~!@#$%()-_=+_Ž";
         log("Creating folder: " + folderName1);
@@ -214,11 +215,11 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         _fileBrowserHelper.createFolder(folderName2);
 
         Set<String> folders = new HashSet<>(_fileBrowserHelper.getFileList());
-        assertEquals("Didn't create expected folders", expectedFolders, folders);
+        assertEquals("Expected folders not created", expectedFolders, folders);
 
         log("Uploading file '" + uploadFileName + "' to " + folderName1);
         _fileBrowserHelper.selectFileBrowserItem(folderName1 + "/");
-        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(uploadFolderName + "/" + uploadFileName));
 
         log("Moving file '" + uploadFileName + "' to " + folderName2);
         _fileBrowserHelper.moveFile("/" + folderName1 + "/" + uploadFileName, folderName2);
@@ -240,8 +241,13 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         _fileBrowserHelper.deleteFile(renamedFile);
         assertFalse("Unable to delete file '" + renamedFile + "'", _fileBrowserHelper.fileIsPresent(renamedFile));
 
-        log("Drag and Drop '" + uploadFileName + "'");
-        _fileBrowserHelper.dragDropUpload(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
+        log("Drag and Drop file '" + uploadFileName + "'");
+        _fileBrowserHelper.dragDropUpload(TestFileUtils.getSampleData(uploadFolderName + "/" + uploadFileName));
+        assertEquals("File not uploaded via drag and drop", _fileBrowserHelper.getFileList().get(0), uploadFileName);
+
+        log("Drag and Drop folder '" + uploadFolderName + "'");
+        _fileBrowserHelper.dragAndDropFileInDropZone(TestFileUtils.getSampleData(uploadFolderName));
+
     }
 
     private void assertActionsAvailable(BrowserAction... actions)
