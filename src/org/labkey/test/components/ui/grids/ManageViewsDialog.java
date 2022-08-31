@@ -5,6 +5,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -80,7 +82,16 @@ public class ManageViewsDialog extends ModalDialog
                 .sendKeys(Keys.TAB)
                 .perform();
 
-        WebDriverWrapper.waitFor(()->!elementCache().viewNameInput.isDisplayed() && getViewNames().contains(newName),
+        WebDriverWrapper.waitFor(()->{
+            try {
+                return !elementCache().viewNameInput.isDisplayed() && getViewNames().contains(newName);
+            }
+            catch (StaleElementReferenceException | NoSuchElementException exp)
+            {
+                // Sometimes there is a race condition with the elementCache().viewRows refreshing after a view has been renamed.
+                return false;
+            }
+        },
                 String.format("New view name '%s' was not added to the list of views.", newName), 1_500);
 
         return this;
