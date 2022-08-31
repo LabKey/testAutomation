@@ -29,7 +29,7 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.ElementCache>
 {
-    private final WebDriver _driver;
+    private WebDriver _driver;
     private final WebElement _editingDiv;
 
     public EntityInsertPanel(WebElement element, WebDriver driver)
@@ -177,8 +177,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public FileUploadPanel getFileUploadPanel()
     {
-        showFileUpload();
-        return fileUploadPanel();
+        var panel = showFileUpload();
+        return panel.fileUploadPanel();
     }
 
     private Optional<EditableGrid> optionalGrid()
@@ -188,9 +188,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel setUpdateDataForFileUpload(boolean checked)
     {
-        showFileUpload();
-        if (checked && elementCache().updateDataCheckbox.isDisplayed())
-            elementCache().updateDataCheckbox.set(true);
+        var panel = showFileUpload();
+        if (checked && panel.elementCache().updateDataCheckbox.isDisplayed())
+            panel.elementCache().updateDataCheckbox.set(true);
         return this;
     }
 
@@ -346,30 +346,43 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public ResponsiveGrid uploadFileExpectingPreview(File file, boolean updateData)
     {
-        uploadFile(file, updateData);
-        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(this);
+        var panel = uploadFile(file, updateData);
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(panel);
     }
 
-    public void uploadFile(File file, boolean updateData)
+    public EntityInsertPanel uploadFile(File file, boolean updateData)
     {
-        showFileUpload();
-        setUpdateDataForFileUpload(updateData);
-        fileUploadPanel().uploadFile(file);
+        var panel = showFileUpload();
+        panel.setUpdateDataForFileUpload(updateData);
+        panel.fileUploadPanel().uploadFile(file);
+        return panel;
     }
 
-    public FileUploadPanel showFileUpload()
+    private WebElement getFileUploadTab()
+    {
+        return modeSelectListItem("from File")
+                .waitForElement(this, 2000);
+    }
+
+    public EntityInsertPanel showFileUpload()
     {
         if (!isFileUploadVisible())
         {
-            var toggle = modeSelectListItem("from File")
-                    .waitForElement(this, 2000);
+            var toggle = getFileUploadTab();
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
             toggle.click();
-            clearElementCache();
-            WebDriverWrapper.waitFor(()-> isFileUploadVisible(),
+
+            // This component may remount so find it again
+            var newPanel = new EntityInsertPanel.EntityInsertPanelFinder(getDriver()).findWhenNeeded(getDriver());
+            
+            newPanel.clearElementCache();
+            newPanel.waitForLoaded();
+            WebDriverWrapper.waitFor(() -> newPanel.isFileUploadVisible(),
                     "the file upload panel did bot become visible", 2000);
+
+            return newPanel;
         }
-        return fileUploadPanel();
+        return this;
     }
 
     private void waitForLoaded()
