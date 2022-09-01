@@ -141,7 +141,10 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     protected void htmlFormat()
     {
         Locator[] reportContains = {Locator.tag("p").withText("This is a minimal example which shows knitr working with HTML pages in LabKey."),
-                                    Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"),
+                                    Locator.XPathLocator.union(
+                                            // Image output varies slightly between versions (not sure if it's pandoc or some R package(s))
+                                            Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"), // old
+                                            Locator.tag("img").withAttribute("alt", "plot of chunk blood-pressure-scatter")), // new
                                     Locator.tag("pre").containing("## \"1\",249318596,\"2008-05-17\",86,36,129,76,64"),
                                     Locator.tag("pre").withText("## knitr says hello to HTML!"),
                                     Locator.tag("pre").startsWith("## Error").containing(": non-numeric argument to binary operator"),

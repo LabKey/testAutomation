@@ -303,7 +303,7 @@ public class WebTestHelper
     public enum DatabaseType
     {
         PostgreSQL("org.postgresql.Driver", "pg", "postgres"),
-        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds.jdbc.Driver", "mssql", "sqlserver");
+        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds.jdbc.Driver", "mssql", "sqlserver", "jtds");
 
         private static final Map<String, DatabaseType> DATABASE_TYPE_MAP;
 
