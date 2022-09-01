@@ -16,6 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
@@ -82,6 +83,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     public ReactAssayDesignerPage setAutoLinkTarget(String containerPath)
     {
         expandPropertiesPanel();
+        WebDriverWrapper.waitFor(() -> elementCache().autoLinkTargetSelect.getOptions().size() > 1,
+                "No Auto-link targets available", 5_000);
         elementCache().autoLinkTargetSelect.selectByVisibleText(containerPath);
         return this;
     }
