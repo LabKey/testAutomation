@@ -156,7 +156,7 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExportImportWithVariousCharsInFileName()
+    public void testExportImportWithSpecialCharactersInFileName()
     {
         String sourceFolder = "Source_Folder~,!@#$%%++_)(&+=[{";
         String targetFolder = "Target_Folder~!@#$%%++_)(&+=]},";
@@ -194,6 +194,9 @@ public class FolderExportTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem(dir + "/" + uploadFileName);
         File downloadedFile = _fileBrowserHelper.downloadSelectedFiles();
         assertEquals("Expected file '" + uploadFileName + "' did not get downloaded", uploadFileName, downloadedFile.getName());
+
+        log("Test Drag and Drop zip folder '" + sourceZip.getName() + "'");
+        _fileBrowserHelper.dragAndDropFileInDropZone(sourceZip);
     }
 
     @Test

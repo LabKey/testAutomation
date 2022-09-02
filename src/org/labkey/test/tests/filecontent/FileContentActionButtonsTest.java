@@ -194,7 +194,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testActionsWithVariousCharsInFileName()
+    public void testActionsWithSpecialCharactersInFileName()
     {
         goToProjectHome();
         goToModule("FileContent");
@@ -244,9 +244,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         log("Drag and Drop file '" + uploadFileName + "'");
         _fileBrowserHelper.dragDropUpload(TestFileUtils.getSampleData(uploadFolderName + "/" + uploadFileName));
         assertEquals("File not uploaded via drag and drop", _fileBrowserHelper.getFileList().get(0), uploadFileName);
-
-        log("Drag and Drop folder '" + uploadFolderName + "'");
-        _fileBrowserHelper.dragAndDropFileInDropZone(TestFileUtils.getSampleData(uploadFolderName));
 
     }
 
