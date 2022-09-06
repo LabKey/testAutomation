@@ -174,15 +174,14 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         return this;
     }
 
-    public ChartTypeDialog clickYAxisMeasure(String columnName)
-    {
-        getWrapper().waitAndClick(elementCache().Y_FIELD_TEXT.withText(columnName));
-        return this;
-    }
-
     public ChartTypeDialog setYAxisSide(int measureIndex, YAxisSide side)
     {
-        getWrapper().mouseOver(elementCache().yAxis());
+        WebElement measureEl = elementCache().Y_FIELD_DISPLAY.index(measureIndex).findElement(this);
+        if (!measureEl.getAttribute("class").contains("selected"))
+        {
+            Locator.byClass("field-selection-text").findElement(measureEl).click();
+        }
+
         switch(side)
         {
             case Left:
@@ -529,8 +528,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         public final String FIELD_DISPLAY = "//div[contains(@class, 'field-selection-display')]";
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
-        public Locator Y_FIELD_TEXT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//div[contains(@class, 'field-selection-text')]");
-
+        public Locator Y_FIELD_DISPLAY = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY);
         public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-left')]");
         public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-right')]");
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
