@@ -50,6 +50,15 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return editField(fieldRow, fieldDefinition);
     }
 
+    public DomainFormPanel addFields(List<FieldDefinition> fieldDefinitions)
+    {
+        for (FieldDefinition fieldDefinition : fieldDefinitions)
+        {
+            addField(fieldDefinition);
+        }
+        return this;
+    }
+
     public DomainFormPanel setField(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = getField(fieldDefinition.getName());
