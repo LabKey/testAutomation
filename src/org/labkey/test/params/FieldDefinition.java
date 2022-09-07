@@ -454,6 +454,7 @@ public class FieldDefinition extends PropertyDescriptor
         Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
         Attachment("Attachment", "attachment"),
         User("User", "int", null, new LookupInfo(null, "core", "users")),
+        @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
         Lookup("Lookup", null),
         OntologyLookup("Ontology Lookup", "string", "http://www.labkey.org/types#conceptCode", null),
         VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
