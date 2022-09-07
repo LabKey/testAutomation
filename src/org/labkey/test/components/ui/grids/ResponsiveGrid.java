@@ -87,6 +87,27 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
+     * Is the left column on this grid locked. I think this will always be true for this grid type.
+     *
+     * @return True if left column is locked, false otherwise.
+     */
+    public boolean hasLockedColumn()
+    {
+        return Locator.tagWithClass("div", "grid-panel__grid")
+                .findElement(getComponentElement())
+                .getAttribute("class").contains("grid-panel__lock-left");
+    }
+
+    /**
+     * Scroll the grid to the top row and left most column.
+     */
+    public void scrollToOrigin()
+    {
+        getWrapper().executeScript("arguments[0].scrollBy(-arguments[0].scrollLeft, -arguments[0].scrollHeight)",
+                Locators.responsiveGrid().findElement(getComponentElement()));
+    }
+
+    /**
      * Sorts from the grid header menu
      * @param columnLabel column header for
      * @return this grid
@@ -226,6 +247,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
     {
+
+        if(hasLockedColumn())
+        {
+            scrollToOrigin();
+        }
+
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
         sleep(500);  //it would be nice to find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
