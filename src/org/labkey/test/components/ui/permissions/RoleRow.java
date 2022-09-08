@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
 {
-    private static final Locator.XPathLocator MEMBER_LOC = Locator.byClass("permissions-member-li");
+    private static final Locator.XPathLocator MEMBER_LOC = Locator.byClass("permissions-groups-member-li");
 
     private final WebElement _el;
     private final WebDriver _driver;
