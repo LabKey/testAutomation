@@ -38,18 +38,18 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
         return getThis();
     }
 
-    public T addDomainTransformer(String domainName, Consumer<Domain> transformer)
+    public T addDomainTransformer(String domainQueryName, Consumer<Domain> transformer)
     {
         _transformers.add(protocol -> {
-            Domain domain = extractDomain(domainName, protocol);
+            Domain domain = extractDomain(domainQueryName, protocol);
             transformer.accept(domain);
         });
         return getThis();
     }
 
-    public T setFields(String domainName, List<PropertyDescriptor> fields, boolean keepExisting)
+    public T setFields(String domainQueryName, List<PropertyDescriptor> fields, boolean keepExisting)
     {
-        return addDomainTransformer(domainName, domain -> {
+        return addDomainTransformer(domainQueryName, domain -> {
             List<PropertyDescriptor> pds = new ArrayList<>();
             if (keepExisting)
             {
@@ -77,23 +77,28 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
         return saveProtocolResponse.getProtocol();
     }
 
-    protected Domain extractDomain(String domainName, Protocol protocol)
+    protected Domain extractDomain(String domainQueryName, Protocol protocol)
     {
         Map<String, Domain> domains = new CaseInsensitiveHashMap<>();
         for (Domain domain : protocol.getDomains())
         {
-            domains.put(domain.getName(), domain);
+            String queryName = (String) domain.getAllProperties().get("queryName");
+            if (queryName == null)
+            {
+                throw new IllegalStateException("Unable to determine query name for domain: " + domain.getName());
+            }
+            domains.put(queryName, domain);
         }
 
-        Domain domain = domains.get(domainName);
+        Domain domain = domains.get(domainQueryName);
         if (domain == null)
         {
-            domain = domains.get(domainName + " Fields");
+            domain = domains.get(domainQueryName + " Fields");
             if (domain == null)
             {
                 throw new IllegalArgumentException(String.format(
                         "Domain '%s' not found for assay provider '%s'. Found: %s",
-                        domainName, protocol.getProviderName(), domains.keySet()));
+                        domainQueryName, protocol.getProviderName(), domains.keySet()));
             }
         }
         return domain;
