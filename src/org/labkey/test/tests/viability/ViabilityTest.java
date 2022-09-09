@@ -301,7 +301,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
         assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy", true);
-        assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition("TargetStudy").setLabel("Target Study").setType(FieldDefinition.ColumnType.String));
+        assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition("TargetStudy", FieldDefinition.ColumnType.String).setLabel("Target Study"));
         assayDesignerPage.clickFinish();
 
         navigateToFolder(getProjectName(), getFolderName());
