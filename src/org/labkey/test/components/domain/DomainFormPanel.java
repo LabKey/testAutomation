@@ -67,7 +67,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     private DomainFormPanel editField(DomainFieldRow fieldRow, FieldDefinition fieldDefinition)
     {
-        if (fieldDefinition.getLookup() != null)
+        if (fieldDefinition.getLookup() != null && fieldDefinition.getType().getConceptURI() == null)
             fieldRow.setLookup(fieldDefinition.getLookup());
         else if (fieldDefinition.getType() != null)
             fieldRow.setType(fieldDefinition.getType());
