@@ -592,6 +592,10 @@ public class FieldDefinition extends PropertyDescriptor
         private final String _table;
         private ColumnType _tableType;
 
+        /**
+         * @deprecated Use {@link IntLookup} or {@link StringLookup}
+         */
+        @Deprecated (since = "22.10")
         public LookupInfo(@Nullable String folder, String schema, String table)
         {
             if (folder == null || folder.isEmpty())
@@ -610,7 +614,7 @@ public class FieldDefinition extends PropertyDescriptor
 
             _schema = StringUtils.trimToNull(schema);
             _table = StringUtils.trimToNull(table);
-            setTableType(ColumnType.String);
+            _tableType = ColumnType.String;
         }
 
         public String getFolder()
@@ -659,13 +663,13 @@ public class FieldDefinition extends PropertyDescriptor
         }
 
         @Override
-        public java.lang.String getLabel()
+        public String getLabel()
         {
             return ColumnType.Lookup.getLabel();
         }
 
         @Override
-        public java.lang.String getRangeURI()
+        public String getRangeURI()
         {
             return _tableType.getRangeURI();
         }
@@ -674,6 +678,47 @@ public class FieldDefinition extends PropertyDescriptor
         public LookupInfo getLookupInfo()
         {
             return this;
+        }
+    }
+
+    private static abstract class Lookup extends LookupInfo
+    {
+        public Lookup(@Nullable String folder, String schema, String table, ColumnType lookupType)
+        {
+            super(folder, schema, table);
+            super.setTableType(lookupType);
+        }
+
+        @Override
+        public LookupInfo setTableType(ColumnType tableType)
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public static class IntLookup extends Lookup
+    {
+        public IntLookup(@Nullable String folder, String schema, String table)
+        {
+            super(folder, schema, table, ColumnType.Integer);
+        }
+
+        public IntLookup(String schema, String table)
+        {
+            this(null, schema, table);
+        }
+    }
+
+    public static class StringLookup extends Lookup
+    {
+        public StringLookup(@Nullable String folder, String schema, String table)
+        {
+            super(folder, schema, table, ColumnType.String);
+        }
+
+        public StringLookup(String schema, String table)
+        {
+            this(null, schema, table);
         }
     }
 
