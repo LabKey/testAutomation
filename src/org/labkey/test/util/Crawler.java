@@ -1045,33 +1045,30 @@ public class Crawler
                             }
                         }
 
-                        if (!_terminalActions.contains(actionId))
+                        int nextDepth = depth + 1;
+
+                        for (Pair<String, ?> p : linksWithAttributes)
                         {
-                            int nextDepth = depth + 1;
-
-                            for (Pair<String, ?> p : linksWithAttributes)
+                            String url = p.getLeft();
+                            try
                             {
-                                String url = p.getLeft();
-                                try
-                                {
-                                    newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
-                                }
-                                catch (IllegalArgumentException badUrl)
-                                {
-                                    throw new IllegalArgumentException("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
-                                }
+                                newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
                             }
-
-                            for (String url : _test.getFormAddresses())
+                            catch (IllegalArgumentException badUrl)
                             {
-                                try
-                                {
-                                    newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth).setFromForm(true));
-                                }
-                                catch (IllegalArgumentException ignore)
-                                {
-                                    // forms might have strange target action (e.g. '../formulations')
-                                }
+                                throw new IllegalArgumentException("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
+                            }
+                        }
+
+                        for (String url : _test.getFormAddresses())
+                        {
+                            try
+                            {
+                                newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth).setFromForm(true));
+                            }
+                            catch (IllegalArgumentException ignore)
+                            {
+                                // forms might have strange target action (e.g. '../formulations')
                             }
                         }
                     }
@@ -1128,7 +1125,9 @@ public class Crawler
             }
         }
 
-        return newUrlsToCheck.stream().filter(UrlToCheck::isVisitableURL).toList();
+        return _terminalActions.contains(actionId)
+                ? Collections.emptyList()
+                : newUrlsToCheck.stream().filter(UrlToCheck::isVisitableURL).toList();
     }
 
     private static final ControllerActionId spiderAction = new ControllerActionId("admin", "spider");
