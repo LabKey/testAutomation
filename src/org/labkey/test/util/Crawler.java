@@ -1020,7 +1020,9 @@ public class Crawler
                     if (code == 200 && _test.getDriver().getTitle().isEmpty())
                         _warnings.add("Action does not specify title: " + actionId);
 
-                    if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
+                    if (depth >= 0 && // Negative depth indicates a one-off check
+                            actualUrl.toString().startsWith(WebTestHelper.getBaseURL()) && // Stop if redirected to an external site
+                            !_terminalActions.contains(actionId))
                     {
                         List<Pair<String, Map<String, String>>> linksWithAttributes = _test.getLinkAddresses();
                         for (Pair<String, Map<String, String>> linkWithAttributes : linksWithAttributes)
