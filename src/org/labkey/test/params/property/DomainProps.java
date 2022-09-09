@@ -39,7 +39,7 @@ public abstract class DomainProps
 
     public final TestDataGenerator create(Connection connection, String containerPath) throws IOException, CommandException
     {
-        TestLogger.info(String.format("Creating domain '%s.%s' in '%s'", getSchemaName(), getQueryName(), containerPath));
+        TestLogger.info(String.format("Creating %s domain '%s.%s' in '%s'", getKind(), getSchemaName(), getQueryName(), containerPath));
         getCreateCommand().execute(connection, containerPath);
         return getTestDataGenerator(containerPath);
     }
