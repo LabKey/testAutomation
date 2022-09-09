@@ -13,12 +13,12 @@ public class GeneralAssayDesign extends AssayDesign<GeneralAssayDesign>
 
     public GeneralAssayDesign setBatchFields(List<PropertyDescriptor> fields, boolean keepExisting)
     {
-        return setFields("Batches", fields, keepExisting);
+        return setFields("Batch", fields, keepExisting);
     }
 
     public GeneralAssayDesign setRunFields(List<PropertyDescriptor> fields, boolean keepExisting)
     {
-        return setFields("Runs", fields, keepExisting);
+        return setFields("Run", fields, keepExisting);
     }
 
     public GeneralAssayDesign setDataFields(List<PropertyDescriptor> fields, boolean keepExisting)

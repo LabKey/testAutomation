@@ -6,14 +6,12 @@ import org.labkey.remoteapi.assay.GetProtocolCommand;
 import org.labkey.remoteapi.assay.Protocol;
 import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.SaveProtocolCommand;
-import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public abstract class AssayDesign<T extends AssayDesign<T>>
@@ -38,18 +36,18 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
         return getThis();
     }
 
-    public T addDomainTransformer(String domainQueryName, Consumer<Domain> transformer)
+    public T addDomainTransformer(String domainName, Consumer<Domain> transformer)
     {
         _transformers.add(protocol -> {
-            Domain domain = extractDomain(domainQueryName, protocol);
+            Domain domain = extractDomain(domainName, protocol);
             transformer.accept(domain);
         });
         return getThis();
     }
 
-    public T setFields(String domainQueryName, List<PropertyDescriptor> fields, boolean keepExisting)
+    public T setFields(String domainName, List<PropertyDescriptor> fields, boolean keepExisting)
     {
-        return addDomainTransformer(domainQueryName, domain -> {
+        return addDomainTransformer(domainName, domain -> {
             List<PropertyDescriptor> pds = new ArrayList<>();
             if (keepExisting)
             {
@@ -67,6 +65,11 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
 
         Protocol protocol = getProtocolResponse.getProtocol();
 
+        return updateProtocol(containerPath, connection, protocol);
+    }
+
+    public Protocol updateProtocol(String containerPath, Connection connection, Protocol protocol) throws IOException, CommandException
+    {
         for (var transformer : _transformers)
         {
             transformer.accept(protocol);
@@ -77,31 +80,19 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
         return saveProtocolResponse.getProtocol();
     }
 
-    protected Domain extractDomain(String domainQueryName, Protocol protocol)
+    protected Domain extractDomain(String domainName, Protocol protocol)
     {
-        Map<String, Domain> domains = new CaseInsensitiveHashMap<>();
         for (Domain domain : protocol.getDomains())
         {
-            String queryName = (String) domain.getAllProperties().get("queryName");
-            if (queryName == null)
+            if (domain.getName().endsWith(domainName + " Fields"))
             {
-                throw new IllegalStateException("Unable to determine query name for domain: " + domain.getName());
+                return domain;
             }
-            domains.put(queryName, domain);
         }
 
-        Domain domain = domains.get(domainQueryName);
-        if (domain == null)
-        {
-            domain = domains.get(domainQueryName + " Fields");
-            if (domain == null)
-            {
-                throw new IllegalArgumentException(String.format(
-                        "Domain '%s' not found for assay provider '%s'. Found: %s",
-                        domainQueryName, protocol.getProviderName(), domains.keySet()));
-            }
-        }
-        return domain;
+        throw new IllegalArgumentException(String.format(
+                "Domain '%s' not found for assay provider '%s'. Found: %s",
+                domainName, protocol.getProviderName(), protocol.getDomains().stream().map(Domain::getName).toList()));
     }
 
     protected abstract T getThis();
