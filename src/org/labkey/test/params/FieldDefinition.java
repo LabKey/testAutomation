@@ -421,6 +421,12 @@ public class FieldDefinition extends PropertyDescriptor
         }
 
         @Override
+        public boolean isLookup()
+        {
+            return false;
+        }
+
+        @Override
         public String getRangeURI()
         {
             return ColumnType.Sample.getRangeURI();
@@ -472,17 +478,47 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
 
+        /**
+         * UI: The Option text for the column type.
+         * API: Unused
+         */
         String getLabel();
+
+        /**
+         * UI: Is this a plain lookup field. (Formerly 'ColumnType.Lookup'). Some column type have lookup info but are
+         * defined as lookups in the domain designer.
+         * API: Unused
+         */
+        boolean isLookup();
+
+        /**
+         * UI: Unused
+         * API: The value used by the server to determine the field's type
+         */
         String getRangeURI();
+
+        /**
+         * UI: Unused
+         * API: For definiting column types that add special functionality.
+         */
         default String getConceptURI()
         {
             return null;
         }
+
+        /**
+         * UI: Lookup info for plain lookup fields ({@link #isLookup()} == true)
+         * API: Lookup info for plain and special (e.g. 'Sample') lookup fields
+         */
         default FieldDefinition.LookupInfo getLookupInfo()
         {
             return null;
         }
 
+        /**
+         * @deprecated Bridge for converting away from enum
+         */
+        @Deprecated (since = "22.10")
         static List<ColumnType> values()
         {
             return COLUMN_TYPES;
@@ -678,6 +714,12 @@ public class FieldDefinition extends PropertyDescriptor
         public LookupInfo getLookupInfo()
         {
             return this;
+        }
+
+        @Override
+        public boolean isLookup()
+        {
+            return true;
         }
     }
 
@@ -988,6 +1030,12 @@ class ColumnTypeImpl implements FieldDefinition.ColumnType
     public String getLabel()
     {
         return _label;
+    }
+
+    @Override
+    public boolean isLookup()
+    {
+        return false;
     }
 
     @Override
