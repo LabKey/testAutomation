@@ -67,8 +67,7 @@ public class FieldDefinition extends PropertyDescriptor
      */
     public FieldDefinition(String name)
     {
-        setName(name);
-        super.setRangeURI(ColumnType.String.getRangeURI());
+        this(name, ColumnType.String);
     }
 
     @Override
@@ -79,33 +78,25 @@ public class FieldDefinition extends PropertyDescriptor
 
     public ColumnType getType()
     {
-        return _type == null
-                ? ColumnType.String // null type indicates usage of the deprecated name-only constructor
-                : _type;
+        return _type;
     }
 
-    public FieldDefinition setType(ColumnType type)
+    private void setType(ColumnType type)
     {
-        if (_type != null)
-        {
-            throw new IllegalStateException(String.format("'%s' already has the type '%s'.", getName(), _type.toString()));
-        }
         if (type == ColumnType.Lookup)
         {
-            throw new IllegalArgumentException("Construct with 'FieldDefinition(String, LookupInfo)' to create lookup fields");
+            throw new IllegalArgumentException("Use IntLookup or StringLookup to create lookup fields");
         }
 
         _type = type;
         if (type.getLookupInfo() != null)
         {
-            // Special 'User' and 'Sample' lookups
             super.setLookup(type.getLookupInfo().getSchema(),
                     type.getLookupInfo().getTable(),
                     type.getLookupInfo().getFolder());
         }
         super.setRangeURI(type.getRangeURI());
         setFieldProperty("conceptURI", type.getConceptURI());
-        return this;
     }
 
     @Override
@@ -467,13 +458,13 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType File = new ColumnTypeImpl("File", "http://cpas.fhcrc.org/exp/xml#fileLink");
         ColumnType Flag = new ColumnTypeImpl("Flag", "string", "http://www.labkey.org/exp/xml#flag", null);
         ColumnType Attachment = new ColumnTypeImpl("Attachment", "attachment");
-        ColumnType User = new ColumnTypeImpl("User", "int", null, new LookupInfo(null, "core", "users"));
+        ColumnType User = new ColumnTypeImpl("User", "int", null, new IntLookup("core", "users"));
         @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
         ColumnType Lookup = new ColumnTypeImpl("Lookup", null);
         ColumnType OntologyLookup = new ColumnTypeImpl("Ontology Lookup", "string", "http://www.labkey.org/types#conceptCode", null);
         ColumnType VisitId = new ColumnTypeImpl("Visit ID", "double", "http://cpas.labkey.com/Study#VisitId", null);
         ColumnType VisitDate = new ColumnTypeImpl("Visit Date", "dateTime", "http://cpas.labkey.com/Study#VisitId", null);
-        ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials"));
+        ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
@@ -673,6 +664,10 @@ public class FieldDefinition extends PropertyDescriptor
             return _tableType;
         }
 
+        /**
+         * @deprecated Use {@link IntLookup} or {@link StringLookup}
+         */
+        @Deprecated (since = "22.10")
         public LookupInfo setTableType(ColumnType tableType)
         {
             _tableType = tableType;
