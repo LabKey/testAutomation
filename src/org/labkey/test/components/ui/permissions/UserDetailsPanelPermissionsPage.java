@@ -21,8 +21,10 @@ public class UserDetailsPanelPermissionsPage extends UserDetailsPanel
 
     public List<String> getEffectiveRoles()
     {
-        return Locator.css(".permissions-ul > li")
-                .findElements(this)
+        var listContainer=  Locator.tagWithClass("div", "principal-detail-label").withText("Effective Roles:")
+                .followingSibling("ul").waitForElement(this, 2000);
+        return Locator.tag("li")
+                .findElements(listContainer)
                 .stream().map(WebElement::getText).collect(Collectors.toList());
     }
 }
