@@ -15,7 +15,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,14 +24,12 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 {
     final WebElement _el;
-    final WebDriver _driver;
     final ResponsiveGrid<?> _grid;
     private Map<String, String> _rowMap = null;
 
-    protected GridRow(ResponsiveGrid<?> grid, WebElement element, WebDriver driver)
+    protected GridRow(ResponsiveGrid<?> grid, WebElement element)
     {
         _el = element;
-        _driver = driver;
         _grid = grid;
     }
 
@@ -63,7 +60,10 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         assertTrue("The row does not have a select box", hasSelectColumn());
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().selectCheckbox.getComponentElement()));
-        elementCache().selectCheckbox.set(checked);
+        if (elementCache().selectCheckbox.get() != checked)
+        {
+            _grid.doAndWaitForUpdate(()-> elementCache().selectCheckbox.set(checked));
+        }
         return this;
     }
 
@@ -184,7 +184,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     @Override
     public WebDriver getDriver()
     {
-        return _driver;
+        return _grid.getDriver();
     }
 
     @Override
@@ -257,7 +257,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         @Override
         protected GridRow construct(WebElement el, WebDriver driver)
         {
-            return new GridRow(_grid, el, driver);
+            return new GridRow(_grid, el);
         }
 
         @Override

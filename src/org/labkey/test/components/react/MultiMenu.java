@@ -11,7 +11,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class MultiMenu extends BootstrapMenu
 {
@@ -48,7 +48,8 @@ public class MultiMenu extends BootstrapMenu
      *
      * @param pathToAction List of the menus to click
      **/
-    public void doMenuAction(List<String> pathToAction)
+    @LogMethod(quiet = true)
+    public void doMenuAction(@LoggedParam List<String> pathToAction)
     {
         expand();
 
@@ -77,22 +78,20 @@ public class MultiMenu extends BootstrapMenu
         }
     }
 
-    private List<String> waitForDataThenGetMenuText()
+    private List<WebElement> waitForData()
     {
         List<WebElement> topMenuList;
         List<String> menuText = new ArrayList<>();
+        RuntimeException lastException;
 
-        boolean stale;
-        boolean loading;
         int tries = 1;
 
         do {
 
-            stale = false;
-            loading = false;
-
             try
             {
+                lastException = null;
+                boolean loading = false;
 
                 topMenuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(this);
                 menuText = new ArrayList<>();
@@ -109,67 +108,56 @@ public class MultiMenu extends BootstrapMenu
 
                 }
 
+                if (!loading)
+                {
+                    return topMenuList;
+                }
             }
-            catch(StaleElementReferenceException staleExc)
+            catch (StaleElementReferenceException ex)
             {
+                lastException = ex;
                 // This happens in the time between the change of the menu content from containing "loading"
                 // to having data (like "sample types").
                 getComponentElement().isEnabled(); // will throw an uncaught 'StaleReferenceException' if the entire menu went stale
-                stale = true;
             }
 
             // Just a small pause, no need to keep hitting the DOM if it looks like the server is doing something
-            if(stale || loading )
-                WebDriverWrapper.sleep(500);
+            WebDriverWrapper.sleep(500);
 
             tries++;
 
             // Keep trying until we get valid menu text.
-        } while((stale || loading) && (tries <= 10));
+        } while(tries <= 10);
 
-        if (stale)
+        if (lastException != null)
         {
-            throw new RuntimeException("Menu items kept going stale");
+            throw new RuntimeException("Menu items kept going stale.", lastException);
         }
-        if (loading)
+        else
         {
-            throw new RuntimeException("Menu items still loading. " + menuText.toString());
+            throw new RuntimeException("Menu items still loading: " + menuText);
         }
-
-        return menuText;
     }
 
     private void expandAll()
     {
         expand();
 
-        List<String> menuText = waitForDataThenGetMenuText();
+        List<WebElement> menuItems = waitForData();
 
-        WebElement menuList = Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
-
-        for (int i = 0; i < menuText.size(); i++)
+        for (WebElement menuItem : menuItems)
         {
-
-            WebElement menuItem = Locator.tag("li").withChild(Locator.tagWithAttribute("a", "role", "menuitem").withText(menuText.get(i))).findElement(menuList);
-
-            try
+            menuItem = Locator.xpath("..").findElement(menuItem); // Up a level
+            Optional<WebElement> expando = Locator.xpath("./i").withClass("fa-chevron-down").findOptionalElement(menuItem);
+            if (expando.isPresent())
             {
-                if (!Locator.xpath("./i").findElement(menuItem).getAttribute("class").contains("fa-chevron-up"))
-                {
-                    // This is a sub-menu item, but click it only if the sub-menu is not expanded.
-                    menuItem.click();
-                }
+                expando.get().click();
+                Locator.tagWithClass("ul", "well").waitForElement(menuItem, 1_000);
             }
-            catch (NoSuchElementException nse)
-            {
-                // There is no chevron so don't do anything.
-            }
-
         }
     }
 
-    @LogMethod(quiet = true)
-    public void doMenuAction(@LoggedParam String ... subMenuLabels)
+    public void doMenuAction(String ... subMenuLabels)
     {
         doMenuAction(Arrays.asList(subMenuLabels));
     }
@@ -184,6 +172,20 @@ public class MultiMenu extends BootstrapMenu
         {
             menuText.add(menuItem.getText());
         }
+
+        collapse();
+
+        return menuText;
+    }
+
+    public List<String> getItemsUnderHeading(String heading)
+    {
+        expandAll();
+
+        WebElement submenu = Locator.byClass("dropdown-header").withText(heading)
+                .followingSibling("li").withClass("dropdown-submenu").findElement(this);
+        List<WebElement> menuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(submenu);
+        List<String> menuText = getWrapper().getTexts(menuList);
 
         collapse();
 

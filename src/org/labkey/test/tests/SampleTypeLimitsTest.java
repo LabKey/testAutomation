@@ -185,7 +185,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         String sampleTypeName = "SampleTypeWithLookup";
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName);
-        definition.addField(new FieldDefinition("label"));
+        definition.addField(new FieldDefinition("label", FieldDefinition.ColumnType.String));
         definition.addField(new FieldDefinition("lookUpField",
                 new FieldDefinition.LookupInfo(null, "exp.materials", "10000Samples")
                     .setTableType(FieldDefinition.ColumnType.Integer))

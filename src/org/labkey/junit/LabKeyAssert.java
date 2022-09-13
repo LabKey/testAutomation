@@ -1,9 +1,10 @@
 package org.labkey.junit;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 public class LabKeyAssert
 {
@@ -17,14 +18,15 @@ public class LabKeyAssert
      */
     public static <T> void assertEqualsSorted(String message, Collection<T> expected, Collection<T> actual)
     {
-        if (expected != null)
+        if (expected == null || actual == null)
         {
-            expected = expected.stream().sorted().collect(Collectors.toList());
+            Assert.assertEquals(message, expected, actual);
         }
-        if (actual != null)
+        else
         {
-            actual = actual.stream().sorted().collect(Collectors.toList());
+            // Can't call 'toArray' on a generic collection and retain type info. Convert to object collection.
+            Collection<Object> actualObjects = Collections.unmodifiableCollection(actual);
+            Assertions.assertThat(actualObjects).as(message).containsExactlyInAnyOrder(expected.toArray());
         }
-        Assert.assertEquals(message, expected, actual);
     }
 }

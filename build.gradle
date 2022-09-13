@@ -21,6 +21,7 @@ project.dependencies {
     implementation "org.xerial:sqlite-jdbc:3.7.2" // declaring SQLite here to be used in targettedMS test
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
+    api("org.assertj:assertj-core:${assertjVersion}")
     implementation("commons-io:commons-io:${commonsIoVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
     implementation("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")

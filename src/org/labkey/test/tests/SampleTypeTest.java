@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -39,12 +38,10 @@ import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
-import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
@@ -78,7 +75,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -222,7 +218,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     {
         String sampleTypeName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
-        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0)), new FieldDefinition(fieldNames.get(1), ColumnType.Decimal));
+        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0), ColumnType.String), new FieldDefinition(fieldNames.get(1), ColumnType.Decimal));
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
         log("Create a new sample type with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
@@ -1002,12 +998,10 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         List<FieldDefinition> fields = new ArrayList<>();
-        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
-                .setType(ColumnType.String)
+        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME, ColumnType.String)
                 .setMvEnabled(false)
                 .setRequired(true));
-        fields.add(new FieldDefinition(MISSING_FIELD_NAME)
-                .setType(ColumnType.String)
+        fields.add(new FieldDefinition(MISSING_FIELD_NAME, ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
         SampleTypeDefinition def = new SampleTypeDefinition(SAMPLE_TYPE_NAME).setFields(fields);

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -31,12 +32,17 @@ import static org.junit.Assert.assertFalse;
 
 public class UIPermissionsHelper extends PermissionsHelper
 {
-    protected BaseWebDriverTest _test;
+    private final BaseWebDriverTest _driver;
 
     public UIPermissionsHelper(BaseWebDriverTest test)
     {
-        super(test);
-        _test = test;
+        _driver = test;
+    }
+
+    @Override
+    protected Connection getConnection()
+    {
+        return _driver.createDefaultConnection();
     }
 
     @Override
@@ -48,7 +54,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     @LogMethod
     public void startCreateGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists)
     {
-        _test.goToHome();
+        _driver.goToHome();
         _driver.goToSiteGroups();
         if (_driver.isElementPresent(Locator.tagWithText("div", groupName)))
         {
@@ -215,7 +221,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public void addUserToSiteGroup(String userName, String groupName)
     {
-        _test.ensureAdminMode();
+        _driver.ensureAdminMode();
         switch (groupName)
         {
             case "Administrators":
@@ -252,7 +258,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         if (!_driver.getCurrentContainerPath().startsWith("/" + projectName))
         {
-            _test.goToProjectHome(projectName);
+            _driver.goToProjectHome(projectName);
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
@@ -262,7 +268,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Deprecated
     public void enterPermissionsUI()
     {
-        PermissionsEditor.enterPermissionsUI(_test);
+        PermissionsEditor.enterPermissionsUI(_driver);
     }
 
     public void exitPermissionsUI()
@@ -340,8 +346,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public boolean doesGroupExist(String groupName, String projectName)
     {
-        _test.ensureAdminMode();
-        _test.clickProject(projectName);
+        _driver.ensureAdminMode();
+        _driver.clickProject(projectName);
         enterPermissionsUI();
         _driver._ext4Helper.clickTabContainingText("Project Groups");
         _driver.waitForText("Member Groups");
@@ -355,8 +361,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public boolean isUserInGroup(String user, String groupName, String projectName, PrincipalType principalType)
     {
-        _test.ensureAdminMode();
-        _test.clickProject(projectName);
+        _driver.ensureAdminMode();
+        _driver.clickProject(projectName);
         enterPermissionsUI();
         _driver._ext4Helper.clickTabContainingText("Project Groups");
         _driver.waitForElement(Locator.css(".groupPicker"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);

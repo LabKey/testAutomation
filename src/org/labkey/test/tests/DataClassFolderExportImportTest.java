@@ -1,7 +1,7 @@
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -26,9 +26,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 @Category({Daily.class})
 public class DataClassFolderExportImportTest extends BaseWebDriverTest
@@ -196,12 +197,10 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
 
         // put a dataclass in the export subfolder and add test data to it
         List<FieldDefinition> testFields = new ArrayList<>();
-        testFields.add(new FieldDefinition("requiredField")
-                .setType(FieldDefinition.ColumnType.String)
+        testFields.add(new FieldDefinition("requiredField", FieldDefinition.ColumnType.String)
                 .setMvEnabled(false)
                 .setRequired(true));
-        testFields.add(new FieldDefinition("missingValueField")
-                .setType(FieldDefinition.ColumnType.String)
+        testFields.add(new FieldDefinition("missingValueField", FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
 
