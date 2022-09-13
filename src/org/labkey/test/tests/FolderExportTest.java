@@ -156,6 +156,50 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testExportImportWithSpecialCharactersInFileName()
+    {
+        String sourceFolder = "Source_Folder~,!@#$%%++_)(&+=[{";
+        String targetFolder = "Target_Folder~!@#$%%++_)(&+=]},";
+        String dir = "test~!@#$%(%)+-_=+_[]{}";
+        String uploadFileName = "pdf_sample_with+%$@+%%+#-+=.pdf";
+
+        goToHome();
+
+        log("Creating " + sourceFolder);
+        _containerHelper.createProject(sourceFolder, "Collaboration");
+
+        log("Creating dir " + dir + " in Files webpart");
+        goToProjectHome(sourceFolder);
+        goToModule("FileContent");
+        _fileBrowserHelper.createFolder(dir);
+
+        log("Uploading file '" + uploadFileName + "' in " + dir);
+        _fileBrowserHelper.selectFileBrowserItem("/" + dir + "/");
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
+
+        goToProjectHome(sourceFolder);
+
+        log("Exporting " + sourceFolder);
+        File sourceZip = exportFolderAsZip(sourceFolder, false, false, false, true);
+
+        log("Creating " + targetFolder);
+        _containerHelper.createProject(targetFolder, "Collaboration");
+
+        log("Importing " + sourceZip.getName() + " to " + targetFolder);
+        goToProjectHome(targetFolder);
+        importFolderFromZip(sourceZip, false, 1);
+
+        log("Verify presence of " + uploadFileName);
+        goToModule("FileContent");
+        _fileBrowserHelper.selectFileBrowserItem(dir + "/" + uploadFileName);
+        File downloadedFile = _fileBrowserHelper.downloadSelectedFiles();
+        assertEquals("Expected file '" + uploadFileName + "' did not get downloaded", uploadFileName, downloadedFile.getName());
+
+        log("Test Drag and Drop zip folder '" + sourceZip.getName() + "'");
+        _fileBrowserHelper.dragAndDropFileInDropZone(sourceZip);
+    }
+
+    @Test
     public void testImportProjectWithoutUsers()
     {
         //test project import with users that do not exist
