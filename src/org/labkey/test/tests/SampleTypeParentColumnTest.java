@@ -134,8 +134,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
             switch(key)
             {
                 case COL_NAME_CAPTION:
-                    fields.add(new FieldDefinition(_mapCaptionToName.get(key))
-                            .setType(FieldDefinition.ColumnType.String));
+                    fields.add(new FieldDefinition(_mapCaptionToName.get(key), FieldDefinition.ColumnType.String));
                     break;
                 default:
                     // These fields are automatically created when the domain is created. Do nothing for them.
@@ -675,8 +674,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         List<FieldDefinition> fields = new ArrayList<>();
 
-        fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT)
-                .setType(FieldDefinition.ColumnType.String));
+        fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT, FieldDefinition.ColumnType.String));
 
         log("Create Sample Type - Add a parent alias column to the sample type that conflicts with a given column name.");
         CreateSampleTypePage createPage = sampleHelper.goToCreateNewSampleType()

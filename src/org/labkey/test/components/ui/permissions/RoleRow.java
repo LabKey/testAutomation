@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
 {
-    private static final Locator.XPathLocator MEMBER_LOC = Locator.byClass("permissions-member-li");
+    private static final Locator.XPathLocator MEMBER_LOC = Locator.byClass("permissions-groups-member-li");
 
     private final WebElement _el;
     private final WebDriver _driver;
@@ -45,7 +45,7 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
     public List<String> getMemberEmails()
     {
         expand();
-        return elementCache().findMembers().stream()
+        return elementCache().findUsers().stream()
                 .map(PermissionsMember::getName)
                 .collect(Collectors.toList());
     }
@@ -53,14 +53,14 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
     public RoleRow selectMember(String email)
     {
         expand();
-        elementCache().findMember(email).select();
+        elementCache().findUser(email).select();
         return this;
     }
 
     public RoleRow removeMember(String email)
     {
         expand();
-        elementCache().findMember(email).remove();
+        elementCache().findUser(email).remove();
         return this;
     }
 
@@ -68,6 +68,35 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
     {
         expand();
         elementCache().memberSelect.select(email);
+        return this;
+    }
+
+    public List<String> getMemberGroups()
+    {
+        expand();
+        return elementCache().findGroups().stream()
+                .map(PermissionsMember::getName)
+                .collect(Collectors.toList());
+    }
+
+    public RoleRow selectMemberGroups(String name)
+    {
+        expand();
+        elementCache().findGroup(name).select();
+        return this;
+    }
+
+    public RoleRow removeMemberGroup(String name)
+    {
+        expand();
+        elementCache().findGroup(name).remove();
+        return this;
+    }
+
+    public RoleRow addMemberGroup(String name)
+    {
+        expand();
+        elementCache().memberSelect.select(name);
         return this;
     }
 
@@ -96,17 +125,34 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
         final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
                 .setOptionLocator(ReactSelect.Locators.option::startsWith);
 
-        List<PermissionsMember> findMembers()
+        List<PermissionsMember> findUsers()
         {
+            var usersList = Locator.tagWithText("div","Users:").followingSibling("ul")
+                    .findElement(assignmentsRow);
             return MEMBER_LOC
-                    .findElements(assignmentsRow).stream()
+                    .findElements(usersList).stream()
                     .map(PermissionsMember::new)
                     .collect(Collectors.toList());
         }
 
-        PermissionsMember findMember(String email)
+        PermissionsMember findUser(String email)
         {
             return new PermissionsMember(email);
+        }
+
+        List<PermissionsMember> findGroups()
+        {
+            var usersList = Locator.tagWithText("div","Groups:").followingSibling("ul")
+                    .findElement(assignmentsRow);
+            return MEMBER_LOC
+                    .findElements(usersList).stream()
+                    .map(PermissionsMember::new)
+                    .collect(Collectors.toList());
+        }
+
+        PermissionsMember findGroup(String name)
+        {
+            return new PermissionsMember(name);
         }
     }
 
@@ -116,7 +162,7 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
         private final WebElement _removeButton = Locator.byClass("btn")
                 .withChild(Locator.byClass("fa-remove")).findWhenNeeded(this);
         private final WebElement _nameButton = Locator.byClass("permissions-button-display")
-                .findWhenNeeded(this);
+                .findWhenNeeded(this).withTimeout(1000);
 
         public PermissionsMember(WebElement el)
         {

@@ -50,6 +50,15 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return editField(fieldRow, fieldDefinition);
     }
 
+    public DomainFormPanel addFields(List<FieldDefinition> fieldDefinitions)
+    {
+        for (FieldDefinition fieldDefinition : fieldDefinitions)
+        {
+            addField(fieldDefinition);
+        }
+        return this;
+    }
+
     public DomainFormPanel setField(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = getField(fieldDefinition.getName());
@@ -58,10 +67,13 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     private DomainFormPanel editField(DomainFieldRow fieldRow, FieldDefinition fieldDefinition)
     {
-        if (fieldDefinition.getLookup() != null)
-            fieldRow.setLookup(fieldDefinition.getLookup());
-        else if (fieldDefinition.getType() != null)
-            fieldRow.setType(fieldDefinition.getType());
+        if (fieldDefinition.getType() != null)
+        {
+            if (fieldDefinition.getType().isLookup())
+                fieldRow.setLookup(fieldDefinition.getLookup());
+            else
+                fieldRow.setType(fieldDefinition.getType());
+        }
 
         if (fieldDefinition.getDescription() != null)
             fieldRow.setDescription(fieldDefinition.getDescription());

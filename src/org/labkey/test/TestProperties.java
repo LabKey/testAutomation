@@ -212,6 +212,16 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.checker.fatal"));
     }
 
+    public static boolean isAssayProductFeatureAvailable()
+    {
+        return isProductFeatureAvailable("assay");
+    }
+
+    public static boolean isProductFeatureAvailable(String feature)
+    {
+        return "true".equals(System.getProperty("webtest.productFeature." + feature.toLowerCase(), "true"));
+    }
+
     /**
      * Parses system property 'webtest.server.startup.timeout' to determine maximum allowed server startup time.
      * If property is not defined or is not an integer, it defaults to 60 seconds.
