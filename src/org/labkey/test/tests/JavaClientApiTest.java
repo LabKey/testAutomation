@@ -564,7 +564,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // stop impersonation
         StopImpersonatingCommand stopCmd = new StopImpersonatingCommand();
         CommandResponse stopResp = stopCmd.execute(cn, PROJECT_NAME);
-        assertEquals(200, stopResp.getStatusCode());
+        assertEquals(302, stopResp.getStatusCode());
 
         // check whoami
         who = new WhoAmICommand().execute(cn, PROJECT_NAME);
@@ -599,7 +599,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals(USER2_NAME, who.getEmail());
         assertTrue(who.isImpersonated());
 
-        cn.stopImpersonate();
+        cn.stopImpersonating();
     }
 
     @Override

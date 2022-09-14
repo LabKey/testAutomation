@@ -19,7 +19,7 @@ public class TestUser
     private CreateUserResponse _createUserResponse;
     private String _password;
     private APIUserHelper _apiUserHelper;
-    private Connection _impersionationConnection;
+    private Connection _impersonationConnection;
 
     public TestUser(String email)
     {
@@ -68,7 +68,7 @@ public class TestUser
      */
     public TestUser setPassword(String password)
     {
-        if (_password == null)  // if null, this is the initial password- we can use the UI to set it now
+        if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
         {
             //... borrowed from LKSW's setInitialPassword - in the future, do via API
             getWrapper().beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", _email)));
@@ -104,24 +104,24 @@ public class TestUser
 
     public void impersonate() throws Exception
     {
-        if (_impersionationConnection != null)
+        if (_impersonationConnection != null)
             log("Already impersonating.");  // maybe an error?
 
         log("Begin impersonating as user: " + getEmail());
-        _impersionationConnection = getWrapper().createDefaultConnection();
-        _impersionationConnection.impersonate(getEmail());
+        _impersonationConnection = getWrapper().createDefaultConnection();
+        _impersonationConnection.impersonate(getEmail());
     }
 
     public void stopImpersonating() throws Exception
     {
-        if (_impersionationConnection == null)
+        if (_impersonationConnection == null)
         {
             throw new IllegalStateException("User " + _email + "is not yet impersonating");
         }
 
         log("Stop impersonating uer " + getEmail());
-        _impersionationConnection.stopImpersonate();
-        _impersionationConnection = null;
+        _impersonationConnection.stopImpersonating();
+        _impersonationConnection = null;
     }
 
     private CreateUserResponse getCreateUserResponse()
