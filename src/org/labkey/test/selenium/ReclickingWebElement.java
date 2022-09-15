@@ -88,7 +88,10 @@ public class ReclickingWebElement extends WebElementDecorator
                 List<String> classes = Arrays.asList(getWrappedElement().getAttribute("class").toLowerCase().trim().split("\\s"));
                 if ("tr".equals(tagName))
                 {
-                    clickRowInFirefox();
+                    if (!clickRowInFirefox())
+                    {
+                        throw e;
+                    }
                 }
                 else if ("area".equals(tagName))
                 {
@@ -97,6 +100,11 @@ public class ReclickingWebElement extends WebElementDecorator
                 else if ("a".equals(tagName) && classes.contains("point")) // probably an SVG point
                 {
                     actionClick();
+                }
+                else if (e.getRawMessage().contains("could not be scrolled into view"))
+                {
+                    // Add some information to help test developer find a better element.
+                    throw new ElementNotInteractableException("Click failed; try clicking a child element. Firefox doesn't like clicking certain wrapping elements\n" + e.getRawMessage(), e);
                 }
                 else
                 {
@@ -174,7 +182,7 @@ public class ReclickingWebElement extends WebElementDecorator
     /**
      * https://bugzilla.mozilla.org/show_bug.cgi?id=1448825
      */
-    private void clickRowInFirefox()
+    private boolean clickRowInFirefox()
     {
         TestLogger.warn("Don't click 'tr' elements directly, use a specific child 'td': " + toString());
         List<WebElement> cells = getWrappedElement().findElements(By.xpath("./td"));
@@ -183,11 +191,10 @@ public class ReclickingWebElement extends WebElementDecorator
             if (cell.isDisplayed())
             {
                 cell.click();
-                return;
+                return true;
             }
         }
-        // Fallback to clicking row if we can't find a displayed cell
-        getWrappedElement().click();
+        return false;
     }
 
     // Allows interaction with elements that have been obscured by floating headers or tooltips
