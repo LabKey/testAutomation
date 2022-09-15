@@ -34,16 +34,15 @@ project.dependencies {
     implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:jetty-repacked:${jettyRepackagedVersion}")
 
-    api("org.apache.httpcomponents:httpcore:${httpcoreVersion}")
     implementation("com.google.guava:guava:${guavaVersion}")
-    api("org.apache.httpcomponents:httpclient:${httpclientVersion}")
+    api("org.apache.httpcomponents.core5:httpcore5:${httpcore5Version}")
+    api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
     api("org.hamcrest:hamcrest-core:${hamcrestCoreVersion}")
     implementation("org.apache.commons:commons-text:${commonsTextVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    implementation("org.apache.httpcomponents:httpmime:${httpmimeVersion}")
     implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
     implementation("net.sf.opencsv:opencsv:${opencsvVersion}")
-    implementation("javax.servlet:javax.servlet-api:${servletApiVersion}") // originally 3.1.0
+    implementation("javax.servlet:javax.servlet-api:${servletApiVersion}")
     aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
     implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
     implementation "org.apache.logging.log4j:log4j-iostreams:${log4j2Version}"
