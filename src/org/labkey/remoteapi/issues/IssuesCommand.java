@@ -5,7 +5,7 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.core5.http.ContentType;
-import org.json.JSONArray;
+import org.json.old.JSONArray;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
