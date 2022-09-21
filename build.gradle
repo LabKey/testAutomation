@@ -18,7 +18,7 @@ project.configurations {
 
 project.dependencies {
 
-    implementation "org.xerial:sqlite-jdbc:3.7.2" // declaring SQLite here to be used in targettedMS test
+    implementation "org.xerial:sqlite-jdbc:3.7.2" // declaring SQLite here to be used in TargetedMS test
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
     api("org.assertj:assertj-core:${assertjVersion}")
@@ -66,7 +66,7 @@ project.dependencies {
     implementation "org.reflections:reflections:${reflectionsVersion}"
     uiTestRuntimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
 
-    if (!project.hasProperty('testWithLocalApi') && // Use this property temporarily when upgrading XMLBeans
+    if (!project.hasProperty('testWithLocalApi') && // Use this property temporarily when upgrading XMLBeans or changing dependencies provided by API
             (project.hasProperty("teamcity") || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)) {
         // LabKey XML schemas are used to decode exported folder XMLs and test case XMLs
         // Don't include local version so that running tests doesn't require building API module
@@ -82,7 +82,6 @@ project.dependencies {
                 transitive: false
         )
     }
-
 }
 
 BuildUtils.addLabKeyDependency(
@@ -102,7 +101,7 @@ if (project.hasProperty("teamcity"))
     apply plugin: 'org.labkey.teamCity'
 }
 
-// If this configuration for the default jar file is included when synching with IntelliJ
+// If this configuration for the default jar file is included when syncing with IntelliJ
 // the classes in other modules that reference classes here will not resolve properly.
 if (!BuildUtils.isIntellij())  {
     // the jar file that contains just the classes from this project, not all other
