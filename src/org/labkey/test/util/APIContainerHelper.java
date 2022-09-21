@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
