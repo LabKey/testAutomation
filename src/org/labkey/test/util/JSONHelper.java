@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.old.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,9 +101,9 @@ public class JSONHelper
     {
         try
         {
-            return new org.json.JSONObject(o).toString(2);
+            return new org.json.old.JSONObject(o).toString(2);
         }
-        catch (org.json.JSONException e)
+        catch (JSONException e)
         {
             return o.toJSONString();
         }
