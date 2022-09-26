@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 public class IssueModel
 {
     private final Map<String, Object> _properties = new CaseInsensitiveHashMap<>();
-    private final List<File> _attachments = new ArrayList();
+    private final List<File> _attachments = new ArrayList<>();
 
     // https://www.labkey.org/Documentation/wiki-page.view?name=sampleJSscripts#issues
     public IssueModel()
     {
     }
 
-    public IssueModel setProperties(Map properties)
+    public IssueModel setProperties(Map<String, String> properties)
     {
         _properties.putAll(properties);
         return this;
@@ -33,8 +33,8 @@ public class IssueModel
         if (!_attachments.isEmpty())
         {
             List<String> names = _attachments.stream()
-                    .map(f -> f.getName())
-                    .collect(Collectors.toList());
+                .map(File::getName)
+                .collect(Collectors.toList());
 
             json.put("attachment", String.join("|", names));
         }
