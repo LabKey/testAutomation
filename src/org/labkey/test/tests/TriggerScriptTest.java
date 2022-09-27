@@ -38,10 +38,12 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -78,6 +80,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     private static final String DATA_CLASSES_SCHEMA = "exp.data";
     private static final String DATA_CLASSES_NAME = "DataClassTest";
+
+    private static final String SAMPLE_TYPE_SCHEMA = "samples";
+    private static final String SAMPLE_TYPE_NAME = "SampleTypeTest";
 
     private static final String COMMENTS_FIELD = "Comments";
     private static final String COUNTRY_FIELD = "Country";
@@ -192,11 +197,12 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
-        //Setup Data Class
+        //Add webparts for dataset, data class, sample type setup
         goToProjectHome();
 
         _portalHelper.addWebPart("Datasets");
         _portalHelper.addWebPart("Data Classes");
+        _portalHelper.addWebPart("Sample Types");
     }
 
     @Before
@@ -231,7 +237,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check BeforeDelete Event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
-        deleteSingleRowViaUI("Company", "Inserting Single", "query");
+        deleteSingleRowViaUI("Company", "Inserting Single", "query", true);
         assertTextPresent(BEFORE_DELETE_ERROR);
         clickButton("Back");
 
@@ -253,7 +259,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check AfterDelete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
-        deleteSingleRowViaUI("Company", BEFORE_UPDATE_COMPANY, "query");
+        deleteSingleRowViaUI("Company", BEFORE_UPDATE_COMPANY, "query", true);
         assertTextPresent(AFTER_DELETE_ERROR);
         clickButton("Back");
         //Verify validation error prevented delete
@@ -381,7 +387,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         GoToDataUI goToDataset = () -> goToDataset(DATASET_NAME);
 
-        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true);
+        doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, true);
 
         //For some reason these only get logged for datasets...
         checkExpectedErrors(6);
@@ -442,11 +448,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testDataClassIndividualTriggers() throws Exception
     {
-        //Generate delegate to move to dataset UI
-        GoToDataUI goToDataClass = () -> goToDataClass(DATA_CLASSES_NAME);
+        //Generate delegate to move to data class UI
+        GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
         setupDataClass();
-        doIndividualTriggerTest("query", goToDataClass, "Name", false);
+        doIndividualTriggerTest("query", goToDataClass, "Name", false, true);
     }
 
 
@@ -455,6 +461,28 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         setupDataClass();
         doAPITriggerTest(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME, "Name", false);
+    }
+
+    /********************************
+     * Sample Type Trigger Script Tests
+     ********************************/
+
+    @Test
+    public void testSampleTypeIndividualTriggers() throws Exception
+    {
+        //Generate delegate to move to sample type UI
+        GoToDataUI goToSampleType = () -> goTo("Sample Types", SAMPLE_TYPE_NAME);
+
+        setupSampleType();
+        doIndividualTriggerTest("Material", goToSampleType, "Name", false, false);
+    }
+
+
+    @Test
+    public void testSampleTypeAPITriggers() throws Exception
+    {
+        setupSampleType();
+        doAPITriggerTest(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME, "Name", false);
     }
 
     /**
@@ -558,7 +586,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Execute a set of tests against a datatype and preset trigger script
      */
-    private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate)
+    private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate, boolean confirmDeletePage)
     {
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
         String updateField = COUNTRY_FIELD; //Field updated by trigger script
@@ -604,7 +632,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check previous step prepared row for delete
         pushLocation();
         assertElementPresent(Locator.tagWithText("td", "BeforeDelete"));
-        deleteSingleRowViaUI(flagField, step, dataRegionName);
+        deleteSingleRowViaUI(flagField, step, dataRegionName, confirmDeletePage);
         assertTextPresent(BEFORE_DELETE_ERROR);
         popLocation();
         //Verify validation error prevented delete
@@ -630,7 +658,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         pushLocation();
-        deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName);
+        deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName, confirmDeletePage);
         assertTextPresent(AFTER_DELETE_ERROR);
         popLocation();
         //Verify validation error prevented delete
@@ -683,20 +711,28 @@ public class TriggerScriptTest extends BaseWebDriverTest
      * @param columnValue value to look for
      * @param tableName DataRegionTable name
      */
-    private void deleteSingleRowViaUI(String columnName, String columnValue, String tableName)
+    private void deleteSingleRowViaUI(String columnName, String columnValue, String tableName, boolean confirmDeletePage)
     {
         DataRegionTable drt = new DataRegionTable(tableName, this);
         int rowId = drt.getRowIndex(columnName, columnValue);
         drt.checkCheckbox(rowId);
-        doAndWaitForPageToLoad(() ->
+        if (confirmDeletePage)
+        {
+            doAndWaitForPageToLoad(() ->
+            {
+                drt.clickHeaderButton("Delete");
+                Alert alert = getAlertIfPresent();
+                if (alert != null)
+                    alert.accept();
+                else
+                    clickButton("Confirm Delete");
+            });
+        }
+        else
         {
             drt.clickHeaderButton("Delete");
-            Alert alert = getAlertIfPresent();
-            if (alert != null)
-                alert.accept();
-            else
-                clickButton("Confirm Delete");
-        });
+            clickButton("Yes, Delete", 0);
+        }
     }
 
     /**
@@ -746,14 +782,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     /**
-     * Navigate to particular Dataset
-     * @param dataClassName
+     * Navigate to particular dataclass/sampletype in the given webpart
      */
-    private void goToDataClass(String dataClassName)
+    private void goTo(String webPartName, String tableName)
     {
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("Data Classes"));
-        clickAndWait(Locator.linkWithText(dataClassName));
+        clickAndWait(Locator.linkWithText(webPartName));
+        clickAndWait(Locator.linkWithText(tableName));
     }
 
     /**
@@ -803,5 +838,17 @@ public class TriggerScriptTest extends BaseWebDriverTest
                         new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
                         new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
         dataClass.create(createDefaultConnection(), getProjectName());
+    }
+
+    /**
+     * Setup the sample type
+     */
+    private void setupSampleType() throws CommandException, IOException
+    {
+        SampleTypeDefinition sampleType = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
+                .setFields(List.of(
+                        new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
+                        new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
     }
 }
