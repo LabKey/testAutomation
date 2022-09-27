@@ -17,8 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -151,7 +150,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("single message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+            JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"single message\"," +
                 "\"extraContext\":{" +
                     "\"A\":\"a\"," +
@@ -189,7 +188,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("one error message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+            JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"one error message\"," +
                 "\"errors\":[{" +
                     "\"errors\":[" +
@@ -224,7 +223,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             assertEquals("boring error message", e.getMessage());
 
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+            JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"boring error message\"," +
                 "\"errors\":[{" +
                     "\"errors\":[{" +
@@ -256,7 +255,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             assertEquals("beforeInsert validation failed", e.getMessage());
 
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+            JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"beforeInsert validation failed\"," +
                 "\"errorCount\":1," +
                 "\"errors\":[{" +
@@ -294,7 +293,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("TestErrorInComplete error global four!", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+            JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"TestErrorInComplete error global four!\"," +
                 "\"success\":false" +
                 "\"errors\":[{" +
@@ -325,7 +324,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("one error message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+            JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"one error message\"," +
                 "\"success\":false" +
                 "\"errors\":[{" +

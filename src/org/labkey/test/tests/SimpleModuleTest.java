@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

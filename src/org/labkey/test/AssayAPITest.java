@@ -15,8 +15,7 @@
  */
 package org.labkey.test;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -411,8 +410,7 @@ public class AssayAPITest extends BaseWebDriverTest
         }
         resetErrors();
 
-        JSONParser parser = new JSONParser();
-        run.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
+        run.setPlateMetadata(new JSONObject(PLATE_METADATA));
 
         try
         {
@@ -493,8 +491,7 @@ public class AssayAPITest extends BaseWebDriverTest
 
         ImportRunCommand cmd = new ImportRunCommand(assayId, resultRows);
         cmd.setProperties(Maps.of("PlateTemplate", lsid));
-        JSONParser parser = new JSONParser();
-        cmd.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
+        cmd.setPlateMetadata(new JSONObject(PLATE_METADATA));
         cmd.setName(runName);
         cmd.execute(createDefaultConnection(), folderPath);
 

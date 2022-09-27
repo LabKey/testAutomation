@@ -1,6 +1,6 @@
 package org.labkey.test.tests.core.security;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

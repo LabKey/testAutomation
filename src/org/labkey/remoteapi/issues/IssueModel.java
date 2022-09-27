@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.io.File;

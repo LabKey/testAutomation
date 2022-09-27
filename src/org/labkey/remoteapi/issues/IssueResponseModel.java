@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
@@ -17,13 +17,15 @@ public class IssueResponseModel
     public IssueResponseModel(JSONObject json)
     {
         JSONObject props = (JSONObject) json.get("properties");
-        _serverProps.putAll(props);
-        _allProps.putAll(json);
+        props.toMap().forEach((k, v) -> {
+            _serverProps.put(k, v);
+            _allProps.put(k, v);
+        });
 
         if (json.get("comments") != null)
         {
             var commentsObj = (JSONArray)json.get("comments");
-            for (int i=0; i < commentsObj.size(); i++)
+            for (int i=0; i < commentsObj.length(); i++)
             {
                 _issueComments.add(new IssueComment((JSONObject) commentsObj.get(i)));
             }

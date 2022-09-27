@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class IssueComment
 
     public IssueComment(JSONObject json)
     {
-        _properties.putAll(json);
+        _properties.putAll(json.toMap());
     }
 
     public String getCreatedBy()
@@ -43,9 +43,9 @@ public class IssueComment
         if (_properties.get("attachments") != null)
         {
             JSONArray attachmentsArray = (JSONArray) _properties.get(ATTACHMENTS);
-            for(int i=0; i < attachmentsArray.size(); i++)
+            for(int i=0; i < attachmentsArray.length(); i++)
             {
-               attachments.add((String) attachmentsArray.get(i));
+               attachments.add(attachmentsArray.getString(i));
             }
         }
         return attachments;

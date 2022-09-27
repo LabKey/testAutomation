@@ -15,14 +15,15 @@
  */
 package org.labkey.remoteapi.olap;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.serverapi.reader.Readers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -120,10 +121,9 @@ public class MdxCommand extends PostCommand<MdxResponse>
     public MdxResponse execute(Connection connection, String folderPath) throws IOException, CommandException
     {
         // Hack override to decode the gzip response, as that's not yet supported in the java client api
-        try (Response response = _execute(connection, folderPath))
+        try (Response response = _execute(connection, folderPath); InputStream is = new GZIPInputStream(response.getInputStream()))
         {
-            JSONObject json;
-            json = (JSONObject) JSONValue.parse(Readers.getReader(new GZIPInputStream(response.getInputStream())));
+            JSONObject json = new JSONObject(new JSONTokener(is));
             return createResponse(null, response.getStatusCode(), response.getContentType(), json);
         }
     }

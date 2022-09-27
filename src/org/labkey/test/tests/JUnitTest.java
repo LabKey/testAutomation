@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONValue;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Command;
@@ -228,7 +228,7 @@ public class JUnitTest extends TestSuite
                 if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
-                Object json = JSONValue.parse(responseBody);
+                JSONObject json = new JSONObject(responseBody);
                 if (json == null)
                 {
 
@@ -292,19 +292,15 @@ public class JUnitTest extends TestSuite
                     }
                 }
 
-                if (!(json instanceof Map))
-                    throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
-
                 TestSuite remotesuite = new JUnitTest();
-                Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
 
                 boolean addedHeader = false;
-                for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
+                for (Map.Entry<String, Object> entry : json.toMap().entrySet())
                 {
                     String suiteName = entry.getKey();
                     TestSuite testsuite = new TestSuite(suiteName);
                     // Individual tests include both the class name and the requested timeout
-                    for (Map<String, Object> testClass : entry.getValue())
+                    for (Map<String, Object> testClass : (List<Map<String, Object>>)entry.getValue()) // TODO: This will probably blow up -- update for JSONObject/JSONArray
                     {
                         // For the time being do not run performance tests with every junit check-in test suite.
                         if(!((String)testClass.get("when")).equalsIgnoreCase("performance"))
@@ -418,12 +414,9 @@ public class JUnitTest extends TestSuite
 
         static String dump(String response, boolean dumpFailures)
         {
-            Map<String, Object> json = (Map<String, Object>)JSONValue.parse(response);
+            JSONObject json = new JSONObject(response);
 
-            if (json == null)
-                return response;
-
-            return dump(json, dumpFailures);
+            return dump(json.toMap(), dumpFailures);
         }
 
         @NotNull

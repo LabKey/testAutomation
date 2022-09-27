@@ -1,6 +1,6 @@
 package org.labkey.test.params.wiki;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.WikiHelper;
 

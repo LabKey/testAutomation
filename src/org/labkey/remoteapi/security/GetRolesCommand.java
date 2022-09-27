@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.security;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.Command;
 
 public class GetRolesCommand extends Command<GetRolesResponse>

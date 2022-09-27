@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.reports;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.ArrayList;

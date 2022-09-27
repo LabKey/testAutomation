@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.ArrayList;
@@ -69,8 +69,8 @@ public class AnnouncementModel
         {
             var responses = new ArrayList<AnnouncementModel>();
             var rawResponses = (JSONArray) json.get("responses");
-            for (int i = 0; i < rawResponses.size(); i++)
-                responses.add(new AnnouncementModel((JSONObject) rawResponses.get(i)));
+            for (int i = 0; i < rawResponses.length(); i++)
+                responses.add(new AnnouncementModel(rawResponses.getJSONObject(i)));
             _responses = responses;
         }
     }

@@ -16,9 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.old.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,13 +64,8 @@ public class JSONHelper
 
     public void assertEquals(String msg, String expected, String actual)
     {
-        JSONObject expectedJSON = (JSONObject)JSONValue.parse(expected);
-        JSONObject actualJSON = (JSONObject)JSONValue.parse(actual);
-
-        if (actualJSON == null)
-        {
-            fail("Unable to parse response:\n" + actual);
-        }
+        JSONObject expectedJSON = new JSONObject(expected);
+        JSONObject actualJSON = new JSONObject(actual);
 
         assertEquals(msg, expectedJSON, actualJSON);
     }
@@ -85,27 +78,14 @@ public class JSONHelper
         }
         else
         {
-            String expectedString = prettyJSON(expected);
-            String actualString = prettyJSON(actual);
+            String expectedString = expected.toString();
+            String actualString = actual.toString();
 
             TestLogger.log("Expected:\n" + expectedString + "\n");
             TestLogger.log("Actual:\n" + actualString + "\n");
 
             String diff = Diff.diff(expectedString, actualString);
             fail(msg + "\n" + diff + "\n");
-        }
-    }
-
-    // TODO: Remove reference to JSONObject in transitive dependency
-    private String prettyJSON(JSONObject o)
-    {
-        try
-        {
-            return new org.json.old.JSONObject(o).toString(2);
-        }
-        catch (JSONException e)
-        {
-            return o.toJSONString();
         }
     }
 

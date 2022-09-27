@@ -1,8 +1,7 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-
 
 public class DeleteMessageThreadResponse extends CommandResponse
 {
