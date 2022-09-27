@@ -43,6 +43,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -844,21 +845,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
      */
     private void setupSampleType() throws CommandException, IOException
     {
-        //Setup Sample Type
-        goToProjectHome();
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Types");
-        int rowId = drt.getRowIndex("Name", SAMPLE_TYPE_NAME);
-        if (rowId >= 0)
-        {
-            drt.checkCheckbox(rowId);
-            drt.clickHeaderButtonAndWait("Delete");
-            clickButton("Confirm Delete");
-        }
-
         SampleTypeDefinition sampleType = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                 .setFields(List.of(
                         new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
                         new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
-        sampleType.create(createDefaultConnection(), getProjectName());
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
     }
 }
