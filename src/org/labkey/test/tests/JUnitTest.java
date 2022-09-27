@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
@@ -228,9 +229,15 @@ public class JUnitTest extends TestSuite
                 if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
-                JSONObject json = new JSONObject(responseBody);
-                if (json == null)
+                final JSONObject json;
+
+                try
                 {
+                    json = new JSONObject(responseBody);
+                }
+                catch (JSONException e)
+                {
+                    // Server likely sent back HTML instead of JSON
 
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
@@ -290,6 +297,8 @@ public class JUnitTest extends TestSuite
 
                         return testSuite;
                     }
+
+                    throw new AssertionFailedError("Unexpected responseBody: " + responseBody);
                 }
 
                 TestSuite remotesuite = new JUnitTest();
