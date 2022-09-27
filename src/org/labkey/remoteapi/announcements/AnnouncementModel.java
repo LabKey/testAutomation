@@ -16,15 +16,15 @@ public class AnnouncementModel
     private String _containerId;
     private String _containerPath;
     private String _created;
-    private Long _createdBy;
+    private Integer _createdBy;
     private String _modified;
-    private Long _modifiedBy;
+    private Integer _modifiedBy;
     private String _discussionSrcIdentifier;
     private String _entityId;
     private String _formattedHtml;
     private String _rendererType;
     private List<AnnouncementModel> _responses = new ArrayList<>();
-    private Long _rowId;
+    private Integer _rowId;
     private String _title;
     private String _parent;
 
@@ -34,38 +34,38 @@ public class AnnouncementModel
 
     public AnnouncementModel(JSONObject json)
     {
-        if (json.get("approved") != null)
-            _approved = json.get("approved").toString();
-        if (json.get("body") != null)
-            _body = json.get("body").toString();
-        if (json.get("containerId") != null)
-            _containerId = json.get("containerId").toString();
-        if (json.get("containerPath") != null)
-            _containerPath = json.get("containerPath").toString();
-        if (json.get("created") != null)
-            _created = json.get("created").toString();
-        if (json.get("createdBy") != null)
-            _createdBy = (Long) json.get("createdBy");
-        if (json.get("modified") != null)
-            _modified = json.get("modified").toString();
-        if (json.get("modifiedBy") != null)
-            _modifiedBy = (Long) json.get("modifiedBy");
-        if (json.get("discussionSrcIdentifier") != null)
-            _discussionSrcIdentifier = json.get("discussionSrcIdentifier").toString();
-        if (json.get("entityId") != null)
-            _entityId = json.get("entityId").toString();
-        if (json.get("formattedHtml") != null)
-            _formattedHtml = json.get("formattedHtml").toString();
-        if (json.get("rendererType") != null)
-            _rendererType = json.get("rendererType").toString();
-        if (json.get("rowId") != null)
-            _rowId = (Long) json.get("rowId");
-        if (json.get("title") != null)
-            _title = json.get("title").toString();
-        if (json.get("parent") != null)
-            _parent = json.get("parent").toString();
+        if (json.has("approved"))
+            _approved = json.getString("approved");
+        if (json.has("body"))
+            _body = json.getString("body");
+        if (json.has("containerId"))
+            _containerId = json.getString("containerId");
+        if (json.has("containerPath"))
+            _containerPath = json.getString("containerPath");
+        if (json.has("created"))
+            _created = json.getString("created");
+        if (json.has("createdBy"))
+            _createdBy = json.getInt("createdBy");
+        if (json.has("modified"))
+            _modified = json.getString("modified");
+        if (json.has("modifiedBy"))
+            _modifiedBy = json.getInt("modifiedBy");
+        if (json.has("discussionSrcIdentifier"))
+            _discussionSrcIdentifier = json.getString("discussionSrcIdentifier");
+        if (json.has("entityId"))
+            _entityId = json.getString("entityId");
+        if (json.has("formattedHtml"))
+            _formattedHtml = json.getString("formattedHtml");
+        if (json.has("rendererType"))
+            _rendererType = json.getString("rendererType");
+        if (json.has("rowId"))
+            _rowId = json.getInt("rowId");
+        if (json.has("title"))
+            _title = json.getString("title");
+        if (json.has("parent"))
+            _parent = json.getString("parent");
 
-        if (json.get("responses") != null)
+        if (json.has("responses"))
         {
             var responses = new ArrayList<AnnouncementModel>();
             var rawResponses = (JSONArray) json.get("responses");
@@ -148,12 +148,12 @@ public class AnnouncementModel
         _created = created;
     }
 
-    public Long getCreatedBy()
+    public Integer getCreatedBy()
     {
         return _createdBy;
     }
 
-    public void setCreatedBy(Long createdBy)
+    public void setCreatedBy(Integer createdBy)
     {
         _createdBy = createdBy;
     }
@@ -168,12 +168,12 @@ public class AnnouncementModel
         _modified = modified;
     }
 
-    public Long getModifiedBy()
+    public Integer getModifiedBy()
     {
         return _modifiedBy;
     }
 
-    public void setModifiedBy(Long modifiedBy)
+    public void setModifiedBy(Integer modifiedBy)
     {
         _modifiedBy = modifiedBy;
     }
@@ -230,12 +230,12 @@ public class AnnouncementModel
         _responses = responses;
     }
 
-    public Long getRowId()
+    public Integer getRowId()
     {
         return _rowId;
     }
 
-    public void setRowId(Long rowId)
+    public void setRowId(Integer rowId)
     {
         _rowId = rowId;
     }

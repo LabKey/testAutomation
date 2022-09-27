@@ -19,7 +19,7 @@ public class GetMessageThreadCommand extends AbstractMessageThreadCommand
         _announcementModel.setEntityId(entityId);
     }
 
-    public GetMessageThreadCommand(Long rowId)
+    public GetMessageThreadCommand(Integer rowId)
     {
         super("getThread");
         _announcementModel = new AnnouncementModel();
@@ -38,5 +38,4 @@ public class GetMessageThreadCommand extends AbstractMessageThreadCommand
 
         return result;
     }
-
 }
