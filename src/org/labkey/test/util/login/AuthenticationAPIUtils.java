@@ -92,7 +92,7 @@ public class AuthenticationAPIUtils
             List<Configuration> configurations = new ArrayList<>();
             for (Map<String, Object> configMap : parsedConfigurations)
             {
-                long configuration = (long) configMap.get("configuration");
+                int configuration = (int) configMap.get("configuration");
                 String description = (String) configMap.get("description");
                 String provider = (String) configMap.get("provider");
                 Configuration config = new Configuration(description, configuration, provider);
@@ -155,10 +155,10 @@ public class AuthenticationAPIUtils
     public static class Configuration
     {
         private final String _description;
-        private final long _configuration;
+        private final int _configuration;
         private final String _provider;
 
-        public Configuration(String description, long configuration, String provider)
+        public Configuration(String description, int configuration, String provider)
         {
             _description = description;
             _configuration = configuration;
@@ -170,7 +170,7 @@ public class AuthenticationAPIUtils
             return _description;
         }
 
-        public long getConfiguration()
+        public int getConfiguration()
         {
             return _configuration;
         }

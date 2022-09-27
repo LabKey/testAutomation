@@ -19,7 +19,7 @@ package org.labkey.test;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableLong;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -1121,7 +1121,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void waitForPendingRequests(int msWait)
     {
         Connection connection = createDefaultConnection();
-        MutableLong pendingRequestCount = new MutableLong(-1);
+        MutableInt pendingRequestCount = new MutableInt(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));
             if (pendingRequestCount.getValue() == 0)
@@ -1140,7 +1140,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
     }
 
-    private long getPendingRequestCount(Connection connection)
+    private int getPendingRequestCount(Connection connection)
     {
         Command<?> getPendingRequestCount = new Command<>("admin", "getPendingRequestCount");
         try
