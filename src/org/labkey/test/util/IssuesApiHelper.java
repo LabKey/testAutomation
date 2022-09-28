@@ -18,7 +18,7 @@ import java.util.Map;
 public class IssuesApiHelper extends IssuesHelper
 {
     private final APIUserHelper _userHelper;
-    private final Long _defaultPriority = 3L;
+    private final int _defaultPriority = 3;
 
     public IssuesApiHelper(WrapsDriver driverWrapper)
     {
@@ -44,7 +44,7 @@ public class IssuesApiHelper extends IssuesHelper
 
             Assert.assertTrue("Unable to properly match user with displayName: " + displayName, user.size() == 1);
             if (user.size() == 1)
-                issue.setAssignedTo(Long.valueOf(user.get(0).getUserId()));
+                issue.setAssignedTo(user.get(0).getUserId());
         }
 
         if (!props.containsKey("priority"))
