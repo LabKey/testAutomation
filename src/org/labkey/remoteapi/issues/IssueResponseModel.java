@@ -33,9 +33,9 @@ public class IssueResponseModel
     }
 
     // read-only props from the server
-    public Long getAssignedTo()
+    public Integer getAssignedTo()
     {
-        return (Long) getProp(ResponseKeys.AssignedTo);
+        return (Integer) getProp(ResponseKeys.AssignedTo);
     }
 
     public String getTitle()
@@ -73,9 +73,9 @@ public class IssueResponseModel
         return (String) getProp(ResponseKeys.resolved);
     }
 
-    public Long getPriority()
+    public Integer getPriority()
     {
-        return (Long) getProp(ResponseKeys.priority);
+        return (Integer) getProp(ResponseKeys.priority);
     }
 
     public String getType()
