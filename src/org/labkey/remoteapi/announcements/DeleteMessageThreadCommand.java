@@ -6,7 +6,7 @@ import org.labkey.remoteapi.PostCommand;
 public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadResponse>
 {
     private String _entityId;
-    private Integer _rowId;
+    private Long _rowId;
 
     public DeleteMessageThreadCommand(String entityId)
     {
@@ -14,7 +14,7 @@ public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadR
         _entityId = entityId;
     }
 
-    public DeleteMessageThreadCommand(Integer rowId)
+    public DeleteMessageThreadCommand(Long rowId)
     {
         super("announcements", "deleteThread");
         _rowId = rowId;
@@ -46,12 +46,12 @@ public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadR
         return _entityId;
     }
 
-    public void setRowId(Integer rowId)
+    public void setRowId(Long rowId)
     {
         _rowId = rowId;
     }
 
-    public Integer getRowId()
+    public Long getRowId()
     {
         return _rowId;
     }

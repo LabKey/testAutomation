@@ -16,15 +16,15 @@ public class AnnouncementModel
     private String _containerId;
     private String _containerPath;
     private String _created;
-    private Integer _createdBy;
+    private Long _createdBy;
     private String _modified;
-    private Integer _modifiedBy;
+    private Long _modifiedBy;
     private String _discussionSrcIdentifier;
     private String _entityId;
     private String _formattedHtml;
     private String _rendererType;
     private List<AnnouncementModel> _responses = new ArrayList<>();
-    private Integer _rowId;
+    private Long _rowId;
     private String _title;
     private String _parent;
 
@@ -45,11 +45,11 @@ public class AnnouncementModel
         if (json.has("created"))
             _created = json.getString("created");
         if (json.has("createdBy"))
-            _createdBy = json.getInt("createdBy");
+            _createdBy = json.getLong("createdBy");
         if (json.has("modified"))
             _modified = json.getString("modified");
         if (json.has("modifiedBy"))
-            _modifiedBy = json.getInt("modifiedBy");
+            _modifiedBy = json.getLong("modifiedBy");
         if (json.has("discussionSrcIdentifier"))
             _discussionSrcIdentifier = json.getString("discussionSrcIdentifier");
         if (json.has("entityId"))
@@ -59,7 +59,7 @@ public class AnnouncementModel
         if (json.has("rendererType"))
             _rendererType = json.getString("rendererType");
         if (json.has("rowId"))
-            _rowId = json.getInt("rowId");
+            _rowId = json.getLong("rowId");
         if (json.has("title"))
             _title = json.getString("title");
         if (json.has("parent"))
@@ -148,12 +148,12 @@ public class AnnouncementModel
         _created = created;
     }
 
-    public Integer getCreatedBy()
+    public Long getCreatedBy()
     {
         return _createdBy;
     }
 
-    public void setCreatedBy(Integer createdBy)
+    public void setCreatedBy(Long createdBy)
     {
         _createdBy = createdBy;
     }
@@ -168,12 +168,12 @@ public class AnnouncementModel
         _modified = modified;
     }
 
-    public Integer getModifiedBy()
+    public Long getModifiedBy()
     {
         return _modifiedBy;
     }
 
-    public void setModifiedBy(Integer modifiedBy)
+    public void setModifiedBy(Long modifiedBy)
     {
         _modifiedBy = modifiedBy;
     }
@@ -230,12 +230,12 @@ public class AnnouncementModel
         _responses = responses;
     }
 
-    public Integer getRowId()
+    public Long getRowId()
     {
         return _rowId;
     }
 
-    public void setRowId(Integer rowId)
+    public void setRowId(Long rowId)
     {
         _rowId = rowId;
     }
