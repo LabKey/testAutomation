@@ -1,12 +1,10 @@
 package org.labkey.test.util;
 
 import org.junit.Assert;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.remoteapi.issues.IssueModel;
 import org.labkey.remoteapi.issues.IssueResponse;
+import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.openqa.selenium.WrapsDriver;
 
