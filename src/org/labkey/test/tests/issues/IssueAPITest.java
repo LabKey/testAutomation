@@ -255,7 +255,7 @@ public class IssueAPITest extends BaseWebDriverTest
             .setType("Defect");
         var issueId = doIssueAction(issue);
         var issueModel = getIssueResponse(issueId);
-        assertEquals("expect the default issueList to have been supplied", ISSUES, issueModel.getIssueDefName());
+        assertEquals("expect the issue def name to have been supplied: ", ISSUES, issueModel.getIssueDefName());
     }
 
     @Test
@@ -273,7 +273,7 @@ public class IssueAPITest extends BaseWebDriverTest
         doIssueAction(close);
         var closedResponse = getIssueResponse(issueId);
         assertEquals("expect status to be closed", "closed", closedResponse.getStatus());
-        assertEquals("expect to be assigned to guest", Long.valueOf(0), closedResponse.getAssignedTo());
+        assertEquals("expect to be assigned to guest", (Integer) 0, closedResponse.getAssignedTo());
 
         doIssueAction(resolve);
         var resolvedResponse = getIssueResponse(issueId);

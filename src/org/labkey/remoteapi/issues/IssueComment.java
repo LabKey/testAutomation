@@ -1,6 +1,5 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
@@ -42,11 +41,8 @@ public class IssueComment
         List<String> attachments= new ArrayList<>();
         if (_properties.get("attachments") != null)
         {
-            JSONArray attachmentsArray = (JSONArray) _properties.get(ATTACHMENTS);
-            for(int i=0; i < attachmentsArray.length(); i++)
-            {
-               attachments.add(attachmentsArray.getString(i));
-            }
+            List<String> attachmentsList = (List<String>) _properties.get(ATTACHMENTS);
+            attachments.addAll(attachmentsList);
         }
         return attachments;
     }
