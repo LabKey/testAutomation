@@ -14,7 +14,6 @@ import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
@@ -88,6 +87,27 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
+     * Is the left column on this grid locked. I think this will always be true for this grid type.
+     *
+     * @return True if left column is locked, false otherwise.
+     */
+    public boolean hasLockedColumn()
+    {
+        return Locator.tagWithClass("div", "grid-panel__grid")
+                .findElement(getComponentElement())
+                .getAttribute("class").contains("grid-panel__lock-left");
+    }
+
+    /**
+     * Scroll the grid to the top row and left most column.
+     */
+    public void scrollToOrigin()
+    {
+        getWrapper().executeScript("arguments[0].scrollBy(-arguments[0].scrollLeft, -arguments[0].scrollHeight)",
+                Locators.responsiveGrid().findElement(getComponentElement()));
+    }
+
+    /**
      * Sorts from the grid header menu
      * @param columnLabel column header for
      * @return this grid
@@ -123,8 +143,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         Optional<WebElement> colHeaderIcon = Locator.XPathLocator.union(
-                Locator.tagWithClass("span", "fa-sort-amount-asc"),
-                Locator.tagWithClass("span", "fa-sort-amount-desc")
+                Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-asc"),
+                Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-desc")
         ).findOptionalElement(headerCell);
         return colHeaderIcon.isPresent();
 
@@ -178,8 +198,61 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return getThis();
     }
 
+    public boolean hasColumnFilterIcon(String columnLabel)
+    {
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        Optional<WebElement> colHeaderIcon = Locator.tagWithClass("span", "grid-panel__col-header-icon")
+                .withClass("fa-filter")
+                .findOptionalElement(headerCell);
+        return colHeaderIcon.isPresent();
+
+    }
+
+    /**
+     * use the column menu to hide the given column.
+     *
+     * @param columnLabel Column to hide.
+     * @return This grid.
+     */
+    public T hideColumn(String columnLabel)
+    {
+        // Because this will remove the column wait for the grid to update.
+        clickColumnMenuItem(columnLabel, "Hide Column", true);
+        return getThis();
+    }
+
+    /**
+     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridViewDialog}. This will click the first column
+     * in the grid.
+     * @return A {@link CustomizeGridViewDialog}
+     */
+    public CustomizeGridViewDialog insertColumn()
+    {
+        return insertColumn(getColumnNames().get(0));
+    }
+
+    /**
+     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridViewDialog}. This will use the given column to
+     * get the menu. This should insert the column after (to the right) of this column.
+     *
+     * @param columnLabel The column to get the menu from.
+     * @return A {@link CustomizeGridViewDialog}
+     */
+    public CustomizeGridViewDialog insertColumn(String columnLabel)
+    {
+        // Because this is going to show the customize grid dialog don't wait for a grid update. the dialog will wait for the update.
+        clickColumnMenuItem(columnLabel, "Insert Column", false);
+        return new CustomizeGridViewDialog(getDriver(), this);
+    }
+
     protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
     {
+
+        if(hasLockedColumn())
+        {
+            scrollToOrigin();
+        }
+
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
         sleep(500);  //it would be nice to find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
@@ -191,8 +264,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         getWrapper().scrollToMiddle(toggle);        // scroll the target vertically to the middle of the page
         toggle.click();
 
-        WebElement menuItem = Locator.css("li > a").containing(menuText).findElement(headerCell);
-        waitFor(()-> menuItem.isDisplayed(), 1000);
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(headerCell);
+        waitFor(menuItem::isDisplayed, 1000);
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
         else

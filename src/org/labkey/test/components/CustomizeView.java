@@ -154,7 +154,17 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     public void saveDefaultView()
     {
-        saveCustomView("");
+        saveDefaultView(true);
+    }
+
+    /**
+     * Can save the view as a default view that is private (shared=false) or default for everyone (shared=true).
+     *
+     * @param shared True to make default for everyone, false for a private default view.
+     */
+    public void saveDefaultView(boolean shared)
+    {
+        saveCustomView("", shared);
     }
 
     public void saveCustomView()
@@ -168,36 +178,37 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
      */
     public void saveCustomView(@Nullable String name)
     {
-        saveCustomView(name, false, false);
+        saveCustomView(name, null, null);
     }
 
     /**
      * Save a custom view
      * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
-     * @param shared if false the report will not be shared, otherwise will mark the view as shared.
+     * @param shared if null the current shared status will not be changed. If false the report will not be shared, otherwise will mark the view as shared.
      */
-    public void saveCustomView(String name, boolean shared)
+    public void saveCustomView(String name, @Nullable Boolean shared)
     {
-        saveCustomView(name, shared, false);
+        saveCustomView(name, shared, null);
     }
 
     /**
      * Save a custom view
      * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
-     * @param shared if false the report will not be shared, otherwise will mark the view as shared.
+     * @param shared if null the current shared status will not be changed. If false the report will not be shared, otherwise will mark the view as shared.
+     * @param inherit if null the current inherited status will not be changed. If false the report will not be inherited, otherwise will mark the view as shared.
      */
-    public void saveCustomView(String name, boolean shared, boolean inherit)
+    public void saveCustomView(String name, @Nullable Boolean shared, @Nullable Boolean inherit)
     {
         SaveWindow saveWindow = clickSave();
 
-        if (shared)
+        if (shared != null)
         {
-            saveWindow.shareCheckbox.check();
+            saveWindow.shareCheckbox.set(shared);
         }
 
-        if (inherit)
+        if (inherit != null)
         {
-            saveWindow.inheritCheckbox.check();
+            saveWindow.inheritCheckbox.set(inherit);
             // TODO: select folder to save custom view into
         }
 

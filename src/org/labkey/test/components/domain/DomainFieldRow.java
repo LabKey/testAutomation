@@ -97,7 +97,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             if (ct.getLabel().equalsIgnoreCase(typeString))
                 return ct;
         }
-        return null;
+        throw new IllegalStateException("Unknown column type: " + typeString);
     }
 
     /**
@@ -423,9 +423,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         setType(FieldDefinition.ColumnType.Lookup);
         setFromFolder(lookupInfo.getFolder());
         setFromSchema(lookupInfo.getSchema());
-        if (lookupInfo.getTableType() == null)
-            throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
-        String tableType = lookupInfo.getTableType().name();
+        String tableType;
+        if (lookupInfo.getTableType() == FieldDefinition.ColumnType.Integer)
+            tableType = "Integer";
+        else if (lookupInfo.getTableType() == FieldDefinition.ColumnType.String)
+            tableType = "String";
+        else
+            throw new IllegalArgumentException("Invalid lookup type specified for " + lookupInfo.getTable() + ": " + lookupInfo.getTableType());
+
         setFromTargetTable(lookupInfo.getTable() + " (" + tableType + ")");
         return this;
     }

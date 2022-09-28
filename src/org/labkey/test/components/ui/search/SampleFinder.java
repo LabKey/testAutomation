@@ -290,7 +290,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         public List<WebElement> getViewsWithCls(String cls)
         {
             expand();
-            return findVisibleMenuItemsWithCls(cls);
+            return findVisibleMenuItemsWithClass(cls);
         }
 
         public void clickView(String viewName)

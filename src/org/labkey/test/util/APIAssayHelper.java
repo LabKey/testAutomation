@@ -39,6 +39,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.assay.AssayDesign;
 
 import java.io.File;
 import java.io.IOException;
@@ -279,15 +280,8 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws IOException, CommandException
     {
-        Connection connection = _test.createDefaultConnection();
-        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
-        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
-
-        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
-        newAssayProtocol.setName(assayName);
-        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
-        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
-        return saveProtocolResponse.getProtocol();
+        return AssayDesign.of(providerName, assayName)
+                .createAssay(containerPath, _test.createDefaultConnection());
     }
 
     /**

@@ -594,7 +594,7 @@ public class StudySecurityPage extends LabKeyPage<StudySecurityPage.ElementCache
         final WebElement groupRadioButton(String groupName, GroupSecuritySetting setting)
         {
             return Locator.xpath(
-                    String.format("//td[text()='%s']/../th/input[@value='%s']", groupName, setting.getRadioValue()))
+                    String.format("//td[text()='%s']/../td/input[@value='%s']", groupName, setting.getRadioValue()))
                     .findElement(groupUpdateForm);
         }
 

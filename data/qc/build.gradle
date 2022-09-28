@@ -5,6 +5,7 @@ apply plugin: 'java'
 
 dependencies {
   BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: BuildUtils.getRemoteApiProjectPath(gradle), depVersion: project.labkeyClientApiVersion)
+  implementation "commons-logging:commons-logging:${project.commonsLoggingVersion}"
 }
 
 sourceSets {

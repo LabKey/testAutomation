@@ -599,7 +599,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals(USER2_NAME, who.getEmail());
         assertTrue(who.isImpersonated());
 
-        cn.stopImpersonate();
+        cn.stopImpersonating();
     }
 
     @Override

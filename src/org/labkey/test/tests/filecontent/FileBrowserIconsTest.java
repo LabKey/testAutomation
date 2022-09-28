@@ -121,7 +121,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-video-o", 1) & pass;
 
         log("Validate number of pdf icons is correct.");
-        pass = validateCount("span.fa-file-pdf-o", 1) & pass;
+        pass = validateCount("span.fa-file-pdf-o", 2) & pass;
 
         log("Validate number of excel icons is correct.");
         pass = validateCount("span.fa-file-excel-o", 4) & pass;

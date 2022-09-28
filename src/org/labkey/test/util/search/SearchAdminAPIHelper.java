@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util.search;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
