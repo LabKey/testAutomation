@@ -26,7 +26,7 @@ public class PuppeteerStatus
 
     public PuppeteerStatus(JSONObject payload)
     {
-        _isAvailable = payload.getBoolean("isAvailable");
+        _isAvailable = payload.optBoolean("isAvailable");
         _pingSuccess = payload.getBoolean("pingSuccess");
         _service = new JSONObject(payload.get("service"));
     }
