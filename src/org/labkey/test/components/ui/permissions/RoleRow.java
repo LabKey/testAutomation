@@ -1,12 +1,10 @@
 package org.labkey.test.components.ui.permissions;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -122,87 +120,39 @@ public class RoleRow extends WebDriverComponent<RoleRow.ElementCache>
     {
         final WebElement rowContainer = Locator.byClass("container-expandable-grey").findWhenNeeded(this);
         final WebElement assignmentsRow = Locator.byClass("permissions-assignments-row").findWhenNeeded(this);
+        final WebElement usersList = Locator.tagWithText("div","Users:").followingSibling("ul")
+                .findElement(assignmentsRow);
+        final WebElement groupsList = Locator.tagWithText("div","Groups:").followingSibling("ul")
+                .findElement(assignmentsRow);
+
         final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
                 .setOptionLocator(ReactSelect.Locators.option::startsWith);
 
         List<PermissionsMember> findUsers()
         {
-            var usersList = Locator.tagWithText("div","Users:").followingSibling("ul")
-                    .findElement(assignmentsRow);
-            return MEMBER_LOC
-                    .findElements(usersList).stream()
-                    .map(PermissionsMember::new)
-                    .collect(Collectors.toList());
+            return new PermissionsMember.PermissionsMemberFinder(getDriver()).findAll(usersList);
         }
 
         PermissionsMember findUser(String email)
         {
-            return new PermissionsMember(email);
+            return new PermissionsMember.PermissionsMemberFinder(getDriver()).withTitle(email).waitFor(usersList);
         }
 
         List<PermissionsMember> findGroups()
         {
-            var usersList = Locator.tagWithText("div","Groups:").followingSibling("ul")
-                    .findElement(assignmentsRow);
-            return MEMBER_LOC
-                    .findElements(usersList).stream()
-                    .map(PermissionsMember::new)
-                    .collect(Collectors.toList());
+            return new PermissionsMember.PermissionsMemberFinder(getDriver()).findAll(groupsList);
         }
 
         PermissionsMember findGroup(String name)
         {
-            return new PermissionsMember(name);
-        }
-    }
-
-    private class PermissionsMember extends Component
-    {
-        private final WebElement _el;
-        private final WebElement _removeButton = Locator.byClass("btn")
-                .withChild(Locator.byClass("fa-remove")).findWhenNeeded(this);
-        private final WebElement _nameButton = Locator.byClass("permissions-button-display")
-                .findWhenNeeded(this).withTimeout(1000);
-
-        public PermissionsMember(WebElement el)
-        {
-            _el = el;
-        }
-
-        private PermissionsMember(String email)
-        {
-            this(MEMBER_LOC.startsWith(email)
-                    .waitForElement(RoleRow.this, 5000));
-        }
-
-        @Override
-        public WebElement getComponentElement()
-        {
-            return _el;
-        }
-
-        public void remove()
-        {
-            _removeButton.click();
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(_el));
-        }
-
-        public void select()
-        {
-            _nameButton.click();
-            getWrapper().shortWait().until(ExpectedConditions.attributeContains(_nameButton, "class", "primary"));
-        }
-
-        public String getName()
-        {
-            return _nameButton.getText();
+            return new PermissionsMember.PermissionsMemberFinder(getDriver()).withTitle(name).waitFor(groupsList);
         }
     }
 
     public static class RoleRowFinder extends WebDriverComponentFinder<RoleRow, RoleRow.RoleRowFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.byClass("permissions-assignment-panel")
-                .child(Locator.byClass("row"));
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "container-expandable")
+                .withChild(Locator.tagWithClass("div", "container-expandable-grey"));
         private String _roleTitle = null;
 
         public RoleRowFinder(WebDriver driver)
