@@ -16,15 +16,14 @@ public class IssueResponseModel
 
     public IssueResponseModel(JSONObject json)
     {
-        JSONObject props = (JSONObject) json.get("properties");
-        props.toMap().forEach((k, v) -> {
-            _serverProps.put(k, v);
-            _allProps.put(k, v);
-        });
+        _allProps.putAll(json.toMap());
+
+        JSONObject props = json.getJSONObject("properties");
+        _serverProps.putAll(props.toMap());
 
         if (json.get("comments") != null)
         {
-            var commentsObj = (JSONArray)json.get("comments");
+            JSONArray commentsObj = json.getJSONArray("comments");
             for (int i=0; i < commentsObj.length(); i++)
             {
                 _issueComments.add(new IssueComment((JSONObject) commentsObj.get(i)));

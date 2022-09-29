@@ -239,7 +239,7 @@ public class IssueAPITest extends BaseWebDriverTest
 
         var issueId = doIssueAction(issue);
         var hopefullyAssignedIssue = getIssueResponse(issueId);
-        assertEquals("expect issue to be assigned to buddy", TEST_BUDDY_ID, hopefullyAssignedIssue.getAssignedTo());
+        assertEquals("expected issue to be assigned to buddy", TEST_BUDDY_ID, hopefullyAssignedIssue.getAssignedTo());
     }
 
     @Test
@@ -255,7 +255,7 @@ public class IssueAPITest extends BaseWebDriverTest
             .setType("Defect");
         var issueId = doIssueAction(issue);
         var issueModel = getIssueResponse(issueId);
-        assertEquals("expect the issue def name to have been supplied: ", ISSUES, issueModel.getIssueDefName());
+        assertEquals("expected issue def name to have been supplied", ISSUES, issueModel.getIssueDefName());
     }
 
     @Test
