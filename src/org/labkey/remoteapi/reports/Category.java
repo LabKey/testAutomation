@@ -72,19 +72,19 @@ public class Category extends ResponseObject
         super.getAllProperties().replace("label", newLabel);
     }
 
-    public Long getDisplayOrder()
+    public Integer getDisplayOrder()
     {
-        return (Long)getAllProperties().get("displayOrder");
+        return (Integer)getAllProperties().get("displayOrder");
     }
 
-    public void setDisplayOrder(Long displayOrdinal)
+    public void setDisplayOrder(Integer displayOrdinal)
     {
         super.getAllProperties().replace("displayOrder", displayOrdinal);
     }
 
-    public Long getRowId()
+    public Integer getRowId()
     {
-        return (Long)getAllProperties().get("rowid");
+        return (Integer)getAllProperties().get("rowid");
     }
 
     public List<Category> getSubcategories()

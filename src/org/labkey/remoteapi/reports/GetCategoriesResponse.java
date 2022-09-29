@@ -51,7 +51,7 @@ public class GetCategoriesResponse extends CommandResponse
         return null;
     }
 
-    public Category getCategory(Long rowId)
+    public Category getCategory(Integer rowId)
     {
         for (Category category : getCategoryList())
         {
