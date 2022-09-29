@@ -4,7 +4,6 @@ import org.hamcrest.CoreMatchers;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -232,7 +231,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // double-check to ensure the column has been deleted
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection());
         List<String> columnsAfterDelete = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
-        Assert.assertThat("Columns after delete", columnsAfterDelete, CoreMatchers.allOf(CoreMatchers.hasItem("Name"), CoreMatchers.not(CoreMatchers.hasItem("deleteMe"))));
+        assertThat("Columns after delete", columnsAfterDelete, CoreMatchers.allOf(CoreMatchers.hasItem("Name"), CoreMatchers.not(CoreMatchers.hasItem("deleteMe"))));
 
         // this column should no longer exist
         List<Map<String, Object>> deleteMe = rowsResponse.getColumnModel().stream().filter(a -> a.get("dataIndex").equals("deleteMe")).collect(Collectors.toList());
@@ -585,7 +584,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // double-check to ensure the column has not been altered on the server side
         SelectRowsResponse rowsResponse = dgen.getRowsFromServer(createDefaultConnection());
         List<String> columnsAfterSaveAttempt = rowsResponse.getColumnModel().stream().map(col -> (String) col.get("dataIndex")).collect(Collectors.toList());
-        Assert.assertThat("Columns after delete", columnsAfterSaveAttempt,
+        assertThat("Columns after delete", columnsAfterSaveAttempt,
                 CoreMatchers.allOf(hasItems("Name", "testCol", "extraField"),
                         CoreMatchers.not(CoreMatchers.hasItem("modified"))));
 
@@ -624,7 +623,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DataRegionTable sampleTypeTable = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         List<String> columnsInDefaultView = sampleTypeTable.getColumnNames();
-        Assert.assertThat("Columns after delete", columnsInDefaultView,
+        assertThat("Columns after delete", columnsInDefaultView,
                 CoreMatchers.allOf(hasItems("Name", "Flag", "extraField", "testCol"),
                         CoreMatchers.not(CoreMatchers.hasItem("defaultViewField"))));
     }
