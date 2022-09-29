@@ -380,7 +380,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         createPage.clickSave();
 
         log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE));
-        Long sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), PARENT_SAMPLE_TYPE, Arrays.asList(PARENT_SAMPLE_01)).get(PARENT_SAMPLE_01);
+        Integer sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), PARENT_SAMPLE_TYPE, Arrays.asList(PARENT_SAMPLE_01)).get(PARENT_SAMPLE_01);
 
         String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
         beginAt(url);
