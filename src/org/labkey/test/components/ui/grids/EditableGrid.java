@@ -780,7 +780,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public ReactSelect lookupSelect()
         {
-            return ReactSelect.finder(getDriver()).find(getComponentElement());
+            return ReactSelect.finder(getDriver()).timeout(10000).find(getComponentElement());
         }
 
         public ReactDatePicker datePicker()
