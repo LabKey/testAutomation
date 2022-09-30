@@ -159,7 +159,6 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
     {
         final WebElement rowContainer = Locator.byClass("container-expandable-grey").findWhenNeeded(this);
 
-        final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
-                .setOptionLocator(ReactSelect.Locators.option::startsWith);
+        final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
     }
 }
