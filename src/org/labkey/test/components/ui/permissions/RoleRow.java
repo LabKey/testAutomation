@@ -29,7 +29,7 @@ public class RoleRow extends PermissionsRowBase<RoleRow>
         return new ElementCache();
     }
 
-    protected class ElementCache extends PermissionsRowBase.ElementCache
+    protected class ElementCache extends PermissionsRowBase<RoleRow>.ElementCache
     {
     }
 

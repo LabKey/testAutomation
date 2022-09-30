@@ -155,12 +155,6 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
         return new ElementCache();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return new ElementCache();
-    }
-
     protected class ElementCache extends WebDriverComponent<?>.ElementCache
     {
         final WebElement rowContainer = Locator.byClass("container-expandable-grey").findWhenNeeded(this);

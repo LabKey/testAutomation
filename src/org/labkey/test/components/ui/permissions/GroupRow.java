@@ -51,7 +51,7 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
         return (ElementCache) super.elementCache();
     }
 
-    protected class ElementCache extends PermissionsRowBase.ElementCache
+    protected class ElementCache extends PermissionsRowBase<GroupRow>.ElementCache
     {
         final WebElement actionContainer = Locator.tagWithClass("div", "expandable-container__action-container")
                 .findWhenNeeded(this);
