@@ -345,7 +345,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      * <p>
      *     This test will:
      *     <ul>
-     *         <li>Create a derived sample using the UI and the name expression to name it.</li>
+     *         <li>Create a derived sample using the UI and the name expression that reference parent property to name it.</li>
+     *         <li>Create a derived sample using the UI and the name expression that references grandparent property to name it.</li>
+     *         <li>Create a derived sample using the bulk import and the name expression that references grandparent property to name it.</li>
      *     </ul>
      * </p>
      * @throws Exception Can be thrown by test helper.
@@ -379,8 +381,56 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.clickSave();
 
-        log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE));
-        Long sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), PARENT_SAMPLE_TYPE, Arrays.asList(PARENT_SAMPLE_01)).get(PARENT_SAMPLE_01);
+        String flagString = "Hello, I'm a derived sample.";
+        String intVal = "987";
+        String derivedSampleName = deriveSample(PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE, sampleType, flagString, intVal);
+
+        checker().verifyTrue("Name of derived sample doesn't look correct.", derivedSampleName.contains("Parent Sample"));
+        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
+
+        final String ancestorNameExpression = String.format("GrandChild_${MaterialInputs/%s/..[MaterialInputs/%s]/Str}_${genId}", sampleType, PARENT_SAMPLE_TYPE);
+        log("Change the sample type name expression to support grandparent property lookup: " + ancestorNameExpression);
+        goToProjectHome();
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.goToSampleType(sampleType);
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
+        updatePage.setNameExpression(ancestorNameExpression);
+        updatePage.clickSave();
+
+        String flagStringGD = "grand child sample.";
+        String intValGD = "567";
+        String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType, flagStringGD, intValGD);
+        checker().verifyTrue("Name of derived sample doesn't look correct.", grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(derivedSampleName)));
+
+        String flagStringBulkImport = "bulk imported grand child.";
+        log("Derive a sample using bulk import but give it no name. The name expression should be used to name the derived sample.");
+        String importData = "MaterialInputs/DerivedUI_SampleType\tStr\n" +
+                derivedSampleName + "\t" + flagStringBulkImport + "\n";
+        sampleHelper.goToSampleType(sampleType);
+        sampleHelper.getSamplesDataRegionTable()
+                .clickImportBulkData()
+                .setText(importData)
+                .submit();
+
+        waitForElement(Locator.tagWithText("td", flagStringBulkImport));
+
+        DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
+        int newSampleRowInd = table.getRowIndex("Str", flagStringBulkImport);
+        String grandImportChildSampleName = table.getDataAsText(newSampleRowInd, "Name");
+        click(Locator.tagWithText("td", grandImportChildSampleName));
+        waitForElement(Locator.tagWithText("td", flagStringBulkImport));
+
+        grandImportChildSampleName = Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
+        checker().verifyTrue("Name of derived sample doesn't look correct.", grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(derivedSampleName)));
+    }
+
+    private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, String strVal, String intVal) throws IOException, CommandException
+    {
+        log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", parentSampleName, parentSampleType));
+        Long sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
 
         String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
         beginAt(url);
@@ -391,22 +441,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText("derive samples from this sample"));
 
-        selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", sampleType, getProjectName()));
+        selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", targetSampleType, getProjectName()));
         clickButton("Next");
 
-        String flagString = "Hello, I'm a derived sample.";
-        setFormElement(Locator.name("outputSample1_Int"), "987");
-        setFormElement(Locator.name("outputSample1_Str"), flagString);
+        setFormElement(Locator.name("outputSample1_Int"), intVal);
+        setFormElement(Locator.name("outputSample1_Str"), strVal);
         clickButton("Submit");
 
-        waitForElement(Locator.tagWithText("td", flagString));
+        waitForElement(Locator.tagWithText("td", strVal));
 
-        String derivedSampleName = Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
-
-        checker().verifyTrue("Name of derived sample doesn't look correct.", derivedSampleName.contains("Parent Sample"));
-
-        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
-
+        return Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
     }
 
     /**
