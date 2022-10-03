@@ -9,7 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +60,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
 
     public Map<String, Integer> getTabsWithCounts()
     {
-        Map<String, Integer> counts = new HashMap<>();
+        Map<String, Integer> counts = new LinkedHashMap<>();
 
         List<String> tabs = getTabs();
 
