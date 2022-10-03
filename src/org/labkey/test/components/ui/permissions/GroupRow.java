@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.permissions;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -54,6 +55,14 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
     {
         final WebElement actionContainer = Locator.tagWithClass("div", "expandable-container__action-container")
                 .findWhenNeeded(this);
+
+        public ElementCache()
+        {
+            super(
+                    g -> ReactSelect.Locators.option.withText("Group: " + g), // group options start with "Group: "
+                    null // user options show just their emails
+            );
+        }
 
         final WebElement deleteEmptyGroupBtn()
         {

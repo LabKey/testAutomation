@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -84,7 +85,7 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
     public T addMember(String email)
     {
         expand();
-        elementCache().memberSelect.select(email);
+        elementCache().userMemberSelect.select(email);
         WebDriverWrapper.waitFor(()-> getMemberEmails().contains(email),
                 "member was not added in time", 2000);
         return getThis();
@@ -115,7 +116,7 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
     public T addGroup(String name)
     {
         expand();
-        elementCache().memberSelect.select(name);
+        elementCache().groupMemberSelect.select(name);
         WebDriverWrapper.waitFor(()-> getGroups().contains(name),
                 "group was not added in time", 2000);
         return getThis();
@@ -150,17 +151,31 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
 
 
     @Override
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
+    protected abstract ElementCache newElementCache();
 
     protected class ElementCache extends WebDriverComponent<?>.ElementCache
     {
         final WebElement rowContainer = Locator.byClass("container-expandable-grey").findWhenNeeded(this);
 
-        final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
-                .setOptionLocator(ReactSelect.Locators.option::endsWith);
+        private final ReactSelect groupMemberSelect;
+        private final ReactSelect userMemberSelect;
+
+        protected ElementCache(Function<String, Locator> groupOptionLocator, Function<String, Locator> userOptionLocator)
+        {
+            // Use same WebElement for both selects but with different option locators.
+            ReactSelect rawMemberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
+
+            groupMemberSelect = new ReactSelect(rawMemberSelect);
+            if (groupOptionLocator != null)
+            {
+                groupMemberSelect.setOptionLocator(groupOptionLocator);
+            }
+            userMemberSelect = new ReactSelect(rawMemberSelect);
+            if (userOptionLocator != null)
+            {
+                userMemberSelect.setOptionLocator(userOptionLocator);
+            }
+        }
     }
 
     protected static abstract class PermissionsRowFinder<T extends PermissionsRowBase<T>> extends WebDriverComponentFinder<T, PermissionsRowBase.PermissionsRowFinder<T>>
