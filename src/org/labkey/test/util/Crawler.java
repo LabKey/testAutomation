@@ -460,6 +460,10 @@ public class Crawler
 
         public UrlToCheck(URL origin, String urlText, int depth)
         {
+            if (depth < 0)
+            {
+                throw new IllegalArgumentException("Invalid crawl depth: " + depth);
+            }
             _origin = origin;
             _urlText = urlText;
             _depth = depth;
@@ -528,9 +532,10 @@ public class Crawler
             return _isFromForm;
         }
 
-        public void setFromForm(boolean fromForm)
+        public UrlToCheck setFromForm(boolean fromForm)
         {
             _isFromForm = fromForm;
+            return this;
         }
 
         public URL getOrigin()
@@ -1020,7 +1025,7 @@ public class Crawler
                     if (code == 200 && _test.getDriver().getTitle().isEmpty())
                         _warnings.add("Action does not specify title: " + actionId);
 
-                    if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
+                    if (actualUrl.toString().startsWith(WebTestHelper.getBaseURL())) // Stop if redirected to an external site
                     {
                         List<Pair<String, Map<String, String>>> linksWithAttributes = _test.getLinkAddresses();
                         for (Pair<String, Map<String, String>> linkWithAttributes : linksWithAttributes)
@@ -1039,27 +1044,31 @@ public class Crawler
                                 }
                             }
                         }
-                        List<String> linkAddresses = linksWithAttributes.stream().map(Pair::getLeft).collect(Collectors.toList());
-                        List<String> formAddresses = _test.getFormAddresses();
-                        linkAddresses.addAll(formAddresses);
 
-                        for (String url : linkAddresses)
+                        int nextDepth = depth + 1;
+
+                        for (Pair<String, ?> p : linksWithAttributes)
                         {
+                            String url = p.getLeft();
                             try
                             {
-                                UrlToCheck candidateUrl = new UrlToCheck(actualUrl, url, depth + 1);
-                                if (candidateUrl.isVisitableURL())
-                                {
-                                    candidateUrl.setFromForm(formAddresses.contains(url));
-                                    newUrlsToCheck.add(candidateUrl);
-                                }
+                                newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
                             }
                             catch (IllegalArgumentException badUrl)
                             {
-                                if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
-                                {
-                                    throw new AssertionError("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
-                                }
+                                throw new IllegalArgumentException("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
+                            }
+                        }
+
+                        for (String url : _test.getFormAddresses())
+                        {
+                            try
+                            {
+                                newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth).setFromForm(true));
+                            }
+                            catch (IllegalArgumentException ignore)
+                            {
+                                // forms might have strange target action (e.g. '../formulations')
                             }
                         }
                     }
@@ -1116,7 +1125,9 @@ public class Crawler
             }
         }
 
-        return newUrlsToCheck;
+        return _terminalActions.contains(actionId)
+                ? Collections.emptyList()
+                : newUrlsToCheck.stream().filter(UrlToCheck::isVisitableURL).toList();
     }
 
     private static final ControllerActionId spiderAction = new ControllerActionId("admin", "spider");
