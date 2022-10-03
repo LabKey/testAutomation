@@ -33,20 +33,17 @@ public class RoleRow extends PermissionsRowBase<RoleRow>
     {
     }
 
-    public static class RoleRowFinder extends WebDriverComponentFinder<RoleRow, RoleRow.RoleRowFinder>
+    public static class RoleRowFinder extends PermissionsRowFinder<RoleRow>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "container-expandable")
-                .withChild(Locator.tagWithClass("div", "container-expandable-grey"));
-        private String _roleTitle = null;
 
         public RoleRowFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public RoleRow.RoleRowFinder forRole(String roleTitle)
+        public RoleRowFinder forRole(String roleTitle)
         {
-            _roleTitle = roleTitle;
+            super.withTitle(roleTitle);
             return this;
         }
 
@@ -54,15 +51,6 @@ public class RoleRow extends PermissionsRowBase<RoleRow>
         protected RoleRow construct(WebElement el, WebDriver driver)
         {
             return new RoleRow(el, driver);
-        }
-
-        @Override
-        protected Locator locator()
-        {
-            if (_roleTitle != null)
-                return _baseLocator.withDescendant(Locator.byClass("permissions-title").withText(_roleTitle));
-            else
-                return _baseLocator;
         }
     }
 }

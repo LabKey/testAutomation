@@ -27,8 +27,7 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
 
     protected boolean isDeleteEmptyButtonDisabled()
     {
-        return elementCache().deleteEmptyGroupBtn().getAttribute("class")
-                .contains("disabled-button-with-tooltip");
+        return !elementCache().deleteEmptyGroupBtn().isEnabled();
     }
 
     public void clickDeleteEmptyGroup()
@@ -63,12 +62,8 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
         }
     }
 
-    public static class GroupRowFinder extends WebDriverComponentFinder<GroupRow, GroupRow.GroupRowFinder>
+    public static class GroupRowFinder extends PermissionsRowFinder<GroupRow>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "container-expandable")
-                .withChild(Locator.tagWithClass("div", "container-expandable-grey"));
-        private String _groupName = null;
-
         public GroupRowFinder(WebDriver driver)
         {
             super(driver);
@@ -76,7 +71,7 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
 
         public GroupRowFinder forGroup(String groupName)
         {
-            _groupName = groupName;
+            super.withTitle(groupName);
             return this;
         }
 
@@ -86,14 +81,6 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
             return new GroupRow(el, driver);
         }
 
-        @Override
-        protected Locator locator()
-        {
-            if (_groupName != null)
-                return _baseLocator.withDescendant(Locator.byClass("permissions-title").withText(_groupName));
-            else
-                return _baseLocator;
-        }
     }
 
 }

@@ -162,4 +162,34 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
         final ReactSelect memberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this)
                 .setOptionLocator(ReactSelect.Locators.option::endsWith);
     }
+
+    protected static abstract class PermissionsRowFinder<T extends PermissionsRowBase<T>> extends WebDriverComponentFinder<T, PermissionsRowBase.PermissionsRowFinder<T>>
+    {
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "container-expandable")
+                .withChild(Locator.tagWithClass("div", "container-expandable-grey"));
+        private String _title = null;
+
+        protected PermissionsRowFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        // Call from group/role row finder
+        protected void withTitle(String title)
+        {
+            _title = title;
+        }
+
+        @Override
+        protected abstract T construct(WebElement el, WebDriver driver);
+
+        @Override
+        protected Locator locator()
+        {
+            if (_title != null)
+                return _baseLocator.withDescendant(Locator.byClass("permissions-title").withText(_title));
+            else
+                return _baseLocator;
+        }
+    }
 }
