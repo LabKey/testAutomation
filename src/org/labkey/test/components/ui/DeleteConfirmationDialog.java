@@ -19,7 +19,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog(@NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        this("delete", sourcePage, confirmPageSupplier);
+        this("Delete", sourcePage, confirmPageSupplier);
     }
 
     protected DeleteConfirmationDialog(String partialTitle, @NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
