@@ -474,7 +474,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToSampleType = () -> goTo("Sample Types", SAMPLE_TYPE_NAME);
 
         setupSampleType();
-        doIndividualTriggerTest("Material", goToSampleType, "Name", false, false);
+        doIndividualTriggerTest("Material", goToSampleType, "Name", false, "Yes, Delete", false);
     }
 
 
