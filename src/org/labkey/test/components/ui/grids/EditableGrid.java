@@ -46,6 +46,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         _driver = driver;
     }
 
+    protected EditableGrid(EditableGrid wrappedGrid)
+    {
+        this(wrappedGrid.getComponentElement(), wrappedGrid.getDriver());
+    }
+
     @Override
     protected WebDriver getDriver()
     {

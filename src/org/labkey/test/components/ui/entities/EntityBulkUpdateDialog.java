@@ -2,17 +2,17 @@ package org.labkey.test.components.ui.entities;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.ToggleButton;
+import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDatePicker;
+import org.labkey.test.components.react.ToggleButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,20 +21,17 @@ import java.util.List;
 public class EntityBulkUpdateDialog extends ModalDialog
 {
     private final int WAIT_TIMEOUT = 2000;
+    private final UpdatingComponent _updatingComponent;
 
     public EntityBulkUpdateDialog(WebDriver driver)
     {
-        this(driver, " selected from ");
+        this(driver, UpdatingComponent.NO_OP);
     }
 
-    public EntityBulkUpdateDialog(WebDriver driver, String title)
+    public EntityBulkUpdateDialog(WebDriver driver, UpdatingComponent updatingComponent)
     {
-        this(new ModalDialogFinder(driver).withTitle(title));
-    }
-
-    private EntityBulkUpdateDialog(ModalDialogFinder finder)
-    {
-        super(finder);
+        super(new ModalDialogFinder(driver).withTitle("Update "));
+        _updatingComponent = updatingComponent;
     }
 
     // enable/disable field editable state
@@ -172,26 +169,13 @@ public class EntityBulkUpdateDialog extends ModalDialog
         dismiss("Edit with Grid");
     }
 
-    public boolean isUpdateButtonEnabled()
-    {
-        WebElement btn = elementCache().updateButton.findElement(this);
-        return btn.getAttribute("disabled") == null;
-    }
-
     public void clickUpdate()
     {
-        String updateButtonText = getUpdateButtonText();
-        if (!isUpdateButtonEnabled())
+        _updatingComponent.doAndWaitForUpdate(() ->
         {
-            getWrapper().log("the ["+updateButtonText+"] button cannot be clicked, it is disabled");
-        }
-        dismiss(updateButtonText);
-    }
-
-    private String getUpdateButtonText()
-    {
-         WebElement btn = elementCache().updateButton.waitForElement(this, 2000);
-         return btn.getText();
+            elementCache().updateButton.click();
+            waitForClose();
+        });
     }
 
     public void clickCancel()
@@ -258,7 +242,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
 
-        Locator updateButton = Locator.tagWithClass("button", "test-loc-submit-button");
+        final WebElement updateButton = Locator.tagWithClass("button", "test-loc-submit-button").findWhenNeeded(this);
     }
 
 }
