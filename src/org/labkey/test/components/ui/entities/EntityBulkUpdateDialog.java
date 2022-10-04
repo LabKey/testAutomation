@@ -2,6 +2,7 @@ package org.labkey.test.components.ui.entities;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
@@ -11,7 +12,10 @@ import org.labkey.test.components.react.ReactDatePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +51,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    private WebDriverWait waiter()
+    {
+        return new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_TIMEOUT));
+    }
+
     // interact with selection fields
 
     public EntityBulkUpdateDialog setSelectionField(String columnTitle, List<String> selectValues)
@@ -66,11 +75,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setTextArea(String fieldKey, String text)
     {
-        setEditableState(fieldKey, true);
-        Input input = elementCache().textArea(fieldKey);
-        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the input did not become enabled in time", WAIT_TIMEOUT);
-        input.set(text);
+        enableAndWait(fieldKey, elementCache().textArea(fieldKey)).set(text);
         return this;
     }
 
@@ -83,11 +88,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setTextField(String fieldKey, String value)
     {
-        Input input = elementCache().textInput(fieldKey);
-        setEditableState(fieldKey, true);
-        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the input did not become enabled in time", WAIT_TIMEOUT);
-        input.set(value);
+        enableAndWait(fieldKey, elementCache().textInput(fieldKey)).set(value);
         return this;
     }
 
@@ -98,11 +99,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setNumericField(String fieldKey, String value)
     {
-        Input input = elementCache().numericInput(fieldKey);
-        setEditableState(fieldKey, true);
-        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the input did not become enabled in time", WAIT_TIMEOUT);
-        input.set(value);
+        enableAndWait(fieldKey, elementCache().numericInput(fieldKey)).set(value);
         return this;
     }
 
@@ -113,11 +110,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
     {
-        setEditableState(fieldKey, true);
-        ReactDatePicker input = elementCache().dateInput("sampleDate");
-        WebDriverWrapper.waitFor(()-> input.getComponentElement().getAttribute("disabled")==null,
-                "the checkbox did not become enabled in time", 2000);
-        input.set(dateString);
+        enableAndWait(fieldKey, elementCache().dateInput("sampleDate")).set(dateString);
         return this;
     }
 
@@ -128,12 +121,16 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setBooleanField(String fieldKey, boolean checked)
     {
-        setEditableState(fieldKey, true);
-        Checkbox box = getCheckBox(fieldKey);
-        WebDriverWrapper.waitFor(()-> box.getComponentElement().getAttribute("disabled")==null,
-                "the checkbox did not become enabled in time", 2000);
-        box.set(checked);
+        enableAndWait(fieldKey, getCheckBox(fieldKey)).set(checked);
         return this;
+    }
+
+    private <T extends Component<?>> T enableAndWait(String fieldKey, T formItem)
+    {
+        setEditableState(fieldKey, true);
+        // "Clickable" means visible and enabled
+        waiter().until(ExpectedConditions.elementToBeClickable(formItem.getComponentElement()));
+        return formItem;
     }
 
     public boolean getBooleanField(String fieldKey)
