@@ -3,12 +3,12 @@ package org.labkey.test.components.ui.permissions;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.BaseReactSelect;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -160,21 +160,15 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
         private final ReactSelect groupMemberSelect;
         private final ReactSelect userMemberSelect;
 
-        protected ElementCache(Function<String, Locator> groupOptionLocator, Function<String, Locator> userOptionLocator)
+        protected ElementCache()
         {
             // Use same WebElement for both selects but with different option locators.
             ReactSelect rawMemberSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
 
             groupMemberSelect = new ReactSelect(rawMemberSelect);
-            if (groupOptionLocator != null)
-            {
-                groupMemberSelect.setOptionLocator(groupOptionLocator);
-            }
-            userMemberSelect = new ReactSelect(rawMemberSelect);
-            if (userOptionLocator != null)
-            {
-                userMemberSelect.setOptionLocator(userOptionLocator);
-            }
+            // it's possible that user select items will have a suffix of the user's display name, so match on startsWith
+            userMemberSelect = new ReactSelect(rawMemberSelect)
+                    .setOptionLocator(BaseReactSelect.Locators.option :: startsWith);
         }
     }
 
