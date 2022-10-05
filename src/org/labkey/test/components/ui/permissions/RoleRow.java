@@ -33,7 +33,7 @@ public class RoleRow extends PermissionsRowBase<RoleRow>
     {
     }
 
-    public static class RoleRowFinder extends PermissionsRowFinder<RoleRow>
+    public static class RoleRowFinder extends PermissionsRowFinder<RoleRow, RoleRowFinder>
     {
 
         public RoleRowFinder(WebDriver driver)

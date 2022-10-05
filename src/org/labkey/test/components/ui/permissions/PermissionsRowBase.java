@@ -163,7 +163,8 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
                 .setOptionLocator(ReactSelect.Locators.option::endsWith);
     }
 
-    protected static abstract class PermissionsRowFinder<T extends PermissionsRowBase<T>> extends WebDriverComponentFinder<T, PermissionsRowBase.PermissionsRowFinder<T>>
+    protected static abstract class PermissionsRowFinder<C extends PermissionsRowBase<C>, F extends PermissionsRowBase.PermissionsRowFinder<C, F>>
+            extends WebDriverComponentFinder<C, F>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "container-expandable")
                 .withChild(Locator.tagWithClass("div", "container-expandable-grey"));
@@ -181,7 +182,7 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
         }
 
         @Override
-        protected abstract T construct(WebElement el, WebDriver driver);
+        protected abstract C construct(WebElement el, WebDriver driver);
 
         @Override
         protected Locator locator()

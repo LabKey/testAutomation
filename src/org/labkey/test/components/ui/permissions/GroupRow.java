@@ -62,7 +62,7 @@ public class GroupRow extends PermissionsRowBase<GroupRow>
         }
     }
 
-    public static class GroupRowFinder extends PermissionsRowFinder<GroupRow>
+    public static class GroupRowFinder extends PermissionsRowFinder<GroupRow, GroupRowFinder>
     {
         public GroupRowFinder(WebDriver driver)
         {
