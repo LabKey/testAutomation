@@ -31,6 +31,11 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         super(element, driver);
     }
 
+    public ReactSelect(ReactSelect wrapped)
+    {
+        this(wrapped.getComponentElement(), wrapped.getDriver());
+    }
+
     public static ReactSelectFinder finder(WebDriver driver)
     {
         return new ReactSelectFinder(driver);
