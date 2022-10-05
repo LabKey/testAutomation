@@ -483,13 +483,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
-        Long fordId = null;
-        Long toyotaId = null;
-        Long hondaId = null;
+        Integer fordId = null;
+        Integer toyotaId = null;
+        Integer hondaId = null;
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long) row.get("RowId");
+            Integer rowId = (Integer) row.get("RowId");
             String name = (String) row.get("Name");
             assertNotNull("Expected response row to have a Name column", name);
             assertNotNull("Expected response row to have a RowId column", rowId);
@@ -559,12 +559,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("finished testing custom thumbnail and popup images");
 
-        Long priusId = null;
-        Long f150Id = null;
+        Integer priusId = null;
+        Integer f150Id = null;
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long) row.get("RowId");
+            Integer rowId = (Integer) row.get("RowId");
             String name = (String) row.get("Name");
             if (name.equalsIgnoreCase("Prius C"))
                 priusId = rowId;
@@ -702,17 +702,17 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
 
-        Long[] vehicleIds = new Long[2];
-        vehicleIds[0] = (Long) (insertResp.getRows().get(0).get("RowId"));
-        vehicleIds[1] = (Long) (insertResp.getRows().get(1).get("RowId"));
+        Integer[] vehicleIds = new Integer[2];
+        vehicleIds[0] = (Integer) (insertResp.getRows().get(0).get("RowId"));
+        vehicleIds[1] = (Integer) (insertResp.getRows().get(1).get("RowId"));
 
         log("** Trying to update Vehicle from wrong container...");
         updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         updateCmd.getRows().addAll(Arrays.asList(
                 Maps.of(
-                        "RowId", vehicleIds[1],
-                        "Milage", Integer.valueOf(4),
-                        "LastService", new Date(2009, 9, 10)
+                    "RowId", vehicleIds[1],
+                    "Milage", Integer.valueOf(4),
+                    "LastService", new Date(2009, 9, 10)
                 )
         ));
         try
