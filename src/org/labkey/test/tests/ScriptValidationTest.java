@@ -149,7 +149,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("single message", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"single message\"," +
                 "\"extraContext\":{" +
@@ -175,7 +174,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                 "}]" +
             "}");
             
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -187,7 +186,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("one error message", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"one error message\"," +
                 "\"errors\":[{" +
@@ -209,7 +207,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                 "}]" +
             "}");
 
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -222,7 +220,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("boring error message", e.getMessage());
 
-            JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"boring error message\"," +
                 "\"errors\":[{" +
@@ -241,7 +238,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                     "}" +
                 "}]" +
             "}");
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -254,7 +251,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("beforeInsert validation failed", e.getMessage());
 
-            JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"beforeInsert validation failed\"," +
                 "\"errorCount\":1," +
@@ -276,7 +272,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                 "\"success\":false," +
                 "\"extraContext\":{}," +
             "}");
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -292,7 +288,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("TestErrorInComplete error global four!", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"TestErrorInComplete error global four!\"," +
                 "\"success\":false" +
@@ -311,7 +306,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                     "}" +
                 "}]" +
             "}");
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -323,7 +318,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("one error message", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = new JSONObject("{" +
                 "\"exception\":\"one error message\"," +
                 "\"success\":false" +
@@ -357,7 +351,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                     "\"rowNumber\":0" +
                 "}]" +
             "}");
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
