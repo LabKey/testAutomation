@@ -80,8 +80,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
     {
         final WebElement label = Locator.tagWithClass("span", "edit-inline-field__label")
                 .refindWhenNeeded(this);
-        final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle")
-                .withChild(Locator.tagWithClass("i", "fa-pencil"));
+        final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle");
         final WebElement input = Locator.css("input.form-control, textarea.form-control").refindWhenNeeded(this);
 
         WebElement placeholderElement()
