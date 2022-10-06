@@ -106,14 +106,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
     public static class EmployeeRecord
     {
         public String name, ssn, company;
-        public Long key;
+        public Integer key;
 
         public EmployeeRecord(String name, String ssn, String company)
         {
             this(name, ssn, company, null);
         }
 
-        public EmployeeRecord(String name, String ssn, String company, Long key)
+        public EmployeeRecord(String name, String ssn, String company, Integer key)
         {
             this.name = name;
             this.ssn = ssn;
@@ -140,7 +140,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         {
             EmployeeRecord newbie = new EmployeeRecord((String)map.get("Name"), (String)map.get("ssn"), (String)map.get("Company"));
             if (map.containsKey("Key"))
-                newbie.key = (Long)map.get("Key");
+                newbie.key = (Integer)map.get("Key");
 
             return newbie;
         }

@@ -46,7 +46,7 @@ public class TestUser
 
     public Integer getUserId()
     {
-        return (Integer) getCreateUserResponse().getUserId();
+        return getCreateUserResponse().getUserId();
     }
 
     public String getEmail()
