@@ -8,7 +8,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCache>
 {
@@ -40,6 +39,13 @@ public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCac
         return Locator.byClass("principal-title-primary")
                 .findOptionalElement(this)
                 .map(WebElement::getText).orElse(null);
+    }
+
+    public List<String> getMemberships()
+    {
+        var membersList = Locator.tagWithClass("div", "principal-detail-label").withText("Member of:")
+                .followingSibling("ul").findElement(this);
+        return getWrapper().getTexts(Locator.tag("li").findElements(membersList));
     }
 
 }
