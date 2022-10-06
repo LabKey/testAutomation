@@ -278,9 +278,9 @@ public class WebTestHelper
      */
     public static String makeRelativeUrl(String url)
     {
-        if (url.startsWith("http://") || url.startsWith("https://"))
+        if (isAbsoluteUrl(url))
         {
-            if (url.startsWith(getBaseURL()))
+            if (isTestServerUrl(url))
             {
                 url = url.substring(getBaseURL().length());
             }
@@ -298,6 +298,16 @@ public class WebTestHelper
             }
         }
         return StringUtils.stripStart(url, "/");
+    }
+
+    public static boolean isAbsoluteUrl(String url)
+    {
+        return url.startsWith("http://") || url.startsWith("https://");
+    }
+
+    public static boolean isTestServerUrl(String url)
+    {
+        return url.startsWith(getBaseURL()) || !isAbsoluteUrl(url);
     }
 
     public enum DatabaseType

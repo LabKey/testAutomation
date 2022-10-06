@@ -1112,7 +1112,7 @@ public class Crawler
             throw new RuntimeException(e);
         }
 
-        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled && WebTestHelper.isTestServerUrl(actualUrl.toString()))
         {
             TestLogger.increaseIndent();
             try
