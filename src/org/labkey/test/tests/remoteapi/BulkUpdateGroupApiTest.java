@@ -97,8 +97,8 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        user1Id = _userHelper.createUser(USER1).getUserId().intValue();
-        user2Id = _userHelper.createUser(USER2).getUserId().intValue();
+        user1Id = _userHelper.createUser(USER1).getUserId();
+        user2Id = _userHelper.createUser(USER2).getUserId();
         group1Id = _permissionsHelper.createProjectGroup(GROUP1, getProjectName());
         group2Id = _permissionsHelper.createProjectGroup(GROUP2, getProjectName());
     }

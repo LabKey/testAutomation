@@ -61,7 +61,7 @@ public class IssueAPITest extends BaseWebDriverTest
         TEST_USER_NAME = getUsername();
         TEST_USER_ID = _userHelper.getUserId(TEST_USER_NAME);
         TEST_USER_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_USER_NAME);
-        TEST_BUDDY_ID = _userHelper.createUser(TEST_BUDDY_NAME).getUserId().intValue();
+        TEST_BUDDY_ID = _userHelper.createUser(TEST_BUDDY_NAME).getUserId();
         TEST_BUDDY_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_BUDDY_NAME);
         var permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.addMemberToRole(TEST_BUDDY_NAME, "Project Administrator",

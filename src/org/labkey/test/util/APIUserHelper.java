@@ -125,7 +125,7 @@ public class APIUserHelper extends AbstractUserHelper
                     Assert.fail("Not able to create the user " + userName + " because " + response.getParsedData().get("htmlErrors").toString());
                 }
                 assertEquals(userName, response.getEmail());
-                assertTrue("Invalid userId", response.getUserId() != null);
+                assertNotNull("Invalid userId", response.getUserId());
             }
 
             return response;

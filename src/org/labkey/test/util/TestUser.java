@@ -44,9 +44,9 @@ public class TestUser
         getApiUserHelper().deleteUsers(false, _email);
     }
 
-    public Long getUserId()
+    public Integer getUserId()
     {
-        return (Long) getCreateUserResponse().getUserId();
+        return (Integer) getCreateUserResponse().getUserId();
     }
 
     public String getEmail()
