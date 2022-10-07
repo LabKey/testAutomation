@@ -288,7 +288,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         TruncateTableCommand truncCmd = new TruncateTableCommand("lists", LIST_NAME);
         TruncateTableResponse resp = truncCmd.execute(cn, PROJECT_NAME);
 
-        assertEquals(2L, resp.getDeletedRowCount());
+        assertEquals((Integer)2, resp.getDeletedRowCount());
 
         log("Completed TruncateTable test...");
     }

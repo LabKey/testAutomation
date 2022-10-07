@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -319,7 +318,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         String keyField = "RowId";
         Map<String, Object> record = response.getRows().get(0);
         Map<String, Object> newRow = new HashMap<>();
-        Integer rowId = (Integer)((JSONObject)record.get(keyField)).get("value");
+        Integer rowId = (Integer)((Map<String, Object>)record.get(keyField)).get("value");
         newRow.put(keyField, rowId);
 
         return newRow;
