@@ -168,7 +168,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
                     "\"rowNumber\":1," +
                     "\"row\":{" +
                         "\"Name\":\"TestFieldErrorMessage!\"," +
-                        "\"Hex\":null" +
+                        "\"Hex\":null," +
                         "\"_rowNumber\":1" +
                     "}" +
                 "}]" +

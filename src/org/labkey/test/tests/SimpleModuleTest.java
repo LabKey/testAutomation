@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -1296,16 +1295,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
 
-        Map<String,Object> row = selectResp.getRows().get(0);
-        String entityId = (String)((JSONObject)row.get("EntityId")).get("value");
-        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((JSONObject)row.get("Path")).get("value"));
+        Map<String, Object> row = selectResp.getRows().get(0);
+        String entityId = (String)((Map<String, Object>)row.get("EntityId")).get("value");
+        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((Map<String, Object>)row.get("Path")).get("value"));
 
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectCmd.setColumns(columns);
         selectCmd.setRequiredVersion(9.1);
         selectResp = selectCmd.execute(cn, getProjectName());
-        JSONObject vehicleRow = (JSONObject)(selectResp.getRows().get(0)).get("container");
+        Map<String, Object> vehicleRow = (Map<String, Object>)(selectResp.getRows().get(0)).get("container");
 
         assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
         assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
