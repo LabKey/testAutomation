@@ -665,7 +665,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         insertCmd.addRow(rowMap);
         SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
         Map<String, Object> row = response.getRows().get(0);
-        Long rowId = (Long)row.get("RowId");
+        Integer rowId = (Integer)row.get("RowId");
         return rowId.toString();
     }
 
