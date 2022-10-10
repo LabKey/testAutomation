@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONArray;
 import org.json.JSONTokener;
@@ -1708,12 +1709,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 nullToFalse(actualField.getAllProperties().get("isPrimaryKey")),
                 is(nullToFalse(intendedField.getAllProperties().get("isPrimaryKey"))));
 
-        for (ConditionalFormat intendedFormat : intendedField.getConditionalFormats())
-        {
-            ConditionalFormat actualFormat = intendedField.getConditionalFormats().stream()
-                    .filter(a-> a.toJSON().equals(intendedFormat.toJSON())).findFirst().orElse(null);
-            assertNotNull("conditional formats did not export with full fidelity", actualFormat);
-        }
+        Assertions.assertThat(actualField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()))
+                .as("Exported conditional fields.")
+                .containsExactlyElementsOf(intendedField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()).toList());
+
         // would like to do validators, but this part of the remoteAPI is incomplete; validators are settable
         // on FieldDefinition, but not gettable on PropertyDescriptor
     }
