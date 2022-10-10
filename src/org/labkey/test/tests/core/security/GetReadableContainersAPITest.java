@@ -1,6 +1,5 @@
 package org.labkey.test.tests.core.security;
 
-import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -13,6 +12,7 @@ import org.labkey.test.util.PermissionsHelper.MemberType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -208,7 +208,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
 
     private <T> T executeGetReadableContainers(Boolean includeSubfolders, Integer depth, Object container, Class<T> expectedResultType)
     {
-        JSONObject config = new JSONObject();
+        Map<String, Object> config = new HashMap<>();
         if (includeSubfolders != null)
             config.put("includeSubfolders", includeSubfolders);
         if (depth != null)

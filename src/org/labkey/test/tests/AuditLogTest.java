@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -966,8 +965,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         try
         {
-            JSONObject jsonObject = new JSONObject(rowEntry.get(columnName).toString());
-            value = jsonObject.get("value").toString();
+            value = ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
         }
         catch(JSONException je)
         {

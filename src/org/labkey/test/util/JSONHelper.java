@@ -16,12 +16,11 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.fail;
@@ -78,8 +77,8 @@ public class JSONHelper
         }
         else
         {
-            String expectedString = expected.toString();
-            String actualString = actual.toString();
+            String expectedString = expected.toString(2);
+            String actualString = actual.toString(2);
 
             TestLogger.log("Expected:\n" + expectedString + "\n");
             TestLogger.log("Actual:\n" + actualString + "\n");
@@ -89,11 +88,11 @@ public class JSONHelper
         }
     }
 
-    public boolean compareMap(Map map1, Map map2, boolean fatal)
+    public boolean compareMap(JSONObject map1, JSONObject map2, boolean fatal)
     {
-        for (Object key : map1.keySet())
+        for (String key : map1.keySet())
         {
-            if (map2.containsKey(key))
+            if (map2.has(key))
             {
                 if (!skipElement(String.valueOf(key)) && !compareElement(map1.get(key), map2.get(key), fatal))
                 {
@@ -110,16 +109,16 @@ public class JSONHelper
         return true;
     }
 
-    public boolean compareList(List list1, List list2, boolean fatal)
+    public boolean compareList(JSONArray list1, JSONArray list2, boolean fatal)
     {
-        if (list1.size() != list2.size())
+        if (list1.length() != list2.length())
         {
             log("Comparison of lists failed: sizes are different", fatal);
             return false;
         }
 
         // lists are not ordered
-        for (int i=0; i < list1.size(); i++)
+        for (int i = 0; i < list1.length(); i++)
         {
             boolean matched = false;
             for (Object o : list2)
@@ -140,17 +139,17 @@ public class JSONHelper
         return true;
     }
 
-    public boolean compareElement(Object o1, Object o2)
+    public boolean compareElement(JSONObject o1, JSONObject o2)
     {
-        return compareElement(o1, o2, true);
+        return compareMap(o1, o2, true);
     }
 
     private boolean compareElement(Object o1, Object o2, boolean fatal)
     {
-        if (o1 instanceof Map)
-            return compareMap((Map)o1, (Map)o2, fatal);
-        if (o1 instanceof List)
-            return compareList((List)o1, (List)o2, fatal);
+        if (o1 instanceof JSONObject j1)
+            return compareMap(j1, (JSONObject)o2, fatal);
+        if (o1 instanceof JSONArray a1)
+            return compareList(a1, (JSONArray)o2, fatal);
         if (StringUtils.equals(String.valueOf(o1), String.valueOf(o2)))
             return true;
 
