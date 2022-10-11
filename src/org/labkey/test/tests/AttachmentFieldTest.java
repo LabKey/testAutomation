@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.List;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 5)
+@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class AttachmentFieldTest extends BaseWebDriverTest
 {
     private final File SAMPLE_PDF = new File(TestFileUtils.getSampleData("fileTypes"), "pdf_sample.pdf");
