@@ -56,7 +56,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAttachmentFieldInSampleType()
+    public void testFileFieldInSampleType()
     {
         String sampleTypeName = "Sample type with attachment";
         String fieldName = "pdfFile";
