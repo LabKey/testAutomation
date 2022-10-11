@@ -417,7 +417,9 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check emailed messages");
         goToModule("Dumbster");
-        assertTextPresent("RE: " + MSG1_TITLE, 6);
+        // If the message title is changed in a response, the subject of the email will have the new title.
+        assertTextPresent("RE: " + MSG1_TITLE, 0); // Do not expect original title in "RE:" email subjects
+        assertTextPresent("RE: " + RESP1_TITLE, 6); // "RE:" email subjects should include the title of the response
         click(Locator.linkWithText(MSG1_TITLE));
         assertElementPresent(Locator.linkWithText("manage lists"));
         click(Locator.linkWithText(MSG1_TITLE).index(1));
@@ -426,7 +428,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(MSG2_TITLE));
 
         log("Check attachment linked in emailed message");
-        click(Locator.linkWithText("RE: " + MSG1_TITLE));
+        click(Locator.linkWithText("RE: " + RESP1_TITLE));
         assertTextPresent(attachmentFile.getName());
         assertTextNotPresent(TEMPLATE_TEXT);
         assertElementPresent(Locator.linkWithText(attachmentFile.getName()));
@@ -637,7 +639,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(_messageTitle));
         clickRespondButton();
-        setFormElement(Locator.name("title"), _messageTitle + " response");
+        String newTitle = _messageTitle + " response";
+        setFormElement(Locator.name("title"), newTitle);
         setFormElement(Locator.id("body"), _messageBody + " response");
         clickButton("Submit");
 
@@ -648,16 +651,17 @@ public class MessagesLongTest extends BaseWebDriverTest
         waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "responder@messages.test");
         EmailRecordTable record = new EmailRecordTable(this);
         List<String> subject = record.getColumnDataAsText("Message");
-        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
-        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
+        String expectedEmailSubject = "RE: "+ newTitle; // Email subject should include the title of the latest response in the message thread.
+        assertEquals("Message creator and responder should both receive notifications", expectedEmailSubject, subject.get(0));
+        assertEquals("Message creator and responder should both receive notifications", expectedEmailSubject, subject.get(1));
         List<String> to = record.getColumnDataAsText("To");
         assertTrue("Incorrect message notifications.",
                 to.get(0).equals(RESPONDER) && to.get(1).equals(PasswordUtil.getUsername()) ||
                 to.get(1).equals(RESPONDER) && to.get(0).equals(PasswordUtil.getUsername()));
 
         assertElementPresent(Locator.linkWithText(_messageTitle));
-        assertElementPresent(Locator.linkWithText("RE: "+_messageTitle));
-        click(Locator.linkWithText("RE: " + _messageTitle).index(1));
+        assertElementPresent(Locator.linkWithText(expectedEmailSubject));
+        click(Locator.linkWithText(expectedEmailSubject).index(1));
     }
 
     private void createNewMessage(String title, String body)
