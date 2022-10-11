@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,18 +207,15 @@ public abstract class ExcelHelper
     public static List<String> getRowData(Sheet sheet, int rowIdx)
     {
         List<String> rowData = new ArrayList<>();
-        Iterator<Cell> row = sheet.getRow(rowIdx).cellIterator();
-        Cell cell;
-        while (row.hasNext())
+        sheet.getRow(rowIdx).cellIterator().forEachRemaining(cell ->
         {
-            cell = row.next();
             final int columnIndex = cell.getColumnIndex();
             while (columnIndex > rowData.size())
             {
                 rowData.add(""); // fill in empty cells
             }
             rowData.add(columnIndex, getCellStringValue(cell));
-        }
+        });
         return rowData;
     }
 
