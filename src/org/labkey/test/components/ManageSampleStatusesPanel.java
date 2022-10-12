@@ -164,7 +164,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         elementCache().saveButton.click();
 
         WebDriverWrapper.waitFor(()->elementCache().deleteButton.isDisplayed(),
-                "Delete button did not become visible after adding a status.", 1_000);
+                "Delete button did not become visible after adding a status.", 5_000);
 
         return this;
     }
