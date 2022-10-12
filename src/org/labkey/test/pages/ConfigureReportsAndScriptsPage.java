@@ -381,7 +381,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     public enum EngineType
     {
         PERL,
-        DOCKER_REPORT, // IPYNB
+        JUPYTER_REPORT, // IPYNB
         REMOTE_R,
         R,
         EXTERNAL,
