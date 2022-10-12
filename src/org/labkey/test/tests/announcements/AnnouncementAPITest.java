@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.announcements.AnnouncementModel;
 import org.labkey.remoteapi.announcements.CreateMessageThreadCommand;
 import org.labkey.remoteapi.announcements.DeleteMessageThreadCommand;
 import org.labkey.remoteapi.announcements.DeleteMessageThreadResponse;
@@ -12,7 +13,6 @@ import org.labkey.remoteapi.announcements.GetDiscussionsCommand;
 import org.labkey.remoteapi.announcements.GetDiscussionsResponse;
 import org.labkey.remoteapi.announcements.GetMessageThreadCommand;
 import org.labkey.remoteapi.announcements.MessageThreadResponse;
-import org.labkey.remoteapi.announcements.AnnouncementModel;
 import org.labkey.remoteapi.announcements.UpdateMessageThreadCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 

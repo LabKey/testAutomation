@@ -11,6 +11,11 @@ import java.util.Map;
 
 public class TestDataUtils
 {
+    private TestDataUtils()
+    {
+        // Utility class. Do not instantiate.
+    }
+
     public static List<Map<String, Object>> rowMapsFromTsv(String tsvString) throws IOException
     {
         try (InputStream dataStream = IOUtils.toInputStream(tsvString, StandardCharsets.UTF_8))
