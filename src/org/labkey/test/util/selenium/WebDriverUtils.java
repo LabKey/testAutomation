@@ -15,10 +15,12 @@
  */
 package org.labkey.test.util.selenium;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
@@ -29,6 +31,32 @@ import java.util.List;
 
 public abstract class WebDriverUtils
 {
+    /**
+     * Modifier key that differs by OS. Has a couple of common uses:
+     * <ul>
+     * <li> Multi-select:
+     * <pre><code>
+     *    new Actions(getDriver())
+     *        .keyDown(MODIFIER_KEY)
+     *        .click(el1)
+     *        .click(el2)
+     *        .keyUp(MODIFIER_KEY)
+     *        .perform();
+     * </code></pre>
+     * </li>
+     * <li> Keyboard shortcuts (e.g. select-all):
+     * <pre><code>
+     *    new Actions(getDriver())
+     *        .keyDown(MODIFIER_KEY)
+     *        .sendKeys(input, "a")
+     *        .keyUp(MODIFIER_KEY)
+     *        .perform();
+     * </code></pre>
+     * </li>
+     * </ul>
+     */
+    public static final Keys MODIFIER_KEY = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+
     public static class ScrollUtil
     {
         private final WebDriver _webDriver;
