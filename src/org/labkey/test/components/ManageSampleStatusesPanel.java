@@ -163,6 +163,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
         elementCache().saveButton.click();
 
+        // Don't know why but on MSSQL/Windows in TC this is taking a long time to complete.
         WebDriverWrapper.waitFor(()->elementCache().deleteButton.isDisplayed(),
                 "Delete button did not become visible after adding a status.", 5_000);
 
