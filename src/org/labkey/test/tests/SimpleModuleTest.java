@@ -49,6 +49,8 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -131,6 +133,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private static final File PRIUS_POPUP =  TestFileUtils.getSampleData("thumbnails/priusPopup.jpg");
     private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/camry.jpg");
     private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("thumbnails/focusPopup.jpg");
+
+    private static final Map<String, String> LIST_NAMES = new HashMap<>();
 
     private static final String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
             "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
@@ -349,13 +353,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         List<String> retVal = customQuery.getColumnDataAsText(colunmName);
         popLocation();
         return retVal;
-
     }
 
     @LogMethod
     private void doTestColumnValidators() throws Exception
     {
-        //first create a maufacturer:
+        //first create a manufacturer:
         InsertRowsCommand insertCmdM = new InsertRowsCommand("vehicle", "Manufacturers");
         Map<String, Object> rowMapM = new HashMap<>();
         rowMapM.put("Name", "TestManufacturer");
@@ -681,7 +684,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 9 rows.", 9, insertResp.getRowsAffected().intValue());
 
-        log("** Inserting vechicles...");
+        log("** Inserting vehicles...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.of(
@@ -807,7 +810,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         catch (CommandException ex)
         {
             assertEquals(403, ex.getStatusCode());
-//            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
     }
 
@@ -855,7 +857,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestViewEditing() throws Exception
+    private void doTestViewEditing()
     {
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
 
@@ -888,7 +890,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestTableAudit() throws Exception
+    private void doTestTableAudit()
     {
         goToSchemaBrowser();
         pushLocation();
@@ -1051,7 +1053,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("This is a web part view in the simple test module");
 
         Boolean value = (Boolean)executeScript("return LABKEY.moduleContext.simpletest.scriptLoaded");
-        assertTrue("Module context not being loaded propertly", value);
+        assertTrue("Module context not being loaded properly", value);
     }
 
     @LogMethod
@@ -1062,54 +1064,20 @@ public class SimpleModuleTest extends BaseWebDriverTest
         new PortalHelper(this).addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
-        createPeopleListInFolder(getProjectName());
+        ListDefinition listDef = new IntListDefinition(LIST_NAME, "Key");
+        listDef.setFields(List.of(
+                new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
+                new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
+        ));
+        listDef.create(createDefaultConnection(), getProjectName());
 
         log("Importing some data...");
+        goToManageLists();
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData()
                 .setText(LIST_DATA)
                 .submit();
-
-        log("Create list in subfolder to prevent query validation failure");
-        createPeopleListInFolder(FOLDER_NAME);
-        projectMenu().navigateToFolder(getProjectName(), "subfolder");
-        log("Create list in container tab containers to prevent query validation failure");
-        createPeopleListInTab(STUDY_FOLDER_TAB_LABEL, getProjectName() + "/subfolder/Study Container Tab");
-        createPeopleListInTab(ASSAY_FOLDER_TAB_LABEL, getProjectName() + "/subfolder/Assay Container Tab 2");
-    }
-
-    private void createPeopleListInFolder(String folderName) throws Exception
-    {
-        String containerPath = folderName.equals(getProjectName()) ? getProjectName() : getProjectName() + "/" + folderName;
-        TestDataGenerator dgen = new TestDataGenerator(new FieldDefinition.LookupInfo(containerPath, "lists", LIST_NAME))
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
-                        TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
-                        TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
-                ));
-        dgen.createList(createDefaultConnection(), "Key");
-        goToManageLists();
-        _listHelper.goToList(LIST_NAME);
-    }
-
-    private void createPeopleListInTab(String tabLabel, String containerPath) throws Exception  // todo: post-20.3, change this to go through the UI
-    {
-        clickTab(tabLabel.replace(" ", ""));
-        if (!isElementPresent(Locator.linkWithText("Lists")))
-        {
-            PortalHelper portalHelper = new PortalHelper(getDriver());
-            portalHelper.addWebPart("Lists");
-        }
-
-        waitAndClickAndWait(Locator.linkWithText("manage lists"));
-        TestDataGenerator dgen = new TestDataGenerator(new FieldDefinition.LookupInfo(containerPath, "lists", LIST_NAME))
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
-                        TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
-                        TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
-                ));
-        dgen.createList(createDefaultConnection(), "Key");
-        refresh();
     }
 
     @LogMethod
@@ -1698,7 +1666,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextNotPresent("Participant Identifier");
     }
 
-    private void editMetadata(String schemaName, String tableName, String operations, String colunmName, String value, String operator)
+    private void editMetadata(String schemaName, String tableName, String operations, String columnName, String value, String operator)
     {
         goToSchemaBrowser();
         selectQuery(schemaName, tableName);
@@ -1711,7 +1679,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
                 "  <table tableName=\"" + tableName + "\" tableDbType=\"TABLE\">\n" +
                 "    <columns>\n" +
-                "      <column columnName=\"" + colunmName + "\">\n" +
+                "      <column columnName=\"" + columnName + "\">\n" +
                 "        <datatype>varchar</datatype>\n" +
                 "        <fk> \n" +
                 "           <fkColumnName >Name</fkColumnName > \n" +
@@ -1872,9 +1840,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
-
     @LogMethod
-    private void doTestRestrictedModule() throws Exception
+    private void doTestRestrictedModule()
     {
         log("Create folder with restricted");
         clickProject(getProjectName());
@@ -1883,7 +1850,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         portalHelper.addWebPart("Restricted Module Web Part");
         assertTextPresent("This is a web part view in the restricted module.");
         assertModuleEnabledByDefault(RESTRICTED_MODULE_NAME);
-        createPeopleListInFolder(RESTRICTED_FOLDER_NAME);
 
         log("folder admin without restricted permission can still see existing restricted folder, web parts");
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
@@ -1901,7 +1867,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("folder admin without restricted permission cannot import restricted folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
-        createPeopleListInFolder(NEW_FOLDER_NAME);
         navigateToFolder(getProjectName(), NEW_FOLDER_NAME);
         importFolderFromZip(RESTRICTED_FOLDER_IMPORT_NAME, false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));
