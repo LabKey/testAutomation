@@ -57,7 +57,6 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -133,8 +132,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private static final File PRIUS_POPUP =  TestFileUtils.getSampleData("thumbnails/priusPopup.jpg");
     private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/camry.jpg");
     private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("thumbnails/focusPopup.jpg");
-
-    private static final Map<String, String> LIST_NAMES = new HashMap<>();
 
     private static final String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
             "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
