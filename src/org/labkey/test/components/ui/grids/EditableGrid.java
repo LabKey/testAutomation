@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.grids;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -31,6 +30,7 @@ import java.util.stream.Collectors;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
@@ -44,6 +44,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         _gridElement = editableGrid;
         _driver = driver;
+    }
+
+    protected EditableGrid(EditableGrid wrappedGrid)
+    {
+        this(wrappedGrid.getComponentElement(), wrappedGrid.getDriver());
     }
 
     @Override
@@ -590,7 +595,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public String copyCurrentSelection() throws IOException, UnsupportedFlavorException
     {
         // now copy the contents of the current selection to the clipboard
-        Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+        Keys cmdKey = MODIFIER_KEY;
         Actions actions = new Actions(getDriver());
         actions.keyDown(cmdKey)
                 .sendKeys( "c")
@@ -625,7 +630,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
                                                                 // this resets the grid state to a known base condition
             // use 'ctrl-a' to select the entire grid
-            Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+            Keys cmdKey = MODIFIER_KEY;
             new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
             WebDriverWrapper.waitFor(this::areAllInSelection,
                     "the expected cells did not become selected", 3000);
@@ -780,7 +785,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public ReactSelect lookupSelect()
         {
-            return ReactSelect.finder(getDriver()).find(getComponentElement());
+            return ReactSelect.finder(getDriver()).timeout(10000).find(getComponentElement());
         }
 
         public ReactDatePicker datePicker()

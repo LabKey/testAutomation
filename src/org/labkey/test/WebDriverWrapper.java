@@ -18,7 +18,6 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -59,6 +58,7 @@ import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -2751,8 +2751,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void openLinkInNewWindow(WebElement link)
     {
-        Keys modifierKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
-        link.sendKeys(Keys.chord(modifierKey, Keys.ENTER));
+        link.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, Keys.ENTER));
         switchToWindow(1);
         waitForDocument();
     }

@@ -2521,8 +2521,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public List<Map<String, Object>> loadTsv(File tsv)
     {
-        TabLoader loader = new TabLoader(tsv, true);
-        return loader.load();
+        try (TabLoader loader = new TabLoader(tsv, true))
+        {
+            return loader.load();
+        }
     }
 
     protected void flash(WebElement element)

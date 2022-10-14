@@ -1,6 +1,7 @@
 package org.labkey.test.tests.flow;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -67,13 +68,13 @@ public class FlowDuplicateSamplesTest extends BaseFlowTest
         Assert.assertEquals("118795.fcs", row0.get(0));
         Assert.assertEquals("1,000", row0.get(1));
         Assert.assertEquals("1000", row0.get(2));
-        Assert.assertThat(row0.get(3), CoreMatchers.containsString("miniFCS/118795.fcs"));
+        MatcherAssert.assertThat(row0.get(3), CoreMatchers.containsString("miniFCS/118795.fcs"));
 
         var row1 = rows.get(1);
         Assert.assertEquals("118795.fcs", row1.get(0));
         Assert.assertEquals("10,000", row1.get(1));
         Assert.assertEquals("10000", row1.get(2));
-        Assert.assertThat(row1.get(3), CoreMatchers.containsString("microFCS/118795.fcs"));
+        MatcherAssert.assertThat(row1.get(3), CoreMatchers.containsString("microFCS/118795.fcs"));
 
         // Issue 41225: flow: import failure for duplicate aliased statistics
         // verify the duplicate alias was detected and ignored

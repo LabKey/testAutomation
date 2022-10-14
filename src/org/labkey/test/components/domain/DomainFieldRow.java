@@ -279,6 +279,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public String getAttachmentBehavior()
+    {
+        expand();
+        return elementCache().attachmentBehavior.getFirstSelectedOption().getText();
+    }
+
+    public DomainFieldRow setAttachmentBehavior(String value)
+    {
+        expand();
+        elementCache().attachmentBehavior.selectByVisibleText(value);
+        return this;
+    }
+
     public String getLabel()
     {
         expand();
@@ -1317,6 +1330,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return new RadioButton.RadioButtonFinder().withValue(option.name()).find(this);
         }
 
+        public Select attachmentBehavior = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-format"))
+                .findWhenNeeded(this);
 
     }
 }

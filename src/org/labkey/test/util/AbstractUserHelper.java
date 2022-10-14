@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +128,11 @@ public abstract class AbstractUserHelper
             usersAndDisplayNames.remove(userEmail);
         }
         _deleteUsers(failIfNotFound, userEmails);
+    }
+
+    public final void deleteUsers(boolean failIfNotFound, TestUser... users)
+    {
+        _deleteUsers(failIfNotFound, Arrays.stream(users).map(TestUser::getEmail).toArray(String[]::new));
     }
 
     public abstract void ensureUsersExist(List<String> userEmails);

@@ -1,8 +1,8 @@
 package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -23,7 +23,8 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
 public class HeatMapTest extends BaseWebDriverTest
