@@ -1,5 +1,6 @@
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.Locator;
@@ -7,6 +8,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
@@ -28,14 +30,15 @@ public class TestUser
 
     /**
      * Creates the user immediately via the API, and stores the createUserResponse to hang on to data like
-     * the user's userId and
-     * @return
+     * the user's userId
      */
     public TestUser create(WebDriverWrapper test)
     {
         _test = test;
         _apiUserHelper = new APIUserHelper(_test);
         _createUserResponse = _apiUserHelper.createUser(_email);
+        _impersonationConnection = null;
+        _password = null;
         return this;
     }
 
@@ -102,21 +105,18 @@ public class TestUser
         return this;
     }
 
-    public void impersonate() throws Exception
+    public void impersonate() throws IOException, CommandException
     {
-        if (_impersonationConnection != null)
-            log("Already impersonating.");  // maybe an error?
-
         log("Begin impersonating as user: " + getEmail());
         _impersonationConnection = getWrapper().createDefaultConnection();
         _impersonationConnection.impersonate(getEmail());
     }
 
-    public void stopImpersonating() throws Exception
+    public void stopImpersonating() throws IOException, CommandException
     {
         if (_impersonationConnection == null)
         {
-            throw new IllegalStateException("User " + _email + "is not yet impersonating");
+            throw new IllegalStateException("User " + _email + " has no impersonating connection. Impersonate using 'TestUser.impersonate'");
         }
 
         log("Stop impersonating uer " + getEmail());
@@ -144,7 +144,6 @@ public class TestUser
 
     /**
      * checks _test for null and if so, throws
-     * @return
      */
     private WebDriverWrapper getWrapper()
     {

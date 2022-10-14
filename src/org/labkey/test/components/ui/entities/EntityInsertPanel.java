@@ -267,7 +267,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         showGrid();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkUpdateBtn));
         elementCache().bulkUpdateBtn.click();
-        return new EntityBulkUpdateDialog(getDriver(), "Update ");
+        return new EntityBulkUpdateDialog(getDriver());
     }
 
     public boolean isBulkUpdateVisible()
@@ -416,7 +416,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         public ElementCache()
         {

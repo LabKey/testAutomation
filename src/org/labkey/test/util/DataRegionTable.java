@@ -54,8 +54,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.tagWithAttribute;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;

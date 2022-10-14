@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -101,7 +102,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
         String noMviFilter = "Does not have a missing value indicator";
         DataRegionTable dataRegionTable = DataRegion(getDriver()).find();
         List<String> columns = dataRegionTable.getColumnNames();
-        Assert.assertThat("Didn't find expected MV enabled columns.", columns, CoreMatchers.hasItems(expectedMvColumns.toArray(new String[]{})));
+        assertThat("Didn't find expected MV enabled columns.", columns, CoreMatchers.hasItems(expectedMvColumns.toArray(new String[]{})));
         for (String colName: columns)
         {
             if (expectedMvColumns.contains(colName))

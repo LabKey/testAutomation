@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_COLUMN_NAME;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
@@ -709,7 +710,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         errors = updatePage.clickSaveExpectingErrors();
 
         String errorMsgExpectedTxt = "An existing sample type property conflicts with parent alias header: " + GOOD_PARENT_NAME;
-        Assert.assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
+        assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();
 
