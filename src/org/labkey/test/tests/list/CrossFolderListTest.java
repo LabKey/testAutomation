@@ -13,7 +13,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.TestUser;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.util.Arrays;
@@ -26,7 +25,6 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 
 @Category({Daily.class, Data.class, Hosting.class})
 public class CrossFolderListTest extends BaseWebDriverTest
@@ -53,7 +51,6 @@ public class CrossFolderListTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_A);
         SUBFOLDER_A_PATH = getProjectName() + "/" + SUBFOLDER_A;
     }
-
 
     @Test
     public void testAddDataInSubfolderToTopLevelList() throws Exception
@@ -147,31 +144,35 @@ public class CrossFolderListTest extends BaseWebDriverTest
     {
         String listName = "test_name_collision_list";
 
+        // The following requires that the list be defined in the subfolder before defining a list with the same
+        // name in the top-level folder. This is done to ensure backwards compatibility of lists existing with the
+        // same name in the same scope.
+
         // create a simple list in subfolder, insert some values, and grab a column's worth of data from it
         ListDefinition listDef = createListDef(listName, testFields());
-        var dGen = listDef.create(createDefaultConnection(), getProjectName());
+        var dGen = listDef.create(createDefaultConnection(), SUBFOLDER_A_PATH);
         dGen.withGeneratedRows(2);
         dGen.insertRows();
-        var topStrings = dGen.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
+        var subfolderData = dGen.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
 
         // create another list with the same name at the project level, insert a little different data and capture the string values
         ListDefinition listDef2 = createListDef(listName, testFields());
-        var dgen2 = listDef2.create(createDefaultConnection(), SUBFOLDER_A_PATH);
+        var dgen2 = listDef2.create(createDefaultConnection(), getProjectName());
         dgen2.withGeneratedRows(3);
         dgen2.insertRows();
-        var bottomStrings = dgen2.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
+        var topFolderData = dgen2.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
 
         // navigate to the top folder, open the container filter to include the subfolder and ensure only data from this list is shown
         var topPage = GridPage.beginAt(this, getProjectName(), listName);
-        topPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);   // include subfolder in filter
+        topPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS_PLUS_SHARED);
         assertEquals("expect the view in the top folder to only show current list data even with different subfolder list by the same name",
-                new HashSet(topStrings), new HashSet(topPage.getGrid().getColumnDataAsText("String Column")));
+                new HashSet<>(topFolderData), new HashSet<>(topPage.getGrid().getColumnDataAsText("String Column")));
 
         // now view the list from the subfolder and ensure the list contents aren't mixed despite name ambiguity
         var subfolderPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, listName);
-        subfolderPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
+        subfolderPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_PLUS_PROJECT_AND_SHARED);
         assertEquals("expect the view in the top folder to only show current list data even with different subfolder list by the same name",
-                new HashSet(bottomStrings), new HashSet(subfolderPage.getGrid().getColumnDataAsText("String Column")));
+                new HashSet<>(subfolderData), new HashSet<>(subfolderPage.getGrid().getColumnDataAsText("String Column")));
     }
 
     private ListDefinition createListDef(String listName, List<FieldDefinition> listColumns)

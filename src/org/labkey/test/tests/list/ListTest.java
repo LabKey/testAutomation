@@ -647,7 +647,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        _listHelper.deleteList("Custom view '" + TEST_VIEW + "'");
+        _listHelper.deleteList();
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
