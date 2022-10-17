@@ -15,8 +15,6 @@
  */
 package org.labkey.remoteapi.security;
 
-import org.labkey.remoteapi.PostCommand;
-
 public class AddAssignmentCommand extends BaseUpdateAssignmentCommand
 {
     public AddAssignmentCommand()
@@ -30,7 +28,7 @@ public class AddAssignmentCommand extends BaseUpdateAssignmentCommand
     }
 
     @Override
-    public PostCommand copy()
+    public AddAssignmentCommand copy()
     {
         return new AddAssignmentCommand(this);
     }

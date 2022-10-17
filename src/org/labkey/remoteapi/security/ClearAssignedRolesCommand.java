@@ -15,8 +15,6 @@
  */
 package org.labkey.remoteapi.security;
 
-import org.labkey.remoteapi.PostCommand;
-
 public class ClearAssignedRolesCommand extends BaseUpdateAssignmentCommand
 {
     public ClearAssignedRolesCommand()
@@ -34,7 +32,7 @@ public class ClearAssignedRolesCommand extends BaseUpdateAssignmentCommand
     public void setRoleClassName(String roleClassName){ }
 
     @Override
-    public PostCommand copy()
+    public ClearAssignedRolesCommand copy()
     {
         return new ClearAssignedRolesCommand(this);
     }

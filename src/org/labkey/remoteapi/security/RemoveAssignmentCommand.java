@@ -15,8 +15,6 @@
  */
 package org.labkey.remoteapi.security;
 
-import org.labkey.remoteapi.PostCommand;
-
 public class RemoveAssignmentCommand extends BaseUpdateAssignmentCommand
 {
     public RemoveAssignmentCommand()
@@ -30,7 +28,7 @@ public class RemoveAssignmentCommand extends BaseUpdateAssignmentCommand
     }
 
     @Override
-    public PostCommand copy()
+    public RemoveAssignmentCommand copy()
     {
         return new RemoveAssignmentCommand(this);
     }

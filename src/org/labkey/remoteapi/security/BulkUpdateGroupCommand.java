@@ -153,7 +153,7 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
     }
 
     @Override
-    public PostCommand copy()
+    public BulkUpdateGroupCommand copy()
     {
         return new BulkUpdateGroupCommand(this);
     }
