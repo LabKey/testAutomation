@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -304,20 +305,21 @@ public class JUnitTest extends TestSuite
                 TestSuite remotesuite = new JUnitTest();
 
                 boolean addedHeader = false;
-                for (Map.Entry<String, Object> entry : json.toMap().entrySet())
+                for (String key : json.keySet())
                 {
-                    String suiteName = entry.getKey();
-                    TestSuite testsuite = new TestSuite(suiteName);
+                    TestSuite testsuite = new TestSuite(key);
+                    JSONArray testClassArray = json.getJSONArray(key);
                     // Individual tests include both the class name and the requested timeout
-                    for (Map<String, Object> testClass : (List<Map<String, Object>>)entry.getValue()) // TODO: This will probably blow up -- update for JSONObject/JSONArray
+                    for (int i = 0; i < testClassArray.length(); i++)
                     {
+                        JSONObject testClass = testClassArray.getJSONObject(i);
                         // For the time being do not run performance tests with every junit check-in test suite.
-                        if(!((String)testClass.get("when")).equalsIgnoreCase("performance"))
+                        if(!(testClass.getString("when")).equalsIgnoreCase("performance"))
                         {
-                            String className = (String) testClass.get("className");
+                            String className = testClass.getString("className");
                             // Timeout is represented in seconds
-                            int timeout = ((Number) testClass.get("timeout")).intValue();
-                            if (accept.test(testClass))
+                            int timeout = testClass.getInt("timeout");
+                            if (accept.test(testClass.toMap()))
                                 testsuite.addTest(new RemoteTest(className, timeout));
                         }
 
