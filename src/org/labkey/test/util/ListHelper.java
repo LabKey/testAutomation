@@ -189,7 +189,7 @@ public class ListHelper extends LabKeySiteWrapper
     {
         String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         beginAt(url);
-        clickButton("OK");
+        clickButton("Confirm Delete");
     }
 
     /**
@@ -200,7 +200,7 @@ public class ListHelper extends LabKeySiteWrapper
         String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         beginAt(url);
         assertTextPresent(confirmText);
-        clickButton("OK");
+        clickButton("Confirm Delete");
     }
 
     @LogMethod
