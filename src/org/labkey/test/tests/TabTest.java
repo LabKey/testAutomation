@@ -22,9 +22,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.labkey.PortalTab;
-import org.labkey.test.components.list.ManageListsGrid;
-import org.labkey.test.pages.list.EditListDefinitionPage;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
@@ -42,12 +39,6 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 13)
 public class TabTest extends SimpleModuleTest
 {
-    @Override
-    public BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
-
     @Override
     protected void doVerifySteps() throws Exception
     {
@@ -254,21 +245,10 @@ public class TabTest extends SimpleModuleTest
         clickTab("Study Container");
         clickAndWait(Locator.lkButton("Create Study"));     // Create study
         clickAndWait(Locator.lkButton("Create Study"));
-
-        // Create the list again so we can pass query validation.
-        log("Create list in subfolder to prevent query validation failure");
-        clickTab(STUDY_FOLDER_TAB_LABEL);
-        new PortalHelper(this).addWebPart("Lists");
-        clickAndWait(Locator.linkWithText("manage lists"));
-        final EditListDefinitionPage editListPage = new ManageListsGrid(getDriver()).clickCreateList();
-        editListPage.setName(LIST_NAME).manuallyDefineFieldsWithAutoIncrementingKey("Key")
-                .addField(new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription("Name"))
-                .addField(new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"))
-                .addField(new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?"));
-        editListPage.clickSave();
     }
 
-    private void revertFolder(String folderName) {
+    private void revertFolder(String folderName)
+    {
         waitForText(folderName);
         WebElement revertButton = Ext4Helper.Locators.ext4Button("Revert").findElement(getDriver());
         shortWait().until(LabKeyExpectedConditions.animationIsDone(revertButton));

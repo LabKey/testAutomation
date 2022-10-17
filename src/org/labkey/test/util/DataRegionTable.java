@@ -1669,6 +1669,8 @@ public class DataRegionTable extends DataRegion
     {
         CURRENT_FOLDER("Current folder"),
         CURRENT_AND_SUBFOLDERS("Current folder and subfolders"),
+        CURRENT_AND_SUBFOLDERS_PLUS_SHARED("Current folder, subfolders, and Shared project"),
+        CURRENT_PLUS_PROJECT_AND_SHARED("Current folder, project, and Shared project"),
         ALL_FOLDERS("All folders");
 
         private final String _label;
