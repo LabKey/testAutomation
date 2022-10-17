@@ -47,7 +47,6 @@ project.dependencies {
     implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
     implementation "org.apache.logging.log4j:log4j-iostreams:${log4j2Version}"
     api "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
-    api "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
     implementation "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     api "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
     implementation "org.apache.tika:tika-core:${tikaVersion}"
