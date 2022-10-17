@@ -15,12 +15,14 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.fail;
@@ -47,6 +49,8 @@ public class JSONHelper
             Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
     };
 
+    private final LinkedList<String> _currentPath = new LinkedList<>();
+
     private final ArrayList<Pattern> _ignoredElements;
 
     public JSONHelper()
@@ -71,7 +75,7 @@ public class JSONHelper
 
     public void assertEquals(String msg, JSONObject expected, JSONObject actual)
     {
-        if (compareElement(expected, actual))
+        if (compareMap(expected, actual, true))
         {
             TestLogger.log("matched json");
         }
@@ -88,73 +92,107 @@ public class JSONHelper
         }
     }
 
-    public boolean compareMap(JSONObject map1, JSONObject map2, boolean fatal)
+    private boolean compareMap(JSONObject expected, JSONObject actual, boolean fatal)
     {
-        for (String key : map1.keySet())
+        for (String key : expected.keySet())
         {
-            if (map2.has(key))
+            if (fatal)
             {
-                if (!skipElement(String.valueOf(key)) && !compareElement(map1.get(key), map2.get(key), fatal))
+                _currentPath.add(key);
+            }
+            if (actual.has(key))
+            {
+                if (!skipElement(String.valueOf(key)) && !compareElement(expected.get(key), actual.get(key), fatal))
                 {
-                    log("Error found in: " + key, fatal);
                     return false;
                 }
             }
-            else
+            // JSONObject might omit entries with null values: https://github.com/stleary/JSON-java/issues/667
+            else if (expected.get(key) != JSONObject.NULL)
             {
-                log("Comparison of maps failed: could not find key: " + key, fatal);
+                log("Comparison of maps failed: could not find element: " + getPath(), fatal);
                 return false;
+            }
+            if (fatal)
+            {
+                _currentPath.removeLast();
             }
         }
         return true;
     }
 
-    public boolean compareList(JSONArray list1, JSONArray list2, boolean fatal)
+    private boolean compareArrays(JSONArray expected, JSONArray actual, boolean fatal)
     {
-        if (list1.length() != list2.length())
+        if (expected.length() != actual.length())
         {
-            log("Comparison of lists failed: sizes are different", fatal);
+            log(String.format("Array size mismatch at %s. %s=/=%s", getPath(), expected.length(), actual.length()), fatal);
             return false;
         }
 
-        // lists are not ordered
-        for (int i = 0; i < list1.length(); i++)
+        if (expected.length() == 1)
         {
-            boolean matched = false;
-            for (Object o : list2)
+            if (fatal)
             {
-                if (compareElement(list1.get(i), o, false))
-                {
-                    matched = true;
-                    break;
-                }
+                _currentPath.set(_currentPath.size() - 1, _currentPath.getLast() + "[0]");
             }
-            if (!matched)
+            return compareElement(expected.get(0), actual.get(0), fatal);
+        }
+        else
+        {
+            // lists are not ordered
+            for (int i = 0; i < expected.length(); i++)
             {
-                log("Failed to match two specified lists. " + list1.get(i) + " was not found in list2.\nList 1: " +
-                        list1 + "\nList 2: " + list2, fatal);
-                return false;
+                boolean matched = false;
+                for (Object o : actual)
+                {
+                    if (compareElement(expected.get(i), o, false))
+                    {
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched)
+                {
+                    log(String.format("Failed to match two specified lists at %s. " + expected.get(i) + " was not found in list2.\nList 1: " +
+                            expected + "\nList 2: " + actual, getPath()), fatal);
+                    return false;
+                }
             }
         }
         return true;
     }
 
-    public boolean compareElement(JSONObject o1, JSONObject o2)
+    private boolean compareElement(Object expected, Object actual, boolean fatal)
     {
-        return compareMap(o1, o2, true);
+        if (expected instanceof JSONObject oExp && actual instanceof JSONObject oAct)
+            return compareMap(oExp, oAct, fatal);
+        if (expected instanceof JSONArray aExp && actual instanceof JSONArray aAct)
+            return compareArrays(aExp, aAct, fatal);
+        else
+            return compareLeaves(expected, actual, fatal);
+
     }
 
-    private boolean compareElement(Object o1, Object o2, boolean fatal)
+    private boolean compareLeaves(Object expected, Object actual, boolean fatal)
     {
-        if (o1 instanceof JSONObject j1)
-            return compareMap(j1, (JSONObject)o2, fatal);
-        if (o1 instanceof JSONArray a1)
-            return compareList(a1, (JSONArray)o2, fatal);
-        if (StringUtils.equals(String.valueOf(o1), String.valueOf(o2)))
-            return true;
+        if (expected instanceof JSONObject || actual instanceof JSONObject ||
+                expected instanceof JSONArray || actual instanceof JSONArray)
+        {
+            log("Type mismatch at " + getPath() + ". expected: " + expected.getClass() + " but found:" + actual.getClass(), fatal);
+            return false;
+        }
+        if (!Objects.equals(expected, actual))
+        {
+            log("Mismatch at " + getPath() + ". expected: " + expected + " but found:" + actual, fatal);
+            return false;
+        }
+        return true;
+    }
 
-        log("Comparison of elements: " + o1 + " and: " + o2 + " failed", fatal);
-        return false;
+    @NotNull
+    private String getPath()
+    {
+        return "'" + String.join(".", _currentPath) + "'";
     }
 
     private void log(String msg, boolean fatal)

@@ -26,7 +26,7 @@ public class IssueResponseModel
             JSONArray commentsObj = json.getJSONArray("comments");
             for (int i=0; i < commentsObj.length(); i++)
             {
-                _issueComments.add(new IssueComment((JSONObject) commentsObj.get(i)));
+                _issueComments.add(new IssueComment(commentsObj.getJSONObject(i)));
             }
         }
     }

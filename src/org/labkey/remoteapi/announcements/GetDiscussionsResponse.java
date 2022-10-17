@@ -18,7 +18,7 @@ public class GetDiscussionsResponse extends CommandResponse
 
         // populate _threads from payload
         _threads = new ArrayList<>();
-        JSONArray discussionThreads =(JSONArray)json.get("data");
+        JSONArray discussionThreads = json.getJSONArray("data");
         for (Object thread : discussionThreads)
         {
             _threads.add(new AnnouncementModel((JSONObject)thread));

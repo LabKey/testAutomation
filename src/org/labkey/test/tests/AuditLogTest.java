@@ -961,18 +961,14 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
     {
-        String value = null;
-
         try
         {
-            value = ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
+            return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
         }
         catch(JSONException je)
         {
             // Just fail here, don't toss the exception up the stack.
-            Assert.assertTrue("There was a parser exception: " + je, false);
+            throw new IllegalArgumentException(je);
         }
-
-        return value;
     }
 }
