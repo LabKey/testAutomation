@@ -34,24 +34,24 @@ public class AnnouncementModel
 
     public AnnouncementModel(JSONObject json)
     {
-        _approved = json.optString("approved");
-        _body = json.optString("body");
-        _containerId = json.optString("containerId");
-        _containerPath = json.optString("containerPath");
-        _created = json.optString("created");
+        _approved = json.optString("approved", null);
+        _body = json.optString("body", null);
+        _containerId = json.optString("containerId", null);
+        _containerPath = json.optString("containerPath", null);
+        _created = json.optString("created", null);
         if (json.has("createdBy"))
             _createdBy = json.getLong("createdBy");
-        _modified = json.optString("modified");
+        _modified = json.optString("modified", null);
         if (json.has("modifiedBy"))
             _modifiedBy = json.getLong("modifiedBy");
-        _discussionSrcIdentifier = json.optString("discussionSrcIdentifier");
-        _entityId = json.optString("entityId");
-        _formattedHtml = json.optString("formattedHtml");
-        _rendererType = json.optString("rendererType");
+        _discussionSrcIdentifier = json.optString("discussionSrcIdentifier", null);
+        _entityId = json.optString("entityId", null);
+        _formattedHtml = json.optString("formattedHtml", null);
+        _rendererType = json.optString("rendererType", null);
         if (json.has("rowId"))
             _rowId = json.getLong("rowId");
-        _title = json.optString("title");
-        _parent = json.optString("parent");
+        _title = json.optString("title", null);
+        _parent = json.optString("parent", null);
 
         if (json.has("responses"))
         {
