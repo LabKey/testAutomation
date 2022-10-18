@@ -135,11 +135,12 @@ public class JSONHelper
             {
                 _currentPath.set(_currentPath.size() - 1, _currentPath.getLast() + "[0]");
             }
+            // Can do a precise comparison on single-element array
             return compareElement(expected.get(0), actual.get(0), fatal);
         }
         else
         {
-            // lists are not ordered
+            // lists are not ordered. Search for a match.
             for (int i = 0; i < expected.length(); i++)
             {
                 boolean matched = false;
