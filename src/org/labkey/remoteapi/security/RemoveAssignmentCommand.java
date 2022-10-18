@@ -21,15 +21,4 @@ public class RemoveAssignmentCommand extends BaseUpdateAssignmentCommand
     {
         super("removeAssignment");
     }
-
-    public RemoveAssignmentCommand(RemoveAssignmentCommand source)
-    {
-        super(source);
-    }
-
-    @Override
-    public RemoveAssignmentCommand copy()
-    {
-        return new RemoveAssignmentCommand(this);
-    }
 }

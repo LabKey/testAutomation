@@ -21,15 +21,4 @@ public class AddAssignmentCommand extends BaseUpdateAssignmentCommand
     {
         super("addAssignment");
     }
-
-    public AddAssignmentCommand(AddAssignmentCommand source)
-    {
-        super(source);
-    }
-
-    @Override
-    public AddAssignmentCommand copy()
-    {
-        return new AddAssignmentCommand(this);
-    }
 }

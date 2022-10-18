@@ -44,16 +44,6 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
         super("security", "bulkUpdateGroup");
     }
 
-    public BulkUpdateGroupCommand(BulkUpdateGroupCommand source)
-    {
-        this();
-        _groupId = source._groupId;
-        _groupName = source._groupName;
-        _members = source._members;
-        _createGroup = source._createGroup;
-        _method = source._method;
-    }
-
     public BulkUpdateGroupCommand(@NotNull String groupName)
     {
         this();
@@ -152,9 +142,4 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
         return 16.1;
     }
 
-    @Override
-    public BulkUpdateGroupCommand copy()
-    {
-        return new BulkUpdateGroupCommand(this);
-    }
 }

@@ -28,12 +28,6 @@ public class GetCategoriesCommand extends Command<GetCategoriesResponse>
     @Override
     protected GetCategoriesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetCategoriesResponse(text, status, contentType, json, copy());
-    }
-
-    @Override
-    public GetCategoriesCommand copy()
-    {
-        return new GetCategoriesCommand();
+        return new GetCategoriesResponse(text, status, contentType, json, this);
     }
 }

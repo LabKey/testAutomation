@@ -28,12 +28,6 @@ public class GetModulesCommand extends Command<GetModulesResponse>
     @Override
     protected GetModulesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetModulesResponse(text, status, contentType, json, copy());
-    }
-
-    @Override
-    public GetModulesCommand copy()
-    {
-        return new GetModulesCommand();
+        return new GetModulesResponse(text, status, contentType, json, this);
     }
 }

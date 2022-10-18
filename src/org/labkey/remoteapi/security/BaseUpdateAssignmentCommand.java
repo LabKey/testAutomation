@@ -31,15 +31,6 @@ public abstract class BaseUpdateAssignmentCommand extends PostCommand<CommandRes
         super("security", action);
     }
 
-    protected BaseUpdateAssignmentCommand(BaseUpdateAssignmentCommand source)
-    {
-        this(source.getActionName());
-        principalId = source.principalId;
-        email = source.email;
-        roleClassName = source.roleClassName;
-        confirm = source.confirm;
-    }
-
     public void setPrincipalId(Integer principalId)
     {
         this.principalId = principalId;
@@ -74,7 +65,8 @@ public abstract class BaseUpdateAssignmentCommand extends PostCommand<CommandRes
         result.put("principalId", principalId);
         result.put("email", email);
         result.put("confirm", confirm);
-        if (roleClassName != null && !roleClassName.isEmpty()) result.put("roleClassName", roleClassName);
+        if (roleClassName != null && !roleClassName.isEmpty())
+            result.put("roleClassName", roleClassName);
         return result;
     }
 }
