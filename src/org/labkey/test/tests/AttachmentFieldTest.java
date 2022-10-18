@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -26,7 +27,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class AttachmentFieldTest extends BaseWebDriverTest
 {
-    private final File SAMPLE_PDF = new File(TestFileUtils.getSampleData("fileTypes"), "pdf_sample.pdf");
+    private final File SAMPLE_FILE = new File(TestFileUtils.getSampleData("fileTypes"), "jpg_sample.jpg");
 
     @BeforeClass
     public static void setupProject()
@@ -59,7 +60,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     public void testFileFieldInSampleType()
     {
         String sampleTypeName = "Sample type with attachment";
-        String fieldName = "pdfFile";
+        String fieldName = "testFile";
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
 
         log("Create a sample type with attachment field");
@@ -74,28 +75,27 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         samplesTable.clickInsertNewRow();
         setFormElement(Locator.name("quf_Name"), "S1");
-        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_PDF);
+        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
         clickButton("Submit");
 
         log("Verifying view in browser works");
-        Locator.linkContainingText(SAMPLE_PDF.getName()).findElement(getDriver()).click();
-        log("Relative URL : " + getCurrentRelativeURL());
-        checker().verifyTrue("Incorrect PDF file displayed", getCurrentRelativeURL().contains("core-downloadFileLink.view"));
+        Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click();
+        Assert.assertTrue("Incorrect file displayed", getCurrentRelativeURL().contains("core-downloadFileLink.view"));
 
         goToProjectHome();
         UpdateSampleTypePage updatePage = sampleTypeHelper.goToEditSampleType(sampleTypeName);
         updatePage.getFieldsPanel().getField(fieldName).expand().setAttachmentBehavior("Download File");
         updatePage.clickSave();
 
-        File downloadedFile = doAndWaitForDownload(() -> Locator.linkContainingText(SAMPLE_PDF.getName()).findElement(getDriver()).click());
-        checker().verifyTrue("Downloaded file is empty", downloadedFile.length() > 0);
+        File downloadedFile = doAndWaitForDownload(() -> Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click());
+        Assert.assertTrue("Downloaded file is empty", downloadedFile.length() > 0);
     }
 
     @Test
     public void testAttachmentFieldInLists()
     {
         String listName = "List with attachment field";
-        String fieldName = "pdfFile";
+        String fieldName = "testFile";
         goToProjectHome();
         log("Creating the list");
         _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "id");
@@ -114,13 +114,13 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
         listTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_PDF);
+        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
         clickButton("Submit");
 
         log("Verify file opened in browser");
-        Locator.linkWithText(SAMPLE_PDF.getName()).findElement(getDriver()).click();
+        Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click();
         switchToWindow(1);
-        checker().verifyTrue("Incorrect PDF file displayed", getCurrentRelativeURL().contains(SAMPLE_PDF.getName()));
+        Assert.assertTrue("Incorrect file displayed", getCurrentRelativeURL().contains(SAMPLE_FILE.getName()));
         switchToMainWindow();
 
         log("Verify file is downloaded");
@@ -131,7 +131,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
-        File downloadedFile = doAndWaitForDownload(() -> Locator.linkWithText(SAMPLE_PDF.getName()).findElement(getDriver()).click());
-        checker().verifyTrue("Downloaded file is empty", downloadedFile.length() > 0);
+        File downloadedFile = doAndWaitForDownload(() -> Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click());
+        Assert.assertTrue("Downloaded file is empty", downloadedFile.length() > 0);
     }
 }
