@@ -425,9 +425,16 @@ public class JUnitTest extends TestSuite
 
         static String dump(String response, boolean dumpFailures)
         {
-            JSONObject json = new JSONObject(response);
-
-            return dump(json.toMap(), dumpFailures);
+            try
+            {
+                JSONObject json = new JSONObject(response);
+                return dump(json.toMap(), dumpFailures);
+            }
+            catch (JSONException ex)
+            {
+                return "Error parsing response: " + ex.getMessage() + "\n" +
+                        response.split("\n", 2)[0];
+            }
         }
 
         @NotNull
