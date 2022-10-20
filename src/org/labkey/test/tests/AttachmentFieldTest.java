@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -79,8 +80,8 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Verifying view in browser works");
-        Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click();
-        Assert.assertTrue("Incorrect file displayed", getCurrentRelativeURL().contains("core-downloadFileLink.view"));
+        clickAndWait(Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()));
+        Assertions.assertThat(getDriver().getCurrentUrl()).as("File field view URL.").contains("core-downloadFileLink.view");
 
         goToProjectHome();
         UpdateSampleTypePage updatePage = sampleTypeHelper.goToEditSampleType(sampleTypeName);
@@ -120,7 +121,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         log("Verify file opened in browser");
         Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click();
         switchToWindow(1);
-        Assert.assertTrue("Incorrect file displayed", getCurrentRelativeURL().contains(SAMPLE_FILE.getName()));
+        Assertions.assertThat(getDriver().getCurrentUrl()).as("Incorrect file displayed").contains(SAMPLE_FILE.getName());
         switchToMainWindow();
 
         log("Verify file is downloaded");
