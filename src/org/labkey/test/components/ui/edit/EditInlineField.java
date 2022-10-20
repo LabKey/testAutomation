@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -64,7 +65,17 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         {
             WebElement toggle = elementCache().toggle();
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
-            toggle.click();
+
+            try {
+                toggle.click();
+            }
+            catch (ElementNotInteractableException e)
+            {
+                // If the EditInlineField has showToggle set to true then we need to click the pencil icon, not the
+                // toggle element.
+                elementCache().pencil().click();
+            }
+
             WebDriverWrapper.waitFor(this::isOpen,
                     "the edit inline field did not open", 2000);
         }
@@ -80,8 +91,8 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
     {
         final WebElement label = Locator.tagWithClass("span", "edit-inline-field__label")
                 .refindWhenNeeded(this);
-        final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle")
-                .withChild(Locator.tagWithClass("i", "fa-pencil"));
+        final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle");
+        final Locator pencilLoc = Locator.tagWithClass("span", "fa-pencil");
         final WebElement input = Locator.css("input.form-control, textarea.form-control").refindWhenNeeded(this);
 
         WebElement placeholderElement()
@@ -93,6 +104,11 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         WebElement toggle()
         {
             return toggleLoc.waitForElement(this, 1_000);
+        }
+
+        WebElement pencil()
+        {
+            return pencilLoc.waitForElement(this, 1_000);
         }
     }
 

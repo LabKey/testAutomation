@@ -40,7 +40,7 @@ public abstract class Locators
 
     public static Locator.XPathLocator appFloatingHeader()
     {
-        return Locator.tag("div").withClasses("app-header-wrapper", "scrolled");
+        return Locator.tag("div").withClass("app-navigation");
     }
 
     public static Locator.XPathLocator bodyPanel()
