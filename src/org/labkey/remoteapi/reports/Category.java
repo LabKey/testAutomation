@@ -33,6 +33,7 @@ public class Category extends ResponseObject
 
     public Category(String label)
     {
+        super(null);
         _label = label;
         _rowId = null;
     }
