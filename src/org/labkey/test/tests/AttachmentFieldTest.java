@@ -121,6 +121,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         log("Verify file opened in browser");
         Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click();
         switchToWindow(1);
+        waitFor(() -> getDriver().getCurrentUrl().startsWith("http"), "Tab failed to load", 5_000);
         Assertions.assertThat(getDriver().getCurrentUrl()).as("Incorrect file displayed").contains(SAMPLE_FILE.getName());
         switchToMainWindow();
 
