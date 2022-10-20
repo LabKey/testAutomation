@@ -1251,6 +1251,30 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testAttachmentFieldWithSpace()
+    {
+        final String listName = "Attachment Field with Space List";
+        final String attachmentFileName = "searchData.tsv";
+        final String path = TestFileUtils.getSampleData("lists/" + attachmentFileName).getAbsolutePath();
+        final String attachmentCol = "Attachment Field With Space";
+
+        Map<String, String> row = new HashMap<>();
+        row.put(attachmentCol, path);
+
+        goToProjectHome();
+
+        log("create list with an attachment column '" + attachmentCol + "'");
+        _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
+                col(attachmentCol, ColumnType.Attachment));
+
+        log("Insert data, upload attachment for col '" + attachmentCol + "'");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.insertNewRow(row, false);
+        assertTextPresent(attachmentFileName);
+    }
+
+    @Test
     public void testAttachmentColumnDeletion()
     {
         final String listName = "Attachment Column Delete List";
