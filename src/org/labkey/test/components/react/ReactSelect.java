@@ -55,8 +55,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void select(String option)
     {
-        waitForLoaded();
-        scrollIntoView();
         open();
         clickOption(option);
         waitForClosed();
@@ -64,8 +62,6 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void typeOptionThenSelect(String option)
     {
-        waitForLoaded();
-        scrollIntoView();
         open();
         enterValueInTextbox(option);
         waitForLoaded();

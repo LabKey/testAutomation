@@ -103,8 +103,15 @@ public class ReclickingWebElement extends WebElementDecorator
                 }
                 else if (e.getRawMessage().contains("could not be scrolled into view"))
                 {
-                    // Add some information to help test developer find a better element.
-                    throw new ElementNotInteractableException("Click failed; try clicking a child element. Firefox doesn't like clicking certain wrapping elements\n" + e.getRawMessage(), e);
+                    if (getWrappedElement().isDisplayed())
+                    {
+                        // Add some information to help test developer find a better element.
+                        throw new ElementNotInteractableException("Click failed; try clicking a child element. Firefox doesn't like clicking certain wrapping elements\n" + e.getRawMessage(), e);
+                    }
+                    else
+                    {
+                        throw new ElementNotInteractableException("Element not displayed.\n" + e.getRawMessage(), e);
+                    }
                 }
                 else
                 {

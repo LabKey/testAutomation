@@ -355,6 +355,7 @@ public abstract class Locator extends By
     }
 
     @Override
+    @NotNull
     public WebElement findElement(SearchContext context)
     {
         Optional<WebElement> optionalElement = findOptionalElement(context);

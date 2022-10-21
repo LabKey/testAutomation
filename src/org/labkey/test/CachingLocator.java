@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
@@ -43,7 +44,7 @@ public class CachingLocator extends Locator.ImmutableLocator
     }
 
     @Override
-    public WebElement findElement(SearchContext context)
+    public @NotNull WebElement findElement(SearchContext context)
     {
         return findElements(context).get(0);
     }

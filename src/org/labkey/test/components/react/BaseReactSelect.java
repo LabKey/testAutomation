@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
-import static org.labkey.test.util.TestLogger.log;
 
 public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebDriverComponent<BaseReactSelect<?>.ElementCache>
 {
@@ -200,6 +199,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         if (isExpanded())
             return getThis();
 
+        scrollIntoView();
+        waitForLoaded();
         waitForInteractive();
 
         try
@@ -344,22 +345,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         return elementCache().input.getAttribute("name");
     }
 
-    protected T scrollIntoView()
+    protected void scrollIntoView()
     {
-        try
-        {
-            if (!getComponentElement().isDisplayed())
-            {
-                getWrapper().scrollIntoView(getComponentElement());
-                getWrapper().scrollBy(0, 200); // room for options
-            }
-        }
-        catch (StaleElementReferenceException ignore)
-        {
-            log("Attempted to scroll reactSelect " + getName() + " into view, but the component element was stale");
-        }
-
-        return getThis();
+        getWrapper().scrollIntoView(getComponentElement(), true);
     }
 
     /**

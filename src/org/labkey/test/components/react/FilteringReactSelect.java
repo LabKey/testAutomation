@@ -49,8 +49,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     public FilteringReactSelect typeAheadSelect(String value, String optionText, String selectedOptionLabel)
     {
-        waitForLoaded();
-        scrollIntoView();
         open();
 
         var elementToClick = ReactSelect.Locators.options.containing(optionText);
@@ -85,7 +83,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
         try
         {
-            getWrapper().scrollIntoView(optionToClick);
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
             optionToClick.click();
         }
@@ -108,57 +105,45 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return this;
     }
 
-    public FilteringReactSelect filterSelect(String value) // adds text for usage in cases where the item isn't in the dropdown and the text is editable
+    public void filterSelect(String value) // adds text for usage in cases where the item isn't in the dropdown and the text is editable
     {
-        return filterSelect(value, getValueLabelLocator().containing(value));
+        filterSelect(value, getValueLabelLocator().containing(value));
     }
 
     /* for use with editable instances of a reactSelect, where the options aren't shown
        unless type-ahead filter information is keyed in first */
-    public FilteringReactSelect filterSelect(String value, Locator elementToWaitFor)
+    public void filterSelect(String value, Locator elementToWaitFor)
     {
-        waitForLoaded();
-        scrollIntoView();
-        WebElement success = null;
-        int tryCount = 0;
-        while (null == success && tryCount < 6)
-        {
-            tryCount++;
-            open();
+        open();
 
-            if (isMulti() || hasValue())
-                sleep(250);
-            setFilter(value);
+        if (isMulti() || hasValue())
+            sleep(250);
+        setFilter(value);
 
-            WebElement elemToClick = Locator.waitForAnyElement(
-                    new FluentWait<SearchContext>(getComponentElement()).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
-                    Locators.options.containing(value));
+        WebElement elemToClick = Locator.waitForAnyElement(
+                new FluentWait<SearchContext>(getComponentElement()).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
+                Locators.options.containing(value));
 
-            log("clicking item with value [" +value+"]");
-            getWrapper().scrollIntoView(elemToClick);
+        log("clicking item with value [" +value+"]");
+        elemToClick.click();
 
-            WebDriverWrapper.waitFor(()-> {
-                try
+        WebDriverWrapper.waitFor(()-> {
+            try
+            {
+                if (isExpanded())
                 {
-                    if (isExpanded())
-                        elemToClick.click();
+                    elemToClick.click();
                     sleep(250);
-                    return !isExpanded();
                 }
-                catch (StaleElementReferenceException retry)
-                {
-                    return false;
-                }
-            },"failed to select item "+ elemToClick.getAttribute("class")  +" by clicking", WAIT_FOR_JAVASCRIPT);
+                return !isExpanded();
+            }
+            catch (StaleElementReferenceException retry)
+            {
+                return false;
+            }
+        },"failed to select item "+ elemToClick.getAttribute("class")  +" by clicking", WAIT_FOR_JAVASCRIPT);
 
-            success = elementToWaitFor.findElement(getComponentElement());
-        }
-
-        if (success == null)
-            log("Expected selection was not found. Selected value(s) are:" + getSelections());
-
-        close();
-        return this;
+        elementToWaitFor.findElement(getComponentElement());
     }
 
     private List<WebElement> setFilter(String value)
