@@ -27,6 +27,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -767,7 +768,11 @@ public class Ext4Helper
     public void closeExtTab(String tabName)
     {
         _test.log("Closing Ext tab " + tabName);
-        _test.click(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]"));
+        WebElement closeButton = _test.shortWait().until(ExpectedConditions
+                .elementToBeClickable(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]")));
+        _test.mouseOver(closeButton);
+        closeButton.click();
+        _test.shortWait().until(ExpectedConditions.stalenessOf(closeButton));
     }
 
     public static class Locators
