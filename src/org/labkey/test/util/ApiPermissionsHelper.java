@@ -223,7 +223,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             if (groupName.equals(group.get("name")))
             {
-                return Math.toIntExact((long)group.get("id"));
+                return (int)group.get("id");
             }
         }
         return null;
@@ -238,7 +238,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             if (groupName.equals(group.get("name")))
             {
-                return Math.toIntExact((long)group.get("id"));
+                return (int)group.get("id");
             }
         }
         return null;
@@ -273,7 +273,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             if (groupName.equals(group.get("name")))
             {
-                groupId = Math.toIntExact((long)group.get("id"));
+                groupId = (int)group.get("id");
                 break;
             }
         }

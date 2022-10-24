@@ -1,12 +1,12 @@
 package org.labkey.remoteapi.domain;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class InferDomainResponse extends CommandResponse
 {
@@ -22,8 +22,8 @@ public class InferDomainResponse extends CommandResponse
         if (_fields == null)
         {
             List<PropertyDescriptor> temp = new ArrayList<>();
-            JSONArray fieldsJson = getProperty("fields");
-            fieldsJson.forEach(fieldJson -> temp.add(new PropertyDescriptor((JSONObject) fieldJson)));
+            List<Map<String, Object>> fieldsJson = getProperty("fields");
+            fieldsJson.forEach(map -> temp.add(new PropertyDescriptor(new JSONObject(map))));
             if (temp.isEmpty())
             {
                 throw new IllegalArgumentException("No fields found in response");

@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 public abstract class AbstractMessageThreadCommand extends PostCommand<MessageThreadResponse>
@@ -16,5 +16,4 @@ public abstract class AbstractMessageThreadCommand extends PostCommand<MessageTh
     {
         return new MessageThreadResponse(text, status, contentType, json, this);
     }
-
 }

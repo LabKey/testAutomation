@@ -103,9 +103,9 @@ public class PuppeteerSettings
         _remoteUrl = remoteUrl;
     }
 
-    public org.json.simple.JSONObject toJSON()
+    public org.json.JSONObject toJSON()
     {
-        var settings = new org.json.simple.JSONObject();
+        var settings = new org.json.JSONObject();
 
         if (getEnabled() != null)
             settings.put("enabled", getEnabled());
@@ -118,7 +118,7 @@ public class PuppeteerSettings
         if (getRemoteUrl() != null)
             settings.put("remote.url", getRemoteUrl());
 
-        var payload = new org.json.simple.JSONObject();
+        var payload = new org.json.JSONObject();
         payload.put("settings", settings);
 
         return payload;

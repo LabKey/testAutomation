@@ -1,6 +1,6 @@
 package org.labkey.test.util;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Command;

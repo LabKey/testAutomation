@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 public class GetIssueCommand extends PostCommand<GetIssueResponse>

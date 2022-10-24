@@ -29,20 +29,6 @@ public class SchemaHelper
         _test = test;
     }
 
-    /**
-     * @deprecated Use other {@link #createLinkedSchema(String, String, String, String, String, String, String)}
-     */
-    @Deprecated (since = "20.10")
-    public void createLinkedSchema(String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
-    {
-        StringBuilder targetContainerPath = new StringBuilder(projectName);
-        if (targetFolder != null)
-        {
-            targetContainerPath.append("/").append(targetFolder);
-        }
-        createLinkedSchema(targetContainerPath.toString(), name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
-    }
-
     @LogMethod
     public void createLinkedSchema(String targetContainerPath, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {

@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.admin;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.ResponseObject;
@@ -27,8 +27,9 @@ import java.util.TreeSet;
 
 public class GetModulesResponse extends CommandResponse
 {
+    private final String _folderType;
+
     private Set<Module> _modules;
-    private String _folderType;
 
     public GetModulesResponse(String text, int statusCode, String contentType, JSONObject json, Command sourceCommand)
     {

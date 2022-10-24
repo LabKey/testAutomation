@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.reports;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class GetCategoriesResponse extends CommandResponse
         return null;
     }
 
-    public Category getCategory(Long rowId)
+    public Category getCategory(Integer rowId)
     {
         for (Category category : getCategoryList())
         {

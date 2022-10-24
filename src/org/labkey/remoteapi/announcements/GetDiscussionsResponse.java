@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GetDiscussionsResponse extends CommandResponse
 {
-    private List<AnnouncementModel> _threads;
+    private final List<AnnouncementModel> _threads;
 
     public GetDiscussionsResponse(String text, int statusCode, String contentType, JSONObject json,
                                   GetDiscussionsCommand sourceCommand)
@@ -18,10 +18,10 @@ public class GetDiscussionsResponse extends CommandResponse
 
         // populate _threads from payload
         _threads = new ArrayList<>();
-        JSONArray discussionThreads =(JSONArray)json.get("data");
-        for (int i=0; i< discussionThreads.size(); i++)
+        JSONArray discussionThreads = json.getJSONArray("data");
+        for (Object thread : discussionThreads)
         {
-            _threads.add(new AnnouncementModel((JSONObject)discussionThreads.get(i)));
+            _threads.add(new AnnouncementModel((JSONObject)thread));
         }
     }
 

@@ -56,7 +56,7 @@ public class UIUserHelper extends AbstractUserHelper
         String message = resultEl.getText();
 
         String email;
-        Number userId;
+        Integer userId;
         List<WebElement> userInfo = Locator.css("meta").findElements(resultEl);
         if (userInfo.size() > 0)
         {
@@ -72,7 +72,7 @@ public class UIUserHelper extends AbstractUserHelper
 
         return new CreateUserResponse(null, 200, null, null, null){
             @Override
-            public Number getUserId()
+            public Integer getUserId()
             {
                 return userId;
             }

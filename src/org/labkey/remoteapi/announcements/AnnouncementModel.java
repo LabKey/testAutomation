@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.ArrayList;
@@ -34,43 +34,31 @@ public class AnnouncementModel
 
     public AnnouncementModel(JSONObject json)
     {
-        if (json.get("approved") != null)
-            _approved = json.get("approved").toString();
-        if (json.get("body") != null)
-            _body = json.get("body").toString();
-        if (json.get("containerId") != null)
-            _containerId = json.get("containerId").toString();
-        if (json.get("containerPath") != null)
-            _containerPath = json.get("containerPath").toString();
-        if (json.get("created") != null)
-            _created = json.get("created").toString();
-        if (json.get("createdBy") != null)
-            _createdBy = (Long) json.get("createdBy");
-        if (json.get("modified") != null)
-            _modified = json.get("modified").toString();
-        if (json.get("modifiedBy") != null)
-            _modifiedBy = (Long) json.get("modifiedBy");
-        if (json.get("discussionSrcIdentifier") != null)
-            _discussionSrcIdentifier = json.get("discussionSrcIdentifier").toString();
-        if (json.get("entityId") != null)
-            _entityId = json.get("entityId").toString();
-        if (json.get("formattedHtml") != null)
-            _formattedHtml = json.get("formattedHtml").toString();
-        if (json.get("rendererType") != null)
-            _rendererType = json.get("rendererType").toString();
-        if (json.get("rowId") != null)
-            _rowId = (Long) json.get("rowId");
-        if (json.get("title") != null)
-            _title = json.get("title").toString();
-        if (json.get("parent") != null)
-            _parent = json.get("parent").toString();
+        _approved = json.optString("approved", null);
+        _body = json.optString("body", null);
+        _containerId = json.optString("containerId", null);
+        _containerPath = json.optString("containerPath", null);
+        _created = json.optString("created", null);
+        if (json.has("createdBy"))
+            _createdBy = json.getLong("createdBy");
+        _modified = json.optString("modified", null);
+        if (json.has("modifiedBy"))
+            _modifiedBy = json.getLong("modifiedBy");
+        _discussionSrcIdentifier = json.optString("discussionSrcIdentifier", null);
+        _entityId = json.optString("entityId", null);
+        _formattedHtml = json.optString("formattedHtml", null);
+        _rendererType = json.optString("rendererType", null);
+        if (json.has("rowId"))
+            _rowId = json.getLong("rowId");
+        _title = json.optString("title", null);
+        _parent = json.optString("parent", null);
 
-        if (json.get("responses") != null)
+        if (json.has("responses"))
         {
-            var responses = new ArrayList<AnnouncementModel>();
-            var rawResponses = (JSONArray) json.get("responses");
-            for (int i = 0; i < rawResponses.size(); i++)
-                responses.add(new AnnouncementModel((JSONObject) rawResponses.get(i)));
+            List<AnnouncementModel> responses = new ArrayList<>();
+            JSONArray rawResponses = json.getJSONArray("responses");
+            for (int i = 0; i < rawResponses.length(); i++)
+                responses.add(new AnnouncementModel(rawResponses.getJSONObject(i)));
             _responses = responses;
         }
     }
@@ -78,22 +66,22 @@ public class AnnouncementModel
     public JSONObject toJSON()
     {
         var json = new JSONObject();
-        if (getApproved() != null) json.put("approved", getApproved());
-        if (getBody() != null) json.put("body", getBody());
-        if (getContainerId() != null) json.put("containerId", getContainerId());
-        if (getContainerPath() != null) json.put("containerPath", getContainerPath());
-        if (getCreated() != null) json.put("created", getCreated());
-        if (getCreatedBy() != null) json.put("createdBy", getCreatedBy());
-        if (getModified() != null) json.put("modified", getModified());
-        if (getModifiedBy() != null) json.put("modifiedBy", getModifiedBy());
-        if (getDiscussionSrcIdentifier() != null) json.put("discussionSrcIdentifier", getDiscussionSrcIdentifier());
-        if (getEntityId() != null) json.put("entityId", getEntityId());
-        if (getFormattedHtml() != null) json.put("formattedHtml", getFormattedHtml());
-        if (getRendererType() != null) json.put("rendererType", getRendererType());
-        if (getResponses() != null && getResponses().size() > 0) json.put("responses", getResponses());
-        if (getRowId() != null) json.put("rowId", getRowId());
-        if (getTitle() != null) json.put("title", getTitle());
-        if (getParent() != null) json.put("parent", getParent());
+        json.put("approved", getApproved());
+        json.put("body", getBody());
+        json.put("containerId", getContainerId());
+        json.put("containerPath", getContainerPath());
+        json.put("created", getCreated());
+        json.put("createdBy", getCreatedBy());
+        json.put("modified", getModified());
+        json.put("modifiedBy", getModifiedBy());
+        json.put("discussionSrcIdentifier", getDiscussionSrcIdentifier());
+        json.put("entityId", getEntityId());
+        json.put("formattedHtml", getFormattedHtml());
+        json.put("rendererType", getRendererType());
+        json.put("responses", getResponses());
+        json.put("rowId", getRowId());
+        json.put("title", getTitle());
+        json.put("parent", getParent());
         return json;
     }
 
