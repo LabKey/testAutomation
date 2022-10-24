@@ -1,7 +1,11 @@
 package org.labkey.test.pages.query;
 
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
+import org.assertj.core.api.Assertions;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
@@ -45,6 +49,12 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
 
     public void update(Map<String, ?> fields)
     {
+        setFields(fields);
+        submit();
+    }
+
+    public void setFields(Map<String, ?> fields)
+    {
         for (Map.Entry<String, ?> entry : fields.entrySet())
         {
             Object value = entry.getValue();
@@ -69,7 +79,6 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
                 throw new IllegalArgumentException("Unsupported value type for '" + entry.getKey() + "': " + value.getClass().getName());
             }
         }
-        submit();
     }
 
     public UpdateQueryRowPage setField(String fieldName, String value)
@@ -112,6 +121,31 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     public void submit()
     {
         clickAndWait(elementCache().submitButton);
+    }
+
+    public UpdateQueryRowPage submitExpectingErrorContaining(String... errors)
+    {
+        String actualError = submitExpectingError();
+        Assertions.assertThat(actualError).as("Error message saving data.").contains(errors);
+        return this;
+    }
+
+    public String submitExpectingError()
+    {
+        submit();
+        clearCache();
+        return waitForErrors();
+    }
+
+    private String waitForErrors()
+    {
+        Mutable<String> error = new MutableObject<>();
+        shortWait().until(wd ->
+        {
+            error.setValue(String.join("\n", getTexts(Locators.labkeyError.withText().findElements(getDriver()))));
+            return !error.getValue().isBlank();
+        });
+        return error.getValue();
     }
 
     @Override
