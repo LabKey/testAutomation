@@ -162,6 +162,11 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         setLabel(label).setDescription(description).setStatusType(statusType);
 
         elementCache().saveButton.click();
+
+        // Don't know why but on MSSQL/Windows in TC this is taking a long time to complete.
+        WebDriverWrapper.waitFor(()->elementCache().deleteButton.isDisplayed(),
+                "Delete button did not become visible after adding a status.", 5_000);
+
         return this;
     }
 
@@ -194,7 +199,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         final WebElement descriptionField = Locator.textarea("description").findWhenNeeded(this);
         final ReactSelect statusTypeSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
         final WebElement saveButton = Locator.tagWithText("button", "Save").findWhenNeeded(this);
-        final WebElement deleteButton = Locator.tagContainingText("button", "Delete").findWhenNeeded(this);
+        final WebElement deleteButton = Locator.tag("button").withChild(Locator.tagContainingText("span", "Delete")).refindWhenNeeded(this);
     }
 
     public static class ManageSampleStatusesPanelFinder extends WebDriverComponentFinder<ManageSampleStatusesPanel, ManageSampleStatusesPanelFinder>
