@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
@@ -16,24 +16,25 @@ public class IssueResponseModel
 
     public IssueResponseModel(JSONObject json)
     {
-        JSONObject props = (JSONObject) json.get("properties");
-        _serverProps.putAll(props);
-        _allProps.putAll(json);
+        _allProps.putAll(json.toMap());
+
+        JSONObject props = json.getJSONObject("properties");
+        _serverProps.putAll(props.toMap());
 
         if (json.get("comments") != null)
         {
-            var commentsObj = (JSONArray)json.get("comments");
-            for (int i=0; i < commentsObj.size(); i++)
+            JSONArray commentsObj = json.getJSONArray("comments");
+            for (int i=0; i < commentsObj.length(); i++)
             {
-                _issueComments.add(new IssueComment((JSONObject) commentsObj.get(i)));
+                _issueComments.add(new IssueComment(commentsObj.getJSONObject(i)));
             }
         }
     }
 
     // read-only props from the server
-    public Long getAssignedTo()
+    public Integer getAssignedTo()
     {
-        return (Long) getProp(ResponseKeys.AssignedTo);
+        return (Integer) getProp(ResponseKeys.AssignedTo);
     }
 
     public String getTitle()
@@ -71,9 +72,9 @@ public class IssueResponseModel
         return (String) getProp(ResponseKeys.resolved);
     }
 
-    public Long getPriority()
+    public Integer getPriority()
     {
-        return (Long) getProp(ResponseKeys.priority);
+        return (Integer) getProp(ResponseKeys.priority);
     }
 
     public String getType()

@@ -29,6 +29,8 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
+import org.openqa.selenium.WebElement;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +39,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -79,26 +80,19 @@ public class ExpTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment", "Query"});
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Data Pipeline");
-        portalHelper.addWebPart("Run Groups");
-        clickButton("Setup");
-        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getAbsolutePath());
-        clickFolder(FOLDER_NAME);
+        new WebDavUploadHelper(PROJECT_NAME + "/" + FOLDER_NAME)
+                .uploadDirectoryContents(TestFileUtils.getSampleData("xarfiles/expVerify"));
+        new PortalHelper(this)
+                .doInAdminMode(portalHelper -> {
+                    portalHelper.addWebPart("Data Pipeline");
+                    portalHelper.addWebPart("Run Groups");
+                });
+
         clickButton("Process and Import Data");
 
         _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
         clickAndWait(Locator.linkWithText("Data Pipeline"));
-        assertElementNotPresent(Locator.linkWithText("ERROR"));
-        int seconds = 0;
-        while (!isElementPresent(Locator.linkWithText("COMPLETE")) && seconds++ < MAX_WAIT_SECONDS)
-        {
-            sleep(1000);
-            clickTab("Pipeline");
-        }
-
-        if (!isElementPresent(Locator.linkWithText("COMPLETE")))
-            fail("Import did not complete.");
+        waitForPipelineJobsToComplete(1, false);
 
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(EXPERIMENT_NAME));
@@ -106,9 +100,10 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(RUN_NAME));
         clickAndWait(Locator.linkWithText("Graph Summary View"));
 
-        Locator.linkWithSpan("Toggle Beta Graph (new!)").waitForElement(getDriver(), 4000)
-                .click();
-        LineageGraph graph = new LineageGraph.LineageGraphFinder(getDriver()).waitFor();
+        LineageGraph graph = shortWait().until(wd -> {
+            Locator.linkWithSpan("Toggle Beta Graph (new!)").findOptionalElement(getDriver()).ifPresent(WebElement::click);
+            return new LineageGraph.LineageGraphFinder(getDriver()).findOptional().orElse(null);
+        });
         graph.getDetailGroup("Data Parents").getItemByTitle("Data: CAexample_mini.mzXML").clickOverViewLink(true);
         assertTextPresent("CAexample_mini.mzXML", "File Not Found");
 
@@ -118,13 +113,14 @@ public class ExpTest extends BaseWebDriverTest
         setFormElement(Locator.name("ff_newQueryName"), "dataCustomQuery");
         selectOptionByText(Locator.name("ff_baseTableName"), "Data");
         clickButton("Create and Edit Source");
-        setCodeEditorValue("queryText", "SELECT Datas.Name AS Name,\n" +
-                "Datas.RowId AS RowId,\n" +
-                "Datas.Run AS Run,\n" +
-                "Datas.DataFileUrl AS DataFileUrl,\n" +
-                "substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,\n" +
-                "Datas.Created AS Created\n" +
-                "FROM Datas");
+        setCodeEditorValue("queryText", """
+                SELECT Datas.Name AS Name,
+                Datas.RowId AS RowId,
+                Datas.Run AS Run,
+                Datas.DataFileUrl AS DataFileUrl,
+                substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,
+                Datas.Created AS Created
+                FROM Datas""");
         _ext4Helper.clickExt4Tab("Data");
 
         // Check that it contains the date format we expect
@@ -170,7 +166,7 @@ public class ExpTest extends BaseWebDriverTest
         int fieldCount = designerPage.getFieldsPanel().fieldNames().size();
         assertTrue(fieldCount > 0);
         domainRow = designerPage.getFieldsPanel().getField(fieldCount-1);
-        domainRow.setType(FieldDefinition.ColumnType.Lookup).setFromSchema("exp").setFromTargetTable("dataCustomQuery" + " (Integer)");
+        domainRow.setLookup(new FieldDefinition.IntLookup("exp", "dataCustomQuery"));
 
         // Save it
         designerPage.clickSave();

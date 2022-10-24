@@ -222,7 +222,7 @@ public class APIAssayHelper extends AbstractAssayHelper
                 fail("Assay not found: " + assayName);
             return 0;
         }
-        return ((Long) alr.getDefinition(assayName).get("id")).intValue();
+        return (int)alr.getDefinition(assayName).get("id");
     }
 
     /**

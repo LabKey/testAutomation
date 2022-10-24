@@ -32,7 +32,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONValue;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Command;
@@ -228,9 +230,15 @@ public class JUnitTest extends TestSuite
                 if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
-                Object json = JSONValue.parse(responseBody);
-                if (json == null)
+                final JSONObject json;
+
+                try
                 {
+                    json = new JSONObject(responseBody);
+                }
+                catch (JSONException e)
+                {
+                    // Server likely sent back HTML instead of JSON
 
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
@@ -290,29 +298,28 @@ public class JUnitTest extends TestSuite
 
                         return testSuite;
                     }
+
+                    throw new AssertionFailedError("Unexpected responseBody: " + responseBody);
                 }
 
-                if (!(json instanceof Map))
-                    throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
-
                 TestSuite remotesuite = new JUnitTest();
-                Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
 
                 boolean addedHeader = false;
-                for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
+                for (String key : json.keySet())
                 {
-                    String suiteName = entry.getKey();
-                    TestSuite testsuite = new TestSuite(suiteName);
+                    TestSuite testsuite = new TestSuite(key);
+                    JSONArray testClassArray = json.getJSONArray(key);
                     // Individual tests include both the class name and the requested timeout
-                    for (Map<String, Object> testClass : entry.getValue())
+                    for (int i = 0; i < testClassArray.length(); i++)
                     {
+                        JSONObject testClass = testClassArray.getJSONObject(i);
                         // For the time being do not run performance tests with every junit check-in test suite.
-                        if(!((String)testClass.get("when")).equalsIgnoreCase("performance"))
+                        if(!(testClass.getString("when")).equalsIgnoreCase("performance"))
                         {
-                            String className = (String) testClass.get("className");
+                            String className = testClass.getString("className");
                             // Timeout is represented in seconds
-                            int timeout = ((Number) testClass.get("timeout")).intValue();
-                            if (accept.test(testClass))
+                            int timeout = testClass.getInt("timeout");
+                            if (accept.test(testClass.toMap()))
                                 testsuite.addTest(new RemoteTest(className, timeout));
                         }
 
@@ -418,12 +425,16 @@ public class JUnitTest extends TestSuite
 
         static String dump(String response, boolean dumpFailures)
         {
-            Map<String, Object> json = (Map<String, Object>)JSONValue.parse(response);
-
-            if (json == null)
-                return response;
-
-            return dump(json, dumpFailures);
+            try
+            {
+                JSONObject json = new JSONObject(response);
+                return dump(json.toMap(), dumpFailures);
+            }
+            catch (JSONException ex)
+            {
+                return "Error parsing response: " + ex.getMessage() + "\n" +
+                        response.split("\n", 2)[0];
+            }
         }
 
         @NotNull

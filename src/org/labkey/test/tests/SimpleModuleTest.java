@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -483,13 +482,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
-        Long fordId = null;
-        Long toyotaId = null;
-        Long hondaId = null;
+        Integer fordId = null;
+        Integer toyotaId = null;
+        Integer hondaId = null;
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long) row.get("RowId");
+            Integer rowId = (Integer) row.get("RowId");
             String name = (String) row.get("Name");
             assertNotNull("Expected response row to have a Name column", name);
             assertNotNull("Expected response row to have a RowId column", rowId);
@@ -559,12 +558,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("finished testing custom thumbnail and popup images");
 
-        Long priusId = null;
-        Long f150Id = null;
+        Integer priusId = null;
+        Integer f150Id = null;
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long) row.get("RowId");
+            Integer rowId = (Integer) row.get("RowId");
             String name = (String) row.get("Name");
             if (name.equalsIgnoreCase("Prius C"))
                 priusId = rowId;
@@ -702,17 +701,17 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
 
-        Long[] vehicleIds = new Long[2];
-        vehicleIds[0] = (Long) (insertResp.getRows().get(0).get("RowId"));
-        vehicleIds[1] = (Long) (insertResp.getRows().get(1).get("RowId"));
+        Integer[] vehicleIds = new Integer[2];
+        vehicleIds[0] = (Integer) (insertResp.getRows().get(0).get("RowId"));
+        vehicleIds[1] = (Integer) (insertResp.getRows().get(1).get("RowId"));
 
         log("** Trying to update Vehicle from wrong container...");
         updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         updateCmd.getRows().addAll(Arrays.asList(
                 Maps.of(
-                        "RowId", vehicleIds[1],
-                        "Milage", Integer.valueOf(4),
-                        "LastService", new Date(2009, 9, 10)
+                    "RowId", vehicleIds[1],
+                    "Milage", Integer.valueOf(4),
+                    "LastService", new Date(2009, 9, 10)
                 )
         ));
         try
@@ -1261,16 +1260,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
 
-        Map<String,Object> row = selectResp.getRows().get(0);
-        String entityId = (String)((JSONObject)row.get("EntityId")).get("value");
-        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((JSONObject)row.get("Path")).get("value"));
+        Map<String, Object> row = selectResp.getRows().get(0);
+        String entityId = (String)((Map<String, Object>)row.get("EntityId")).get("value");
+        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((Map<String, Object>)row.get("Path")).get("value"));
 
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectCmd.setColumns(columns);
         selectCmd.setRequiredVersion(9.1);
         selectResp = selectCmd.execute(cn, getProjectName());
-        JSONObject vehicleRow = (JSONObject)(selectResp.getRows().get(0)).get("container");
+        Map<String, Object> vehicleRow = (Map<String, Object>)(selectResp.getRows().get(0)).get("container");
 
         assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
         assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));

@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.admin;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.Command;
 
 public class GetModulesCommand extends Command<GetModulesResponse>
@@ -28,12 +28,6 @@ public class GetModulesCommand extends Command<GetModulesResponse>
     @Override
     protected GetModulesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetModulesResponse(text, status, contentType, json, copy());
-    }
-
-    @Override
-    public GetModulesCommand copy()
-    {
-        return new GetModulesCommand();
+        return new GetModulesResponse(text, status, contentType, json, this);
     }
 }

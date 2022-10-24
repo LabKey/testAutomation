@@ -590,7 +590,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         Protocol serverProtocol = saveProtocolCommand.execute(createDefaultConnection(), subfolderPath).getProtocol();
 
         // now save a couple of runs
-        Integer protocolId = Integer.parseInt(serverProtocol.getProtocolId().toString());
+        Integer protocolId = serverProtocol.getProtocolId();
         List<Map<String, Object>> runRecords1 = new ArrayList<>();
         runRecords1.add(Map.of("sampleId", "sample1", "resultData", "this thing"));
         runRecords1.add(Map.of("sampleId", "sample2", "resultData", "that thing"));

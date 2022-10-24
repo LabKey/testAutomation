@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;

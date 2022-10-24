@@ -1,9 +1,10 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONTokener;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -44,6 +45,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1706,12 +1709,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 nullToFalse(actualField.getAllProperties().get("isPrimaryKey")),
                 is(nullToFalse(intendedField.getAllProperties().get("isPrimaryKey"))));
 
-        for (ConditionalFormat intendedFormat : intendedField.getConditionalFormats())
-        {
-            ConditionalFormat actualFormat = intendedField.getConditionalFormats().stream()
-                    .filter(a-> a.toJSON().equals(intendedFormat.toJSON())).findFirst().orElse(null);
-            assertNotNull("conditional formats did not export with full fidelity", actualFormat);
-        }
+        Assertions.assertThat(actualField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()))
+                .as("Exported conditional fields.")
+                .containsExactlyElementsOf(intendedField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()).toList());
+
         // would like to do validators, but this part of the remoteAPI is incomplete; validators are settable
         // on FieldDefinition, but not gettable on PropertyDescriptor
     }
@@ -1721,19 +1722,21 @@ public class DomainDesignerTest extends BaseWebDriverTest
         return val == null ? false : val;
     }
 
-    private ArrayListMap<String, PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws Exception
+    private ArrayListMap<String, PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws IOException
     {
-        JSONParser parser = new JSONParser();
-        JSONArray  jsonArray = (JSONArray) parser.parse(new FileReader(exportFile));
-
-        ArrayListMap<String, PropertyDescriptor> exportFields = new ArrayListMap<>();
-        for (int i=0; i < jsonArray.size(); i++)
+        try (Reader reader = new FileReader(exportFile, StandardCharsets.UTF_8))
         {
-            PropertyDescriptor field = new PropertyDescriptor((JSONObject) jsonArray.get(i));
-            exportFields.put(field.getName(), field);
-        }
+            JSONArray jsonArray = new JSONArray(new JSONTokener(reader));
+            ArrayListMap<String, PropertyDescriptor> exportFields = new ArrayListMap<>();
 
-        return exportFields;
+            for (int i=0; i < jsonArray.length(); i++)
+            {
+                PropertyDescriptor field = new PropertyDescriptor(jsonArray.getJSONObject(i));
+                exportFields.put(field.getName(), field);
+            }
+
+            return exportFields;
+        }
     }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)

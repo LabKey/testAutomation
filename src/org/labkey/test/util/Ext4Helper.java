@@ -808,27 +808,24 @@ public class Ext4Helper
         }
 
         /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         * Consider using {@link org.labkey.test.components.ext4.Window}
          */
-        @Deprecated
         public static Locator.XPathLocator window()
         {
             return Window.Locators.window();
         }
 
         /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         * Consider using {@link org.labkey.test.components.ext4.Window}
          */
-        @Deprecated
         public static Locator.XPathLocator window(String title)
         {
             return window().withDescendant(Window.Locators.title().withText(title));
         }
 
         /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         * Consider using {@link org.labkey.test.components.ext4.Window}
          */
-        @Deprecated
         public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)
         {
             return window(windowTitle).append(ext4Button(buttonText));

@@ -15,28 +15,36 @@
  */
 package org.labkey.remoteapi.reports;
 
+import org.json.JSONObject;
 import org.labkey.remoteapi.ResponseObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Category extends ResponseObject
 {
-    private List<Category> _subcategories;
+    private final List<Category> _subcategories = new ArrayList<>();
+    private final Integer _rowId;
+    private String _label;
+    private Integer _displayOrder;
+    private Integer _parent;
 
     public Category(String label)
     {
-        this(new HashMap<>(Map.of("label", label)));
+        super(null);
+        _label = label;
+        _rowId = null;
     }
 
     Category(Map<String, Object> map)
     {
         super(map);
-        _subcategories=new ArrayList<>();
+        _rowId = (Integer) map.get("rowId");
+        _label = (String) map.get("label");
+        _displayOrder = (Integer) map.get("displayOrder");
+        _parent = (Integer) map.get("parent");
         List<Map<String, Object>> subCategories = (List<Map<String, Object>>) map.getOrDefault("subCategories", Collections.emptyList());
         for (Map<String, Object> subcategoryMap : subCategories)
         {
@@ -44,47 +52,51 @@ public class Category extends ResponseObject
         }
     }
 
-    public void addSubcategories(String... labels)
+    public JSONObject toJSONObject()
     {
-        for (String label : labels)
-        {
-            _subcategories.add(new Category(label));
-        }
+        JSONObject json = new JSONObject();
+        json.put("label", _label);
+        json.put("rowId", _rowId);
+        json.put("displayOrder", _displayOrder);
+        json.put("parent", _parent);
+
+        return json;
     }
 
-    public void addSubcategories(Category... categories)
+    public Integer getParent()
     {
-        _subcategories.addAll(Arrays.asList(categories));
+        return _parent;
     }
 
-    public Long getParent()
+    public Category setParent(Integer parent)
     {
-        return (Long)getAllProperties().get("parent");
+        _parent = parent;
+        return this;
     }
 
     public String getLabel()
     {
-        return (String)getAllProperties().get("label");
+        return _label;
     }
 
     public void setLabel(String newLabel)
     {
-        super.getAllProperties().replace("label", newLabel);
+        _label = newLabel;
     }
 
-    public Long getDisplayOrder()
+    public Integer getDisplayOrder()
     {
-        return (Long)getAllProperties().get("displayOrder");
+        return _displayOrder;
     }
 
-    public void setDisplayOrder(Long displayOrdinal)
+    public void setDisplayOrder(Integer displayOrdinal)
     {
-        super.getAllProperties().replace("displayOrder", displayOrdinal);
+        _displayOrder = displayOrdinal;
     }
 
-    public Long getRowId()
+    public Integer getRowId()
     {
-        return (Long)getAllProperties().get("rowid");
+        return _rowId;
     }
 
     public List<Category> getSubcategories()
