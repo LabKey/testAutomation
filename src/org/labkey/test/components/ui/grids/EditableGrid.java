@@ -199,6 +199,32 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Find the first row index containing the text value in the given column.
+     * If not found -1 is returned.
+     *
+     * @param columnLabel Column label to look at.
+     * @param text Text to look for (must match exactly).
+     * @return The first row index where found, -1 if not found.
+     */
+    public Integer getRowIndex(String columnLabel, String text)
+    {
+        int index = -1;
+
+        List<String> columnData = getColumnData(columnLabel);
+        for(int i = 0; i < columnData.size(); i++)
+        {
+            if(columnData.get(i).equals(text))
+            {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+
+    /**
      * Get the td element for a cell.
      *
      * @param row The 0 based row index.
