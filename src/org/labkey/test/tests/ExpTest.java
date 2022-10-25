@@ -29,7 +29,6 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.openqa.selenium.WebElement;
 
 import java.text.DateFormat;
@@ -80,13 +79,15 @@ public class ExpTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment", "Query"});
-        new WebDavUploadHelper(PROJECT_NAME + "/" + FOLDER_NAME)
-                .uploadDirectoryContents(TestFileUtils.getSampleData("xarfiles/expVerify"));
         new PortalHelper(this)
                 .doInAdminMode(portalHelper -> {
                     portalHelper.addWebPart("Data Pipeline");
                     portalHelper.addWebPart("Run Groups");
                 });
+        clickButton("Setup");
+        // Don't upload file. Uploading file creates 'exp.Data' entries that we don't want.
+        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getAbsolutePath());
+        clickFolder(FOLDER_NAME);
 
         clickButton("Process and Import Data");
 
