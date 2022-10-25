@@ -14,7 +14,7 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 {
     private static final Locator.XPathLocator NAME_LOC = Locator.XPathLocator.union(
             Locator.tagWithClass("a", "lineage-link"),
-            Locator.tagWithClass("span", "lineage-sm-name"));
+            Locator.tag("span"));
 
     final WebElement _el;
     final WebDriver _driver;
