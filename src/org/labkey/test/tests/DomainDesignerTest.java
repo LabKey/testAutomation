@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONArray;
 import org.json.JSONTokener;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -1367,7 +1366,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now confirm 2 validators on the field
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
 
         // Domain designer UI only handles Range, Regex and Lookup validators
         validators = validators.stream().filter(val ->
@@ -1438,7 +1437,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now verify we have 2 formats on the size field
         DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor updatedSizeCol = getColumn(updatedResponse.getDomain(), "size");
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
         assertEquals("expect only 2 validators on the field",2, validators.size());
         Map<String, Object> editedLte2 = getPropertyValidator(updatedSizeCol, "lte2");
         Map<String, Object> editedEquals3 = getPropertyValidator(updatedSizeCol, "equals3");
@@ -1501,7 +1500,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse validationResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");
 
-        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
+        List<Map<String, Object>> formats = (List<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
         assertEquals(2, formats.size());
 
         Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~eq=Thor");
@@ -1750,7 +1749,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     public Map<String, Object> getPropertyValidator(PropertyDescriptor column, String name)
     {
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
         Map<String, Object> validator = validators.stream()
                 .filter(a-> a.get("name").equals(name))
                 .findFirst().orElse(null);
@@ -1760,7 +1759,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
     {
-        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        List<Map<String, Object>> formats = (List<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
         Map<String, Object> conditionalFormat = formats.stream()
                 .filter(a-> a.get("filter").equals(filterExpression))
                 .findFirst().orElse(null);
