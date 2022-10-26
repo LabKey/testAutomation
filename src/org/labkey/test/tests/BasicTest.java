@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Short test to verify installed modules are well formed
+ * Short test to verify installed modules are well-formed
  */
 @Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class, Smoke.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -61,48 +61,6 @@ public class BasicTest extends BaseWebDriverTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    @Test
-    public void testCredits()
-    {
-        // Navigate to the credits page and verify that all external components are documented
-        beginAt(WebTestHelper.buildURL("admin", "credits"));
-        Locator.XPathLocator warningLoc = Locator.tagWithClass("div", "labkey-wiki").containing("WARNING:");
-        List<WebElement> warningWebparts = Locator.tagWithClass("table", "labkey-wp").withDescendant(warningLoc).findElements(getDriver());
-        if (warningWebparts.size() > 0)
-        {
-            List<String> badModules = new ArrayList<>();
-            for (WebElement wpEl : warningWebparts)
-            {
-                WebPart webPart = new BodyWebPart(getDriver(), wpEl);
-                String title = webPart.getTitle();
-                Pattern moduleNamePattern = Pattern.compile(".* ([^\\s]+) Module");
-                Matcher matcher = moduleNamePattern.matcher(title);
-                String module;
-                if(matcher.find())
-                    module = matcher.group(1);
-                else
-                    module = "<unknown>";
-                log("Warning for " + module + " Module: " + warningLoc.findElement(wpEl).getText());
-                if (!ignoreCreditsWarnings(module))
-                    badModules.add(module);
-            }
-            assertTrue("Credits page is not up-to-date. See log for more details", badModules.isEmpty());
-        }
-        else
-        {
-            warningLoc.findElements(getDriver()).forEach((e)->log(e.getText()));
-            assertTextNotPresent("WARNING:"); // In case the page format changes. Update test if this fails
-        }
-    }
-
-    private boolean ignoreCreditsWarnings(String moduleName)
-    {
-        Set<String> ignoredModules = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
-        // This set isn't expected to change much, so just hard code it for now
-        ignoredModules.addAll(Arrays.asList("elispot", "pepdb", "peptide", "specimen_tracking"));
-        return ignoredModules.contains(moduleName);
     }
 
     @Test
