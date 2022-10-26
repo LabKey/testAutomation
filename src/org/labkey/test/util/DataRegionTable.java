@@ -1306,6 +1306,20 @@ public class DataRegionTable extends DataRegion
         getViewsMenu().clickSubMenu(true, "Folder Filter", filterType.getLabel());
     }
 
+    public String getContainerFilter()
+    {
+        getViewsMenu().openMenuTo("Folder Filter", "Folder Filter");
+        var visibleFilterMenuItemOptions = getViewsMenu().findVisibleMenuItems();
+        for (WebElement el : visibleFilterMenuItemOptions)
+        {
+            if (Locator.tagWithClass("i", "fa-check-square-o").existsIn(el))
+            {
+                return el.getText();   // would be nice if enum.valueOf() allowed us to get the enum constant from its text but oh java you crazy
+            }
+        }
+        return null;
+    }
+
     /**
      * Set the current offset by manipulating the url rather than using the pagination buttons.
      */
@@ -1516,7 +1530,7 @@ public class DataRegionTable extends DataRegion
         private List<WebElement> summaryStatCells;
         private final WebElement toggleHeaderCell = Locator.tag("th").withClasses("labkey-column-header", "labkey-selectors").findWhenNeeded(columnHeaderRow);
         private final WebElement toggleAllOnPage = Locator.input(".toggle").findWhenNeeded(toggleHeaderCell); // tri-state checkbox
-        private SelectorMenu selectionMenu = new SelectorMenu(toggleHeaderCell);
+        private final SelectorMenu selectionMenu = new SelectorMenu(toggleHeaderCell);
 
         protected List<WebElement> getDataRows()
         {
