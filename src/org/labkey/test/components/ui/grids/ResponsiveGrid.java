@@ -261,7 +261,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
         toggle.click();
 
-        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(headerCell);
+        // Use getDriver() because the grid menus are rendered in a "react portal" at the end of the HTML body, so they
+        // are totally detached from the rest of the grid.
+        WebElement menu = Locator.css("ul.grid-header-cell__dropdown-menu.open").findWhenNeeded(getDriver());
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(menu);
         waitFor(menuItem::isDisplayed, 1000);
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
@@ -723,7 +726,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         {
             if (!headerCells.containsKey(headerText))
             {
-                WebElement headerCell = Locator.tagWithClass("th", "grid-header-cell")
+                WebElement headerCell = Locator.tagWithClass("div", "grid-header-cell__body")
                         .withChild(Locator.tag("span").startsWith(headerText)).findElement(this);
                 headerCells.put(headerText, headerCell);
             }
