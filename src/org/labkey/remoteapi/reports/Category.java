@@ -41,7 +41,7 @@ public class Category extends ResponseObject
     Category(Map<String, Object> map)
     {
         super(map);
-        _rowId = (Integer) map.get("rowId");
+        _rowId = (Integer) map.get("rowid");
         _label = (String) map.get("label");
         _displayOrder = (Integer) map.get("displayOrder");
         _parent = (Integer) map.get("parent");
@@ -56,7 +56,7 @@ public class Category extends ResponseObject
     {
         JSONObject json = new JSONObject();
         json.put("label", _label);
-        json.put("rowId", _rowId);
+        json.put("rowid", _rowId);
         json.put("displayOrder", _displayOrder);
         json.put("parent", _parent);
 
