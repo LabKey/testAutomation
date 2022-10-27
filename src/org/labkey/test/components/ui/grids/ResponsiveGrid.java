@@ -656,8 +656,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public boolean getColumnPHIProtected(String columnText)
     {
-        return elementCache().getColumnHeaderCell(columnText)
-                .getAttribute("class").contains("phi-protected");
+        WebElement columnHeader = Locator.tagWithClass("th", "grid-header-cell")
+                .withDescendant(Locators.headerCellBody(columnText)).findElement(this);
+        return columnHeader.getAttribute("class").contains("phi-protected");
     }
 
     /**
@@ -726,8 +727,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         {
             if (!headerCells.containsKey(headerText))
             {
-                WebElement headerCell = Locator.tagWithClass("div", "grid-header-cell__body")
-                        .withChild(Locator.tag("span").startsWith(headerText)).findElement(this);
+                WebElement headerCell = Locators.headerCellBody(headerText).findElement(this);
                 headerCells.put(headerText, headerCell);
             }
             return headerCells.get(headerText);
@@ -857,7 +857,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
         static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
-
+        static public Locator.XPathLocator headerCellBody(String headerText)
+        {
+            return Locator.tagWithClass("div", "grid-header-cell__body")
+                    .withChild(Locator.tag("span").startsWith(headerText));
+        }
     }
 
     public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid, ResponsiveGridFinder>
