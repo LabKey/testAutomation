@@ -11,7 +11,9 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -184,10 +186,14 @@ public class CustomizeGridViewDialog extends ModalDialog
                 listItem.isDisplayed());
 
         String iconClass = expand ? "fa-plus-square" : "fa-minus-square";
+        String oppositeIconClass = !expand ? "fa-plus-square" : "fa-minus-square";
 
         WebElement expandIcon = Locator.tagWithClass("div", "field-expand-icon")
                 .withChild(Locator.tagWithClass("i", iconClass))
                 .findElement(listItem);
+        Locator oppositeIcon = Locator.tagWithClass("div", "field-expand-icon")
+                .withChild(Locator.tagWithClass("i", oppositeIconClass));
+
 
         String errorMessage;
 
@@ -197,9 +203,7 @@ public class CustomizeGridViewDialog extends ModalDialog
             errorMessage = String.format("There is no collapse icon for field with data-fieldkey attribute '%s' in the 'Available Fields' panel.", fieldKey);
 
         Assert.assertTrue(errorMessage, listItem.isDisplayed());
-
-        expandIcon.click();
-
+        getWrapper().doAndWaitForElementToRefresh(expandIcon::click, () -> oppositeIcon.findElement(listItem), new WebDriverWait(getDriver(), Duration.ofSeconds(1)));
     }
 
     /**
