@@ -69,6 +69,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
         // expect the UI to refuse
         var listEditPage = new ListHelper(getDriver()).beginCreateList(SUBFOLDER_A_PATH, listName);
         listEditPage.addField(new FieldDefinition("field", FieldDefinition.ColumnType.String));
+        listEditPage.selectAutoIntegerKeyField();
         var errors = listEditPage.clickSaveExpectingErrors();
 
         assertThat(errors).as("error should explain that our list name is already in use")
@@ -87,7 +88,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
 
         // expect default folder filter to be "current folder, project, and shared project"
         assertThat(listsPage.getGrid().getContainerFilter()).as("expect current, project, shared")
-                .isEqualTo("Current folder, project, and Shared project");
+                .isEqualTo(DataRegionTable.ContainerFilterType.CURRENT_PLUS_PROJECT_AND_SHARED);
     }
 
     @Test
@@ -115,14 +116,12 @@ public class CrossFolderListTest extends BaseWebDriverTest
 
         // click the 'stringy' link in the record we put into the shared list
         clickAndWait(Locator.linkWithText("stringy"));  // the presence of this link confirms data in this view
-        assertThat(getURL().toString()).as("expect data url to be in project, is not in /Shared")
-                .contains("CrossFolderListTest")
-                .doesNotContain("Shared");
-        // now click on the list link, expecting that to navigate us to where it is defined, in ths /Shared folder
+        assertThat(getCurrentContainerPath()).as("expect data url to be in project, is not in /Shared")
+                . isEqualTo("/" + getProjectName());
+        // now click on the list link, expecting that to navigate us to where it is defined, in the /Shared folder
         clickAndWait(Locator.linkWithText(SHARED_LIST));
-        assertThat(getURL().toString()).as("expect link to shared list to navigate to shared folder")
-                .doesNotContain("CrossFolderListTest")
-                .contains("Shared");
+        assertThat(getCurrentContainerPath()).as("expect link to shared list to navigate to shared folder")
+                .isEqualTo("/Shared");
 
         // navigate to lists in the subfolderA
         navigateToFolder(getProjectName(), SUBFOLDER_A);

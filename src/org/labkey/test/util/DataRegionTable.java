@@ -1306,7 +1306,7 @@ public class DataRegionTable extends DataRegion
         getViewsMenu().clickSubMenu(true, "Folder Filter", filterType.getLabel());
     }
 
-    public String getContainerFilter()
+    public ContainerFilterType getContainerFilter()
     {
         getViewsMenu().openMenuTo("Folder Filter", "Folder Filter");
         var visibleFilterMenuItemOptions = getViewsMenu().findVisibleMenuItems();
@@ -1314,7 +1314,7 @@ public class DataRegionTable extends DataRegion
         {
             if (Locator.tagWithClass("i", "fa-check-square-o").existsIn(el))
             {
-                return el.getText();   // would be nice if enum.valueOf() allowed us to get the enum constant from its text but oh java you crazy
+                return ContainerFilterType.fromLabel(el.getText());
             }
         }
         return null;
@@ -1692,6 +1692,12 @@ public class DataRegionTable extends DataRegion
         ContainerFilterType(String label)
         {
             _label = label;
+        }
+
+        public static ContainerFilterType fromLabel(String label)
+        {
+            return Arrays.stream(ContainerFilterType.values())
+                    .filter(a-> a.getLabel().equals(label)).findFirst().orElse(null);
         }
 
         public String getLabel()
