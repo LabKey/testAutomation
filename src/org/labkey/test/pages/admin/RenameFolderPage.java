@@ -14,10 +14,10 @@ public class RenameFolderPage extends LabKeyPage<RenameFolderPage.ElementCache>
         super(driver);
     }
 
-    public static ReorderFoldersPage beginAt(WebDriverWrapper driver, String containerPath)
+    public static RenameFolderPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "renameFolder"));
-        return new ReorderFoldersPage(driver.getDriver());
+        return new RenameFolderPage(driver.getDriver());
     }
 
     public String getProjectName()
