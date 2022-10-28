@@ -50,7 +50,7 @@ public class SaveCategoriesCommand extends PostCommand<CommandResponse>
         JSONArray jsonArray = new JSONArray();
         for (org.labkey.remoteapi.reports.Category cat : _categories)
         {
-            jsonArray.put(cat.getAllProperties());
+            jsonArray.put(cat.toJSONObject());
         }
         jsonObject.put("categories", jsonArray);
         return jsonObject;
