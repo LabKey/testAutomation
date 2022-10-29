@@ -1353,6 +1353,42 @@ public class GridPanelTest extends GridPanelBaseTest
         columns.add(FILTER_INT_COL);
         validateExportedColumnHeader(exportedFile, columns, removedColumns);
 
+        // Test for Issue 46465 (Sample export do not respect filter when samples have been selected)
+        grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+
+        grid.clearAllSelections()
+                .clearFilters();
+
+        grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, NUMBER_STRING);
+        grid.selectAllOnPage(true);
+
+        int rowsCountBefore = grid.getRecordCount();
+
+        grid.filterColumn(FILTER_INT_COL, Filter.Operator.GT, 10);
+
+        int rowCountAfter = grid.getRecordCount();
+
+        // If the filters did not generate the needed data don't continue.
+        if(checker().verifyTrue("Applying the second filter did not provide the expected number of rows. Cannot continue.",
+                (rowCountAfter < rowsCountBefore) && (rowCountAfter > 0)))
+        {
+
+            List<Map<String, Object>> expectedData = new ArrayList<>();
+
+            List<String> intColData = grid.getColumnDataAsText(FILTER_INT_COL);
+
+            for(String colValue : intColData)
+            {
+                // All the rows will have the same value in the string column (FILTER_STRING_COL).
+                expectedData.add(Map.of(FILTER_STRING_COL, NUMBER_STRING,
+                        FILTER_INT_COL, colValue));
+            }
+
+            exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
+
+            validateExportedData(exportedFile, expectedData, Arrays.asList(FILTER_STRING_COL, FILTER_INT_COL));
+        }
+
     }
 
     /**
