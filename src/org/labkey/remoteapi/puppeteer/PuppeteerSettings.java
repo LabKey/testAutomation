@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.puppeteer;
 
-import org.json.old.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 public class PuppeteerSettings
@@ -103,9 +103,9 @@ public class PuppeteerSettings
         _remoteUrl = remoteUrl;
     }
 
-    public org.json.JSONObject toJSON()
+    public JSONObject toJSON()
     {
-        var settings = new org.json.JSONObject();
+        var settings = new JSONObject();
 
         if (getEnabled() != null)
             settings.put("enabled", getEnabled());
@@ -118,7 +118,7 @@ public class PuppeteerSettings
         if (getRemoteUrl() != null)
             settings.put("remote.url", getRemoteUrl());
 
-        var payload = new org.json.JSONObject();
+        var payload = new JSONObject();
         payload.put("settings", settings);
 
         return payload;
