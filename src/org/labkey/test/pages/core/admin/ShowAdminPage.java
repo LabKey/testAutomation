@@ -237,7 +237,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement systemMaintenanceLink = Locator.linkWithText("system maintenance").findWhenNeeded(this);
         protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
         protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
-        protected WebElement creditsLink = Locator.linkWithText("credits").findElementOrNull(this);
+        protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {
