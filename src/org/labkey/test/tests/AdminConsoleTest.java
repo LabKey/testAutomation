@@ -223,6 +223,18 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
     }
 
+    /*
+       Test coverage : Issue 46587: Add test for display of credits page
+       https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=46587
+    */
+    @Test
+    public void testAdminConsoleCredits()
+    {
+        goToAdminConsole().clickCredits();
+        log("Verifying the page is properly loaded");
+        assertTextPresent("JAR Files Distributed with the API Module");
+    }
+
     @Override
     public List<String> getAssociatedModules()
     {
