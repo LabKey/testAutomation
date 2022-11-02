@@ -43,7 +43,7 @@ public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCac
 
     public List<String> getMemberships()
     {
-        var membersList = Locator.tagWithClass("div", "principal-detail-label").withText("Member of:")
+        var membersList = Locator.tagWithClass("div", "principal-detail-label").withText("Member of")
                 .followingSibling("ul").findElement(this);
         return getWrapper().getTexts(Locator.tag("li").findElements(membersList));
     }
