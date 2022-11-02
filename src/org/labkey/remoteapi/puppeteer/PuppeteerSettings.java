@@ -18,6 +18,8 @@ package org.labkey.remoteapi.puppeteer;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
+import java.util.Map;
+
 public class PuppeteerSettings
 {
     private Boolean _enabled;
@@ -50,7 +52,7 @@ public class PuppeteerSettings
 
     public PuppeteerSettings(CommandResponse response)
     {
-        this(new JSONObject(response.getParsedData().get("data")));
+        this(new JSONObject((Map<String, Object>)response.getParsedData().get("data")));
     }
 
     public Boolean getEnabled()
