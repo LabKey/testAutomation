@@ -36,19 +36,10 @@ public class PuppeteerSettings
     public PuppeteerSettings(JSONObject json)
     {
         this();
-        TestLogger.log(json.toString());
         _enabled = json.getBoolean("enabled");
         _mode = json.getString("mode");
-        _dockerImage = json.getString("docker.image");
-
-        try
-        {
-            _dockerPort = Integer.parseInt(json.getString("docker.port"));
-        }
-        catch (NumberFormatException ignored)
-        {
-        }
-
+        _dockerImage = json.optString("docker.image", null);
+        _dockerPort = json.optInt("docker.port");
         _remoteUrl = json.getString("remote.url");
     }
 
