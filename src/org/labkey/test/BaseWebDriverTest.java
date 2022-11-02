@@ -109,6 +109,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -609,11 +610,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         setServerDebugLogging();
         setExperimentalFlags();
 
-        if (!TestProperties.isPrimaryUserAppAdmin())
-        {
-            WebTestHelper.setNoQuestionMarkUrl(ExperimentalFeaturesHelper.isNoQuestionMarkMode(createDefaultConnection()));
-        }
-
         // Start logging JS errors.
         resumeJsErrorChecker();
 
@@ -1006,9 +1002,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 try
                 {
                     Path path = Paths.get(notEmpty.getFile());
-                    List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
-                            .filter(s -> !s.isEmpty()).collect(Collectors.toList());
-                    TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    try (Stream<Path> paths = Files.walk(path))
+                    {
+                        List<String> subdirs = paths.map(p -> path.relativize(p).toString())
+                            .filter(s -> !s.isEmpty()).toList();
+                        TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    }
                     getArtifactCollector().dumpHeap();
                 }
                 catch (IOException e)
