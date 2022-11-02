@@ -39,7 +39,7 @@ project.dependencies {
     api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
     api("org.hamcrest:hamcrest-core:${hamcrestCoreVersion}")
     implementation("org.apache.commons:commons-text:${commonsTextVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
     implementation("net.sf.opencsv:opencsv:${opencsvVersion}")
     implementation("javax.servlet:javax.servlet-api:${servletApiVersion}")
