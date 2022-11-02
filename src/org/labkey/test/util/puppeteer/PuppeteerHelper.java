@@ -18,10 +18,9 @@ package org.labkey.test.util.puppeteer;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.test.WebTestHelper;
 import org.labkey.remoteapi.puppeteer.PuppeteerSettings;
 import org.labkey.remoteapi.puppeteer.PuppeteerStatus;
-import org.labkey.test.util.TestLogger;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 
@@ -55,7 +54,6 @@ public class PuppeteerHelper
         updateCmd.setRequiredVersion(0);
         updateCmd.setJsonObject(settings.toJSON());
         var response = updateCmd.execute(connection, "/");
-        TestLogger.log(response.toString());
         return new PuppeteerSettings(response);
     }
 }

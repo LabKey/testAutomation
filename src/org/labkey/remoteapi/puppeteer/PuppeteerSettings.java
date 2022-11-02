@@ -17,6 +17,7 @@ package org.labkey.remoteapi.puppeteer;
 
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
+import org.labkey.test.util.TestLogger;
 
 import java.util.Map;
 
@@ -35,6 +36,7 @@ public class PuppeteerSettings
     public PuppeteerSettings(JSONObject json)
     {
         this();
+        TestLogger.log(json.toString());
         _enabled = json.getBoolean("enabled");
         _mode = json.getString("mode");
         _dockerImage = json.getString("docker.image");
