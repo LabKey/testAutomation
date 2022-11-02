@@ -227,6 +227,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
+            getWrapper().scrollIntoView(elementCache().collapseToggle);
             elementCache().collapseToggle.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
             WebDriverWrapper.waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
