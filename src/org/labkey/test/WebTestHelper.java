@@ -103,18 +103,12 @@ public class WebTestHelper
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
-    private static boolean NO_QUESTION_MARK_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
     private static final Map<String, String> savedSessionKeys = new HashMap<>();
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
         USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
-    }
-
-    public static void setNoQuestionMarkUrl(boolean noQuestionMarkUrl)
-    {
-        NO_QUESTION_MARK_URL = noQuestionMarkUrl;
     }
 
     /**
@@ -171,11 +165,6 @@ public class WebTestHelper
     public static boolean isUseContainerRelativeUrl()
     {
         return USE_CONTAINER_RELATIVE_URL;
-    }
-
-    public static boolean isNoQuestionMarkUrl()
-    {
-        return NO_QUESTION_MARK_URL;
     }
 
     private static void acceptLocalhostCert() throws Exception
