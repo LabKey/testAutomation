@@ -18,9 +18,9 @@ package org.labkey.test.util.puppeteer;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.test.WebTestHelper;
 import org.labkey.remoteapi.puppeteer.PuppeteerSettings;
 import org.labkey.remoteapi.puppeteer.PuppeteerStatus;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 
