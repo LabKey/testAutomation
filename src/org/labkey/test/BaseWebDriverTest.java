@@ -1588,7 +1588,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         map.put("moduleName", property.getModuleName());
         map.put("containerPath", property.getContainerPath());
         map.put("propName", property.getPropertyName());
-        waitForText(property.getPropertyName()); //wait for the property name to appear
+        waitForText(property.getPropertyLabel()); //wait for the property name to appear
         String query = ComponentQuery.fromAttributes("field", map);
         return _ext4Helper.queryOne(query, Ext4FieldRef.class);
     }
