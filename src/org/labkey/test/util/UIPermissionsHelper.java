@@ -86,8 +86,8 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
         _driver.waitForElement(Locator.name("names"));
-        _driver.setFormElement(Locator.name("names"), namesList.toString());
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
+        _driver.setFormElement(Locator.name("names"), namesList.toString());
 
         Integer groupId = Integer.parseInt(WebTestHelper.parseUrlQuery(_driver.getURL()).get("id"));
         _driver.clickButton("Update Group Membership");
@@ -446,8 +446,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     public void addUserToGroupFromGroupScreen(String userName)
     {
         _driver.waitForElement(Locator.name("names"));
-        _driver.setFormElement(Locator.name("names"), userName);
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
+        _driver.setFormElement(Locator.name("names"), userName);
         _driver.clickButton("Update Group Membership");
     }
 
