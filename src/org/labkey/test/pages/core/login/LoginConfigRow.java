@@ -83,11 +83,11 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         final WebElement provider = Locator.tagWithClass("div", "provider").findWhenNeeded(baseFieldsElement);
 
         WebElement statusElement = Locator.tagWithClass("div", "col-xs-7")
-                .withChild(Locator.tagWithClass("svg", "fa-circle")).findWhenNeeded(this);
+                .withChild(Locator.tagWithClass("span", "fa-circle")).findWhenNeeded(this);
 
-        final WebElement deleteButton = Locator.tagWithClass("svg", "fa-times-circle")
+        final WebElement deleteButton = Locator.tagWithClass("span", "fa-times-circle")
                 .findWhenNeeded(this).withTimeout(2000);
-        Locator editButtonLoc = Locator.tagWithClass("svg", "fa-pencil-alt");
+        Locator editButtonLoc = Locator.tagWithClass("span", "fa-pencil-alt");
         final WebElement editButton = editButtonLoc.findWhenNeeded(this).withTimeout(2000);
     }
 
