@@ -24,7 +24,7 @@ project.dependencies {
     api("org.assertj:assertj-core:${assertjVersion}")
     implementation("commons-io:commons-io:${commonsIoVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
-    implementation("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")
+    implementation("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
 
     //api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}")
@@ -57,7 +57,7 @@ project.dependencies {
     api "org.apache.poi:poi:${poiVersion}"
     implementation "org.apache.poi:poi-ooxml:${poiVersion}"
     implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
-    implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
+    implementation "org.bouncycastle:bcpg-jdk18on:${bouncycastlePgpVersion}"
     implementation "org.jetbrains:annotations:${annotationsVersion}"
     implementation "org.mock-server:mockserver-netty:${mockserverNettyVersion}" // used by test classes in accounts
     runtimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
