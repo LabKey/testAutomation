@@ -87,7 +87,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
         final WebElement deleteButton = Locator.tagWithClass("span", "fa-times-circle")
                 .findWhenNeeded(this).withTimeout(2000);
-        Locator editButtonLoc = Locator.tagWithClass("span", "fa-pencil-alt");
+        Locator editButtonLoc = Locator.tagWithClass("span", "fa-pencil");
         final WebElement editButton = editButtonLoc.findWhenNeeded(this).withTimeout(2000);
     }
 
