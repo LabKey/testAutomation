@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -1412,25 +1413,31 @@ public class SampleTypeTest extends BaseWebDriverTest
     public void testCreateViaScript()
     {
         String sampleTypeName = "Created_by_Script";
-        String createScript = "LABKEY.Domain.create({\n" +
-                "  domainKind: \"SampleSet\",\n" +
-                "  domainDesign: {\n" +
-                "    name: \"" + sampleTypeName +"\",\n" +
-                "    fields: [{\n" +
-                "       name: \"name\", rangeURI: \"string\"\n" +
-                "    },{\n" +
-                "       name: \"intField\", rangeURI: \"int\"\n" +
-                "    },{\n" +
-                "       name: \"strField\", rangeURI: \"string\"\n" +
-                "    }]\n" +
-                "  }\n" +
-                "});";
+        String createScript = String.format("""
+                LABKEY.Domain.create({
+                  domainKind: "SampleSet",
+                  domainDesign: {
+                    name: "%s",
+                    fields: [{
+                       name: "name", rangeURI: "string"
+                    },{
+                       name: "intField", rangeURI: "int"
+                    },{
+                       name: "strField", rangeURI: "string"
+                    }]
+                  },
+                  success: callback,
+                  failure: callback
+                });
+                """, sampleTypeName);
 
         log("Go to project home.");
         goToProjectHome();
 
         log("Create a Sample Type using script.");
-        executeScript(createScript);
+        Map<String, Object> response = executeAsyncScript(createScript, Map.class);
+        Assertions.assertThat(response).as("'LABKEY.Domain.create' response")
+                .containsEntry("success", true);
 
         List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
         List<Map<String, String>> sampleData = new ArrayList<>();
