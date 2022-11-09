@@ -102,7 +102,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     private boolean isPaneExpanded(WebElement expandCollapsePane)
     {
-        return Locator.tagWithClass("svg", "fa-angle-down").existsIn(expandCollapsePane);
+        return Locator.tagWithClass("span", "fa-angle-down").existsIn(expandCollapsePane);
     }
 
     public AdvancedListSettingsDialog setIndexFileAttachments(boolean checked)
