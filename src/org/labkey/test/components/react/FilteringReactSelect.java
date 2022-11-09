@@ -85,7 +85,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
         try
         {
-            getWrapper().scrollIntoView(optionToClick);
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
             optionToClick.click();
         }
