@@ -85,7 +85,10 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
     public ReactDatePicker clickTime(String time)
     {
         expand();
-        elementCache().timeListItem(time).click();
+        WebElement liElement = Locator.tagWithClass("ul", "react-datepicker__time-list")
+                .child(Locator.tagWithText("li", time)).findElement(elementCache().popup);
+        getWrapper().fireEvent(liElement, WebDriverWrapper.SeleniumEvent.click);
+
         WebDriverWrapper.waitFor(()-> !isExpanded(), "Date picker didn't close", 1000);
         return this;
     }
@@ -147,20 +150,9 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         WebElement popup = Locator.xpath(".").followingSibling("div").withClass("react-datepicker__tab-loop")
                 .refindWhenNeeded(this);
 
-        WebElement timeList = Locator.tagWithClass("div", "react-datepicker__time-box")
-                    .child(Locator.tagWithClass("ul", "react-datepicker__time-list"))
-                    .refindWhenNeeded(popup);
-
-        WebElement timeListItem(String text)
-        {
-            return Locator.tagWithClass("li", "react-datepicker__time-list-item").withText(text)
-                    .findElement(timeList);
-        }
-
         /**
          * Return the date cell div of react datepicker
          * @param day '01', '02', ... '31'
-         * @return
          */
         WebElement datePickerDateCell(String day)
         {
