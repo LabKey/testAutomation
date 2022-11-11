@@ -86,7 +86,7 @@ public abstract class PermissionsRowBase<T extends PermissionsRowBase<T>> extend
     {
         expand();
         elementCache().userMemberSelect.select(email);
-        WebDriverWrapper.waitFor(()-> getMemberEmails().contains(email),
+        WebDriverWrapper.waitFor(()-> getMemberEmails().stream().anyMatch(a-> a.startsWith(email)),
                 "member was not added in time", 2000);
         return getThis();
     }
