@@ -44,7 +44,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -212,18 +211,15 @@ public class ReclickingWebElement extends WebElementDecorator
         }
         else
         {
-            Optional<ProjectMenu> projectMenu = ProjectMenu.finder(getDriver()).findOptional();
-            if (projectMenu.isPresent())
+            try
             {
-                try
-                {
-                    projectMenu.get().close(); // Project menu often gets in the way after scrolling
-                }
-                catch (WebDriverException ignore)
-                {
-                }
+                ProjectMenu.finder(getDriver()).findOptional().ifPresent(ProjectMenu::close); // Project menu often gets in the way after scrolling
             }
-            else if (!scrollUtil.scrollUnderFloatingHeader(el) && interceptingElInfo.getRight() != null)
+            catch (WebDriverException ignore) {}
+
+            scrollUtil.scrollUnderFloatingHeader(el);
+
+            if (interceptingElInfo.getRight() != null)
             {
                 List<WebElement> interceptingElements = interceptingElInfo.getRight().findElements(getDriver());
                 if (!interceptingElements.isEmpty())
