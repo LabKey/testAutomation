@@ -327,6 +327,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "text/csv");
                     profile.setPreference("pdfjs.disabled", true); // disable Firefox's built-in PDF viewer
                     profile.setPreference("pdfjs.enabledCache.state", false);
+                    profile.setPreference("widget.gtk.overlay-scrollbars.enabled", false); // Disable mini-scrollbars on Linux
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 

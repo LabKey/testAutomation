@@ -17,7 +17,6 @@ package org.labkey.test.selenium;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -201,43 +200,35 @@ public class ReclickingWebElement extends WebElementDecorator
     // Allows interaction with elements that have been obscured by floating headers or tooltips
     private void revealElement(WebElement el, String shortMessage)
     {
-        final WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
-        final Pair<String, Locator.XPathLocator> interceptingElInfo = parseInterceptingElementLoc(shortMessage);
-
-        if ("html".equalsIgnoreCase(interceptingElInfo.getLeft()))
+        try
         {
-            // Scroll bar sometimes blocks elements at the bottom of the page. Scroll up a little.
-            scrollUtil.scrollBy(0, 20);
+            ProjectMenu.finder(getDriver()).findOptional().ifPresent(ProjectMenu::close); // Project menu often gets in the way after scrolling
         }
-        else
+        catch (WebDriverException ignore) {}
+
+        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
+        scrollUtil.scrollUnderFloatingHeader(el);
+
+        Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
+        if (interceptingElLoc != null)
         {
-            try
+            List<WebElement> interceptingElements = interceptingElLoc.findElements(getDriver());
+            if (!interceptingElements.isEmpty())
             {
-                ProjectMenu.finder(getDriver()).findOptional().ifPresent(ProjectMenu::close); // Project menu often gets in the way after scrolling
-            }
-            catch (WebDriverException ignore) {}
-
-            scrollUtil.scrollUnderFloatingHeader(el);
-
-            if (interceptingElInfo.getRight() != null)
-            {
-                List<WebElement> interceptingElements = interceptingElInfo.getRight().findElements(getDriver());
-                if (!interceptingElements.isEmpty())
-                {
-                    final ExpectedCondition<?>[] expectations = (ExpectedCondition<?>[]) interceptingElements.stream()
-                            .map(interceptingElement -> ExpectedConditions.or(
-                                    LabKeyExpectedConditions.animationIsDone(interceptingElement),
-                                    ExpectedConditions.invisibilityOf(interceptingElement)
-                            )).toArray(ExpectedCondition[]::new);
-                    new WebDriverWait(getDriver(), Duration.ofSeconds(5))
-                            .until(ExpectedConditions.and(expectations));
-                }
+                final ExpectedCondition<?>[] expectations = (ExpectedCondition<?>[]) interceptingElements.stream()
+                        .map(interceptingElement -> ExpectedConditions.or(
+                                LabKeyExpectedConditions.animationIsDone(interceptingElement),
+                                ExpectedConditions.invisibilityOf(interceptingElement)
+                        )).toArray(ExpectedCondition[]::new);
+                new WebDriverWait(getDriver(), Duration.ofSeconds(5))
+                        .until(ExpectedConditions.and(expectations));
             }
         }
     }
 
-    private static Pair<String, Locator.XPathLocator> parseInterceptingElementLoc(String shortMessage)
+    private static Locator.XPathLocator parseInterceptingElementLoc(String shortMessage)
     {
+        Locator.XPathLocator interceptingElLoc = null;
         Matcher matcher = interceptingElPattern.matcher(shortMessage);
         if (matcher.matches())
         {
@@ -245,19 +236,15 @@ public class ReclickingWebElement extends WebElementDecorator
             String tag = matcher.group("tag");
             String attributes = matcher.group("attributes");
             Matcher attributeMatcher = elAttributePattern.matcher(attributes);
-            Locator.XPathLocator interceptingElLoc = Locator.tag(tag);
+            interceptingElLoc = Locator.tag(tag);
             while (attributeMatcher.find())
             {
                 String name = attributeMatcher.group("name");
                 String value = attributeMatcher.group("value");
                 interceptingElLoc = interceptingElLoc.withAttribute(name, value);
             }
-            return Pair.of(tag, interceptingElLoc);
         }
-        else
-        {
-            return Pair.of("", null);
-        }
+        return interceptingElLoc;
     }
 
     private Mutable<WebDriver> _webDriver = null;
@@ -270,13 +257,13 @@ public class ReclickingWebElement extends WebElementDecorator
         return _webDriver.getValue();
     }
 
-    public static class TempExceptionParser
+    public static class TempEceptionParser
     {
         @Test
-        public void testInterceptingElLoc()
+        public void testInterceptinElLoc()
         {
             final Locator.XPathLocator xPathLocator = parseInterceptingElementLoc("Element <a href=\"something\"> is not clickable at point (732,301) because another element " +
-                    "<div id=\"elId\" class=\"cls1 cls2\"> obscures it").getRight();
+                    "<div id=\"elId\" class=\"cls1 cls2\"> obscures it");
             Assert.assertEquals(Locator.tag("div").withAttribute("id", "elId").withAttribute("class", "cls1 cls2"), xPathLocator);
         }
     }
