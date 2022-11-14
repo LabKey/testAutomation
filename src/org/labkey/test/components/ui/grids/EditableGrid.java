@@ -427,6 +427,29 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
+     * @param row   the row
+     * @param columnName    name of the column
+     * @param value     value to insert
+     */
+    public void setNewSelectValue(int row, String columnName, String value)
+    {
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
+
+        // Select the cell.
+        selectCell(gridCell);
+
+        // Activate the cell.
+        activateCell(gridCell);
+
+        ReactSelect createSelect = elementCache().lookupSelect();
+
+        waitFor(()->createSelect.isInteractive() && !createSelect.isLoading(), "Select control is not ready.", 1_000);
+        createSelect.createValue(value);
+    }
+
+    /**
      * Search for a row and then clear the given cell (columnNameToClear) on the row.
      *
      * @param columnNameToSearch Column to search.
