@@ -102,7 +102,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     public boolean isBulkInsertVisible()
     {
-        return mode().equals("Enter Data Into Grid") &&
+        return mode().equals(PanelMode.EnterDataIntoGrid.getText()) &&
                 elementCache().bulkInsertBtnLoc.existsIn(this) &&
                 isElementVisible(elementCache().bulkInsertBtn);
     }
@@ -135,7 +135,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     public boolean isFileUploadVisible()
     {
-        return mode().equals("Upload Files") &&
+        return mode().equals(PanelMode.UploadFiles.getText()) &&
                 optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
     }
@@ -261,7 +261,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     public enum PanelMode
     {
-        UploadFiles("Import Data from Files"),
+        UploadFiles("Import Data from File"),
         EnterDataIntoGrid("Enter Data into Grid");
 
         private final String _text;
