@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class Checkbox extends Component implements FormItem<Boolean>
@@ -29,6 +30,12 @@ public class Checkbox extends Component implements FormItem<Boolean>
     public Checkbox(WebElement element)
     {
         _el = element;
+    }
+
+    public Checkbox(SearchContext context, String labelText)
+    {
+        WebElement label = Locator.tagWithText("label", labelText).findWhenNeeded(context);
+        _el = Locator.tagWithAttribute("input", "type", "checkbox").findWhenNeeded(label);
     }
 
     public static SimpleComponentFinder<Checkbox> Checkbox(Locator loc)

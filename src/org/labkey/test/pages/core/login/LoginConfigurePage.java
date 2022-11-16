@@ -3,9 +3,9 @@ package org.labkey.test.pages.core.login;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.params.login.AuthenticationProvider;
@@ -184,9 +184,9 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        ReactCheckBox selfSignupCheckBox = new ReactCheckBox(this, "Allow self sign up");
-        ReactCheckBox allowUserEmailEditCheckbox = new ReactCheckBox(this, "Allow users to edit their own email addresses");
-        ReactCheckBox autoCreateCheckBox = new ReactCheckBox(this,"Auto-create authenticated users");
+        Checkbox selfSignupCheckBox = new Checkbox(this, "Allow self sign up");
+        Checkbox allowUserEmailEditCheckbox = new Checkbox(this, "Allow users to edit their own email addresses");
+        Checkbox autoCreateCheckBox = new Checkbox(this,"Auto-create authenticated users");
         WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);

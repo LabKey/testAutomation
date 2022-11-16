@@ -3,7 +3,7 @@ package org.labkey.test.components.list;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
@@ -49,7 +49,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
                                                                        SearchIndexOptions indexOptions)
     {
         String labelText = "Index entire list as a single document";
-        new ReactCheckBox(this, labelText).set(checked);
+        new Checkbox(this, labelText).set(checked);
         if (checked)
         {
             WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
@@ -71,7 +71,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
     public AdvancedListSettingsDialog indexEachItemAsASeparateDocument(boolean checked, String docTitle, SearchIndexOptions indexOptions)
     {
         String labelText = "Index each item as a separate document";
-        new ReactCheckBox(this, labelText).set(checked);
+        new Checkbox(this, labelText).set(checked);
         if (checked)
         {
             WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
@@ -107,8 +107,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     public AdvancedListSettingsDialog setIndexFileAttachments(boolean checked)
     {
-        ReactCheckBox checkbox = new ReactCheckBox(this, "Index file attachments");
-        checkbox.set(checked);
+        new Checkbox(this, "Index file attachments").set(checked);
         return this;
     }
 

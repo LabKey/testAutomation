@@ -1,8 +1,8 @@
 package org.labkey.test.pages.ldap;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.pages.core.login.AuthDialogBase;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.params.ldap.LdapAuthenticationProvider;
@@ -172,10 +172,9 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 
     protected class ElementCache extends AuthDialogBase.ElementCache
     {
-        ReactCheckBox checkbox(String inputId)
+        Checkbox checkbox(String inputId)
         {
-            return new ReactCheckBox(Locator.tagWithId("input", inputId)
-                    .findWhenNeeded(this));
+            return new Checkbox(Locator.tagWithId("input", inputId).findWhenNeeded(this));
         }
 
         Input serverUrlsInput = new Input(Locator.input("servers")
@@ -187,9 +186,9 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 
         WebElement testButton = Locator.tagWithClass("button", "labkey-button")
                 .withText("Test").findWhenNeeded(this).withTimeout(2000);
-        ReactCheckBox saslCheckbox = checkbox("sasl");
-        ReactCheckBox searchCheckbox = checkbox("search");
-        ReactCheckBox readAttributeCheckbox = checkbox("readAttributes");
+        Checkbox saslCheckbox = checkbox("sasl");
+        Checkbox searchCheckbox = checkbox("search");
+        Checkbox readAttributeCheckbox = checkbox("readAttributes");
         Input userInput = new Input(Locator.input("username")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
         Input passwordInput = new Input(Locator.input("password")
