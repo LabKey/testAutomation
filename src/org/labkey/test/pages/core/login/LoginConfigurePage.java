@@ -5,6 +5,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.params.login.AuthenticationProvider;
@@ -183,13 +184,16 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        SvgCheckbox selfSignupCheckBox = new SvgCheckbox(checkBoxLoc("Allow self sign up").findWhenNeeded(globalSettingsPanel())
-                .withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
-        SvgCheckbox allowUserEmailEditCheckbox = new SvgCheckbox(checkBoxLoc("Allow users to edit their own email addresses")
-                .findWhenNeeded(globalSettingsPanel()).withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
-        SvgCheckbox autoCreateCheckBox = new SvgCheckbox(checkBoxLoc("Auto-create authenticated users")
-                .findWhenNeeded(globalSettingsPanel())
-                .withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
+        ReactCheckBox checkbox(String labelText)
+        {
+            WebElement label = Locator.tagWithText("label", labelText).findWhenNeeded(this);
+            return new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
+                    .findWhenNeeded(label));
+        }
+
+        ReactCheckBox selfSignupCheckBox = checkbox("Allow self sign up");
+        ReactCheckBox allowUserEmailEditCheckbox = checkbox("Allow users to edit their own email addresses");
+        ReactCheckBox autoCreateCheckBox = checkbox("Auto-create authenticated users");
         WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
@@ -208,12 +212,6 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                     .withChild(Locator.tagWithClass("div", "panel-heading")
                             .withChild(Locator.tag("span").withText("Global Settings")))
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
-        }
-
-        Locator checkBoxLoc(String label)
-        {
-            return Locator.tagWithClass("div", "global-settings__text-row").containing(label)
-                    .child(Locator.tagWithClass("span", "clickable"));
         }
 
         WebElement configurationsPanel()
