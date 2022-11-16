@@ -49,7 +49,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
                                                                        SearchIndexOptions indexOptions)
     {
         String labelText = "Index entire list as a single document";
-        elementCache().checkbox(labelText).set(checked);
+        new ReactCheckBox(this, labelText).set(checked);
         if (checked)
         {
             WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
@@ -71,7 +71,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
     public AdvancedListSettingsDialog indexEachItemAsASeparateDocument(boolean checked, String docTitle, SearchIndexOptions indexOptions)
     {
         String labelText = "Index each item as a separate document";
-        elementCache().checkbox(labelText).set(checked);
+        new ReactCheckBox(this, labelText).set(checked);
         if (checked)
         {
             WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
@@ -107,7 +107,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     public AdvancedListSettingsDialog setIndexFileAttachments(boolean checked)
     {
-        ReactCheckBox checkbox = elementCache().checkbox("Index file attachments");
+        ReactCheckBox checkbox = new ReactCheckBox(this, "Index file attachments");
         checkbox.set(checked);
         return this;
     }
@@ -150,13 +150,6 @@ public class AdvancedListSettingsDialog extends ModalDialog
         Locator.XPathLocator collapsibleFieldContainer(String checkboxLabelText)
         {
             return Locator.tag("div").withChild(checkBoxLoc(checkboxLabelText));
-        }
-
-        ReactCheckBox checkbox(String labelText)
-        {
-            WebElement label = Locator.tagWithText("label", labelText).findWhenNeeded(this);
-            return new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
-                    .findWhenNeeded(label));
         }
 
         RadioButton radio(String labelText)

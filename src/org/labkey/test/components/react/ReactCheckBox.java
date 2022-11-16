@@ -3,8 +3,10 @@ package org.labkey.test.components.react;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.Checkbox;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 /* this component wraps the ternary checkbox that uses hidden attributes 'checked' and 'indeterminate' to signal its state.
@@ -16,6 +18,12 @@ public class ReactCheckBox extends Checkbox
     public ReactCheckBox(WebElement element)
     {
        super(element);
+    }
+    
+    public ReactCheckBox(SearchContext context, String labelText)
+    {
+        super(Locator.tagWithAttribute("input", "type", "checkbox")
+                .findWhenNeeded(Locator.tagWithText("label", labelText).findWhenNeeded(context)));
     }
 
     @Override

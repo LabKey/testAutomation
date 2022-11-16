@@ -184,16 +184,9 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        ReactCheckBox checkbox(String labelText)
-        {
-            WebElement label = Locator.tagWithText("label", labelText).findWhenNeeded(this);
-            return new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
-                    .findWhenNeeded(label));
-        }
-
-        ReactCheckBox selfSignupCheckBox = checkbox("Allow self sign up");
-        ReactCheckBox allowUserEmailEditCheckbox = checkbox("Allow users to edit their own email addresses");
-        ReactCheckBox autoCreateCheckBox = checkbox("Auto-create authenticated users");
+        ReactCheckBox selfSignupCheckBox = new ReactCheckBox(this, "Allow self sign up");
+        ReactCheckBox allowUserEmailEditCheckbox = new ReactCheckBox(this, "Allow users to edit their own email addresses");
+        ReactCheckBox autoCreateCheckBox = new ReactCheckBox(this,"Auto-create authenticated users");
         WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
