@@ -15,6 +15,9 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +33,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -44,11 +48,12 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -88,7 +93,7 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
-        _rReportHelper.ensureRConfig();
+//        _rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(PROJECT_NAME, "Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
@@ -131,13 +136,6 @@ public class RlabkeyTest extends BaseWebDriverTest
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
     }
 
-    private void setupAssays()
-    {
-        log("Create a GPAT assay design");
-        goToManageAssays();
-        _assayHelper.createAssayDesign("General", "Rlabkey GPAT Test").clickFinish();
-    }
-
     /**
      * Create a new issues list and override the default assigned to group
      */
@@ -165,7 +163,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         // Dummy files for saveBatch API test
         _fileBrowserHelper.createFolder("data.tsv");
         _fileBrowserHelper.createFolder("result.txt");
-        setupAssays();
+        new APIAssayHelper(this).createAssayDesignWithDefaults(getProjectName(), "General", "Rlabkey GPAT Test");
 
         doRLabkeyTest(RLABKEY_API_EXPERIMENT);
     }
@@ -276,8 +274,6 @@ public class RlabkeyTest extends BaseWebDriverTest
             clickProject(getProjectName());
             goToManageViews().clickAddReport("R Report");
 
-            List<String> errors = new ArrayList<>();
-
             // we want to load the Rlabkey package from the override location
             File libPath = RReportHelper.getRLibraryPath();
             String pathCmd = TestProperties.isServerRemote()
@@ -288,10 +284,11 @@ public class RlabkeyTest extends BaseWebDriverTest
             {
                 StringBuilder sb = new StringBuilder(pathCmd);
 
-                sb.append('\n');
+                sb.append(String.format("\nprint(\"Test Case: %s - %s\")\n", testData.getName(), test.getName()));
                 String expectedOutput = test.getResponse().trim()
                         .replaceAll("\n +", "\n")
-                        .replaceAll("%projectName%", getProjectName());
+                        .replaceAll("%projectName%", getProjectName())
+                        .replaceAll("%contextPath%", WebTestHelper.getContextPath());
                 {
                     String testScript = test.getUrl().trim()
                             .replaceAll("\n +", "\n")
@@ -316,7 +313,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 {
                     TestLogger.error("Expected results for test case: " + test.getName() + ":\n" + expectedOutput);
                     TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb.toString());
-                    errors.add(test.getName());
+                    checker().withScreenshot(testData.getName()).error(test.getName());
                 }
                 else if ("DEBUG".equalsIgnoreCase(test.getType()))
                 {
@@ -327,7 +324,6 @@ public class RlabkeyTest extends BaseWebDriverTest
             }
             _rReportHelper.clickSourceTab();
             clickButton("Cancel");
-            assertTrue("Failed executing R script for test case(s): " + String.join(", ", errors) + ". See log for details.", errors.isEmpty());
         }
         else
         {
@@ -360,6 +356,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     }
 
     @Override
+    @NotNull
     protected String getProjectName()
     {
         return PROJECT_NAME;
