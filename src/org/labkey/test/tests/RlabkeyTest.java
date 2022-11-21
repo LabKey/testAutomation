@@ -93,7 +93,7 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
-//        _rReportHelper.ensureRConfig();
+        _rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(PROJECT_NAME, "Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
