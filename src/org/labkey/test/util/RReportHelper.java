@@ -280,11 +280,14 @@ public class RReportHelper
         return rVersion;
     }
 
+    public void configureRemoteRserve()
+    {
+        configureRemoteRserve(null, null);
+    }
+
     public void configureRemoteRserve(String reports_temp,String data)
     {
-        String username = "rserve";
-        String password = "rserve";
-        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(username,password,reports_temp,data);
+        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(reports_temp, data);
         config.setMachine("127.0.0.1");
         config.setPortNumber("6311");
 

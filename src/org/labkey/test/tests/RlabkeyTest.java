@@ -15,8 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -52,8 +50,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -93,7 +89,7 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
-        _rReportHelper.ensureRConfig();
+        configureR();
 
         _containerHelper.createProject(PROJECT_NAME, "Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
@@ -104,6 +100,11 @@ public class RlabkeyTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME_2, null);
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         new ApiPermissionsHelper(this).checkInheritedPermissions();
+    }
+
+    protected void configureR()
+    {
+        _rReportHelper.ensureRConfig();
     }
 
     // create an issues list in projects and subfolder to test ContainerFilters.
