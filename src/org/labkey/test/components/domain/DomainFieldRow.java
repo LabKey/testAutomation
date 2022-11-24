@@ -25,6 +25,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,6 +99,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 return ct;
         }
         throw new IllegalStateException("Unknown column type: " + typeString);
+    }
+
+    public List<String> getTypeOptions()
+    {
+        List<String> typeOptions = new ArrayList<>();
+        for (WebElement option : elementCache().fieldTypeSelectInput.getOptions())
+        {
+            typeOptions.add(option.getText());
+        }
+        return typeOptions;
     }
 
     /**
@@ -1211,8 +1222,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
 
         // barcode option
-        public final Locator scannableCheckboxLoc = Locator.input("domainpropertiesrow-scannable");
-        public final Checkbox scannableCheckbox = new Checkbox(scannableCheckboxLoc.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        protected final Locator scannableCheckboxLoc = Locator.input("domainpropertiesrow-scannable");
+        public final Checkbox scannableCheckbox = new Checkbox(scannableCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         // date field options
         public final Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
