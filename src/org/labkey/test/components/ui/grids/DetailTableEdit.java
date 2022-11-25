@@ -383,7 +383,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement header = Locator.tagWithClass("div", "detail__edit--heading")
+        public WebElement header = Locator.tagWithClass("div", "panel-heading")
                 .findWhenNeeded(this);
         public WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
                 .findWhenNeeded(this);
@@ -426,8 +426,8 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public DetailTableEditFinder withTitle(String title)
         {
-            _locator = _baseLocator.withDescendant(Locator.tagWithClass("div", "detail__edit--heading")
-                    .withText(title));
+            _locator = _baseLocator.withDescendant(Locator.tagWithClass("span", "detail__edit--heading")
+                .parent().withText(title));
             return this;
         }
 

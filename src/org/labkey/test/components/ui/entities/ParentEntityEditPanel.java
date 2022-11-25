@@ -448,10 +448,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         {
             return Locator
                     .tagContainingText("div", "Editing")
-                    .withClass("detail__edit--heading")
+                    .withClass("panel-heading")
                     .parent()
-                    .followingSibling("div")
-                    .withClass("panel-body");
+                    .child(Locator.tagWithClass("div", "panel-body"));
         }
     }
 
@@ -467,7 +466,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         // to be the entire page. This is has a dependence that only one entity panel can be in edit mode at a time.
         WebElement button(String buttonText)
         {
-            return Locator.tagWithClass("div", "detail__edit--heading")
+            return Locator.tagWithClass("span", "detail__edit--heading")
                     .parent("div")
                     .parent("div")
                     .followingSibling("div")
