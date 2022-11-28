@@ -62,7 +62,7 @@ public abstract class ListDefinition extends DomainProps
         return this;
     }
 
-    public List<? extends PropertyDescriptor> getFields()
+    public List<PropertyDescriptor> getFields()
     {
         return new ArrayList<>(_fields); // return a copy
     }

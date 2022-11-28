@@ -129,9 +129,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
     protected void setPandocEnabled(boolean useRmarkdownV2)
     {
-            Assume.assumeFalse(useRmarkdownV2);
-
-            //        _rReportHelper.setPandocEnabled(useRmarkdownV2);
+        _rReportHelper.setPandocEnabled(useRmarkdownV2);
     }
 
     protected WebElement saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
