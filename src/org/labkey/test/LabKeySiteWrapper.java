@@ -16,22 +16,23 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -772,24 +773,24 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
 
-        HttpResponse response = null;
+        CloseableHttpResponse response = null;
         HttpUriRequest method;
         int status;
 
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             // These requests should NOT redirect to the upgrade page
 
             method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
-            status = response.getStatusLine().getStatusCode();
+            status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
             method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
-            status = response.getStatusLine().getStatusCode();
+            status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
@@ -812,7 +813,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     }
                     if (!isRedirect)
                     {
-                        int responseCode = httpResponse.getStatusLine().getStatusCode();
+                        int responseCode = httpResponse.getCode();
                         if (responseCode == 301 || responseCode == 302)
                             return true;
 //                        if (WebTestHelper.getHttpResponseBody(httpResponse).contains("http-equiv=\"Refresh\""))
@@ -853,7 +854,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 loginMethod.setEntity(new UrlEncodedFormEntity(loginParams));
                 HttpClientContext httpContext = WebTestHelper.getBasicHttpContext();
                 response = redirectClient.execute(loginMethod, httpContext);
-                status = response.getStatusLine().getStatusCode();
+                status = response.getCode();
                 assertEquals("Unexpected response to login: \n" + TestFileUtils.getStreamContentsAsString(response.getEntity().getContent()), HttpStatus.SC_OK, status);
                 EntityUtils.consume(response.getEntity());
 
@@ -864,7 +865,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
                 response = redirectClient.execute(logoutMethod, httpContext);
-                status = response.getStatusLine().getStatusCode();
+                status = response.getCode();
                 assertEquals("Unexpected response to logout: \n" + TestFileUtils.getStreamContentsAsString(response.getEntity().getContent()), HttpStatus.SC_OK, status);
                 // TODO: check login, once http-equiv redirect is sorted out
                 assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));

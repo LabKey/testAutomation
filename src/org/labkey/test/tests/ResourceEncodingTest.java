@@ -15,12 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
@@ -129,24 +128,20 @@ public class ResourceEncodingTest extends BaseWebDriverTest
     private void assertGzipEncodedResponse(String fileName) throws IOException
     {
         String url = WebTestHelper.getBaseURL() + "/" + fileName;
-        HttpResponse response = null;
 
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             HttpGet get = new HttpGet(url);
             get.addHeader("Accept-Encoding", "gzip, deflate, sdch");
 
-            response = client.execute(get, WebTestHelper.getBasicHttpContext());
-            Header encodingHeader = response.getEntity().getContentEncoding();
-            String encoding = encodingHeader == null ? null : encodingHeader.getValue();
+            try (CloseableHttpResponse response = client.execute(get, WebTestHelper.getBasicHttpContext()))
+            {
+                String encoding = response.getEntity().getContentEncoding();
 
-            String expectedEncoding = TestProperties.isDevModeEnabled() ? null : "gzip";
-            Assert.assertEquals("File had wrong 'Content-Encoding'", expectedEncoding, encoding);
-        }
-        finally
-        {
-            if (response != null)
+                String expectedEncoding = TestProperties.isDevModeEnabled() ? null : "gzip";
+                Assert.assertEquals("File had wrong 'Content-Encoding'", expectedEncoding, encoding);
                 EntityUtils.consumeQuietly(response.getEntity());
+            }
         }
     }
 }
