@@ -140,7 +140,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 infoCount <= 1);
 
         // A reference to the editing header title
-        WebElement editorHeading = Locator.tagContainingText("div", "Editing").withClass("detail__edit--heading").findWhenNeeded(getDriver());
+        WebElement editorHeading = Locator.tagWithClass("div", "panel-heading").startsWith("Editing").findWhenNeeded(getDriver());
 
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
