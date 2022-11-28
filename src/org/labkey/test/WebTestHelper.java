@@ -633,6 +633,7 @@ public class WebTestHelper
 
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
             .setConnectionManager(SELF_SIGNED_CONNECTION_MANAGER)
+            .setConnectionManagerShared(true)
             .setDefaultCredentialsProvider(credentialsProvider)
             .setDefaultRequestConfig(requestConfig);
 
