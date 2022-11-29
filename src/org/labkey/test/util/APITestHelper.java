@@ -16,16 +16,16 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.query.xml.ApiTestsDocument;
@@ -153,26 +153,23 @@ public class APITestHelper
     {
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpUriRequest method = null;
-        HttpResponse response = null;
         String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
 
         switch (type)
         {
-            case "get":
-                method = new HttpGet(requestUrl);
-                break;
-            case "post":
+            case "get" -> method = new HttpGet(requestUrl);
+            case "post" ->
+            {
                 method = new HttpPost(requestUrl);
-                ((HttpPost)method).setEntity(new StringEntity(formData, ContentType.create("application/json", "UTF-8")));
-                break;
+                method.setEntity(new StringEntity(formData, ContentType.create("application/json", "UTF-8")));
+            }
         }
 
         injectCookies(username, method);
 
-        try (CloseableHttpClient client = (CloseableHttpClient) WebTestHelper.getHttpClient(username, password))
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient(username, password); CloseableHttpResponse response = client.execute(method, context))
         {
-            response = client.execute(method, context);
-            int status = response.getStatusLine().getStatusCode();
+            int status = response.getCode();
             String responseBody = WebTestHelper.getHttpResponseBody(response);
             if (status == HttpStatus.SC_OK || acceptErrors)
             {
@@ -180,15 +177,11 @@ public class APITestHelper
             }
             else
                 fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, "\n" + responseBody));
+            EntityUtils.consumeQuietly(response.getEntity());
         }
         catch (IOException e)
         {
             throw new RuntimeException("Test failed requesting the URL,", e);
-        }
-        finally
-        {
-            if (response != null)
-                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
