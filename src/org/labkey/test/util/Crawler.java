@@ -24,12 +24,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
@@ -1168,25 +1168,22 @@ public class Crawler
 
         // Check whether 404 was due to a missing action
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = null;
 
-        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try (CloseableHttpClient httpClient = WebTestHelper.getHttpClient())
         {
             // LabKey actions don't support HEAD requests. Only a non-existent action will 404
             var method = new HttpHead(url);
-            response = httpClient.execute(method, context);
-            // If url 404s, then the action doesn't exist
-            return response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_FOUND;
+            try (CloseableHttpResponse response = httpClient.execute(method, context))
+            {
+                EntityUtils.consumeQuietly(response.getEntity());
+                // If url 404s, then the action doesn't exist
+                return response.getCode() != HttpStatus.SC_NOT_FOUND;
+            }
         }
         catch (IOException | IllegalArgumentException e)
         {
             TestLogger.warn("Unable to verify existence of action: " + urlToCheck.getActionId(), e);
             return true;
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
