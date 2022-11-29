@@ -624,18 +624,14 @@ public class WebTestHelper
         HttpHost targetHost = new HttpHost(target.getScheme(), target.getHost(), target.getPort());
         AuthScope authScope = new AuthScope(targetHost.getHostName(), target.getPort());
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password.toCharArray());
-
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(authScope, credentials);
-
-        RequestConfig requestConfig = requestConfigBuilder
-            .build();
 
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
             .setConnectionManager(SELF_SIGNED_CONNECTION_MANAGER)
             .setConnectionManagerShared(true)
             .setDefaultCredentialsProvider(credentialsProvider)
-            .setDefaultRequestConfig(requestConfig);
+            .setDefaultRequestConfig(requestConfigBuilder.build());
 
         Map<String, Cookie> cookies = getCookies(username);
         if (!cookies.isEmpty())
