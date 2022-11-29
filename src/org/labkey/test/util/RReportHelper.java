@@ -290,10 +290,13 @@ public class RReportHelper
         ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(reports_temp, data);
         config.setMachine("127.0.0.1");
         config.setPortNumber("6311");
+        config.setName(REMOTE_R_SERVE);
 
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
         if(!scripts.isEnginePresent(REMOTE_R_SERVE))
             scripts.addEngine(EngineType.REMOTE_R, config);
+        else
+            scripts.updateEngine(config);
 
         scripts.setSiteDefault(REMOTE_R_SERVE);
     }
