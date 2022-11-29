@@ -43,6 +43,7 @@ import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.ZipUtil;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
@@ -185,9 +186,9 @@ public class RlabkeyTest extends BaseWebDriverTest
     public void testRlabkeyQueryApi() throws Exception
     {
         log("Import Lists");
-        File listArchive = new File(RReportHelper.getRLibraryPath(), "/listArchive.zip");
+        final File listArchive = TestFileUtils.getSampleData("lists/rlabkey.lists");
         goToProjectHome();
-        _listHelper.importListArchive(listArchive);
+        goToManageLists().importListArchive(new ZipUtil(listArchive).tempZip());
 
         setupIssues();
         doRLabkeyTest(RLABKEY_API_QUERY);
