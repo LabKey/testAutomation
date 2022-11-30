@@ -234,6 +234,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         EditEngineWindow editEngineWindow = editEngine(engineConfig.getName());
         engineConfig.configureEngine(editEngineWindow);
         editEngineWindow.submit();
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void deleteSelectedEngine(WebElement selectedEngineRow)

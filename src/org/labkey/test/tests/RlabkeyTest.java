@@ -90,8 +90,6 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
-        configureR();
-
         _containerHelper.createProject(PROJECT_NAME, "Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel("Rlabkey Study")
@@ -101,6 +99,8 @@ public class RlabkeyTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME_2, null);
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         new ApiPermissionsHelper(this).checkInheritedPermissions();
+
+        configureR();
     }
 
     protected void configureR()
@@ -276,11 +276,7 @@ public class RlabkeyTest extends BaseWebDriverTest
             clickProject(getProjectName());
             goToManageViews().clickAddReport("R Report");
 
-            // we want to load the Rlabkey package from the override location
-            File libPath = RReportHelper.getRLibraryPath();
-            String pathCmd = TestProperties.isServerRemote()
-                ? ""
-                : String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+            String pathCmd = getLibPathOverride();
 
             for (APITestHelper.ApiTestCase test : tests)
             {
@@ -330,6 +326,19 @@ public class RlabkeyTest extends BaseWebDriverTest
         else
         {
             throw new IllegalStateException("No test cases found in " + testData.getAbsolutePath());
+        }
+    }
+
+    protected String getLibPathOverride()
+    {
+        // we want to load the Rlabkey package from the override location
+        if (TestProperties.isServerRemote())
+        {
+            return "";
+        }
+        else
+        {
+            return String.format(LIBPATH_OVERRIDE, RReportHelper.getRLibraryPath().getAbsolutePath().replaceAll("\\\\", "/"));
         }
     }
 

@@ -100,9 +100,9 @@ public class RReportHelper
     private static File rScriptExecutable = null;
     private static String defaultEngineVersion = null;
 
-    private static final String localEngineName = "R Scripting Engine";
+    public static final String LOCAL_R_ENGINE = "R Scripting Engine";
     public static final String R_DOCKER_SCRIPTING_ENGINE = "R Docker Scripting Engine";
-    private static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
+    public static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
 
@@ -251,16 +251,16 @@ public class RReportHelper
         {
             _test.refresh(); // Avoid menu alignment issue on TeamCity
 
-            if (scripts.isEnginePresent(localEngineName))
+            if (scripts.isEnginePresent(LOCAL_R_ENGINE))
             {
                 if (!TestProperties.isTestRunningOnTeamCity())
                 {
-                    scripts.editEngine(localEngineName);
+                    scripts.editEngine(LOCAL_R_ENGINE);
                     rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath-inputEl")));
-                    TestLogger.log(localEngineName + " is already configured using: " + rExecutable.getAbsolutePath());
+                    TestLogger.log(LOCAL_R_ENGINE + " is already configured using: " + rExecutable.getAbsolutePath());
                     rVersion = getRVersion(rExecutable);
                     _test.clickButton("Cancel", 0);
-                    scripts.setSiteDefault(localEngineName);
+                    scripts.setSiteDefault(LOCAL_R_ENGINE);
                     return rVersion;
                 }
                 else // Reset R scripting engine on TeamCity
@@ -275,7 +275,7 @@ public class RReportHelper
             EngineConfig config = new EngineConfig(getRExecutable());
             config.setVersion(rVersion);
             scripts.addEngine(EngineType.R, config);
-            scripts.setSiteDefault(localEngineName);
+            scripts.setSiteDefault(LOCAL_R_ENGINE);
         }
         return rVersion;
     }
