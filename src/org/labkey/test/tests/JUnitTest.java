@@ -21,12 +21,12 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -200,8 +200,8 @@ public class JUnitTest extends TestSuite
         }
 
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = null;
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        CloseableHttpResponse response = null;
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view?";
             HttpGet method = new HttpGet(url);
@@ -223,7 +223,7 @@ public class JUnitTest extends TestSuite
                     return failsuite;
                 }
             }
-            int status = response.getStatusLine().getStatusCode();
+            int status = response.getCode();
             if (status == HttpStatus.SC_OK)
             {
                 final String responseBody = WebTestHelper.getHttpResponseBody(response);
@@ -346,7 +346,7 @@ public class JUnitTest extends TestSuite
                 LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
                 final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
                 response.getEntity().writeTo(streamLogger);
-                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getStatusLine() + "): " + url);
+                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getReasonPhrase() + "): " + url);
             }
         }
         finally
