@@ -90,6 +90,8 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
+        _rReportHelper.ensureRConfig();
+
         _containerHelper.createProject(PROJECT_NAME, "Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel("Rlabkey Study")
@@ -100,12 +102,6 @@ public class RlabkeyTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         new ApiPermissionsHelper(this).checkInheritedPermissions();
 
-        configureR();
-    }
-
-    protected void configureR()
-    {
-        _rReportHelper.ensureRConfig();
     }
 
     // create an issues list in projects and subfolder to test ContainerFilters.

@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
-public final class AssayTransformWarningTest extends BaseWebDriverTest
+public class AssayTransformWarningTest extends BaseWebDriverTest
 {
     public static final File JAVA_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformWarning.jar");
     public static final File R_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/assayTransformWarning.R");
@@ -84,7 +84,7 @@ public final class AssayTransformWarningTest extends BaseWebDriverTest
         init.doInit();
     }
 
-    private void doInit()
+    protected void doInit()
     {
         new RReportHelper(this).ensureRConfig();
         new QCAssayScriptHelper(this).ensureEngineConfig();
