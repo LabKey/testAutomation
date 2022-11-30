@@ -196,7 +196,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         public DetailTableFinder withTitle(String title)
         {
             _locator = Locator.tagWithClass("div", "panel")
-                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(title))
+                    .withChild(Locator.tagWithClass("div", "panel-heading").startsWith(title))
                     .descendant(_baseLocator);
             return this;
         }
