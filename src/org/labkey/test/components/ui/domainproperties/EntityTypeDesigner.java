@@ -232,26 +232,6 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().optionalWarningAlert();
     }
 
-    public String getStoredAmountDisplayUnits()
-    {
-        return elementCache().storedAmountDisplayUnitsSelect.getValue();
-    }
-
-    public T setStoredAmountDisplayUnits(String displayUnits)
-    {
-        elementCache().storedAmountDisplayUnitsSelect.select(displayUnits);
-        return getThis();
-    }
-
-    public boolean isBarcodeInfoShown()
-    {
-        return elementCache().uniqueIdMsgLoc.existsIn(this);
-    }
-
-    public String getBarcodeInfoMsg()
-    {
-        return elementCache().uniqueIdMsgLoc.waitForElement(this, WAIT_FOR_JAVASCRIPT).getText();
-    }
 
     /**
      * Dialog that allows the user to set the genId value.
