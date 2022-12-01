@@ -25,6 +25,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,6 +99,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 return ct;
         }
         throw new IllegalStateException("Unknown column type: " + typeString);
+    }
+
+    public List<String> getTypeOptions()
+    {
+        List<String> typeOptions = new ArrayList<>();
+        for (WebElement option : elementCache().fieldTypeSelectInput.getOptions())
+        {
+            typeOptions.add(option.getText());
+        }
+        return typeOptions;
     }
 
     /**
@@ -414,6 +425,30 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public boolean isMaxTextLengthPresent(int rowIndex)
     {
         return getWrapper().isElementPresent(elementCache().getCharScaleInputLocForRow(rowIndex));
+    }
+
+    // barcode- scannable options
+
+    /**
+     *  Indicates that the field should be searched when
+     */
+    public boolean isFieldScannable()
+    {
+        expand();
+        return elementCache().scannableCheckbox.get();
+    }
+
+    public DomainFieldRow setFieldScannable(boolean checked)
+    {
+        expand();
+        elementCache().scannableCheckbox.set(checked);
+        return this;
+    }
+
+    public boolean isScannableCheckboxPresent()
+    {
+        expand();
+        return elementCache().scannableCheckboxLoc.existsIn(this);
     }
 
     //
@@ -1099,7 +1134,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row").withoutClass("domain-floating-hdr");
         private String _title = null;
-        private DomainFormPanel _domainFormPanel;
+        private final DomainFormPanel _domainFormPanel;
 
         public DomainFieldRowFinder(DomainFormPanel panel, WebDriver driver)
         {
@@ -1185,6 +1220,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
         public final Input charScaleInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
                 .refindWhenNeeded(this), getDriver());
+
+        // barcode option
+        protected final Locator scannableCheckboxLoc = Locator.input("domainpropertiesrow-scannable");
+        public final Checkbox scannableCheckbox = new Checkbox(scannableCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+
         // date field options
         public final Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());

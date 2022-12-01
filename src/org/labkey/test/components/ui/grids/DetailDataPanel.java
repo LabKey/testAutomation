@@ -161,7 +161,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement heading = Locator.tagWithClass("div", "detail__edit--heading").findWhenNeeded(this);
+        final WebElement heading = Locator.tagWithClass("span", "detail__edit--heading").parent().findWhenNeeded(this);
 
         public Optional<WebElement> editButton()
         {
