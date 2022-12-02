@@ -38,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -285,7 +284,7 @@ public class RReportHelper
         configureRemoteRserve(null, null);
     }
 
-    public void configureRemoteRserve(String reports_temp,String data)
+    public void configureRemoteRserve(String reports_temp, String data)
     {
         ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(reports_temp, data);
         config.setMachine("127.0.0.1");
@@ -331,7 +330,7 @@ public class RReportHelper
         rConfigurationPage.save();
     }
 
-    public void setPandocEnabled(Boolean enabled)
+    public void setPandocEnabled(String engineName, Boolean enabled)
     {
         if (TestProperties.isPrimaryUserAppAdmin())
         {
@@ -340,19 +339,11 @@ public class RReportHelper
         }
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
-        String defaultScriptName = "R Scripting Engine";
-        assertTrue("R Engine not setup", scripts.isEnginePresentForLanguage("R"));
+        ConfigureReportsAndScriptsPage.EditEngineWindow editEngineWindow = scripts.editEngine(engineName);
 
-        scripts.editEngine(defaultScriptName);
+        Checkbox.Ext4Checkbox().withLabel("Use pandoc & rmarkdown:").find(editEngineWindow).set(enabled);
 
-        Checkbox enabledCheckbox = Checkbox.Ext4Checkbox().withLabel("Use pandoc & rmarkdown:").find(_test.getDriver());
-        if(enabled)
-            enabledCheckbox.check();
-        else
-            enabledCheckbox.uncheck();
-
-        _test.clickButton("Submit", 0);
-        _test.waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
+        editEngineWindow.submit();
     }
 
 
