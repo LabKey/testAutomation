@@ -170,7 +170,8 @@ public class JUnitTest extends TestSuite
                 }
                 for (SuiteFactory.SuiteInfo suiteInfo : suiteInfos)
                 {
-                    if (testCategories.contains(suiteInfo.getName()))
+                    if (testCategories.contains(suiteInfo.getName()) &&
+                            suiteInfo.getSubset() == suiteInfo.getSubsetCount()) // Only run in last shard for sharded suite
                         return true;
                 }
                 return testCategories.contains("smoke"); // Always run smoke tests
