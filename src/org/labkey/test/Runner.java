@@ -1128,9 +1128,11 @@ class BatchInfo
     {
         if (_instance == null)
         {
-            int currentBatch = Integer.parseInt(System.getProperty("webtest.parallelTests.currentBatch", "1"));
-            int totalBatches = Integer.parseInt(System.getProperty("webtest.parallelTests.totalBatches", "1"));
-            _instance = new BatchInfo(currentBatch, totalBatches);
+            String currentBatch = StringUtils.trimToNull(System.getProperty("webtest.parallelTests.currentBatch"));
+            String totalBatches = StringUtils.trimToNull(System.getProperty("webtest.parallelTests.totalBatches"));
+            _instance = new BatchInfo(
+                    currentBatch != null ? Integer.parseInt(currentBatch) : 1,
+                    totalBatches != null ? Integer.parseInt(totalBatches) : 1);
         }
         return _instance;
     }
