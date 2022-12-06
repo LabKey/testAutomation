@@ -54,7 +54,6 @@ public class SuiteFactory
     private final Map<String, Set<Class<?>>> _suites;
     private final Map<String, Class<?>> _testsByName;
     private final Map<String, List<String>> _missingTests;
-    private final BatchInfo _batchInfo;
 
     private SuiteFactory()
     {
@@ -62,7 +61,6 @@ public class SuiteFactory
         _suites = new CaseInsensitiveHashMap<>();
         _testsByName = new CaseInsensitiveHashMap<>();
         _missingTests = new CaseInsensitiveHashMap<>();
-        _batchInfo = new BatchInfo();
         loadSuites();
     }
 
@@ -392,34 +390,6 @@ public class SuiteFactory
         public boolean isOptional()
         {
             return optional;
-        }
-    }
-
-    public static class BatchInfo
-    {
-        private final Integer currentBatch;
-        private final Integer totalBatches;
-
-        public BatchInfo(Integer currentBatch, Integer totalBatches)
-        {
-            this.currentBatch = currentBatch;
-            this.totalBatches = totalBatches;
-        }
-
-        private BatchInfo()
-        {
-            currentBatch = Integer.parseInt(System.getProperty("webtest.parallelTests.currentBatch", "1"));
-            totalBatches = Integer.parseInt(System.getProperty("webtest.parallelTests.totalBatches", "1"));
-        }
-
-        public Integer getCurrentBatch()
-        {
-            return currentBatch;
-        }
-
-        public Integer getTotalBatches()
-        {
-            return totalBatches;
         }
     }
 }
