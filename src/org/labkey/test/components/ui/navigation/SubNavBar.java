@@ -117,7 +117,7 @@ public class SubNavBar extends WebDriverComponent<SubNavBar.ElementCache>
     static protected class Locators
     {
         static Locator.XPathLocator component = Locator.tagWithClass("nav", "sub-nav")
-                .child(Locator.tagWithClass("div", "container"));
+                .child(Locator.tagWithClass("div", "sub-nav-container"));
         static Locator scrollButtonGroup = Locator.xpath("//nav[contains(@class,'sub-nav')]//div[contains(@class,'scroll-btn-group')]");
     }
 
