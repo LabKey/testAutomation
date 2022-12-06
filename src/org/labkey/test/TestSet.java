@@ -27,7 +27,7 @@ import java.util.Set;
 
 public class TestSet
 {
-    private String _suite;
+    private final String _suite;
     private List<Class<?>> _tests;
 
     TestSet(@NotNull Set<Class<?>> tests, @NotNull String suite)

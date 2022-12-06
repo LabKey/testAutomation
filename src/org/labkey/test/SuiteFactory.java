@@ -46,28 +46,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SuiteBuilder
+public class SuiteFactory
 {
-    private static SuiteBuilder _instance;
-    private static final Map<String, List<String>> _requestedMissingTests = new CaseInsensitiveHashMap<>();
+    private static SuiteFactory _instance;
 
+    private final Map<String, List<String>> _requestedMissingTests;
     private final Map<String, Set<Class<?>>> _suites;
     private final Map<String, Class<?>> _testsByName;
     private final Map<String, List<String>> _missingTests;
+    private final BatchInfo _batchInfo;
 
-    private SuiteBuilder()
+    private SuiteFactory()
     {
+        _requestedMissingTests = new CaseInsensitiveHashMap<>();
         _suites = new CaseInsensitiveHashMap<>();
         _testsByName = new CaseInsensitiveHashMap<>();
         _missingTests = new CaseInsensitiveHashMap<>();
+        _batchInfo = new BatchInfo();
         loadSuites();
     }
 
-    public static SuiteBuilder getInstance()
+    public static SuiteFactory getInstance()
     {
         if (_instance == null)
         {
-            _instance = new SuiteBuilder();
+            _instance = new SuiteFactory();
         }
 
         return _instance;
@@ -262,7 +265,7 @@ public class SuiteBuilder
             tests.add(MissingTests.class);
         }
 
-        tests = extractSubset(tests, subset, subsetCount);
+        tests = extractBatch(tests, subset, subsetCount);
 
         if (tests == null)
             return null;
@@ -270,9 +273,9 @@ public class SuiteBuilder
         return new TestSet(tests, suiteName);
     }
 
-    private Set<Class<?>> extractSubset(Set<Class<?>> tests, int subset, int subsetCount)
+    public static Set<Class<?>> extractBatch(Set<Class<?>> tests, int batch, int batchCount)
     {
-        if (tests == null || tests.isEmpty() || subsetCount == 1)
+        if (tests == null || tests.isEmpty() || batchCount == 1)
         {
             return tests;
         }
@@ -281,12 +284,12 @@ public class SuiteBuilder
         sorted.sort(Comparator.comparing(Class::getName));
 
         int size = sorted.size();
-        int index = subset - 1;
-        int subsetSize = size / subsetCount;
-        int remainder = size % subsetCount;
-        int isLargeSubset = index < remainder ? 1 : 0;
-        int fromIndex = subsetSize * index + Math.min(index, remainder);
-        int toIndex = Math.min(fromIndex + subsetSize + isLargeSubset, size);
+        int index = batch - 1;
+        int batchSize = size / batchCount;
+        int remainder = size % batchCount;
+        int isLargeBatch = index < remainder ? 1 : 0;
+        int fromIndex = batchSize * index + Math.min(index, remainder);
+        int toIndex = Math.min(fromIndex + batchSize + isLargeBatch, size);
 
         return new HashSet<>(sorted.subList(fromIndex, toIndex));
     }
@@ -303,7 +306,7 @@ public class SuiteBuilder
 
     public static Map<String, List<String>> getRequestedMissingTests()
     {
-        return _requestedMissingTests;
+        return new CaseInsensitiveHashMap<>(getInstance()._requestedMissingTests);
     }
 
     public static class MissingTests
@@ -319,7 +322,7 @@ public class SuiteBuilder
         @org.junit.Test
         public void run()
         {
-            Map<String, List<String>> requestedMissingTests = SuiteBuilder.getRequestedMissingTests();
+            Map<String, List<String>> requestedMissingTests = SuiteFactory.getRequestedMissingTests();
             StringBuilder msg = new StringBuilder("Suite specifies non-existent test(s):");
             for (String suite : requestedMissingTests.keySet())
             {
@@ -349,6 +352,7 @@ public class SuiteBuilder
             }
             // Support syntax for splitting up test suites
             // e.g. "Daily[1/3]" to select the first third of tests in the Daily suite
+            // TODO: Remove in favor of Runner.BatchInfo
             Pattern pattern = Pattern.compile("(.+)\\[(\\d+)/(\\d+)]");
             Matcher matcher = pattern.matcher(suiteName);
             if (matcher.matches())
@@ -388,6 +392,34 @@ public class SuiteBuilder
         public boolean isOptional()
         {
             return optional;
+        }
+    }
+
+    public static class BatchInfo
+    {
+        private final Integer currentBatch;
+        private final Integer totalBatches;
+
+        public BatchInfo(Integer currentBatch, Integer totalBatches)
+        {
+            this.currentBatch = currentBatch;
+            this.totalBatches = totalBatches;
+        }
+
+        private BatchInfo()
+        {
+            currentBatch = Integer.parseInt(System.getProperty("webtest.parallelTests.currentBatch", "1"));
+            totalBatches = Integer.parseInt(System.getProperty("webtest.parallelTests.totalBatches", "1"));
+        }
+
+        public Integer getCurrentBatch()
+        {
+            return currentBatch;
+        }
+
+        public Integer getTotalBatches()
+        {
+            return totalBatches;
         }
     }
 }

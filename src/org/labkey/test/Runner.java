@@ -33,6 +33,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
@@ -90,7 +91,7 @@ public class Runner extends TestSuite
     private static final Logger LOG = LogManager.getLogger(Runner.class);
 
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
-    private static SuiteBuilder _suites = SuiteBuilder.getInstance();
+    private static SuiteFactory _suites = SuiteFactory.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
     private static List<Class<?>> _remainingTests;
@@ -529,7 +530,7 @@ public class Runner extends TestSuite
             }
         }
 
-        if (!foundServerSideTest)
+        if (!foundServerSideTest && BatchInfo.get().isLastBatch())
         {
             // Automatically run server-side tests based on 'suite' parameter
             // if standard JUnitTest isn't already included
@@ -800,7 +801,7 @@ public class Runner extends TestSuite
             if (testNames.isEmpty())
             {
                 final List<String> specifiedSuites = getSpecifiedSuites();
-                set = getCompositeTestSet(specifiedSuites);
+                set = BatchInfo.get().getBatch(getCompositeTestSet(specifiedSuites));
             }
             else
             {
@@ -1107,5 +1108,51 @@ public class Runner extends TestSuite
             return ((JUnit4TestAdapter) test).getTestClass();
         else
             return test.getClass();
+    }
+}
+
+class BatchInfo
+{
+    private static BatchInfo _instance;
+
+    private final int _currentBatch;
+    private final int _totalBatches;
+
+    private BatchInfo(int currentBatch, int totalBatches)
+    {
+        this._currentBatch = currentBatch;
+        this._totalBatches = totalBatches;
+    }
+
+    static BatchInfo get()
+    {
+        if (_instance == null)
+        {
+            int currentBatch = Integer.parseInt(System.getProperty("webtest.parallelTests.currentBatch", "1"));
+            int totalBatches = Integer.parseInt(System.getProperty("webtest.parallelTests.totalBatches", "1"));
+            _instance = new BatchInfo(currentBatch, totalBatches);
+        }
+        return _instance;
+    }
+
+    int getCurrentBatch()
+    {
+        return _currentBatch;
+    }
+
+    int getTotalBatches()
+    {
+        return _totalBatches;
+    }
+
+    boolean isLastBatch()
+    {
+        return _currentBatch == _totalBatches;
+    }
+
+    @NotNull
+    public TestSet getBatch(TestSet testSet)
+    {
+        return new TestSet(SuiteFactory.extractBatch(new HashSet<>(testSet.getTestList()), getCurrentBatch(), getTotalBatches()), testSet.getSuite());
     }
 }
