@@ -17,17 +17,21 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
@@ -41,6 +45,8 @@ import org.labkey.test.util.query.QueryApiHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +63,8 @@ public class ScriptValidationTest extends BaseWebDriverTest
 {
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
+
+    public static final String VEHICLES_TABLE = "vehicles";
 
     public static class ColorRecord
     {
@@ -100,6 +108,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         clickProject(getProjectName());
         doTestTransformation();
         doTestValidation();
+        doTestCrossFolderSaveRows();
 
         log("Create list to prevent query validation failure");
         new IntListDefinition("People", "Key")
@@ -108,6 +117,102 @@ public class ScriptValidationTest extends BaseWebDriverTest
                         new FieldDefinition("Age", FieldDefinition.ColumnType.Integer),
                         new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean)))
                 .create(createDefaultConnection(), getProjectName());
+    }
+
+    public void doTestCrossFolderSaveRows() throws Exception
+    {
+        Connection cn = createDefaultConnection();
+
+        List<ColorRecord> colors = insertColors(Arrays.asList(
+                new ColorRecord("Yellow2", "#f00")
+        ));
+
+        // Create manufacturers:
+        ArrayList<Map<String, Object>> list1 = new ArrayList<>();
+        list1.add(Map.of("Name", "Manufacturer1"));
+        InsertRowsCommand cmd1 = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
+        cmd1.getRows().addAll(list1);
+        Object manufacturerId = cmd1.execute(cn, getProjectName()).getRows().get(0).get("rowid");
+
+        // Create model:
+        ArrayList<Map<String, Object>> list2 = new ArrayList<>();
+        list2.add(Map.of("ManufacturerId", manufacturerId, "Name", "Model1"));
+        InsertRowsCommand cmd2 = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
+        cmd2.getRows().addAll(list2);
+        Object modelId = cmd2.execute(cn, getProjectName()).getRows().get(0).get("RowId");
+
+        PostCommand<CommandResponse> saveRowsCommand = prepareSaveRowsCommand("insertWithKeys", getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE, "RowId",
+                new String[]{"ModelId", "Color", "ModelYear", "Milage", "LastService"},
+                new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
+        CommandResponse response = saveRowsCommand.execute(cn, "/home");
+        Map<String, Object> row = (Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values");
+        Object vehicleRowId = row.get("rowid");
+
+        SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
+        src.setColumns(Arrays.asList("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
+        src.setSorts(Arrays.asList(new Sort("RowId", Sort.Direction.DESCENDING)));
+        SelectRowsResponse sr2 = src.execute(cn, getProjectName());
+        assertEquals("Incorrect model", modelId, sr2.getRows().get(0).get("ModelId"));
+        assertEquals("Incorrect Milage", 1234, sr2.getRows().get(0).get("Milage"));
+        assertEquals("Incorrect RowId for First Record", vehicleRowId, sr2.getRows().get(0).get("RowId"));
+
+        // This should be true for all rows, including the one we just added:
+        sr2.getRows().forEach(r -> {
+            assertEquals("Containers should match, rowId: " + r.get("RowId"), r.get("Container"), r.get("TriggerScriptContainer"));
+        });
+
+    }
+
+    private PostCommand<CommandResponse> prepareSaveRowsCommand(String command, String containerPath, String schema, String queryName, String pkName, String[] fieldNames, Object[][] rows, @Nullable Object[][] oldKeys)
+    {
+        PostCommand<CommandResponse> postCommand = new PostCommand<>("query", "saveRows");
+
+        JSONObject commandJson = new JSONObject();
+        commandJson.put("containerPath", containerPath);
+        commandJson.put("schemaName", schema);
+        commandJson.put("queryName", queryName);
+        commandJson.put("command", command);
+        JSONArray jsonRows = new JSONArray();
+        int idx = 0;
+        for (Object[] row : rows)
+        {
+            JSONObject oldKeyMap = new JSONObject();
+            JSONObject values = new JSONObject();
+
+            int position = 0;
+            for (String name : fieldNames)
+            {
+                Object v = row[position];
+                values.put(name, v);
+                if (pkName.equals(name))
+                    oldKeyMap.put(name, v);
+
+                position++;
+            }
+
+            if (oldKeys != null && oldKeys.length > idx)
+            {
+                JSONObject obj = new JSONObject();
+                int j = 0;
+                for (String field : fieldNames)
+                {
+                    obj.put(field, oldKeys[idx][j]);
+                    j++;
+                }
+                oldKeyMap = obj;
+            }
+
+            JSONObject ro = new JSONObject();
+            ro.put("oldKeys", oldKeyMap);
+            ro.put("values", values);
+            jsonRows.put(ro);
+        }
+        commandJson.put("rows", jsonRows);
+
+        JSONObject commands = new JSONObject();
+        commands.put("commands", Collections.singletonList(commandJson));
+        postCommand.setJsonObject(commands);
+        return postCommand;
     }
 
     private void doTestTransformation() throws Exception
