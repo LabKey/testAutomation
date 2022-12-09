@@ -16,7 +16,7 @@
 
 package org.labkey.test.testpicker;
 
-import org.labkey.test.SuiteBuilder;
+import org.labkey.test.SuiteFactory;
 import org.labkey.test.TestConfig;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestSet;
@@ -271,14 +271,14 @@ public class TestHelper
         _treeRoot = new CheckNode(_rootName);
         _testTree = new JTree(_treeRoot);
 
-        SuiteBuilder suiteBuilder = SuiteBuilder.getInstance();
+        SuiteFactory suiteFactory = SuiteFactory.getInstance();
 
-        List<String> suites = new ArrayList<>(suiteBuilder.getSuites());
+        List<String> suites = new ArrayList<>(suiteFactory.getSuites());
         Collections.sort(suites);
 
         for (String suite : suites)
         {
-            TestSet testSet = suiteBuilder.getTestSet(suite);
+            TestSet testSet = suiteFactory.getTestSet(suite);
             if (!testSet.getTestNames().isEmpty())
             {
                 CheckNode suiteNode = new CheckNode(testSet.getSuite());
@@ -392,7 +392,7 @@ public class TestHelper
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                setResult(SuiteBuilder.getInstance().getTestSet(Continue.class.getSimpleName()), new ArrayList<String>());
+                setResult(SuiteFactory.getInstance().getTestSet(Continue.class.getSimpleName()), new ArrayList<String>());
                 _window.dispose();
             }
         });
@@ -831,7 +831,7 @@ public class TestHelper
 
             if (selectedTests.size() != 0 )
             {
-                setResult(SuiteBuilder.getInstance().getTestSet(Test.class.getSimpleName()), selectedTests);
+                setResult(SuiteFactory.getInstance().getTestSet(Test.class.getSimpleName()), selectedTests);
             }
             _window.dispose();
         }

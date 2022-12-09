@@ -379,6 +379,10 @@ public class NabAssayTest extends AbstractAssayTest
                 "Host Cell changed from blank to 'EditedHostCell'",
                 "Name changed from 'ptid + visit + specimenid' to 'NameEdited.xlsx'");
 
+        // Issue 46796 - try forcing an immediate stats update to prompt a better query plan selection
+        startSystemMaintenance("Database");
+        waitForSystemMaintenanceCompletion();
+
         // Return to the run list
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
