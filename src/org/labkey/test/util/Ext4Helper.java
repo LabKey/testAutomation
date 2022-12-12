@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
@@ -697,7 +698,7 @@ public class Ext4Helper
             try
             {
                 Object result = _test.executeAsyncScript("Ext4.onReady(callback);");
-                return result == null; // If executeAsyncScript returned something, there was probably an error.
+                return result == null || result.equals(Map.of("single", true)); // If executeAsyncScript returned something, there was probably an error.
             }
             catch (WebDriverException scriptError)
             {

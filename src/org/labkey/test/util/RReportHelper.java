@@ -38,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -100,9 +99,9 @@ public class RReportHelper
     private static File rScriptExecutable = null;
     private static String defaultEngineVersion = null;
 
-    private static final String localEngineName = "R Scripting Engine";
+    public static final String LOCAL_R_ENGINE = "R Scripting Engine";
     public static final String R_DOCKER_SCRIPTING_ENGINE = "R Docker Scripting Engine";
-    private static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
+    public static final String REMOTE_R_SERVE ="Remote R Scripting Engine";
 
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
 
@@ -251,16 +250,16 @@ public class RReportHelper
         {
             _test.refresh(); // Avoid menu alignment issue on TeamCity
 
-            if (scripts.isEnginePresent(localEngineName))
+            if (scripts.isEnginePresent(LOCAL_R_ENGINE))
             {
                 if (!TestProperties.isTestRunningOnTeamCity())
                 {
-                    scripts.editEngine(localEngineName);
+                    scripts.editEngine(LOCAL_R_ENGINE);
                     rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath-inputEl")));
-                    TestLogger.log(localEngineName + " is already configured using: " + rExecutable.getAbsolutePath());
+                    TestLogger.log(LOCAL_R_ENGINE + " is already configured using: " + rExecutable.getAbsolutePath());
                     rVersion = getRVersion(rExecutable);
                     _test.clickButton("Cancel", 0);
-                    scripts.setSiteDefault(localEngineName);
+                    scripts.setSiteDefault(LOCAL_R_ENGINE);
                     return rVersion;
                 }
                 else // Reset R scripting engine on TeamCity
@@ -275,22 +274,28 @@ public class RReportHelper
             EngineConfig config = new EngineConfig(getRExecutable());
             config.setVersion(rVersion);
             scripts.addEngine(EngineType.R, config);
-            scripts.setSiteDefault(localEngineName);
+            scripts.setSiteDefault(LOCAL_R_ENGINE);
         }
         return rVersion;
     }
 
-    public void configureRemoteRserve(String reports_temp,String data)
+    public void configureRemoteRserve()
     {
-        String username = "rserve";
-        String password = "rserve";
-        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(username,password,reports_temp,data);
+        configureRemoteRserve(null, null);
+    }
+
+    public void configureRemoteRserve(String reports_temp, String data)
+    {
+        ConfigureReportsAndScriptsPage.RServeEngineConfig config = new ConfigureReportsAndScriptsPage.RServeEngineConfig(reports_temp, data);
         config.setMachine("127.0.0.1");
         config.setPortNumber("6311");
+        config.setName(REMOTE_R_SERVE);
 
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
         if(!scripts.isEnginePresent(REMOTE_R_SERVE))
             scripts.addEngine(EngineType.REMOTE_R, config);
+        else
+            scripts.updateEngine(config);
 
         scripts.setSiteDefault(REMOTE_R_SERVE);
     }
@@ -325,7 +330,7 @@ public class RReportHelper
         rConfigurationPage.save();
     }
 
-    public void setPandocEnabled(Boolean enabled)
+    public void setPandocEnabled(String engineName, Boolean enabled)
     {
         if (TestProperties.isPrimaryUserAppAdmin())
         {
@@ -334,19 +339,11 @@ public class RReportHelper
         }
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
-        String defaultScriptName = "R Scripting Engine";
-        assertTrue("R Engine not setup", scripts.isEnginePresentForLanguage("R"));
+        ConfigureReportsAndScriptsPage.EditEngineWindow editEngineWindow = scripts.editEngine(engineName);
 
-        scripts.editEngine(defaultScriptName);
+        Checkbox.Ext4Checkbox().withLabel("Use pandoc & rmarkdown:").find(editEngineWindow).set(enabled);
 
-        Checkbox enabledCheckbox = Checkbox.Ext4Checkbox().withLabel("Use pandoc & rmarkdown:").find(_test.getDriver());
-        if(enabled)
-            enabledCheckbox.check();
-        else
-            enabledCheckbox.uncheck();
-
-        _test.clickButton("Submit", 0);
-        _test.waitForElementToDisappear(ConfigureReportsAndScriptsPage.Locators.editEngineWindow);
+        editEngineWindow.submit();
     }
 
 
