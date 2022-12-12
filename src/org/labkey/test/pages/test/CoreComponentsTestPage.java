@@ -5,7 +5,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.grids.EditableGrid;
-import org.labkey.test.components.ui.heatmap.HeatMap;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.entities.EntityInsertPanel;
@@ -67,12 +66,6 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
         Input.Input(Locator.input("schemaName"), getDriver()).waitFor().set(schema);
         Input.Input(Locator.input("queryName"), getDriver()).waitFor().set(query);
         Locator.button("Apply").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
-    }
-
-    public HeatMap getHeatMap()
-    {
-        getComponentSelect().select("HeatMap");
-        return new HeatMap.HeatMapFinder(getDriver()).waitFor();
     }
 
     /**
