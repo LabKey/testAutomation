@@ -30,6 +30,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
@@ -181,6 +182,18 @@ public class TestDataGenerator
             row.put(columns.get(i), values.get(i));
         }
         addCustomRow(row);
+        return this;
+    }
+
+    public TestDataGenerator addRowsFromFile(File tsv)
+    {
+        try (TabLoader loader = new TabLoader(tsv, true))
+        {
+            for (Map<String, Object> row : loader.load())
+            {
+                addCustomRow(row);
+            }
+        }
         return this;
     }
 
