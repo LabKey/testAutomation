@@ -8,6 +8,7 @@ import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -16,6 +17,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.util.List;
 import java.util.Optional;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
@@ -230,6 +232,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().optionalWarningAlert();
     }
 
+
     /**
      * Dialog that allows the user to set the genId value.
      */
@@ -296,6 +299,11 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         protected final WebElement editGenIdButton = Locator.tagWithClass("button", "edit-genid-btn").findWhenNeeded(this);
 
         protected final WebElement resetGenIdButton = Locator.tagWithClass("button", "reset-genid-btn").findWhenNeeded(this);
+
+        protected final ReactSelect storedAmountDisplayUnitsSelect = ReactSelect.finder(getDriver())
+                .withContainerClass("sampleset-metric-unit-select-container").timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
+
+        final Locator uniqueIdMsgLoc = Locator.tagWithClass("div", "uniqueid-msg");
 
     }
 

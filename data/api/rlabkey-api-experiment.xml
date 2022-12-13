@@ -3,10 +3,10 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                m1 <- labkey.experiment.createMaterial(list(name = "87444063.2604.626"))
-                m2 <- labkey.experiment.createMaterial(list(name = "87444063.2604.625"))
-                run <- labkey.experiment.createRun(list(name = "new run with materials"), materialInputs = m1, materialOutputs = m2)
-                labkey.experiment.saveBatch(protocolName=labkey.experiment.SAMPLE_DERIVATION_PROTOCOL, runList=run, baseUrl=labkey.url.base, folderPath="%projectName%")
+                print(m1 <- labkey.experiment.createMaterial(list(name = "87444063.2604.626")))
+                print(m2 <- labkey.experiment.createMaterial(list(name = "87444063.2604.625")))
+                print(run <- labkey.experiment.createRun(list(name = "new run with materials"), materialInputs = m1, materialOutputs = m2))
+                print(labkey.experiment.saveBatch(protocolName=labkey.experiment.SAMPLE_DERIVATION_PROTOCOL, runList=run, baseUrl=labkey.url.base, folderPath="%projectName%"))
             ]]>
         </url>
         <response>
@@ -30,10 +30,10 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                d1 <- labkey.experiment.createData(list(pipelinePath = "data.tsv"))
-                d2 <- labkey.experiment.createData(list(pipelinePath = "result.txt"))
-                run <- labkey.experiment.createRun(list(name = "new run with datas"), dataInputs = d1, dataOutputs = d2)
-                labkey.experiment.saveBatch(protocolName=labkey.experiment.SAMPLE_DERIVATION_PROTOCOL, runList=run, baseUrl=labkey.url.base, folderPath="%projectName%")
+                print(d1 <- labkey.experiment.createData(list(pipelinePath = "data.tsv")))
+                print(d2 <- labkey.experiment.createData(list(pipelinePath = "result.txt")))
+                print(run <- labkey.experiment.createRun(list(name = "new run with datas"), dataInputs = d1, dataOutputs = d2))
+                print(labkey.experiment.saveBatch(protocolName=labkey.experiment.SAMPLE_DERIVATION_PROTOCOL, runList=run, baseUrl=labkey.url.base, folderPath="%projectName%"))
             ]]>
         </url>
         <response>
@@ -57,7 +57,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.saveBatch(baseUrl=labkey.url.base, folderPath="%projectName%", "Rlabkey GPAT Test", data.frame(SpecimenID=c(1,2,3)))
+                print(labkey.saveBatch(baseUrl=labkey.url.base, folderPath="%projectName%", "Rlabkey GPAT Test", data.frame(SpecimenID=c(1,2,3))))
             ]]>
         </url>
         <response>

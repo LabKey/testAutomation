@@ -17,8 +17,8 @@ package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.exp.query.ExpSchema;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
@@ -183,7 +183,7 @@ public class FieldDefinition extends PropertyDescriptor
         if (validators != null)
         {
             propertyValidators = new JSONArray();
-            validators.stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
+            validators.stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::put);
         }
         setFieldProperty("propertyValidators", propertyValidators);
         _validators = validators;

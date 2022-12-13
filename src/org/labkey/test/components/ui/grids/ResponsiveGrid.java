@@ -32,7 +32,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -254,17 +253,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         }
 
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
-        getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
-        sleep(500);  //it would be nice to find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
-                         //  sleep here to give scrollToMiddle call below a better chance of firing
+        // Scroll to middle in order to make room for the dropdown menu
+        getWrapper().scrollToMiddle(headerCell);
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
-        getWrapper().scrollToMiddle(toggle);        // scroll the target vertically to the middle of the page
         toggle.click();
 
-        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(headerCell);
+        // Use getDriver() because the grid menus are rendered in a "react portal" at the end of the HTML body, so they
+        // are totally detached from the rest of the grid.
+        WebElement menu = Locator.css("ul.grid-header-cell__dropdown-menu.open").findWhenNeeded(getDriver());
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(menu);
         waitFor(menuItem::isDisplayed, 1000);
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
@@ -656,8 +656,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public boolean getColumnPHIProtected(String columnText)
     {
-        return elementCache().getColumnHeaderCell(columnText)
-                .getAttribute("class").contains("phi-protected");
+        WebElement columnHeader = Locator.tagWithClass("th", "grid-header-cell")
+                .withDescendant(Locators.headerCellBody(columnText)).findElement(this);
+        return columnHeader.getAttribute("class").contains("phi-protected");
     }
 
     /**
@@ -726,8 +727,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         {
             if (!headerCells.containsKey(headerText))
             {
-                WebElement headerCell = Locator.tagWithClass("th", "grid-header-cell")
-                        .withChild(Locator.tag("span").startsWith(headerText)).findElement(this);
+                WebElement headerCell = Locators.headerCellBody(headerText).findElement(this);
                 headerCells.put(headerText, headerCell);
             }
             return headerCells.get(headerText);
@@ -857,7 +857,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
         static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
-
+        static public Locator.XPathLocator headerCellBody(String headerText)
+        {
+            return Locator.tagWithClass("div", "grid-header-cell__body")
+                    .withChild(Locator.tag("span").startsWith(headerText));
+        }
     }
 
     public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid, ResponsiveGridFinder>

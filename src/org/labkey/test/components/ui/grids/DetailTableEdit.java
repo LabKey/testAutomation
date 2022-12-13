@@ -9,7 +9,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -242,14 +241,15 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     }
 
     /**
-     * Get the value of an select field. This could be one or many values, because of this the result is returned as a list.
+     * Get the value of a select field.
      *
      * @param fieldCaption The caption/label of the field to get.
-     * @return A (String) list of the values selected.
+     * @return The selected value.
      **/
-    public List<String> getSelectValue(String fieldCaption)
+    public String getSelectedValue(String fieldCaption)
     {
-        return ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find().getSelections();
+        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
+        return reactSelect.getValue();
     }
 
     /**
@@ -259,7 +259,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      */
     public DetailTableEdit clearSelectionValues(String fieldCaption)
     {
-        ReactSelect reactSelect =  ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find();
+        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
         reactSelect.clearSelection();
         return this;
     }
@@ -383,7 +383,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement header = Locator.tagWithClass("div", "detail__edit--heading")
+        public WebElement header = Locator.tagWithClass("div", "panel-heading")
                 .findWhenNeeded(this);
         public WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
                 .findWhenNeeded(this);
@@ -426,8 +426,8 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public DetailTableEditFinder withTitle(String title)
         {
-            _locator = _baseLocator.withDescendant(Locator.tagWithClass("div", "detail__edit--heading")
-                    .withText(title));
+            _locator = _baseLocator.withDescendant(Locator.tagWithClass("span", "detail__edit--heading")
+                .parent().withText(title));
             return this;
         }
 

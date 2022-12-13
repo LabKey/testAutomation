@@ -199,6 +199,32 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Find the first row index containing the text value in the given column.
+     * If not found -1 is returned.
+     *
+     * @param columnLabel Column label to look at.
+     * @param text Text to look for (must match exactly).
+     * @return The first row index where found, -1 if not found.
+     */
+    public Integer getRowIndex(String columnLabel, String text)
+    {
+        int index = -1;
+
+        List<String> columnData = getColumnData(columnLabel);
+        for(int i = 0; i < columnData.size(); i++)
+        {
+            if(columnData.get(i).equals(text))
+            {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+
+    /**
      * Get the td element for a cell.
      *
      * @param row The 0 based row index.
@@ -398,6 +424,29 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
         }
+    }
+
+    /**
+     * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
+     * @param row   the row
+     * @param columnName    name of the column
+     * @param value     value to insert
+     */
+    public void setNewSelectValue(int row, String columnName, String value)
+    {
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
+
+        // Select the cell.
+        selectCell(gridCell);
+
+        // Activate the cell.
+        activateCell(gridCell);
+
+        ReactSelect createSelect = elementCache().lookupSelect();
+
+        waitFor(()->createSelect.isInteractive() && !createSelect.isLoading(), "Select control is not ready.", 1_000);
+        createSelect.createValue(value);
     }
 
     /**

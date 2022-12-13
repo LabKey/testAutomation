@@ -135,7 +135,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private Long createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
+    private Integer createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
     {
         final String PERL_SCRIPT = "modifyColumnInAssayRun.pl";
 
@@ -610,7 +610,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         final String instrumentSetting = "456";
         final String commentPrefix = "This is a comment for run to be exported via XAR. This is for run: ";
 
-        int assayId = createSimpleProjectAndAssay(exportProject, assayName).intValue();
+        int assayId = createSimpleProjectAndAssay(exportProject, assayName);
 
         Connection cn = createDefaultConnection();
 

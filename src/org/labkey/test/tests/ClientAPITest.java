@@ -20,8 +20,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -1364,7 +1363,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         Command<?> command = new Command<>(controller, action);
         Map<String, Object> completionValues;
-        String errMsg = "for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
+        String errMsg = "for controller " + controller + ", displayNameOnly == " + displayNameOnly;
         try
         {
             completionValues = command.execute(cn, "/" + getProjectName()).getParsedData();
@@ -1376,16 +1375,16 @@ public class ClientAPITest extends BaseWebDriverTest
             throw new RuntimeException("Command execution error " + errMsg, e);
         }
 
-        // Awful lot of casting going on here, but if any of it fails that's indication we've unintentionally
+        // Awful lot of casting going on here, but if any of it fails that's an indication we've unintentionally
         // changed this API response format.
-        JSONArray entries = (JSONArray)completionValues.get("completions");
-        assertTrue("No autocompletion entries returned" + errMsg, entries.size() > 0);
+        List<Map<String, String>> list = (List<Map<String, String>>)completionValues.get("completions");
+        assertFalse("No autocompletion entries returned" + errMsg, list.isEmpty());
         boolean testPassed = false;
 
-        for (JSONObject entry : (List<JSONObject>)entries)
+        for (Map<String, String> map : list)
         {
             // The order in the response isn't guaranteed. Loop to find one we know should be in the list.
-            String responseValue = (String)entry.get("value");
+            String responseValue = map.get("value");
             if (StringUtils.startsWith(responseValue, _autocompleteUserDisplayName))
             {
                 String correctValue = displayNameOnly ? _autocompleteUserDisplayName : AUTOCOMPLETE_USER + " (" + _autocompleteUserDisplayName + ")";

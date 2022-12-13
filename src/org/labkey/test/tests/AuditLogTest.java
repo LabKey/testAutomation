@@ -18,9 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -933,11 +931,11 @@ public class AuditLogTest extends BaseWebDriverTest
 
         String[] commentAsArray = comment.split(";");
 
-        Map<String, String> fieldComments = new HashMap();
+        Map<String, String> fieldComments = new HashMap<>();
 
-        for(int i = 0; i < commentAsArray.length; i++)
+        for (String s : commentAsArray)
         {
-            String[] fieldValue = commentAsArray[i].split(":");
+            String[] fieldValue = s.split(":");
 
             // If the split on the ':' produced more than two entries in the array it most likely means that the
             // comment for that property had a : in it. So treat the first entry as the field name and then concat the
@@ -949,7 +947,7 @@ public class AuditLogTest extends BaseWebDriverTest
             StringBuilder sb = new StringBuilder();
             sb.append(fieldValue[1].trim());
 
-            for(int j = 2; j < fieldValue.length; j++)
+            for (int j = 2; j < fieldValue.length; j++)
             {
                 sb.append(":");
                 sb.append(fieldValue[j]);
@@ -963,21 +961,14 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
     {
-        String value = null;
-
-        JSONParser parser = new JSONParser();
-        JSONObject jsonObject;
         try
         {
-            jsonObject = (JSONObject)parser.parse(rowEntry.get(columnName).toString());
-            value = jsonObject.get("value").toString();
+            return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
         }
-        catch(ParseException pe)
+        catch(JSONException je)
         {
             // Just fail here, don't toss the exception up the stack.
-            Assert.assertTrue("There was a parser exception: " + pe.toString(), false);
+            throw new IllegalArgumentException(je);
         }
-
-        return value;
     }
 }

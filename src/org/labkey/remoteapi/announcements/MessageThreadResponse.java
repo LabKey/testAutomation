@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandResponse;
 

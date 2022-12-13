@@ -19,13 +19,13 @@ package org.labkey.test;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableLong;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -109,6 +109,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -609,11 +610,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         setServerDebugLogging();
         setExperimentalFlags();
 
-        if (!TestProperties.isPrimaryUserAppAdmin())
-        {
-            WebTestHelper.setNoQuestionMarkUrl(ExperimentalFeaturesHelper.isNoQuestionMarkMode(createDefaultConnection()));
-        }
-
         // Start logging JS errors.
         resumeJsErrorChecker();
 
@@ -1006,9 +1002,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 try
                 {
                     Path path = Paths.get(notEmpty.getFile());
-                    List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
-                            .filter(s -> !s.isEmpty()).collect(Collectors.toList());
-                    TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    try (Stream<Path> paths = Files.walk(path))
+                    {
+                        List<String> subdirs = paths.map(p -> path.relativize(p).toString())
+                            .filter(s -> !s.isEmpty()).toList();
+                        TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    }
                     getArtifactCollector().dumpHeap();
                 }
                 catch (IOException e)
@@ -1121,7 +1120,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void waitForPendingRequests(int msWait)
     {
         Connection connection = createDefaultConnection();
-        MutableLong pendingRequestCount = new MutableLong(-1);
+        MutableInt pendingRequestCount = new MutableInt(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));
             if (pendingRequestCount.getValue() == 0)
@@ -1140,7 +1139,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
     }
 
-    private long getPendingRequestCount(Connection connection)
+    private int getPendingRequestCount(Connection connection)
     {
         Command<?> getPendingRequestCount = new Command<>("admin", "getPendingRequestCount");
         try
@@ -1589,7 +1588,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         map.put("moduleName", property.getModuleName());
         map.put("containerPath", property.getContainerPath());
         map.put("propName", property.getPropertyName());
-        waitForText(property.getPropertyName()); //wait for the property name to appear
+        waitForText(property.getPropertyLabel()); //wait for the property label to appear
         String query = ComponentQuery.fromAttributes("field", map);
         return _ext4Helper.queryOne(query, Ext4FieldRef.class);
     }

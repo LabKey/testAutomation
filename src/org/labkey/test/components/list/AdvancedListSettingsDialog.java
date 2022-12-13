@@ -3,10 +3,10 @@ package org.labkey.test.components.list;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.pages.core.login.SvgCheckbox;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.openqa.selenium.WebElement;
 
@@ -49,7 +49,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
                                                                        SearchIndexOptions indexOptions)
     {
         String labelText = "Index entire list as a single document";
-        elementCache().checkbox(labelText).set(checked);
+        new Checkbox(this, labelText).set(checked);
         if (checked)
         {
             WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
@@ -71,7 +71,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
     public AdvancedListSettingsDialog indexEachItemAsASeparateDocument(boolean checked, String docTitle, SearchIndexOptions indexOptions)
     {
         String labelText = "Index each item as a separate document";
-        elementCache().checkbox(labelText).set(checked);
+        new Checkbox(this, labelText).set(checked);
         if (checked)
         {
             WebElement expandContainer = elementCache().collapsibleFieldContainer(labelText)
@@ -102,16 +102,12 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     private boolean isPaneExpanded(WebElement expandCollapsePane)
     {
-        return Locator.tagWithClass("svg", "fa-angle-down").existsIn(expandCollapsePane);
+        return Locator.tagWithClass("span", "fa-angle-down").existsIn(expandCollapsePane);
     }
 
     public AdvancedListSettingsDialog setIndexFileAttachments(boolean checked)
     {
-        Locator loc = Locator.tagWithClass("span", "list__advanced-settings-model__index-checkbox")
-                .withChild(Locator.tagWithText("span", "Index file attachments"))
-                .child(Locator.tagWithClass("span", "list__properties__no-highlight"));
-        SvgCheckbox checkbox = new SvgCheckbox(loc.waitForElement(this, 2000), getDriver());
-        checkbox.set(checked);
+        new Checkbox(this, "Index file attachments").set(checked);
         return this;
     }
 
@@ -143,23 +139,16 @@ public class AdvancedListSettingsDialog extends ModalDialog
     {
         Locator.XPathLocator checkBoxLoc(String labelText)
         {
-            return Locator.tagWithClass("span", "list__advanced-settings-modal__index-checkbox")
-                    .withDescendant(Locator.tagWithText("span", labelText).withClass("list__clickable"))
-                    .child(Locator.tagWithClass("span", "list__properties__no-highlight"));
+            return Locator.tagWithText("label", labelText);
         }
         Locator.XPathLocator collapsibleFieldLoc(String checkboxLabelText)
         {
-            return Locator.tag("div").withChild(checkBoxLoc(checkboxLabelText))
-                    .child(Locator.tagWithClass("span", "list__advanced-settings-model__collapsible-field"));
+            return Locator.tagWithClass("div", "list__advanced-settings-modal__collapsible-field")
+                    .withDescendant(checkBoxLoc(checkboxLabelText));
         }
         Locator.XPathLocator collapsibleFieldContainer(String checkboxLabelText)
         {
             return Locator.tag("div").withChild(checkBoxLoc(checkboxLabelText));
-        }
-
-        SvgCheckbox checkbox(String labelText)
-        {
-            return new SvgCheckbox(checkBoxLoc(labelText).waitForElement(this, 2000), getDriver());
         }
 
         RadioButton radio(String labelText)

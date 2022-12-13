@@ -1,9 +1,9 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONTokener;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -44,6 +44,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1364,7 +1366,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now confirm 2 validators on the field
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
 
         // Domain designer UI only handles Range, Regex and Lookup validators
         validators = validators.stream().filter(val ->
@@ -1435,7 +1437,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now verify we have 2 formats on the size field
         DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor updatedSizeCol = getColumn(updatedResponse.getDomain(), "size");
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
         assertEquals("expect only 2 validators on the field",2, validators.size());
         Map<String, Object> editedLte2 = getPropertyValidator(updatedSizeCol, "lte2");
         Map<String, Object> editedEquals3 = getPropertyValidator(updatedSizeCol, "equals3");
@@ -1498,7 +1500,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainResponse validationResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");
 
-        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
+        List<Map<String, Object>> formats = (List<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
         assertEquals(2, formats.size());
 
         Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~eq=Thor");
@@ -1706,12 +1708,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 nullToFalse(actualField.getAllProperties().get("isPrimaryKey")),
                 is(nullToFalse(intendedField.getAllProperties().get("isPrimaryKey"))));
 
-        for (ConditionalFormat intendedFormat : intendedField.getConditionalFormats())
-        {
-            ConditionalFormat actualFormat = intendedField.getConditionalFormats().stream()
-                    .filter(a-> a.toJSON().equals(intendedFormat.toJSON())).findFirst().orElse(null);
-            assertNotNull("conditional formats did not export with full fidelity", actualFormat);
-        }
+        Assertions.assertThat(actualField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()))
+                .as("Exported conditional fields.")
+                .containsExactlyElementsOf(intendedField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()).toList());
+
         // would like to do validators, but this part of the remoteAPI is incomplete; validators are settable
         // on FieldDefinition, but not gettable on PropertyDescriptor
     }
@@ -1721,19 +1721,21 @@ public class DomainDesignerTest extends BaseWebDriverTest
         return val == null ? false : val;
     }
 
-    private ArrayListMap<String, PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws Exception
+    private ArrayListMap<String, PropertyDescriptor> getFieldsFromExportFile(File exportFile) throws IOException
     {
-        JSONParser parser = new JSONParser();
-        JSONArray  jsonArray = (JSONArray) parser.parse(new FileReader(exportFile));
-
-        ArrayListMap<String, PropertyDescriptor> exportFields = new ArrayListMap<>();
-        for (int i=0; i < jsonArray.size(); i++)
+        try (Reader reader = new FileReader(exportFile, StandardCharsets.UTF_8))
         {
-            PropertyDescriptor field = new PropertyDescriptor((JSONObject) jsonArray.get(i));
-            exportFields.put(field.getName(), field);
-        }
+            JSONArray jsonArray = new JSONArray(new JSONTokener(reader));
+            ArrayListMap<String, PropertyDescriptor> exportFields = new ArrayListMap<>();
 
-        return exportFields;
+            for (int i=0; i < jsonArray.length(); i++)
+            {
+                PropertyDescriptor field = new PropertyDescriptor(jsonArray.getJSONObject(i));
+                exportFields.put(field.getName(), field);
+            }
+
+            return exportFields;
+        }
     }
 
     public PropertyDescriptor getColumn(Domain domain, String columnName)
@@ -1747,7 +1749,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     public Map<String, Object> getPropertyValidator(PropertyDescriptor column, String name)
     {
-        List<Map<String, Object>> validators = (ArrayList<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
         Map<String, Object> validator = validators.stream()
                 .filter(a-> a.get("name").equals(name))
                 .findFirst().orElse(null);
@@ -1757,7 +1759,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
     {
-        List<Map<String, Object>> formats = (ArrayList<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        List<Map<String, Object>> formats = (List<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
         Map<String, Object> conditionalFormat = formats.stream()
                 .filter(a-> a.get("filter").equals(filterExpression))
                 .findFirst().orElse(null);

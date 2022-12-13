@@ -647,7 +647,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        _listHelper.deleteList("Custom view '" + TEST_VIEW + "'");
+        _listHelper.deleteList();
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
@@ -1248,6 +1248,30 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
         new PortalHelper(this).addWebPart("Search");
         searchFor(getProjectName(), "hypertrophimadeupword", 1, null);
+    }
+
+    @Test
+    public void testAttachmentFieldWithSpace()
+    {
+        final String listName = "Attachment Field with Space List";
+        final String attachmentFileName = "searchData.tsv";
+        final String path = TestFileUtils.getSampleData("lists/" + attachmentFileName).getAbsolutePath();
+        final String attachmentCol = "Attachment Field With Space";
+
+        Map<String, String> row = new HashMap<>();
+        row.put(attachmentCol, path);
+
+        goToProjectHome();
+
+        log("create list with an attachment column '" + attachmentCol + "'");
+        _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
+                col(attachmentCol, ColumnType.Attachment));
+
+        log("Insert data, upload attachment for col '" + attachmentCol + "'");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.insertNewRow(row, false);
+        assertTextPresent(attachmentFileName);
     }
 
     @Test

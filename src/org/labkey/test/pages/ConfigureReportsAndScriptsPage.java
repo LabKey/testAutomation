@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.util.Ext4Helper;
@@ -233,6 +234,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         EditEngineWindow editEngineWindow = editEngine(engineConfig.getName());
         engineConfig.configureEngine(editEngineWindow);
         editEngineWindow.submit();
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void deleteSelectedEngine(WebElement selectedEngineRow)
@@ -523,19 +525,22 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
     public static class RServeEngineConfig extends EngineConfig
     {
+        private final String _remoteReportsTemp;
+        private final String _remoteData;
         private String _userName;
         private String _password;
-        private String _remoteReportsTemp;
-        private String _remoteDate;
         private String _portNumber;
         private String _machine;
 
-        public RServeEngineConfig(String userName, String password, String remoteReportsTemp, String remoteDate)
+        public RServeEngineConfig(String remoteReportsTemp, String remoteData)
         {
-            _userName = userName;
-            _password = password;
             _remoteReportsTemp = remoteReportsTemp;
-            _remoteDate = remoteDate;
+            _remoteData = remoteData;
+        }
+
+        public RServeEngineConfig()
+        {
+            this(null, null);
         }
 
         @Override
@@ -546,18 +551,6 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
 
         @Override
         public EngineConfig setPath(File path)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public String getCommand()
-        {
-            return null;
-        }
-
-        @Override
-        public EngineConfig setCommand(String command)
         {
             throw new UnsupportedOperationException();
         }
@@ -581,28 +574,6 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         public EngineConfig setPassword(String password)
         {
             _password = password;
-            return this;
-        }
-
-        public String getRemoteReportsTemp()
-        {
-            return _remoteReportsTemp;
-        }
-
-        public EngineConfig setRemoteReportsTemp(String remoteReportsTemp)
-        {
-            _remoteReportsTemp = remoteReportsTemp;
-            return this;
-        }
-
-        public String getRemoteDate()
-        {
-            return _remoteDate;
-        }
-
-        public EngineConfig setRemoteDate(String remoteData)
-        {
-            _remoteDate = remoteData;
             return this;
         }
 
@@ -644,16 +615,25 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
         @Override
         public void configureEngine(EditEngineWindow configWindow)
         {
-            // need to set the change password checkbox
-            configWindow.getWrapper()._ext4Helper.checkCheckbox(Locator.id("editEngine_changePassword-inputEl"));
+            // Might need to set the change password checkbox
+            new Checkbox(Locator.id("editEngine_changePassword-inputEl").findElement(configWindow))
+                    .set(getUserName() != null || getPassword() != null);
             super.configureEngine(configWindow);
 
-            TestLogger.debug("Configuring the path mapping");
-            configWindow.getWrapper().click(Locator.tagWithClassContaining("td", "remoteURI").index(0));
-            Locator.name("remoteURI").findElement(configWindow.getWrapper().getDriver()).sendKeys(_remoteReportsTemp);
+            if (_remoteReportsTemp != null)
+            {
+                Locator.tag("input").withLabel("Mapped").findElement(configWindow).click();
+                TestLogger.debug("Configuring the path mapping");
+                configWindow.getWrapper().click(Locator.tagWithClassContaining("td", "remoteURI").index(0));
+                Locator.name("remoteURI").findElement(configWindow.getWrapper().getDriver()).sendKeys(_remoteReportsTemp);
 
-            configWindow.getWrapper().click(Locator.tagWithClassContaining("td", "remoteURI").index(1));
-            Locator.name("remoteURI").findElement(configWindow.getWrapper().getDriver()).sendKeys(_remoteDate);
+                configWindow.getWrapper().click(Locator.tagWithClassContaining("td", "remoteURI").index(1));
+                Locator.name("remoteURI").findElement(configWindow.getWrapper().getDriver()).sendKeys(_remoteData);
+            }
+            else
+            {
+                Locator.tag("input").withLabel("Auto").findElement(configWindow).click();
+            }
         }
     }
 

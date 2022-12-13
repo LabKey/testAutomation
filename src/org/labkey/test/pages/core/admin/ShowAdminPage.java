@@ -110,6 +110,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
+    public void clickComplianceSettings()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().complianceSettings);
+    }
+
     public void clickEmailCustomization()
     {
         goToSettingsSection();
@@ -121,6 +127,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         goToSettingsSection();
         clickAndWait(elementCache().notificationServiceAdminLink);
     }
+
     public ConfigureFileSystemAccessPage clickFiles()
     {
         goToSettingsSection();
@@ -198,6 +205,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ConfigureReportsAndScriptsPage(this);
     }
 
+    public void clickCredits()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().creditsLink);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -216,6 +229,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
         protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
         protected WebElement configurePageElements = Locator.linkWithText("configure page elements").findWhenNeeded(this);
+        protected WebElement complianceSettings = Locator.linkWithText("Compliance Settings").findWhenNeeded(this);
         protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
         protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
@@ -230,6 +244,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement systemMaintenanceLink = Locator.linkWithText("system maintenance").findWhenNeeded(this);
         protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
         protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
+        protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {

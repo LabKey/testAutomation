@@ -1,11 +1,11 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 public class GetDiscussionsCommand extends PostCommand<GetDiscussionsResponse>
 {
-    private String _discussionSrcIdentifier;
+    private final String _discussionSrcIdentifier;
 
     public GetDiscussionsCommand(String discussionSrcIdentifier)
     {

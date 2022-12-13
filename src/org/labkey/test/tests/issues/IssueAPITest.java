@@ -12,7 +12,6 @@ import org.labkey.remoteapi.issues.IssueResponse;
 import org.labkey.remoteapi.issues.IssueResponseModel;
 import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,11 +37,11 @@ public class IssueAPITest extends BaseWebDriverTest
     IssuesHelper _issuesHelper = new IssuesHelper(this);
     APIUserHelper _userHelper = new APIUserHelper(this);
     static String ISSUES = "issues";
-    static Long TEST_USER_ID;
+    static Integer TEST_USER_ID;
     static String TEST_USER_NAME;
     static String TEST_USER_DISPLAY_NAME;
 
-    static Long TEST_BUDDY_ID;
+    static Integer TEST_BUDDY_ID;
     static String TEST_BUDDY_NAME = "testbuddy@issues.test";
     static String TEST_BUDDY_DISPLAY_NAME;
 
@@ -61,9 +59,9 @@ public class IssueAPITest extends BaseWebDriverTest
         _issuesHelper.createNewIssuesList(ISSUES, getContainerHelper());
 
         TEST_USER_NAME = getUsername();
-        TEST_USER_ID = Long.valueOf(_userHelper.getUserId(TEST_USER_NAME));
+        TEST_USER_ID = _userHelper.getUserId(TEST_USER_NAME);
         TEST_USER_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_USER_NAME);
-        TEST_BUDDY_ID = _userHelper.createUser(TEST_BUDDY_NAME).getUserId().longValue();
+        TEST_BUDDY_ID = _userHelper.createUser(TEST_BUDDY_NAME).getUserId();
         TEST_BUDDY_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_BUDDY_NAME);
         var permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.addMemberToRole(TEST_BUDDY_NAME, "Project Administrator",
@@ -105,11 +103,11 @@ public class IssueAPITest extends BaseWebDriverTest
         String originalTitle = "Pre-Update Issue Test Issue";
         String comment = "This is the update comment";
         String title = "Updated issue test issue";
-        Long updatedPri = 4L;
+        Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
         IssueModel updateIssue = basicIssueModel(title, comment)
-                .setAction(IssueModel.IssueAction.update)
-                .setPriority(updatedPri);
+            .setAction(IssueModel.IssueAction.update)
+            .setPriority(updatedPri);
 
         // insert the issue
         var issueId = doIssueAction(originalIssue);
@@ -133,13 +131,13 @@ public class IssueAPITest extends BaseWebDriverTest
         String originalTitle = "Resolve Issue Test";
         String newComment = "This issue should now be resolved";
         String newTitle = "Resolved test issue";
-        Long updatedPri = 4L;
+        Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
 
         IssueModel resolveIssue = basicIssueModel(newTitle, newComment)
-                .setAction(IssueModel.IssueAction.resolve)
-                .setResolution("Fixed")
-                .setPriority(updatedPri);
+            .setAction(IssueModel.IssueAction.resolve)
+            .setResolution("Fixed")
+            .setPriority(updatedPri);
 
         // create the issue
         var issueId = doIssueAction(originalIssue);
@@ -163,11 +161,11 @@ public class IssueAPITest extends BaseWebDriverTest
         String originalTitle = "Close Issue Test";
         String newComment = "This issue should now be closed";
         String newTitle = "Closed test issue";
-        Long updatedPri = 4L;
+        Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
         IssueModel closeIssue = basicIssueModel(newTitle, newComment)
-                .setAction(IssueModel.IssueAction.close)
-                .setPriority(updatedPri);
+            .setAction(IssueModel.IssueAction.close)
+            .setPriority(updatedPri);
 
         // insert the issue
         var issueId = doIssueAction(originalIssue);
@@ -241,23 +239,23 @@ public class IssueAPITest extends BaseWebDriverTest
 
         var issueId = doIssueAction(issue);
         var hopefullyAssignedIssue = getIssueResponse(issueId);
-        assertEquals("expect issue to be assigned to buddy", TEST_BUDDY_ID, hopefullyAssignedIssue.getAssignedTo());
+        assertEquals("expected issue to be assigned to buddy", TEST_BUDDY_ID, hopefullyAssignedIssue.getAssignedTo());
     }
 
     @Test
     public void testInsertIssueWithoutIssueDefId() throws Exception
     {
         IssueModel issue = new IssueModel()
-                .setTitle("test to ensure default for container if no issueDefName is specified")
-                .setComment("hopefully blows up")
-                .setAction(IssueModel.IssueAction.insert)
-                .setAssignedTo(TEST_USER_ID)
-                .setNotify(TEST_BUDDY_NAME)
-                .setPriority(3L)
-                .setType("Defect");
+            .setTitle("test to ensure default for container if no issueDefName is specified")
+            .setComment("hopefully blows up")
+            .setAction(IssueModel.IssueAction.insert)
+            .setAssignedTo(TEST_USER_ID)
+            .setNotify(TEST_BUDDY_NAME)
+            .setPriority(3)
+            .setType("Defect");
         var issueId = doIssueAction(issue);
         var issueModel = getIssueResponse(issueId);
-        assertEquals("expect the default issueList to have been supplied", ISSUES, issueModel.getIssueDefName());
+        assertEquals("expected issue def name to have been supplied", ISSUES, issueModel.getIssueDefName());
     }
 
     @Test
@@ -275,7 +273,7 @@ public class IssueAPITest extends BaseWebDriverTest
         doIssueAction(close);
         var closedResponse = getIssueResponse(issueId);
         assertEquals("expect status to be closed", "closed", closedResponse.getStatus());
-        assertEquals("expect to be assigned to guest", Long.valueOf(0), closedResponse.getAssignedTo());
+        assertEquals("expect to be assigned to guest", (Integer) 0, closedResponse.getAssignedTo());
 
         doIssueAction(resolve);
         var resolvedResponse = getIssueResponse(issueId);
@@ -392,17 +390,18 @@ public class IssueAPITest extends BaseWebDriverTest
     public void testWithNoAction() throws Exception
     {
         IssueModel issue = new IssueModel()
-                .setTitle("test with no action")
-                .setComment("hopefully blows up")
-                .setAssignedTo(TEST_USER_ID)
-                .setNotify(TEST_BUDDY_NAME)
-                .setPriority(3L)
-                .setType("Defect");
+            .setTitle("test with no action")
+            .setComment("hopefully blows up")
+            .setAssignedTo(TEST_USER_ID)
+            .setNotify(TEST_BUDDY_NAME)
+            .setPriority(3)
+            .setType("Defect");
         try
         {
             doIssueAction(issue);
             fail("should produce an error");
-        }catch (CommandException success)
+        }
+        catch (CommandException success)
         {
             assertEquals("Action must be specified : (update, resolve, close, reopen)", success.getMessage());
         }
@@ -412,12 +411,12 @@ public class IssueAPITest extends BaseWebDriverTest
     public void testIssueWithoutAssignedTo() throws Exception
     {
         IssueModel issue = new IssueModel()
-                .setTitle("test with no assignedTo")
-                .setComment("should assign to guest")
-                .setAction(IssueModel.IssueAction.insert)
-                .setNotify(TEST_BUDDY_NAME)
-                .setPriority(3L)
-                .setType("Defect");
+            .setTitle("test with no assignedTo")
+            .setComment("should assign to guest")
+            .setAction(IssueModel.IssueAction.insert)
+            .setNotify(TEST_BUDDY_NAME)
+            .setPriority(3)
+            .setType("Defect");
 
         try
         {
@@ -469,14 +468,14 @@ public class IssueAPITest extends BaseWebDriverTest
     private IssueModel basicIssueModel(String title, String comment)
     {
         return new IssueModel()
-                .setTitle(title)
-                .setComment(comment)
-                .setAction(IssueModel.IssueAction.insert)
-                .setAssignedTo(TEST_USER_ID)
-                .setNotify(TEST_BUDDY_NAME)
-                .setIssueDefName(ISSUES)
-                .setPriority(3L)
-                .setType("Defect");
+            .setTitle(title)
+            .setComment(comment)
+            .setAction(IssueModel.IssueAction.insert)
+            .setAssignedTo(TEST_USER_ID)
+            .setNotify(TEST_BUDDY_NAME)
+            .setIssueDefName(ISSUES)
+            .setPriority(3)
+            .setType("Defect");
     }
 
 

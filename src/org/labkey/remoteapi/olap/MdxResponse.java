@@ -17,7 +17,7 @@ package org.labkey.remoteapi.olap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandResponse;
 

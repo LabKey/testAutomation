@@ -16,15 +16,15 @@
 
 package org.labkey.test.tests;
 
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -195,27 +195,23 @@ public class ChartingAPITest extends BaseWebDriverTest
         String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method;
-        HttpResponse response = null;
 
-        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try (CloseableHttpClient httpClient = WebTestHelper.getHttpClient())
         {
             method = new HttpPost(url);
             APITestHelper.injectCookies(method);
             List<NameValuePair> args = new ArrayList<>();
             args.add(new BasicNameValuePair("svg", svgText));
             method.setEntity(new UrlEncodedFormEntity(args));
-            response = httpClient.execute(method, context);
-            int status = response.getStatusLine().getStatusCode();
-            assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
-            assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-            assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
+            try (CloseableHttpResponse response = httpClient.execute(method, context))
+            {
+                int status = response.getCode();
+                assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
+                assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
+                assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
 
-            EntityUtils.consumeQuietly(response.getEntity()); // Prevent server-side TranscoderException
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consumeQuietly(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity()); // Prevent server-side TranscoderException
+            }
         }
     }
 

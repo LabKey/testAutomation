@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.io.File;
@@ -94,7 +94,7 @@ public class IssueModel
         return (Integer) getProp(ModelKeys.assignedto);
     }
 
-    public IssueModel setAssignedTo(Long assignedTo)
+    public IssueModel setAssignedTo(Integer assignedTo)
     {
         return setProp(ModelKeys.assignedto, assignedTo);
     }
@@ -119,12 +119,12 @@ public class IssueModel
         return setProp(ModelKeys.type, type);
     }
 
-    public Long getPriority()
+    public Integer getPriority()
     {
-        return (Long) getProp(ModelKeys.priority);
+        return (Integer) getProp(ModelKeys.priority);
     }
 
-    public IssueModel setPriority(Long priority)
+    public IssueModel setPriority(Integer priority)
     {
         return setProp(ModelKeys.priority, priority);
     }

@@ -126,8 +126,7 @@ public class ScatterPlotTest extends GenericChartsTest
         Protocol serverProtocol = saveProtocol(createDefaultConnection(), newAssay);
 
         // add runs to
-        // protocolId comes back as a long, but ImportRunCommand weirdly requires an int
-        Integer protocolId = Integer.parseInt(serverProtocol.getProtocolId().toString());
+       Integer protocolId = serverProtocol.getProtocolId();
 
         List<Map<String, Object>> runRecords = new ArrayList<>();
         runRecords.add(Map.of("height", 168, "weight", 83.2));

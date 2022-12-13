@@ -52,7 +52,7 @@ public class ApiSampleHelper
 
     public void addParents(String sampleType, List<String> sampleIds, Map<String, List<String>> parents, Map<String, List<String>> sources) throws IOException, CommandException
     {
-        Map<String, Long> rowIds = SampleTypeAPIHelper.getRowIdsForSamples(_containerPath, sampleType, sampleIds);
+        Map<String, Integer> rowIds = SampleTypeAPIHelper.getRowIdsForSamples(_containerPath, sampleType, sampleIds);
 
         Map<String, Object> sampleParentsColumns = new HashMap<>();
         for (Map.Entry<String, List<String>> parentEntries : parents.entrySet())
@@ -78,5 +78,4 @@ public class ApiSampleHelper
         updateRowsCommand.setRows(rows);
         updateRowsCommand.execute(_connection.get(), _containerPath);
     }
-
 }

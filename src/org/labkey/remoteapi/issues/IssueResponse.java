@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ public class IssueResponse extends CommandResponse
         super(text, statusCode, contentType, json, sourceCommand);
 
         JSONArray issuesArray = (JSONArray)json.get("issues");
-        for (int i=0; i< issuesArray.size(); i++)
+        for (int i=0; i< issuesArray.length(); i++)
         {
-            _issueIds.add((Long) issuesArray.get(i));
+            _issueIds.add(issuesArray.getLong(i));
         }
     }
 

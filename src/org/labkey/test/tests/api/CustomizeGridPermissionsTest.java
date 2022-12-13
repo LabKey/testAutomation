@@ -89,18 +89,20 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
         recreateList();
     }
 
-    private void recreateList() throws Exception
+    private void recreateList()
     {
         final ManageListsGrid manageListsGrid = BeginPage.beginAt(this, getProjectName()).getGrid();
+        manageListsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_FOLDER);
+
         if (manageListsGrid.getDataRowCount() > 0)
         {
-            manageListsGrid.checkAll();
+            manageListsGrid.checkAllOnPage();
             manageListsGrid.deleteSelectedLists();
         }
-        manageListsGrid.
-                clickImportArchive().
-                setZipFile(LIST_ARCHIVE).
-                clickImport();
+
+        manageListsGrid.clickImportArchive()
+                .setZipFile(LIST_ARCHIVE)
+                .clickImport();
     }
 
     private DataRegionTable goToList()
@@ -219,7 +221,7 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testViewEditorNamedCustomGrid() throws Exception
+    public void testViewEditorNamedCustomGrid()
     {
         impersonate(VIEW_EDITOR);
         {

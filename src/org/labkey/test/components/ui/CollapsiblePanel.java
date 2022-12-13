@@ -74,8 +74,8 @@ public class CollapsiblePanel extends WebDriverComponent<CollapsiblePanel.Elemen
         WebElement expandCollapseToggle = Locator.tagWithClass("span", "pull-right")
                 .findWhenNeeded(header).withTimeout(2000);
         private Locator.XPathLocator body = Locator.tagWithClass("div", "panel-collapse");
-        Locator expandedLoc = Locator.tagWithAttributeContaining("svg", "class", "fa-minus-square");
-        Locator collapsedLoc = Locator.tagWithAttributeContaining("svg", "class", "fa-plus-square");
+        Locator expandedLoc = Locator.tagWithAttributeContaining("span", "class", "fa-minus-square");
+        Locator collapsedLoc = Locator.tagWithAttributeContaining("span", "class", "fa-plus-square");
 
         WebElement waitForBody()
         {

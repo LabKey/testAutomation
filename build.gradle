@@ -24,7 +24,7 @@ project.dependencies {
     api("org.assertj:assertj-core:${assertjVersion}")
     implementation("commons-io:commons-io:${commonsIoVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
-    implementation("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")
+    implementation("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
 
     //api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}")
@@ -39,7 +39,7 @@ project.dependencies {
     api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
     api("org.hamcrest:hamcrest-core:${hamcrestCoreVersion}")
     implementation("org.apache.commons:commons-text:${commonsTextVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
     implementation("net.sf.opencsv:opencsv:${opencsvVersion}")
     implementation("javax.servlet:javax.servlet-api:${servletApiVersion}")
@@ -47,7 +47,6 @@ project.dependencies {
     implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
     implementation "org.apache.logging.log4j:log4j-iostreams:${log4j2Version}"
     api "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
-    api "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
     implementation "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
     api "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
     implementation "org.apache.tika:tika-core:${tikaVersion}"
@@ -58,7 +57,7 @@ project.dependencies {
     api "org.apache.poi:poi:${poiVersion}"
     implementation "org.apache.poi:poi-ooxml:${poiVersion}"
     implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
-    implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
+    implementation "org.bouncycastle:bcpg-jdk18on:${bouncycastlePgpVersion}"
     implementation "org.jetbrains:annotations:${annotationsVersion}"
     implementation "org.mock-server:mockserver-netty:${mockserverNettyVersion}" // used by test classes in accounts
     runtimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"

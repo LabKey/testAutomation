@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.api.settings.AppProps;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -84,10 +83,5 @@ public class ExperimentalFeaturesHelper
         {
             throw new RuntimeException("Error retrieving experimental feature '" + feature + "'.", e);
         }
-    }
-
-    public static boolean isNoQuestionMarkMode(Connection cn)
-    {
-        return isExperimentalFeatureEnabled(cn, AppProps.EXPERIMENTAL_NO_QUESTION_MARK_URL);
     }
 }

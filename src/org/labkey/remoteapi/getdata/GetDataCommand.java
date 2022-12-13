@@ -15,15 +15,12 @@
  */
 package org.labkey.remoteapi.getdata;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.labkey.remoteapi.PostCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Minimal wrapper for VisualizationController.GetDataAction usage. Grabs pre-defined JSON to send as the POST body.
@@ -35,12 +32,14 @@ public class GetDataCommand extends PostCommand<GetDataResponse>
 {
     private final JSONObject _payload;
 
-    public GetDataCommand(InputStream inputJSON) throws IOException, ParseException
+    public GetDataCommand(InputStream inputJSON) throws IOException
     {
         super("visualization", "getData");
-        JSONParser parser = new JSONParser();
-        _payload = (JSONObject)parser.parse(new InputStreamReader(inputJSON, StandardCharsets.UTF_8));
-        inputJSON.close();
+
+        try (InputStream is = inputJSON)
+        {
+            _payload = new JSONObject(new JSONTokener(is));
+        }
     }
 
     @Override

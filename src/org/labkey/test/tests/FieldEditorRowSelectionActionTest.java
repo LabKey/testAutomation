@@ -1,9 +1,8 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONTokener;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -21,6 +20,7 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -246,17 +246,18 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 
     private ArrayList<String> getFieldsFromExportFile(File exportFile) throws Exception
     {
-
-        JSONParser parser = new JSONParser();
-        JSONArray jsonArray = (JSONArray) parser.parse(Readers.getReader(exportFile));
-
-        ArrayList<String> exportFields = new ArrayList<>();
-        for (int i = 0; i < jsonArray.size(); i++)
+        try (Reader reader = Readers.getReader(exportFile))
         {
-            PropertyDescriptor field = new PropertyDescriptor((JSONObject) jsonArray.get(i));
-            exportFields.add(field.getName());
+            JSONArray jsonArray = new JSONArray(new JSONTokener(reader));
+
+            ArrayList<String> exportFields = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++)
+            {
+                PropertyDescriptor field = new PropertyDescriptor(jsonArray.getJSONObject(i));
+                exportFields.add(field.getName());
+            }
+            return exportFields;
         }
-        return exportFields;
     }
 }
 
