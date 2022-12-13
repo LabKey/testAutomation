@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.ontology;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.WebDriver;
@@ -8,7 +9,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -22,6 +22,14 @@ public class ConceptPickerDialog extends ModalDialog
     public ConceptPickerDialog(ModalDialogFinder finder)
     {
         super(finder);
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        super.waitForReady();
+        WebDriverWrapper.waitFor(() -> elementCache().ontologySelect.getComponentElement().isDisplayed() ||
+                elementCache().searchBox.getComponentElement().isDisplayed(), "Concept picker didn't load", 5_000);
     }
 
     /**
@@ -83,8 +91,7 @@ public class ConceptPickerDialog extends ModalDialog
      */
     public boolean hasOntologySelect()
     {
-        waitForReady(elementCache());
-        return elementCache().selectOntologySelect().isPresent();
+        return elementCache().ontologySelect.getComponentElement().isDisplayed();
     }
 
     /**
@@ -95,9 +102,9 @@ public class ConceptPickerDialog extends ModalDialog
      */
     public ConceptPickerDialog selectOntology(String ontology)
     {
-        getWrapper().waitFor(() -> elementCache().selectOntologySelect().isPresent(),
+        WebDriverWrapper.waitFor(() -> elementCache().ontologySelect.getComponentElement().isDisplayed(),
                 "the ontology select did not become present", WAIT_FOR_JAVASCRIPT);
-        var select = elementCache().selectOntologySelect().get();
+        var select = elementCache().ontologySelect;
         var selectElement = select.getComponentElement();
         select.select(ontology);
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(selectElement));
@@ -110,10 +117,9 @@ public class ConceptPickerDialog extends ModalDialog
      */
     public List<String> getAvailableOntologies()
     {
-        getWrapper().waitFor(() -> elementCache().selectOntologySelect().isPresent(),
+        WebDriverWrapper.waitFor(() -> elementCache().ontologySelect.getComponentElement().isDisplayed(),
                 "the ontology select did not become present", WAIT_FOR_JAVASCRIPT);
-        var select = elementCache().selectOntologySelect().get();
-        return select.getOptions();
+        return elementCache().ontologySelect.getOptions();
     }
 
     public ConceptPickerDialog waitForActiveTreeNode()
@@ -155,11 +161,8 @@ public class ConceptPickerDialog extends ModalDialog
         final ConceptInfoTabs infoTabs = new ConceptInfoTabs.ConceptInfoTabsFinder(getDriver())
                 .findWhenNeeded(this);
 
-        Optional<ReactSelect> selectOntologySelect()
-        {
-            return ReactSelect.finder(getDriver())
-                    .withId("ontology-select").findOptional();
-        }
+        final ReactSelect ontologySelect = ReactSelect.finder(getDriver()).withId("ontology-select")
+                .findWhenNeeded(this);
     }
 
 
