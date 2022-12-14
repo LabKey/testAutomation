@@ -7,7 +7,6 @@ import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

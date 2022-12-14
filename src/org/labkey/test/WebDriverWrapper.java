@@ -46,7 +46,6 @@ import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
@@ -1163,7 +1162,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             String currentUrl = getDriver().getCurrentUrl();
             String destinationAction = new Crawler.ControllerActionId(destinationUrl).getAction();
-            String currentSansHash = EscapeUtil.decode(currentUrl.split("#", 2)[0]);
+            String currentSansHash = currentUrl.split("#", 2)[0];
             String destinationSansHash = destinationUrl.split("#", 2)[0];
 
             return !destinationAction.equals(appAction) ||
