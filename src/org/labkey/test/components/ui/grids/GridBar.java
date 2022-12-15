@@ -20,6 +20,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -230,7 +231,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void clickButton(String buttonCaption)
     {
-        BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000).click();
+        var btn = BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(btn));   // for cases when a disabled button
+        btn.click();                                                                    // awaits being enabled, for example by selecting grid items
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
