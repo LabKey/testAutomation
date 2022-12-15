@@ -99,6 +99,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModule(getProjectName(), MODULE_NAME);
+        new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE).truncateTable();
         new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, "Colors").truncateTable();
     }
 

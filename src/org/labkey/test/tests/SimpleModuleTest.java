@@ -74,6 +74,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1304,7 +1305,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectCmd.setMaxRows(-1);
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
 
-        String[] expectedCols = new String[]{"ModelId", "ModelYear", "Milage", "LastService", "RowId"};
+        String[] expectedCols = new String[]{"ModelId", "ModelYear", "Milage", "LastService", "RowId", "TriggerScriptContainer"};
         assertEquals("Expected to return " + expectedCols.length + " columns, based on the saved view", expectedCols.length, selectResp.getColumnModel().size());
         for (String col : expectedCols)
         {
