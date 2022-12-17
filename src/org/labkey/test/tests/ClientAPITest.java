@@ -1427,7 +1427,7 @@ public class ClientAPITest extends BaseWebDriverTest
         command = new Command<>("query", "selectRows.api");
         validateUnauthorizedResponses(cn, command, expectedProps);
 
-        expectedProps.put("exception", "No such project: " + bogusProjectName);
+        expectedProps.put("exception", "No such project: " + bogusContainerPath); // Might need to change back to bogusProjectName, see Issue 46969.
 
         // Reset command so that it's not requesting XML responses
         command = new Command<>("query", "selectRows.api");
