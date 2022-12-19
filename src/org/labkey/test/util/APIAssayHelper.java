@@ -65,8 +65,9 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
-        irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        irc.setTimeout(180000); // Wait 3 minutes for
+        projectPath = projectPath.startsWith("/") ? projectPath : "/" + projectPath;// assay import
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -76,7 +77,8 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setRunFilePath(runFilePath);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        projectPath = projectPath.startsWith("/") ? projectPath : "/" + projectPath;
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -88,7 +90,8 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setProperties(runProperties);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        projectPath = projectPath.startsWith("/") ? projectPath : "/" + projectPath;
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -124,8 +127,10 @@ public class APIAssayHelper extends AbstractAssayHelper
         if(null != batchProperties)
             irc.setBatchProperties(batchProperties);
 
+        projectPath = projectPath.startsWith("/") ? projectPath : "/" + projectPath;
+
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @Override
@@ -240,9 +245,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         SelectRowsCommand cmd = new SelectRowsCommand("assay", "AssayList");
         cmd.setColumns(Arrays.asList("Name", "Description", "Type"));
 
-        String formattedContainerPath = containerPath;
-        if(!formattedContainerPath.startsWith("/"))
-            formattedContainerPath = "/" + formattedContainerPath;
+        String formattedContainerPath = containerPath.startsWith("/") ? containerPath : "/" + containerPath;
 
         List<String> resultData = new ArrayList<>();
 
@@ -276,7 +279,8 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         SaveAssayBatchCommand cmd = new SaveAssayBatchCommand(assayId, batch);
         cmd.setTimeout(180000); // Wait 3 minutes for assay import
-        cmd.execute(_test.createDefaultConnection(), "/" + projectPath);
+        projectPath = projectPath.startsWith("/") ? projectPath : "/" + projectPath;
+        cmd.execute(_test.createDefaultConnection(), projectPath);
     }
 
     public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws IOException, CommandException
