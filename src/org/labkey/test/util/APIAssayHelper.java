@@ -202,7 +202,8 @@ public class APIAssayHelper extends AbstractAssayHelper
         AssayListResponse alr = null;
         try
         {
-            alr = alc.execute(_test.createDefaultConnection(), "/" + projectPath);
+            projectPath = projectPath.startsWith("/") ? projectPath : "/" + projectPath;
+            alr = alc.execute(_test.createDefaultConnection(), projectPath);
         }
         catch (CommandException | IOException e)
         {
