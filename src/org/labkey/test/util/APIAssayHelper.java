@@ -65,7 +65,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
-        irc.setTimeout(180000); // Wait 3 minutes for
+        irc.setTimeout(180000); // Wait 3 minutes for assay import
         return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
