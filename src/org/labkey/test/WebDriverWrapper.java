@@ -94,6 +94,7 @@ import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -1162,8 +1163,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             String currentUrl = getDriver().getCurrentUrl();
             String destinationAction = new Crawler.ControllerActionId(destinationUrl).getAction();
-            String currentSansHash = currentUrl.split("#", 2)[0];
-            String destinationSansHash = destinationUrl.split("#", 2)[0];
+            String currentSansHash = URIUtil.decodePath(currentUrl.split("#", 2)[0]);
+            String destinationSansHash = URIUtil.decodePath(destinationUrl.split("#", 2)[0]);
 
             return !destinationAction.equals(appAction) ||
                     !destinationUrl.contains("#") || // Will always navigate if there is no hash
