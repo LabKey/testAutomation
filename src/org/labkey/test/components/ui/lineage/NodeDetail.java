@@ -51,8 +51,7 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 
     private void clickHiddenLink(WebElement link, boolean wait)
     {
-        getWrapper().scrollIntoView(getComponentElement());
-        getWrapper().mouseOver(link);
+        getWrapper().mouseOver(getComponentElement());
         new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(ExpectedConditions.elementToBeClickable(link));
         if (wait)
             getWrapper().clickAndWait(link);
