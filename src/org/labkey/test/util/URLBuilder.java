@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
@@ -47,9 +46,6 @@ import static org.labkey.test.WebTestHelper.getBaseURL;
  */
 public class URLBuilder
 {
-    // More permissive than reality but good enough to prevent egregious values.
-    private static final Pattern CONTROLLER_PATTERN = Pattern.compile("[a-zA-Z\\-]+");
-    private static final Pattern ACTION_PATTERN = Pattern.compile("[0-9a-zA-Z\\-.]+");
 
     private final String _controller;
     private final String _action;
@@ -68,32 +64,14 @@ public class URLBuilder
      */
     public URLBuilder(String controller, String action, @Nullable String containerPath)
     {
-        _controller = verifyController(controller);
-        _action = verifyAction(action);
+        _controller = Objects.requireNonNull(controller);
+        _action = Objects.requireNonNull(action);
         _containerPath = verifyContainerPath(containerPath);
     }
 
     public URLBuilder(String controller, String action)
     {
         this(controller, action, null);
-    }
-
-    private static String verifyController(String controller)
-    {
-        if (!CONTROLLER_PATTERN.matcher(controller).matches())
-        {
-            throw new IllegalArgumentException("Invalid controller: " + controller);
-        }
-        return controller;
-    }
-
-    private static String verifyAction(String action)
-    {
-        if (!ACTION_PATTERN.matcher(action).matches())
-        {
-            throw new IllegalArgumentException("Invalid action: " + action);
-        }
-        return action;
     }
 
     /**
