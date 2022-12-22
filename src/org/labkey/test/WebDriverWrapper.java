@@ -94,6 +94,7 @@ import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -1107,14 +1108,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return createDefaultConnection();
     }
 
-    public long beginAt(String relativeURL)
+    public long beginAt(String url)
     {
-        return beginAt(relativeURL, defaultWaitForPage);
+        return beginAt(url, defaultWaitForPage);
     }
 
-    public long beginAt(String relativeURL, int millis)
+    public long beginAt(String url, int millis)
     {
-        relativeURL = makeRelativeUrl(relativeURL);
+        String relativeURL = makeRelativeUrl(url);
         String logMessage = "";
 
         try
@@ -1123,14 +1124,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 logMessage = "Navigating to root";
             else
             {
+                relativeURL = "/" + relativeURL;
                 logMessage = "Navigating to " + relativeURL;
-                if (relativeURL.charAt(0) != '/')
-                {
-                    relativeURL = "/" + relativeURL;
-                }
             }
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
+            final boolean expectPageLoad = expectPageLoad(fullURL);
 
             long elapsedTime = doAndWaitForPageToLoad(() -> {
                 try
@@ -1141,7 +1140,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 {
                     throw new TestTimeoutException(ex); // Triggers thread dump.
                 }
-            }, millis);
+            }, expectPageLoad ? millis : 0);
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
@@ -1153,6 +1152,36 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     * Navigating within an app will not trigger a page load.
+     * Compare current page URL with destination to determine whether to expect a page load.
+     */
+    private boolean expectPageLoad(String destinationUrl)
+    {
+        String appAction = "app";
+        try
+        {
+            String currentUrl = getDriver().getCurrentUrl();
+            String destinationAction = new Crawler.ControllerActionId(destinationUrl).getAction();
+            String currentSansHash = URIUtil.decodePath(currentUrl.split("#", 2)[0]);
+            String destinationSansHash = URIUtil.decodePath(destinationUrl.split("#", 2)[0]);
+
+            return !destinationAction.equals(appAction) ||
+                    !destinationUrl.contains("#") || // Will always navigate if there is no hash
+                    !destinationSansHash.equals(currentSansHash);
+        }
+        catch (IllegalArgumentException bustedUrl)
+        {
+            // this will happen when the url looks like 'about:blank', or where there isn't a folder or action to
+            // parse from the URL
+            return true;
+        }
+    }
+
+    /**
+     * @deprecated Use {@link #beginAt(String, int)}
+     */
+    @Deprecated (since = "22.9")
     public long goToURL(final URL url, int milliseconds)
     {
         return beginAt(url.toString(), milliseconds);
@@ -3795,22 +3824,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String suffix = "";
         if (currentURL.contains("#"))
         {
-            String[] parts = currentURL.split("#");
+            String[] parts = currentURL.split("#", 2);
             currentURL = parts[0];
             // There might not be anything after the '#'
             suffix = "#" + (parts.length > 1 ? parts[1] : "");
         }
         if (!currentURL.contains(parameter))
         {
+            final String paramSep;
             if (currentURL.contains("?"))
             {
                 if (currentURL.indexOf("?") == currentURL.length() - 1)
-                    beginAt(currentURL.concat(parameter + suffix), mils);
+                    paramSep = "";
                 else
-                    beginAt(currentURL.concat("&" + parameter + suffix), mils);
+                    paramSep = "&";
             }
             else
-                beginAt(currentURL.concat("?" + parameter + suffix), mils);
+                paramSep = "?";
+
+            beginAt(currentURL + paramSep + parameter + suffix, mils);
         }
     }
 
