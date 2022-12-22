@@ -1,11 +1,14 @@
 package org.labkey.test.components.ui.lineage;
 
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 /**
  * Automates the labkey UI for node details (implemented in /components/lineage/LineageNodeList.tsx)
@@ -25,6 +28,12 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
         _driver = driver;
     }
 
+    @Override
+    protected void waitForReady()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(getComponentElement()));
+    }
+
     public String getName()
     {
        return elementCache().nameElement.getText();
@@ -32,24 +41,23 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 
     public void clickOverViewLink(boolean wait)
     {
-        getWrapper().mouseOver(getComponentElement());
-        WebDriverWrapper.waitFor(()-> elementCache().overviewLink.isEnabled(),
-                () -> "Overview link not enabled for " + getName(), 1000);
-        if (wait)
-            getWrapper().clickAndWait(elementCache().overviewLink);
-        else
-            elementCache().overviewLink.click();
+        clickHiddenLink(elementCache().overviewLink, wait);
     }
 
     public void clickLineageGraphLink(boolean wait)
     {
-        getWrapper().mouseOver(getComponentElement());
-        WebDriverWrapper.waitFor(()-> elementCache().lineageGraphLink.isEnabled(),
-                () -> "Lineage graph link not enabled for " + getName(), 1000);
+        clickHiddenLink(elementCache().lineageGraphLink, wait);
+    }
+
+    private void clickHiddenLink(WebElement link, boolean wait)
+    {
+        getWrapper().scrollIntoView(getComponentElement());
+        getWrapper().mouseOver(link);
+        new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(ExpectedConditions.elementToBeClickable(link));
         if (wait)
-            getWrapper().clickAndWait(elementCache().lineageGraphLink);
+            getWrapper().clickAndWait(link);
         else
-            elementCache().lineageGraphLink.click();
+            link.click();
     }
 
     public WebElement getIcon()
