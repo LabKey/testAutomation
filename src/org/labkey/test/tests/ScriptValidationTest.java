@@ -142,13 +142,14 @@ public class ScriptValidationTest extends BaseWebDriverTest
         InsertRowsCommand cmd2 = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         cmd2.getRows().addAll(list2);
         Object modelId = cmd2.execute(cn, getProjectName()).getRows().get(0).get("RowId");
+        assertNotNull("RowId not returned for models insert, values", modelId);
 
         PostCommand<CommandResponse> saveRowsCommand = prepareSaveRowsCommand("insertWithKeys", getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE, "RowId",
                 new String[]{"ModelId", "Color", "ModelYear", "Milage", "LastService"},
                 new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
         CommandResponse response = saveRowsCommand.execute(cn, "/home");
         Map<String, Object> row = (Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values");
-        Object vehicleRowId = row.get("rowId");
+        Object vehicleRowId = row.get("RowId");
         assertNotNull("RowId not returned for vehicles insert", vehicleRowId);
 
         SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
