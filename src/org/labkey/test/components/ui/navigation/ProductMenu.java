@@ -8,7 +8,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.util.TestLogger;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -111,25 +110,6 @@ public class ProductMenu extends BaseBootstrapMenu
         elementCache().menuSectionLink(headerText, menuText).click();
     }
 
-    public boolean sectionHasOverflowLink(String headerText)
-    {
-        expand();
-        try
-        {
-            return elementCache().overFlowLink(headerText).isDisplayed();
-        }
-        catch(NoSuchElementException nse)
-        {
-            return false;
-        }
-    }
-
-    public void clickOverflowLink(String headerText)
-    {
-        expand();
-        elementCache().overFlowLink(headerText).click();
-    }
-
     @Override
     protected Locator getToggleLocator()
     {
@@ -152,32 +132,26 @@ public class ProductMenu extends BaseBootstrapMenu
     {
         private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").findWhenNeeded(this);
 
-        private final Map<String, WebElement> menuSections = new HashMap<>();
         Locator.XPathLocator menuSectionHeaderLoc(String headerText)
         {
             return Locator.tagWithClass("div", "menu-section")
-                    .child(Locator.tagWithClass("span", "menu-section-header").withText(Locator.NBSP + headerText));
+                    .child(Locator.tag("ul"))
+                    .child(Locator.tagWithClass("li", "menu-section-header").containing(headerText));
         }
 
         WebElement menuSectionHeader(String headerText)
         {
-            return menuSectionHeaderLoc(headerText).child(Locator.linkWithText(Locator.NBSP + headerText)).findElement(elementCache().menuContent);
+            return menuSectionHeaderLoc(headerText).child(Locator.linkContainingText(headerText)).findElement(elementCache().menuContent);
         }
 
         WebElement menuSectionBody(String headerText)
         {
-            return menuSectionHeaderLoc(headerText).followingSibling("ul").findElement(elementCache().menuContent);
+            return menuSectionHeaderLoc(headerText).parent("ul").findElement(elementCache().menuContent);
         }
 
         WebElement menuSectionLink(String headerText, String linkText)
         {
             return Locator.linkWithText(linkText).findElement(menuSectionBody(headerText));
-        }
-
-        WebElement overFlowLink(String headerText)
-        {
-            return menuSectionHeaderLoc(headerText)
-                    .followingSibling("span").withClass("overflow-link").findElement(elementCache().menuContent);
         }
     }
 }
