@@ -65,14 +65,14 @@ public class ProductMenu extends BaseBootstrapMenu
     public List<String> getMenuSectionHeaders()
     {
         expand();
-        List<WebElement> headersElements = Locator.tagWithClass("span", "menu-section-header").findElements(this);
+        List<WebElement> headersElements = MENU_SECTION_HEADER_LOC.findElements(this);
         return getWrapper().getTexts(headersElements).stream().map(String::trim).collect(Collectors.toList());
     }
 
     public Map<String, String> getMenuSectionHeaderLinks()
     {
         expand();
-        List<WebElement> headerElements = Locator.tagWithClass("span", "menu-section-header").findElements(this);
+        List<WebElement> headerElements = MENU_SECTION_HEADER_LOC.findElements(this);
         Map<String, String> links = new HashMap<>();
         headerElements.forEach((header) -> {
             links.put(header.getText().trim(),Locator.tag("a").findElement(header).getAttribute("href"));
