@@ -149,7 +149,8 @@ public class ScriptValidationTest extends BaseWebDriverTest
                 new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
         CommandResponse response = saveRowsCommand.execute(cn, "/home");
         Map<String, Object> row = (Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values");
-        Object vehicleRowId = row.get("RowId");
+        // See discussion in: https://github.com/LabKey/testAutomation/pull/1338
+        Object vehicleRowId = row.get("rowId");  // NOTE: even though the XML for this table defines the case as RowId, using SaveRows/insertWithKeys results in the code converting the first letter of the field names to lowercase, in ResultSetRowMapFactory
         assertNotNull("RowId not returned for vehicles insert", vehicleRowId);
 
         SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
