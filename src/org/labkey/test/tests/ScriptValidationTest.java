@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -147,7 +148,8 @@ public class ScriptValidationTest extends BaseWebDriverTest
                 new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
         CommandResponse response = saveRowsCommand.execute(cn, "/home");
         Map<String, Object> row = (Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values");
-        Object vehicleRowId = row.get("rowid");
+        Object vehicleRowId = row.get("RowId");
+        assertNotNull("RowId not returned for vehicles insert", vehicleRowId);
 
         SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
         src.setColumns(Arrays.asList("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
