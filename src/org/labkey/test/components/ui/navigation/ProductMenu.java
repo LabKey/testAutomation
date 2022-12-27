@@ -103,11 +103,37 @@ public class ProductMenu extends BaseBootstrapMenu
                 .collect(Collectors.toList());
     }
 
-
     public void clickMenuItem(String headerText, String menuText)
     {
         expand();
         elementCache().menuSectionLink(headerText, menuText).click();
+    }
+
+    public ProductMenu clickFolderItem(String folderName)
+    {
+        expand();
+        elementCache().folderItemLink(folderName).click();
+        return this;
+    }
+
+    public void goToFolder(String folderName)
+    {
+        clickFolderItem(folderName);
+        clickMenuColumnHeader("Dashboard");
+    }
+
+    public String getButtonTitle()
+    {
+        WebElement buttonTitle = Locator.tagWithId("button", "product-menu")
+                .child(Locator.tagWithClass("div", "title")).findElement(this);
+        return buttonTitle.getText();
+    }
+
+    public String getButtonSubtitle()
+    {
+        WebElement buttonSubtitle = Locator.tagWithId("button", "product-menu")
+                .child(Locator.tagWithClass("div", "subtitle")).findElement(this);
+        return buttonSubtitle.getText();
     }
 
     @Override
@@ -152,6 +178,11 @@ public class ProductMenu extends BaseBootstrapMenu
         WebElement menuSectionLink(String headerText, String linkText)
         {
             return Locator.linkWithText(linkText).findElement(menuSectionBody(headerText));
+        }
+
+        WebElement folderItemLink(String folderName)
+        {
+            return Locator.tagWithClass("a", "menu-folder-item").withText(folderName).findElement(elementCache().menuContent);
         }
     }
 }
