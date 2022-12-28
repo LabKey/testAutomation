@@ -149,9 +149,9 @@ public class ScriptValidationTest extends BaseWebDriverTest
                 new String[]{"ModelId", "Color", "ModelYear", "Milage", "LastService"},
                 new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
         CommandResponse response = saveRowsCommand.execute(cn, "/home");
-        CaseInsensitiveHashMap<String> row = new CaseInsensitiveHashMap<>((Map<?,?>)((Map<?,?>)((List<?>)((Map<?,?>)((List<?>)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values"));
+        CaseInsensitiveHashMap row = new CaseInsensitiveHashMap<>((Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values"));
         // See discussion in: https://github.com/LabKey/testAutomation/pull/1338
-        String vehicleRowId = row.get("rowId");  // NOTE: even though the XML for this table defines the case as RowId, using SaveRows/insertWithKeys results in the code converting the first letter of the field names to lowercase, in ResultSetRowMapFactory
+        Object vehicleRowId = row.get("rowId");  // NOTE: even though the XML for this table defines the case as RowId, using SaveRows/insertWithKeys results in the code converting the first letter of the field names to lowercase, in ResultSetRowMapFactory
         assertNotNull("RowId not returned for vehicles insert, keys found: " + StringUtils.join(row.keySet(), ","), vehicleRowId);
 
         SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
