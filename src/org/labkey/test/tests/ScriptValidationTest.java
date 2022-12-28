@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -141,13 +143,16 @@ public class ScriptValidationTest extends BaseWebDriverTest
         InsertRowsCommand cmd2 = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         cmd2.getRows().addAll(list2);
         Object modelId = cmd2.execute(cn, getProjectName()).getRows().get(0).get("RowId");
+        assertNotNull("RowId not returned for models insert, values", modelId);
 
         PostCommand<CommandResponse> saveRowsCommand = prepareSaveRowsCommand("insertWithKeys", getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE, "RowId",
                 new String[]{"ModelId", "Color", "ModelYear", "Milage", "LastService"},
                 new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
         CommandResponse response = saveRowsCommand.execute(cn, "/home");
-        Map<String, Object> row = (Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values");
-        Object vehicleRowId = row.get("rowid");
+        CaseInsensitiveHashMap row = new CaseInsensitiveHashMap<>((Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values"));
+        // See discussion in: https://github.com/LabKey/testAutomation/pull/1338
+        Object vehicleRowId = row.get("rowId");  // NOTE: even though the XML for this table defines the case as RowId, using SaveRows/insertWithKeys results in the code converting the first letter of the field names to lowercase, in ResultSetRowMapFactory
+        assertNotNull("RowId not returned for vehicles insert, keys found: " + StringUtils.join(row.keySet(), ","), vehicleRowId);
 
         SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
         src.setColumns(Arrays.asList("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
@@ -155,7 +160,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         SelectRowsResponse sr2 = src.execute(cn, getProjectName());
         assertEquals("Incorrect model", modelId, sr2.getRows().get(0).get("ModelId"));
         assertEquals("Incorrect Milage", 1234, sr2.getRows().get(0).get("Milage"));
-        assertEquals("Incorrect RowId for First Record", vehicleRowId, sr2.getRows().get(0).get("RowId"));
+        assertEquals("Incorrect RowId for First Record", vehicleRowId, sr2.getRows().get(0).get("rowId"));
 
         // This should be true for all rows, including the one we just added:
         sr2.getRows().forEach(r -> {
