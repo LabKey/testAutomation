@@ -162,7 +162,7 @@ public class ProductMenu extends BaseBootstrapMenu
         {
             return Locator.tagWithClass("div", "menu-section")
                     .child(Locator.tag("ul"))
-                    .child(Locator.tagWithClass("li", "menu-section-header").containing(headerText));
+                    .child(Locator.tagWithClass("li", "menu-section-header").endsWith(headerText));
         }
 
         WebElement menuSectionHeader(String headerText)
