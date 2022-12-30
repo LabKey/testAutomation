@@ -60,6 +60,9 @@ public class BarTenderMockPostCallback implements ExpectationResponseCallback
 
             label = StringUtils.trimToNull(label);
 
+            if (path.endsWith(SERVICE_NOT_FOUND))
+                return response("Not found").withStatusCode(NOT_FOUND);
+
             // Respond successfully to requests with blank labels. This isn't Ideal, but it simplifies the parsing of label value and needs to be allowed for the TestConnection scenario.
             if (label == null)
                 return readFileResponse(SUCCESS_RESPONSE_FILE, "");
