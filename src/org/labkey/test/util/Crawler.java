@@ -917,7 +917,8 @@ public class Crawler
                             return true; // Stop waiting
                         }
                     }
-                    if (!_test.getDriver().getCurrentUrl().equals(initialUrl))
+                    String currentUrl = _test.getDriver().getCurrentUrl();
+                    if (!currentUrl.equals(initialUrl) && stripHash(currentUrl).equals(stripHash(initialUrl)))
                     {
                         // URL changed without document going stale.
                         // Probably a single-page app navigation or page anchor navigation.
