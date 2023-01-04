@@ -89,15 +89,7 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         return ServerNotificationMenu.finder(getDriver()).find(this);
     }
 
-    public MultiMenu getFolderMenu()
-    {
-        return elementCache().folderMenu;
-    }
-
-    public ProductMenu getProductMenu(int expectedColumnCount)
-    {
-        return elementCache().productMenu(expectedColumnCount);
-    }
+    public abstract ProductMenu getProductMenu();
 
     public abstract UserMenu getUserMenu();
 
