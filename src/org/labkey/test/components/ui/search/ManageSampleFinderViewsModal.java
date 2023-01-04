@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.search;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -125,7 +126,10 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public String getErrorMsg()
     {
-        return elementCache().errorMsg.getText();
+        if(WebDriverWrapper.waitFor(()->elementCache().errorMsg.isDisplayed(), 1_000))
+            return elementCache().errorMsg.getText();
+        else
+            return "";
     }
 
     @Override

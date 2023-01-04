@@ -884,6 +884,7 @@ public class Crawler
             final File[] existingDownloads = downloadDir.listFiles();
 
             long elapsedTime = _test.doAndMaybeWaitForPageToLoad(WebDriverWrapper.WAIT_FOR_PAGE, () -> {
+                final String initialUrl = _test.getDriver().getCurrentUrl();
                 final WebElement mightGoStale = Locators.documentRoot.findElement(_test.getDriver());
                 ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
                 // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
@@ -915,6 +916,14 @@ public class Crawler
                             navigated.setValue(false); // Don't wait for page load when a download occurs
                             return true; // Stop waiting
                         }
+                    }
+                    String currentUrl = _test.getDriver().getCurrentUrl();
+                    if (!currentUrl.equals(initialUrl) && stripHash(currentUrl).equals(stripHash(initialUrl)))
+                    {
+                        // URL changed without document going stale.
+                        // Probably a single-page app navigation or page anchor navigation.
+                        navigated.setValue(false);
+                        return true; // Stop waiting
                     }
                     return false; // No navigation or download detected. Continue waiting.
                 }, WebDriverWrapper.WAIT_FOR_PAGE))
