@@ -49,6 +49,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -207,10 +208,11 @@ public class Crawler
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
 
-            // Disable crawler for single-page apps until we make `beginAt` work with them
+            // Disable crawler for single-page apps until we make the crawler able to navigate them
             new ControllerActionId("biologics", "app"),
             new ControllerActionId("cds", "app"),
             new ControllerActionId("samplemanager", "app"),
+            new ControllerActionId("freezermanager", "app"),
 
             // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
             new ControllerActionId("biologics", "begin"),
@@ -589,7 +591,7 @@ public class Crawler
             String strippedRelativeURL = stripQueryParams(getRelativeURL());
 
             // never go to the exactly same URL (minus query params) twice:
-            if (_urlsChecked.contains(strippedRelativeURL))
+            if (_urlsChecked.contains(URIUtil.decodePath(strippedRelativeURL)))
                 return false;
 
             if (getRelativeURL().contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
@@ -955,6 +957,7 @@ public class Crawler
         // Keep track of where crawler has been
         _actionsVisited.add(actionId);
         _urlsChecked.add(stripQueryParams(relativeURL));
+        _urlsChecked.add(URIUtil.decodePath(stripQueryParams(relativeURL)));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
         String originMessage = (origin != null ? "\nOriginating page: " + origin : "") +
