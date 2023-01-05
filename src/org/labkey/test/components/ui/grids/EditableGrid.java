@@ -412,6 +412,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             {
                 WebElement inputCell = elementCache().inputCell();
                 inputCell.clear();
+
+                // the clear may end up deactivating the cell
+                if (elementCache().inputCell() == null)
+                {
+                    selectCell(gridCell);
+                    activateCell(gridCell);
+                    inputCell = elementCache().inputCell();
+                }
+
                 inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
             }
 
@@ -829,7 +838,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         public final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
         public WebElement inputCell()
         {
-            return Locators.inputCell.findElement(getComponentElement());
+            return Locators.inputCell.findElementOrNull(getComponentElement());
         }
 
         public ReactSelect lookupSelect()
