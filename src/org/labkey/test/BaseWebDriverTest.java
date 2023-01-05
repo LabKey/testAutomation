@@ -364,7 +364,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
     private static boolean reenableMiniProfiler = false;
-    private static long testClassStartTime;
+    private static long previousLeakCheck = 0;
     private static long testCount;
     private static int currentTestNumber;
 
@@ -376,7 +376,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             public void starting(Description description)
             {
-                testClassStartTime = System.currentTimeMillis();
                 SingletonWebDriver.getInstance().clear();
                 testCount = description.getChildren().stream().filter(child -> child.getAnnotation(Ignore.class) == null).count();
                 currentTestNumber = 0;
@@ -598,7 +597,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
-            checker().withScreenshot("startupLeaks").wrapAssertion(() -> checkLeaks(null));
+            checker().withScreenshot("startupLeaks").wrapAssertion(() -> checkLeaks());
             checker().resetErrorTypes();
             _checkedLeaksAndErrors = true;
         }
@@ -1108,7 +1107,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
             checkErrors();
-            checkLeaks(null);
+            checkLeaks();
         }
 
         if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
@@ -1205,17 +1204,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
-    protected void checkLeaks(Long leakCutoffTime)
+    protected void checkLeaks()
     {
         if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
             return;
-
-        if (leakCutoffTime == null)
-        {
-            leakCutoffTime = testClassStartTime;
-        }
 
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
@@ -1235,12 +1229,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     sleep(10000);
                 }
             }
-            msSinceTestStart = System.currentTimeMillis() - leakCutoffTime;
+            msSinceTestStart = System.currentTimeMillis() - previousLeakCheck;
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
+
+        previousLeakCheck = System.currentTimeMillis();
 
         if (leakCount > MAX_LEAK_LIMIT)
         {
