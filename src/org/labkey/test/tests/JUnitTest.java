@@ -468,8 +468,6 @@ public class JUnitTest extends TestSuite
 
     public static class BaseJUnitTestWrapper extends BaseWebDriverTest
     {
-        // Used by 'JUnitFooter' to check for leaks from server-side tests
-        protected static Long startTime = null;
         // Don't configure pipeline tools or R for smoke suite
         protected static boolean extraSetup = false;
 
