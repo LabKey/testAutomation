@@ -90,6 +90,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         }
         catch (StaleElementReferenceException sere)
         {
+            log("Expected option was found, but disappeared. Available options are:" + getWrapper().getTexts(elementCache().getOptions()));
             throw sere;
         }
 
