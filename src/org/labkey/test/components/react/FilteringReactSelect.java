@@ -82,7 +82,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
                 }
             }
         }
-        log("tryCount: " + tryCount);
 
         try
         {
@@ -91,7 +90,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         }
         catch (StaleElementReferenceException sere)
         {
-            log("Expected option was found, but disappeared. Available options are:" + getWrapper().getTexts(elementCache().getOptions()));
             throw sere;
         }
 
@@ -99,10 +97,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         {
             log("Select didn't collapse after selecting an option. Closing it now.");
             getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
-        }
-        else
-        {
-            log("Select collapsed on its own.");
         }
 
         WebDriverWrapper.waitFor(()-> elementToWaitFor.findElementOrNull(getComponentElement()) != null,
