@@ -95,7 +95,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
         if (!WebDriverWrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
         {
-            log("Select didn't collapse after selecting an option. Closing it now.");
             getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
 
