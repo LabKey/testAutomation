@@ -332,7 +332,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         List<String> rawItems = getWrapper().getTexts(selectedItems);
 
         // If it wasn't open before close it, otherwise leave it in the open state.
-        if(!alreadyOpened)
+        if (!alreadyOpened)
             close();
 
         return rawItems.stream().map(String::trim).collect(Collectors.toList());
@@ -413,7 +413,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     protected class ElementCache extends WebDriverComponent<?>.ElementCache
     {
-        WebElement input = new EphemeralWebElement(Locator.css(".select-input__input > input"), this);
+        WebElement input = new EphemeralWebElement(Locator.tagWithClass("input", "select-input__input"), this);
         WebElement arrow = new EphemeralWebElement(Locators.arrow, this);
         WebElement selectMenu = new EphemeralWebElement(Locators.selectMenu, this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 

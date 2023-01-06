@@ -287,7 +287,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setSelectValue(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
-        selectValues.forEach(s -> {reactSelect.typeAheadSelect(s);});
+        selectValues.forEach(reactSelect::typeAheadSelect);
         return this;
     }
 
