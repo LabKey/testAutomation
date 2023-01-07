@@ -17,10 +17,11 @@
 /* vehicle-0.00-1.00.sql */
 
 CREATE SCHEMA vehicle;
+GO
 
 CREATE TABLE vehicle.Colors
 (
-    Name VARCHAR(30) NOT NULL,
+    Name NVARCHAR(30) NOT NULL,
     Hex TEXT,
 
     CONSTRAINT PK_Colors PRIMARY KEY (Name)
@@ -28,17 +29,17 @@ CREATE TABLE vehicle.Colors
 
 CREATE TABLE vehicle.Manufacturers
 (
-    RowId SERIAL NOT NULL,
-    Name VARCHAR(255) NOT NULL,
+    RowId INT IDENTITY(1,1),
+    Name NVARCHAR(255) NOT NULL,
 
     CONSTRAINT PK_Manufacturers PRIMARY KEY (RowId)
 );
 
 CREATE TABLE vehicle.Models
 (
-    RowId SERIAL NOT NULL,
+    RowId INT IDENTITY(1,1),
     ManufacturerId INT NOT NULL,
-    Name VARCHAR(255) NOT NULL,
+    Name NVARCHAR(255) NOT NULL,
 
     CONSTRAINT PK_Models PRIMARY KEY (RowId),
     CONSTRAINT FK_Models_Manufacturers FOREIGN KEY (ManufacturerId) REFERENCES vehicle.Manufacturers(RowId)
@@ -46,19 +47,19 @@ CREATE TABLE vehicle.Models
 
 CREATE TABLE vehicle.Vehicles
 (
-    RowId SERIAL NOT NULL,
+    RowId INT IDENTITY(1,1) NOT NULL,
     Container ENTITYID NOT NULL,
     CreatedBy USERID NOT NULL,
-    Created TIMESTAMP NOT NULL,
+    Created DATETIME NOT NULL,
     ModifiedBy USERID NOT NULL,
-    Modified TIMESTAMP NOT NULL,
+    Modified DATETIME NOT NULL,
 
     ModelId INT NOT NULL,
-    Color VARCHAR(30) NOT NULL,
+    Color NVARCHAR(30) NOT NULL,
 
     ModelYear INT NOT NULL,
     Milage INT NOT NULL,
-    LastService TIMESTAMP NOT NULL,
+    LastService DATETIME NOT NULL,
 
     CONSTRAINT PK_Vehicles PRIMARY KEY (RowId),
     CONSTRAINT FK_Vehicles_Models FOREIGN KEY (ModelId) REFERENCES vehicle.Models(RowId),
@@ -74,12 +75,12 @@ ALTER TABLE vehicle.Vehicles
 /* vehicle-12.30-13.10.sql */
 
 CREATE TABLE vehicle.emissiontest (
-  rowid SERIAL,
+  rowid int identity(1,1),
   name varchar(100),
   container entityid,
   parentTest int,
   vehicleId int,
-  result boolean,
+  result bit,
 
   CONSTRAINT PK_emissiontest PRIMARY KEY (rowid),
   CONSTRAINT FK_emissiontest_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
@@ -87,30 +88,28 @@ CREATE TABLE vehicle.emissiontest (
 
 /* vehicle-13.10-13.20.sql */
 
-CREATE TABLE vehicle.etl_source
-(
-  rowid SERIAL,
+CREATE TABLE vehicle.etl_source(
+  RowId INT IDENTITY(1,1),
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  created DATETIME,
+  modified DATETIME,
 
   id VARCHAR(9),
   name VARCHAR(100),
   TransformRun INT,
-  rowversion SERIAL,
+  rowversion rowversion,
 
-  CONSTRAINT PK_etlsource PRIMARY KEY (rowid),
+CONSTRAINT PK_etlsource PRIMARY KEY (rowid),
   CONSTRAINT AK_etlsource UNIQUE (container,id),
   CONSTRAINT FK_etlsource_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
 );
 
 
-CREATE TABLE vehicle.etl_target
-(
-  rowid SERIAL,
+CREATE TABLE vehicle.etl_target(
+  RowId INT IDENTITY(1,1),
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  created DATETIME,
+  modified DATETIME,
 
   id VARCHAR(9),
   name VARCHAR(100),
@@ -123,10 +122,10 @@ CREATE TABLE vehicle.etl_target
 
 CREATE TABLE vehicle.etl_target2
 (
-  rowid INT NOT NULL,
+  RowId INT NOT NULL,
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  created DATETIME,
+  modified DATETIME,
 
   id VARCHAR(9),
   name VARCHAR(100),
@@ -139,11 +138,11 @@ CREATE TABLE vehicle.etl_target2
 
 CREATE TABLE vehicle.Owner
 (
-  RowId SERIAL,
+  RowId INT IDENTITY(1,1),
   container ENTITYID,
-  created TIMESTAMP,
+  created DATETIME,
   createdby USERID,
-  modified TIMESTAMP,
+  modified DATETIME,
   modifiedby USERID,
 
   first_name VARCHAR(100),
@@ -155,17 +154,18 @@ CREATE TABLE vehicle.Owner
   state VARCHAR(100),
   zip VARCHAR(10),
   text VARCHAR(1000),
-  birth_date TIMESTAMP,
+  birth_date DATETIME,
   CONSTRAINT PK_owner PRIMARY KEY (container,rowid)
 );
 
+
 CREATE TABLE vehicle.OwnerBackup
 (
-  RowId SERIAL,
+  RowId INT IDENTITY(1,1),
   container ENTITYID,
-  created TIMESTAMP,
+  created DATETIME,
   createdby USERID,
-  modified TIMESTAMP,
+  modified DATETIME,
   modifiedby USERID,
 
   first_name VARCHAR(100),
@@ -177,7 +177,7 @@ CREATE TABLE vehicle.OwnerBackup
   state VARCHAR(100),
   zip VARCHAR(10),
   text VARCHAR(1000),
-  birth_date TIMESTAMP,
+  birth_date DATETIME,
   diTransformRunId INT,
 
   CONSTRAINT PK_ownerbackup PRIMARY KEY (container,rowid)
@@ -185,93 +185,114 @@ CREATE TABLE vehicle.OwnerBackup
 
 /* vehicle-13.20-13.30.sql */
 
-CREATE TABLE vehicle.transfer
+CREATE TABLE vehicle.Transfer
 (
-    RowId Int NOT NULL,
-    TransferStart TIMESTAMP NOT NULL,
-    TransferComplete TIMESTAMP NULL,
-    SchemaName VARCHAR(100),
-    Description VARCHAR(1000) NULL,
-    Log VARCHAR,
-    status VARCHAR(10) NULL,
-    container ENTITYID NULL
+    RowId INT NOT NULL,
+    TransferStart DATETIME NOT NULL,
+	transferComplete DATETIME NULL,
+	schemaName NVARCHAR(100) NOT NULL,
+	description NVARCHAR(1000) NULL,
+	log NTEXT NULL,
+	status NVARCHAR(10) NULL,
+	container dbo.ENTITYID NULL
 );
 
 /* vehicle-13.30-14.10.sql */
 
-ALTER TABLE vehicle.Transfer ADD CONSTRAINT FK_etltransfer_container FOREIGN KEY (container) REFERENCES core.Containers (EntityId);
+ALTER TABLE vehicle.Transfer  ADD CONSTRAINT FK_etltransfer_container FOREIGN KEY(container)
+	REFERENCES core.Containers (EntityId)
 ALTER TABLE vehicle.transfer ADD CONSTRAINT PK_transfer PRIMARY KEY (rowid);
+GO
 
--- It is intentional that there are no procedures in this script corresponding to the SQL Server version.
--- Stored Proc ETL's are not yet supported in Postgres and the test is skipped.
 
-CREATE OR REPLACE FUNCTION vehicle.etlMissingTransformRunId()
-RETURNS RECORD
+CREATE PROCEDURE vehicle.etlMissingTransformRunId
 AS
-$BODY$
 BEGIN
-	SELECT 1;
-END;
-$BODY$ LANGUAGE plpgsql;
+	SELECT 1
+END
+
+GO
 
 /* vehicle-15.00-15.01.sql */
 
-CREATE OR REPLACE FUNCTION vehicle.etltestresultset(transformrunid integer, containerid entityid DEFAULT NULL::character varying, debug character varying DEFAULT ''::character varying, filterrunid integer DEFAULT NULL::integer, filterstarttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, filterendtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, previousfilterrunid integer DEFAULT (-1), previousfilterstarttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, previousfilterendtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone, testmode integer DEFAULT (-1))
-  RETURNS refcursor AS
-$BODY$
+CREATE PROCEDURE [vehicle].[etlTestResultSet]
+ 	@transformRunId int,
+ 	@containerId varchar(100) = NULL OUTPUT,
+ 	@rowsInserted int = 0 OUTPUT,
+ 	@rowsDeleted int = 0 OUTPUT,
+ 	@rowsModified int = 0 OUTPUT,
+ 	@returnMsg varchar(100) = 'default message' OUTPUT,
+ 	@debug varchar(1000) = '',
+ 	@filterRunId int = null,
+ 	@filterStartTimeStamp datetime = null OUTPUT,
+ 	@filterEndTimeStamp datetime = null OUTPUT,
+ 	@testMode int,
+ 	@testInOutParam varchar(10) = null OUTPUT,
+ 	@runCount int = 1 OUTPUT,
+ 	@previousFilterRunId int = null OUTPUT,
+ 	@previousFilterStartTimeStamp datetime = null OUTPUT,
+ 	@previousFilterEndTimeStamp datetime = null OUTPUT
+ AS
+ BEGIN
 
-DECLARE
-      ref refcursor;                                                     -- Declare a cursor variable
-    BEGIN
-      OPEN ref FOR SELECT * FROM vehicle.etl_source where container = containerid;   -- Open a cursor
-      RETURN ref;                                                       -- Return the cursor to the caller
-    END;
+ IF @testMode = 9
+ BEGIN
+ 	SELECT * FROM vehicle.etl_source WHERE container = @containerId
+ END
 
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+ IF @testInOutParam IS NOT NULL SET @testInOutParam = 'after'
+
+ RETURN 0
+
+ END
+
+ GO
 
 /* vehicle-15.10-15.11.sql */
 
 CREATE TABLE vehicle.etl_delete
 (
-  RowId SERIAL,
+  RowId INT IDENTITY(1,1),
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  created DATETIME,
+  modified DATETIME,
 
   id VARCHAR(9),
   name VARCHAR(100),
   TransformRun INT,
-  rowversion SERIAL,
+  rowversion rowversion,
   CONSTRAINT PK_etldelete PRIMARY KEY (rowid),
   CONSTRAINT AK_etldelete UNIQUE (container,id),
   CONSTRAINT FK_etldelete_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
 );
+GO
 
 /* vehicle-15.20-15.21.sql */
 
-CREATE OR REPLACE FUNCTION vehicle.etltest
-(IN transformrunid integer
-, IN containerid entityid DEFAULT NULL::character varying
-, INOUT rowsinserted integer DEFAULT 0
-, INOUT rowsdeleted integer DEFAULT 0
-, INOUT rowsmodified integer DEFAULT 0
-, INOUT returnmsg character varying DEFAULT 'default message'::character varying
-, IN debug character varying DEFAULT ''::character varying
-, IN filterrunid integer DEFAULT NULL::integer
-, INOUT filterstarttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone
-, INOUT filterendtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone
-, INOUT previousfilterrunid integer DEFAULT (-1)
-, INOUT previousfilterstarttimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone
-, INOUT previousfilterendtimestamp timestamp without time zone DEFAULT NULL::timestamp without time zone
---, INOUT procVersion decimal DEFAULT 0
-, IN testmode integer DEFAULT (-1)
-, INOUT testinoutparam character varying DEFAULT ''::character varying
-, INOUT runcount integer DEFAULT 1
-, OUT return_status integer)
-  RETURNS record AS
-$BODY$
+-- =============================================
+-- Author:		Tony Galuhn
+-- Create date: 11/22/2013 / modified 1/28/2014
+-- Description:	sp for ETL testing
+-- =============================================
+CREATE PROCEDURE vehicle.etlTest
+	@transformRunId int,
+	@containerId entityId = NULL OUTPUT,
+	@rowsInserted int = 0 OUTPUT,
+	@rowsDeleted int = 0 OUTPUT,
+	@rowsModified int = 0 OUTPUT,
+	@returnMsg varchar(100) = 'default message' OUTPUT,
+	@debug varchar(1000) = '',
+	@filterRunId int = null,
+	@filterStartTimeStamp datetime = null,
+	@filterEndTimeStamp datetime = null,
+	@testMode int,
+	@testInOutParam varchar(10) = null OUTPUT,
+	@runCount int = 1 OUTPUT,
+	@previousFilterRunId int = null OUTPUT,
+	@previousFilterStartTimeStamp datetime = null OUTPUT,
+	@previousFilterEndTimeStamp datetime = null OUTPUT
+AS
+BEGIN
 
 /*
 	Test modes
@@ -280,129 +301,106 @@ $BODY$
 	3	raise error
 	4	input/output parameter persistence
 	5	override of persisted input/output parameter
-	6	Run filter strategy, require filterRunId. Test persistence.
-  7 Modified since filter strategy, no source, require filterStartTimeStamp & filterEndTimeStamp,
-		populated from output of previous run
-  8	Modified since filter strategy with source, require filterStartTimeStamp & filterEndTimeStamp
-		populated from the filter strategy IncrementalStartTime & IncrementalEndTime
+	6	Run filter strategy, require @filterRunId. Test persistence.
+	7	Modified since filter strategy, require @filterStartTimeStamp & @filterEndTimeStamp. Test persistence.
 
 */
+
+IF @testMode IS NULL
 BEGIN
+	SET @returnMsg = 'No testMode set'
+	RETURN 1
+END
 
-IF testMode IS NULL
-THEN
-  returnMsg := 'No testMode set';
-  return_status := 1;
-  RETURN;
-END IF;
+IF @testMode = 1
+BEGIN
+	print 'Test print statement logging'
+	SET @rowsInserted = 1
+	SET @rowsDeleted = 2
+	SET @rowsModified = 4
+	SET @returnMsg = 'Test returnMsg logging'
+	RETURN 0
+END
 
-IF runCount IS NULL
-THEN
-	runCount := 1;
-ELSE
-	runCount := runCount + 1;
-END IF;
+IF @testMode = 2 RETURN 1
 
-IF testMode = 1
-THEN
-	RAISE NOTICE '%', 'Test print statement logging';
-	rowsInserted := 1;
-	rowsDeleted := 2;
-	rowsModified := 4;
-	returnMsg := 'Test returnMsg logging';
-	return_status := 0;
-	RETURN;
-END IF;
+IF @testMode = 3
+BEGIN
+	SET @returnMsg = 'Intentional SQL Exception From Inside Proc'
+	RAISERROR(@returnMsg, 11, 1)
+END
 
-IF testMode = 2 THEN return_status := 1; RETURN; END IF;
+IF @testMode = 4 AND @testInOutParam != 'after' AND @runCount > 1
+BEGIN
+	SET @returnMsg = 'Expected value "after" for @testInOutParam on run count = ' + convert(varchar, @runCount) + ', but was ' + @testInOutParam
+	RETURN 1
+END
 
-IF testMode = 3
-THEN
-	returnMsg := 'Intentional SQL Exception From Inside Proc';
-	RAISE EXCEPTION '%', returnMsg;
-END IF;
+IF @testMode = 5 AND @testInOutParam != 'before' AND @runCount > 1
+BEGIN
+	SET @returnMsg = 'Expected value "before" for @testInOutParam on run count = ' + convert(varchar, @runCount) + ', but was ' + @testInOutParam
+	RETURN 1
+END
 
-IF testMode = 4 AND testInOutParam != 'after' AND runCount > 1
-THEN
-	returnMsg := 'Expected value "after" for testInOutParam on run count = ' || runCount || ', but was ' || testInOutParam;
-	return_status := 1;
-	RETURN;
-END IF;
+IF @testMode = 6
+BEGIN
+	IF @filterRunId IS NULL
+	BEGIN
+		SET @returnMsg = 'Required @filterRunId value not supplied'
+		RETURN 1
+	END
+	IF @runCount > 1 AND (@previousFilterRunId IS NULL OR @previousFilterRunId <= @filterRunId)
+	BEGIN
+		SET @returnMsg = 'Required @filterRunId was not persisted from previous run.'
+		RETURN 1
+	END
+	SET @previousFilterRunId = @filterRunId
+END
 
-IF testMode = 5 AND testInOutParam != 'before' AND runCount > 1
-THEN
-	returnMsg := 'Expected value "before" for testInOutParam on run count = ' || runCount || ', but was ' || testInOutParam;
-	return_status := 1;
-	RETURN;
-END IF;
-
-IF testMode = 6
-THEN
-	IF filterRunId IS NULL
-	THEN
-		returnMsg := 'Required filterRunId value not supplied';
-		return_status := 1;
-		RETURN;
-	END IF;
-	IF runCount > 1 AND (previousFilterRunId IS NULL OR previousFilterRunId >= filterRunId)
-	THEN
-		returnMsg := 'Required filterRunId was not persisted from previous run.';
-		return_status := 1;
-		RETURN;
-	END IF;
-	previousFilterRunId := filterRunId;
-END IF;
-
-IF testMode = 7
-THEN
-	IF runCount > 1 AND (filterStartTimeStamp IS NULL AND filterEndTimeStamp IS NULL)
-	THEN
-		returnMsg := 'Required filterStartTimeStamp or filterEndTimeStamp were not persisted from previous run.';
-		return_status := 1;
-		RETURN;
-	END IF;
-	filterStartTimeStamp := localtimestamp;
-	filterEndTimeStamp := localtimestamp;
-END IF;
-
-IF testMode = 8
-THEN
-	IF runCount > 1 AND ((previousFilterStartTimeStamp IS NULL AND previousFilterEndTimeStamp IS NULL)
-							OR (filterStartTimeStamp IS NULL AND filterEndTimeStamp IS NULL))
-	THEN
-		returnMsg := 'Required filterStartTimeStamp or filterEndTimeStamp were not persisted from previous run.';
-		return_status := 1;
-		RETURN;
-	END IF;
-	previousFilterStartTimeStamp := coalesce(filterStartTimeStamp, localtimestamp);
-	previousFilterEndTimeStamp := coalesce(filterEndTimeStamp, localtimestamp);
-END IF;
-
+IF @testMode = 7
+BEGIN
+	IF @runCount > 1 AND (@previousFilterStartTimeStamp IS NULL OR @previousFilterEndTimeStamp IS NULL
+							OR @previousFilterStartTimeStamp <= @filterStartTimeStamp OR @previousFilterEndTimeStamp <= @filterEndTimeStamp)
+	BEGIN
+		SET @returnMsg = 'Required @filterStartTimeStamp or @filterEndTimeStamp were not persisted from previous run.'
+		RETURN 1
+	END
+	SET @previousFilterStartTimeStamp = @filterStartTimeStamp
+	SET @previousFilterEndTimeStamp = @filterEndTimeStamp
+END
 
 -- set value for persistence tests
-IF testInOutParam != ''
-THEN
-	testInOutParam := 'after';
-END IF;
+IF @testInOutParam IS NOT NULL SET @testInOutParam = 'after'
 
-return_status := 0;
-RETURN;
+RETURN 0
 
-END;
-$BODY$
-  LANGUAGE plpgsql;
+END
+GO
 
 /* vehicle-16.20-16.30.sql */
 
--- For testing merge, need to not have a sequence set on rowid PK
-ALTER TABLE vehicle.etl_target ALTER COLUMN rowid DROP DEFAULT;
-DROP SEQUENCE vehicle.etl_target_rowid_seq;
+-- For testing merge, need to have the PK on this table not be IDENTITY
+DROP TABLE vehicle.etl_target;
+CREATE TABLE vehicle.etl_target(
+  RowId INT NOT NULL,
+  container entityid,
+  created DATETIME,
+  modified DATETIME,
+  id VARCHAR(9),
+  name VARCHAR(100),
+  diTransformRunId INT,
+
+  CONSTRAINT PK_etltarget PRIMARY KEY (rowid),
+  CONSTRAINT AK_etltarget UNIQUE (container,id),
+  CONSTRAINT FK_etltarget_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
+);
+
 
 CREATE TABLE vehicle.etl_180column_source(
-  rowid SERIAL,
-  container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  RowId int IDENTITY(1,1) NOT NULL,
+  container dbo.ENTITYID NULL,
+  created datetime NULL,
+  modified datetime NULL,
   field5 INT NULL,
   field6 INT NULL,
   field7 INT NULL,
@@ -585,10 +583,10 @@ CREATE TABLE vehicle.etl_180column_source(
 );
 
 CREATE TABLE vehicle.etl_180column_target(
-  rowid INT NOT NULL,
-  container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  RowId int NOT NULL,
+  container dbo.ENTITYID NULL,
+  created datetime NULL,
+  modified datetime NULL,
   field5 INT NULL,
   field6 INT NULL,
   field7 INT NULL,
@@ -772,13 +770,11 @@ CREATE TABLE vehicle.etl_180column_target(
 
 -- Undo change to this table from the 16.20-16.21 script. Make the merge test use etl_target2 instead
 DROP TABLE vehicle.etl_target;
-CREATE TABLE vehicle.etl_target
-(
-  rowid SERIAL,
+CREATE TABLE vehicle.etl_target(
+  RowId INT IDENTITY(1,1),
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
-
+  created DATETIME,
+  modified DATETIME,
   id VARCHAR(9),
   name VARCHAR(100),
   diTransformRunId INT,
@@ -789,21 +785,25 @@ CREATE TABLE vehicle.etl_target
 );
 
 TRUNCATE TABLE vehicle.etl_target2;
-ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT pk_etltarget2;
-ALTER TABLE vehicle.etl_target2 ALTER COLUMN container SET NOT NULL;
-ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT pk_etltarget2 PRIMARY KEY (RowId, container);
+ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT PK_etltarget2;
+ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT AK_etltarget2;
+ALTER TABLE vehicle.etl_target2 ALTER COLUMN container entityid NOT NULL;
+GO
+ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT AK_etltarget2 UNIQUE (Container, id);
+ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT PK_etltarget2 PRIMARY KEY (RowId, container);
 
 TRUNCATE TABLE vehicle.etl_180column_target;
-ALTER TABLE vehicle.etl_180column_target DROP CONSTRAINT pk_etl_180column_target;
-ALTER TABLE vehicle.etl_180column_target ALTER COLUMN container SET NOT NULL;
-ALTER TABLE vehicle.etl_180column_target ADD CONSTRAINT pk_etl_180column_target PRIMARY KEY (RowId, container);
+ALTER TABLE vehicle.etl_180column_target DROP CONSTRAINT PK_etl_180column_target;
+ALTER TABLE vehicle.etl_180column_target ALTER COLUMN container entityid NOT NULL;
+GO
+ALTER TABLE vehicle.etl_180column_target ADD CONSTRAINT PK_etl_180column_target PRIMARY KEY (RowId, container);
 
 /* vehicle-16.30-17.10.sql */
 
 ALTER TABLE vehicle.Models
     ADD InitialReleaseYear INT;
 
--- Drop tables / functions for ETL testing from this schema; they've been moved to the etltest schema.
+-- Drop tables / procedures for ETL testing from this schema; they've been moved to the etltest schema.
 DROP TABLE vehicle.etl_source;
 DROP TABLE vehicle.etl_target;
 DROP TABLE vehicle.etl_target2;
@@ -812,10 +812,10 @@ DROP TABLE vehicle.etl_180column_source;
 DROP TABLE vehicle.etl_180column_target;
 DROP TABLE vehicle.etl_delete;
 
-DROP FUNCTION vehicle.etltest(integer, entityid, integer, integer, integer, character varying, character varying, integer, timestamp without time zone, timestamp without time zone, integer, timestamp without time zone, timestamp without time zone, integer, character varying, integer);
-DROP FUNCTION vehicle.etltestresultset(integer, entityid, character varying, integer, timestamp without time zone, timestamp without time zone, integer, timestamp without time zone, timestamp without time zone, integer);
--- This function wasn't being used
-DROP FUNCTION vehicle.etlmissingtransformrunid();
+DROP PROCEDURE vehicle.etlTest;
+DROP PROCEDURE vehicle.etlTestResultSet;
+-- This procedure wasn't being used
+DROP PROCEDURE vehicle.etlMissingTransformRunId
 
 -- These two tables seem to have been introduced for ETL testing, but were never used
 DROP TABLE vehicle.owner;
@@ -823,26 +823,26 @@ DROP TABLE vehicle.ownerbackup;
 
 /* vehicle-17.10-17.20.sql */
 
-ALTER TABLE vehicle.Colors ADD TriggerScriptProperty VARCHAR(100);
+ALTER TABLE vehicle.Colors ADD TriggerScriptProperty NVARCHAR(100);
 
 /* vehicle-18.20-18.30.sql */
 
-ALTER TABLE vehicle.Models ADD ThumbnailImage VARCHAR(60);
-ALTER TABLE vehicle.Models ADD Image VARCHAR(60);
-ALTER TABLE vehicle.Models ADD PopupImage VARCHAR(60);
+ALTER TABLE vehicle.Models ADD ThumbnailImage NVARCHAR(60);
+ALTER TABLE vehicle.Models ADD Image NVARCHAR(60);
+ALTER TABLE vehicle.Models ADD PopupImage NVARCHAR(60);
 
 /* vehicle-19.20-19.30.sql */
 
 CREATE TABLE vehicle.FirstFKTable
 (
-    RowId INT NOT NULL,
+    RowId INT IDENTITY(1,1),
     StartCycleCol INT NOT NULL UNIQUE,
     CONSTRAINT PK_FirstFKTable PRIMARY KEY (RowId)
 );
 
 CREATE TABLE vehicle.SecondFKTable
 (
-    RowId INT NOT NULL,
+    RowId INT IDENTITY(1,1),
     StartCycleCol INT NOT NULL UNIQUE,
     CycleCol INT NOT NULL UNIQUE,
 
@@ -851,7 +851,7 @@ CREATE TABLE vehicle.SecondFKTable
 
 CREATE TABLE vehicle.ThirdFKTable
 (
-    RowId INT NOT NULL,
+    RowId INT IDENTITY(1,1),
     CycleCol INT NOT NULL UNIQUE,
 
     CONSTRAINT PK_ThirdFKTable PRIMARY KEY (RowId)
@@ -860,3 +860,7 @@ CREATE TABLE vehicle.ThirdFKTable
 ALTER TABLE vehicle.FirstFKTable ADD CONSTRAINT FK_SecondFKTable_StartCycleCol FOREIGN KEY (StartCycleCol) REFERENCES vehicle.SecondFKTable (StartCycleCol);
 ALTER TABLE vehicle.SecondFKTable ADD CONSTRAINT FK_ThirdFKTable_CycleCol FOREIGN KEY (CycleCol) REFERENCES vehicle.ThirdFKTable (CycleCol);
 ALTER TABLE vehicle.ThirdFKTable ADD CONSTRAINT FK_SecondFKTable_CycleCol FOREIGN KEY (CycleCol) REFERENCES vehicle.SecondFKTable (CycleCol);
+
+/* 21.xxx SQL scripts */
+
+ALTER TABLE vehicle.Vehicles ADD TriggerScriptContainer ENTITYID;
