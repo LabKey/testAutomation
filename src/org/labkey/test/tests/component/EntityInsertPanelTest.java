@@ -9,6 +9,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.entities.EntityInsertPanel;
+import org.labkey.test.components.ui.entities.EntityInsertPanelForUpdate;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -101,7 +102,7 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
                 .withGeneratedRows(10);
         File testFile = dgen.writeData("fileUploadTest.tsv");
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
-        EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
+        EntityInsertPanelForUpdate testPanel = testPage.getEntityInsertPanelForUpdate();
         testPanel.targetEntityTypeSelect().select(sampleTypeName);
         var previewGrid = testPanel.uploadFileExpectingPreview(testFile, true);
 

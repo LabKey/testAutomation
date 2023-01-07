@@ -199,7 +199,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return elementCache().updateDataCheckBoxLocator.existsIn(this);
     }
 
-    private FileUploadPanel fileUploadPanel()
+    protected FileUploadPanel fileUploadPanel()
     {
         return new FileUploadPanel.FileUploadPanelFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
     }
@@ -343,17 +343,15 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         }
         return this;
     }
-
-    public ResponsiveGrid uploadFileExpectingPreview(File file, boolean updateData)
+    public ResponsiveGrid uploadFileExpectingPreview(File file)
     {
-        var panel = uploadFile(file, updateData);
+        var panel = uploadFile(file);
         return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(panel);
     }
 
-    public EntityInsertPanel uploadFile(File file, boolean updateData)
+    public EntityInsertPanel uploadFile(File file)
     {
         var panel = showFileUpload();
-        panel.setUpdateDataForFileUpload(updateData);
         panel.fileUploadPanel().uploadFile(file);
         return panel;
     }
