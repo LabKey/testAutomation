@@ -186,17 +186,17 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return new EditableGrid.EditableGridFinder(_driver).findOptional(this);
     }
 
-    public EntityInsertPanel setUpdateDataForFileUpload(boolean checked)
+    public EntityInsertPanel setMergeData(boolean checked)
     {
         var panel = showFileUpload();
-        if (checked && panel.elementCache().updateDataCheckbox.isDisplayed())
-            panel.elementCache().updateDataCheckbox.set(true);
+        if (checked && panel.elementCache().mergeDataCheckbox.isDisplayed())
+            panel.elementCache().mergeDataCheckbox.set(true);
         return this;
     }
 
-    public boolean hasUpdateDataOption()
+    public boolean hasMergeOption()
     {
-        return elementCache().updateDataCheckBoxLocator.existsIn(this);
+        return elementCache().mergeDataCheckBoxLocator.existsIn(this);
     }
 
     protected FileUploadPanel fileUploadPanel()
@@ -437,10 +437,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
 
-        Locator updateDataCheckBoxLocator = Locator.tag("div")
+        Locator mergeDataCheckBoxLocator = Locator.tag("div")
                 .withChild(Locator.tagWithClass("span", "entity-mergeoption-checkbox"))
             .child("input");
-        Checkbox updateDataCheckbox = new Checkbox(updateDataCheckBoxLocator.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        Checkbox mergeDataCheckbox = new Checkbox(mergeDataCheckBoxLocator.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
 

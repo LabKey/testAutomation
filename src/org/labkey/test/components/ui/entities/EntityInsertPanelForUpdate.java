@@ -24,7 +24,7 @@ public class EntityInsertPanelForUpdate extends EntityInsertPanel
     public EntityInsertPanel uploadFile(File file, boolean allowMerge)
     {
         var panel = showFileUpload();
-        panel.setUpdateDataForFileUpload(allowMerge);
+        panel.setMergeData(allowMerge);
         panel.fileUploadPanel().uploadFile(file);
         return panel;
     }
