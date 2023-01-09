@@ -4,7 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.components.ui.entities.EntityInsertPanelForUpdate;
+import org.labkey.test.components.ui.entities.EntityUpdateFromFilePanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
@@ -42,10 +42,10 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
                 .waitFor();
     }
 
-    public EntityInsertPanelForUpdate getEntityInsertPanelForUpdate()
+    public EntityUpdateFromFilePanel getEntityInsertPanelForUpdate()
     {
         getComponentSelect().select("EntityInsertPanelForUpdate");
-        return new EntityInsertPanelForUpdate.EntityInsertPanelForUpdateFinder(getDriver())
+        return new EntityUpdateFromFilePanel.EntityUpdateFromFilePanelFinder(getDriver())
                 .waitFor();
     }
 

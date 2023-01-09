@@ -8,9 +8,9 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
-public class EntityInsertPanelForUpdate extends EntityInsertPanel
+public class EntityUpdateFromFilePanel extends EntityInsertPanel
 {
-    public EntityInsertPanelForUpdate(WebElement element, WebDriver driver)
+    public EntityUpdateFromFilePanel(WebElement element, WebDriver driver)
     {
         super(element, driver);
     }
@@ -29,20 +29,20 @@ public class EntityInsertPanelForUpdate extends EntityInsertPanel
         return panel;
     }
 
-    public static class EntityInsertPanelForUpdateFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanelForUpdate, EntityInsertPanelForUpdate.EntityInsertPanelForUpdateFinder>
+    public static class EntityUpdateFromFilePanelFinder extends WebDriverComponent.WebDriverComponentFinder<EntityUpdateFromFilePanel, EntityUpdateFromFilePanel.EntityUpdateFromFilePanelFinder>
     {
         private final Locator _locator;
 
-        public EntityInsertPanelForUpdateFinder(WebDriver driver)
+        public EntityUpdateFromFilePanelFinder(WebDriver driver)
         {
             super(driver);
             _locator = Locator.tagWithClass("div", "panel").child(Locator.tagWithClass("div", "panel-body"));
         }
 
         @Override
-        protected EntityInsertPanelForUpdate construct(WebElement element, WebDriver driver)
+        protected EntityUpdateFromFilePanel construct(WebElement element, WebDriver driver)
         {
-            return new EntityInsertPanelForUpdate(element, driver);
+            return new EntityUpdateFromFilePanel(element, driver);
         }
 
         @Override
