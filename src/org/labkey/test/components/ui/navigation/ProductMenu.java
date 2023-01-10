@@ -4,12 +4,14 @@
  */
 package org.labkey.test.components.ui.navigation;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,8 +21,6 @@ import java.util.stream.Collectors;
 
 public class ProductMenu extends BaseBootstrapMenu
 {
-    private final static Locator MENU_SECTION_HEADER_LOC = Locator.byClass("menu-section-header");
-    private int expectedSectionCount = 1;
 
     protected ProductMenu(WebElement element, WebDriver driver)
     {
@@ -37,42 +37,24 @@ public class ProductMenu extends BaseBootstrapMenu
     {
         boolean ariaExpanded = super.isExpanded();
         boolean menuContentDisplayed = elementCache().menuContent.isDisplayed();
-        int headerSectionCount =  MENU_SECTION_HEADER_LOC.findElements(this).size();
-        int expectedHeaderSecionCount = getExpectedSectionCount();
-        TestLogger.debug(String.format("product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b, %d of %d expected header sections are present",
-                ariaExpanded, menuContentDisplayed, headerSectionCount, expectedHeaderSecionCount));
+        TestLogger.debug(String.format("Product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b.",
+                ariaExpanded, menuContentDisplayed));
 
-        return  ariaExpanded && menuContentDisplayed && headerSectionCount >= expectedHeaderSecionCount;
-    }
-
-    /**
-     * the number of menu sections is how many sections (not just columns) this menu will wait for before reporting
-     * that it is fully open
-     * @param expectedSectionCount the number of sections to expect
-     * @return the current instance
-     */
-    public ProductMenu setExpectedSectionCount(int expectedSectionCount)
-    {
-        this.expectedSectionCount = expectedSectionCount;
-        return this;
-    }
-
-    protected int getExpectedSectionCount()
-    {
-        return expectedSectionCount;
+        return  ariaExpanded && menuContentDisplayed &&
+                ExpectedConditions.invisibilityOfAllElements(BootstrapLocators.loadingSpinner.findElements(this)).apply(getDriver());
     }
 
     public List<String> getMenuSectionHeaders()
     {
         expand();
-        List<WebElement> headersElements = MENU_SECTION_HEADER_LOC.findElements(this);
-        return getWrapper().getTexts(headersElements).stream().map(String::trim).collect(Collectors.toList());
+        return elementCache().menuSectionHeaderElements().stream().map(el -> el.getText().trim())
+                .collect(Collectors.toList());
     }
 
     public Map<String, String> getMenuSectionHeaderLinks()
     {
         expand();
-        List<WebElement> headerElements = MENU_SECTION_HEADER_LOC.findElements(this);
+        List<WebElement> headerElements = elementCache().menuSectionHeaderElements();
         Map<String, String> links = new HashMap<>();
         headerElements.forEach((header) -> {
             links.put(header.getText().trim(),Locator.tag("a").findElement(header).getAttribute("href"));
@@ -107,6 +89,22 @@ public class ProductMenu extends BaseBootstrapMenu
     {
         expand();
         elementCache().menuSectionLink(headerText, menuText).click();
+    }
+
+    public boolean hasFolderColumn()
+    {
+        expand();
+        return elementCache().folderColumn().isDisplayed();
+    }
+
+    public List<String> getFolderList()
+    {
+        expand();
+
+        // Use .collect(Collectors.toList()) to allow the returned list to be manipulated if needed.
+        return elementCache().folderMenuItems()
+                .stream()
+                .map(WebElement::getText).collect(Collectors.toList());
     }
 
     public ProductMenu clickFolderItem(String folderName)
@@ -156,23 +154,27 @@ public class ProductMenu extends BaseBootstrapMenu
 
     protected class ElementCache extends BaseBootstrapMenu.ElementCache
     {
-        private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").findWhenNeeded(this);
+        private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").refindWhenNeeded(this);
+        private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").refindWhenNeeded(menuContent);
 
         Locator.XPathLocator menuSectionHeaderLoc(String headerText)
         {
-            return Locator.tagWithClass("div", "menu-section")
-                    .child(Locator.tag("ul"))
-                    .child(Locator.tagWithClass("li", "menu-section-header").endsWith(headerText));
+            return Locator.tagWithClass("li", "menu-section-header").endsWith(headerText);
+        }
+
+        List<WebElement> menuSectionHeaderElements()
+        {
+            return Locator.tagWithClass("li", "menu-section-header").findElements(sectionContent);
         }
 
         WebElement menuSectionHeader(String headerText)
         {
-            return menuSectionHeaderLoc(headerText).child(Locator.linkContainingText(headerText)).findElement(elementCache().menuContent);
+            return menuSectionHeaderLoc(headerText).child(Locator.linkContainingText(headerText)).refindWhenNeeded(sectionContent);
         }
 
         WebElement menuSectionBody(String headerText)
         {
-            return menuSectionHeaderLoc(headerText).parent("ul").findElement(elementCache().menuContent);
+            return menuSectionHeaderLoc(headerText).parent("ul").findElement(sectionContent);
         }
 
         WebElement menuSectionLink(String headerText, String linkText)
@@ -180,9 +182,21 @@ public class ProductMenu extends BaseBootstrapMenu
             return Locator.linkWithText(linkText).findElement(menuSectionBody(headerText));
         }
 
+        WebElement folderColumn()
+        {
+            return Locator.tagWithClass("div", "col-folders").refindWhenNeeded(menuContent);
+        }
+
+        private final Locator folderMenuItemLocator = Locator.tagWithClass("a", "menu-folder-item");
+
+        List<WebElement> folderMenuItems()
+        {
+            return folderMenuItemLocator.findElements(folderColumn());
+        }
+
         WebElement folderItemLink(String folderName)
         {
-            return Locator.tagWithClass("a", "menu-folder-item").withText(folderName).findElement(elementCache().menuContent);
+            return folderMenuItemLocator.withText(folderName).findElement(folderColumn());
         }
     }
 }
