@@ -37,11 +37,6 @@ public class ImportsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
                 2_500);
     }
 
-    public static ImportsPage beginAt(WebDriverWrapper webDriverWrapper)
-    {
-        return beginAt(webDriverWrapper, webDriverWrapper.getCurrentContainerPath());
-    }
-
     public static ImportsPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
         if (StringUtils.isBlank(containerPath) || "home".equalsIgnoreCase(containerPath))
