@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.entities.EntityUpdateFromFilePanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
@@ -38,6 +39,13 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
     {
         getComponentSelect().select("EntityInsertPanel");
         return new EntityInsertPanel.EntityInsertPanelFinder(getDriver())
+                .waitFor();
+    }
+
+    public EntityUpdateFromFilePanel getEntityInsertPanelForUpdate()
+    {
+        getComponentSelect().select("EntityInsertPanelForUpdate");
+        return new EntityUpdateFromFilePanel.EntityUpdateFromFilePanelFinder(getDriver())
                 .waitFor();
     }
 
