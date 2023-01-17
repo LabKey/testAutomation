@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
+import org.labkey.test.components.ui.pipeline.ImportsPage;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,8 +36,8 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         String text = "0";
         boolean stale = true;
 
-        // Bit of a challenge to get the count. The element can update (because, you know it's async) if it does then a
-        // StaleElementException will happen. Try to protect against that by getting the element again f stale.
+        // Bit of a challenge to get the count. The element can update (because, you know, it's async) if it does then a
+        // StaleElementException will happen. Try to protect against that by getting the element again if stale.
         // If it is not there at all it will return null and exit the loop gracefully.
         while(stale)
         {
@@ -112,6 +113,13 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     {
         expand();
         elementCache().markAll().click();
+    }
+
+    public ImportsPage clickViewAll()
+    {
+        expand();
+        elementCache().viewAllLink.click();
+        return new ImportsPage(getWrapper());
     }
 
     /**
@@ -235,6 +243,8 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
                     .child(Locator.tagWithClass("div", "server-notifications-link"))
                     .refindWhenNeeded(this);
         }
+
+        public final WebElement viewAllLink = Locator.tagWithText("div", "View all activity").refindWhenNeeded(this);
 
     }
 
