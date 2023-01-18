@@ -152,8 +152,10 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     {
         if (action.equals("Merge"))
             elementCache().action.index(0).findElement(this).click();
+        else if (action.equals("Update"))
+            elementCache().action.index(1).findElement(this).click();
         else
-            elementCache().action.index(1).findElement(this).click(); // Append
+            elementCache().action.index(2).findElement(this).click(); // Append
         return this;
     }
 
@@ -289,7 +291,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input paramFunctionInput = new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
         WebElement showAdvanced = Locator.byClass("custom-config__button").withText("Show Advanced Settings").findWhenNeeded(this);
         WebElement addCustomParam = Locator.byClass("custom-config__button").withText("Add Custom Parameter").findWhenNeeded(this);
-        Locator action = Locator.radioButtonByName("mergeData");
+        Locator action = Locator.radioButtonByName("insertOption");
         Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
         //navgiation elements
         WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
