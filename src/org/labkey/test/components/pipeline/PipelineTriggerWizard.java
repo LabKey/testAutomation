@@ -150,12 +150,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard setAction(String action)
     {
-        if (action.equals("Merge"))
-            elementCache().action.index(0).findElement(this).click();
-        else if (action.equals("Update"))
-            elementCache().action.index(1).findElement(this).click();
-        else
-            elementCache().action.index(2).findElement(this).click(); // Append
+        Locator.radioButtonByNameAndValue("insertOption", action)
+                .findElement(this).click();
         return this;
     }
 
@@ -303,4 +299,24 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
         WebElement error = Locator.tagWithClass("div", "alert-danger").findWhenNeeded(this);
     }
+
+    public enum ActionOptions
+    {
+        MERGE("MERGE"),
+        UPDATE("UPDATE"),
+        APPEND("INSERT");
+
+        private String value;
+
+        ActionOptions(String value)
+        {
+            this.value = value;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+    }
+
 }
