@@ -615,11 +615,17 @@ public class FileBrowserHelper extends WebDriverWrapper
         selectImportDataAction(importAction);
     }
 
+    private WebElement waitForToolbar()
+    {
+        return Locator.byClass("fbrowser").append(Locator.byClass("x4-toolbar"))
+                .describedAs("File browser toolbar").waitForElement(getDriver(), 5_000);
+    }
+
     @LogMethod (quiet = true)
     public void clickFileBrowserButton(@LoggedParam BrowserAction action)
     {
         waitForFileGridReady();
-        WebElement button = action.findButton(getDriver());
+        WebElement button = action.findButton(waitForToolbar());
         if (button.isDisplayed())
         {
             waitFor(() -> !button.getAttribute("class").contains("disabled"), "Button not enabled: " + action, WAIT_FOR_JAVASCRIPT);
@@ -641,7 +647,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     public List<WebElement> findBrowserButtons()
     {
         waitForFileGridReady();
-        return Locator.css(".fbrowser > .x4-toolbar a.x4-btn[data-qtip]").findElements(getDriver());
+        return Locator.css("a.x4-btn[data-qtip]").findElements(waitForToolbar());
     }
 
     public List<BrowserAction> getAvailableBrowserActions()
