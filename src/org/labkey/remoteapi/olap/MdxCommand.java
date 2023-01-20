@@ -37,15 +37,6 @@ public class MdxCommand extends PostCommand<MdxResponse>
     private String _cubeName;
     private String _query;
 
-    public MdxCommand(MdxCommand source)
-    {
-        super(source);
-        _configId = source.getConfigId();
-        _schemaName = source.getSchemaName();
-        _cubeName = source.getCubeName();
-        _query = source.getQuery();
-    }
-
     public MdxCommand(String configId, String schema, String query)
     {
         super("olap", "executeMdx");

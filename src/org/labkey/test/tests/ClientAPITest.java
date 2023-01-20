@@ -1477,10 +1477,10 @@ public class ClientAPITest extends BaseWebDriverTest
 
         try
         {
-            new Command<>(source)
+            new Command<>(source.getControllerName(), source.getActionName())
             {
                 @Override
-                protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws CommandException, URISyntaxException
+                protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws URISyntaxException
                 {
                     HttpUriRequest request = super.getHttpRequest(connection, folderPath);
                     request.setHeader("Content-Type", requestContentType);
