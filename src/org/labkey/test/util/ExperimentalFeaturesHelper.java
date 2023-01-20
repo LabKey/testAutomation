@@ -71,7 +71,7 @@ public class ExperimentalFeaturesHelper
     public static boolean isExperimentalFeatureEnabled(Connection cn, String feature)
     {
         Command<CommandResponse> command = new Command<>("admin", "experimentalFeature");
-        command.setParameters(new HashMap<>(Map.of("feature", feature)));
+        command.setParameters(Map.of("feature", feature));
         try
         {
             CommandResponse r = command.execute(cn, null);

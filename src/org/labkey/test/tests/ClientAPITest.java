@@ -1435,7 +1435,7 @@ public class ClientAPITest extends BaseWebDriverTest
         // Check that a bad container path produces the right kind of response
         runCommand(cn, command, "application/json", "application/json", 404, expectedProps, bogusContainerPath);
         // Try again requesting an XML response
-        command.getParameters().put("respFormat", "xml");
+        command.setParameters(Map.of("respFormat", "xml"));
         runCommand(cn, command, "application/json", "text/xml", 404, null, bogusContainerPath);
 
         command = new Command<>("query", "selectRows.api");
@@ -1445,7 +1445,7 @@ public class ClientAPITest extends BaseWebDriverTest
         runCommand(cn, command, "application/json", "application/json", 404, expectedProps);
 
         // Try again requesting an XML response
-        command.getParameters().put("respFormat", "xml");
+        command.setParameters(Map.of("respFormat", "xml"));
         runCommand(cn, command, "application/json", "text/xml", 404, null);
     }
 
@@ -1455,7 +1455,7 @@ public class ClientAPITest extends BaseWebDriverTest
         runCommand(cn, command, "text/xml", "application/json", 401, expectedProps);
         runCommand(cn, command, "text/html", "application/json", 401, expectedProps);
 
-        command.getParameters().put("respFormat", "xml");
+        command.setParameters(Map.of("respFormat", "xml"));
 
         runCommand(cn, command, "application/json", "text/xml", 401, expectedProps);
         runCommand(cn, command, "text/xml", "text/xml", 401, expectedProps);

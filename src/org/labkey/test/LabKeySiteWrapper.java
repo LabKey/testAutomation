@@ -1222,7 +1222,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void setAuthenticationProvider(@LoggedParam String provider, @LoggedParam boolean enabled, Connection cn)
     {
         Command<?> command = new PostCommand<>("login", "setProviderEnabled");
-        command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
+        command.setParameters(Maps.of("provider", provider, "enabled", enabled));
         try
         {
             command.execute(cn, null);

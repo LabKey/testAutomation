@@ -524,13 +524,13 @@ public class WebTestHelper
         }
     }
 
-    public static void logToServer(String message)
+    public static void logToServer(@NotNull String message)
     {
         logToServer(message, getRemoteApiConnection());
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent
-    public static void logToServer(String message, Connection connection)
+    public static void logToServer(@NotNull String message, Connection connection)
     {
         if (message.contains("\n"))
         {
@@ -544,9 +544,7 @@ public class WebTestHelper
         }
 
         PostCommand<?> command = new PostCommand<>("admin", "log");
-        Map<String, Object> params = new HashMap<>();
-        params.put("message", message);
-        command.setParameters(params);
+        command.setParameters(Map.of("message", message));
         try
         {
             command.execute(connection, "/");

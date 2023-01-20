@@ -379,9 +379,7 @@ public class JUnitTest extends TestSuite
             try
             {
                 Command<CommandResponse> command = new PostCommand<>("junit", "go");
-                Map<String, Object> params = new HashMap<>();
-                params.put("testCase", _remoteClass);
-                command.setParameters(params);
+                command.setParameters(Map.of("testCase", _remoteClass));
                 command.setTimeout(_timeout * 1000);
 
                 CommandResponse response = command.execute(connection, "/");

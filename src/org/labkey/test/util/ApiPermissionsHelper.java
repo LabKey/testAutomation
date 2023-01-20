@@ -280,7 +280,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
         Connection connection = getConnection();
         Command<?> command = new Command<>("security", "getGroupMembers");
-        command.setParameters(new HashMap<>(Maps.of("groupId", groupId)));
+        command.setParameters(Maps.of("groupId", groupId));
 
         CommandResponse response;
         try
@@ -316,7 +316,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     {
         Connection connection = getConnection();
         Command<?> command = new Command<>("security", "getUserPerms");
-        command.setParameters(new HashMap<>(Maps.of("userEmail", user)));
+        command.setParameters(Maps.of("userEmail", user));
 
         CommandResponse response;
         try
