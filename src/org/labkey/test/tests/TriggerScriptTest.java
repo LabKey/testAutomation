@@ -544,22 +544,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         row3 = resp.getRows().get(1);
 
-        //Check After Update Event
-        step = "AfterUpdate";
-        log("** " + testName + " " + step + " Event");
-        UpdateRowsCommand updCmd = new UpdateRowsCommand(schemaName, queryName);
-        row2.put(flagField, "AfterUpdate");
-        updCmd.addRow(row2);
-        updCmd.addRow(row3);
-        assertAPIErrorMessage(updCmd, AFTER_UPDATE_ERROR, cn);
-
         //Check Before Update Event
         step = "BeforeUpdate";
         log("** " + testName + " " + step + " Event");
-        updCmd = new UpdateRowsCommand(schemaName,queryName);
+        UpdateRowsCommand updCmd = new UpdateRowsCommand(schemaName,queryName);
         row2.put(flagField, "BeforeUpdate");
         row2.put(updateField, "Labkey");
-        row3.put(flagField,"BeforeDelete");  //For later.
+        row3.put(flagField, "BeforeDelete");  //For later.
         updCmd.addRow(row2);
         updCmd.addRow(row3);
         resp = updCmd.execute(cn, getProjectName());
@@ -567,6 +558,15 @@ public class TriggerScriptTest extends BaseWebDriverTest
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
         //Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));
+
+        //Check After Update Event
+        step = "AfterUpdate";
+        log("** " + testName + " " + step + " Event");
+        updCmd = new UpdateRowsCommand(schemaName, queryName);
+        row2.put(flagField, "AfterUpdate");
+        updCmd.addRow(row2);
+        updCmd.addRow(row3);
+        assertAPIErrorMessage(updCmd, AFTER_UPDATE_ERROR, cn);
 
         //Check After Delete Event
         step = "After Delete";
