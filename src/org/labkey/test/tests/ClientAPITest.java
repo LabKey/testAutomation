@@ -1477,7 +1477,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         try
         {
-            new Command<>(source.getControllerName(), source.getActionName())
+            Command<CommandResponse> cmd = new Command<>(source.getControllerName(), source.getActionName())
             {
                 @Override
                 protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws URISyntaxException
@@ -1487,7 +1487,9 @@ public class ClientAPITest extends BaseWebDriverTest
 
                     return request;
                 }
-            }.execute(cn, folderPath);
+            };
+            cmd.setParameters(source.getParameters());
+            cmd.execute(cn, folderPath);
         }
         catch (IOException e)
         {
