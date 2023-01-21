@@ -65,15 +65,24 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     }
 
     /**
-     * Open the entity filter dialog for the specified parent type.
+     * Open the entity filter dialog for the specified filter type.
      *
-     * @param parentNoun "Source" or "Parent" in SM. "Registry Parent" or "Sample Parent" in Biologics
+     * @param filterKind "Source" or "Parent" or "Assay" in SM. "Registry Parent" or "Sample Parent" or "Assay" in Biologics
      * @return component wrapper for the EntityFieldFilterModal
      */
-    public EntityFieldFilterModal clickAddParent(String parentNoun)
+    public EntityFieldFilterModal clickAddParent(String filterKind)
     {
-        elementCache().findAddParentButton(parentNoun).click();
+        elementCache().findFilterKindButton(filterKind).click();
         return new EntityFieldFilterModal(getDriver(), this::doAndWaitForUpdate);
+    }
+
+    /**
+     * returns the list of search/filter buttons contained in the header section
+     * @return
+     */
+    public List<WebElement> getFilterButtons()
+    {
+        return elementCache().getFilterKindButtons();
     }
 
     /**
@@ -128,12 +137,24 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
     public SavedSearchesMenu getSaveSearchMenu()
     {
-        return new SavedSearchesMenu(elementCache().savedViewsMenu.getComponentElement(), getDriver(), elementCache().saveViewsDropdown);
+        return new SavedSearchesMenu(elementCache().savedViewsMenu().getComponentElement(), getDriver(), elementCache().saveViewsDropdown());
     }
 
     public BootstrapMenu getSaveSearchDropdownBtn()
     {
         return elementCache().saveViewDropdownBtn;
+    }
+
+    /**
+     * Clicks the 'Save Search' button next to the saved searches menu
+     * This button will only be present if a search has been done
+     * @return
+     */
+    public SaveSampleFinderViewModal clickSaveSearchBtn()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveSearchButton));
+        elementCache().saveSearchButton.click();
+        return new SaveSampleFinderViewModal(getDriver());
     }
 
     /**
@@ -177,10 +198,20 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     {
         final WebElement panelHeading = Locator.byClass("panel-heading").findWhenNeeded(this);
 
-        WebElement findAddParentButton(String parentNoun)
+        WebElement findFilterKindButton(String filterNoun)
         {
-            return BootstrapLocators.button(parentNoun + " Properties")
+            return BootstrapLocators.button(filterNoun + " Properties")
                     .withChild(Locator.byClass("container--addition-icon")).findElement(panelHeading);
+        }
+
+
+        WebElement saveSearchButton = BootstrapLocators.button("Save Search").findWhenNeeded(panelHeading);
+
+        List<WebElement> getFilterKindButtons()
+        {
+            return Locator.tagWithClass("button", "btn-default")
+                    .withChild(Locator.tagWithClass("i", "container--addition-icon"))
+                    .findElements(panelHeading);
         }
 
         final WebElement filterCardsSection = Locator.byClass("filter-cards").findWhenNeeded(this);
@@ -202,13 +233,20 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
         final TabbedGridPanel resultsGrid = new TabbedGridPanel.TabbedGridPanelFinder(getDriver()).findWhenNeeded(this);
 
-        final BootstrapMenu savedViewsMenu = BootstrapMenu.finder(getDriver()).locatedBy(
-                Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").parent()).findWhenNeeded(this);
+        final BootstrapMenu savedViewsMenu()
+        {
+            return BootstrapMenu.finder(getDriver())
+                    .locatedBy(Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").parent())
+                    .waitFor(this);
+        }
 
         final BootstrapMenu saveViewDropdownBtn = BootstrapMenu.finder(getDriver()).locatedBy(
                 Locator.tagWithAttributeContaining("button", "id", "save-finderview-dropdown").parent()).findWhenNeeded(this);
 
-        final WebElement saveViewsDropdown = Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").findWhenNeeded(this);
+        final WebElement saveViewsDropdown()
+        {
+            return Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").findElement(this);
+        }
 
     }
 
@@ -217,7 +255,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         final static String SAVE_MENU_OPTION = "Save as custom search";
         final static String MANGE_MENU_OPTION = "Manage saved searches";
 
-        private WebElement _dropdownEl;
+        private final WebElement _dropdownEl;
         SavedSearchesMenu(WebElement componentElement, WebDriver driver, WebElement dropdownEl)
         {
             super(driver, componentElement);
