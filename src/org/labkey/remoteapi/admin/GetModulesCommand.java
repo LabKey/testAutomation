@@ -16,9 +16,9 @@
 package org.labkey.remoteapi.admin;
 
 import org.json.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.GetCommand;
 
-public class GetModulesCommand extends Command<GetModulesResponse>
+public class GetModulesCommand extends GetCommand<GetModulesResponse>
 {
     public GetModulesCommand()
     {

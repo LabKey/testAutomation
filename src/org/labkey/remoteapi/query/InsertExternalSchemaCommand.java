@@ -1,7 +1,6 @@
 package org.labkey.remoteapi.query;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -30,9 +29,9 @@ public class InsertExternalSchemaCommand extends PostCommand<CommandResponse>
     }
 
     @Override
-    protected HttpUriRequest createRequest(URI uri)
+    protected HttpPost createRequest(URI uri)
     {
-        HttpPost request = (HttpPost) super.createRequest(uri);
+        HttpPost request = super.createRequest(uri);
 
         try
         {

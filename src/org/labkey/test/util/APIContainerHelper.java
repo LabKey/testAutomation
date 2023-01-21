@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
@@ -242,7 +242,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
         final String containerPath = projectName + "/" + folderName;
-        PostCommand command = new PostCommand("core", "moveContainer")
+        SimplePostCommand command = new SimplePostCommand("core", "moveContainer")
         {
             @Override
             public JSONObject getJsonObject()

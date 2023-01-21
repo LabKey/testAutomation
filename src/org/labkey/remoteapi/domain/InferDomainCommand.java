@@ -1,16 +1,15 @@
 package org.labkey.remoteapi.domain;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.core5.http.ContentType;
 import org.json.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.PostCommand;
 
 import java.io.File;
 import java.net.URI;
 
-public class InferDomainCommand extends Command<InferDomainResponse>
+public class InferDomainCommand extends PostCommand<InferDomainResponse>
 {
     private final File _file;
     private final String _domainKindName;
@@ -37,7 +36,7 @@ public class InferDomainCommand extends Command<InferDomainResponse>
     }
 
     @Override
-    protected HttpUriRequest createRequest(URI uri)
+    protected HttpPost createRequest(URI uri)
     {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 

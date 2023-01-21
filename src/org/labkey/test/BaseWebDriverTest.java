@@ -43,7 +43,8 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -637,7 +638,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return; // app admin can't enable stack traces
         }
         Connection cn = createDefaultConnection();
-        PostCommand<?> command = new PostCommand<>("mini-profiler", "enableTroubleshootingStacktraces");
+        SimplePostCommand command = new SimplePostCommand("mini-profiler", "enableTroubleshootingStacktraces");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", true);
         command.setJsonObject(jsonObject);
@@ -1140,7 +1141,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private int getPendingRequestCount(Connection connection)
     {
-        Command<?> getPendingRequestCount = new Command<>("admin", "getPendingRequestCount");
+        SimpleGetCommand getPendingRequestCount = new SimpleGetCommand("admin", "getPendingRequestCount");
         try
         {
             CommandResponse response = getPendingRequestCount.execute(connection, null);
@@ -1319,7 +1320,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     /**
      * TODO: 7695: Custom views are not deleted when list is deleted
-     * @return List of view names which are no longer valid
+     * @return Set of view names which are no longer valid
      */
     protected Set<String> getOrphanedViews()
     {

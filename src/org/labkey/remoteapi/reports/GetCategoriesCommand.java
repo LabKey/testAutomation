@@ -16,9 +16,9 @@
 package org.labkey.remoteapi.reports;
 
 import org.json.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.GetCommand;
 
-public class GetCategoriesCommand extends Command<GetCategoriesResponse>
+public class GetCategoriesCommand extends GetCommand<GetCategoriesResponse>
 {
     public GetCategoriesCommand()
     {

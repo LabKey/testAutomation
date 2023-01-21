@@ -27,6 +27,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -171,7 +172,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
 
     private PostCommand<CommandResponse> prepareSaveRowsCommand(String command, String containerPath, String schema, String queryName, String pkName, String[] fieldNames, Object[][] rows, @Nullable Object[][] oldKeys)
     {
-        PostCommand<CommandResponse> postCommand = new PostCommand<>("query", "saveRows");
+        SimplePostCommand postCommand = new SimplePostCommand("query", "saveRows");
 
         JSONObject commandJson = new JSONObject();
         commandJson.put("containerPath", containerPath);

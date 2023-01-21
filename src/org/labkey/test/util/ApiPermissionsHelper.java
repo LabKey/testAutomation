@@ -17,10 +17,10 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.security.AddAssignmentCommand;
 import org.labkey.remoteapi.security.AddGroupMembersCommand;
 import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
@@ -38,7 +38,6 @@ import org.labkey.test.WebTestHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -279,7 +278,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
 
         Connection connection = getConnection();
-        Command<?> command = new Command<>("security", "getGroupMembers");
+        SimpleGetCommand command = new SimpleGetCommand("security", "getGroupMembers");
         command.setParameters(Maps.of("groupId", groupId));
 
         CommandResponse response;
@@ -315,7 +314,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     private CommandResponse getUserPerms(String container, String user) throws CommandException
     {
         Connection connection = getConnection();
-        Command<?> command = new Command<>("security", "getUserPerms");
+        SimpleGetCommand command = new SimpleGetCommand("security", "getUserPerms");
         command.setParameters(Maps.of("userEmail", user));
 
         CommandResponse response;

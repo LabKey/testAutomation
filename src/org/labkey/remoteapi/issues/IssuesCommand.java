@@ -1,7 +1,6 @@
 package org.labkey.remoteapi.issues;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.core5.http.ContentType;
@@ -46,7 +45,7 @@ public class IssuesCommand extends PostCommand<IssueResponse>
     }
 
     @Override
-    protected HttpUriRequest createRequest(URI uri)
+    protected HttpPost createRequest(URI uri)
     {
         HttpPost request = new HttpPost(uri);
 

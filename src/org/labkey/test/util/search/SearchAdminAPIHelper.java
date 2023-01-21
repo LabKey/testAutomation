@@ -17,6 +17,7 @@ package org.labkey.test.util.search;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -26,7 +27,6 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -47,7 +47,7 @@ public abstract class SearchAdminAPIHelper
     public static void waitForIndexer(int timeout)
     {
         // Invoke a special server action that waits until all previous indexer tasks are complete
-        var cmd = new PostCommand("search", "waitForIndexer");
+        var cmd = new SimplePostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
 
        executeWaitForIndexer(cmd);
@@ -62,7 +62,7 @@ public abstract class SearchAdminAPIHelper
     public static void waitForIndexerBackground(int timeout)
     {
         // Invoke a special server action that waits until all previous indexer tasks are complete, even wait for background indexing tasks to complete (e.g. deleteContainer)
-        var cmd = new PostCommand("search", "waitForIndexer");
+        var cmd = new SimplePostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
         cmd.setParameters(Map.of("priority", "background"));
 

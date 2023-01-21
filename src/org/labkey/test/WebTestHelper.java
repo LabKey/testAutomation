@@ -45,7 +45,7 @@ import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.LogMethod;
@@ -140,7 +140,7 @@ public class WebTestHelper
         if (!savedSessionKeys.containsKey(sessionId))
         {
             Connection connection = getRemoteApiConnection(user, true);
-            PostCommand<?> command = new PostCommand<>("security", "createApiKey");
+            SimplePostCommand command = new SimplePostCommand("security", "createApiKey");
             JSONObject json = new JSONObject();
             json.put("type", "session");
             command.setJsonObject(json);
@@ -543,7 +543,7 @@ public class WebTestHelper
             return;
         }
 
-        PostCommand<?> command = new PostCommand<>("admin", "log");
+        SimplePostCommand command = new SimplePostCommand("admin", "log");
         command.setParameters(Map.of("message", message));
         try
         {

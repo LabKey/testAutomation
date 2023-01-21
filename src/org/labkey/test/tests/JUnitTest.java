@@ -37,11 +37,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
@@ -63,7 +62,6 @@ import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -378,7 +376,7 @@ public class JUnitTest extends TestSuite
             long startTime = System.currentTimeMillis();
             try
             {
-                Command<CommandResponse> command = new PostCommand<>("junit", "go");
+                SimplePostCommand command = new SimplePostCommand("junit", "go");
                 command.setParameters(Map.of("testCase", _remoteClass));
                 command.setTimeout(_timeout * 1000);
 
