@@ -94,17 +94,12 @@ public class MdxCommand extends PostCommand<MdxResponse>
     @Override
     public JSONObject getJsonObject()
     {
-        JSONObject result = super.getJsonObject();
-        if (result == null)
-        {
-            result = new JSONObject();
-        }
+        JSONObject result = new JSONObject();
         result.put("configId", _configId);
         result.put("schemaName", _schemaName);
         if (_cubeName != null)
             result.put("cubeName", _cubeName);
         result.put("query", _query);
-        setJsonObject(result);
         return result;
     }
 

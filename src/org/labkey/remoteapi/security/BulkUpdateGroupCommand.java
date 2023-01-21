@@ -123,11 +123,7 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
     @Override
     public JSONObject getJsonObject()
     {
-        JSONObject result = super.getJsonObject();
-        if (result == null)
-        {
-            result = new JSONObject();
-        }
+        JSONObject result = new JSONObject();
         if (_groupId != null) result.put("groupId", _groupId);
         if (_groupName != null) result.put("groupName", _groupName);
         result.put("createGroup", _createGroup);

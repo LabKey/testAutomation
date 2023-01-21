@@ -247,15 +247,11 @@ public class APIContainerHelper extends AbstractContainerHelper
             @Override
             public JSONObject getJsonObject()
             {
-                JSONObject result = super.getJsonObject();
-                if (result == null)
-                {
-                    result = new JSONObject();
-                }
+                JSONObject result = new JSONObject();
                 result.put("container", containerPath);
                 result.put("parent", newParent);
                 result.put("addAlias", createAlias);
-                setJsonObject(result);
+
                 return result;
             }
         };
