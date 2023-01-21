@@ -148,6 +148,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
+    public DetailTableEdit setTextareaByFieldName(String fieldName, String value)
+    {
+        Locator inputloc = Locator.tagWithClass("textarea", "form-control")
+                .withAttribute("name",  fieldName);
+        Input input = Input.Input(inputloc,
+                getDriver()).waitFor();
+        input.set(value);
+        return this;
+    }
+
     /**
      * Get the value of a boolean field.
      *
