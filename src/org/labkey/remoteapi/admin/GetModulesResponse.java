@@ -17,7 +17,6 @@ package org.labkey.remoteapi.admin;
 
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.HasRequiredVersion;
 import org.labkey.remoteapi.ResponseObject;
 
 import java.util.List;
@@ -31,9 +30,9 @@ public class GetModulesResponse extends CommandResponse
 
     private Set<Module> _modules;
 
-    public GetModulesResponse(String text, int statusCode, String contentType, JSONObject json, HasRequiredVersion hasRequiredVersion)
+    public GetModulesResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, hasRequiredVersion);
+        super(text, statusCode, contentType, json);
         _folderType = getProperty("folderType");
     }
 

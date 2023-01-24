@@ -16,7 +16,7 @@ public class GetIssueCommand extends PostCommand<GetIssueResponse>
     @Override
     protected GetIssueResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetIssueResponse(text, status, contentType, json, this);
+        return new GetIssueResponse(text, status, contentType, json);
     }
 
     @Override

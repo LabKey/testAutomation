@@ -28,6 +28,6 @@ public class GetRolesCommand extends GetCommand<GetRolesResponse>
     @Override
     protected GetRolesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetRolesResponse(text, status, contentType, json, this);
+        return new GetRolesResponse(text, status, contentType, json);
     }
 }

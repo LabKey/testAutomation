@@ -32,7 +32,7 @@ public class InferDomainCommand extends PostCommand<InferDomainResponse>
     @Override
     protected InferDomainResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new InferDomainResponse(text, status, contentType, json, this);
+        return new InferDomainResponse(text, status, contentType, json);
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.labkey.remoteapi.announcements;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.HasRequiredVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +11,9 @@ public class GetDiscussionsResponse extends CommandResponse
 {
     private final List<AnnouncementModel> _threads;
 
-    public GetDiscussionsResponse(String text, int statusCode, String contentType, JSONObject json,
-                                  HasRequiredVersion hasRequiredVersion)
+    public GetDiscussionsResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, hasRequiredVersion);
+        super(text, statusCode, contentType, json);
 
         // populate _threads from payload
         _threads = new ArrayList<>();

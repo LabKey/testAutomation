@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.HasRequiredVersion;
 
 import java.util.List;
 import java.util.Map;
@@ -38,11 +37,10 @@ public class MdxResponse extends CommandResponse
      * @param statusCode         The HTTP status code
      * @param contentType        The response content type
      * @param json               The parsed JSONObject (or null if JSON was not returned)
-     * @param hasRequiredVersion An object that implements HasRequiredVersion
      */
-    public MdxResponse(String text, int statusCode, String contentType, JSONObject json, HasRequiredVersion hasRequiredVersion)
+    public MdxResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, hasRequiredVersion);
+        super(text, statusCode, contentType, json);
     }
 
     public List<Map<String,Object>> getAxes()

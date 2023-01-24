@@ -117,7 +117,7 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
     @Override
     protected BulkUpdateGroupResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new BulkUpdateGroupResponse(text, status, contentType, json, this);
+        return new BulkUpdateGroupResponse(text, status, contentType, json);
     }
 
     @Override

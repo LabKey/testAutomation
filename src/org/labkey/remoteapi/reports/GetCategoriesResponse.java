@@ -17,7 +17,6 @@ package org.labkey.remoteapi.reports;
 
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.HasRequiredVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +26,9 @@ public class GetCategoriesResponse extends CommandResponse
 {
     private final List<Category> _categoryList;
 
-    public GetCategoriesResponse(String text, int statusCode, String contentType, JSONObject json, HasRequiredVersion hasRequiredVersion)
+    public GetCategoriesResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, hasRequiredVersion);
+        super(text, statusCode, contentType, json);
         _categoryList = new ArrayList<>();
         for ( Map<String, Object> categoryMap : (List<Map<String, Object>>)getProperty("categories"))
         {

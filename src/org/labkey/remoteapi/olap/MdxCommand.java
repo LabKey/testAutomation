@@ -20,7 +20,6 @@ import org.json.JSONTokener;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.serverapi.reader.Readers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,7 +87,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
     @Override
     protected MdxResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new MdxResponse(text, status, contentType, json, this);
+        return new MdxResponse(text, status, contentType, json);
     }
 
     @Override

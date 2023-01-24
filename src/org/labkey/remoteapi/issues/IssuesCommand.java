@@ -30,7 +30,7 @@ public class IssuesCommand extends PostCommand<IssueResponse>
     @Override
     protected IssueResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new IssueResponse(text, status, contentType, json, this);
+        return new IssueResponse(text, status, contentType, json);
     }
 
     public void setIssues(List<IssueModel> issues)

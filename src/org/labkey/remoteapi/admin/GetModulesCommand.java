@@ -28,6 +28,6 @@ public class GetModulesCommand extends GetCommand<GetModulesResponse>
     @Override
     protected GetModulesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetModulesResponse(text, status, contentType, json, this);
+        return new GetModulesResponse(text, status, contentType, json);
     }
 }

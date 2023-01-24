@@ -2,7 +2,6 @@ package org.labkey.remoteapi.domain;
 
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.HasRequiredVersion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,9 +12,9 @@ public class InferDomainResponse extends CommandResponse
 {
     List<PropertyDescriptor> _fields;
 
-    public InferDomainResponse(String text, int statusCode, String contentType, JSONObject json, HasRequiredVersion hasRequiredVersion)
+    public InferDomainResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, hasRequiredVersion);
+        super(text, statusCode, contentType, json);
     }
 
     public List<PropertyDescriptor> getFields()
