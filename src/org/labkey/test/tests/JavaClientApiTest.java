@@ -82,7 +82,7 @@ import static org.junit.Assert.fail;
 /**
  * Test for the Java Client API library. This test is written in
  * Selenium because we don't yet have a way to create a list via
- * the API, so this test will setup a list and then use the Java
+ * the API, so this test will set up a list and then use the Java
  * client API library to insert, read, update, and delete from that list
  */
 @Category({Daily.class})

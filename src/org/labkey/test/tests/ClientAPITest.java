@@ -1403,8 +1403,7 @@ public class ClientAPITest extends BaseWebDriverTest
         Connection cn = getConnection(true);
         SimpleGetCommand command = new SimpleGetCommand("bam", "boozled");
 
-        final String bogusProjectName = "BOGUS---CONTAINER---PATH";
-        final String bogusContainerPath = "/" + bogusProjectName;
+        final String bogusContainerPath = "/BOGUS---CONTAINER---PATH";
 
         runCommand(cn, command, "application/json", "text/html", 404, null);
         runCommand(cn, command, "text/xml", "text/html", 404, null);
@@ -1426,7 +1425,7 @@ public class ClientAPITest extends BaseWebDriverTest
         command = new SimpleGetCommand("query", "selectRows.api");
         validateUnauthorizedResponses(cn, command, expectedProps);
 
-        expectedProps.put("exception", "No such project: " + bogusContainerPath); // Might need to change back to bogusProjectName, see Issue 46969.
+        expectedProps.put("exception", "No such project: " + bogusContainerPath);
 
         // Reset command so that it's not requesting XML responses
         command = new SimpleGetCommand("query", "selectRows.api");
