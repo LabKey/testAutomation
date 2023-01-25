@@ -41,7 +41,8 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -1134,7 +1135,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean isMiniProfilerEnabled()
     {
         Connection cn = createDefaultConnection();
-        Command<?> command = new Command<>("mini-profiler", "isEnabled");
+        SimpleGetCommand command = new SimpleGetCommand("mini-profiler", "isEnabled");
         try
         {
             CommandResponse r = command.execute(cn, null);
@@ -1161,7 +1162,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void setMiniProfilerEnabled(boolean enabled)
     {
         Connection cn = createDefaultConnection();
-        PostCommand<?> setEnabled = new PostCommand<>("mini-profiler", "enable");
+        SimplePostCommand setEnabled = new SimplePostCommand("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
         setEnabled.setJsonObject(jsonObject);
@@ -1221,8 +1222,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void setAuthenticationProvider(@LoggedParam String provider, @LoggedParam boolean enabled, Connection cn)
     {
-        Command<?> command = new PostCommand<>("login", "setProviderEnabled");
-        command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
+        SimplePostCommand command = new SimplePostCommand("login", "setProviderEnabled");
+        command.setParameters(Maps.of("provider", provider, "enabled", enabled));
         try
         {
             command.execute(cn, null);
@@ -1237,7 +1238,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     protected void invokeApiAction(@Nullable String folderPath, String controllerName, String actionName, String failureMessage)
     {
-        Command<CommandResponse> command = new PostCommand<>(controllerName, actionName);
+        SimplePostCommand command = new SimplePostCommand(controllerName, actionName);
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
         try

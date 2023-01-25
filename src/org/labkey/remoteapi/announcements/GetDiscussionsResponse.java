@@ -11,10 +11,9 @@ public class GetDiscussionsResponse extends CommandResponse
 {
     private final List<AnnouncementModel> _threads;
 
-    public GetDiscussionsResponse(String text, int statusCode, String contentType, JSONObject json,
-                                  GetDiscussionsCommand sourceCommand)
+    public GetDiscussionsResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, sourceCommand);
+        super(text, statusCode, contentType, json);
 
         // populate _threads from payload
         _threads = new ArrayList<>();

@@ -17,7 +17,7 @@ public class GetDiscussionsCommand extends PostCommand<GetDiscussionsResponse>
     @Override
     protected GetDiscussionsResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetDiscussionsResponse(text, status, contentType, json, this);
+        return new GetDiscussionsResponse(text, status, contentType, json);
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.labkey.test.pages.core.login;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.OptionSelect;
@@ -89,7 +89,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
             JSONObject params = new JSONObject();
             params.put("expiration", oldExpiration != null ? oldExpiration.name() : PasswordExpiration.Never.name());
             params.put("strength", oldStrength != null ? oldStrength.name() : PasswordStrength.Strong.name());
-            PostCommand<?> postCommand = new PostCommand<>("login", "SaveDbLoginProperties");
+            SimplePostCommand postCommand = new SimplePostCommand("login", "SaveDbLoginProperties");
             postCommand.setJsonObject(params);
             try
             {

@@ -1,11 +1,11 @@
 package org.labkey.test.util.login;
 
 import org.json.JSONObject;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
@@ -80,7 +80,7 @@ public class AuthenticationAPIUtils
 
     private static List<Configuration> getAllConfigurations(Connection connection)
     {
-        Command<?> initialMount = new Command<>("login", "initialMount");
+        SimpleGetCommand initialMount = new SimpleGetCommand("login", "initialMount");
         try
         {
             CommandResponse response = initialMount.execute(connection, "/");
@@ -136,7 +136,7 @@ public class AuthenticationAPIUtils
 
     private static void deleteConfiguration(Configuration configuration, Connection connection)
     {
-        PostCommand<?> delete = new PostCommand<>("login", "deleteConfiguration");
+        SimplePostCommand delete = new SimplePostCommand("login", "deleteConfiguration");
         JSONObject json = new JSONObject();
         json.put("configuration", configuration._configuration);
         delete.setJsonObject(json);

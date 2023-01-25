@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -265,7 +265,7 @@ public class SecurityTest extends BaseWebDriverTest
     public void passwordParameterTest()
     {
         // 31000: fail login actions if parameters present on URL
-        PostCommand command = new PostCommand("login", "loginAPI");
+        SimplePostCommand command = new SimplePostCommand("login", "loginAPI");
 
         Map<String, Object> params = new HashMap<>();
         params.put("email", NORMAL_USER);

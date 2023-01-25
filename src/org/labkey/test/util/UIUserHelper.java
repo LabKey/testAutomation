@@ -70,7 +70,7 @@ public class UIUserHelper extends AbstractUserHelper
             userId = null;
         }
 
-        return new CreateUserResponse(null, 200, null, null, null){
+        return new CreateUserResponse(null, 200, null, null){
             @Override
             public Integer getUserId()
             {

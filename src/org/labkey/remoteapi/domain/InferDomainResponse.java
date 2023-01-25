@@ -12,9 +12,9 @@ public class InferDomainResponse extends CommandResponse
 {
     List<PropertyDescriptor> _fields;
 
-    public InferDomainResponse(String text, int statusCode, String contentType, JSONObject json, InferDomainCommand sourceCommand)
+    public InferDomainResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, sourceCommand);
+        super(text, statusCode, contentType, json);
     }
 
     public List<PropertyDescriptor> getFields()

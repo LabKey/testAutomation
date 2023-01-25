@@ -18,10 +18,9 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -228,7 +227,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     private List<Map<String, String>> getAutoCompleteResponse(String user, String containerPath) throws IOException
     {
         Connection connection = new Connection(WebTestHelper.getBaseURL(), user, PasswordUtil.getPassword());
-        Command<CommandResponse> command = new Command<>("security", "CompleteUserRead");
+        SimpleGetCommand command = new SimpleGetCommand("security", "CompleteUserRead");
 
         try
         {
