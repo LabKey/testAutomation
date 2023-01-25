@@ -16,9 +16,9 @@
 package org.labkey.remoteapi.security;
 
 import org.json.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.GetCommand;
 
-public class GetRolesCommand extends Command<GetRolesResponse>
+public class GetRolesCommand extends GetCommand<GetRolesResponse>
 {
     public GetRolesCommand()
     {
@@ -28,6 +28,6 @@ public class GetRolesCommand extends Command<GetRolesResponse>
     @Override
     protected GetRolesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetRolesResponse(text, status, contentType, json, this);
+        return new GetRolesResponse(text, status, contentType, json);
     }
 }

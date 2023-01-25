@@ -16,9 +16,9 @@
 package org.labkey.remoteapi.reports;
 
 import org.json.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.GetCommand;
 
-public class GetCategoriesCommand extends Command<GetCategoriesResponse>
+public class GetCategoriesCommand extends GetCommand<GetCategoriesResponse>
 {
     public GetCategoriesCommand()
     {
@@ -28,6 +28,6 @@ public class GetCategoriesCommand extends Command<GetCategoriesResponse>
     @Override
     protected GetCategoriesResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetCategoriesResponse(text, status, contentType, json, this);
+        return new GetCategoriesResponse(text, status, contentType, json);
     }
 }

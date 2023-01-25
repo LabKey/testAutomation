@@ -17,9 +17,8 @@ package org.labkey.test;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
@@ -146,7 +145,7 @@ public class TestScrubber extends ExtraSiteWrapper
     @LogMethod(quiet = true)
     private void disableLoginAttemptLimit() throws IOException, CommandException
     {
-        PostCommand<CommandResponse> command = new PostCommand<>("compliance", "complianceSettings");
+        SimplePostCommand command = new SimplePostCommand("compliance", "complianceSettings");
         Map<String, Object> params = new HashMap<>();
         params.put("tab", "login");
         params.put("attemptEnabled", "false");
@@ -158,7 +157,7 @@ public class TestScrubber extends ExtraSiteWrapper
     @LogMethod(quiet = true)
     private void resetPremiumPageElements() throws IOException, CommandException
     {
-        PostCommand<CommandResponse> command = new PostCommand<>("premium", "adminConsoleConfigurePageElements");
+        SimplePostCommand command = new SimplePostCommand("premium", "adminConsoleConfigurePageElements");
         Map<String, Object> params = new HashMap<>();
         params.put("headerModule", "none");
         params.put("bannerModule", "none");
@@ -168,7 +167,7 @@ public class TestScrubber extends ExtraSiteWrapper
         executeIgnoring404(command);
     }
 
-    private void executeIgnoring404(PostCommand<CommandResponse> command) throws IOException, CommandException
+    private void executeIgnoring404(SimplePostCommand command) throws IOException, CommandException
     {
         Connection connection = getRemoteApiConnection();
         try
@@ -188,7 +187,7 @@ public class TestScrubber extends ExtraSiteWrapper
     {
         if (TestProperties.isTestRunningOnTeamCity())
         {
-            PostCommand<CommandResponse> command = new PostCommand<>("admin", "filesSiteSettings");
+            SimplePostCommand command = new SimplePostCommand("admin", "filesSiteSettings");
             // POST'ing without any parameters will enable upload without touching site level file root
             command.execute(createDefaultConnection(), "/");
         }

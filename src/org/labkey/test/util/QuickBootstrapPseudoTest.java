@@ -3,12 +3,12 @@ package org.labkey.test.util;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.GuestCredentialsProvider;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -55,7 +55,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
     private void waitForStartup()
     {
         Connection cn = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
-        Command<?> command = new Command<>("admin", "healthCheck");
+        SimpleGetCommand command = new SimpleGetCommand("admin", "healthCheck");
         Exception lastException = null;
 
         Timer timer = new Timer(Duration.ofMinutes(5));
@@ -93,7 +93,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
     private boolean isInitialUserCreated()
     {
         Connection cn = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
-        PostCommand<?> command = new PostCommand<>("admin", "configurationSummary");
+        SimplePostCommand command = new SimplePostCommand("admin", "configurationSummary");
 
         try
         {
@@ -130,7 +130,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
     private void createInitialUser_API()
     {
         Connection cn = createDefaultConnection();
-        PostCommand<?> initialUserCommand = new PostCommand<>("login", "initialUser");
+        SimplePostCommand initialUserCommand = new SimplePostCommand("login", "initialUser");
         JSONObject params = new JSONObject();
         params.put("email", PasswordUtil.getUsername());
         params.put("password", PasswordUtil.getPassword());
@@ -151,7 +151,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
     private void waitForBootstrap()
     {
         Connection cn = WebTestHelper.getRemoteApiConnection(false);
-        Command<?> command = new Command<>("admin", "startupStatus");
+        SimpleGetCommand command = new SimpleGetCommand("admin", "startupStatus");
         Exception lastException = null;
 
         Timer timer = new Timer(Duration.ofMinutes(5));

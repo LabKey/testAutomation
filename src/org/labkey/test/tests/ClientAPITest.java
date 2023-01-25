@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -26,11 +26,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -1328,7 +1327,7 @@ public class ClientAPITest extends BaseWebDriverTest
         verifyAutocompletionResponse(cn, "announcements", "completeUser", false, true);
 
         // Impersonate a role that shouldn't be allowed to see emails, and shouldn't even be allowed the action for security & pipeline
-        PostCommand command = new PostCommand("user", "impersonateRoles") {
+        SimplePostCommand command = new SimplePostCommand("user", "impersonateRoles") {
             @Override
             public JSONObject getJsonObject()
             {
@@ -1361,7 +1360,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void verifyAutocompletionResponse(Connection cn, String controller, String action, boolean displayNameOnly, boolean actionAllowed)
     {
-        Command<?> command = new Command<>(controller, action);
+        SimpleGetCommand command = new SimpleGetCommand(controller, action);
         Map<String, Object> completionValues;
         String errMsg = "for controller " + controller + ", displayNameOnly == " + displayNameOnly;
         try
@@ -1402,10 +1401,9 @@ public class ClientAPITest extends BaseWebDriverTest
         // 30509: For 401 and 404, respond with same ContentType as request
         log("Testing response content type for 404");
         Connection cn = getConnection(true);
-        Command<CommandResponse> command = new Command<>("bam", "boozled");
+        SimpleGetCommand command = new SimpleGetCommand("bam", "boozled");
 
-        final String bogusProjectName = "BOGUS---CONTAINER---PATH";
-        final String bogusContainerPath = "/" + bogusProjectName;
+        final String bogusContainerPath = "/BOGUS---CONTAINER---PATH";
 
         runCommand(cn, command, "application/json", "text/html", 404, null);
         runCommand(cn, command, "text/xml", "text/html", 404, null);
@@ -1416,7 +1414,7 @@ public class ClientAPITest extends BaseWebDriverTest
         // An API location/command that requires permissions
         log("Testing response content type for 401");
         cn = getConnection(false);
-        command = new Command<>("core", "getExtContainerAdminTree.api");
+        command = new SimpleGetCommand("core", "getExtContainerAdminTree.api");
 
         Map<String, Object> expectedProps = new HashMap<>();
         expectedProps.put("success", false);
@@ -1424,38 +1422,38 @@ public class ClientAPITest extends BaseWebDriverTest
 
         validateUnauthorizedResponses(cn, command, expectedProps);
 
-        command = new Command<>("query", "selectRows.api");
+        command = new SimpleGetCommand("query", "selectRows.api");
         validateUnauthorizedResponses(cn, command, expectedProps);
 
-        expectedProps.put("exception", "No such project: " + bogusContainerPath); // Might need to change back to bogusProjectName, see Issue 46969.
+        expectedProps.put("exception", "No such project: " + bogusContainerPath);
 
         // Reset command so that it's not requesting XML responses
-        command = new Command<>("query", "selectRows.api");
+        command = new SimpleGetCommand("query", "selectRows.api");
 
         // Check that a bad container path produces the right kind of response
         runCommand(cn, command, "application/json", "application/json", 404, expectedProps, bogusContainerPath);
         // Try again requesting an XML response
-        command.getParameters().put("respFormat", "xml");
+        command.setParameters(Map.of("respFormat", "xml"));
         runCommand(cn, command, "application/json", "text/xml", 404, null, bogusContainerPath);
 
-        command = new Command<>("query", "selectRows.api");
+        command = new SimpleGetCommand("query", "selectRows.api");
         // Check that an valid container with bogus parameters also does the right thing for selectRows
         expectedProps.put("exception", "The specified schema does not exist");
         cn = getConnection(true);
         runCommand(cn, command, "application/json", "application/json", 404, expectedProps);
 
         // Try again requesting an XML response
-        command.getParameters().put("respFormat", "xml");
+        command.setParameters(Map.of("respFormat", "xml"));
         runCommand(cn, command, "application/json", "text/xml", 404, null);
     }
 
-    private void validateUnauthorizedResponses(Connection cn, Command<CommandResponse> command, Map<String, Object> expectedProps)
+    private void validateUnauthorizedResponses(Connection cn, SimpleGetCommand command, Map<String, Object> expectedProps)
     {
         runCommand(cn, command, "application/json", "application/json", 401, expectedProps);
         runCommand(cn, command, "text/xml", "application/json", 401, expectedProps);
         runCommand(cn, command, "text/html", "application/json", 401, expectedProps);
 
-        command.getParameters().put("respFormat", "xml");
+        command.setParameters(Map.of("respFormat", "xml"));
 
         runCommand(cn, command, "application/json", "text/xml", 401, expectedProps);
         runCommand(cn, command, "text/xml", "text/xml", 401, expectedProps);
@@ -1466,28 +1464,30 @@ public class ClientAPITest extends BaseWebDriverTest
      * Run a Command that makes a request using the specified contentType. That contentType, expectedStatus,
      * and expectedProps are checked against the response to validate if an expected response was received.
      */
-    private void runCommand(Connection cn, Command<CommandResponse> source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps)
+    private void runCommand(Connection cn, SimpleGetCommand source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps)
     {
         runCommand(cn, source, requestContentType, expectedResponseContentType, expectedStatus, expectedProps, "/" + getProjectName());
     }
 
-    private void runCommand(Connection cn, Command<CommandResponse> source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps, String folderPath)
+    private void runCommand(Connection cn, SimpleGetCommand source, String requestContentType, String expectedResponseContentType, int expectedStatus, @Nullable Map<String, Object> expectedProps, String folderPath)
     {
         CommandException exception = null;
 
         try
         {
-            new Command<>(source)
+            SimpleGetCommand cmd = new SimpleGetCommand(source.getControllerName(), source.getActionName())
             {
                 @Override
-                protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws CommandException, URISyntaxException
+                protected HttpGet getHttpRequest(Connection connection, String folderPath) throws URISyntaxException
                 {
-                    HttpUriRequest request = super.getHttpRequest(connection, folderPath);
+                    HttpGet request = super.getHttpRequest(connection, folderPath);
                     request.setHeader("Content-Type", requestContentType);
 
                     return request;
                 }
-            }.execute(cn, folderPath);
+            };
+            cmd.setParameters(source.getParameters());
+            cmd.execute(cn, folderPath);
         }
         catch (IOException e)
         {

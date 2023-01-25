@@ -37,9 +37,4 @@ public class DeletePolicyCommand extends PostCommand<CommandResponse>
         result.put("resourceId", resourceId);
         return result;
     }
-
-    public DeletePolicyCommand(PostCommand source)
-    {
-        super(source);
-    }
 }

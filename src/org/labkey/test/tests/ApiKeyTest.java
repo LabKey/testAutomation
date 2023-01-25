@@ -23,7 +23,7 @@ import org.labkey.remoteapi.ApiKeyCredentialsProvider;
 import org.labkey.remoteapi.BasicAuthCredentialsProvider;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
@@ -214,7 +214,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowSessionKeys(true)
                 .save();
         Connection cn = createDefaultConnection();
-        PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
+        SimplePostCommand generateAPIKeyCommand = new SimplePostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "apikey")));
         try
         {
@@ -239,7 +239,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowSessionKeys(false)
                 .save();
         Connection cn = createDefaultConnection();
-        PostCommand generateAPIKeyCommand = new PostCommand("security", "createApiKey");
+        SimplePostCommand generateAPIKeyCommand = new SimplePostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "session")));
         try
         {
