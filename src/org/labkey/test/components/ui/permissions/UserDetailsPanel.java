@@ -40,10 +40,10 @@ public class UserDetailsPanel extends WebDriverComponent<Component<?>.ElementCac
                 .map(WebElement::getText).orElse(null);
     }
 
-    public List<String> getMemberships()
+    public List<String> getGroups()
     {
-        var membersList = Locator.tagWithClass("div", "principal-detail-label").withText("Member of")
-                .followingSibling("ul").findElement(this);
+        var membersList = Locator.tagWithClass("div", "principal-detail-label").withText("Groups")
+                .parent().descendant("ul").findElement(this);
         return getWrapper().getTexts(Locator.tag("li").findElements(membersList));
     }
 
