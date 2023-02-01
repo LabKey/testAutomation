@@ -21,7 +21,7 @@ public class UserDetailsPanelPermissionsPage extends UserDetailsPanel
 
     public List<String> getEffectiveRoles()
     {
-        var listContainer=  Locator.tagWithClass("div", "principal-detail-label").withText("Permissions")
+        var listContainer=  Locator.tagWithClass("div", "principal-detail-label").withText("Effective Roles")
                 .parent().descendant("ul").waitForElement(this, 2000);
         return Locator.tag("li")
                 .findElements(listContainer)
