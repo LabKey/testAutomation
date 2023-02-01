@@ -115,7 +115,9 @@ public class StudySurveyTest extends BaseWebDriverTest
         //Test is verifying that edited date is not messing up the survey.
         //https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=39291
 
-        checker().verifyEquals("Edited date is incorrect", newDate, getFormElement(Locator.name("date")));
+        WebElement dateField = Locator.name("date").findWhenNeeded(getDriver());
+        waitFor(dateField::isDisplayed, "Date field never showed up.", 1_000);
+        checker().verifyEquals("Edited date is incorrect", newDate, getFormElement(dateField));
     }
 
     private void gotoDataset(String datasetName)
