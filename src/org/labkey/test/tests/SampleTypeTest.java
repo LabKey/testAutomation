@@ -291,7 +291,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Submit", "duplicate key");
 
         log("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 1);
+        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_OPTION, 1);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -318,7 +318,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         // Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.length() < 100);
 
         log ("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
+        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_OPTION, 0);
         importDataPage
                 .setFile(sampleData)
                 .submit();
@@ -1119,7 +1119,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_DATA_LABEL);
+        sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_OPTION);
 
         try
         {

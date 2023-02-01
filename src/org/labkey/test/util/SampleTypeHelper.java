@@ -50,8 +50,9 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGI
  */
 public class SampleTypeHelper extends WebDriverWrapper
 {
-    public static final String IMPORT_DATA_LABEL = "Insert";
-    public static final String MERGE_DATA_LABEL = "Insert and Replace";
+    public static final String IMPORT_OPTION = "IMPORT";
+    public static final String MERGE_OPTION = "MERGE";
+    public static final String UPDATE_OPTION = "UPDATE";
     private final WebDriver _driver;
 
     public enum StatusType {
@@ -154,12 +155,11 @@ public class SampleTypeHelper extends WebDriverWrapper
         return new CreateSampleTypePage(getDriver());
     }
 
-    public void selectImportOption(String label, int index)
+    public void selectImportOption(String option, int index)
     {
         waitForText("Import Lookups by Alternate Key");
-        boolean merge = MERGE_DATA_LABEL.equals(label);
-        String componentId = "insertOption" + index;
-        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge ? "1" : "0") + ")";
+        String componentId = "insertOptionHidden" + index;
+        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue('" + option + "')";
         executeScript(script);
     }
 
@@ -220,12 +220,12 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile)
     {
-        fileImport(dataFile, IMPORT_DATA_LABEL);
+        fileImport(dataFile, IMPORT_OPTION);
     }
 
     public void mergeImport(File dataFile)
     {
-        fileImport(dataFile, MERGE_DATA_LABEL);
+        fileImport(dataFile, MERGE_OPTION);
     }
 
     private void fileImport(File dataFile, String importOption)
@@ -240,19 +240,19 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void bulkImport(String tsvData)
     {
-        startTsvImport(tsvData, IMPORT_DATA_LABEL)
+        startTsvImport(tsvData, IMPORT_OPTION)
                 .submit();
     }
 
     public void mergeImport(String tsvData)
     {
-        startTsvImport(tsvData, SampleTypeHelper.MERGE_DATA_LABEL)
+        startTsvImport(tsvData, SampleTypeHelper.MERGE_OPTION)
                 .submit();
     }
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, IMPORT_DATA_LABEL)
+        startTsvImport(data, IMPORT_OPTION)
                 .submit();
     }
 
@@ -264,13 +264,13 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void mergeImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
+        startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
                 .submit();
     }
 
     public void mergeImportExpectingError(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
+        startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
                 .submitExpectingError();
     }
 
