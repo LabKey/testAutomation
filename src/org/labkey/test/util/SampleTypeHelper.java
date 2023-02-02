@@ -155,14 +155,6 @@ public class SampleTypeHelper extends WebDriverWrapper
         return new CreateSampleTypePage(getDriver());
     }
 
-    public void selectImportOption(String option, int index)
-    {
-        waitForText("Import Lookups by Alternate Key");
-        String componentId = "insertOptionHidden" + index;
-        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue('" + option + "')";
-        executeScript(script);
-    }
-
     public SampleTypeHelper goToSampleType(String name)
     {
         TestLogger.log("Go to the sample type '" + name + "'");
@@ -234,7 +226,10 @@ public class SampleTypeHelper extends WebDriverWrapper
         TestLogger.log("Adding data from file");
         ImportDataPage importDataPage = drt.clickImportBulkData();
         importDataPage.setFile(dataFile);
-        selectImportOption(importOption, 0);
+        if (MERGE_OPTION.equals(importOption))
+            importDataPage.setFileMerge(true);
+        else if (UPDATE_OPTION.equals(importOption))
+            importDataPage.setFileInsertOption(true);
         importDataPage.submit();
     }
 
@@ -278,7 +273,10 @@ public class SampleTypeHelper extends WebDriverWrapper
     {
         DataRegionTable drt = getSamplesDataRegionTable();
         ImportDataPage importDataPage = drt.clickImportBulkData();
-        selectImportOption(importOption, 1);
+        if (MERGE_OPTION.equals(importOption))
+            importDataPage.setCopyPasteMerge(true);
+        else if (UPDATE_OPTION.equals(importOption))
+            importDataPage.setCopyPasteInsertOption(true);
         importDataPage.setText(tsv);
         return importDataPage;
     }

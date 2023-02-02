@@ -283,7 +283,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Try to import overlapping data with TSV");
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickImportBulkData();
+        ImportDataPage importDataPage = drt.clickImportBulkData();
         String header = "Name\t" + fieldNames.get(0) + "\n";
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
@@ -291,7 +291,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Submit", "duplicate key");
 
         log("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_OPTION, 1);
+        importDataPage.setCopyPasteMerge(true);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -310,7 +310,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("Try to import overlapping data from file");
         final File sampleData = TestFileUtils.getSampleData("simpleSampleType.xls");
-        final ImportDataPage importDataPage = drt.clickImportBulkData();
+        importDataPage = drt.clickImportBulkData();
         importDataPage.setFile(sampleData);
         final String errorText = importDataPage.submitExpectingError();
         Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.contains("duplicate key"));
@@ -318,7 +318,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         // Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.length() < 100);
 
         log ("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_OPTION, 0);
+        importDataPage.setFileMerge(true);
         importDataPage
                 .setFile(sampleData)
                 .submit();

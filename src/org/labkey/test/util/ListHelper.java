@@ -333,16 +333,6 @@ public class ListHelper extends LabKeySiteWrapper
                 .submit();
     }
 
-    public boolean isMergeOptionPresent()
-    {
-        return isElementPresent(Locator.tagContainingText("label", "Update data"));
-    }
-
-    public void chooseMerge(boolean isFileUpload)
-    {
-        click(tag("input").withAttribute("type", "button").index(isFileUpload ? 0 : 2));
-    }
-
     public EditListDefinitionPage goToEditDesign(String listName)
     {
         goToList(listName);
