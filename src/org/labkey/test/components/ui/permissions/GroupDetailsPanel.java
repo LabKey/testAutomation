@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 
 public class GroupDetailsPanel extends WebDriverComponent<GroupDetailsPanel.ElementCache>
 {
-    protected static final Locator LOC = BootstrapLocators.panel("Group Details");
+    protected static final Locator LOC = Locator.byClass("group-details-panel");
     private final WebElement _el;
     private final WebDriver _driver;
 
@@ -56,7 +56,7 @@ public class GroupDetailsPanel extends WebDriverComponent<GroupDetailsPanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement title = Locator.tagWithClass("p", "principal-title-primary").findWhenNeeded(this);
+        final WebElement title = Locator.tagWithClass("p", "panel-heading").findWhenNeeded(this);
 
         WebElement detailValueEl(String label)
         {
