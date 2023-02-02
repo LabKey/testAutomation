@@ -358,24 +358,43 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         verifyThumbnail(chart, null);
     }
 
+    private String getThumbnail(String chart)
+    {
+        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
+        mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
+        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
+        waitForElement(thumbnail);
+        return WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+    }
+
     @LogMethod
     protected void verifyThumbnail(String chart, String expected)
     {
         // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         sleep(500);
         goToDataViews();
-        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
-        mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
-        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
-        waitForElement(thumbnail);
-        String thumbnailData;
-        thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+        String thumbnailData = getThumbnail(chart);
 
         if (null == expected)
-            checker().withScreenshot("ReportThumbnailTest_ThumbnailStillDefault").verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+        {
+            // If the thumbnail isn't different, refresh the page and try again. (Issue 47143)
+            if(THUMBNAIL_DATA.equals(thumbnailData))
+            {
+                refresh();
+                thumbnailData = getThumbnail(chart);
+            }
+
+            // If the thumbnail is still not as expected after a refresh then record an error.
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailStillDefault")
+                    .verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+        }
         else
-            checker().withScreenshot("ReportThumbnailTest_ThumbnailNotPersisted").verifyTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
-                    new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
+        {
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailNotPersisted")
+                    .verifyTrue("Thumbnail wasn't persisted correctly.",
+                            expected.equals(thumbnailData) || new LevenshteinDistance().apply(expected.substring(0, 5000),
+                                    thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
+        }
 
         THUMBNAIL_DATA = thumbnailData;
     }
