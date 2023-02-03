@@ -360,10 +360,12 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
     private String getThumbnail(String chart)
     {
+        sleep(500);
         waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
         mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
+        sleep(500);
         return WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
     }
 
@@ -377,10 +379,13 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
         if (null == expected)
         {
-            // If the thumbnail isn't different, refresh the page and try again. (Issue 47143)
+            // If the thumbnail isn't different, refresh/revisit the page and try again. (Issue 47143)
             if(THUMBNAIL_DATA.equals(thumbnailData))
             {
-                refresh();
+                log("The thumbnail was not updated as expecting. Trying a 'refresh' to get the updated image.");
+                goToProjectHome();
+                sleep(500);
+                goToDataViews();
                 thumbnailData = getThumbnail(chart);
             }
 
