@@ -383,9 +383,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
             if(THUMBNAIL_DATA.equals(thumbnailData))
             {
                 log("The thumbnail was not updated as expecting. Trying a 'refresh' to get the updated image.");
-                goToProjectHome();
-                sleep(500);
-                goToDataViews();
+                sleep(1_500);
+                refresh();
+                sleep(1_500);
                 thumbnailData = getThumbnail(chart);
             }
 
