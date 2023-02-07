@@ -375,12 +375,20 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         sleep(500);
         goToDataViews();
+
+        // Trying to work around flaky test failures on Windows.
+        String osName = System.getProperty("os.name").toLowerCase();
+        if(osName.contains("windows"))
+        {
+            refresh();
+        }
+
         String thumbnailData = getThumbnail(chart);
 
         if (null == expected)
         {
             // If the thumbnail isn't different, refresh/revisit the page and try again. (Issue 47143)
-            if(THUMBNAIL_DATA.equals(thumbnailData))
+            if(THUMBNAIL_DATA.equals(thumbnailData) && osName.contains("windows"))
             {
                 log("The thumbnail was not updated as expecting. Trying a 'refresh' to get the updated image.");
                 sleep(1_500);
