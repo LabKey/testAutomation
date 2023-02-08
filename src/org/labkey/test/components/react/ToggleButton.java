@@ -39,9 +39,24 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
         return this;
     }
 
+    /*
+        The componentElement will get the 'off' class when the slider is grayed out.
+     */
     public boolean get()
     {
         return !getComponentElement().getAttribute("class").contains("off");
+    }
+
+    /*
+        the 'off' status causes the child span with 'toggle-off' class to be shown; otherwise,
+        the one with 'toggle-on' is shown.
+     */
+    public String getSelectedStatus()
+    {
+        if (get())
+            return Locator.tagWithClass("span", "toggle-on").findElement(this).getText();
+        else
+            return Locator.tagWithClass("span", "toggle-off").findElement(this).getText();
     }
 
     public static class ToggleButtonFinder extends WebDriverComponentFinder<ToggleButton, ToggleButtonFinder>
