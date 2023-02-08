@@ -703,10 +703,10 @@ public class ListTest extends BaseWebDriverTest
         createList(mergeListName, BatchListColumns, BatchListData);
         _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
 
-        _listHelper.clickImportData();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", _listHelper.isMergeOptionPresent());
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", importDataPage.isPasteMergeOptionPresent());
         _listHelper.chooseFileUpload();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", _listHelper.isMergeOptionPresent());
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", importDataPage.isFileMergeOptionPresent());
         _listHelper.chooseCopyPasteText();
 
         log("Try to upload the same data without choosing to merge.  Errors are expected.");
@@ -718,14 +718,14 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Upload the same data using the merge operation. No errors should result.");
-        _listHelper.clickImportData();
-        _listHelper.chooseMerge(false);
+        importDataPage = _listHelper.clickImportData();
+        importDataPage.setCopyPasteMerge(true);
         setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData));
         _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Now upload some new data and modify existing data");
-        _listHelper.clickImportData();
-        _listHelper.chooseMerge(false);
+        importDataPage = _listHelper.clickImportData();
+        importDataPage.setCopyPasteMerge(true);
         setListImportAsTestDataField(toTSV(BatchListMergeColumns, BatchListMergeData));
         _listHelper.verifyListData(BatchListColumns, BatchListAfterMergeData, checker());
     }
@@ -737,8 +737,8 @@ public class ListTest extends BaseWebDriverTest
 
         _listHelper.createList(PROJECT_VERIFY, mergeListName, ListColumnType.AutoInteger, "Key", col("Name", ColumnType.String));
 
-        _listHelper.clickImportData();
-        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", _listHelper.isMergeOptionPresent());
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", importDataPage.isPasteMergeOptionPresent());
     }
 
     @Test

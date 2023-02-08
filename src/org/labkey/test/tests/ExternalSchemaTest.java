@@ -373,7 +373,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(403, ex.getStatusCode());
+            assertEquals(400, ex.getStatusCode());
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
 //            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
