@@ -239,7 +239,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
 
-        final WebElement updateButton = Locator.tagWithClass("button", "test-loc-submit-button").findWhenNeeded(this);
+        final WebElement updateButton = Locator.tagWithClass("button", "btn-success").findWhenNeeded(this);
     }
 
 }
