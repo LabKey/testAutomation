@@ -134,7 +134,8 @@ public class ParticipantReportTest extends ReportTest
 
         // Check that group has correct number of participants
         clickAndWait(Locator.linkWithText("Mice"));
-        waitForElement(Locator.css(".lk-filter-panel-label")); // Wait for participant list to appear.
+        waitForElement(Locator.css(".lk-filter-panel-label.group-label")); // Wait for group checkboxes
+        waitForElement(Locator.css(".subjectlist")); // Wait for participant list to appear
         _ext4Helper.deselectAllParticipantFilter();
         waitForText("No matching enrolled Mice");
         _ext4Helper.checkGridRowCheckbox(MICE_C);
