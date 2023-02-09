@@ -20,12 +20,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.announcements.AdminPage;
 import org.labkey.test.pages.announcements.EmailPrefsPage;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.ModeratorReviewPage;
+import org.labkey.test.pages.announcements.RespondPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
@@ -116,6 +118,65 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testNewThread()
+    {
+        log("Verify 'New Thread' setting requires approval on every new thread");
+        AdminPage.beginAt(this)
+                .setModeratorReviewNewThread()
+                .save();
+
+        log("Verify new thread requires approval");
+        String title = insertAndReviewMessage(APPROVED_USER, APPROVED_TITLE, true);
+
+        // Response should not require moderator approval
+        log(String.format("Verify response to thread by %s does not require approval", APPROVED_USER));
+        title = addResponse(APPROVED_USER, title, true);
+
+        // Response by another author should require approval since this is their first message
+        log(String.format("Verify response to thread by %s requires approval since it is the first message by user", SPAM_USER));
+        addResponse(SPAM_USER, title, false);
+
+        // A new message thread should still require approval
+        log("Verify new thread still requires approval");
+        insertMessage(APPROVED_USER, SPAM_TITLE, false);
+
+        log("Verify posts from editors are auto-approved");
+        insertMessage(EDITOR_USER, "This is an editor message", true);
+    }
+
+    private String addResponse(String user, String title, boolean expectAutoApproved)
+    {
+        goToProjectHome();
+        impersonate(user);
+        log("Add response");
+        log("Currently impersonating user:" + user);
+
+        clickAndWait(Locator.linkWithText(title));
+        clickButton("Respond");
+        String response = "This is a response to " + title + " by user " + user;
+        String responseTitle = title + " - " + user;
+        new RespondPage(getDriver())
+                .setTitle(responseTitle)
+                .setBody(response)
+                .submit();
+
+        boolean responseAdded = isTextPresent(response);
+        if (expectAutoApproved && !responseAdded)
+        {
+            checker().fatal().error(String.format("Expected response '%s' was not present on the thread page.", response));
+        }
+        else if (!expectAutoApproved && responseAdded)
+        {
+            checker().fatal().error(String.format("Response '%s' was present on the thread page. It should not be", response));
+        }
+        stopImpersonating();
+
+        verifyNotification("RE: " + responseTitle, expectAutoApproved);
+
+        return expectAutoApproved ? responseTitle : title; // New title if the response was posted successfully
+    }
+
+    @Test
     public void testAll()
     {
         log("Verify 'All' setting requires approval for all posts");
@@ -178,12 +239,13 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         return title;
     }
 
-    private void insertAndReviewMessage(String user, String title, boolean approve)
+    private String insertAndReviewMessage(String user, String title, boolean approve)
     {
         title = insertMessage(user, title, false);
         ModeratorReviewPage.beginAt(this)
                 .review(title, approve);
         verifyMessage(title, approve);
+        return title;
     }
 
     private void verifyMessage(String title, boolean expect)
@@ -192,7 +254,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         boolean condition = false;
         int tries = 0;
 
-        // Give the message a change to show up, or be removed, from the home page.
+        // Give the message a chance to show up, or be removed, from the home page.
         while(!condition && tries < 5)
         {
             if (expect)
