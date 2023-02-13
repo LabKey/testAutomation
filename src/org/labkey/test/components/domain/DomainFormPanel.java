@@ -393,6 +393,19 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 .waitFor(this);
     }
 
+    /*
+
+     */
+    public DomainFormPanel clickSummaryGridNameLink(String linkText)
+    {
+        var targetCell = getSummaryModeGrid().getRow("Name", linkText).getCell("Name");
+        var clickable = Locator.linkWithText(linkText).findElement(targetCell);
+        clickable.click();
+        WebDriverWrapper.waitFor(()-> isDetailMode(),
+                "DomainFormPanel did not switch to detail mode as expected", 2000);
+        return this;
+    }
+
     public List<String> getSummaryModeColumns()
     {
         var rawColumns = getSummaryModeGrid().getColumnNames();

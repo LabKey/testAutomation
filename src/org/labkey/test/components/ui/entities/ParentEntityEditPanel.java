@@ -357,7 +357,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         var selectParent = FilteringReactSelect.finder(getDriver())
                 .withNamedInput(String.format("parentEntityValue_%s", typeName))
-                .find(this);
+                .waitFor(this);
 
         for (String id : parentIds)
         {
