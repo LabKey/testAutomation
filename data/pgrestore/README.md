@@ -21,7 +21,7 @@ You can also run the individual queries listed below.
   - `UPDATE prop.properties SET value = '' WHERE name = 'accountId';`
   - `UPDATE prop.properties SET value = '' WHERE name = 'trackingScript';`
 
-Things that you might want to update:
+Things that you might want to update (via SQL script or through LabKey UI after starting the server):
 - search index file path
 - systemShortName
 - systemDescription
