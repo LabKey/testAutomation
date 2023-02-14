@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class DataClassAPIHelper
 {
@@ -60,13 +59,23 @@ public class DataClassAPIHelper
                 new FieldDefinition("attachmentColumn", FieldDefinition.ColumnType.Attachment));
     }
 
-    public static Map<String, Integer> getRowIdsForDataEntity(String containerPath, String dataTypeName, List<String> entityNames) throws IOException, CommandException
+    /**
+     * Given a folder name, the name of a source type, and a list of source names return the list of row ids.
+     *
+     * @param containerPath Path of the container where the source type is defined.
+     * @param sourceTypeName Name of the source type that contains the sources.
+     * @param sourceNames List of sources to get row ids for.
+     * @return A map of containing source names and their corresponding row ids.
+     * @throws IOException Can be thrown by the call to SelectRowsCommand.
+     * @throws CommandException Can be thrown by the call to SelectRowsCommand.
+     */
+    public static Map<String, Integer> getRowIdsForSources(String containerPath, String sourceTypeName, List<String> sourceNames) throws IOException, CommandException
     {
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("exp.data", dataTypeName);
+        SelectRowsCommand cmd = new SelectRowsCommand("exp.data", sourceTypeName);
         cmd.setColumns(Arrays.asList("RowId", "Name"));
-        cmd.addFilter("Name", String.join(";", entityNames), Filter.Operator.IN);
+        cmd.addFilter("Name", String.join(";", sourceNames), Filter.Operator.IN);
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
@@ -80,9 +89,8 @@ public class DataClassAPIHelper
         }
 
         // Check that the names returned from the query match the names sent in.
-        Set<String> names = new HashSet<>(entityNames);
-        Assert.assertTrue("The names of the data entities returned from the query do not match the names sent in.",
-                names.containsAll(rowIds.keySet()));
+        Assert.assertEquals("The names of the sources returned from the query do not match the names sent in.",
+                new HashSet<>(sourceNames), rowIds.keySet());
 
         return rowIds;
     }
