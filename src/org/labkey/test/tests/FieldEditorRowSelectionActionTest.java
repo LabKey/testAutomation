@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
@@ -92,18 +94,19 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         checker().verifyTrue("Exported Fields are not same as UI", uiFields.equals(exportedFields));
 
         log("Verifying the toggle between summary view and detail view list domain");
-        checker().verifyTrue("Incorrect default display mode", domainFormPanel.isSummaryMode());
+        checker().verifyTrue("Incorrect default display mode", domainFormPanel.isDetailMode());
 
-        domainFormPanel.switchMode("Detail Mode");
-        checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
-        checker().verifyEquals("Incorrect header values in detail mode in list domain",
-                expectedListHeaders, domainFormPanel.getDetailModeHeaders());
+        domainFormPanel.switchMode("Summary Mode");
+        checker().verifyTrue("Did not switch to Summary Mode", domainFormPanel.isSummaryMode());
+        checker().wrapAssertion(()-> assertThat(domainFormPanel.getSummaryModeColumns())
+                .as("Incorrect header values in summary mode in list domain")
+                .containsAll(expectedListHeaders));
 
-        Locator.linkWithText("FirstName").findElement(getDriver()).click();
-        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
+        domainFormPanel.clickSummaryGridNameLink("FirstName");
+        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isDetailMode());
         checker().verifyTrue("Clicked row is not expanded in summary mode", domainFormPanel.getField("FirstName").isExpanded());
         checker().verifyEquals("Inconsistent number of rows in summary and detail mode",
-                domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
+                domainFormPanel.fieldNames().size(), domainFormPanel.getRowcountInSummaryMode());
 
         domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
     }
@@ -129,18 +132,20 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         checker().verifyTrue("Exported Fields are not same as UI", exportedFields.equals(domainFormPanel.fieldNames()));
 
         log("Verifying the toggle between summary view and detail view");
-        checker().verifyTrue("Incorrect default display mode", domainFormPanel.isSummaryMode());
+        checker().verifyTrue("Incorrect default display mode", domainFormPanel.isDetailMode());
 
-        domainFormPanel.switchMode("Detail Mode");
-        checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
-        checker().verifyEquals("Incorrect header values in detail mode", expectedHeaders, domainFormPanel.getDetailModeHeaders());
+        domainFormPanel.switchMode("Summary Mode");
+        checker().verifyTrue("Did not switch to Summary Mode", domainFormPanel.isSummaryMode());
+        checker().wrapAssertion(()-> assertThat(domainFormPanel.getSummaryModeColumns())
+                        .as("Incorrect columns in summary mode")
+                        .containsAll(expectedHeaders));
 
-        log("Checking the links in detail mode");
-        Locator.linkWithText("Language").findElement(getDriver()).click();
-        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
-        checker().verifyTrue("Clicked row is not expanded in summary mode", domainFormPanel.getField("Language").isExpanded());
+        log("Checking the links in summary mode");
+        domainFormPanel.clickSummaryGridNameLink("Language");
+        checker().verifyTrue("Clicking on the name data did not navigate to detail mode", domainFormPanel.isDetailMode());
+        checker().verifyTrue("Clicked row is not expanded in detail mode", domainFormPanel.getField("Language").isExpanded());
         checker().verifyEquals("Inconsistent number of rows in summary and detail mode",
-                domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
+                domainFormPanel.fieldNames().size(), domainFormPanel.getRowcountInSummaryMode());
 
         domainDesignerPage.clickCancelWithUnsavedChanges().discardChanges();
 
@@ -203,18 +208,20 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
                 domainFormPanel.fieldNames().equals(getFieldsFromExportFile(downloadedFile)));
 
         log("Verifying the toggle between summary view and detail view for Results domain");
-        checker().verifyTrue("Incorrect default display mode for result domain", domainFormPanel.isSummaryMode());
+        checker().verifyTrue("Incorrect default display mode for result domain", domainFormPanel.isDetailMode());
 
-        domainFormPanel.switchMode("Detail Mode");
-        checker().verifyTrue("Did not switch to Detail Mode", domainFormPanel.isDetailMode());
-        List<String> actualHeaders = domainFormPanel.getDetailModeHeaders();
-        checker().verifyEquals("Incorrect header values in detail mode in result domain", expectedHeaders, actualHeaders);
+        domainFormPanel.switchMode("Summary Mode");
+        checker().verifyTrue("Did not switch to Summary Mode", domainFormPanel.isSummaryMode());
+        List<String> actualHeaders = domainFormPanel.getSummaryModeColumns();
+        checker().wrapAssertion(()-> assertThat(actualHeaders)
+                .as("Incorrect header values in detail mode in result domain")
+                .containsAll(expectedHeaders));
 
-        Locator.linkWithText("Date").findElement(getDriver()).click();
-        checker().verifyTrue("Clicking on the name data did not navigate to summary mode", domainFormPanel.isSummaryMode());
-        checker().verifyTrue("Clicked row is not expanded in summary mode", domainFormPanel.getField("Date").isExpanded());
+        domainFormPanel.clickSummaryGridNameLink("Date");
+        checker().verifyTrue("Clicking on the name data did not navigate to detail mode", domainFormPanel.isDetailMode());
+        checker().verifyTrue("Clicked row is not expanded in detail mode", domainFormPanel.getField("Date").isExpanded());
         checker().verifyEquals("Inconsistent number of rows in summary and detail mode",
-                domainFormPanel.fieldNames().size(), domainFormPanel.getRowCountInDetailMode());
+                domainFormPanel.fieldNames().size(), domainFormPanel.getRowcountInSummaryMode());
 
         assayDesignerPage.clickSave();
     }
