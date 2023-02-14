@@ -62,3 +62,9 @@ psql -ew -c "UPDATE prop.properties p1 SET value = ''
 psql -ew -c "UPDATE prop.properties p1 SET value = ''
     FROM prop.propertysets p2 WHERE p1.set = p2.set
     AND p1.name = 'trackingScript' AND p2.category = 'analytics';"
+
+## Clear trial server properties
+psql -ew -c "UPDATE prop.properties p1 SET value = ''
+    WHERE p1.name = 'EvaluationContent Settings/manageHostedSiteUrl';"
+psql -ew -c "UPDATE prop.properties p1 SET value = ''
+    WHERE p1.name = 'EvaluationContent Settings/trialEndDate';"
