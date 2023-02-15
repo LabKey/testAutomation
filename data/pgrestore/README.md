@@ -28,3 +28,4 @@ Things that you might want to update (via SQL script or through LabKey UI after 
 - serverGUID
 - DefaultDomain
 - remove email template overrides
+- pipeline tools directory

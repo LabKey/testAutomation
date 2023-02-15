@@ -9,6 +9,7 @@ export PGDATABASE=${PGDATABASE:-labkey_restored}
 
 BASE_SERVER_URL=${BASE_SERVER_URL:-http://localhost:8080}
 LABKEY_FILES=${LABKEY_FILES:-$LABKEY_HOME/build/deploy/files}
+LABKEY_PIPELINE_TOOLS=${LABKEY_PIPELINE_TOOLS:-$LABKEY_HOME/build/deploy/bin}
 
 ## Check that we can connect to DB
 psql -ew -c "SELECT 1" &> /dev/null || (
@@ -26,6 +27,10 @@ psql -ew -c "UPDATE prop.properties p1 SET value = '${BASE_SERVER_URL}'
 psql -ew -c "UPDATE prop.properties p1 SET value = '${LABKEY_FILES}'
     FROM prop.propertysets p2 WHERE p1.set = p2.set
     AND p1.name = 'siteFileRoot' AND p2.category = 'SiteConfig';"
+# Update pipeline tools directory
+psql -ew -c "UPDATE prop.properties p1 SET value = '${LABKEY_PIPELINE_TOOLS}'
+    FROM prop.propertysets p2 WHERE p1.set = p2.set
+    AND p1.name = 'pipelineToolsDirectory' AND p2.category = 'SiteConfig';"
 # Disable SSL requirement
 psql -ew -c "UPDATE prop.properties p1 SET value = 'FALSE'
     FROM prop.propertysets p2 WHERE p1.set = p2.set
