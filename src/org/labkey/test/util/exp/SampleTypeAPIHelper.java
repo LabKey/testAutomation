@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SampleTypeAPIHelper
 {
@@ -95,9 +94,8 @@ public class SampleTypeAPIHelper
         }
 
         // Check that the names returned from the query match the names sent in.
-        Set<String> names = new HashSet<>(sampleNames);
-        Assert.assertTrue("The sample names returned from the query do not match the sample names sent in.",
-                names.containsAll(rowIds.keySet()));
+        Assert.assertEquals("The sample names returned from the query do not match the sample names sent in.",
+                new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
     }

@@ -49,6 +49,12 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return this;
     }
 
+    public MultiMenu getDropDownMenu()
+    {
+        elementCache().jumpToDropdown.expand();
+        return elementCache().jumpToDropdown;
+    }
+
     public int getCurrentPage()                 // only works on GridPanel
     {
         return Integer.parseInt(elementCache().currentPageButton.getText());
