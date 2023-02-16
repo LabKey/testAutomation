@@ -657,11 +657,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         exportPanel.exportXarToPipeline(FOLDER_RELATIVE, toPipelineXarName)
                 .waitForComplete();
 
-        log("Delete runs.");
-        AssayRunsPage assayRunsPage = goToManageAssays().clickAssay(assayName);
-        DataRegionTable runsGrid = assayRunsPage.getTable();
-        runsGrid.checkAllOnPage();
-        runsGrid.deleteSelectedRows();
+        deleteAllAssayRuns(assayName);
 
         log("Reimport runs into same project.");
         goToModule("FileContent");
@@ -677,9 +673,16 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(partialRelativeXarFile);
         _fileBrowserHelper.importFile(partialRelativeXarFile.getName(), "Import Experiment");
+        goToDataPipeline();
+        waitForPipelineJobsToComplete(1, false);
+
+        compareRunColumnsWithExpected(importProject, assayName, RUN01_NAME, run01ColumnData);
+        compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
+
+        deleteAllAssayRuns(assayName);
+
+        log("Delete jobs.");
         PipelineStatusTable pipelineStatusTable = goToDataPipeline();
-        waitForPipelineJobsToComplete(1, true);
-        checkExpectedErrors(2);
         pipelineStatusTable.deleteAllPipelineJobs();
 
         log("Import runs (folder relative LSID) into a new project");
@@ -694,6 +697,15 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         compareRunColumnsWithExpected(importProject, assayName, RUN01_NAME, run01ColumnData);
         compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
+    }
+
+    private void deleteAllAssayRuns(String assayName)
+    {
+        log("Delete runs.");
+        AssayRunsPage assayRunsPage = goToManageAssays().clickAssay(assayName);
+        DataRegionTable runsGrid = assayRunsPage.getTable();
+        runsGrid.checkAllOnPage();
+        runsGrid.deleteSelectedRows();
     }
 
 }
