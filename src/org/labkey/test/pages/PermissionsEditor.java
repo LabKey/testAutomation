@@ -363,8 +363,8 @@ public class PermissionsEditor
     {
         clickManageGroup(groupName);
 
-        _test.setFormElement(Locator.name("names"), String.join("\n", userNames));
         _test.uncheckCheckbox(Locator.name("sendEmail"));
+        _test.setFormElement(Locator.name("names"), String.join("\n", userNames));
         _test.clickButton("Update Group Membership");
     }
 }

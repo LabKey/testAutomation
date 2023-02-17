@@ -428,17 +428,13 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
     {
         clickManageGroup(groupName);
 
-        setFormElement(Locator.name("names"), String.join("\n", userNames));
-        uncheckCheckbox(Locator.name("sendEmail"));
-        clickButton("Update Group Membership");
-        return this;
+        return addUserToGroupFromGroupScreen(userNames);
     }
 
-    public PermissionsPage addUserToGroupFromGroupScreen(String userName)
+    public PermissionsPage addUserToGroupFromGroupScreen(@LoggedParam String... userNames)
     {
-        waitForElement(Locator.name("names"));
-        setFormElement(Locator.name("names"), userName);
         uncheckCheckbox(Locator.name("sendEmail"));
+        setFormElement(Locator.name("names"), String.join("\n", userNames));
         clickButton("Update Group Membership");
         return this;
     }
