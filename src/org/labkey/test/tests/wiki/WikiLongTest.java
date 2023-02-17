@@ -417,8 +417,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Create fake user for permissions check");
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.clickManageGroup(USERS_GROUP);
-        setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.name("sendEmail"));
+        setFormElement(Locator.name("names"), USER1);
         clickButton("Update Group Membership");
 
         log("Check if permissions work");
