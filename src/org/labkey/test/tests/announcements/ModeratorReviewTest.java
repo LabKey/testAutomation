@@ -98,6 +98,9 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     {
         log("Delete all existing messages in project");
         QueryUtils.selectAndDeleteAllRows(getProjectName(), "announcement", "Announcement");
+        // Go to the project home page to start the test so that settings are changed in the correct folder even in
+        // the case that a previous test failed.
+        goToProjectHome();
     }
 
     @Test
@@ -132,9 +135,9 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         log(String.format("Verify response to thread by %s does not require approval", APPROVED_USER));
         title = addResponse(APPROVED_USER, title, true);
 
-        // Response by another author should require approval since this is their first message
-        log(String.format("Verify response to thread by %s requires approval since it is the first message by user", SPAM_USER));
-        addResponse(SPAM_USER, title, false);
+        // Response by another author should not require approval even if this is their first message
+        log(String.format("Verify response to thread by %s does not require approval", SPAM_USER));
+        addResponse(SPAM_USER, title, true);
 
         // A new message thread should still require approval
         log("Verify new thread still requires approval");
