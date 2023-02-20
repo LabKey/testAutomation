@@ -64,9 +64,9 @@ public class EntityInsertPanelTest extends BaseWebDriverTest
         EntityInsertPanel testPanel = testPage.getEntityInsertPanel();
         testPanel.targetEntityTypeSelect().select(sampleTypeName);
 
-        String pasteText = "ed\tbrother\tthe quiet one\t\t2\tstringfellow\t11/11/2020\ttrue\n" +
-                "jed\tother brother\tthe squinty one\t\t3\tstrongfellow\t11/11/2020\tfalse\n" +
-                "ted\tother other brother\tisn't sure about the others\t\t4\tstrangefellow\t11/11/2020\ttrue";
+        String pasteText = "ed\tbrother\tthe quiet one\t\t\t2\tstringfellow\t11/11/2020\ttrue\n" +
+                "jed\tother brother\tthe squinty one\t\t\t3\tstrongfellow\t11/11/2020\tfalse\n" +
+                "ted\tother other brother\tisn't sure about the others\t\t\t4\tstrangefellow\t11/11/2020\ttrue";
 
         testPanel.clickAddRows()
                 .getEditableGrid().pasteFromCell(0, "Name *", pasteText);

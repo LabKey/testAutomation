@@ -59,6 +59,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
     // Column names.
     private static final String FILTER_NAME_COL = "Name";
+    private static final String FILTER_EXPDATE_COL = "Expiration Date";
     private static final String FILTER_STRING_COL = "Str";
     private static final String FILTER_INT_COL = "Int";
     private static final String FILTER_EXTEND_CHAR_COL = "\u0106\u00D8\u0139";
@@ -1497,6 +1498,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         expectedList = new ArrayList<>();
         expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_EXPDATE_COL);
         expectedList.add(FILTER_INT_COL);
         expectedList.add(FILTER_STRING_COL);
         expectedList.add(FILTER_DATE_COL);
@@ -1554,6 +1556,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         expectedList = new ArrayList<>(extraColumnsHeaders);
         expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_EXPDATE_COL);
         expectedList.add(FILTER_STRING_COL);
         expectedList.add(FILTER_INT_COL);
         expectedList.add(FILTER_BOOL_COL);
