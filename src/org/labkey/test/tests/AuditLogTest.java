@@ -279,10 +279,10 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(getUsername() + " stopped impersonating " + AUDIT_TEST_USER);
 
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
-        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
         stopImpersonating();
-        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
         String adminGroup = "Administrator";
         impersonateGroup(adminGroup, true);
