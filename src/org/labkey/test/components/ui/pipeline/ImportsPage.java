@@ -1,6 +1,6 @@
 package org.labkey.test.components.ui.pipeline;
 
-import org.apache.tika.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ui.grids.QueryGrid;
