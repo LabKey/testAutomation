@@ -9,9 +9,6 @@ dependencies {
     modules ("org.labkey.module:api:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:internal:${labkeyVersion}@module") {
-        transitive = true
-    }
     modules ("org.labkey.module:audit:${labkeyVersion}@module") {
         transitive = true
     }
