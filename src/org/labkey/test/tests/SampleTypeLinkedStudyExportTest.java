@@ -114,7 +114,7 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
         goToProjectHome(IMPORT_PROJECT);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE));
         DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        checker().verifyEquals("Incorrect Columns in imported sample type", Arrays.asList("Name", "Flag", "Visit ID", "Date", "Participant ID",
+        checker().verifyEquals("Incorrect Columns in imported sample type", Arrays.asList("Name", "Expiration Date", "Flag", "Visit ID", "Date", "Participant ID",
                 "Linked to " + LINKED_STUDY + " Study"), table.getColumnLabels());
 
         clickAndWait(Locator.linkWithText("linked"));
