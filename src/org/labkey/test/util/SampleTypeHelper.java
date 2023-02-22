@@ -175,6 +175,7 @@ public class SampleTypeHelper extends WebDriverWrapper
         Set<String> actualNames = new HashSet<>(getSampleTypeFields());
         Set<String> expectedNames = _fields.stream().map(FieldDefinition::getName).collect(Collectors.toSet());
         expectedNames.add("Name");
+        expectedNames.add("MaterialExpDate");
         expectedNames.add("Flag");
         assertEquals("Fields in sample type.", expectedNames, actualNames);
     }

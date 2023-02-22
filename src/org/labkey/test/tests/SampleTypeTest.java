@@ -1380,6 +1380,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         Set<String> expectedHeaders = new HashSet<>();
         expectedHeaders.add("Name");
+        expectedHeaders.add("Expiration Date");
         expectedHeaders.add("Flag");
         expectedHeaders.add("Other Prop");
         expectedHeaders.add("File Attachment");
