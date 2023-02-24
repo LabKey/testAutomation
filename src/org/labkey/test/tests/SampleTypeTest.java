@@ -170,6 +170,51 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.verifyDataValues(data);
     }
 
+    // Issue 47280: LKSM: Trailing whitespace in Source name won't resolve when deriving samples
+    @Test
+    public void testImportSamplesWithTrailingSpace()
+    {
+        final String sampleTypeName = "SampleTypeWithProvidedName";
+        final List<FieldDefinition> fields = List.of(
+                new FieldDefinition("IntCol", FieldDefinition.ColumnType.Integer),
+                new FieldDefinition("StringCol", FieldDefinition.ColumnType.String),
+                new FieldDefinition("DateCol", FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition("BoolCol", FieldDefinition.ColumnType.Boolean));
+
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
+
+        log("Create a new sample type with no name expression");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.createSampleType(sampleTypeDefinition);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+
+        log("Add a single row to the sample type, with trailing spaces");
+        Map<String, String> fieldMap = Map.of("Name", "S-1 ", "StringCol", "Ess ", "IntCol", "1 ");
+        sampleTypeHelper.insertRow(fieldMap);
+
+        log("Verify values were saved are without trailing spaces");
+        sampleTypeHelper.verifyDataValues(Collections.singletonList(fieldMap));
+
+        log("Bulk insert into to the sample type, with trailing spaces");
+        List<Map<String, String>> data = new ArrayList<>();
+        data.add(Map.of("Name", "S-2 ", "StringCol", "Tee ", "IntCol", "2 ", "BoolCol", "true "));
+        data.add(Map.of("Name", "S-3 ", "StringCol", "Ewe ", "IntCol", "3 ", "BoolCol", "false "));
+        sampleTypeHelper.bulkImport(data);
+        assertEquals("Number of samples not as expected", 3, sampleTypeHelper.getSampleCount());
+
+        log("Verify values were saved are without trailing spaces");
+        sampleTypeHelper.verifyDataValues(data);
+
+        log("Import samples from file, with trialing spaces in Name, String, and Bool fields");
+        data = new ArrayList<>();
+        data.add(Map.of("Name", "SampleSetBVT1 ", "StringCol", "a ", "IntCol", "100 ", "BoolCol", "true "));
+        sampleTypeHelper.bulkImport(TestFileUtils.getSampleData("sampleType.xlsx"));
+
+        log("Verify values were imported are without trailing spaces");
+        sampleTypeHelper.verifyDataValues(data);
+    }
+
     @Test
     public void testMeFilterOnSampleType()
     {
