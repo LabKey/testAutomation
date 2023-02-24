@@ -310,7 +310,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
         for (Map.Entry<String, String> field : expectedData.entrySet())
         {
-            assertEquals(field.getKey() + " not as expected at index " + index, field.getValue(), actualData.get(field.getKey()));
+            assertEquals(field.getKey() + " not as expected at index " + index, field.getValue().trim(), actualData.get(field.getKey()));
         }
     }
 
@@ -319,7 +319,7 @@ public class SampleTypeHelper extends WebDriverWrapper
         DataRegionTable drt = getSamplesDataRegionTable();
         for (Map<String, String> expectedRow : data)
         {
-            int index = drt.getRowIndex("Name", expectedRow.get("Name"));
+            int index = drt.getRowIndex("Name", expectedRow.get("Name").trim());
             verifyDataRow(expectedRow, index, drt);
         }
     }
