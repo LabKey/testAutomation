@@ -90,6 +90,7 @@
                                 "org.labkey.api.lists.permissions.ManagePicklistsPermission",
                                 "org.labkey.api.security.permissions.UpdatePermission",
                                 "org.labkey.announcements.model.SecureMessageBoardReadPermission",
+                                "org.labkey.api.security.permissions.SampleWorkflowDeletePermission",
                                 "org.labkey.api.security.permissions.SampleWorkflowJobPermission",
                                 "org.labkey.api.security.permissions.AssayReadPermission",
                                 "org.labkey.api.security.permissions.NotebookReadPermission",
