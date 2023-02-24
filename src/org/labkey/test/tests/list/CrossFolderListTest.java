@@ -9,6 +9,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.pages.LabkeyErrorPage;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
@@ -89,6 +90,27 @@ public class CrossFolderListTest extends BaseWebDriverTest
         // expect default folder filter to be "current folder, project, and shared project"
         assertThat(listsPage.getGrid().getContainerFilter()).as("expect current, project, shared")
                 .isEqualTo(DataRegionTable.ContainerFilterType.CURRENT_PLUS_PROJECT_AND_SHARED);
+    }
+
+    @Test
+    public void testRenameList() throws Exception
+    {
+        goToProjectHome();
+        String listName = "list_to_be_renamed";
+        String newListName = "list_that_was_renamed";
+        ListDefinition listDef = createListDef(listName, testFields());
+        listDef.create(createDefaultConnection(), getProjectName());
+
+        goToProjectFolder(getProjectName(), SUBFOLDER_A);
+        new ListHelper(getDriver())
+                .goToEditDesign(listName)
+                .setName(newListName)
+                .clickSave();
+
+        // Issue 47356: Rewrite returnURL in the event of a list name change
+        new GridPage(getDriver()).getGrid();
+        assertThat(getURL().getQuery()).contains("name=" + newListName);
+        assertThat(getURL().getPath()).contains("/" + SUBFOLDER_A);
     }
 
     @Test
