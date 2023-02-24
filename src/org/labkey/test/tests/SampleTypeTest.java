@@ -170,7 +170,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.verifyDataValues(data);
     }
 
-    // Issue 47280: LKSM: Trailing whitespace in Source name won't resolve when deriving samples
+    // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
     @Test
     public void testImportSamplesWithTrailingSpace()
     {
@@ -190,7 +190,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.goToSampleType(sampleTypeName);
 
         log("Add a single row to the sample type, with trailing spaces");
-        Map<String, String> fieldMap = Map.of("Name", "S-1 ", "StringCol", "Ess ", "IntCol", "1 ");
+        Map<String, String> fieldMap = Map.of("Name", " S-1 ", "StringCol", "Ess ", "IntCol", "1 ");
         sampleTypeHelper.insertRow(fieldMap);
 
         log("Verify values were saved are without trailing spaces");
@@ -198,8 +198,8 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("Bulk insert into to the sample type, with trailing spaces");
         List<Map<String, String>> data = new ArrayList<>();
-        data.add(Map.of("Name", "S-2 ", "StringCol", "Tee ", "IntCol", "2 ", "BoolCol", "true "));
-        data.add(Map.of("Name", "S-3 ", "StringCol", "Ewe ", "IntCol", "3 ", "BoolCol", "false "));
+        data.add(Map.of("Name", " S-2 ", "StringCol", "Tee ", "IntCol", "2 ", "BoolCol", "true "));
+        data.add(Map.of("Name", " S-3 ", "StringCol", "Ewe ", "IntCol", "3 ", "BoolCol", "false "));
         sampleTypeHelper.bulkImport(data);
         assertEquals("Number of samples not as expected", 3, sampleTypeHelper.getSampleCount());
 

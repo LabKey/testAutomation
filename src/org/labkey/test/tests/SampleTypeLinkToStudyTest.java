@@ -658,7 +658,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(childSampleType));
         samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         samplesTable.setFilter("Name", "Equals", "derivedChildSample");
-        checker().verifyEquals("Incorrect child row created", Arrays.asList("derivedChildSample", "", "", "2.0", now + " 00:00", "P2", "linked"),
+        checker().verifyEquals("Incorrect child row created", Arrays.asList("derivedChildSample", " ", "", "2.0", now + " 00:00", "P2", "linked"),
                 samplesTable.getRowDataAsText(0));
     }
 
