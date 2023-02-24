@@ -172,6 +172,13 @@ public class EntityBulkUpdateDialog extends ModalDialog
         dismiss("Edit with Grid");
     }
 
+    public String clickUpdateExpectingError()
+    {
+        elementCache().updateButton.click();
+
+        return BootstrapLocators.errorBanner.waitForElement(getDriver(), 2000).getText();
+    }
+
     public void clickUpdate()
     {
         _updatingComponent.doAndWaitForUpdate(() ->
