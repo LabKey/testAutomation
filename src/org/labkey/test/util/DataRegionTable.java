@@ -1507,6 +1507,11 @@ public class DataRegionTable extends DataRegion
         {
             return Locator.tagWithClass("div", "lk-region-context-action").withChild(Locator.tagWithClass("i", "fa-filter"));
         }
+
+        public static Locator.XPathLocator contextAction()
+        {
+            return Locator.tagWithClass("div", "lk-region-context-action");
+        }
     }
 
     public class Elements extends ElementCache
