@@ -69,6 +69,12 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         return new AdminPage(getDriver());
     }
 
+    public AdminPage setModeratorReviewNewThread()
+    {
+        confirmOptionSelected(elementCache().moderatorReviewNewThread);
+        return new AdminPage(getDriver());
+    }
+
     public AdminPage setModeratorReviewInitial()
     {
         confirmOptionSelected(elementCache().moderatorReviewInitial);
@@ -189,6 +195,7 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         private Locator.XPathLocator moderatorReview = Locator.radioButtonByName("moderatorReview");
         protected WebElement moderatorReviewAll = moderatorReview.withAttribute("value", "All").findWhenNeeded(this);
         protected WebElement moderatorReviewInitial = moderatorReview.withAttribute("value", "InitialPost").findWhenNeeded(this);
+        protected WebElement moderatorReviewNewThread = moderatorReview.withAttribute("value", "NewThread").findWhenNeeded(this);
         protected WebElement moderatorReviewNone = moderatorReview.withAttribute("value", "None").findWhenNeeded(this);
 
         Checkbox canEditTitle = Checkbox(Locator.checkboxByName("titleEditable")).findWhenNeeded(this);
