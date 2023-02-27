@@ -93,7 +93,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     public FilterFacetedPanel filterValues(String filterStr)
     {
         elementCache().filterInput.set(filterStr);
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().checkboxSection));
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().checkboxLabelLoc.findElementOrNull(this)));
         return this;
     }
 
@@ -108,7 +108,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         protected final Input filterInput =
                 Input(Locator.id("filter-faceted__typeahead-input"), getDriver()).findWhenNeeded(this);
         protected final WebElement checkboxSection =
-                Locator.byClass("labkey-wizard-pills").index(0).waitForElement(this, 5_000);
+                Locator.byClass("labkey-wizard-pills").index(0).refindWhenNeeded(this);
         protected final Locator.XPathLocator checkboxLabelLoc
                 = Locator.byClass("filter-faceted__value");
 
