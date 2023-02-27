@@ -8,6 +8,7 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,6 +48,15 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     }
 
     /**
+     * Check single facet value by label to see if it is checked or not.
+     * @param value desired value
+     */
+    public boolean isChecked(String value)
+    {
+        return elementCache().findCheckbox(value).isChecked();
+    }
+
+    /**
      * Check all the specified options. Should retain any existing selections.
      * @param values values to select
      */
@@ -80,6 +90,13 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         return elementCache().getSelectedValues();
     }
 
+    public FilterFacetedPanel filterValues(String filterStr)
+    {
+        elementCache().filterInput.set(filterStr);
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().checkboxSection));
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -89,9 +106,9 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     protected class ElementCache extends Component<?>.ElementCache
     {
         protected final Input filterInput =
-                Input(Locator.id("find-filter-typeahead-input"), getDriver()).findWhenNeeded(this);
+                Input(Locator.id("filter-faceted__typeahead-input"), getDriver()).findWhenNeeded(this);
         protected final WebElement checkboxSection =
-                Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
+                Locator.byClass("labkey-wizard-pills").index(0).waitForElement(this, 5_000);
         protected final Locator.XPathLocator checkboxLabelLoc
                 = Locator.byClass("filter-faceted__value");
 
