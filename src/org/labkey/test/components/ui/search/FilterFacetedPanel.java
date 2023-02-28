@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.search;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -92,8 +93,11 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
     public FilterFacetedPanel filterValues(String filterStr)
     {
-        elementCache().filterInput.set(filterStr);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().checkboxLabelLoc.findElementOrNull(this)));
+        if (StringUtils.isEmpty(filterStr))
+            elementCache().filterInput.set("");
+        else
+            elementCache().filterInput.setWithPaste(filterStr);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().checkboxLabelLoc.waitForElement(this, 5_000)));
         return this;
     }
 
