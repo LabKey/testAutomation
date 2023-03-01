@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -144,6 +145,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return new Checkbox(elementCache().checkBoxLoc.findElement(row));
     }
 
+    public String getErrorAlertText()
+    {
+        return BootstrapLocators.errorBanner.waitForElement(this, getWrapper().defaultWaitForPage).getText();
+    }
+
     public List<String> getColumns()
     {
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
@@ -164,6 +170,13 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public void clickEditWithGrid()
     {
         dismiss("Edit with Grid");
+    }
+
+    public String clickUpdateExpectingError()
+    {
+        elementCache().updateButton.click();
+
+        return BootstrapLocators.errorBanner.waitForElement(getDriver(), 2000).getText();
     }
 
     public void clickUpdate()
