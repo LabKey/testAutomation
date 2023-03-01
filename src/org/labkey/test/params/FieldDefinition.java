@@ -278,6 +278,12 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public FieldDefinition setPHI(PhiSelectType phiType)
+    {
+        super.setPHI(phiType.name());
+        return this;
+    }
+
     public String getSourceOntology()
     {
         return (String) getFieldProperty("sourceOntology");
