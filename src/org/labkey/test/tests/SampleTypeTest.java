@@ -1332,7 +1332,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     {
         final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey to support this sample type: " +
-                "Name, Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container, SampleId, SampleID.";
+                "Name, Created, createdBy, Modified, modifiedBy, container, SampleId, created, createdby, modified, modifiedBy, Container, SampleID.";
 
         List<String> lines = new ArrayList<>();
         lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,SampleId,created,createdby,modified,modifiedBy,Container,SampleID");
@@ -1431,6 +1431,8 @@ public class SampleTypeTest extends BaseWebDriverTest
         expectedHeaders.add("File Attachment");
         expectedHeaders.add("Amount");
         expectedHeaders.add("Units");
+        expectedHeaders.add("Aliquots Created Count");
+        expectedHeaders.add("Aliquots Total Amount");
 
         setFileAttachment(0, experimentFilePath);
         setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
