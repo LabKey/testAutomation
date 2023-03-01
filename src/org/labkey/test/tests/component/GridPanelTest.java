@@ -690,6 +690,88 @@ public class GridPanelTest extends GridPanelBaseTest
     }
 
     /**
+     * Verify filtering on a column that has >250 distinct values for the Choose Values filter tab.
+     * Issue 47266: For a grid the filter dialog does not enable the 'Apply' button if filter and select a single option
+     * Issue 47247: LKSM: Filtering values >250 doesn't save selection
+     */
+    @Test
+    public void testFilterWithMaxDistinctValues() throws IOException, CommandException
+    {
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+        checker().verifyEquals("Unfiltered grid row count not as expected", 300, grid.getRecordCount());
+
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(FILTER_NAME_COL);
+
+        log("Verify the facet filter list initially includes a max of 250 options and they are not initially selected");
+        FilterFacetedPanel facetedPanel = filterDialog.selectFacetTab();
+        List<String> availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Initial filter options should include max options of 250", 250, availableValues.size());
+        checker().verifyEquals("First value not as expected", FILTER_SAMPLE_PREFIX + "1", availableValues.get(0));
+        checker().verifyFalse("Available options should not be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "1"));
+        checker().verifyEquals("Last value not as expected", FILTER_SAMPLE_PREFIX + "300", availableValues.get(249));
+        checker().verifyFalse("Available options should not be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "300"));
+
+        log("Verify we can filter down to a single value that is not initially shown and select it");
+        String filterValue = FILTER_SAMPLE_PREFIX + "75";
+        facetedPanel.filterValues(filterValue);
+        availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Only one option should be available after filter", 1, availableValues.size());
+        checker().verifyEquals("Only one option should be available after filter", filterValue, availableValues.get(0));
+        facetedPanel.checkValues(filterValue);
+        List<String> selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Only one option should be selected after filter", 1, selectedValues.size());
+        checker().verifyEquals("Only one option should be selected after filter", filterValue, selectedValues.get(0));
+
+        log("Remove filter and verify the available and selected options");
+        facetedPanel.filterValues("");
+        availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Should be back to showing initial 250 options", 250, availableValues.size());
+        checker().verifyFalse("Filtered value should not exist in the available options", availableValues.contains(filterValue));
+        selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Should retain single filtered selection", 1, selectedValues.size());
+        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.get(0));
+
+        log("Verify single filtered value filter applied as expected");
+        filterDialog.confirm();
+        checker().verifyEquals("Filtered grid row count not as expected", 1, grid.getRecordCount());
+
+        log("Add more filtered options to verify selections retain");
+        filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(FILTER_NAME_COL);
+        facetedPanel = filterDialog.selectFacetTab();
+        selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Should retain single filtered selection", 1, selectedValues.size());
+        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.get(0));
+        facetedPanel.filterValues(FILTER_SAMPLE_PREFIX + "8");
+        availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Filtered set of available options not as expected", 11, availableValues.size());
+        facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "8");
+        for (int i = 0; i < 10; i++)
+            facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "8" + i);
+        selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Should retain filtered selection", 12, selectedValues.size());
+        checker().verifyEquals("Should retain filtered selection", filterValue, selectedValues.get(0));
+        checker().verifyEquals("Should retain filtered selection", FILTER_SAMPLE_PREFIX + "89", selectedValues.get(11));
+
+        log("And verify adding selections from the unfiltered set");
+        facetedPanel.filterValues("");
+        facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "1", FILTER_SAMPLE_PREFIX + "10");
+        filterDialog.confirm();
+        checker().verifyEquals("Filtered grid row count not as expected", 14, grid.getRecordCount());
+
+        log("Verify the selections are checked in the available list when modal opened");
+        filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(FILTER_NAME_COL);
+        facetedPanel = filterDialog.selectFacetTab();
+        checker().verifyTrue("Previous filter value should be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "1"));
+        checker().verifyTrue("Previous filter value should be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "10"));
+        filterDialog.cancel();
+
+        grid.clearFilters();
+    }
+
+    /**
      * Validate that if required fields are not set for filter the dialog shows an error. Also validate that for some
      * field types, like an integer, there is only a Filter tab and not a Values tab in the filter dialog.
      */
