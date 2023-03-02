@@ -45,9 +45,9 @@ public class ExecuteSqlTestWiki extends LabKeyPage<ExecuteSqlTestWiki.ElementCac
         new ApiWikiHelper().createWiki(containerPath, wikiParams);
     }
 
-    public DataRegionTable executeSql(String schemaName, String sql)
+    public void executeSql(String schemaName, String sql)
     {
-        if (StringUtils.trimToEmpty(schemaName).isEmpty())
+        if (StringUtils.isBlank(schemaName))
         {
             throw new IllegalArgumentException("Schema name is required for 'executeSql'");
         }
@@ -57,7 +57,19 @@ public class ExecuteSqlTestWiki extends LabKeyPage<ExecuteSqlTestWiki.ElementCac
         setFormElement(elementCache().sqlInput, sql);
         elementCache().executeButton.click();
         panel.ifPresent(p -> shortWait().until(ExpectedConditions.stalenessOf(p)));
-        return new DataRegionTable.DataRegionFinder(getDriver()).waitFor();
+
+        // Execute button re-enables after 'executeSql' API call returns
+        shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().executeButton));
+    }
+
+    public DataRegionTable getResultGrid()
+    {
+        return new DataRegionTable.DataRegionFinder(getDriver()).timeout(0).find(elementCache().findResultPanel().get());
+    }
+
+    public String getResultMessage()
+    {
+        return Locator.byClass("panel-body").findElement(elementCache().findResultPanel().get()).getText();
     }
 
     @Override
@@ -68,15 +80,17 @@ public class ExecuteSqlTestWiki extends LabKeyPage<ExecuteSqlTestWiki.ElementCac
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        WebElement schemaInput = Locator.id("qwpSchema").findWhenNeeded(this);
-        WebElement sqlInput = Locator.id("qwpSql").findWhenNeeded(this);
-        WebElement executeButton = Locator.id("button_loadqwp").findWhenNeeded(this);
+        final WebElement schemaInput = Locator.id("qwpSchema").findWhenNeeded(this);
+        final WebElement sqlInput = Locator.id("qwpSql").findWhenNeeded(this);
+        final WebElement executeButton = Locator.id("button_loadqwp").findWhenNeeded(this);
+        final WebElement qwpDiv = Locator.id("qwp-div").findWhenNeeded(this);
+
+        final Locator.XPathLocator resultPanelLoc = Locator.tagWithName("div", "webpart")
+                .withDescendant(Locator.tagWithClass("span", "labkey-wp-title-text").withText(qwpTitle));
 
         Optional<WebElement> findResultPanel()
         {
-            return Locator.tagWithName("div", "webpart")
-                    .withDescendant(Locator.tagWithClass("span", "labkey-wp-title-text").withText(qwpTitle))
-                    .findOptionalElement(this);
+            return resultPanelLoc.findOptionalElement(qwpDiv);
         }
     }
 }
