@@ -179,8 +179,6 @@ public class SampleTypeHelper extends WebDriverWrapper
         expectedNames.add("StoredAmount");
         expectedNames.add("Units");
         expectedNames.add("Flag");
-        expectedNames.add("AliquotCount");
-        expectedNames.add("AliquotVolume");
         assertEquals("Fields in sample type.", expectedNames, actualNames);
     }
 

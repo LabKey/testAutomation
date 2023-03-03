@@ -66,8 +66,6 @@ public class GridPanelTest extends GridPanelBaseTest
     private static final String FILTER_BOOL_COL = "Bool";
     private static final String FILTER_DATE_COL = "Date";
     private static final String FILTER_STORED_AMOUNT_COL = "Amount";
-    private static final String FILTER_ALIQUOT_AMOUNT_COL = "Aliquot Total Amount";
-    private static final String FILTER_ALIQUOT_COUNT_COL = "Aliquots Created Count";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
@@ -1588,8 +1586,6 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedList.add(FILTER_STRING_COL);
         expectedList.add(FILTER_DATE_COL);
         expectedList.add(FILTER_STORED_AMOUNT_COL);
-        expectedList.add(FILTER_ALIQUOT_AMOUNT_COL);
-        expectedList.add(FILTER_ALIQUOT_COUNT_COL);
 
         actualList = filterDialog.getAvailableFields();
 
@@ -1649,8 +1645,6 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedList.add(FILTER_INT_COL);
         expectedList.add(FILTER_BOOL_COL);
         expectedList.add(FILTER_DATE_COL);
-        expectedList.add(FILTER_ALIQUOT_COUNT_COL);
-        expectedList.add(FILTER_ALIQUOT_AMOUNT_COL);
         expectedList.add(FILTER_STORED_AMOUNT_COL);
 
         filterDialog = grid.getGridBar().openFilterDialog();
