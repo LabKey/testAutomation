@@ -1431,8 +1431,6 @@ public class SampleTypeTest extends BaseWebDriverTest
         expectedHeaders.add("File Attachment");
         expectedHeaders.add("Amount");
         expectedHeaders.add("Units");
-        expectedHeaders.add("Aliquots Created Count");
-        expectedHeaders.add("Aliquots Total Amount");
 
         setFileAttachment(0, experimentFilePath);
         setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
