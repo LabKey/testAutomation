@@ -11,46 +11,41 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.pages.compliance.FolderManagementComplianceTab.PhiColumnBehavior.HIDE;
-import static org.labkey.test.pages.compliance.FolderManagementComplianceTab.PhiColumnBehavior.SHOW;
+import static org.labkey.test.pages.compliance.ComplianceFolderSettingsPage.PhiColumnBehavior.HIDE;
+import static org.labkey.test.pages.compliance.ComplianceFolderSettingsPage.PhiColumnBehavior.SHOW;
 
-public class FolderManagementComplianceTab extends FolderManagementPage
+public class ComplianceFolderSettingsPage extends FolderManagementPage
 {
-    public FolderManagementComplianceTab(WebDriver driver)
+    public ComplianceFolderSettingsPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static FolderManagementComplianceTab beginAt(WebDriverWrapper driver)
-    {
-        return beginAt(driver, driver.getCurrentContainerPath());
-    }
-
-    public static FolderManagementComplianceTab beginAt(WebDriverWrapper driver, String containerPath)
+    public static ComplianceFolderSettingsPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("compliance", containerPath, "settings"));
-        return new FolderManagementComplianceTab(driver.getDriver());
+        return new ComplianceFolderSettingsPage(driver.getDriver());
     }
 
-    public FolderManagementComplianceTab setInheritTermsOfUse(boolean check)
+    public ComplianceFolderSettingsPage setInheritTermsOfUse(boolean check)
     {
         setCheckbox(elementCache().inheritTermsOfUse, check);
         return this;
     }
 
-    public FolderManagementComplianceTab setRequireActivity(boolean check)
+    public ComplianceFolderSettingsPage setRequireActivity(boolean check)
     {
         setCheckbox(elementCache().requireActivity, check);
         return this;
     }
 
-    public FolderManagementComplianceTab setPhiRolesRequired(boolean check)
+    public ComplianceFolderSettingsPage setPhiRolesRequired(boolean check)
     {
         setCheckbox(elementCache().phiRolesRequired, check);
         return this;
     }
 
-    public FolderManagementComplianceTab setPhiRolesRequiredAndColumnBehavior(boolean check, PhiColumnBehavior behavior)
+    public ComplianceFolderSettingsPage setPhiRolesRequiredAndColumnBehavior(boolean check, PhiColumnBehavior behavior)
     {
         setCheckbox(elementCache().phiRolesRequired, check);
         if (check)
@@ -65,7 +60,7 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         return this;
     }
 
-    public FolderManagementComplianceTab setColumnBehavior(PhiColumnBehavior behavior)
+    public ComplianceFolderSettingsPage setColumnBehavior(PhiColumnBehavior behavior)
     {
         // Can't directly SHOW; must uncheck phiRolesRequired to SHOW
         switch(behavior)
@@ -81,7 +76,7 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         return this;
     }
 
-    public FolderManagementComplianceTab setPhiDatasetLoggingBehavior(PhiDatasetLoggingBehavior behavior)
+    public ComplianceFolderSettingsPage setQueryLoggingBehavior(QueryLoggingBehavior behavior)
     {
         switch(behavior)
         {
@@ -106,15 +101,15 @@ public class FolderManagementComplianceTab extends FolderManagementPage
     }
 
     @Override
-    protected FolderManagementComplianceTab.ElementCache elementCache()
+    protected ComplianceFolderSettingsPage.ElementCache elementCache()
     {
-        return (FolderManagementComplianceTab.ElementCache) super.elementCache();
+        return (ComplianceFolderSettingsPage.ElementCache) super.elementCache();
     }
 
     @Override
-    protected FolderManagementComplianceTab.ElementCache newElementCache()
+    protected ComplianceFolderSettingsPage.ElementCache newElementCache()
     {
-        return new FolderManagementComplianceTab.ElementCache();
+        return new ComplianceFolderSettingsPage.ElementCache();
     }
 
     protected class ElementCache extends FolderManagementPage.ElementCache
@@ -138,7 +133,7 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         BLANK
     }
 
-    public enum PhiDatasetLoggingBehavior
+    public enum QueryLoggingBehavior
     {
         NONE,
         PHI,
