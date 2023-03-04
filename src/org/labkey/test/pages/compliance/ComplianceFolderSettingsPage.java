@@ -8,11 +8,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.util.compliance.ComplianceUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.pages.compliance.ComplianceFolderSettingsPage.PhiColumnBehavior.HIDE;
-import static org.labkey.test.pages.compliance.ComplianceFolderSettingsPage.PhiColumnBehavior.SHOW;
+import static org.labkey.test.util.compliance.ComplianceUtils.PhiColumnBehavior.HIDE;
+import static org.labkey.test.util.compliance.ComplianceUtils.PhiColumnBehavior.SHOW;
 
 public class ComplianceFolderSettingsPage extends FolderManagementPage
 {
@@ -45,7 +46,7 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
         return this;
     }
 
-    public ComplianceFolderSettingsPage setPhiRolesRequiredAndColumnBehavior(boolean check, PhiColumnBehavior behavior)
+    public ComplianceFolderSettingsPage setPhiRolesRequiredAndColumnBehavior(boolean check, ComplianceUtils.PhiColumnBehavior behavior)
     {
         setCheckbox(elementCache().phiRolesRequired, check);
         if (check)
@@ -60,7 +61,7 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
         return this;
     }
 
-    public ComplianceFolderSettingsPage setColumnBehavior(PhiColumnBehavior behavior)
+    public ComplianceFolderSettingsPage setColumnBehavior(ComplianceUtils.PhiColumnBehavior behavior)
     {
         // Can't directly SHOW; must uncheck phiRolesRequired to SHOW
         switch(behavior)
@@ -76,7 +77,7 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
         return this;
     }
 
-    public ComplianceFolderSettingsPage setQueryLoggingBehavior(QueryLoggingBehavior behavior)
+    public ComplianceFolderSettingsPage setQueryLoggingBehavior(ComplianceUtils.QueryLoggingBehavior behavior)
     {
         switch(behavior)
         {
@@ -126,17 +127,4 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
     }
 
-    public enum PhiColumnBehavior
-    {
-        SHOW,
-        HIDE,
-        BLANK
-    }
-
-    public enum QueryLoggingBehavior
-    {
-        NONE,
-        PHI,
-        ALL
-    }
 }
