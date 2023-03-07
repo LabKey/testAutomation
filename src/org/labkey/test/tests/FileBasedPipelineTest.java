@@ -137,7 +137,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         assertExtMsgBox("Error", "Cannot redefine an existing protocol", "OK");
 
         // Delete the job, including any referenced runs
-        deletePipelineJob(jobDescription, true);
+        deletePipelineJob(jobDescription, true, true);
 
         // Verify the analysis dir was deleted
         verifyPipelineAnalysisDeleted(pipelineName, protocolName);
@@ -242,7 +242,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, jobDescription, fileRoot, outputFiles);
 
         // Delete the job, including any referenced runs
-        deletePipelineJob(jobDescription, true);
+        deletePipelineJob(jobDescription, true, true);
 
         // Verify the analysis dir was deleted
         verifyPipelineAnalysisDeleted(pipelineName, protocolName);
