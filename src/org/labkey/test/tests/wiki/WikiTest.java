@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests.wiki;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -161,14 +160,14 @@ public class WikiTest extends BaseWebDriverTest
     {
         String wikiName = "Wiki with video";
         String wikiTitle = "Sample finder video";
-        String wikiContent = "<b>Some random content start : Have fun watching video below</b> <br><br>" +
-                "<iframe width=\"750\" height=\"500\" src=\"https://www.youtube.com/embed/JEE4807UHN4\" frameborder=\"0\" allow=\"autoplay; encrypted-media\" allowfullscreen></iframe>" +
-                "<br><br><b>Hope you fun watching the video..!</b><br><br>";
+        String wikiContent = "Some random content start : Have fun watching video below\n" +
+                "{video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}\n" +
+                "Hope you fun watching the video..!\n";
 
         goToProjectHome();
         log("Creating the wiki with video");
         WikiHelper wikiHelper = new WikiHelper(this);
-        wikiHelper.createNewWikiPage("HTML");
+        wikiHelper.createNewWikiPage("RADEOX");
         numberOfWikiCreated++;
         setFormElement(Locator.name("name"), wikiName);
         setFormElement(Locator.name("title"), wikiTitle);
