@@ -132,7 +132,7 @@ public class ActivityDialog extends LabKeyPage<LabKeyPage<?>.ElementCache>
             }
             updateQueryRowPage.setField("PHI", level.getPHI().equals("PHI"));
             updateQueryRowPage.setField("Term", role.getTerms());
-            updateQueryRowPage.setField("SortOrder", role.getIRBFieldIndex().toString());
+            updateQueryRowPage.setField("SortOrder", role.getIRBFieldIndex());
 
             updateQueryRowPage.submit();
         }
