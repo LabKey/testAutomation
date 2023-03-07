@@ -14,20 +14,20 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSettingsPage<ComplianceSettingsProjectLockAndReviewPage.ElementCache>
+public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage<ProjectLockAndReviewSettingsPage.ElementCache>
 {
-    public ComplianceSettingsProjectLockAndReviewPage(WebDriver driver)
+    public ProjectLockAndReviewSettingsPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ComplianceSettingsProjectLockAndReviewPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static ProjectLockAndReviewSettingsPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         BaseComplianceSettingsPage.beginAt(webDriverWrapper, SettingsTab.ProjectLockingAndReview);
-        return new ComplianceSettingsProjectLockAndReviewPage(webDriverWrapper.getDriver());
+        return new ProjectLockAndReviewSettingsPage(webDriverWrapper.getDriver());
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage setAllowProjectLocking(boolean checked)
+    public ProjectLockAndReviewSettingsPage setAllowProjectLocking(boolean checked)
     {
         elementCache().projectLockCheckbox().set(checked);
         return this;
@@ -48,7 +48,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
         return getTexts(elementCache().excludedProjectsSelect.getOptions());
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage excludeProject(String project)
+    public ProjectLockAndReviewSettingsPage excludeProject(String project)
     {
         assertThat("Expect to see project in non-excluded list", getNonExcludedProjects(), hasItem(project));
         elementCache().nonExcludedProjectsSelect.selectByVisibleText(project);
@@ -58,7 +58,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
         return this;
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage includeProject(String project)
+    public ProjectLockAndReviewSettingsPage includeProject(String project)
     {
         assertThat("Expect to see project in excluded list", getExcludedProjects(), hasItem(project));
         elementCache().excludedProjectsSelect.selectByVisibleText(project);
@@ -68,7 +68,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
         return this;
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage setEnableProjectReviewWorkflow(boolean checked)
+    public ProjectLockAndReviewSettingsPage setEnableProjectReviewWorkflow(boolean checked)
     {
         elementCache().enableWorkflowCheckBox.set(checked);
         return this;
@@ -84,7 +84,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
         return elementCache().enableWorkflowCheckBox.get();
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage setExpirationInterval(String months)
+    public ProjectLockAndReviewSettingsPage setExpirationInterval(String months)
     {
         elementCache().intervalCombo.selectComboBoxItem(months);
         return this;
@@ -98,7 +98,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
     /**
      * @param days the number of days at which to begin sending warning messages
      */
-    public ComplianceSettingsProjectLockAndReviewPage setExpirationWarning(String days)
+    public ProjectLockAndReviewSettingsPage setExpirationWarning(String days)
     {
         elementCache().beginWarningEmailInput.setValue(days);
         return this;
@@ -109,7 +109,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
         return elementCache().beginWarningEmailInput.get();
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage setExpirationWarningInterval(String days)
+    public ProjectLockAndReviewSettingsPage setExpirationWarningInterval(String days)
     {
         elementCache().warningFrequencyInput.setValue(days);
         return this;
@@ -120,7 +120,7 @@ public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSe
         return elementCache().projectReviewMessage.getValue();
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage setProjectReviewMessage(String message)
+    public ProjectLockAndReviewSettingsPage setProjectReviewMessage(String message)
     {
         elementCache().projectReviewMessage.set(message);
         return this;

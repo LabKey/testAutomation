@@ -4,26 +4,26 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.WebDriver;
 
-public class ComplianceSettingsSessionPage extends BaseComplianceSettingsPage<ComplianceSettingsSessionPage.ElementCache>
+public class ComplianceSessionSettingsPage extends BaseComplianceSettingsPage<ComplianceSessionSettingsPage.ElementCache>
 {
-    public ComplianceSettingsSessionPage(WebDriver driver)
+    public ComplianceSessionSettingsPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ComplianceSettingsSessionPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static ComplianceSessionSettingsPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         BaseComplianceSettingsPage.beginAt(webDriverWrapper, SettingsTab.Session);
-        return new ComplianceSettingsSessionPage(webDriverWrapper.getDriver());
+        return new ComplianceSessionSettingsPage(webDriverWrapper.getDriver());
     }
 
-    public ComplianceSettingsSessionPage showBackgroundBehindLoggedOutModal()
+    public ComplianceSessionSettingsPage showBackgroundBehindLoggedOutModal()
     {
         elementCache().showBackgroundRadio.check();
         return this;
     }
 
-    public ComplianceSettingsSessionPage blurBackgroundBehindLoggedOutModal()
+    public ComplianceSessionSettingsPage blurBackgroundBehindLoggedOutModal()
     {
         elementCache().blurBackgroundRadio.check();
         return this;

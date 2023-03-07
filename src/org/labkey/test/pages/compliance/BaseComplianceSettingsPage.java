@@ -45,16 +45,16 @@ public abstract class BaseComplianceSettingsPage<EC extends BaseComplianceSettin
         return new ComplianceSettingsLoginPage(getDriver());
     }
 
-    public ComplianceSettingsSessionPage clickSessionTab()
+    public ComplianceSessionSettingsPage clickSessionTab()
     {
         showTab(SettingsTab.Session);
-        return new ComplianceSettingsSessionPage(getDriver());
+        return new ComplianceSessionSettingsPage(getDriver());
     }
 
-    public ComplianceSettingsProjectLockAndReviewPage clickProjectLockingTab()
+    public ProjectLockAndReviewSettingsPage clickProjectLockingTab()
     {
         showTab(SettingsTab.ProjectLockingAndReview);
-        return new ComplianceSettingsProjectLockAndReviewPage(getDriver());
+        return new ProjectLockAndReviewSettingsPage(getDriver());
     }
 
     protected void showTab(SettingsTab tab)
