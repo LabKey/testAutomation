@@ -7,6 +7,7 @@ package org.labkey.test.pages.compliance;
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
@@ -122,15 +123,18 @@ public class ActivityDialog extends LabKeyPage<LabKeyPage<?>.ElementCache>
         {
             ActivityDialog.ActivityRole role = term.getLeft();
             ActivityDialog.PHILevel level = term.getRight();
-            termsDRT.clickInsertNewRow();
-            waitForText("TermsOfUse");
-            selectOptionByValue(Locator.name("quf_Activity"), role.name());
-            setFormElement(Locator.name("quf_IRB"), role.getIrb());
-            setCheckbox(Locator.checkboxByName("quf_PHI"), level.getPHI().equals("PHI"));
-            setFormElement(Locator.name("quf_Term"), role.getTerms());
-            setFormElement(Locator.name("quf_SortOrder"), role.getIRBFieldIndex().toString());
-            clickAndWait(Locator.linkWithSpan("Submit"));
-            waitForText("TermsOfUse");
+            UpdateQueryRowPage updateQueryRowPage = termsDRT.clickInsertNewRow();
+
+            updateQueryRowPage.setField("Activity", role.name());
+            if (role.getIrb() != null)
+            {
+                updateQueryRowPage.setField("IRB", role.getIrb());
+            }
+            updateQueryRowPage.setField("PHI", level.getPHI().equals("PHI"));
+            updateQueryRowPage.setField("Term", role.getTerms());
+            updateQueryRowPage.setField("SortOrder", role.getIRBFieldIndex().toString());
+
+            updateQueryRowPage.submit();
         }
         popLocation();
     }
