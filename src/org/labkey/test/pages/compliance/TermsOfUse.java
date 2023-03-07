@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TermsOfUse extends LabKeyPage
+public class TermsOfUse extends LabKeyPage<LabKeyPage<?>.ElementCache>
 {
     public TermsOfUse(WebDriver driver)
     {

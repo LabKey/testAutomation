@@ -2,7 +2,6 @@ package org.labkey.test.pages.compliance;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -11,26 +10,24 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
+public class ComplianceSettingsProjectLockAndReviewPage extends BaseComplianceSettingsPage<ComplianceSettingsProjectLockAndReviewPage.ElementCache>
 {
-    public ProjectLockAndReviewSettingsPage(WebDriver driver)
+    public ComplianceSettingsProjectLockAndReviewPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ProjectLockAndReviewSettingsPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static ComplianceSettingsProjectLockAndReviewPage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("compliance", null, "complianceSettings",
-                Map.of("tab", "projectLockAndReview")));
-        return new ProjectLockAndReviewSettingsPage(webDriverWrapper.getDriver());
+        BaseComplianceSettingsPage.beginAt(webDriverWrapper, SettingsTab.ProjectLockingAndReview);
+        return new ComplianceSettingsProjectLockAndReviewPage(webDriverWrapper.getDriver());
     }
 
-    public ProjectLockAndReviewSettingsPage setAllowProjectLocking(boolean checked)
+    public ComplianceSettingsProjectLockAndReviewPage setAllowProjectLocking(boolean checked)
     {
         elementCache().projectLockCheckbox().set(checked);
         return this;
@@ -51,7 +48,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return getTexts(elementCache().excludedProjectsSelect.getOptions());
     }
 
-    public ProjectLockAndReviewSettingsPage excludeProject(String project)
+    public ComplianceSettingsProjectLockAndReviewPage excludeProject(String project)
     {
         assertThat("Expect to see project in non-excluded list", getNonExcludedProjects(), hasItem(project));
         elementCache().nonExcludedProjectsSelect.selectByVisibleText(project);
@@ -61,7 +58,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return this;
     }
 
-    public ProjectLockAndReviewSettingsPage includeProject(String project)
+    public ComplianceSettingsProjectLockAndReviewPage includeProject(String project)
     {
         assertThat("Expect to see project in excluded list", getExcludedProjects(), hasItem(project));
         elementCache().excludedProjectsSelect.selectByVisibleText(project);
@@ -71,7 +68,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return this;
     }
 
-    public ProjectLockAndReviewSettingsPage setEnableProjectReviewWorkflow(boolean checked)
+    public ComplianceSettingsProjectLockAndReviewPage setEnableProjectReviewWorkflow(boolean checked)
     {
         elementCache().enableWorkflowCheckBox.set(checked);
         return this;
@@ -87,7 +84,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return elementCache().enableWorkflowCheckBox.get();
     }
 
-    public ProjectLockAndReviewSettingsPage setExpirationInterval(String months)
+    public ComplianceSettingsProjectLockAndReviewPage setExpirationInterval(String months)
     {
         elementCache().intervalCombo.selectComboBoxItem(months);
         return this;
@@ -99,11 +96,9 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
     }
 
     /**
-     *
      * @param days the number of days at which to begin sending warning messages
-     * @return
      */
-    public ProjectLockAndReviewSettingsPage setExpirationWarning(String days)
+    public ComplianceSettingsProjectLockAndReviewPage setExpirationWarning(String days)
     {
         elementCache().beginWarningEmailInput.setValue(days);
         return this;
@@ -114,7 +109,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return elementCache().beginWarningEmailInput.get();
     }
 
-    public ProjectLockAndReviewSettingsPage setExpirationWarningInterval(String days)
+    public ComplianceSettingsProjectLockAndReviewPage setExpirationWarningInterval(String days)
     {
         elementCache().warningFrequencyInput.setValue(days);
         return this;
@@ -125,36 +120,19 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return elementCache().projectReviewMessage.getValue();
     }
 
-    public ProjectLockAndReviewSettingsPage setProjectReviewMessage(String message)
+    public ComplianceSettingsProjectLockAndReviewPage setProjectReviewMessage(String message)
     {
         elementCache().projectReviewMessage.set(message);
         return this;
     }
 
-    public ProjectLockAndReviewSettingsPage clickSave()
-    {
-        clickButton("Save");
-        return this;
-    }
-
-    public ProjectLockAndReviewSettingsPage clickCancel()
-    {
-        clickButton("Cancel");
-        return this;
-    }
-
     @Override
-    protected BaseComplianceSettingsPage.ElementCache newElementCache()
+    protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
-    protected class ElementCache extends BaseComplianceSettingsPage.ElementCache
+    protected class ElementCache extends BaseComplianceSettingsPage<ElementCache>.ElementCache
     {
         Checkbox projectLockCheckbox()
         {

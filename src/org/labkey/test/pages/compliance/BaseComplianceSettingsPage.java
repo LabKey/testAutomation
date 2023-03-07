@@ -14,34 +14,50 @@ import java.util.Map;
  * Base test wrapper for `ComplianceController.ComplianceSettingsAction`. Subclasses represent the different tabs on that page.
  * Available tabs are defined in `org.labkey.compliance.ComplianceManager.ComplianceSetting`
  */
-public abstract class BaseComplianceSettingsPage<EC extends BaseComplianceSettingsPage.ElementCache> extends LabKeyPage<EC>
+public abstract class BaseComplianceSettingsPage<EC extends BaseComplianceSettingsPage<EC>.ElementCache> extends LabKeyPage<EC>
 {
     public BaseComplianceSettingsPage(WebDriver driver)
     {
         super(driver);
     }
 
-    protected static void beginAt(WebDriverWrapper webDriverWrapper, String tabId)
+    protected static void beginAt(WebDriverWrapper webDriverWrapper, SettingsTab tab)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("compliance", null, "complianceSettings",
-                Map.of("tab", tabId)));
+                Map.of("tab", tab.getTabId())));
     }
 
-    // todo: pull the accounts and audit tabs into subclasses of this class
+    public ComplianceSettingsAccountsPage clickAccountsTab()
+    {
+        showTab(SettingsTab.Accounts);
+        return new ComplianceSettingsAccountsPage(getDriver());
+    }
 
-    public ComplianceLoginSettingsPage showLoginTab()
+    public ComplianceSettingsAuditPage clickAuditTab()
+    {
+        showTab(SettingsTab.Audit);
+        return new ComplianceSettingsAuditPage(getDriver());
+    }
+
+    public ComplianceSettingsLoginPage clickLoginTab()
     {
         showTab(SettingsTab.Login);
-        return new ComplianceLoginSettingsPage(getDriver());
+        return new ComplianceSettingsLoginPage(getDriver());
     }
 
-    public ComplianceSessionSettingsPage showSessionTab()
+    public ComplianceSettingsSessionPage clickSessionTab()
     {
         showTab(SettingsTab.Session);
-        return new ComplianceSessionSettingsPage(getDriver());
+        return new ComplianceSettingsSessionPage(getDriver());
     }
 
-    protected void showTab(ComplianceSettingsPage.SettingsTab tab)
+    public ComplianceSettingsProjectLockAndReviewPage clickProjectLockingTab()
+    {
+        showTab(SettingsTab.ProjectLockingAndReview);
+        return new ComplianceSettingsProjectLockAndReviewPage(getDriver());
+    }
+
+    protected void showTab(SettingsTab tab)
     {
         if (!isTabActive(tab))
         {
@@ -50,49 +66,68 @@ public abstract class BaseComplianceSettingsPage<EC extends BaseComplianceSettin
             shortWait().until(ExpectedConditions.elementToBeClickable(changeSettingsLink));
             clickAndWait(changeSettingsLink);
             waitFor(()-> isTabActive(tab),
-                    "tab took too long to become active", 4000);
+                    "tab took too long to become active: " + tab.name(), 4000);
         }
     }
 
-    private boolean isTabActive(ComplianceSettingsPage.SettingsTab tab)
+    private boolean isTabActive(SettingsTab tab)
     {
         WebElement tabElement = elementCache().settingsTab(tab);
         String tabClass = tabElement.getAttribute("class");
         return tabClass != null && tabClass.contains("active-tab");
     }
 
+    public final void clickSave()
+    {
+        clickAndWait(elementCache().saveButton);
+        clearCache(); // Saving triggers a load but stays on the page.
+    }
+
+    public final void clickCancel()
+    {
+        clickAndWait(elementCache().cancelButton);
+    }
+
     @Override
-    protected EC newElementCache()
-    {
-        return (EC) new ElementCache();
-    }
+    protected abstract EC newElementCache();
 
-    protected EC elementCache()
+    protected abstract class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        return (EC) super.elementCache();
-    }
+        final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
 
-    protected class ElementCache extends LabKeyPage.ElementCache
-    {
-        WebElement settingsTab(ComplianceSettingsPage.SettingsTab tab)
+        WebElement settingsTab(SettingsTab tab)
         {
             return Locator.tagWithClass("div", "tab")
-                    .withChild(Locator.tagWithText("a", tab._text)).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+                    .withChild(Locator.tagWithText("a", tab.getTabText())).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         }
     }
 
     public enum SettingsTab
     {
-        Accounts("Accounts"),
-        Audit("Audit"),
-        Login("Login"),
-        Session("Session"),
-        ProjectLockingAndReview("Project Locking & Review");
+        Accounts("Accounts", "accounts"),
+        Audit("Audit", "audit"),
+        Login("Login", "login"),
+        Session("Session", "session"),
+        ProjectLockingAndReview("Project Locking & Review", "projectLockAndReview");
 
-        public final String _text;
-        SettingsTab(String tabText)
+        private final String _tabText;
+        private final String _tabId;
+
+        SettingsTab(String tabText, String tabId)
         {
-            this._text = tabText;
+            this._tabText = tabText;
+            this._tabId = tabId;
+        }
+
+        public String getTabText()
+        {
+            return _tabText;
+        }
+
+        public String getTabId()
+        {
+            return _tabId;
         }
     }
 }

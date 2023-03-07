@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -110,10 +111,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
-    public void clickComplianceSettings()
+    public ComplianceSettingsAccountsPage clickComplianceSettings()
     {
         goToSettingsSection();
         clickAndWait(elementCache().complianceSettings);
+        return new ComplianceSettingsAccountsPage(getDriver());
     }
 
     public void clickEmailCustomization()
