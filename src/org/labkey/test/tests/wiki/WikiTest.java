@@ -16,7 +16,7 @@
 
 package org.labkey.test.tests.wiki;
 
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -138,7 +138,7 @@ public class WikiTest extends BaseWebDriverTest
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
-        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()),WIKI_PAGE_ALTTITLE);
+        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()), WIKI_PAGE_ALTTITLE);
         clickButton("Submit");
         verifyWikiPagePresent();
 
@@ -153,6 +153,29 @@ public class WikiTest extends BaseWebDriverTest
         log("verify second wiki part pointing to first handled delete well");
         clickFolder(getSubfolderName());
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
+    }
+
+    @Test
+    public void testEmbeddedVideoInWiki()
+    {
+        String wikiName = "Wiki with video";
+        String wikiTitle = "Sample finder video";
+        String wikiContent = "Some random content start : Have fun watching video below\n" +
+                "{video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}\n" +
+                "Hope you fun watching the video..!\n";
+
+        goToProjectHome();
+        log("Creating the wiki with video");
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("RADEOX");
+        numberOfWikiCreated++;
+        setFormElement(Locator.name("name"), wikiName);
+        setFormElement(Locator.name("title"), wikiTitle);
+        wikiHelper.setWikiBody(wikiContent);
+        wikiHelper.saveWikiPage();
+
+        Assert.assertEquals("Video is missing", "https://www.youtube.com/embed/JEE4807UHN4",
+                getAttribute(Locator.tag("iframe"), "src"));
     }
 
     @Test
