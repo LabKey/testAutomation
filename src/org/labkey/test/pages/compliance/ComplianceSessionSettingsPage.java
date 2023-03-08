@@ -20,12 +20,14 @@ public class ComplianceSessionSettingsPage extends BaseComplianceSettingsPage<Co
     public ComplianceSessionSettingsPage showBackgroundBehindLoggedOutModal()
     {
         elementCache().showBackgroundRadio.check();
+        clickSave();
         return this;
     }
 
     public ComplianceSessionSettingsPage blurBackgroundBehindLoggedOutModal()
     {
         elementCache().blurBackgroundRadio.check();
+        clickSave();
         return this;
     }
 
