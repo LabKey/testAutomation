@@ -36,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -333,7 +332,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         waitForStartup();
         log("Signing in");
-        simpleSignOut();
+        if (isSignedIn())
+        {
+            simpleSignOut();
+        }
         checkForUpgrade();
         simpleSignIn();
         assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
