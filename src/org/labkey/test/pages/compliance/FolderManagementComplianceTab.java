@@ -15,38 +15,38 @@ import org.openqa.selenium.WebElement;
 import static org.labkey.test.util.compliance.ComplianceUtils.PhiColumnBehavior.HIDE;
 import static org.labkey.test.util.compliance.ComplianceUtils.PhiColumnBehavior.SHOW;
 
-public class ComplianceFolderSettingsPage extends FolderManagementPage
+public class FolderManagementComplianceTab extends FolderManagementPage
 {
-    public ComplianceFolderSettingsPage(WebDriver driver)
+    public FolderManagementComplianceTab(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ComplianceFolderSettingsPage beginAt(WebDriverWrapper driver, String containerPath)
+    public static FolderManagementComplianceTab beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("compliance", containerPath, "settings"));
-        return new ComplianceFolderSettingsPage(driver.getDriver());
+        return new FolderManagementComplianceTab(driver.getDriver());
     }
 
-    public ComplianceFolderSettingsPage setInheritTermsOfUse(boolean check)
+    public FolderManagementComplianceTab setInheritTermsOfUse(boolean check)
     {
         setCheckbox(elementCache().inheritTermsOfUse, check);
         return this;
     }
 
-    public ComplianceFolderSettingsPage setRequireActivity(boolean check)
+    public FolderManagementComplianceTab setRequireActivity(boolean check)
     {
         setCheckbox(elementCache().requireActivity, check);
         return this;
     }
 
-    public ComplianceFolderSettingsPage setPhiRolesRequired(boolean check)
+    public FolderManagementComplianceTab setPhiRolesRequired(boolean check)
     {
         setCheckbox(elementCache().phiRolesRequired, check);
         return this;
     }
 
-    public ComplianceFolderSettingsPage setPhiRolesRequiredAndColumnBehavior(boolean check, ComplianceUtils.PhiColumnBehavior behavior)
+    public FolderManagementComplianceTab setPhiRolesRequiredAndColumnBehavior(boolean check, ComplianceUtils.PhiColumnBehavior behavior)
     {
         setCheckbox(elementCache().phiRolesRequired, check);
         if (check)
@@ -61,7 +61,7 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
         return this;
     }
 
-    public ComplianceFolderSettingsPage setColumnBehavior(ComplianceUtils.PhiColumnBehavior behavior)
+    public FolderManagementComplianceTab setColumnBehavior(ComplianceUtils.PhiColumnBehavior behavior)
     {
         // Can't directly SHOW; must uncheck phiRolesRequired to SHOW
         switch(behavior)
@@ -77,7 +77,7 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
         return this;
     }
 
-    public ComplianceFolderSettingsPage setQueryLoggingBehavior(ComplianceUtils.QueryLoggingBehavior behavior)
+    public FolderManagementComplianceTab setQueryLoggingBehavior(ComplianceUtils.QueryLoggingBehavior behavior)
     {
         switch(behavior)
         {
@@ -102,15 +102,15 @@ public class ComplianceFolderSettingsPage extends FolderManagementPage
     }
 
     @Override
-    protected ComplianceFolderSettingsPage.ElementCache elementCache()
+    protected FolderManagementComplianceTab.ElementCache elementCache()
     {
-        return (ComplianceFolderSettingsPage.ElementCache) super.elementCache();
+        return (FolderManagementComplianceTab.ElementCache) super.elementCache();
     }
 
     @Override
-    protected ComplianceFolderSettingsPage.ElementCache newElementCache()
+    protected FolderManagementComplianceTab.ElementCache newElementCache()
     {
-        return new ComplianceFolderSettingsPage.ElementCache();
+        return new FolderManagementComplianceTab.ElementCache();
     }
 
     protected class ElementCache extends FolderManagementPage.ElementCache

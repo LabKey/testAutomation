@@ -191,8 +191,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (!settings.isEmpty())
         {
-            clickAdvancedSettings()
-                    .setAdvancedFieldSettings(settings)
+            AdvancedSettingsDialog advancedSettingsDialog = clickAdvancedSettings();
+            for (AdvancedFieldSetting setting : settings)
+            {
+                setting.accept(advancedSettingsDialog);
+            }
+            advancedSettingsDialog
                     .apply();
         }
         return this;

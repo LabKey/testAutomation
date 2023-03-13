@@ -11,7 +11,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class AdvancedSettingsDialog extends ModalDialog
@@ -27,15 +26,6 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog(DomainFieldRow row)
     {
         this(row, new ModalDialogFinder(row.getDriver()).withTitle("Advanced Settings and Properties"));
-    }
-
-    public AdvancedSettingsDialog setAdvancedFieldSettings(List<AdvancedFieldSetting> advancedSettings)
-    {
-        for (AdvancedFieldSetting setting : advancedSettings)
-        {
-            setting.accept(this);
-        }
-        return this;
     }
 
     public boolean isShownInDefaultView()
