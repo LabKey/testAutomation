@@ -119,8 +119,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 fieldRow.setType(fieldDefinition.getType());
         }
 
-        fieldRow.setAdvancedSettings(advancedSettingsFromFieldDefinition(fieldDefinition));
-
         if (fieldDefinition.getDescription() != null)
             fieldRow.setDescription(fieldDefinition.getDescription());
         if (fieldDefinition.getLabel() != null)
@@ -201,6 +199,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 fieldRow.setRangeValidators(rangeValidators);
             }
         }
+
+        fieldRow.setAdvancedSettings(advancedSettingsFromFieldDefinition(fieldDefinition));
 
         fieldRow.collapse();
 

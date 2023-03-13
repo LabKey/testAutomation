@@ -196,8 +196,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             {
                 setting.accept(advancedSettingsDialog);
             }
-            advancedSettingsDialog
-                    .apply();
+            advancedSettingsDialog.apply();
         }
         return this;
     }
