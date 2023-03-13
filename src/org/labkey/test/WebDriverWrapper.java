@@ -507,8 +507,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Enable/disable server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            // Don't use browser session. Some tests need to pause briefly, while impersonating.
-            Connection cn = WebTestHelper.getRemoteApiConnection(false);
+            WhoAmIResponse whoAmI = whoAmI();
+            // Don't use browser session when impersonating. Impersonated user/role might not have correct permission.
+            boolean useBrowserSession = PasswordUtil.getUsername().equals(whoAmI.getEmail()) && !whoAmI.isImpersonated();
+            Connection cn = WebTestHelper.getRemoteApiConnection(useBrowserSession);
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", b);
         }
     }
