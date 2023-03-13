@@ -9,17 +9,17 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
-public class ComplianceSettingsLoginPage extends BaseComplianceSettingsPage<ComplianceSettingsLoginPage.ElementCache>
+public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<ComplianceLoginSettingsPage.ElementCache>
 {
-    public ComplianceSettingsLoginPage(WebDriver driver)
+    public ComplianceLoginSettingsPage(WebDriver driver)
     {
         super(driver);
     }
 
-    public static ComplianceSettingsLoginPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static ComplianceLoginSettingsPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         BaseComplianceSettingsPage.beginAt(webDriverWrapper, SettingsTab.Login);
-        return new ComplianceSettingsLoginPage(webDriverWrapper.getDriver());
+        return new ComplianceLoginSettingsPage(webDriverWrapper.getDriver());
     }
 
 

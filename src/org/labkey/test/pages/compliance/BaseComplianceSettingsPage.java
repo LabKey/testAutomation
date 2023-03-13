@@ -39,10 +39,10 @@ public abstract class BaseComplianceSettingsPage<EC extends BaseComplianceSettin
         return new ComplianceSettingsAuditPage(getDriver());
     }
 
-    public ComplianceSettingsLoginPage clickLoginTab()
+    public ComplianceLoginSettingsPage clickLoginTab()
     {
         showTab(SettingsTab.Login);
-        return new ComplianceSettingsLoginPage(getDriver());
+        return new ComplianceLoginSettingsPage(getDriver());
     }
 
     public ComplianceSessionSettingsPage clickSessionTab()
