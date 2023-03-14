@@ -36,8 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
@@ -333,7 +333,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         waitForStartup();
         log("Signing in");
-        if (isSignedIn())
+        Number userId = whoAmI().getUserId();
+        if (userId != null && userId.longValue() > 0)
         {
             simpleSignOut();
         }
