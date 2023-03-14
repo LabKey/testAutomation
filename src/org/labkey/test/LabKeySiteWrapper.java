@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
