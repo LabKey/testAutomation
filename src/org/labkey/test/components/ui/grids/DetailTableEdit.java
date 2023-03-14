@@ -274,6 +274,15 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
+    /*
+        This allows you to query a given select in the edit panel to see what options it offers
+     */
+    public List<String> getSelectOptions(String fieldCaption)
+    {
+        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
+        return reactSelect.getOptions();
+    }
+
     /**
      * Select a single value from a select list.
      *
