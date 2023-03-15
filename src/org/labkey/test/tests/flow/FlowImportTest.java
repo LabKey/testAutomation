@@ -95,7 +95,7 @@ public class FlowImportTest extends BaseFlowTest
         {
             assertTrue("expect each field in FileDate column to have a value, is [" + date + "]", !date.isEmpty());
             // make sure the resulting value parses to a date
-            new SimpleDateFormat("YYYY-MM-DD HH:mm").parse(date);
+            new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date);
         }
         // UNDONE: Check '118795.fcs' FCSAnalysis well has a fake FCSFile that has an original FCSFile data input.
         // UNDONE: Check FCSFiles.Original column
@@ -125,6 +125,5 @@ public class FlowImportTest extends BaseFlowTest
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this);
         assertEquals("Expected four runs", table.getDataRowCount(), 4);
-
     }
 }
