@@ -39,7 +39,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.junit.rules.TestWatcher;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -69,6 +68,7 @@ import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.query.QueryUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -2036,7 +2036,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 WebElement folderIcon = loc.findElement(getDriver());
                 // Moving to desired tree node should dismiss tooltip from previously clicked folder
                 new Actions(getDriver()).moveToElement(folderIcon).perform();
-                folderIcon.click();
+                try
+                {
+                    folderIcon.click();
+                }
+                catch (ElementClickInterceptedException retry)
+                {
+                    sleep(500); // Tooltip needs a moment to update
+                    folderIcon.click();
+                }
             }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
         }
