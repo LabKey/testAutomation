@@ -2,13 +2,14 @@ package org.labkey.test.pages.compliance;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.ComboBox;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.Map;
+import java.util.List;
 
-public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage
+public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<ComplianceLoginSettingsPage.ElementCache>
 {
     public ComplianceLoginSettingsPage(WebDriver driver)
     {
@@ -17,7 +18,7 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage
 
     public static ComplianceLoginSettingsPage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        BaseComplianceSettingsPage.beginAt(webDriverWrapper, "login");
+        BaseComplianceSettingsPage.beginAt(webDriverWrapper, SettingsTab.Login);
         return new ComplianceLoginSettingsPage(webDriverWrapper.getDriver());
     }
 
@@ -25,61 +26,59 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage
     public void enableLoginControls()
     {
         checkCheckbox(elementCache().enableLoginChk);
-        waitForElement(elementCache().loginAttemptCountCombo.enabled());
+        shortWait().until(wd -> elementCache().loginAttemptCountCombo.isEnabled());
     }
 
     public void disableLoginControls()
     {
         uncheckCheckbox(elementCache().enableLoginChk);
-        //TODO: make this wait not dumb
-        sleep(2000);
+        shortWait().until(wd -> !elementCache().loginAttemptCountCombo.isEnabled());
     }
 
     public void setLoginAttemptCount(String count)
     {
-        setFormElement(elementCache().loginAttemptCountInput(), count);
+        setFormElement(elementCache().loginAttemptCountInput, count);
     }
 
     public void selectLoginAttemptCount(String count)
     {
-        _ext4Helper.selectComboBoxItem(elementCache().loginAttemptCountCombo, count);
+        elementCache().loginAttemptCountCombo.selectComboBoxItem(count);
     }
 
     public void selectLoginAttemptPeriod(String period)
     {
-        _ext4Helper.selectComboBoxItem(elementCache().loginAttemptPeriodCombo, period);
+        elementCache().loginAttemptPeriodCombo.selectComboBoxItem(period);
     }
 
     public void selectLoginAttemptRecoveryTime(String time)
     {
-        _ext4Helper.selectComboBoxItem(elementCache().loginAttemptRecoveryTimeCombo, time);
+        elementCache().loginAttemptRecoveryTimeCombo.selectComboBoxItem(time);
     }
 
     public void setLoginAttemptRecoveryTime(String time)
     {
-        setFormElement(elementCache().loginAttemptRecoveryTimeInput(), time);
+        setFormElement(elementCache().loginAttemptRecoveryTimeInput, time);
     }
 
     public void setLoginAttemptPeriod(String time)
     {
-        setFormElement(elementCache().loginAttemptPeriodInput(), time);
+        setFormElement(elementCache().loginAttemptPeriodInput, time);
     }
-
 
     public void enableFicamProviders()
     {
         checkCheckbox(elementCache().acceptOnlyFicamChk);
-        waitForElementToBeVisible(elementCache().ficamProvidersDiv);
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().ficamProvidersDiv));
     }
 
     public boolean isFicamProvidersChecked()
     {
-        return isChecked(elementCache().acceptOnlyFicamChk);
+        return elementCache().acceptOnlyFicamChk.isSelected();
     }
 
     public boolean isFicamProvidersDivDisplayed()
     {
-        return elementCache().ficamProvidersDiv().isDisplayed();
+        return elementCache().ficamProvidersDiv.isDisplayed();
     }
 
     public void disableFicamProviders()
@@ -87,100 +86,35 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage
         uncheckCheckbox(elementCache().acceptOnlyFicamChk);
     }
 
-    public String getFicamProviersList()
+    public List<String> getFicamProviersList()
     {
-        return getText(elementCache().ficamProvidersList);
+        return getTexts(Locator.tag("li").findElements(elementCache().ficamProvidersDiv));
     }
 
     public void clickSaveExpectingAlert(String expectedAlert)
     {
-        elementCache().saveBtn.waitForElement(getDriver(), 2000).click();
+        elementCache().saveButton.click();
         assertAlert(expectedAlert);
     }
 
-    public ComplianceLoginSettingsPage clickSave()
-    {
-        clickButton("Save");
-        return new ComplianceLoginSettingsPage(getDriver());
-    }
-
-    public ComplianceLoginSettingsPage clickCancel()
-    {
-        clickButton("Cancel");
-        return new ComplianceLoginSettingsPage(getDriver());
-    }
-
     @Override
-    protected BaseComplianceSettingsPage.ElementCache newElementCache()
+    protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected ElementCache elementCache()
+    protected class ElementCache extends BaseComplianceSettingsPage<ElementCache>.ElementCache
     {
-        return (ElementCache) super.elementCache();
-    }
+        final WebElement enableLoginChk = Locator.checkboxById("enableLogin").findWhenNeeded(this);
+        final ComboBox loginAttemptCountCombo = new ComboBox.ComboBoxFinder(getDriver()).locatedBy(Locator.tagWithId("span", "loginAttemptCount")).findWhenNeeded(this);
+        final ComboBox loginAttemptPeriodCombo = new ComboBox.ComboBoxFinder(getDriver()).locatedBy(Locator.tagWithId("span", "loginAttemptPeriod")).findWhenNeeded(this);
+        final ComboBox loginAttemptRecoveryTimeCombo = new ComboBox.ComboBoxFinder(getDriver()).locatedBy(Locator.tagWithId("span", "loginAttemptRecoveryTime")).findWhenNeeded(this);
+        final WebElement loginAttemptCountInput = Locator.input("attemptLimit").findWhenNeeded(this);
+        final WebElement loginAttemptPeriodInput = Locator.input("attemptPeriod").findWhenNeeded(this);
+        final WebElement loginAttemptRecoveryTimeInput = Locator.input("resetTime").findWhenNeeded(this);
 
-    protected class ElementCache extends BaseComplianceSettingsPage.ElementCache
-    {
-        final Locator.XPathLocator loginTab = Locator.tagWithClass("div", "tab").childTag("a").withText("Login");
-        final Locator.XPathLocator enableLoginChk = Locator.checkboxById("enableLogin");
-        final Locator.XPathLocator loginAttemptCountCombo = Locator.tagWithId("span", "loginAttemptCount");
-        final Locator.XPathLocator loginAttemptPeriodCombo = Locator.tagWithId("span", "loginAttemptPeriod");
-        final Locator.XPathLocator loginAttemptRecoveryTimeCombo = Locator.tagWithId("span", "loginAttemptRecoveryTime");
-        final Locator.XPathLocator loginAttemptCountInput = Locator.input("attemptLimit");
-        final Locator.XPathLocator loginAttemptPeriodInput = Locator.input("attemptPeriod");
-        final Locator.XPathLocator loginAttemptRecoveryTimeInput = Locator.input("resetTime");
+        final WebElement acceptOnlyFicamChk = Locator.checkboxById("acceptOnlyFICAMProviders").findWhenNeeded(this);
+        final WebElement ficamProvidersDiv = Locator.tagWithId("div", "FICAMProviders").findWhenNeeded(this);
 
-        final Locator.XPathLocator acceptOnlyFicamChk = Locator.checkboxById("acceptOnlyFICAMProviders");
-        final Locator.XPathLocator ficamProvidersDiv = Locator.tagWithId("div", "FICAMProviders");
-         final Locator.XPathLocator ficamProvidersList = Locator.xpath("//div[@id='FICAMProviders']//li");
-
-        final Locator.XPathLocator saveBtn = Locator.linkWithSpan("Save");
-
-        WebElement enableLoginChk()
-        {
-            return enableLoginChk.waitForElement(this, 1_000);
-        }
-
-        WebElement loginAttemptCount()
-        {
-            return loginAttemptCountCombo.waitForElement(this, 1_000);
-        }
-
-        WebElement loginAttemptPeriod()
-        {
-            return loginAttemptPeriodCombo.waitForElement(this, 1_000);
-        }
-
-        WebElement loginAttemptRecoveryTime()
-        {
-            return loginAttemptRecoveryTimeCombo.waitForElement(this, 1_000);
-        }
-
-        WebElement loginAttemptCountInput()
-        {
-            return loginAttemptCountInput.waitForElement(this, 1_000);
-        }
-
-        WebElement loginAttemptPeriodInput()
-        {
-            return loginAttemptPeriodInput.waitForElement(this, 1_000);
-        }
-
-        WebElement loginAttemptRecoveryTimeInput()
-        {
-            return loginAttemptRecoveryTimeInput.waitForElement(this, 1_000);
-        }
-
-        WebElement acceptOnlyFicamChk()
-        {
-            return acceptOnlyFicamChk.waitForElement(this, 1_000);
-        }
-
-        WebElement ficamProvidersDiv()
-        {
-            return ficamProvidersDiv.waitForElement(this, 1_000);
-        }
     }
 }

@@ -4,15 +4,15 @@
  */
 package org.labkey.test.pages.compliance;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ComplianceTermsOfUsePage extends LabKeyPage
+public class ComplianceTermsOfUsePage extends LabKeyPage<ComplianceTermsOfUsePage.ElementCache>
 {
-    public ComplianceTermsOfUsePage(BaseWebDriverTest test)
+    public ComplianceTermsOfUsePage(WebDriver test)
     {
         super(test);
         waitForText("Terms of Use");
@@ -39,11 +39,6 @@ public class ComplianceTermsOfUsePage extends LabKeyPage
     {
         return elementCache().agreeLabel.getText();
     }
-    @Override
-    protected ComplianceTermsOfUsePage.ElementCache elementCache()
-    {
-        return (ComplianceTermsOfUsePage.ElementCache) super.elementCache();
-    }
 
     @Override
     protected ComplianceTermsOfUsePage.ElementCache newElementCache()
@@ -51,10 +46,10 @@ public class ComplianceTermsOfUsePage extends LabKeyPage
         return new ComplianceTermsOfUsePage.ElementCache();
     }
 
-    private class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        Checkbox agreeCheckbox = Checkbox.Ext4Checkbox().locatedBy(Locator.id("AgreeToTermsCheckbox-inputEl")).findWhenNeeded(this);
-        WebElement agreeLabel = Locator.xpath("//label[@id='AgreeToTermsCheckbox-boxLabelEl']").findWhenNeeded(this);
+        final Checkbox agreeCheckbox = Checkbox.Ext4Checkbox().locatedBy(Locator.id("AgreeToTermsCheckbox-inputEl")).findWhenNeeded(this);
+        final WebElement agreeLabel = Locator.xpath("//label[@id='AgreeToTermsCheckbox-boxLabelEl']").findWhenNeeded(this);
     }
 
 }

@@ -15,7 +15,9 @@
  */
 package org.labkey.test.pages;
 
+import org.apache.tika.utils.StringUtils;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -81,12 +83,17 @@ public class DatasetInsertPage extends InsertPage
 
         clickAndWait(Locator.lkButton("Submit"));
 
-        if (errorMsg != null && !errorMsg.isEmpty())
+        if (expectSuccess)
         {
-            if (!expectSuccess)
-                assertTextPresent(errorMsg);
-            else
-                assertTextNotPresent(errorMsg);
+            assertElementNotPresent(Locators.labkeyError);
+        }
+        else if (!StringUtils.isBlank(errorMsg))
+        {
+            assertTextNotPresent(errorMsg);
+        }
+        else
+        {
+            assertElementPresent(Locators.labkeyError);
         }
     }
 }

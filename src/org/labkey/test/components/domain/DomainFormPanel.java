@@ -40,6 +40,48 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         super(element, driver);
     }
 
+    public static List<AdvancedFieldSetting> advancedSettingsFromFieldDefinition(FieldDefinition def)
+    {
+        List<AdvancedFieldSetting> advancedSettings = new ArrayList<>();
+
+        //TODO: Add missing settings to 'FieldDefinitions:
+        //      Show in default view
+        //      Default type
+        //      Exclude from shifting
+        //      Recommended variable
+
+        if (def.getShownInUpdateView() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.shownInUpdateView(def.getShownInUpdateView()));
+        }
+        if (def.getShownInInsertView() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.shownInInsertView(def.getShownInInsertView()));
+        }
+        if (def.getShownInDetailsView() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.shownInDetailsView(def.getShownInDetailsView()));
+        }
+        if (def.getMeasure() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.measure(def.getMeasure()));
+        }
+        if (def.getDimension() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.measure(def.getDimension()));
+        }
+        if (def.getMvEnabled() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.mvEnabled(def.getMvEnabled()));
+        }
+        if (def.getPHI() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.PHI(def.getPhiLevel()));
+        }
+
+        return advancedSettings;
+    }
+
     @Override
     protected DomainFormPanel getThis()
     {
@@ -89,8 +131,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.getImportAliases() != null)
             fieldRow.setImportAliases(fieldDefinition.getImportAliases());
-        if (fieldDefinition.getMvEnabled())
-            fieldRow.setMissingValuesEnabled(fieldDefinition.getMvEnabled());
         if (fieldDefinition.getRequired())
             fieldRow.setRequiredField(fieldDefinition.getRequired());
         if (fieldDefinition.getLookupValidatorEnabled() != null)
@@ -159,6 +199,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 fieldRow.setRangeValidators(rangeValidators);
             }
         }
+
+        fieldRow.setAdvancedSettings(advancedSettingsFromFieldDefinition(fieldDefinition));
 
         fieldRow.collapse();
 
