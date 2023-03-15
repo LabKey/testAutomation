@@ -62,14 +62,14 @@ public class ComplianceSettingsAuditPage extends BaseComplianceSettingsPage<Comp
 
     public void assertRadiosDisabled()
     {
-        assertFalse("Radio button is enabled when it should not be", elementCache().allRadio.isEnabled());
-        assertFalse("Radio button is enabled when it should not be", elementCache().primaryRadio.isEnabled());
+        assertFalse("Notification radio buttons should not be enabled", elementCache().allRadio.isEnabled());
+        assertFalse("Notification radio buttons should not be enabled", elementCache().primaryRadio.isEnabled());
     }
 
     public void assertRadiosEnabled()
     {
-        assertTrue("Radio button is enabled when it should not be", elementCache().allRadio.isEnabled());
-        assertTrue("Radio button is enabled when it should not be", elementCache().primaryRadio.isEnabled());
+        assertTrue("Notification radio buttons should be enabled", elementCache().allRadio.isEnabled());
+        assertTrue("Notification radio buttons should be enabled", elementCache().primaryRadio.isEnabled());
     }
 
     @Override
