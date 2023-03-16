@@ -183,7 +183,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     }
 
     // Coverage for Issue 47504
-
     /**
      * Validate that a name expression works correctly with commas and other 'tricky' characters.
      */
