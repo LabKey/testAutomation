@@ -5,24 +5,21 @@
 package org.labkey.test.pages.compliance;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class ComplianceRoleAndLevelPage extends LabKeyPage
+public class ComplianceRoleAndLevelPage extends LabKeyPage<ComplianceRoleAndLevelPage.ElementCache>
 {
 
-    BaseWebDriverTest _test;
-
-    public ComplianceRoleAndLevelPage(BaseWebDriverTest test)
+    public ComplianceRoleAndLevelPage(WebDriver test)
     {
         super(test);
-        _test = test;
         waitForText("Select your desired role and PHI level. Note that this choice will be logged.");
     }
 
@@ -185,13 +182,7 @@ public class ComplianceRoleAndLevelPage extends LabKeyPage
         // Code Review Feedback:
         // Use clickAndWait(..) if this is expected to trigger a page load.
         click(Locator.linkWithText("Next"));
-        return new ComplianceTermsOfUsePage(_test);
-    }
-
-    @Override
-    protected ComplianceRoleAndLevelPage.ElementCache elementCache()
-    {
-        return (ComplianceRoleAndLevelPage.ElementCache) super.elementCache();
+        return new ComplianceTermsOfUsePage(getDriver());
     }
 
     @Override
@@ -208,7 +199,7 @@ public class ComplianceRoleAndLevelPage extends LabKeyPage
     //     return RadioButton.RadioButton().withLabel(role.getText()).find(this);
     // }
     // That would allow you to loop through the roles or find a particular one without a switch like above.
-    private class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         RadioButton researchWithWavier = RadioButton.RadioButton().withLabel("Research with Waiver of HIPAA Authorization/Consent").findWhenNeeded(this);
         // Code Review Feedback:
@@ -232,7 +223,7 @@ public class ComplianceRoleAndLevelPage extends LabKeyPage
         FULL("Identified/Full PHI"),
         RESTRICTED("Restricted PHI");
 
-        private String _text;
+        private final String _text;
 
         PhiLevel(String text)
         {
@@ -254,7 +245,7 @@ public class ComplianceRoleAndLevelPage extends LabKeyPage
         QA("Quality Improvement/Quality Assurance"),
         PUBLICHEALTHREPORTING("Public Health Reporting");
 
-        private String _text;
+        private final String _text;
 
         ComplianceRole(String text)
         {
