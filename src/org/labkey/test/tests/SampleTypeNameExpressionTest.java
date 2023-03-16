@@ -37,13 +37,19 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.text.CompactNumberFormat;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -174,6 +180,106 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertThat(names.get(0), startsWith("a-b.3." + batchRandomId + "."));
         assertThat(names.get(1), startsWith("a-b.2." + batchRandomId + "."));
         assertThat(names.get(2), startsWith("a-b.1." + batchRandomId + "."));
+    }
+
+    // Coverage for Issue 47504
+
+    /**
+     * Validate that a name expression works correctly with commas and other 'tricky' characters.
+     */
+    @Test
+    public void testWithTrickyCharacters()
+    {
+
+        goToProjectHome();
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        final String sampleTypeName = "TrickyNameExprTest";
+
+        CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
+
+        createPage.setName(sampleTypeName);
+
+        String tricky01 = "Søµ∑,String,,,";
+        String tricky02 = "NE∫,";
+        String tricky03 = "@-\\*-";
+        String tricky04 = "+{My'Text}=%#$"; // These curly braces cause the warning when saving.
+        String tricky05 = String.format("@\"%s", tricky01);
+        String dateFormat = "yy-MM-dd";
+        int counterStart = 500;
+
+        //Søµ∑,String,,,${NE∫,:withCounter(500)}@-\\*-${genId:number('000,000')}+{My'Text}=%#$${now:date('yy-MM-dd')}@\"Søµ∑,String,,,
+        String nameExpression = String.format("%s${%s:withCounter(%d)}%s${genId:number('000,000')}%s${now:date('%s')}%s",
+                tricky01, tricky02, counterStart, tricky03, tricky04, dateFormat, tricky05);
+
+        log(String.format("Use name expression: '%s'.", nameExpression));
+
+        createPage.setNameExpression(nameExpression);
+
+        log("Click the 'Save' button and wait for the warning dialog.");
+        Locator.button("Save").findElement(getDriver()).click();
+
+        ModalDialog dialog = null;
+
+        try
+        {
+            dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Naming Pattern Warning(s)").waitFor();
+        }
+        catch (TimeoutException toe)
+        {
+            checker().withScreenshot("No_Warning_Dialog")
+                    .error("The expected warning dialog for this name expression did not show up.");
+        }
+
+        if(null != dialog)
+        {
+            log("Verify that you can save with the warning.");
+            dialog.dismiss("Save anyways...", 2_500);
+        }
+
+        log("Validate save worked. Should be sent back to the project begin page and there should be a link with the sample type name.");
+
+        checker().fatal()
+                .verifyTrue("Did not successfully save the sample type. Fatal error.",
+                        waitFor(()->Locator.linkWithText(sampleTypeName).findWhenNeeded(getDriver()).isDisplayed(), 1_000));
+
+        log("Create some samples and validate the name(s).");
+
+        int samplesCount = 4;
+        String pasteData = """
+                Description
+                A
+                B
+                C
+                D""";
+
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        var importDataPage = dataRegion.clickImportBulkData();
+        importDataPage.setCopyPasteInsertOption(false);
+        importDataPage.selectCopyPaste()
+                .setFormat(ImportDataPage.Format.TSV)
+                .setText(pasteData)
+                .submit();
+
+        // Get the date as soon after sample creation as possible.
+        LocalDateTime ldt = LocalDateTime.now();
+        String date = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH).format(ldt);
+
+        var sampleTypeGrid = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("Material").waitFor();
+
+        checker().verifyEquals("Number of samples created not as expected.",
+                samplesCount, sampleTypeGrid.getDataRowCount());
+
+        // Only going to validate the name of the last sample created. It's counter and GenID values, in combination
+        // with the count of samples created, should be enough.
+        String expectedName = String.format("%s%s%d%s000,%03d%s%s%s",
+                tricky01, tricky02, counterStart + (samplesCount - 1), tricky03, samplesCount, tricky04, date, tricky05);
+        String actualName = sampleTypeGrid.getDataAsText(0, "Name");
+
+        checker().verifyEquals("Sample name not as expected.", expectedName, actualName);
     }
 
     @Test
