@@ -1685,28 +1685,28 @@ public class DomainDesignerTest extends BaseWebDriverTest
     private void verifyExpectedFieldProperties(PropertyDescriptor intendedField,  PropertyDescriptor actualField)
     {
         log("verifying properties for field [" +intendedField.getName()+ "]");
-        assertThat("Description does not match expected",
-                actualField.getDescription(), is(intendedField.getDescription()));
-        assertThat("Label does not match intended label",
-                actualField.getLabel(), is(intendedField.getLabel()));
-        assertThat("Required bit does not match expected",
-                actualField.getRequired(), is(intendedField.getRequired()));
-        assertThat("Hidden value does not match expected",
-                actualField.getHidden(), is(intendedField.getHidden()));
-        assertThat("MvEnabled bit does not match expected",
-                actualField.getMvEnabled(), is(intendedField.getMvEnabled()));
-        assertThat("Dimension does not match expected",
-                actualField.getDimension(), is(intendedField.getDimension()));
-        if (intendedField.getPHI() != null)
-            assertThat("PHI does not match specified value",
-                    actualField.getPHI(), is(intendedField.getPHI()));
-        assertThat("Expect measure bit to match intended measure",
-                actualField.getMeasure(), is(intendedField.getMeasure()));
-        assertThat("Format property should export",
-                actualField.getFormat(), is(intendedField.getFormat()));
-        assertThat("Key field property should export",
-                nullToFalse(actualField.getAllProperties().get("isPrimaryKey")),
-                is(nullToFalse(intendedField.getAllProperties().get("isPrimaryKey"))));
+        checker().verifyEquals("Description does not match expected",
+                intendedField.getDescription(), actualField.getDescription());
+        checker().verifyEquals("Label does not match intended label",
+                intendedField.getLabel(), actualField.getLabel());
+        checker().verifyEquals("Required bit does not match expected",
+                intendedField.getRequired(), actualField.getRequired());
+        checker().verifyEquals("Hidden value does not match expected",
+                intendedField.getHidden(), actualField.getHidden());
+        checker().verifyEquals("MvEnabled bit does not match expected",
+                nullToFalse(intendedField.getMvEnabled()), actualField.getMvEnabled());
+        checker().verifyEquals("Dimension does not match expected",
+                nullToFalse(intendedField.getDimension()), actualField.getDimension());
+        checker().verifyEquals("PHI does not match specified value",
+                (intendedField.getPHI() == null ? FieldDefinition.PhiSelectType.NotPHI.name() : intendedField.getPHI()),
+                actualField.getPHI());
+        checker().verifyEquals("Expect measure bit to match intended measure",
+                nullToFalse(intendedField.getMeasure()), actualField.getMeasure());
+        checker().verifyEquals("Format property should export",
+                intendedField.getFormat(), actualField.getFormat());
+        checker().verifyEquals("Key field property should export",
+                nullToFalse(intendedField.getAllProperties().get("isPrimaryKey")),
+                nullToFalse(actualField.getAllProperties().get("isPrimaryKey")));
 
         Assertions.assertThat(actualField.getConditionalFormats().stream().map(f -> f.toJSON().toMap()))
                 .as("Exported conditional fields.")

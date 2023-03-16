@@ -44,10 +44,38 @@ public class DatasetInsertPage extends InsertPage
 
     public void insert(Map<String, String> values)
     {
-        insert(values, true, "");
+        tryInsert(values);
+
+        assertElementNotPresent(Locators.labkeyError);
     }
 
-    public void insert(Map<String, String> values, boolean expectSuccess, String errorMsg)
+    public void insert(Map<String, String> values, boolean b, String s)
+    {
+        tryInsert(values);
+
+        assertElementNotPresent(Locators.labkeyError);
+    }
+
+    public void insertExpectingError(Map<String, String> values)
+    {
+        insertExpectingError(values, null);
+    }
+
+    public void insertExpectingError(Map<String, String> values, String errorMsg)
+    {
+        tryInsert(values);
+
+        if (StringUtils.isBlank(errorMsg))
+        {
+            assertElementPresent(Locators.labkeyError);
+        }
+        else
+        {
+            assertTextPresent(errorMsg);
+        }
+    }
+
+    private void tryInsert(Map<String, String> values)
     {
         for (Map.Entry<String, String> entry : values.entrySet())
         {
@@ -82,18 +110,5 @@ public class DatasetInsertPage extends InsertPage
         }
 
         clickAndWait(Locator.lkButton("Submit"));
-
-        if (expectSuccess)
-        {
-            assertElementNotPresent(Locators.labkeyError);
-        }
-        else if (!StringUtils.isBlank(errorMsg))
-        {
-            assertTextNotPresent(errorMsg);
-        }
-        else
-        {
-            assertElementPresent(Locators.labkeyError);
-        }
     }
 }
