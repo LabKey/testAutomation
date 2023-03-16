@@ -59,6 +59,10 @@ public class FieldDefinition extends PropertyDescriptor
     {
         setName(name);
         setType(type);
+        // Clear out default advanced properties to avoid opening advanced field properties dialog
+        setMeasure(null);
+        setDimension(null);
+        setMvEnabled(null);
     }
 
     /**
