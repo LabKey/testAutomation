@@ -1,0 +1,34 @@
+<div><label for="qwpSchema">Schema:</label></div>
+<div><input id="qwpSchema"/></div>
+<div><label for="qwpSql">SQL:</label></div>
+<div><textarea rows="10" cols="65" id="qwpSql"></textarea></div>
+<div><input type="button" value="Execute SQL" onClick="loadQWP();" id="button_loadqwp"/></div>
+<div id="qwp-div">Query Web Part DIV</div>
+
+<script type="text/javascript">
+
+    function loadQWP()
+    {
+        var loadBtn = document.getElementById("button_loadqwp");
+        loadBtn.disabled = true;
+
+        var schema = document.getElementById("qwpSchema").value;
+        var sql = document.getElementById("qwpSql").value;
+
+        new LABKEY.QueryWebPart({
+            title: 'SQL Results',
+            schemaName: schema,
+            sql: sql,
+            renderTo: 'qwp-div',
+            success: function(dataRegion) {
+                loadBtn.disabled = false;
+            },
+            failure: function () {
+                loadBtn.disabled = false;
+                console.log(resp);
+                alert(resp.exception);
+            }
+        });
+    }
+
+</script>

@@ -11,12 +11,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AdvancedSettingsDialog extends ModalDialog
 {
-    private DomainFieldRow _row;
+    private final DomainFieldRow _row;
 
     private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
@@ -27,15 +26,6 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog(DomainFieldRow row)
     {
         this(row, new ModalDialogFinder(row.getDriver()).withTitle("Advanced Settings and Properties"));
-    }
-
-    public AdvancedSettingsDialog setAdvancedFieldSettings(Map<AdvancedFieldSetting, Object> advancedSettings)
-    {
-        for (Map.Entry<AdvancedFieldSetting, Object> setting : advancedSettings.entrySet())
-        {
-            setting.getKey().setValue(this, setting.getValue());
-        }
-        return this;
     }
 
     public boolean isShownInDefaultView()

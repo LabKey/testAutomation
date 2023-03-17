@@ -59,6 +59,10 @@ public class FieldDefinition extends PropertyDescriptor
     {
         setName(name);
         setType(type);
+        // Clear out default advanced properties to avoid opening advanced field properties dialog
+        setMeasure(null);
+        setDimension(null);
+        setMvEnabled(null);
     }
 
     /**
@@ -276,6 +280,24 @@ public class FieldDefinition extends PropertyDescriptor
     {
         setFieldProperty("shownInUpdateView", shownInUpdateView);
         return this;
+    }
+
+    public FieldDefinition setPHI(PhiSelectType phiType)
+    {
+        super.setPHI(phiType.name());
+        return this;
+    }
+
+    public PhiSelectType getPhiLevel()
+    {
+        if (StringUtils.isBlank(getPHI()))
+        {
+            return PhiSelectType.NotPHI;
+        }
+        else
+        {
+            return PhiSelectType.valueOf(getPHI());
+        }
     }
 
     public String getSourceOntology()
