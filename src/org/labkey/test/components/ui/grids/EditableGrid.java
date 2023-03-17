@@ -557,9 +557,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         ReactSelect lookupSelect = elementCache().lookupSelect();
 
-        // If the double click did not expand the select this will.
-        // This will have no effect if the list is expended.
-        lookupSelect.open();
+        if(!waitFor(lookupSelect::isExpanded, 500))
+        {
+            // If the double click did not expand the select this will.
+            // This will have no effect if the list is expended.
+            lookupSelect.open();
+        }
 
         if (filterText != null && !filterText.trim().isEmpty())
         {
