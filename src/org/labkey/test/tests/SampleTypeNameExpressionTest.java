@@ -198,8 +198,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setName(sampleTypeName);
 
-        String tricky01 = "Søµ∑,String,,,";
-        String tricky02 = "NE∫,";
+        String tricky01 = "S\u00f8\u03bc\u2211,String,,,";
+        String tricky02 = "NE\u222b,";
         String tricky03 = "@-\\*-";
         String tricky04 = "+{My'Text}=%#$"; // These curly braces cause the warning when saving.
         String tricky05 = String.format("@\"%s", tricky01);
@@ -277,6 +277,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         String actualName = sampleTypeGrid.getDataAsText(0, "Name");
 
         checker().verifyEquals("Sample name not as expected.", expectedName, actualName);
+
+        checker().screenShotIfNewError("SampleCreationError");
     }
 
     @Test
