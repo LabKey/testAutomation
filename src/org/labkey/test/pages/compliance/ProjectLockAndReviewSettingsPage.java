@@ -2,7 +2,6 @@ package org.labkey.test.pages.compliance;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -11,12 +10,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
+public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage<ProjectLockAndReviewSettingsPage.ElementCache>
 {
     public ProjectLockAndReviewSettingsPage(WebDriver driver)
     {
@@ -25,8 +23,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
 
     public static ProjectLockAndReviewSettingsPage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("compliance", null, "complianceSettings",
-                Map.of("tab", "projectLockAndReview")));
+        BaseComplianceSettingsPage.beginAt(webDriverWrapper, SettingsTab.ProjectLockingAndReview);
         return new ProjectLockAndReviewSettingsPage(webDriverWrapper.getDriver());
     }
 
@@ -99,9 +96,7 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
     }
 
     /**
-     *
      * @param days the number of days at which to begin sending warning messages
-     * @return
      */
     public ProjectLockAndReviewSettingsPage setExpirationWarning(String days)
     {
@@ -131,30 +126,13 @@ public class ProjectLockAndReviewSettingsPage extends BaseComplianceSettingsPage
         return this;
     }
 
-    public ProjectLockAndReviewSettingsPage clickSave()
-    {
-        clickButton("Save");
-        return this;
-    }
-
-    public ProjectLockAndReviewSettingsPage clickCancel()
-    {
-        clickButton("Cancel");
-        return this;
-    }
-
     @Override
-    protected BaseComplianceSettingsPage.ElementCache newElementCache()
+    protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
-    protected class ElementCache extends BaseComplianceSettingsPage.ElementCache
+    protected class ElementCache extends BaseComplianceSettingsPage<ElementCache>.ElementCache
     {
         Checkbox projectLockCheckbox()
         {

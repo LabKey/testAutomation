@@ -8,22 +8,18 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.util.compliance.ComplianceUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.pages.compliance.FolderManagementComplianceTab.PhiColumnBehavior.HIDE;
-import static org.labkey.test.pages.compliance.FolderManagementComplianceTab.PhiColumnBehavior.SHOW;
+import static org.labkey.test.util.compliance.ComplianceUtils.PhiColumnBehavior.HIDE;
+import static org.labkey.test.util.compliance.ComplianceUtils.PhiColumnBehavior.SHOW;
 
 public class FolderManagementComplianceTab extends FolderManagementPage
 {
     public FolderManagementComplianceTab(WebDriver driver)
     {
         super(driver);
-    }
-
-    public static FolderManagementComplianceTab beginAt(WebDriverWrapper driver)
-    {
-        return beginAt(driver, driver.getCurrentContainerPath());
     }
 
     public static FolderManagementComplianceTab beginAt(WebDriverWrapper driver, String containerPath)
@@ -50,7 +46,7 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         return this;
     }
 
-    public FolderManagementComplianceTab setPhiRolesRequiredAndColumnBehavior(boolean check, PhiColumnBehavior behavior)
+    public FolderManagementComplianceTab setPhiRolesRequiredAndColumnBehavior(boolean check, ComplianceUtils.PhiColumnBehavior behavior)
     {
         setCheckbox(elementCache().phiRolesRequired, check);
         if (check)
@@ -65,7 +61,7 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         return this;
     }
 
-    public FolderManagementComplianceTab setColumnBehavior(PhiColumnBehavior behavior)
+    public FolderManagementComplianceTab setColumnBehavior(ComplianceUtils.PhiColumnBehavior behavior)
     {
         // Can't directly SHOW; must uncheck phiRolesRequired to SHOW
         switch(behavior)
@@ -81,7 +77,7 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         return this;
     }
 
-    public FolderManagementComplianceTab setPhiDatasetLoggingBehavior(PhiDatasetLoggingBehavior behavior)
+    public FolderManagementComplianceTab setQueryLoggingBehavior(ComplianceUtils.QueryLoggingBehavior behavior)
     {
         switch(behavior)
         {
@@ -131,17 +127,4 @@ public class FolderManagementComplianceTab extends FolderManagementPage
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
     }
 
-    public enum PhiColumnBehavior
-    {
-        SHOW,
-        HIDE,
-        BLANK
-    }
-
-    public enum PhiDatasetLoggingBehavior
-    {
-        NONE,
-        PHI,
-        ALL
-    }
 }

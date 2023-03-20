@@ -7,16 +7,14 @@ package org.labkey.test.pages.compliance;
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 
 import java.util.List;
 
-/**
- * Created by RyanS on 2/8/2016.
- */
-public class ActivityDialog extends LabKeyPage
+public class ActivityDialog extends LabKeyPage<LabKeyPage<?>.ElementCache>
 {
     public ActivityDialog(WebDriver driver)
     {
@@ -32,14 +30,14 @@ public class ActivityDialog extends LabKeyPage
         QI("Quality Improvement/Quality Assurance","Test terms qa", true, null, false,5),
         PH("Public Health Reporting","Test terms health reporting", true, null, false,6);
 
-        private String _description;
-        private String _terms;
-        private Integer _sortOrder;
-        private boolean _enabled;
-        private String _irb;
-        private boolean _testRole;
+        private final String _description;
+        private final String _terms;
+        private final Integer _sortOrder;
+        private final boolean _enabled;
+        private final String _irb;
+        private final boolean _testRole;
 
-        private ActivityRole(String description, String terms, boolean enabled, String irb, boolean testRole ,Integer sortOrder)
+        ActivityRole(String description, String terms, boolean enabled, String irb, boolean testRole ,Integer sortOrder)
         {
             _description = description;
             _sortOrder = sortOrder;
@@ -88,11 +86,11 @@ public class ActivityDialog extends LabKeyPage
         LIMITED("Limited PHI", "Limited", false),
         IDENTIFIED("Identified/Full PHI", "PHI", false);
 
-        private String _description;
-        private String _PHI;
-        private boolean _enabled;
+        private final String _description;
+        private final String _PHI;
+        private final boolean _enabled;
 
-        private PHILevel(String description, String PHI, boolean enabled)
+        PHILevel(String description, String PHI, boolean enabled)
         {
             _description = description;
             _PHI = PHI;
@@ -125,15 +123,18 @@ public class ActivityDialog extends LabKeyPage
         {
             ActivityDialog.ActivityRole role = term.getLeft();
             ActivityDialog.PHILevel level = term.getRight();
-            termsDRT.clickInsertNewRow();
-            waitForText("TermsOfUse");
-            selectOptionByValue(Locator.name("quf_Activity"), role.name());
-            setFormElement(Locator.name("quf_IRB"), role.getIrb());
-            setCheckbox(Locator.checkboxByName("quf_PHI"), level.getPHI().equals("PHI"));
-            setFormElement(Locator.name("quf_Term"), role.getTerms());
-            setFormElement(Locator.name("quf_SortOrder"), role.getIRBFieldIndex().toString());
-            clickAndWait(Locator.linkWithSpan("Submit"));
-            waitForText("TermsOfUse");
+            UpdateQueryRowPage updateQueryRowPage = termsDRT.clickInsertNewRow();
+
+            updateQueryRowPage.setField("Activity", role.name());
+            if (role.getIrb() != null)
+            {
+                updateQueryRowPage.setField("IRB", role.getIrb());
+            }
+            updateQueryRowPage.setField("PHI", level.getPHI().equals("PHI"));
+            updateQueryRowPage.setField("Term", role.getTerms());
+            updateQueryRowPage.setField("SortOrder", role.getIRBFieldIndex());
+
+            updateQueryRowPage.submit();
         }
         popLocation();
     }

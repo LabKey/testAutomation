@@ -75,7 +75,7 @@ public class SignedSnapshotDetailsPage extends LabKeyPage<SignedSnapshotDetailsP
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         WebElement sourceSchmea = new RefindingWebElement(Locators.sourceSchema, this);
         WebElement sourceQuery = new RefindingWebElement(Locators.sourceQuery, this);

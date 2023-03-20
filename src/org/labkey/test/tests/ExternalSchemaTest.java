@@ -286,7 +286,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         boolean foundEvent = rows.stream().anyMatch(a-> a.get("_labkeyurl_container").toString().contains(containerPath) && a.get("comment").toString().equals(matchingComment));
         if (!foundEvent)
         {
-            ShowAuditLogPage.beginAt(this, containerPath, "ContainerAuditEvent");
+            ShowAuditLogPage.beginAt(this, "ContainerAuditEvent");
             Assert.fail("Event not found: " + matchingComment);
         }
     }
