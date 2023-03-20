@@ -1,5 +1,7 @@
 package org.labkey.test.tests.core.security;
 
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -7,13 +9,18 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Git;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 @Category({Git.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -42,20 +49,23 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAuditLogsIsAccessible()
+    public void testAuditLogsIsAccessible() throws IOException
     {
         impersonate(TROUBLESHOOTER);
-        goToAdminConsole().goToSettingsSection();
+        ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
 
         log("Verifying audit log link is present");
-        checker().verifyTrue("Audit log is not present for troubleshooter",
+        assertTrue("Audit log is not present for troubleshooter",
                 isElementPresent(Locator.linkWithText("audit log")));
-        clickAndWait(Locator.linkWithText("audit log"));
 
         log("Verify the export file is non empty");
-        ShowAuditLogPage auditLogPage = new ShowAuditLogPage(getDriver());
-        File exportedFile = auditLogPage.exportExcelxlsx();
-        checker().verifyTrue("Empty downloaded [" + exportedFile.getName() + "]", exportedFile.length() > 0);
+        ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
+        auditLogPage.selectView("Domain events"); // Pick something that will have some rows.
+        DataRegionTable logTable = auditLogPage.getLogTable();
+        assertTrue("Troubleshooter should see audit entries", logTable.getDataRowCount() > 0);
+        File exportedFile = logTable.expandExportPanel().exportText();
+        int exportedRowCount = IteratorUtils.size(FileUtils.lineIterator(exportedFile)) - 1;
+        assertTrue("Empty downloaded [" + exportedFile.getName() + "]", exportedRowCount > 0);
 
         log("Verify permissions from troubleshooter");
         verifySitePermissionSetting(false);
@@ -65,6 +75,22 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         goToHome();
         verifySitePermissionSetting(true);
 
+    }
+
+    /**
+     * Issue 47508: auditLog table visibility is inconsistent
+     * Assert broken behavior to prompt a test update once issue is fixed.
+     */
+    @Test
+    public void testAllAuditTableVisibility()
+    {
+        impersonate(TROUBLESHOOTER);
+        ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
+
+        log("Verify the export file is non empty");
+        ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
+        auditLogPage.selectView("Group events");
+        assertTextPresent("You do not have permission to see this data.");
     }
 
     private void verifySitePermissionSetting(boolean canSave)

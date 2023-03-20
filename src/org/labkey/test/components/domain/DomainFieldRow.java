@@ -27,7 +27,6 @@ import org.openqa.selenium.support.ui.Select;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -188,11 +187,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
     }
 
-    public DomainFieldRow setAdvancedSettings(Map<AdvancedFieldSetting, Object> settings)
+    public DomainFieldRow setAdvancedSettings(List<AdvancedFieldSetting> settings)
     {
-        clickAdvancedSettings()
-                .setAdvancedFieldSettings(settings)
-                .apply();
+        if (!settings.isEmpty())
+        {
+            AdvancedSettingsDialog advancedSettingsDialog = clickAdvancedSettings();
+            for (AdvancedFieldSetting setting : settings)
+            {
+                setting.accept(advancedSettingsDialog);
+            }
+            advancedSettingsDialog.apply();
+        }
         return this;
     }
 
