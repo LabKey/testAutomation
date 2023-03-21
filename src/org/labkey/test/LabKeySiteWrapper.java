@@ -335,7 +335,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         waitForStartup();
         log("Signing in");
-        simpleSignOut();
+        Number userId = whoAmI().getUserId();
+        if (userId != null && userId.longValue() > 0)
+        {
+            simpleSignOut();
+        }
         checkForUpgrade();
         simpleSignIn();
         assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
