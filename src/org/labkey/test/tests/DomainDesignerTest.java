@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.json.JSONArray;
 import org.json.JSONTokener;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -36,6 +37,7 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
@@ -163,7 +165,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
 
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-            .withColumns(List.of(
+                .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("stringField", FieldDefinition.ColumnType.String),
                         new FieldDefinition("multilineField", FieldDefinition.ColumnType.MultiLine)
@@ -241,6 +243,53 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // make sure the name field is still there
         List<Map<String, Object>> name = rowsResponse.getColumnModel().stream().filter(a -> a.get("dataIndex").equals("Name")).collect(Collectors.toList());
         assertEquals(1, name.size());
+    }
+
+    @Test
+    public void testInvalidLookupDomainField() throws IOException, CommandException
+    {
+        String listName = "InvalidLookUpNameList";
+        String editedListName = listName + "_edited";
+        String sampleType = "TestSampleForInvalidLookupField";
+
+        log("Creating a list used for look up");
+        _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "Id");
+
+        log("Creating a sample type with look up field to above list");
+        FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
+        TestDataGenerator dgen = new TestDataGenerator(lookupInfo1)
+                .withColumns(List.of(
+                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("extraField", FieldDefinition.ColumnType.String)));
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
+        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
+        domainDesignerPage.fieldsPanel().addField("lookUpField")
+                .setType(FieldDefinition.ColumnType.Lookup)
+                .expand()
+                .setFromFolder("Current Folder")
+                .setFromSchema("lists")
+                .setFromTargetTable(listName + " (Integer)")
+                .collapse();
+        domainDesignerPage.clickFinish();
+
+        log("Editing the list name");
+        _listHelper.goToEditDesign(listName);
+        EditListDefinitionPage editListDefinitionPage = new EditListDefinitionPage(getDriver());
+        editListDefinitionPage.setName(editedListName)
+                .clickSave();
+
+        log("Verifying the error message");
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
+        domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage();
+        Assert.assertEquals("Missing invalid look up message", "Current Folder > lists > " + listName + " . Error: Lookup target table does not exist.",
+                domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage());
+
+        log("Updating valid value for lookup field value ");
+        domainDesignerPage.fieldsPanel().getField("lookUpField")
+                .expand()
+                .setFromTargetTable(editedListName + " (Integer)")
+                .collapse();
+        domainDesignerPage.clickFinish();
     }
 
     @Test
@@ -437,7 +486,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String)
-                            .setRequired(true),                                                                 // <-- marked 'required'
+                                .setRequired(true),                                                                 // <-- marked 'required'
                         new FieldDefinition("color", FieldDefinition.ColumnType.String)));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
@@ -474,9 +523,9 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // add a new field and remove it, new fields should not have Confirm Remove Field dialog
         domainFormPanel.addField("deleteMe")
-            .setLabel("field label test")
-            .setDescription("field description test")
-            .clickRemoveField(false);
+                .setLabel("field label test")
+                .setDescription("field description test")
+                .clickRemoveField(false);
 
         domainDesignerPage.clickFinish();
     }
@@ -1081,6 +1130,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     /**
      * verifies that when a user marks a field 'required' (and that field already has empty values in it) they are warned
+     *
      * @throws Exception
      */
     @Test
@@ -1101,7 +1151,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "icecream", "color", "blue", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "pbs", "color", "yellow", "manufacturer", "glaxo", "volume", 2.34));
-        dgen.addCustomRow(Map.of("name", "slurm", "color", "orange",                                  "volume", 2.34));  //<-- no value for manufacturer
+        dgen.addCustomRow(Map.of("name", "slurm", "color", "orange", "volume", 2.34));  //<-- no value for manufacturer
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
@@ -1119,6 +1169,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     /**
      * verifies that a field with data (and no blank values) can be marked as 'required'
+     *
      * @throws Exception
      */
     @Test
@@ -1139,7 +1190,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "stuff", "color", "clear", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "icecream", "color", "blue", "manufacturer", "glaxo", "volume", 2.34));
         dgen.addCustomRow(Map.of("name", "pbs", "color", "yellow", "manufacturer", "glaxo", "volume", 2.34));
-        dgen.addCustomRow(Map.of("name", "slurm", "color", "orange","manufacturer", "slurmCo","volume", 2.34));
+        dgen.addCustomRow(Map.of("name", "slurm", "color", "orange", "manufacturer", "slurmCo", "volume", 2.34));
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleTypeName);
@@ -1157,6 +1208,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     /**
      * confirms that clicking the name field does not expand the field row
+     *
      * @throws Exception
      */
     @Test
@@ -1366,7 +1418,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now confirm 2 validators on the field
         DomainResponse newResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor snackField = getColumn(newResponse.getDomain(), "favoriteSnack");
-        List<Map<String, Object>> validators = (List<Map<String, Object>>)snackField.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>) snackField.getAllProperties().get("propertyValidators");
 
         // Domain designer UI only handles Range, Regex and Lookup validators
         validators = validators.stream().filter(val ->
@@ -1376,7 +1428,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         Map<String, Object> spec = getPropertyValidator(snackField, "specialChars");
 
         // no validator with name 'angleBrackets' exists now
-        assertEquals(0, validators.stream().filter(a-> a.get("name").equals("angleBrackets")).collect(Collectors.toList()).size());
+        assertEquals(0, validators.stream().filter(a -> a.get("name").equals("angleBrackets")).collect(Collectors.toList()).size());
         // why not just verify just 2 validators on the field now?  ...because apparently when removed, it becomes a filter on text size is less-than-or-equal-to field cap
         // ...but that looks like a regression of issue 38598, we're tracking it as 38662
         assertEquals("issue 38662", 2, validators.size());
@@ -1437,13 +1489,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         // now verify we have 2 formats on the size field
         DomainResponse updatedResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor updatedSizeCol = getColumn(updatedResponse.getDomain(), "size");
-        List<Map<String, Object>> validators = (List<Map<String, Object>>)updatedSizeCol.getAllProperties().get("propertyValidators");
-        assertEquals("expect only 2 validators on the field",2, validators.size());
+        List<Map<String, Object>> validators = (List<Map<String, Object>>) updatedSizeCol.getAllProperties().get("propertyValidators");
+        assertEquals("expect only 2 validators on the field", 2, validators.size());
         Map<String, Object> editedLte2 = getPropertyValidator(updatedSizeCol, "lte2");
         Map<String, Object> editedEquals3 = getPropertyValidator(updatedSizeCol, "equals3");
 
-        assertEquals("expect description edit to take","2 or less", editedLte2.get("description"));
-        assertEquals("expect description edit to take","equals 3", editedEquals3.get("description"));
+        assertEquals("expect description edit to take", "2 or less", editedLte2.get("description"));
+        assertEquals("expect description edit to take", "equals 3", editedEquals3.get("description"));
     }
 
     @Test
@@ -1489,18 +1541,18 @@ public class DomainDesignerTest extends BaseWebDriverTest
         ConditionalFormatDialog dlg = domainDesignerPage.fieldsPanel().getField("superHero")
                 .clickConditionalFormatButton();
         dlg.getPanelByIndex(2)  // ironman
-            .clickRemove();
+                .clickRemove();
         dlg.getPanelByIndex(0) // thor
-            .setItalicsCheckbox(true);
+                .setItalicsCheckbox(true);
         dlg.getPanelByIndex(1)  // aquaman
-            .setBoldCheckbox(true);
+                .setBoldCheckbox(true);
         dlg.clickApply();
         domainDesignerPage.clickFinish();
 
         DomainResponse validationResponse = dgen.getDomain(createDefaultConnection());
         PropertyDescriptor editedHeroCol = getColumn(validationResponse.getDomain(), "superHero");
 
-        List<Map<String, Object>> formats = (List<Map<String, Object>>)editedHeroCol.getAllProperties().get("conditionalFormats");
+        List<Map<String, Object>> formats = (List<Map<String, Object>>) editedHeroCol.getAllProperties().get("conditionalFormats");
         assertEquals(2, formats.size());
 
         Map<String, Object> editedThor = getConditionalFormats(editedHeroCol, "format.column~eq=Thor");
@@ -1613,7 +1665,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // ensure exported fields order the same as they appear on the page, and that this also applies when imported
 
-        for (int i=0; i<uiFields.size(); i++)
+        for (int i = 0; i < uiFields.size(); i++)
         {
             assertThat("Expect exported fields to be in the same order as their original UI",
                     exportedFields.get(i).getName(), is(uiFields.get(i)));
@@ -1653,7 +1705,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         ArrayListMap<String, PropertyDescriptor> sampleFields = getFieldsFromExportFile(sampleTypeFields);
         PropertyDescriptor keyField = sampleFields.get("Key");
         assertFalse("Expect field import to disregard PK on fields imported to SampleType",
-                (Boolean)keyField.getAllProperties().get("isPrimaryKey"));
+                (Boolean) keyField.getAllProperties().get("isPrimaryKey"));
     }
 
     private List<PropertyDescriptor> importExportTestFields()
@@ -1665,26 +1717,26 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         List<PropertyDescriptor> fields = new ArrayList<>();
         fields.add(new FieldDefinition("textField", FieldDefinition.ColumnType.String)
-                        .setDescription("is texty").setLabel("text field"));
+                .setDescription("is texty").setLabel("text field"));
         fields.add(new FieldDefinition("booleanField", FieldDefinition.ColumnType.Boolean)
-                        .setLabel("Boolean Field")
-                        .setRequired(true)
-                        .setURL("fake/list-def.url"));
+                .setLabel("Boolean Field")
+                .setRequired(true)
+                .setURL("fake/list-def.url"));
         fields.add(new FieldDefinition("attachmentField", FieldDefinition.ColumnType.Attachment)
-                        .setHidden(true));
+                .setHidden(true));
         fields.add(new FieldDefinition("decimalField", FieldDefinition.ColumnType.Decimal).
-                        setScale(1234).setFormat("0.####"));
+                setScale(1234).setFormat("0.####"));
         fields.add(new FieldDefinition("intField", FieldDefinition.ColumnType.Integer)
-                        .setMvEnabled(true)
-                        .setConditionalFormats(List.of(new ConditionalFormat(List.of(gtFive), true, true, false))));
+                .setMvEnabled(true)
+                .setConditionalFormats(List.of(new ConditionalFormat(List.of(gtFive), true, true, false))));
         fields.add(new FieldDefinition("dateTimeField", FieldDefinition.ColumnType.DateAndTime)
-                        .setValidators(List.of(soonValidator)));
+                .setValidators(List.of(soonValidator)));
         return fields;
     }
 
-    private void verifyExpectedFieldProperties(PropertyDescriptor intendedField,  PropertyDescriptor actualField)
+    private void verifyExpectedFieldProperties(PropertyDescriptor intendedField, PropertyDescriptor actualField)
     {
-        log("verifying properties for field [" +intendedField.getName()+ "]");
+        log("verifying properties for field [" + intendedField.getName() + "]");
         checker().verifyEquals("Description does not match expected",
                 intendedField.getDescription(), actualField.getDescription());
         checker().verifyEquals("Label does not match intended label",
@@ -1728,7 +1780,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
             JSONArray jsonArray = new JSONArray(new JSONTokener(reader));
             ArrayListMap<String, PropertyDescriptor> exportFields = new ArrayListMap<>();
 
-            for (int i=0; i < jsonArray.length(); i++)
+            for (int i = 0; i < jsonArray.length(); i++)
             {
                 PropertyDescriptor field = new PropertyDescriptor(jsonArray.getJSONObject(i));
                 exportFields.put(field.getName(), field);
@@ -1749,21 +1801,21 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
     public Map<String, Object> getPropertyValidator(PropertyDescriptor column, String name)
     {
-        List<Map<String, Object>> validators = (List<Map<String, Object>>)column.getAllProperties().get("propertyValidators");
+        List<Map<String, Object>> validators = (List<Map<String, Object>>) column.getAllProperties().get("propertyValidators");
         Map<String, Object> validator = validators.stream()
-                .filter(a-> a.get("name").equals(name))
+                .filter(a -> a.get("name").equals(name))
                 .findFirst().orElse(null);
-        assertNotNull("did not find property validator ["+name+"] on column. Column properties: " + column.getAllProperties().toString(), validator);
+        assertNotNull("did not find property validator [" + name + "] on column. Column properties: " + column.getAllProperties().toString(), validator);
         return validator;
     }
 
     public Map<String, Object> getConditionalFormats(PropertyDescriptor column, String filterExpression)
     {
-        List<Map<String, Object>> formats = (List<Map<String, Object>>)column.getAllProperties().get("conditionalFormats");
+        List<Map<String, Object>> formats = (List<Map<String, Object>>) column.getAllProperties().get("conditionalFormats");
         Map<String, Object> conditionalFormat = formats.stream()
-                .filter(a-> a.get("filter").equals(filterExpression))
+                .filter(a -> a.get("filter").equals(filterExpression))
                 .findFirst().orElse(null);
-        assertNotNull("did not find conditionalFormat ["+filterExpression+"] on column. Column properties: " + column.getAllProperties().toString(), conditionalFormat);
+        assertNotNull("did not find conditionalFormat [" + filterExpression + "] on column. Column properties: " + column.getAllProperties().toString(), conditionalFormat);
         return conditionalFormat;
     }
 
