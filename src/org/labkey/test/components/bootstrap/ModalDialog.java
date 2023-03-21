@@ -25,8 +25,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -130,14 +128,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         if (waitSeconds > 0) // Zero to not expect dialog to close
         {
-            List<WebElement> elements = new ArrayList<>();
-            elements.add(getComponentElement());
-            elements.addAll(Locator.byClass("modal").findElements(getDriver()));
-            new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds))
-                    .until(ExpectedConditions.and(
-                            ExpectedConditions.invisibilityOfAllElements(elements),
-                            ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("modal")) // Another mask might appear
-                    ));
+            new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds)).until(ExpectedConditions.stalenessOf(getComponentElement()));
         }
     }
 
