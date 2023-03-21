@@ -134,7 +134,10 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
             elements.add(getComponentElement());
             elements.addAll(Locator.byClass("modal").findElements(getDriver()));
             new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds))
-                    .until(ExpectedConditions.invisibilityOfAllElements(elements));
+                    .until(ExpectedConditions.and(
+                            ExpectedConditions.invisibilityOfAllElements(elements),
+                            ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("modal")) // Another mask might appear
+                    ));
         }
     }
 
