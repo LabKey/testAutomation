@@ -19,6 +19,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -28,6 +29,7 @@ import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class WebDriverUtils
 {
@@ -82,6 +84,7 @@ public abstract class WebDriverUtils
             {
                 int elHeight = blockedElement.getSize().getHeight();
                 scrollBy(0, -(headerHeight + elHeight));
+                TestLogger.debug("Scrolled under floating headers:\n" + floatingHeaders.stream().map(WebElement::toString).collect(Collectors.joining("\n")));
                 return true;
             }
             return false;

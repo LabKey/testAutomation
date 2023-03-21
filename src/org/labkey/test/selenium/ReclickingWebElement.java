@@ -212,6 +212,7 @@ public class ReclickingWebElement extends WebElementDecorator
             if (interceptingElLoc != null)
             {
                 List<WebElement> interceptingElements = interceptingElLoc.findElements(getDriver());
+                TestLogger.debug("Found %s element(s) matching extracted locator: %s".formatted(interceptingElements.size(), shortMessage));
                 if (interceptingElements.size() == 1)
                 {
                     new WebDriverWait(getDriver(), Duration.ofSeconds(5))
@@ -226,6 +227,7 @@ public class ReclickingWebElement extends WebElementDecorator
             }
             else
             {
+                TestLogger.debug("Unable to extract intercepting element locator: " + shortMessage);
                 // Unable to determine locator from exception, just wait a moment
                 WebDriverWrapper.sleep(1_000);
             }
