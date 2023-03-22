@@ -80,14 +80,22 @@ public abstract class WebDriverUtils
             {
                 headerHeight += floatingHeader.getSize().getHeight();
             }
-            if (headerHeight > 0 && headerHeight > ((Locatable) blockedElement).getCoordinates().inViewPort().getY())
+            if (headerHeight > 0)
             {
-                int elHeight = blockedElement.getSize().getHeight();
-                scrollBy(0, -(headerHeight + elHeight));
-                TestLogger.debug("Scrolled under floating headers:\n" + floatingHeaders.stream().map(WebElement::toString).collect(Collectors.joining("\n")));
-                return true;
+                int elYInViewPort = blockedElement.getLocation().getY() - getWindowScrollY().intValue();
+                if (headerHeight > elYInViewPort)
+                {
+                    TestLogger.debug("Scrolled under floating headers:\n" + floatingHeaders.stream().map(WebElement::toString).collect(Collectors.joining("\n")));
+                    ((Locatable) blockedElement).getCoordinates().inViewPort(); // 'inViewPort()' will scroll element into view
+                    return true;
+                }
             }
             return false;
+        }
+
+        private Long getWindowScrollY()
+        {
+            return (Long) ((JavascriptExecutor)_webDriver).executeScript("return window.scrollY;");
         }
 
         public WebElement scrollIntoView(WebElement el)
