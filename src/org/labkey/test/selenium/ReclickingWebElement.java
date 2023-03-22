@@ -37,7 +37,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -215,8 +214,8 @@ public class ReclickingWebElement extends WebElementDecorator
                 TestLogger.debug("Found %s element(s) matching extracted locator: %s".formatted(interceptingElements.size(), shortMessage));
                 if (interceptingElements.size() == 1)
                 {
-                    new WebDriverWait(getDriver(), Duration.ofSeconds(5))
-                            .until(ExpectedConditions.invisibilityOf(interceptingElements.get(0)));
+                    //noinspection ResultOfMethodCallIgnored
+                    WebDriverWrapper.waitFor(() -> ExpectedConditions.invisibilityOf(interceptingElements.get(0)).apply(getDriver()), 2_000);
                 }
                 else if (interceptingElements.size() > 1)
                 {
