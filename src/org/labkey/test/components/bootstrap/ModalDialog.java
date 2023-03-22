@@ -128,7 +128,10 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         if (waitSeconds > 0) // Zero to not expect dialog to close
         {
-            new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds)).until(ExpectedConditions.stalenessOf(getComponentElement()));
+            new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds)).until(ExpectedConditions.and(
+                    ExpectedConditions.invisibilityOf(getComponentElement()),
+                    ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("modal")),
+                    ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("modal-backdrop"))));
         }
     }
 
