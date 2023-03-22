@@ -69,6 +69,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    public List<String> getSelectionOptions(String fieldKey)
+    {
+        return enableAndWait(fieldKey, elementCache().getSelect(fieldKey)).getOptions();
+    }
+
     public List<String> getSelectionFieldValues(String fieldKey)
     {
         return elementCache().getSelect(fieldKey).getSelections();
@@ -95,7 +100,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public String getTextField(String fieldKey)
     {
-        return elementCache().textInput(fieldKey).get();
+        return enableAndWait(fieldKey, elementCache().textInput(fieldKey)).get();
     }
 
     public EntityBulkUpdateDialog setNumericField(String fieldKey, String value)
