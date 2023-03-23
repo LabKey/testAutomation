@@ -240,7 +240,7 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Sort the collections before checking to for equal. If not equal record an error message.
+     * Sort the collections before checking for equal. If not equal record an error message.
      *
      * @param message Message to show if check fails.
      * @param expected The expected collection of objects.
