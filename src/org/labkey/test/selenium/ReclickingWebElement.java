@@ -215,7 +215,7 @@ public class ReclickingWebElement extends WebElementDecorator
                 if (interceptingElements.size() == 1)
                 {
                     //noinspection ResultOfMethodCallIgnored
-                    WebDriverWrapper.waitFor(() -> ExpectedConditions.invisibilityOf(interceptingElements.get(0)).apply(getDriver()), 2_000);
+                    WebDriverWrapper.waitFor(() -> ExpectedConditions.stalenessOf(interceptingElements.get(0)).apply(getDriver()), 1_000);
                 }
                 else if (interceptingElements.size() > 1)
                 {
