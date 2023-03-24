@@ -11,7 +11,7 @@
             <AppenderRef ref="CONSOLE"/>
         </Root>
 
-        <Logger name="org.labkey.test" additivity="false" level="DEBUG">
+        <Logger name="org.labkey.test" additivity="false" level="INFO">
             <AppenderRef ref="CONSOLE"/>
         </Logger>
 
