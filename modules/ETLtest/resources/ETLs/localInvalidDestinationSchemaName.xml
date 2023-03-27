@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Test Bad Destination Schema</name>
+<description>append rows from source to invalid target</description>
+<transforms>
+    <transform id="step1">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination schemaName="study_buddy" queryName="etl target" targetOption="truncate"/>
+    </transform>
+</transforms>
+<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>
