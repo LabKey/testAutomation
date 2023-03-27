@@ -22,7 +22,7 @@
         </transform>
     </transforms>
     <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="Modified">
-        <deletedRowsSource remoteSource="EtlTest_RemoteConnection2" schemaName="AuditLog" queryName="ListAuditEvent" deletedSourceKeyColumnName="listitementityid" targetKeyColumnName="id" timestampColumnName="Created">
+        <deletedRowsSource remoteSource="EtlTest_RemoteConnection2" schemaName="AuditLog" queryName="ListAuditEvent" deletedSourceKeyColumnName="listitementityid" targetKeyColumnName="name" timestampColumnName="Created">
             <sourceFilters>
                 <sourceFilter column="listname" operator="eq" value="SourceListForRemoteDelete"/>
                 <sourceFilter column="comment" operator="eq" value="An existing list record was deleted"/>
