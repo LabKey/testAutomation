@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Remote Test With Remote Delete</name>
+<description>append rows from "remote" source to target, with "remote" delete based on the audit trail</description>
+    <transforms>
+        <transform type="RemoteQueryTransformStep" id="step1">
+            <description>Copy to target</description>
+            <source remoteSource="EtlTest_RemoteConnection2" schemaName="lists" queryName="SourceListForRemoteDelete" >
+                <sourceColumns>
+                    <column>name</column>
+                    <column>ditransformrunid</column>
+                    <column>EntityId</column>
+                </sourceColumns>
+            </source>
+            <destination schemaName="etltest" queryName="target" targetOption="append">
+                <columnTransforms>
+                    <!-- switch columns so data length fits-->
+                    <column source="name" target="id" />
+                    <column source="EntityId" target="name" />
+                </columnTransforms>
+            </destination>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="Modified">
+        <deletedRowsSource remoteSource="EtlTest_RemoteConnection2" schemaName="AuditLog" queryName="ListAuditEvent" deletedSourceKeyColumnName="listitementityid" targetKeyColumnName="id" timestampColumnName="Created">
+            <sourceFilters>
+                <sourceFilter column="listname" operator="eq" value="SourceListForRemoteDelete"/>
+                <sourceFilter column="comment" operator="eq" value="An existing list record was deleted"/>
+            </sourceFilters>
+        </deletedRowsSource>
+    </incrementalFilter>
+</etl>
