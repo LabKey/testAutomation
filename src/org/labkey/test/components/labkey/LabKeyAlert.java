@@ -20,6 +20,10 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -82,6 +86,18 @@ public class LabKeyAlert extends ModalDialog implements Alert
     public void clickButton(String buttonText)
     {
         getWrapper().clickAndWait(Locator.linkWithText(buttonText).findElement(this));
+    }
+
+    @Override
+    protected void waitForClose(Integer waitSeconds)
+    {
+        if (waitSeconds > 0) // Zero to not expect dialog to close
+        {
+            new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds)).until(ExpectedConditions.and(
+                    ExpectedConditions.invisibilityOf(getComponentElement()),
+                    ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("modal")),
+                    ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("modal-backdrop"))));
+        }
     }
 
     public static class ExtraLocators {

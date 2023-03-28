@@ -34,7 +34,6 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
@@ -66,14 +65,11 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final String ASSAY_NAME_FNA_MULTIPLE = "FASTA Assay - Multiple file upload";
     private static final String ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT = "FASTA Assay - Multiple file single input upload";
 
-    private final WebDavUploadHelper _uploadHelper = new WebDavUploadHelper(getProjectName());
-
     @BeforeClass
     public static void doSetup()
     {
         GpatAssayTest init = (GpatAssayTest) getCurrentTest();
         init._containerHelper.createProject(init.getProjectName(), "Assay");
-        PortalHelper portalHelper = new PortalHelper(init.getDriver());
         init.goToProjectHome();
     }
 
@@ -228,7 +224,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     private void startCreateGpatAssay(File dataFile, @LoggedParam String assayName)
     {
         log("Create GPAT assay from " + dataFile.getName());
-        _uploadHelper.uploadFile(dataFile);
+        new WebDavUploadHelper(getProjectName()).uploadFile(dataFile);
         beginAt(WebTestHelper.buildURL("pipeline", getProjectName(), "browse"));
         _fileBrowserHelper.importFile(dataFile.getName(), "Create New Standard Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
