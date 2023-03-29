@@ -59,9 +59,6 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE8_TITLE = "Page 8 Title For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
 
-    private static final String WIKI_PAGE1_TITLE_LINK = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name";
-    private static final String WIKI_PAGE1_TITLE_LINK_COPY = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name1";
-
     private static final String DISC1_TITLE = "Let's Talk";
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
