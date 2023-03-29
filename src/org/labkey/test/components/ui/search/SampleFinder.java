@@ -335,7 +335,9 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         public List<WebElement> getViewsWithCls(String cls)
         {
             expand();
-            return findVisibleMenuItemsWithClass(cls);
+            List<WebElement> elements = findVisibleMenuItemsWithClass(cls);
+            collapse();
+            return elements;
         }
 
         public void clickView(String viewName)
