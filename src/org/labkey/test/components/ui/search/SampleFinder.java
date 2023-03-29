@@ -322,13 +322,23 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         {
             List<String> viewNames = new ArrayList<>();
             getViewsWithCls("saved-finder-view").forEach(el -> viewNames.add(el.getText()));
+            collapse();
+            return viewNames;
+        }
+
+        public List<String> getBuiltInViews()
+        {
+            List<String> viewNames = new ArrayList<>();
+            getViewsWithCls("built-in-finder-view").forEach(el -> viewNames.add(el.getText()));
+            collapse();
             return viewNames;
         }
 
         public List<WebElement> getViewsWithCls(String cls)
         {
             expand();
-            return findVisibleMenuItemsWithClass(cls);
+            List<WebElement> elements = findVisibleMenuItemsWithClass(cls);
+            return elements;
         }
 
         public void clickView(String viewName)
