@@ -58,7 +58,7 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
 
         // simulate a session expiration and make sure you can still log in to a project with terms.
         signOut();
-        beginAt(WebTestHelper.buildURL("login", "login", Maps.of("returnUrl", "/labkey/project/" + PUBLIC_TERMS_PROJECT_NAME + "/begin.view?")));
+        beginAt(WebTestHelper.buildURL("login", "login", Maps.of("returnUrl", WebTestHelper.getContextPath() + "/" + PUBLIC_TERMS_PROJECT_NAME + "/project-begin.view")));
         attemptSignIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
         waitForElement(Locators.labkeyError.containing("you must log in and approve the terms of use"));
         assertTextPresent(PROJECT_TERMS_SNIPPET);
