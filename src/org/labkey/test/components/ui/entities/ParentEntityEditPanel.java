@@ -454,6 +454,26 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         }
     }
 
+    public static class DataClassAddParentEntityPanelFinder extends WebDriverComponentFinder<ParentEntityEditPanel, DataClassAddParentEntityPanelFinder>
+    {
+        public DataClassAddParentEntityPanelFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        @Override
+        protected ParentEntityEditPanel construct(WebElement element, WebDriver driver)
+        {
+            return new ParentEntityEditPanel(element, driver);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return Locator.tagWithClass("div", "dataclass-insert-add-parent-panel");
+        }
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
