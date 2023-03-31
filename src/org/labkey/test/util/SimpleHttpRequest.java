@@ -19,7 +19,6 @@ import org.labkey.remoteapi.Connection;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -84,50 +83,6 @@ public class SimpleHttpRequest
     }
 
     public SimpleHttpResponse getResponse() throws IOException
-    {
-        HttpURLConnection con = null;
-
-        try
-        {
-            URL url = new URL(_url);
-            if (_username != null && _password != null)
-            {
-                Authenticator.setDefault(new Authenticator()
-                {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication()
-                    {
-                        return new PasswordAuthentication(_username, _password.toCharArray());
-                    }
-                });
-            }
-            con = (HttpURLConnection)url.openConnection();
-            con.setRequestMethod(_requestMethod);
-            con.setReadTimeout(_timeout);
-
-            if (!_cookies.isEmpty())
-            {
-                useCopiedSession(con);
-            }
-            else
-            {
-                // Authenticator.setDefault() call above doesn't seem to work (I don't know why), so add the basic auth header explicitly
-                String encoded = Base64.getEncoder().encodeToString((_username + ":" + _password).getBytes(StandardCharsets.UTF_8));
-                con.setRequestProperty("Authorization", "Basic " + encoded);
-            }
-
-            con.connect();
-            return SimpleHttpResponse.readResponse(con);
-        }
-        finally
-        {
-            if (con != null)
-                con.disconnect();
-            Authenticator.setDefault(null);
-        }
-    }
-
-    public File getResponseAsFile() throws IOException
     {
         HttpURLConnection con = null;
 
