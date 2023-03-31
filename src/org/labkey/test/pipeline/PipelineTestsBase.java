@@ -15,11 +15,16 @@
  */
 package org.labkey.test.pipeline;
 
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 
@@ -90,7 +95,7 @@ public class PipelineTestsBase
 
     public void beginAt()
     {
-        _test.beginAt("/labkey/Project/" + _test.getProjectName() + "/" + _folder.getFolderName() + "/begin.view");        
+        _test.beginAt(WebTestHelper.buildURL("project", _test.getProjectName() + "/" + _folder.getFolderName(), "begin"));
     }
     
     public void clean()
