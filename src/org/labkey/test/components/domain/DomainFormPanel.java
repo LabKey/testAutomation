@@ -226,6 +226,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         if (isManuallyDefineFieldsPresent())
             return manuallyDefineFields(name);
 
+        getWrapper().waitForElementToDisappear(Locator.tagWithText("span", "Loading..."));
         getWrapper().scrollIntoView(elementCache().addFieldButton, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addFieldButton)); // give modal dialogs time to disappear
         elementCache().addFieldButton.click();
