@@ -22,7 +22,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class AuditLogMaintenanceTest extends BaseWebDriverTest
 {
-    private final static String listName = "List for audit log entries - 2";
+    private final static String listName = "List for audit log entries";
 
     @Override
     protected @Nullable String getProjectName()
@@ -66,6 +66,8 @@ public class AuditLogMaintenanceTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText("Audit Log Maintenance"));
         switchToWindow(1);
         shortWait().until(ExpectedConditions.textToBePresentInElementLocated(Locator.id("status-text"), "COMPLETE"));
+        Assert.assertTrue("Expected audit event was deleted", isTextPresent("Skipping \"SampleTimelineEvent\"; its provider doesn't allow deleting",
+                "Skipping \"InventoryAuditEvent\"; its provider doesn't allow deleting"));
         switchToMainWindow();
 
         log("Verifying audit logs got deleted");
@@ -90,7 +92,6 @@ public class AuditLogMaintenanceTest extends BaseWebDriverTest
     {
         goToAdminConsole().clickAuditLogMaintenance()
                 .setRetentionTime("None - all audit log data is retained indefinitely")
-                .setExportDataBeforeDeleting(false)
                 .clickSave();
     }
 }
