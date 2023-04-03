@@ -1,22 +1,27 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.pages.core.admin.AuditLogMaintenancePage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.ListHelper;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
@@ -65,7 +70,7 @@ public class AuditLogMaintenanceTest extends BaseWebDriverTest
         goToAdminConsole().clickSystemMaintenance();
         waitAndClick(Locator.linkWithText("Audit Log Maintenance"));
         switchToWindow(1);
-        shortWait().until(ExpectedConditions.textToBePresentInElementLocated(Locator.id("status-text"), "COMPLETE"));
+        new PipelineStatusDetailsPage(getDriver()).waitForStatus("COMPLETE");
         Assert.assertTrue("Expected audit event was deleted", isTextPresent("Skipping \"SampleTimelineEvent\"; its provider doesn't allow deleting",
                 "Skipping \"InventoryAuditEvent\"; its provider doesn't allow deleting"));
         switchToMainWindow();
@@ -73,7 +78,7 @@ public class AuditLogMaintenanceTest extends BaseWebDriverTest
         log("Verifying audit logs got deleted");
         ShowAuditLogPage auditLogPage = goToAdminConsole().clickAuditLog();
         auditLogPage.selectView("List events");
-        checker().verifyTrue("Audit log table not cleared", auditLogPage.getLogTable().getDataRowCount() == 0);
+        Assert.assertTrue("Audit log table not cleared", auditLogPage.getLogTable().getDataRowCount() == 0);
     }
 
     @Test
@@ -88,10 +93,10 @@ public class AuditLogMaintenanceTest extends BaseWebDriverTest
     }
 
     @After
-    public void restoreSettings()
+    public void restoreSettings() throws IOException, CommandException
     {
-        goToAdminConsole().clickAuditLogMaintenance()
-                .setRetentionTime("None - all audit log data is retained indefinitely")
-                .clickSave();
+        SimplePostCommand command = new SimplePostCommand("professional", "auditLogMaintenance");
+        command.setJsonObject(new JSONObject(Map.of("retentionTime", -1, "export", false)));
+        command.execute(createDefaultConnection(), null);
     }
 }

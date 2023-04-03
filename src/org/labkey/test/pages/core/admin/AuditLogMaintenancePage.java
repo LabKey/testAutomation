@@ -3,17 +3,18 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 public class AuditLogMaintenancePage extends LabKeyPage<AuditLogMaintenancePage.ElementCache>
 {
     public AuditLogMaintenancePage(WebDriver driver)
     {
         super(driver);
-        waitForPage();
     }
 
     public static AuditLogMaintenancePage beginAt(WebDriverWrapper wrapper)
@@ -28,7 +29,7 @@ public class AuditLogMaintenancePage extends LabKeyPage<AuditLogMaintenancePage.
         waitFor(() -> {
                     try
                     {
-                        return elementCache().retentionTime.isDisplayed();
+                        return elementCache().exportData.isDisplayed();
                     }
                     catch (NoSuchElementException nse)
                     {
@@ -47,12 +48,12 @@ public class AuditLogMaintenancePage extends LabKeyPage<AuditLogMaintenancePage.
 
     public String getRetentionTime()
     {
-        return elementCache().retentionTime.getText();
+        return elementCache().retentionTime.getFirstSelectedOption().getText();
     }
 
     public AuditLogMaintenancePage setRetentionTime(String value)
     {
-        selectOptionByText(elementCache().retentionTime, value);
+        elementCache().retentionTime.selectByVisibleText(value);
         return this;
     }
 
@@ -64,17 +65,17 @@ public class AuditLogMaintenancePage extends LabKeyPage<AuditLogMaintenancePage.
 
     public void clickSave()
     {
-        elementCache().saveBtn.click();
+        clickAndWait(elementCache().saveBtn);
     }
 
     public void clickCancel()
     {
-        elementCache().cancelBtn.click();
+        clickAndWait(elementCache().cancelBtn);
     }
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement retentionTime = Locator.name("retentionTime").findWhenNeeded(this);
+        Select retentionTime = SelectWrapper.Select(Locator.name("retentionTime")).findWhenNeeded(this);
         WebElement exportData = Locator.name("export").findWhenNeeded(this);
 
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
