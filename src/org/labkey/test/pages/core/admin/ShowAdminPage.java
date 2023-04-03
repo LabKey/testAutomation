@@ -22,6 +22,7 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.pages.professional.AuditLogMaintenancePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
