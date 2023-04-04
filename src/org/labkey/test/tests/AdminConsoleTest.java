@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -219,7 +220,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         log("Verifying cannot be duplicate");
         setFormElement(Locator.name("newExternalRedirectHost"), host);
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("\'" + host + "\' already exists. Duplicate hosts not allowed."));
+        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
 
     }
 
@@ -233,6 +234,34 @@ public class AdminConsoleTest extends BaseWebDriverTest
         goToAdminConsole().clickCredits();
         log("Verifying the page is properly loaded");
         assertTextPresent("JAR Files Distributed with the API Module");
+    }
+
+    /*
+        adds regression coverage for Issue 46738
+        explicitly navigate between admin console, site users and user domain editor
+     */
+    @Test
+    public void testChangeUserPropertiesNavigation()
+    {
+        var console = goToAdminConsole();
+        var userEditPage = console.clickChangeUserProperties();
+        var adminConsoleUrl = getURL();
+        checker().wrapAssertion(()-> assertThat(userEditPage.fieldsPanel().fieldNames())
+                .as("expect any standard user fields to be present")
+                .contains("FirstName", "LastName", "Description"));
+        userEditPage.clickCancel();
+        checker().verifyEquals("expect redirect back to admin console",
+                adminConsoleUrl, getURL());
+
+        var siteUsers = goToSiteUsers();
+        var siteUsersURL = getURL();
+        var usersPropertyPage = siteUsers.clickChangeUserProperties();
+        checker().wrapAssertion(()-> assertThat(usersPropertyPage.fieldsPanel().fieldNames())
+                .as("expect any standard user fields to be present")
+                .contains("FirstName", "LastName", "Description"));
+        usersPropertyPage.clickCancel();
+        checker().verifyEquals("expect redirect back to site users",
+                siteUsersURL, getURL());
     }
 
     @Override
