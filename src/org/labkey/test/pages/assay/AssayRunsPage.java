@@ -99,7 +99,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
             clickButton("update", 0);
             ModalDialog dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Error").find();
             Assert.assertEquals("A comment is required when changing a QC State for the selected run(s).", dialog.getBodyText());
-            dialog.dismiss();
+            dialog.dismiss(0);
             return updatePage.clickCancel();
         }
 
