@@ -22,7 +22,6 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
-import org.labkey.test.pages.professional.AuditLogMaintenancePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -98,11 +97,10 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ShowAuditLogPage(getDriver());
     }
 
-    public AuditLogMaintenancePage clickAuditLogMaintenance()
+    public void clickAuditLogMaintenance()
     {
         goToSettingsSection();
         clickAndWait(elementCache().auditLogMaintenanceLink);
-        return new AuditLogMaintenancePage(getDriver());
     }
     public LoginConfigurePage clickAuthentication()
     {
