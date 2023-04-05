@@ -53,11 +53,13 @@ public class FindByIdsDialog extends ModalDialog
     public void clickCancel()
     {
         elementCache().cancelButton.click();
+        waitForClose();
     }
 
     public void clickFindSamples()
     {
         elementCache().findSamplesButton.click();
+        waitForClose();
     }
 
     @Override
