@@ -19,7 +19,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.remoteapi.Connection;
-import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
@@ -132,13 +131,19 @@ public class SimpleHttpRequest
         }
     }
 
-    public File getResponseAsFile() throws IOException
+    /**
+     * Attempts to save the request's response to a file. If the target file is an existing directory, the response will
+     * be streamed into a file within the directory. The file name will be extracted from response headers, if possible.
+     * If the target file is an existing file, it will be overwritten. If the target file does not exist, it will be
+     * created (parent directories will not be created).
+     * @param targetFile Target file or directory
+     * @return File pointer to the saved file
+     * @throws IOException if the download fails for some reason
+     */
+    public File getResponseAsFile(File targetFile) throws IOException
     {
-        return getResponseAsFile(null);
-    }
+        String fileName = targetFile.isDirectory() ? null : targetFile.getName();
 
-    public File getResponseAsFile(String fileName) throws IOException
-    {
         HttpURLConnection con = null;
 
         try
@@ -164,14 +169,14 @@ public class SimpleHttpRequest
             if (con.getResponseCode() != 200)
             {
                 TestLogger.error(IOUtils.toString(con.getErrorStream(), StandardCharsets.UTF_8));
-                throw new RuntimeException("Failed to download file [%d]: %s".formatted(con.getResponseCode(), con.getResponseMessage()));
+                throw new IOException("Failed to download file [%d]: %s".formatted(con.getResponseCode(), con.getResponseMessage()));
             }
             else
             {
                 // Extract file name from response header.
                 // Example:
                 // attachment; filename="diagnostics_2023-03-31_12-36-31.zip"
-                String contentDisposition = con.getHeaderField("Content-Disposition");
+                String contentDisposition = StringUtils.trimToEmpty(con.getHeaderField("Content-Disposition"));
                 String[] splitDisposition = contentDisposition.split("; ");
                 Map<String, String> params = new LinkedHashMap<>();
                 for (String s : splitDisposition)
@@ -184,9 +189,10 @@ public class SimpleHttpRequest
                 {
                     if (responseFilename == null)
                     {
-                        throw new IllegalArgumentException("Unable to determine filename for download.");
+                        throw new IOException("Unable to determine filename for download.");
                     }
                     fileName = responseFilename;
+                    targetFile = new File(targetFile, fileName);
                 }
                 else if (responseFilename != null && fileName.contains("."))
                 {
@@ -194,12 +200,12 @@ public class SimpleHttpRequest
                     String expectedExtension = fileName.split("\\.", 2)[1];
                     if (!responseFilename.endsWith("." + expectedExtension))
                     {
-                        throw new IllegalArgumentException("Download didn't match expected extension.\n%s\n%s".formatted(responseFilename, fileName));
+                        throw new IOException("Download didn't match expected extension.\n%s\n%s".formatted(responseFilename, fileName));
                     }
                 }
-                File file = TestFileUtils.writeTempFile(fileName, con.getInputStream());
-                TestLogger.info("%s: Downloaded [%s] from %s".formatted(file.getName(), FileUtils.byteCountToDisplaySize(file.length()), _url));
-                return file;
+                FileUtils.copyInputStreamToFile(con.getInputStream(), targetFile);
+                TestLogger.info("%s: Downloaded [%s] from %s".formatted(targetFile.getName(), FileUtils.byteCountToDisplaySize(targetFile.length()), _url));
+                return targetFile;
             }
         }
         finally
