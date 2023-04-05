@@ -100,16 +100,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public void dismiss()
     {
-        dismiss(10);
-    }
-
-    public void dismiss(Integer waitSeconds)
-    {
         WebElement button = Locator.tagWithClass("button", "close").findElement(getComponentElement());
         new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_FOR_JAVASCRIPT))
                 .until(ExpectedConditions.elementToBeClickable(button));
         button.click();
-        waitForClose(waitSeconds);
+        waitForClose();
     }
 
     public void dismiss(String buttonText)
