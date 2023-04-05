@@ -15,10 +15,15 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.remoteapi.Connection;
+import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -29,6 +34,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -123,6 +129,83 @@ public class SimpleHttpRequest
             if (con != null)
                 con.disconnect();
             Authenticator.setDefault(null);
+        }
+    }
+
+    public File getResponseAsFile() throws IOException
+    {
+        return getResponseAsFile(null);
+    }
+
+    public File getResponseAsFile(String fileName) throws IOException
+    {
+        HttpURLConnection con = null;
+
+        try
+        {
+            URL url = new URL(_url);
+            con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod(_requestMethod);
+            con.setReadTimeout(_timeout);
+
+            if (!_cookies.isEmpty())
+            {
+                useCopiedSession(con);
+            }
+            else
+            {
+                // Authenticator.setDefault() call above doesn't seem to work (I don't know why), so add the basic auth header explicitly
+                String encoded = Base64.getEncoder().encodeToString((_username + ":" + _password).getBytes(StandardCharsets.UTF_8));
+                con.setRequestProperty("Authorization", "Basic " + encoded);
+            }
+
+            con.connect();
+
+            if (con.getResponseCode() != 200)
+            {
+                TestLogger.error(IOUtils.toString(con.getErrorStream(), StandardCharsets.UTF_8));
+                throw new RuntimeException("Failed to download file [%d]: %s".formatted(con.getResponseCode(), con.getResponseMessage()));
+            }
+            else
+            {
+                // Extract file name from response header.
+                // Example:
+                // attachment; filename="diagnostics_2023-03-31_12-36-31.zip"
+                String contentDisposition = con.getHeaderField("Content-Disposition");
+                String[] splitDisposition = contentDisposition.split("; ");
+                Map<String, String> params = new LinkedHashMap<>();
+                for (String s : splitDisposition)
+                {
+                    String[] param = s.split("=", 2);
+                    params.put(param[0], param.length == 2 ? StringUtils.strip(param[1], "\"") : null);
+                }
+                String responseFilename = params.get("filename");
+                if (fileName == null)
+                {
+                    if (responseFilename == null)
+                    {
+                        throw new IllegalArgumentException("Unable to determine filename for download.");
+                    }
+                    fileName = responseFilename;
+                }
+                else if (responseFilename != null && fileName.contains("."))
+                {
+                    // Verify correct extension
+                    String expectedExtension = fileName.split("\\.", 2)[1];
+                    if (!responseFilename.endsWith("." + expectedExtension))
+                    {
+                        throw new IllegalArgumentException("Download didn't match expected extension.\n%s\n%s".formatted(responseFilename, fileName));
+                    }
+                }
+                File file = TestFileUtils.writeTempFile(fileName, con.getInputStream());
+                TestLogger.info("%s: Downloaded [%s] from %s".formatted(file.getName(), FileUtils.byteCountToDisplaySize(file.length()), _url));
+                return file;
+            }
+        }
+        finally
+        {
+            if (con != null)
+                con.disconnect();
         }
     }
 
