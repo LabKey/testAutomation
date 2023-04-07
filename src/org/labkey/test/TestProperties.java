@@ -142,6 +142,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.enable.heap.dump"));
     }
 
+    public static boolean isDiagnosticsExportEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.enable.export.diagnostics"));
+    }
+
     public static boolean isRunWebDriverHeadless()
     {
         return "true".equals(System.getProperty("webtest.webdriver.headless"));

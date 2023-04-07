@@ -47,11 +47,10 @@ import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Empty;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.testpicker.TestHelper;
-import org.labkey.test.tests.BasicTest;
-import org.labkey.test.tests.DatabaseDiagnosticsTest;
 import org.labkey.test.tests.JUnitTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
+import org.labkey.test.util.ExportDiagnosticsPseudoTest;
 import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
@@ -975,11 +974,12 @@ public class Runner extends TestSuite
             }
         }
 
-        set.prioritizeTest(BasicTest.class, 0); // Always start with BasicTest (if present)
+        List<Class<?>> testClasses = testNames.isEmpty() ? set.getSortedTestList() : getTestClasses(testNames);
 
-        set.prioritizeTest(DatabaseDiagnosticsTest.class, set.getTestList().size() - 1); // Always end with DatabaseDiagnosticsTest (if present)
-
-        List<Class<?>> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(testNames);
+        if (TestProperties.isServerRemote() && TestProperties.isTestRunningOnTeamCity() || TestProperties.isDiagnosticsExportEnabled())
+        {
+            testClasses.add(ExportDiagnosticsPseudoTest.class);
+        }
 
         TestSuite suite = getSuite(testClasses, cleanOnly);
 
