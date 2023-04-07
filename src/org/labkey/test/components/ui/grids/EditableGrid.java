@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -12,6 +13,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.annotation.Nullable;
@@ -20,11 +22,15 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -303,11 +309,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return new ArrayList<>(Arrays.asList(unPopulatedRows, populatedRows));
     }
 
-    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet)
-    {
-        setCellValue(columnNameToSearch, valueToSearch, columnNameToSet, valueToSet, false);
-    }
-
     /**
      * <p>
      *     For a given column, 'columnNameToSet', set the cell in the row if value in column 'columnNameToSearch'
@@ -326,9 +327,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param valueToSearch The value to check for in 'columnNameToSearch' to see if the row should be updated.
      * @param columnNameToSet The column to update in a row.
      * @param valueToSet The new value to put into column 'columnNameToSet'.
-     * @param useDatePicker For date field, use datepicker instead of keyboard
      */
-    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet, boolean useDatePicker)
+    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet)
     {
         List<Map<String, String>> gridData = getGridData();
         int index = 0;
@@ -337,16 +337,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             if (rowData.get(columnNameToSearch).equals(valueToSearch))
             {
-                setCellValue(index, columnNameToSet, valueToSet, useDatePicker);
+                setCellValue(index, columnNameToSet, valueToSet);
                 break;
             }
             index++;
         }
-    }
-
-    public void setCellValue(int row, String columnName, Object value)
-    {
-        setCellValue(row, columnName, value, false);
     }
 
     /**
@@ -360,28 +355,29 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      *
      * @param row Index of the row (0 based).
      * @param columnName Name of the column to update.
-     * @param value If the cell is a lookup, value should be List.of(value(s))
-     * @param useDatePicker For date field, use datepicker instead of keyboard, only works with yyyy-MM-dd format
+     * @param value If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
      */
-    public void setCellValue(int row, String columnName, Object value, boolean useDatePicker)
+    public void setCellValue(int row, String columnName, Object value)
     {
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        // Normalize date values
+        if (value instanceof LocalDate ld)
+        {
+            value = ld.atStartOfDay();
+        }
+        else if (value instanceof Date date)
+        {
+            value = LocalDateTime.ofInstant(date.toInstant(), TimeZone.getDefault().toZoneId());
+        }
 
-        // Select the cell.
-        selectCell(gridCell);
-
-        // Activate the cell.
-        activateCell(gridCell);
+        WebElement gridCell = selectCell(row, columnName);
 
         if (value instanceof List)
         {
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
-            ReactSelect lookupSelect = elementCache().lookupSelect();
+            ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
-            waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
             lookupSelect.open();
 
             for (String _value : values)
@@ -390,47 +386,29 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
 
         }
+        else if (value instanceof LocalDateTime localDateTime)
+        {
+            // Activate the cell.
+            activateCell(gridCell);
+
+            ReactDatePicker datePicker = elementCache().datePicker();
+            datePicker.select(localDateTime);
+        }
         else
         {
-            // Treat the object being sent in as a string.
-            // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
+            String str = value.toString();
+            new Actions(getDriver()).sendKeys(str).perform(); // Type into no particular element
 
-            boolean isUnsupportedDateFormat = false;
-            if (useDatePicker)
-            {
-                ReactDatePicker datePicker = elementCache().datePicker();
-                isUnsupportedDateFormat = !datePicker.select((String) value);
+            WebElement inputCell = elementCache().inputCell();
+            inputCell.sendKeys(Keys.RETURN); // Add the RETURN to close the inputCell.
 
-                if (!isUnsupportedDateFormat)
-                {
-                    WebElement inputCell = elementCache().inputCell();
-                    inputCell.sendKeys(Keys.RETURN);
-                }
-            }
-
-            if (isUnsupportedDateFormat || !useDatePicker)
-            {
-                WebElement inputCell = elementCache().inputCell();
-                inputCell.clear();
-
-                // the clear may end up deactivating the cell
-                if (elementCache().inputCell() == null)
-                {
-                    selectCell(gridCell);
-                    activateCell(gridCell);
-                    inputCell = elementCache().inputCell();
-                }
-
-                inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
-            }
-
-            getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
             // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
             // of the existing value so the new value should exist somewhere in the cell text value not necessarily
             // at the end of it.
-            WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
+            WebDriverWrapper.waitFor(() -> gridCell.getText().contains(str),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
         }
     }
@@ -443,18 +421,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public void setNewSelectValue(int row, String columnName, String value)
     {
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        WebElement gridCell = selectCell(row, columnName);
 
-        // Select the cell.
-        selectCell(gridCell);
+        ReactSelect createSelect = elementCache().lookupSelect(gridCell);
 
-        // Activate the cell.
-        activateCell(gridCell);
-
-        ReactSelect createSelect = elementCache().lookupSelect();
-
-        waitFor(()->createSelect.isInteractive() && !createSelect.isLoading(), "Select control is not ready.", 1_000);
         createSelect.createValue(value);
     }
 
@@ -518,7 +488,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid dismissDropdownList()
     {
-        elementCache().lookupSelect().close();
+        ReactSelect.finder(getDriver()).find(getComponentElement()).close();
 
         return this;
     }
@@ -547,21 +517,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public List<String> getFilteredDropdownListForCell(int row, String columnName, @Nullable String filterText)
     {
 
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        WebElement gridCell = selectCell(row, columnName);
 
-        selectCell(gridCell);
+        ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
-        // Double click to make the ReactSelect active. This may expand the list.
-        getWrapper().doubleClick(gridCell);
-
-        ReactSelect lookupSelect = elementCache().lookupSelect();
-
-        // If the double click did not expand the select this will.
+        // If the click did not expand the select this will.
         // This will have no effect if the list is expended.
         lookupSelect.open();
 
-        if (filterText != null && !filterText.trim().isEmpty())
+        if (StringUtils.isNotBlank(filterText))
         {
             lookupSelect.enterValueInTextbox(filterText);
         }
@@ -693,6 +657,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             WebDriverWrapper.waitFor(this::areAllInSelection,
                     "the expected cells did not become selected", 3000);
         }
+    }
+
+    private WebElement selectCell(int row, String columnName)
+    {
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
+
+        // Select the cell.
+        selectCell(gridCell);
+        return gridCell;
     }
 
     /**
@@ -841,9 +815,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return Locators.inputCell.findElementOrNull(getComponentElement());
         }
 
-        public ReactSelect lookupSelect()
+        public ReactSelect lookupSelect(WebElement cell)
         {
-            return ReactSelect.finder(getDriver()).timeout(10000).find(getComponentElement());
+            Locator.byClass("cell-menu-selector").findOptionalElement(cell).ifPresent(WebElement::click);
+            ReactSelect lookupSelect = ReactSelect.finder(getDriver()).timeout(2_000).find(getComponentElement());
+            waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
+            return lookupSelect;
         }
 
         public ReactDatePicker datePicker()
