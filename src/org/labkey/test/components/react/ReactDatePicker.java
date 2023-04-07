@@ -68,7 +68,7 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
     {
         set("", false);
         set(value.getYear() + "-" + value.getMonthValue(), false); // use keyboard input to set year and month
-        elementCache().datePickerDateCell(String.valueOf(value.getDayOfMonth())).click(); // use calendar ui to select day
+        elementCache().datePickerDateCell(value.getDayOfMonth()).click(); // use calendar ui to select day
         if (!value.toLocalTime().equals(LocalTime.MIDNIGHT)) // use timepicker to select time
             clickTime(value.toLocalTime());
         else
@@ -134,9 +134,10 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
          * Return the date cell div of react datepicker
          * @param day '01', '02', ... '31'
          */
-        WebElement datePickerDateCell(String day)
+        WebElement datePickerDateCell(int day)
         {
-            return datePickerDateLoc(day).findElement(popup);
+            String dayStr = (day < 10 ? "0" : "") + day; // Add leading zero if necessary
+            return datePickerDateLoc(dayStr).findElement(popup);
         }
     }
 
