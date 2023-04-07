@@ -1,5 +1,6 @@
 package org.labkey.test.components.react;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -93,12 +94,17 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
             hour -= 12;
             amPm = "PM";
         }
-        String timeStr = "%d:%d %s".formatted(hour, time.getMinute(), amPm);
+        String timeStr = "%d:%s %s".formatted(hour, withLeadingZero(time.getMinute()), amPm);
         WebElement liElement = Locator.tagWithClass("ul", "react-datepicker__time-list")
                 .child(Locator.tagWithText("li", timeStr)).findElement(elementCache().popup);
         getWrapper().fireEvent(liElement, WebDriverWrapper.SeleniumEvent.click);
 
         WebDriverWrapper.waitFor(()-> !isExpanded(), "Date picker didn't close", 1000);
+    }
+
+    private String withLeadingZero(int i)
+    {
+        return StringUtils.leftPad(String.valueOf(i), 2, "0");
     }
 
     private boolean isExpanded()
@@ -136,8 +142,7 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
          */
         WebElement datePickerDateCell(int day)
         {
-            String dayStr = (day < 10 ? "0" : "") + day; // Add leading zero if necessary
-            return datePickerDateLoc(dayStr).findElement(popup);
+            return datePickerDateLoc(withLeadingZero(day)).findElement(popup);
         }
     }
 
