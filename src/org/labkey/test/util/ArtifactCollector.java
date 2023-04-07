@@ -113,6 +113,10 @@ public class ArtifactCollector
 
     private void publishArtifact(File file, @Nullable String destination)
     {
+        if (file.isDirectory() && destination == null)
+        {
+            destination = file.getName() + ".tar.gz";
+        }
         TeamCityUtils.publishArtifact(file, destination);
     }
 
