@@ -3,6 +3,7 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.categories.Daily;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         adds regression coverage for Issue 46738
         explicitly navigate between admin console, site users and user domain editor
     */
-@Category({})
+@Category({Daily.class})
 public class UserDomainEditNavigationTest extends BaseWebDriverTest
 {
     @Test
