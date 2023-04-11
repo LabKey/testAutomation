@@ -386,6 +386,22 @@ public abstract class TestFileUtils
      * @return File object pointing to the new file
      * @throws IOException If an I/O error occurs when opening or writing to the file
      */
+    public static File writeTempFile(String name, InputStream contents) throws IOException
+    {
+        File file = new File(getTestTempDir(), name);
+        FileUtils.forceMkdirParent(file);
+
+        FileUtils.copyInputStreamToFile(contents, file);
+        return file;
+    }
+
+    /**
+     * Write text to a file in the test temp directory. Temp directory will be created if it does not exist.
+     * @param name Name of the file to be created. An existing file will be overwritten
+     * @param contents text to write to the file
+     * @return File object pointing to the new file
+     * @throws IOException If an I/O error occurs when opening or writing to the file
+     */
     public static File writeTempFile(String name, String contents) throws IOException
     {
         File file = new File(getTestTempDir(), name);
