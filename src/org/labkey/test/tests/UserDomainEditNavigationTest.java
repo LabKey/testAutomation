@@ -18,6 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Category({Daily.class})
 public class UserDomainEditNavigationTest extends BaseWebDriverTest
 {
+
+    // override doCleanup, prevent base class from trying to clean up a project this test never creates
+    @Override
+    protected void doCleanup(boolean afterTest){}
+
     @Test
     public void testNavigateFromAdminConsole()
     {
@@ -49,7 +54,7 @@ public class UserDomainEditNavigationTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "UserDomainEditNavigationTest Project";
+        return null;
     }
 
     @Override
