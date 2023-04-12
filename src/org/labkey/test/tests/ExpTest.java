@@ -29,7 +29,6 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.WebElement;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -101,10 +100,7 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(RUN_NAME));
         clickAndWait(Locator.linkWithText("Graph Summary View"));
 
-        LineageGraph graph = shortWait().until(wd -> {
-            Locator.linkWithSpan("Toggle Beta Graph (new!)").findOptionalElement(getDriver()).ifPresent(WebElement::click);
-            return new LineageGraph.LineageGraphFinder(getDriver()).findOptional().orElse(null);
-        });
+        LineageGraph graph = LineageGraph.showLineageGraph(getDriver());
         graph.getDetailGroup("Data Parents").getItemByTitle("Data: CAexample_mini.mzXML").clickOverViewLink(true);
         assertTextPresent("CAexample_mini.mzXML", "File Not Found");
 
