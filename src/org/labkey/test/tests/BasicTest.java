@@ -19,9 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Base;
@@ -30,24 +28,15 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Smoke;
-import org.labkey.test.components.BodyWebPart;
-import org.labkey.test.components.WebPart;
-import org.openqa.selenium.WebElement;
+import org.labkey.test.util.Prioritized;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Short test to verify installed modules are well-formed
  */
 @Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class, Smoke.class})
+@Prioritized(priority = 1)
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class BasicTest extends BaseWebDriverTest
 {
