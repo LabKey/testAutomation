@@ -30,8 +30,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
@@ -1058,8 +1057,8 @@ public class Crawler
                                 if (target.equals("_blank"))
                                 {
                                     // Issue 40708: Create automated tests to look for anchor tags with link to an outside server
-                                    MatcherAssert.assertThat(String.format("Bad 'rel' attribute for link to %s. On Page: %s", href, actualUrl),
-                                            rel, CoreMatchers.hasItems("noopener", "noreferrer"));
+                                    Assertions.assertThat(rel).as("Bad 'rel' attribute for link to %s. On Page: %s".formatted(href, actualUrl))
+                                            .containsAll(List.of("noopener", "noreferrer"));
                                 }
                             }
                         }
