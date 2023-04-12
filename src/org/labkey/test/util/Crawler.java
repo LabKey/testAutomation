@@ -488,7 +488,14 @@ public class Crawler
                     if (!relativeURL.isBlank())
                     {
                         _relativeURL = relativeURL;
-                        _actionId = new ControllerActionId(_relativeURL);
+
+                        ControllerActionId tempActionId = null;
+                        try
+                        {
+                            tempActionId = new ControllerActionId(_relativeURL);;
+                        }
+                        catch (IllegalArgumentException ignore) { } // Probably a resource, not an action.
+                        _actionId = tempActionId;
                     }
                     else
                     {
@@ -709,8 +716,6 @@ public class Crawler
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
             _folder = StringUtils.strip(rootRelativeURL, "/");
-            if (_folder.endsWith("/"))
-                _folder = _folder.substring(0,_folder.length()-1);
         }
 
         @NotNull public String getAction()
@@ -1043,7 +1048,9 @@ public class Crawler
                         for (Pair<String, Map<String, String>> linkWithAttributes : linksWithAttributes)
                         {
                             String href = linkWithAttributes.getLeft();
-                            if (href.contains("://") && !href.startsWith(WebTestHelper.getBaseURL())) // Remote URL
+                            if ((href.startsWith("http://") || href.startsWith("https://")) && // Full URL
+                                    !href.startsWith(WebTestHelper.getBaseURL()) && // Not self
+                                    !href.startsWith("https://www.labkey.com/")) // Trust links to labkey.com
                             {
                                 Map<String, String> attributes = linkWithAttributes.getRight();
                                 String target = StringUtils.trimToEmpty(attributes.get("target"));
