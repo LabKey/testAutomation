@@ -17,10 +17,12 @@
 package org.labkey.test;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.util.Prioritized;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -88,6 +90,40 @@ public class TestSet
     public List<Class<?>> getTestList()
     {
         return _tests;
+    }
+
+    public List<Class<?>> getSortedTestList()
+    {
+        List<Class<?>> firstTests = new ArrayList<>();
+        List<Class<?>> unprioritized = new ArrayList<>();
+        List<Class<?>> lastTests = new ArrayList<>();
+        for (Class<?> next : _tests)
+        {
+            Prioritized annotation = next.getAnnotation(Prioritized.class);
+            double priority = annotation != null ? annotation.priority() : 0;
+            if (priority > 0)
+            {
+                firstTests.add(next);
+            }
+            else if (priority < 0)
+            {
+                lastTests.add(next);
+            }
+            else
+            {
+                unprioritized.add(next);
+            }
+        }
+        firstTests.sort(Comparator.comparingDouble(c -> c.getAnnotation(Prioritized.class).priority()));
+        Collections.reverse(firstTests);
+        lastTests.sort(Comparator.comparingDouble(c -> c.getAnnotation(Prioritized.class).priority()));
+        Collections.reverse(lastTests);
+
+        List<Class<?>> sortedTests = new ArrayList<>(_tests.size());
+        sortedTests.addAll(firstTests);
+        sortedTests.addAll(unprioritized);
+        sortedTests.addAll(lastTests);
+        return sortedTests;
     }
 
     public List<String> getTestNames()
