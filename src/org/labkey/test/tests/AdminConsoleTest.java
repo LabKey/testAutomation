@@ -219,7 +219,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         log("Verifying cannot be duplicate");
         setFormElement(Locator.name("newExternalRedirectHost"), host);
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("\'" + host + "\' already exists. Duplicate hosts not allowed."));
+        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
 
     }
 
@@ -234,6 +234,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
         log("Verifying the page is properly loaded");
         assertTextPresent("JAR Files Distributed with the API Module");
     }
+
+
 
     @Override
     public List<String> getAssociatedModules()

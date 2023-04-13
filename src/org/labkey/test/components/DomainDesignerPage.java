@@ -9,7 +9,6 @@ import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.domain.UnsavedChangesModalDialog;
-import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -50,6 +49,7 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
     // if you are looking for a specific one, use the fieldsPanel(title) helper
     public DomainFormPanel fieldsPanel()
     {
+        getWrapper().waitForElementToDisappear(Locator.tagWithText("span", "Loading..."));
         return elementCache().firstDomainFormPanel;
     }
 

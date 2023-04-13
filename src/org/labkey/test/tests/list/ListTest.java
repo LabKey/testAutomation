@@ -662,7 +662,7 @@ public class ListTest extends BaseWebDriverTest
         String exportUrl = "/" + EscapeUtil.encode(PROJECT_VERIFY) + "/query-exportRowsTsv.view?schemaName=lists&query.queryName=" + EscapeUtil.encode(LIST_NAME_COLORS);
         beginAt(exportUrl);
         assertEquals("Incorrect response code", 404, getResponseCode());
-        assertTextPresent("The specified query does not exist in schema 'lists'");
+        assertTextPresent("The specified query '%s' does not exist in schema '%s'".formatted(LIST_NAME_COLORS, "lists"));
 
         clickButton("Back");
         // after the 13.2 audit log migration, we are no longer going to co-mingle domain and list events in the same table

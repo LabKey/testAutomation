@@ -59,6 +59,7 @@ public class EditMetadataPage extends BaseDomainDesigner<EditMetadataPage.Elemen
 
     public DomainFormPanel fieldsPanel()
     {
+        getWrapper().waitForElementToDisappear(Locator.tagWithText("span", "Loading..."));
         return elementCache().firstDomainFormPanel;
     }
 
