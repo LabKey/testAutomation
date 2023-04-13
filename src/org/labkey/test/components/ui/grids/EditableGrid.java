@@ -400,7 +400,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             String str = value.toString();
             WebElement inputCell = elementCache().inputCell();
-            inputCell.sendKeys(str, Keys.RETURN); // Add the RETURN to close the inputCell.
+            inputCell.sendKeys(Keys.BACK_SPACE, str, Keys.RETURN); // Add the RETURN to close the inputCell.
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
