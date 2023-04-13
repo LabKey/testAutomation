@@ -185,6 +185,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
+    public PipelineTriggerWizard setConfigurationFile(String value)
+    {
+        elementCache().configurationFileInput.set(value);
+        return this;
+    }
+
     public boolean isMoveEnabled()
     {
         return elementCache().containerMoveInput.getComponentElement().isDisplayed() &&
@@ -288,6 +294,7 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         WebElement showAdvanced = Locator.byClass("custom-config__button").withText("Show Advanced Settings").findWhenNeeded(this);
         WebElement addCustomParam = Locator.byClass("custom-config__button").withText("Add Custom Parameter").findWhenNeeded(this);
         Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
+        Input configurationFileInput = new Input(Locator.name("configFileName").findWhenNeeded(this), getDriver());
         //navgiation elements
         WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
         WebElement configurationButton = Locator.buttonContainingText("Configuration").findWhenNeeded(this);
