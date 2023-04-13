@@ -9,6 +9,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -295,6 +296,15 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         List<String> selection = Arrays.asList(selectValue);
         return setSelectValue(fieldCaption, selection);
     }
+
+    public DetailTableEdit createSelectValue(String fieldCaption, String value)
+    {
+        WebElement container = Locator.tag("td").withAttribute("data-caption", fieldCaption).findElement(this);
+        var select = ReactSelect.finder(getDriver()).waitFor(container);
+        select.createValue(value);
+        return this;
+    }
+
 
     /**
      * Select multiple values from a select list.
