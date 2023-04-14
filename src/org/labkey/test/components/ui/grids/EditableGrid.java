@@ -396,11 +396,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
         else
         {
-            String str = value.toString();
-            new Actions(getDriver()).sendKeys(str).perform(); // Type into no particular element
+            new Actions(getDriver()).sendKeys(" ").perform(); // Type into no particular element to activate input
 
+            String str = value.toString();
             WebElement inputCell = elementCache().inputCell();
-            inputCell.sendKeys(Keys.RETURN); // Add the RETURN to close the inputCell.
+            inputCell.sendKeys(Keys.BACK_SPACE, str, Keys.RETURN); // Add the RETURN to close the inputCell.
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
