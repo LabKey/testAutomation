@@ -1,5 +1,6 @@
 package org.labkey.test.tests.query;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -62,6 +63,16 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 .create(createDefaultConnection(), getProjectName());
     }
 
+    @Before
+    public void resetToDefault()
+    {
+        // visit the metadata edit page for the test list, clear whatever open edits it might have
+        EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST).resetToDefault();
+    }
+
+    /*
+        Coverage for Issue 47487, Issue 47495
+     */
     @Test
     public void testUpdateLookupFields()
     {
@@ -102,9 +113,6 @@ public class QueryMetadataTest extends BaseWebDriverTest
         checker().withScreenshot("xml_mismatch")
                 .verifyEquals("expect xml to show only the delta for value description",
                 expectedXml, queryPage.getMetadataXml());
-
-        // clean up after
-        EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST).resetToDefault();
     }
 
     @Test
@@ -130,9 +138,6 @@ public class QueryMetadataTest extends BaseWebDriverTest
         checker().withScreenshot("xml_mismatch")
                 .verifyEquals("expect xml to show only the delta for value description",
                 expectedXml, queryPage.getMetadataXml());
-
-        // clean up after
-        EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST).resetToDefault();
     }
 
     /*
