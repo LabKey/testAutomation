@@ -3994,6 +3994,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         _extHelper.setCodeMirrorValue(id, value);
     }
 
+    protected String getCodeEditorValue(String id)
+    {
+        return _extHelper.getCodeMirrorValue(id);
+    }
+
     public void waitForElements(final Locator loc, final int count)
     {
         waitForElements(loc, count, WAIT_FOR_JAVASCRIPT);
