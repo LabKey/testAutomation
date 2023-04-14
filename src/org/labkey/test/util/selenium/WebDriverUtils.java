@@ -95,7 +95,8 @@ public abstract class WebDriverUtils
 
         private Long getWindowScrollY()
         {
-            return (Long) ((JavascriptExecutor)_webDriver).executeScript("return window.scrollY;");
+            Number N = (Number) ((JavascriptExecutor)_webDriver).executeScript("return window.scrollY;");
+            return null==N ? null : N.longValue();
         }
 
         public WebElement scrollIntoView(WebElement el)
