@@ -99,7 +99,8 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 "  </table>\n" +
                 "</tables>";
         var queryPage = editPage.clickEditSource();
-        checker().verifyEquals("expect xml to show only the delta for value description",
+        checker().withScreenshot("xml_mismatch")
+                .verifyEquals("expect xml to show only the delta for value description",
                 expectedXml, queryPage.getMetadataXml());
 
         // clean up after
@@ -126,7 +127,8 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 "</tables>";
 
         var queryPage = editPage.clickEditSource();
-        checker().verifyEquals("expect xml to show only the delta for value description",
+        checker().withScreenshot("xml_mismatch")
+                .verifyEquals("expect xml to show only the delta for value description",
                 expectedXml, queryPage.getMetadataXml());
 
         // clean up after
@@ -189,9 +191,6 @@ public class QueryMetadataTest extends BaseWebDriverTest
             .wrapAssertion(()-> assertThat(actualAfterXml)
             .as("expect xml to show only the delta for value description")
             .isEqualTo(expectedAfterXml));
-
-        // clean up after
-        EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST).resetToDefault();
     }
 
 
