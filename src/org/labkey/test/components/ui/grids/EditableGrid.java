@@ -11,6 +11,7 @@ import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -89,9 +90,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         for (int i=0; i< columnTexts.size(); i++ )
         {
             if (columnTexts.get(i).equalsIgnoreCase(columnHeader))
-                return i + 1; // Zero (0) based index in the list, one (1) based index with the control collection.
+                return i;
         }
-        return -1;
+        throw new NotFoundException("Column not found in grid: " + columnHeader);
     }
 
     private boolean hasSelectColumn()
@@ -222,9 +223,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public WebElement getCell(int row, String column)
     {
-        int columnIndex = getColumnIndex(column);
-        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
-        getWrapper().scrollIntoView(gridCell);
+        int columNumber = getColumnIndex(column) + 1;
+        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columNumber + ")"));
         return gridCell;
     }
 
@@ -641,6 +641,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             WebDriverWrapper.waitFor(()->  isCellSelected(cell),
                     "the target cell did not become selected", 4000);
         }
+        else
+        {
+            getWrapper().scrollIntoView(cell);
+        }
     }
 
     private void activateCell(WebElement cell)
@@ -773,13 +777,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
 
         private final List<String> columnNames = new ArrayList<>();
-        private final List<WebElement> headerCells = new ArrayList<>();
 
         public List<String> getColumnNames()
         {
-            if (headerCells.isEmpty())
+            if (columnNames.isEmpty())
             {
-                headerCells.addAll(Locators.headerCells.waitForElements(getComponentElement(), WAIT_FOR_JAVASCRIPT));
+                List<WebElement> headerCells = Locators.headerCells.waitForElements(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+
                 for (WebElement el : headerCells)
                 {
                     columnNames.add(el.getText().trim());
