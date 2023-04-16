@@ -45,6 +45,7 @@ import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
@@ -3991,12 +3992,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setCodeEditorValue(String id, String value)
     {
-        _extHelper.setCodeMirrorValue(id, value);
+        new CodeMirrorHelper(this, id).setCodeMirrorValue(value);
     }
 
     protected String getCodeEditorValue(String id)
     {
-        return _extHelper.getCodeMirrorValue(id);
+        return new CodeMirrorHelper(this, id).getCodeMirrorValue();
     }
 
     public void waitForElements(final Locator loc, final int count)
