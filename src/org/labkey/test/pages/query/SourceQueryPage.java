@@ -73,6 +73,12 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
         return this;
     }
 
+    public String getMetadataXml()
+    {
+        viewMetadata();
+        return getCodeEditorValue("metadataText");
+    }
+
     public SourceQueryPage clickSave()
     {
         Ext4Helper.Locators.ext4Button("Save").findElement(getDriver()).click();

@@ -3,6 +3,7 @@ package org.labkey.test.pages.query;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -10,6 +11,8 @@ import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.Map;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -20,21 +23,35 @@ public class EditMetadataPage extends BaseDomainDesigner<EditMetadataPage.Elemen
         super(driver);
     }
 
+    public static EditMetadataPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
+    {
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery",
+                Map.of("schemaName", schemaName, "query.queryName", queryName)));
+        return new EditMetadataPage (webDriverWrapper.getDriver());
+    }
 
     public DataRegionTable clickViewData(BaseWebDriverTest test, String schemaName, String queryName)
     {
         return test.viewQueryData(schemaName, queryName);
     }
 
-    public void clickEditSourcePage()
+    public SourceQueryPage clickEditSource()
     {
-        elementCache().editSourceBtn.click();
+        getWrapper().clickAndWait(elementCache().editSourceBtn);
+        return new SourceQueryPage(getDriver());
     }
 
+    @Override
     public EditMetadataPage clickSave()
     {
         elementCache().saveBtn.click();
         return this;
+    }
+
+    public String waitForSuccess()
+    {
+        return Locator.tagWithClass("div", "alert-success").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)
+                .getText();
     }
 
     public void resetToDefault()

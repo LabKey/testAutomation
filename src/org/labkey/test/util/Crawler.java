@@ -30,8 +30,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
@@ -488,7 +487,14 @@ public class Crawler
                     if (!relativeURL.isBlank())
                     {
                         _relativeURL = relativeURL;
-                        _actionId = new ControllerActionId(_relativeURL);
+
+                        ControllerActionId tempActionId = null;
+                        try
+                        {
+                            tempActionId = new ControllerActionId(_relativeURL);;
+                        }
+                        catch (IllegalArgumentException ignore) { } // Probably a resource, not an action.
+                        _actionId = tempActionId;
                     }
                     else
                     {
@@ -709,8 +715,6 @@ public class Crawler
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
             _folder = StringUtils.strip(rootRelativeURL, "/");
-            if (_folder.endsWith("/"))
-                _folder = _folder.substring(0,_folder.length()-1);
         }
 
         @NotNull public String getAction()
@@ -1043,7 +1047,9 @@ public class Crawler
                         for (Pair<String, Map<String, String>> linkWithAttributes : linksWithAttributes)
                         {
                             String href = linkWithAttributes.getLeft();
-                            if (href.contains("://") && !href.startsWith(WebTestHelper.getBaseURL())) // Remote URL
+                            if ((href.startsWith("http://") || href.startsWith("https://")) && // Full URL
+                                    !href.startsWith(WebTestHelper.getBaseURL()) && // Not self
+                                    !href.startsWith("https://www.labkey.com/")) // Trust links to labkey.com
                             {
                                 Map<String, String> attributes = linkWithAttributes.getRight();
                                 String target = StringUtils.trimToEmpty(attributes.get("target"));
@@ -1051,8 +1057,8 @@ public class Crawler
                                 if (target.equals("_blank"))
                                 {
                                     // Issue 40708: Create automated tests to look for anchor tags with link to an outside server
-                                    MatcherAssert.assertThat(String.format("Bad 'rel' attribute for link to %s. On Page: %s", href, actualUrl),
-                                            rel, CoreMatchers.hasItems("noopener", "noreferrer"));
+                                    Assertions.assertThat(rel).as("Bad 'rel' attribute for link to %s. On Page: %s".formatted(href, actualUrl))
+                                            .containsAll(List.of("noopener", "noreferrer"));
                                 }
                             }
                         }
