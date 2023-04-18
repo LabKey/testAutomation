@@ -92,7 +92,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             if (columnTexts.get(i).equalsIgnoreCase(columnHeader))
                 return i;
         }
-        throw new NotFoundException("Column not found in grid: " + columnHeader);
+        throw new NotFoundException("Column not found in grid: " + columnHeader + ". Found: " + columnTexts);
     }
 
     private boolean hasSelectColumn()
@@ -635,15 +635,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     private void selectCell(WebElement cell)
     {
+        getWrapper().scrollIntoView(cell);
+
         if (!isCellSelected(cell))
         {
             cell.click();
             WebDriverWrapper.waitFor(()->  isCellSelected(cell),
                     "the target cell did not become selected", 4000);
-        }
-        else
-        {
-            getWrapper().scrollIntoView(cell);
         }
     }
 
