@@ -76,7 +76,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";
-    public static final String GROUP_AUDIT_EVENT = "Group events";
+    public static final String GROUP_AUDIT_EVENT = "Group and role events";
     public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Link to Study events";
