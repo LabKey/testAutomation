@@ -1,5 +1,5 @@
 <etl xmlns="http://labkey.org/etl/xml">
-    <name>Remote connectoin with target option</name>
+    <name>Remote connection with target option</name>
     <description>User Defined ETL</description>
     <transforms>
         <transform id="step1forEditTest" type="org.labkey.di.pipeline.TransformTask">
