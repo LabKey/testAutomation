@@ -421,7 +421,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public void clearCellValue(int row, String columnName)
     {
-        selectCell(row, columnName).sendKeys(Keys.DELETE);
+        selectCell(row, columnName);
+        new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
     }
 
     /**
