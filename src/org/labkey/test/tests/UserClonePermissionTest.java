@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -21,7 +22,6 @@ public class UserClonePermissionTest extends BaseWebDriverTest
     private static final String CLONED_SOURCE_APP_USER = "sourceappuser@clonepermission.test";
     private static final String CLONED_TARGET_SITE_USER = "targetsiteuser@clonepermission.test";
     private static final String CLONED_TARGET_APP_USER = "targetappuser@clonepermission.test";
-    private static final String TEST_PASSWORD = "123456";
     private static final String CLONE_GROUP = "Test clone group";
 
     ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
@@ -75,13 +75,28 @@ public class UserClonePermissionTest extends BaseWebDriverTest
     {
         impersonate(CLONED_TARGET_SITE_USER);
         ClonePermissionsPage clonePermissionsPage = goToMyAccount().clickClonePermission();
+
+        Assert.assertEquals("Incorrect warning message",
+                "Warning! Cloning permissions will delete all group memberships and direct role assignments for targetsiteuser (targetsiteuser@clonepermission.test) and replace them with the group memberships and direct role assignments of the user selected below.",
+                clonePermissionsPage.getWarningMessage());
+
         clonePermissionsPage.setCloneUser(CLONED_SOURCE_SITE_USER);
         clonePermissionsPage.clonePermission();
         stopImpersonating();
 
-        _permissionsHelper.assertPermissionSetting(CLONED_SOURCE_SITE_USER, "Developers");
-        _permissionsHelper.assertPermissionSetting(CLONED_SOURCE_SITE_USER, "Reader");
+        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, "Reader");
+        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, "Developers");
+
+        //verify audit log entry
+
     }
+
+    @Test
+    public void testAppAdminClonePermission()
+    {
+
+    }
+
 
     @Override
     protected void doCleanup(boolean afterTest)
