@@ -41,6 +41,12 @@ public class ClonePermissionsPage extends LabKeyPage<ClonePermissionsPage.Elemen
         return new ShowUsersPage(getDriver());
     }
 
+    public String clonePermissionExpectingError()
+    {
+        elementCache().clonePermissionBtn.click();
+        return Locator.tagWithClass("div", "labkey-error").findElement(getDriver()).getText();
+    }
+
     public ShowUsersPage cancelPermission()
     {
         clickAndWait(elementCache().cancelBtn);
