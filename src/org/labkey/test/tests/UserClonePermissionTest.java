@@ -104,6 +104,8 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, "Author");
         _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, "Editor");
         _permissionsHelper.assertNoPermission(CLONED_TARGET_SITE_USER, "Submitter");
+        Assert.assertTrue("Project group is not cloned",
+                _permissionsHelper.isUserInGroup(CLONED_TARGET_SITE_USER, CLONE_GROUP, getProjectName(), PermissionsHelper.PrincipalType.USER));
 
         log("Verifying site level permission");
         _permissionsHelper = new ApiPermissionsHelper("");
@@ -155,6 +157,8 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper = new ApiPermissionsHelper(getProjectName());
         _permissionsHelper.assertPermissionSetting(CLONED_TARGET_APP_USER, "Author");
         _permissionsHelper.assertPermissionSetting(CLONED_TARGET_APP_USER, "Editor");
+        Assert.assertTrue("Project group is not cloned",
+                _permissionsHelper.isUserInGroup(CLONED_TARGET_APP_USER, CLONE_GROUP, getProjectName(), PermissionsHelper.PrincipalType.USER));
 
         log("Verifying site level permission");
         _permissionsHelper = new ApiPermissionsHelper("");
