@@ -21,12 +21,9 @@ import java.util.List;
 public class UserClonePermissionTest extends BaseWebDriverTest
 {
     private static final String CLONED_SOURCE_SITE_USER = "sourcesiteuser@clonepermission.test";
-    private static final String SOURCE_SITE_USERNAME = "sourcesiteuser";
     private static final String CLONED_SOURCE_APP_USER = "sourceappuser@clonepermission.test";
     private static final String CLONED_TARGET_SITE_USER = "targetsiteuser@clonepermission.test";
-    private static final String TARGET_SITE_USERNAME = "targetsiteuser";
     private static final String CLONED_TARGET_APP_USER = "targetappuser@clonepermission.test";
-    private static final String TARGET_APP_USERNAME = "targetappuser";
     private static final String CLONE_GROUP = "Test clone group";
 
     ApiPermissionsHelper _permissionsHelper;
@@ -81,12 +78,12 @@ public class UserClonePermissionTest extends BaseWebDriverTest
     public void testSiteUserClonePermission()
     {
         goToSiteUsers();
-        clickAndWait(Locator.linkWithText(TARGET_SITE_USERNAME));
+        clickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER)));
         clickAndWait(Locator.linkWithText("Clone Permissions"));
         ClonePermissionsPage clonePermissionsPage = new ClonePermissionsPage(getDriver());
 
         Assert.assertEquals("Incorrect warning message",
-                "Warning! Cloning permissions will delete all group memberships and direct role assignments for " + TARGET_SITE_USERNAME + " (" +
+                "Warning! Cloning permissions will delete all group memberships and direct role assignments for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER) + " (" +
                         CLONED_TARGET_SITE_USER + ") and replace them with the group memberships and direct role assignments of the user selected below.",
                 clonePermissionsPage.getWarningMessage());
 
@@ -99,7 +96,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         Assert.assertEquals("Invalid error message for invalid user ", "Unknown clone user", clonePermissionsPage.clonePermissionExpectingError());
 
         clonePermissionsPage = new ClonePermissionsPage(getDriver());
-        clonePermissionsPage.setCloneUser(CLONED_SOURCE_SITE_USER + " (" + SOURCE_SITE_USERNAME + ")");
+        clonePermissionsPage.setCloneUser(CLONED_SOURCE_SITE_USER + " (" + _userHelper.getDisplayNameForEmail(CLONED_SOURCE_SITE_USER) + ")");
         clonePermissionsPage.clonePermission();
 
         log("Verifying project level permission");
@@ -117,10 +114,10 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         DataRegionTable table = goToAdminConsole().clickAuditLog()
                 .selectView("Group and role events")
                 .getLogTable();
-        table.setFilter("user", "Contains", TARGET_SITE_USERNAME);
+        table.setFilter("user", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER));
 
-        Assert.assertEquals("Incorrect audit rows for " + TARGET_SITE_USERNAME, 7, table.getDataRowCount());
-        Assert.assertEquals("Incorrect audit log messages for " + TARGET_SITE_USERNAME, Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
+        Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), 7, table.getDataRowCount());
+        Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Developers",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Test clone group",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Administrators",
@@ -135,15 +132,21 @@ public class UserClonePermissionTest extends BaseWebDriverTest
     {
         goToSiteUsers();
         impersonateRole("Application Admin");
-        clickAndWait(Locator.linkWithText(TARGET_APP_USERNAME));
+        clickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER)));
         clickAndWait(Locator.linkWithText("Clone Permissions"));
         ClonePermissionsPage clonePermissionsPage = new ClonePermissionsPage(getDriver());
 
         Assert.assertEquals("Incorrect warning message",
-                "Warning! Cloning permissions will delete all group memberships and direct role assignments for " + TARGET_APP_USERNAME + " (" +
+                "Warning! Cloning permissions will delete all group memberships and direct role assignments for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER) + " (" +
                         CLONED_TARGET_APP_USER + ") and replace them with the group memberships and direct role assignments of the user selected below.",
                 clonePermissionsPage.getWarningMessage());
 
+        clonePermissionsPage.setCloneUser(CLONED_SOURCE_SITE_USER);
+        Assert.assertEquals("App admin should not be able to clone from site admin",
+                "Only site administrators can clone from users with site administration permissions",
+                clonePermissionsPage.clonePermissionExpectingError());
+
+        clonePermissionsPage = new ClonePermissionsPage(getDriver());
         clonePermissionsPage.setCloneUser(CLONED_SOURCE_APP_USER);
         clonePermissionsPage.clonePermission();
         stopImpersonating();
@@ -161,10 +164,10 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         DataRegionTable table = goToAdminConsole().clickAuditLog()
                 .selectView("Group and role events")
                 .getLogTable();
-        table.setFilter("user", "Contains", TARGET_APP_USERNAME);
+        table.setFilter("user", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER));
 
-        Assert.assertEquals("Incorrect audit rows for " + TARGET_APP_USERNAME, 3, table.getDataRowCount());
-        Assert.assertEquals("Incorrect audit log messages for " + TARGET_APP_USERNAME, Arrays.asList("The user " + CLONED_TARGET_APP_USER + " was assigned to the security role Application Admin.",
+        Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER), 3, table.getDataRowCount());
+        Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER), Arrays.asList("The user " + CLONED_TARGET_APP_USER + " was assigned to the security role Application Admin.",
                         "User: " + CLONED_TARGET_APP_USER + " was added as a member to Group: Test clone group",
                         "The user " + CLONED_TARGET_APP_USER + " had their group memberships and role assignments deleted and replaced with those of user sourceappuser@clonepermission.test"),
                 table.getColumnDataAsText("comment"));
