@@ -105,7 +105,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 
         createAssay(assayName, SAMPLE_TYPE_NAME, "Integer", sampleTypeFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
-        waitForText("Failed to convert 'SampleID': Could not translate value: ID_123456");
+        waitForText("Could not convert value 'ID_123456' (String) for Integer field 'SampleID'");
 
         goToProjectHome();
         clickFolder(FOLDER_NAME);
