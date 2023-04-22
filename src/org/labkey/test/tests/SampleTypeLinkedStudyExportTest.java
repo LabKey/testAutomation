@@ -95,6 +95,13 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
                 "Date", now,
                 "ParticipantID", "P1"));
 
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.clickImportBulkData();
+        String header = "AliquotedFrom\n";
+        String aliquotRow =  "Blood\n";
+        setFormElement(Locator.name("text"), header + aliquotRow);
+        clickButton("Submit");
+
         log("Export the Sample type folder");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         goToFolderManagement()
