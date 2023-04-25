@@ -29,7 +29,6 @@ public class ListArchiveExportTest extends BaseWebDriverTest
     private final static String LIST_FOLDER_A = "LIST_FOLDER_A";
     private final static String LIST_A = "List Export A";
     private final static String LIST_B = "List Export B";
-    private final static String SHARED_LIST = "Shared list C";
     private final static String _listUser = "listuser@listarchiveexport.test";
 
     @Override
@@ -79,6 +78,10 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         _listHelper.insertNewRow(rowData);
     }
 
+    /*
+        Test coverage for
+        Issue 47289: Export List Archive if the user is an Admin of the folders of the selected Lists, else throw Permission error
+     */
     @Test
     public void testExportListArchive()
     {
@@ -86,6 +89,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         impersonate(_listUser);
         ManageListsGrid listsGrid = goToManageLists().getGrid();
         listsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
+        listsGrid.setFilter("Container", "Equals One Of (example usage: a;b;c)", LIST_FOLDER_A + ";" + getProjectName());
         listsGrid.checkAllOnPage();
         listsGrid.clickHeaderButton("Export List Archive");
         waitForElement(Locators.labkeyErrorHeading);
@@ -105,9 +109,10 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         goBack();
 
         listsGrid = new ManageListsGrid(getDriver());
-        listsGrid.uncheckCheckbox(0);
+        listsGrid.setFilter("Container", "Equals One Of (example usage: a;b;c)", LIST_FOLDER_A + ";" + getProjectName());
+        listsGrid.checkAllOnPage();
         File listExport = listsGrid.exportSelectedLists();
-        Assert.assertTrue("Empty file downloaded", listExport.length() > 0);
+        Assert.assertTrue("Empty export file downloaded", listExport.length() > 0);
     }
 
     @Override
