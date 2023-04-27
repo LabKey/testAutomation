@@ -116,7 +116,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         DataRegionTable table = goToAdminConsole().clickAuditLog()
                 .selectView("Group and role events")
                 .getLogTable();
-        table.setFilter("user", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER));
+        table.setFilter("User", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER));
 
         Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), 7, table.getDataRowCount());
         Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
@@ -126,7 +126,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
                         "The user " + CLONED_TARGET_SITE_USER + " was removed from the security role Submitter.",
                         "The user " + CLONED_TARGET_SITE_USER + " had their group memberships and role assignments deleted and replaced with those of user sourcesiteuser@clonepermission.test",
                         "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Submitter."),
-                table.getColumnDataAsText("comment"));
+                table.getColumnDataAsText("Comment"));
     }
 
     @Test
@@ -168,13 +168,13 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         DataRegionTable table = goToAdminConsole().clickAuditLog()
                 .selectView("Group and role events")
                 .getLogTable();
-        table.setFilter("user", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER));
+        table.setFilter("User", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER));
 
         Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER), 3, table.getDataRowCount());
         Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER), Arrays.asList("The user " + CLONED_TARGET_APP_USER + " was assigned to the security role Application Admin.",
                         "User: " + CLONED_TARGET_APP_USER + " was added as a member to Group: Test clone group",
                         "The user " + CLONED_TARGET_APP_USER + " had their group memberships and role assignments deleted and replaced with those of user sourceappuser@clonepermission.test"),
-                table.getColumnDataAsText("comment"));
+                table.getColumnDataAsText("Comment"));
     }
 
     @Override
