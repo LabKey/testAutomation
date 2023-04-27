@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.lineage;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -31,7 +32,7 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
     @Override
     protected void waitForReady()
     {
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(getComponentElement()));
+        getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
     }
 
     public String getName()
@@ -51,8 +52,10 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 
     private void clickHiddenLink(WebElement link, boolean wait)
     {
-        getWrapper().mouseOver(getComponentElement());
-        new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(ExpectedConditions.elementToBeClickable(link));
+        new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(wd -> {
+            getWrapper().mouseOver(getComponentElement());
+            return ExpectedConditions.elementToBeClickable(link).apply(wd);
+        });
         if (wait)
             getWrapper().clickAndWait(link);
         else
