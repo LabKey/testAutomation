@@ -5,18 +5,21 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.list.ManageListsGrid;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -44,13 +47,13 @@ public class ListArchiveExportTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws IOException, CommandException
     {
         ListArchiveExportTest initTest = (ListArchiveExportTest) getCurrentTest();
         initTest.doSetUp();
     }
 
-    private void doSetUp()
+    private void doSetUp() throws IOException, CommandException
     {
         _containerHelper.createProject(getProjectName(), null);
         createListWithData(LIST_B, Map.of("Shape", "Triangle", "Count", "4"));
@@ -69,13 +72,14 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         _permissionHelper.addMemberToRole(_listUser, "Reader", PermissionsHelper.MemberType.user);
     }
 
-    private void createListWithData(String name, Map rowData)
+    private void createListWithData(String name, Map rowData) throws IOException, CommandException
     {
-        log("Creating test list in " + getCurrentContainerPath());
-        _listHelper.createList(getCurrentContainerPath(), name, ListHelper.ListColumnType.AutoInteger, "RowId",
-                new ListHelper.ListColumn("Shape", "Shape", ListHelper.ListColumnType.String),
-                new ListHelper.ListColumn("Count", "Count", ListHelper.ListColumnType.Integer));
-        _listHelper.insertNewRow(rowData);
+        var connection = createDefaultConnection();
+        var listDef = new IntListDefinition(name, "RowId").setFields(List.of(
+                new FieldDefinition("Shape", FieldDefinition.ColumnType.String),
+                new FieldDefinition("Count", FieldDefinition.ColumnType.Integer)));
+        var dataGenerator = listDef.create(connection, getCurrentContainerPath());
+        dataGenerator.insertRows(connection, List.of(rowData));
     }
 
     /*
