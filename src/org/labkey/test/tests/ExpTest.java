@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -91,7 +92,7 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Process and Import Data");
 
         _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
-        Date importDate = new Date();
+        Date importDate = new Date(); // Import timestamp will have various formats applied to it
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(1, false);
 
@@ -176,9 +177,10 @@ public class ExpTest extends BaseWebDriverTest
         _customizeViewsHelper.addColumn("WrappedRowId/Created");
         _customizeViewsHelper.applyCustomView();
         // Verify that it was joined and formatted correctly
-        textCount = countText(dateFormat.format(importDate));
+        String dateTxt = dateFormat.format(importDate);
+        textCount = countText(dateTxt);
         // records for generated files experiment.xar.log and experiment.xar.xml may have been created automatically
-        assertTrue("Number of records is not as expected", textCount == 5 || textCount == 7);
+        Assertions.assertThat(textCount).as("Number of records with date (%s)", dateTxt).isIn(5, 7);
 
         // Since this metadata is shared, clear it out 
         clickAndWait(Locator.linkWithText("exp Schema"));
