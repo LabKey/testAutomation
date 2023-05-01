@@ -91,6 +91,7 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Process and Import Data");
 
         _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
+        Date importDate = new Date();
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(1, false);
 
@@ -122,7 +123,7 @@ public class ExpTest extends BaseWebDriverTest
 
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(new Date()));
+        waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(importDate));
         // records for generated files experiment.xar.log and experiment.xar.xml may have been created when exp schema is created (exp.files auto creates data records for all files)
         int textCount = countText("file:/");
         assertTrue("Exp.data records are not as expected", textCount == 5*2 || textCount == 7*2);
@@ -148,7 +149,7 @@ public class ExpTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Data");
         waitForText(WAIT_FOR_JAVASCRIPT, "editedCreated");
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
-        waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(new Date()));
+        waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(importDate));
 
         // Add a new wrapped column to the exp.Datas table
         clickTab("Query");
@@ -175,7 +176,7 @@ public class ExpTest extends BaseWebDriverTest
         _customizeViewsHelper.addColumn("WrappedRowId/Created");
         _customizeViewsHelper.applyCustomView();
         // Verify that it was joined and formatted correctly
-        textCount = countText(dateFormat.format(new Date()));
+        textCount = countText(dateFormat.format(importDate));
         // records for generated files experiment.xar.log and experiment.xar.xml may have been created automatically
         assertTrue("Number of records is not as expected", textCount == 5 || textCount == 7);
 
