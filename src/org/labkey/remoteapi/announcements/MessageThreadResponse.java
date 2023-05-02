@@ -10,7 +10,7 @@ public class MessageThreadResponse extends CommandResponse
     public MessageThreadResponse(String text, int statusCode, String contentType, JSONObject json)
     {
         super(text, statusCode, contentType, json);
-        _announcementModel = new AnnouncementModel((JSONObject) json.get("data"));
+        _announcementModel = new AnnouncementModel(json.getJSONObject("data"));
     }
 
     public AnnouncementModel getAnnouncementModel()
