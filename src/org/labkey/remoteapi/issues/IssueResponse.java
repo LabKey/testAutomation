@@ -23,7 +23,7 @@ public class IssueResponse extends CommandResponse
     {
         super(text, statusCode, contentType, json);
 
-        JSONArray issuesArray = (JSONArray)json.get("issues");
+        JSONArray issuesArray = json.getJSONArray("issues");
         for (int i=0; i< issuesArray.length(); i++)
         {
             _issueIds.add(issuesArray.getLong(i));
