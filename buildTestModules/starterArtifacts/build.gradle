@@ -85,7 +85,6 @@ dependencies {
     // add dependencies on all starter API artifacts
     implementation "org.labkey.api:core:${labkeyVersion}"
     implementation "org.labkey.api:assay:${labkeyVersion}"
-    implementation "org.labkey.api:issues:${labkeyVersion}"
     implementation "org.labkey.api:ms2:${labkeyVersion}"
     implementation "org.labkey.api:targetedms:${labkeyVersion}"
     implementation "org.labkey.api:dataintegration:${labkeyVersion}"
