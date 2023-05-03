@@ -51,7 +51,8 @@ public class LinkedReportTest extends BaseWebDriverTest
 
         waitAndClick(Locator.linkWithText(REPORT_NAME));
         switchToWindow(1);
-        waitForText("Bridge the gap between data and discovery.");
+
+        waitForElement(Locator.linkWithText("Solutions"));
         Assert.assertTrue("Linked report navigated to incorrect external link", isElementPresent(Locator.linkWithText("Get a Demo")));
     }
 }
