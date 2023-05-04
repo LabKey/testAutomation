@@ -16,7 +16,7 @@ import java.util.List;
 public class LinkedReportTest extends BaseWebDriverTest
 {
     private static final String REPORT_NAME = "Labkey linked report";
-    private static final String LINK_REPORT_URL = "https://www.labkey.com";
+    private static final String LINK_REPORT_URL = "https://www.labkey.com/";
 
     @Override
     protected @Nullable String getProjectName()
@@ -52,7 +52,7 @@ public class LinkedReportTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText(REPORT_NAME));
         switchToWindow(1);
 
-        waitForElement(Locator.linkWithText("Solutions"));
-        Assert.assertTrue("Linked report navigated to incorrect external link", isElementPresent(Locator.linkWithText("Get a Demo")));
+        waitForElement(Locator.linkWithText("Get a Demo"));
+        Assert.assertEquals("Linked report navigated to incorrect external link", LINK_REPORT_URL, getDriver().getCurrentUrl());
     }
 }
