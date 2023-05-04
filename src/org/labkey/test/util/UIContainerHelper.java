@@ -48,7 +48,13 @@ public class UIContainerHelper extends AbstractContainerHelper
     }
 
     @LogMethod
-    public void doCreateProject(String projectName, String folderType, String templateFolder)
+    public void createProjectFromTemplate(String projectName, String templateFolder)
+    {
+        doCreateProject(projectName, "Create From Template Folder", templateFolder);
+    }
+
+    @LogMethod
+    private void doCreateProject(String projectName, String folderType, String templateFolder)
     {
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();

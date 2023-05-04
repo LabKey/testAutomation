@@ -201,7 +201,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
         // Issue 47841: verify that menu config comes through with folder export/import (via create from template)
         UIContainerHelper uiContainerHelper = new UIContainerHelper(this);
-        uiContainerHelper.doCreateProject(getAltProjectName(), "Create From Template Folder", "/" + getProjectName());
+        uiContainerHelper.createProjectFromTemplate(getAltProjectName(), "/" + getProjectName());
         openMenu("Assays");
         openMenu("Studies");
         openMenu(WIKI_PAGE_TITLE);
