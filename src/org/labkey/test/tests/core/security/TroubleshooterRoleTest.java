@@ -89,7 +89,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
 
         log("Verify the export file is non empty");
         ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
-        auditLogPage.selectView("Group events");
+        auditLogPage.selectView("Group and role events");
         assertTextPresent("You do not have permission to see this data.");
     }
 
