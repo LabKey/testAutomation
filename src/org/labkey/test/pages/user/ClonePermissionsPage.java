@@ -47,12 +47,6 @@ public class ClonePermissionsPage extends LabKeyPage<ClonePermissionsPage.Elemen
         return Locator.tagWithClass("div", "labkey-error").findElement(getDriver()).getText();
     }
 
-    public ShowUsersPage cancelPermission()
-    {
-        clickAndWait(elementCache().cancelBtn);
-        return new ShowUsersPage(getDriver());
-    }
-
     @Override
     protected ClonePermissionsPage.ElementCache newElementCache()
     {
@@ -64,6 +58,5 @@ public class ClonePermissionsPage extends LabKeyPage<ClonePermissionsPage.Elemen
         WebElement warningMsg = Locator.xpath("//table/tbody/tr[1]/td").findWhenNeeded(this);
         Input cloneUser = new Input(Locator.name("cloneUser").findWhenNeeded(this), getDriver());
         WebElement clonePermissionBtn = Locator.lkButton("Clone Permissions").findWhenNeeded(this);
-        WebElement cancelBtn = Locator.lkButton("Cancel").findElement(this);
     }
 }
