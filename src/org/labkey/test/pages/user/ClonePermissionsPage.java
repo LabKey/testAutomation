@@ -61,10 +61,9 @@ public class ClonePermissionsPage extends LabKeyPage<ClonePermissionsPage.Elemen
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        WebElement warningMsg = Locator.xpath("//table/tbody/tr[3]/td").findWhenNeeded(this);
+        WebElement warningMsg = Locator.xpath("//table/tbody/tr[1]/td").findWhenNeeded(this);
         Input cloneUser = new Input(Locator.name("cloneUser").findWhenNeeded(this), getDriver());
         WebElement clonePermissionBtn = Locator.lkButton("Clone Permissions").findWhenNeeded(this);
         WebElement cancelBtn = Locator.lkButton("Cancel").findElement(this);
-
     }
 }
