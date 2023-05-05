@@ -16,70 +16,65 @@ sourceSets {
   }
 }
 
-project.task('validatorJar',
-        group: "QC",
-        type: Jar,
-        description: "Builds jar for assay validation",
-        {
-            from sourceSets.main.output
-            from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            archiveFileName.set("validator.jar")
-            destinationDirectory = project.projectDir
-            manifest {
-                attributes 'Implementation-Title': 'Assay Validator Jar',
-                        'Implementation-Version': project.version,
-                        'Built-By' : System.getProperty("user.name"),
-                        'Main-Class': 'org.labkey.AssayValidator'
-            }
-        }
-)
+project.tasks.register('validatorJar', Jar) {
+    group = "QC"
+    description = "Builds jar for assay validation"
 
-project.task('transformJar',
-        group: "QC",
-        type: Jar,
-        description: "Builds jar for doing assay transforms",
-
-        {
-            from sourceSets.main.output
-            from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            archiveFileName.set("transform.jar")
-            destinationDirectory = project.projectDir
-            manifest {
-            attributes 'Implementation-Title': 'Assay Validator Jar',
-                    'Implementation-Version': project.version,
-                    'Built-By' : System.getProperty("user.name"),
-                    'Main-Class': 'org.labkey.AssayTransform'
-            }
-        }
-)
-
-project.task('transformWarningJar',
-        group: "QC",
-        type: Jar,
-        description: "Builds jar for doing assay transform warnings",
-        {
-            from sourceSets.main.output
-            from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            archiveFileName.set("transformWarning.jar")
-            destinationDirectory = project.projectDir
-            manifest {
-            attributes 'Implementation-Title': 'Assay Validator Jar',
-                    'Implementation-Version': project.version,
-                    'Built-By' : System.getProperty("user.name"),
-                    'Main-Class': 'org.labkey.AssayTransformWarning'
-            }
-        }
-)
-
-project.tasks.jar.dependsOn(project.tasks.validatorJar)
-project.tasks.jar.dependsOn(project.tasks.transformJar)
-project.tasks.jar.dependsOn(project.tasks.transformWarningJar)
-
-project.tasks.jar.configure { jarTask ->
-    project.project(BuildUtils.getTestProjectPath(project.gradle)).tasks.withType(RunTestSuite).configureEach({ t ->
-        t.dependsOn(jarTask)
-    })
+    from sourceSets.main.output
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName.set("validator.jar")
+    destinationDirectory = project.projectDir
+    manifest {
+        attributes 'Implementation-Title': 'Assay Validator Jar',
+                'Implementation-Version': project.version,
+                'Built-By': System.getProperty("user.name"),
+                'Main-Class': 'org.labkey.AssayValidator'
+    }
 }
+
+project.tasks.register('transformJar', Jar) {
+    group = "QC"
+    description = "Builds jar for doing assay transforms"
+
+    from sourceSets.main.output
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName.set("transform.jar")
+    destinationDirectory = project.projectDir
+    manifest {
+        attributes 'Implementation-Title': 'Assay Validator Jar',
+                'Implementation-Version': project.version,
+                'Built-By': System.getProperty("user.name"),
+                'Main-Class': 'org.labkey.AssayTransform'
+    }
+}
+
+project.tasks.register('transformWarningJar', Jar) {
+    group = "QC"
+    description = "Builds jar for doing assay transform warnings"
+
+    from sourceSets.main.output
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName.set("transformWarning.jar")
+    destinationDirectory = project.projectDir
+    manifest {
+        attributes 'Implementation-Title': 'Assay Validator Jar',
+                'Implementation-Version': project.version,
+                'Built-By': System.getProperty("user.name"),
+                'Main-Class': 'org.labkey.AssayTransformWarning'
+    }
+}
+
+var jarTask = project.tasks.named('jar')
+
+jarTask.configure {
+    dependsOn(project.tasks.validatorJar)
+    dependsOn(project.tasks.transformJar)
+    dependsOn(project.tasks.transformWarningJar)
+}
+
+project.project(BuildUtils.getTestProjectPath(project.gradle)).tasks.withType(RunTestSuite).configureEach({ t ->
+    t.dependsOn(jarTask)
+})

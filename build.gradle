@@ -119,7 +119,7 @@ if (!BuildUtils.isIntellij())  {
             }
         }
     }
-    project.tasks.jar {
+    project.tasks.named('jar').configure {
         Jar jar ->
             jar.archiveBaseName.set(apiArtifactName)
             jar.setGroup('org.labkey.api')
