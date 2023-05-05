@@ -10,10 +10,10 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.RenameContainerCommand;
 import org.labkey.remoteapi.security.RenameContainerResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
-import org.labkey.test.pages.samplemanagement.admin.AuditLogPage;
 import org.labkey.test.util.LogMethod;
 
 import java.io.IOException;
@@ -86,6 +86,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         try
         {
             command.execute(cn, getProjectName());
+            Assert.fail("Rename should have failed");
         }
         catch (CommandException e)
         {
@@ -98,6 +99,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         try
         {
             command.execute(cn, getProjectName());
+            Assert.fail("Rename should have failed");
         }
         catch (CommandException e)
         {
@@ -110,6 +112,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         try
         {
             command.execute(cn, getProjectName());
+            Assert.fail("Rename should have failed");
         }
         catch (CommandException e)
         {
@@ -122,6 +125,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         try
         {
             command.execute(cn, getProjectName());
+            Assert.fail("Rename should have failed");
         }
         catch (CommandException e)
         {
@@ -137,7 +141,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         Assert.assertEquals("Incorrect new title", newTitle + " NO ALIAS", response.getProperty("title"));
 
         goToProjectHome(newContainerName);
-        Assert.assertEquals("","");
+//        Assert.assertEquals("Project should not be accessible with old name","", Locators.labkeyErrorHeading.findElement(getDriver()).getText());
 
         ShowAuditLogPage logPage = goToAdminConsole().clickAuditLog();
         logPage.selectView("Project and Folder events");
