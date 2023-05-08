@@ -25,6 +25,13 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
 {
     private static final String DUPLICATE_FOLDER_NAME = "Duplicate folder name";
 
+    @BeforeClass
+    public static void doSetup()
+    {
+        RenameFolderJavaClientApiTest initTest = (RenameFolderJavaClientApiTest) getCurrentTest();
+        initTest.setupProject();
+    }
+
     @Override
     protected @Nullable String getProjectName()
     {
@@ -35,13 +42,6 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
     public List<String> getAssociatedModules()
     {
         return null;
-    }
-
-    @BeforeClass
-    public static void doSetup()
-    {
-        RenameFolderJavaClientApiTest initTest = (RenameFolderJavaClientApiTest) getCurrentTest();
-        initTest.setupProject();
     }
 
     @LogMethod
@@ -90,7 +90,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Blank names are not allowed.", 500, e.getStatusCode());
+            Assert.assertEquals("Blank names are not allowed.", 400, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "Please specify a name or a title.", e.getMessage());
         }
 
@@ -103,7 +103,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Blank names are not allowed.", 500, e.getStatusCode());
+            Assert.assertEquals("Blank names are not allowed.", 400, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "Please specify a name or a title.", e.getMessage());
         }
 
@@ -116,7 +116,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Blank names are not allowed.", 500, e.getStatusCode());
+            Assert.assertEquals("Blank names are not allowed.", 400, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "Please specify a name or a title.", e.getMessage());
         }
 
@@ -129,23 +129,29 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Folder should not be renamed to existing folder", 500, e.getStatusCode());
+            Assert.assertEquals("Folder should not be renamed to existing folder", 400, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "The server already has a project with this name.", e.getMessage());
         }
 
         log("AddAlias explicitly false: Verify works, and name and title update");
+        goToProjectHome(newContainerName);
         command = new RenameContainerCommand(newContainerName + " NO ALIAS", newTitle + " NO ALIAS", false);
         response = command.execute(cn, getProjectName());
         Assert.assertEquals("Rename container api failed ", 200, response.getStatusCode());
         Assert.assertEquals("Incorrect new name", newContainerName + " NO ALIAS", response.getName());
         Assert.assertEquals("Incorrect new title", newTitle + " NO ALIAS", response.getProperty("title"));
 
-        goToProjectHome(newContainerName);
-//        Assert.assertEquals("Project should not be accessible with old name","", Locators.labkeyErrorHeading.findElement(getDriver()).getText());
+        goToProjectHome(newContainerName + "1");
+        Assert.assertEquals("Project should not be accessible with old name",
+                "No such project: /" + newContainerName + "1",
+                Locators.labkeyErrorHeading.findElement(getDriver()).getText());
 
         ShowAuditLogPage logPage = goToAdminConsole().clickAuditLog();
         logPage.selectView("Project and Folder events");
-        Assert.assertEquals("", "");
+        Assert.assertEquals("Incorrect comment in audit log",
+                newContainerName + " NO ALIAS was renamed from " +
+                        newContainerName + "1 to " + newContainerName + " NO ALIAS",
+                logPage.getLogTable().getDataAsText(0, "Comment"));
     }
 
     @Override
