@@ -25,6 +25,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         public String label;
         public String description;
         public SampleTypeHelper.StatusType statusType;
+        public boolean isLocked;
     }
 
     public ManageSampleStatusesPanel(WebElement element, WebDriver driver)
@@ -76,10 +77,33 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public SampleStatus selectStatus(String name, SampleTypeHelper.StatusType statusType)
     {
-        elementCache().statusItem(name, statusType).click();
+        WebElement groupItem = elementCache().statusItem(name, statusType);
+        groupItem.click();
         SampleStatus status = new SampleStatus();
 
-        waitForEditReady();
+        status.isLocked = isLocked();
+
+        if(!status.isLocked)
+        {
+            waitForEditReady();
+        }
+        else
+        {
+            WebDriverWrapper.waitFor(()->
+                    {
+                        try
+                        {
+                            return groupItem.getText().trim().toLowerCase()
+                                    .contains(getWrapper().getFormElement(elementCache().labelField.getComponentElement()).trim().toLowerCase());
+                        }
+                        catch (NoSuchElementException | StaleElementReferenceException exp)
+                        {
+                            return false;
+                        }
+                    },
+                    "Edit part of the panel for a locked status did not render in time.", 1_000);
+
+        }
 
         status.statusType = getStatusType();
         status.label = getLabel();
@@ -103,6 +127,13 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return SampleTypeHelper.StatusType.valueOf(elementCache().statusTypeSelect.getValue());
     }
 
+    public boolean isLocked()
+    {
+        return Locator.tagWithClass("span", "domain-field-lock-icon")
+                .findWhenNeeded(elementCache().selectedStatusItem)
+                .isDisplayed();
+    }
+
     public List<String> getStatusNames()
     {
         return elementCache().statusItems
@@ -116,6 +147,11 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     {
         elementCache().addStatusButton.click();
         return this;
+    }
+
+    public boolean isAddStatusPresent()
+    {
+        return elementCache().addStatusButton.isDisplayed();
     }
 
     public ManageSampleStatusesPanel setLabel(String label)
@@ -193,6 +229,8 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
         final Locator statusItems = Locator.tagWithClass("button", "list-group-item");
 
+        final WebElement selectedStatusItem = Locator.tagWithClass("button", "list-group-item").withClass("active")
+                .refindWhenNeeded(this);
         final WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
                 .findWhenNeeded(getComponentElement());
         final Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).findWhenNeeded(this);
