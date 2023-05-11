@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -53,6 +54,11 @@ public class MenuBarTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    private String getAltProjectName()
+    {
+        return PROJECT_NAME + "2";
     }
 
     @Test
@@ -192,12 +198,23 @@ public class MenuBarTest extends BaseWebDriverTest
         openMenu("Folders");
         waitForElement(Locator.linkWithText(DEM_STUDY_FOLDER));
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER));
+
+        // Issue 47841: verify that menu config comes through with folder export/import (via create from template)
+        UIContainerHelper uiContainerHelper = new UIContainerHelper(this);
+        uiContainerHelper.createProjectFromTemplate(getAltProjectName(), "/" + getProjectName());
+        openMenu("Assays");
+        openMenu("Studies");
+        openMenu(WIKI_PAGE_TITLE);
+        openMenu("Wiki Render Types");
+        openMenu("Participant Reports");
+        openMenu("Folders");
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getAltProjectName(), afterTest);
     }
 
     @Override
