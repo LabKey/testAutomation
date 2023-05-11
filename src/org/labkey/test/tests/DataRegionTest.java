@@ -64,6 +64,7 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Set Paging to 3 with config", "testPagingConfig"),
                     Pair.of("Set Paging to 2 with API", "testSetPaging"),
                     Pair.of("Parameterized Queries", "testParameterizedQueries"),
+                    Pair.of("Issue #47735: Date filter format", "testDateFilterFormat"),
                     Pair.of("Regression #25337", "test25337"),
                     Pair.of("Change Page Offset", "testPageOffset"),
                     Pair.of("Keep Removable Filters", "testRemovableFilters"),
