@@ -24,6 +24,7 @@ import org.labkey.test.util.TestLogger;
 import java.io.File;
 import java.io.InputStream;
 import java.net.FileNameMap;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -127,7 +128,7 @@ public class MimeMap implements FileNameMap
         try (InputStream is = MimeMap.class.getResourceAsStream("mime.txt"))
         {
             // tab delimited file is easier to edit in a spreadsheet
-            List<String> lines = IOUtils.readLines(is);
+            List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
             for (String line : lines)
             {
                 int tab = StringUtils.indexOfAny(line, "\t ");
@@ -148,7 +149,7 @@ public class MimeMap implements FileNameMap
     }
 
 
-    private Hashtable<String, MimeType> map = new Hashtable<>();
+    private final Hashtable<String, MimeType> map = new Hashtable<>();
 
     public void addContentType(String extn, String type)
     {
