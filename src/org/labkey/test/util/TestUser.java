@@ -107,12 +107,33 @@ public class TestUser
 
     public void impersonate() throws IOException, CommandException
     {
+        impersonate(false);
+    }
+
+    /**
+     * Impersonate the given test user.
+     * @param refresh If the test is already within the App and isn't reloading the page via navigation, the LABKEY.user object will be out of sync with the newly impersonated user so a page refresh will help.
+     */
+    public void impersonate(boolean refresh) throws IOException, CommandException
+    {
         log("Begin impersonating as user: " + getEmail());
         _impersonationConnection = getWrapper().createDefaultConnection();
         _impersonationConnection.impersonate(getEmail());
+
+        if (refresh)
+            getWrapper().refresh();
     }
 
     public void stopImpersonating() throws IOException, CommandException
+    {
+        stopImpersonating(false);
+    }
+
+    /**
+     * Stop impersonating the test user.
+     * @param refresh If the test is already within the App and isn't reloading the page via navigation, the LABKEY.user object will be out of sync with the newly impersonated user so a page refresh will help
+     */
+    public void stopImpersonating(boolean refresh) throws IOException, CommandException
     {
         if (_impersonationConnection == null)
         {
@@ -122,6 +143,9 @@ public class TestUser
         log("Stop impersonating uer " + getEmail());
         _impersonationConnection.stopImpersonating();
         _impersonationConnection = null;
+
+        if (refresh)
+            getWrapper().refresh();
     }
 
     private CreateUserResponse getCreateUserResponse()
