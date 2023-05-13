@@ -96,10 +96,9 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         listsGrid.setFilter("Container", "Equals One Of (example usage: a;b;c)", LIST_FOLDER_A + ";" + getProjectName());
         listsGrid.checkAllOnPage();
         listsGrid.clickHeaderButton("Export List Archive");
-        waitForElement(Locators.labkeyErrorHeading);
-        Assert.assertEquals("Incorrect permission error message",
-                "You do not have the permission to export List '" + LIST_B + "' from Folder '/" + getProjectName() + "'.",
-                Locators.labkeyErrorSubHeading.findElement(getDriver()).getText());
+        Assert.assertEquals("Invalid error message", "List archive export is only supported for Lists in folders where you are an administrator. Try filtering to select only Lists in the local folder.",
+                Locator.tagWithClass("div", "labkey-error").findElement(getDriver()).getText());
+        goBack();
         stopImpersonating();
 
         goToProjectHome();
