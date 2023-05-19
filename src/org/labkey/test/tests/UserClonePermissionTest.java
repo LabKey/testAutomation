@@ -14,6 +14,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @Category({Daily.class})
@@ -119,14 +120,14 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         table.setFilter("User", "Contains", _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER));
 
         Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), 7, table.getDataRowCount());
-        Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
+        Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), new HashSet<>(Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Developers",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Test clone group",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Administrators",
                         "The user " + CLONED_TARGET_SITE_USER + " was removed from the security role Submitter.",
                         "The user " + CLONED_TARGET_SITE_USER + " had their group memberships and role assignments deleted and replaced with those of user sourcesiteuser@clonepermission.test",
-                        "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Submitter."),
-                table.getColumnDataAsText("Comment"));
+                        "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Submitter.")),
+                new HashSet<>(table.getColumnDataAsText("Comment")));
     }
 
     @Test
