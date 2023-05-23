@@ -114,10 +114,16 @@ public class ProductMenu extends BaseBootstrapMenu
         return this;
     }
 
-    public void goToFolder(String folderName)
+    public void goToFolderDashboard(String folderName)
     {
         clickFolderItem(folderName);
-        clickMenuColumnHeader("Dashboard");
+        elementCache().activeDashboardIcon.click();
+    }
+
+    public void goToFolderAdministration(String folderName)
+    {
+        clickFolderItem(folderName);
+        elementCache().activeAdministrationIcon.click();
     }
 
     public String getButtonTitle()
@@ -156,6 +162,14 @@ public class ProductMenu extends BaseBootstrapMenu
     {
         private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").refindWhenNeeded(this);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").refindWhenNeeded(menuContent);
+        public WebElement activeDashboardIcon = Locator.tagWithClass("div", "col-folders")
+                .descendant(Locator.tagWithClass("li", "active"))
+                .descendant(Locator.tagWithClass("i", "fa-home"))
+                .findWhenNeeded(menuContent);
+        public WebElement activeAdministrationIcon = Locator.tagWithClass("div", "col-folders")
+                .descendant(Locator.tagWithClass("li", "active"))
+                .descendant(Locator.tagWithClass("i", "fa-gear"))
+                .findWhenNeeded(menuContent);
 
         Locator.XPathLocator menuSectionHeaderLoc(String headerText)
         {
