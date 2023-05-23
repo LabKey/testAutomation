@@ -198,7 +198,30 @@ public class QueryMetadataTest extends BaseWebDriverTest
             .isEqualTo(expectedAfterXml));
     }
 
+    /*
+        Regression coverage for Issue 47659
+     */
+    @Test
+    public void testEnsureOnlyModifiedColumnAppearsInMetadataXML()
+    {
+        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
+        editPage.fieldsPanel().getField("Created")
+                .setDateFormat("Date");
+        editPage.clickSave();
 
+        var queryXmlPage = editPage.clickEditSource();
+        var actualXml = queryXmlPage.getMetadataXml();
+        String expectedColumnPart = "<table tableName=\"queryMetadataTestList\" tableDbType=\"NOT_IN_DB\">\n" +
+                "    <columns>\n" +
+                "      <column columnName=\"Created\">\n" +
+                "        <formatString>Date</formatString>\n" +
+                "      </column>\n" +
+                "    </columns>\n" +
+                "  </table>";
+        assertThat(actualXml)
+                .as("expect only the field edited in this test to appear in the query xml")
+                .contains(expectedColumnPart);
+    }
 
     @Override
     protected String getProjectName()
