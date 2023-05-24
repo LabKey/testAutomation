@@ -25,7 +25,7 @@ public class ExportDiagnosticsPseudoTest extends BaseWebDriverTest
         }
         FileUtils.forceMkdir(diagnosticsDir);
 
-        if (_containerHelper.getAllModules().contains("Premium"))
+        if (_containerHelper.getAllModules().contains("CloudServices"))
         {
             SimpleHttpRequest req = new SimpleHttpRequest(WebTestHelper.buildURL("diagnostics", "exportDiagnostics"), "POST");
             req.copySession(getDriver());
@@ -35,7 +35,7 @@ public class ExportDiagnosticsPseudoTest extends BaseWebDriverTest
         else
         {
 
-            TestLogger.info("Premium module not available, dumping logs manually");
+            TestLogger.info("CloudServices module not available, dumping logs manually");
             SimpleHttpRequest req = new SimpleHttpRequest(WebTestHelper.buildURL("admin", "showPrimaryLog"));
             req.copySession(getDriver());
             req.getResponseAsFile(new File(diagnosticsDir, "labkey.log"));
