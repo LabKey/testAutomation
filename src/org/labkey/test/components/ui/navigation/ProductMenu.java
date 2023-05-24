@@ -120,10 +120,20 @@ public class ProductMenu extends BaseBootstrapMenu
         elementCache().activeDashboardIcon.click();
     }
 
+    public int getDashboardIconCount()
+    {
+        return elementCache().dashboardIconLoc.findElements(elementCache().menuContent).size();
+    }
+
     public void goToFolderAdministration(String folderName)
     {
         clickFolderItem(folderName);
         elementCache().activeAdministrationIcon.click();
+    }
+
+    public int getAdministrationIconCount()
+    {
+        return elementCache().administrationIconLoc.findElements(elementCache().menuContent).size();
     }
 
     public String getButtonTitle()
@@ -162,13 +172,16 @@ public class ProductMenu extends BaseBootstrapMenu
     {
         private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").refindWhenNeeded(this);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").refindWhenNeeded(menuContent);
+
+        public Locator.XPathLocator dashboardIconLoc = Locator.tagWithClass("i", "fa-home");
         public WebElement activeDashboardIcon = Locator.tagWithClass("div", "col-folders")
                 .descendant(Locator.tagWithClass("li", "active"))
-                .descendant(Locator.tagWithClass("i", "fa-home"))
+                .descendant(dashboardIconLoc)
                 .findWhenNeeded(menuContent);
+        public Locator.XPathLocator administrationIconLoc = Locator.tagWithClass("i", "fa-gear");
         public WebElement activeAdministrationIcon = Locator.tagWithClass("div", "col-folders")
                 .descendant(Locator.tagWithClass("li", "active"))
-                .descendant(Locator.tagWithClass("i", "fa-gear"))
+                .descendant(administrationIconLoc)
                 .findWhenNeeded(menuContent);
 
         Locator.XPathLocator menuSectionHeaderLoc(String headerText)
