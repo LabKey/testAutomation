@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -63,21 +64,21 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         log("New name only: Verify name and title become " + newContainerName);
         RenameContainerCommand command = new RenameContainerCommand(newContainerName, null, true);
         RenameContainerResponse response = command.execute(cn, getProjectName());
-        Assert.assertEquals("Rename container api failed ", 200, response.getStatusCode());
+        Assert.assertEquals("Rename container api failed ", HttpStatus.SC_OK, response.getStatusCode());
         Assert.assertEquals("Incorrect new name", newContainerName, response.getName());
         Assert.assertEquals("Incorrect new title", newContainerName, response.getProperty("title"));
 
         log("New title only: Verify only title changes to " + newTitle);
         command = new RenameContainerCommand(null, newTitle, true);
         response = command.execute(cn, getProjectName());
-        Assert.assertEquals("Rename container api failed ", 200, response.getStatusCode());
+        Assert.assertEquals("Rename container api failed ", HttpStatus.SC_OK, response.getStatusCode());
         Assert.assertEquals("Incorrect new name", newContainerName, response.getName());
         Assert.assertEquals("Incorrect new title", newTitle, response.getProperty("title"));
 
         log("New name and title: Verify both name and title update");
         command = new RenameContainerCommand(newContainerName + "1", newTitle + "1", true);
         response = command.execute(cn, getProjectName());
-        Assert.assertEquals("Rename container api failed ", 200, response.getStatusCode());
+        Assert.assertEquals("Rename container api failed ", HttpStatus.SC_OK, response.getStatusCode());
         Assert.assertEquals("Incorrect new name", newContainerName + "1", response.getName());
         Assert.assertEquals("Incorrect new title", newTitle + "1", response.getProperty("title"));
 
@@ -90,7 +91,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Blank names are not allowed.", 400, e.getStatusCode());
+            Assert.assertEquals("Blank names are not allowed.", HttpStatus.SC_BAD_REQUEST, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "Please specify a name or a title.", e.getMessage());
         }
 
@@ -103,7 +104,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Blank names are not allowed.", 400, e.getStatusCode());
+            Assert.assertEquals("Blank names are not allowed.", HttpStatus.SC_BAD_REQUEST, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "Please specify a name or a title.", e.getMessage());
         }
 
@@ -116,7 +117,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Blank names are not allowed.", 400, e.getStatusCode());
+            Assert.assertEquals("Blank names are not allowed.", HttpStatus.SC_BAD_REQUEST, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "Please specify a name or a title.", e.getMessage());
         }
 
@@ -129,7 +130,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Folder should not be renamed to existing folder", 400, e.getStatusCode());
+            Assert.assertEquals("Folder should not be renamed to existing folder", HttpStatus.SC_BAD_REQUEST, e.getStatusCode());
             Assert.assertEquals("Incorrect error message", "The server already has a project with this name.", e.getMessage());
         }
 
@@ -137,7 +138,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
         goToProjectHome(newContainerName);
         command = new RenameContainerCommand(newContainerName + " NO ALIAS", newTitle + " NO ALIAS", false);
         response = command.execute(cn, getProjectName());
-        Assert.assertEquals("Rename container api failed ", 200, response.getStatusCode());
+        Assert.assertEquals("Rename container api failed ", HttpStatus.SC_OK, response.getStatusCode());
         Assert.assertEquals("Incorrect new name", newContainerName + " NO ALIAS", response.getName());
         Assert.assertEquals("Incorrect new title", newTitle + " NO ALIAS", response.getProperty("title"));
 

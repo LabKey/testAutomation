@@ -1006,7 +1006,7 @@ public class Crawler
                     if (code >= 400)
                     {
                         String message = relativeURL + "\nproduced response code " + code + originMessage;
-                        if (code == 403 && TestProperties.isPrimaryUserAppAdmin())
+                        if (code == HttpStatus.SC_FORBIDDEN && TestProperties.isPrimaryUserAppAdmin())
                         {
                             // Crawling as app admin is likely to hit numerous 403s. Don't fail immediately.
                             _test.checker().wrapAssertion(() -> fail(message));
@@ -1038,7 +1038,7 @@ public class Crawler
                         } // Hiccup with the project menu, try again next time.
                     }
 
-                    if (code == 200 && _test.getDriver().getTitle().isEmpty())
+                    if (code == HttpStatus.SC_OK && _test.getDriver().getTitle().isEmpty())
                         _warnings.add("Action does not specify title: " + actionId);
 
                     if (actualUrl.toString().startsWith(WebTestHelper.getBaseURL())) // Stop if redirected to an external site

@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.nab;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -471,7 +472,7 @@ public class NabAssayTest extends AbstractAssayTest
 
             // no permission to details page for "ptid 1 C"; it wasn't linked to the study
             beginAt(ptid1c_detailsURL);
-            assertEquals(403, getResponseCode());
+            assertEquals(HttpStatus.SC_FORBIDDEN, getResponseCode());
 
             stopImpersonating();
 

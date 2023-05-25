@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -315,7 +316,7 @@ public class DataReportsTest extends ReportTest
             assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
             assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
             beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
-            assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
+            assertEquals("App admin shouldn't be able to create an advanced report.", HttpStatus.SC_FORBIDDEN, getResponseCode());
             return; // success
         }
 

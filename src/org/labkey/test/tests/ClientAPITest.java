@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -1369,7 +1370,7 @@ public class ClientAPITest extends BaseWebDriverTest
         }
         catch (IOException | CommandException e)
         {
-            if (e instanceof CommandException && !actionAllowed && ((CommandException) e).getStatusCode() == 403)
+            if (e instanceof CommandException && !actionAllowed && ((CommandException) e).getStatusCode() == HttpStatus.SC_FORBIDDEN)
                 return; // This is OK. Properly validated action wasn't allowed
             throw new RuntimeException("Command execution error " + errMsg, e);
         }
@@ -1405,11 +1406,11 @@ public class ClientAPITest extends BaseWebDriverTest
 
         final String bogusContainerPath = "/BOGUS---CONTAINER---PATH";
 
-        runCommand(cn, command, "application/json", "text/html", 404, null);
-        runCommand(cn, command, "text/xml", "text/html", 404, null);
-        runCommand(cn, command, "text/html", "text/html", 404, null);
-        runCommand(cn, command, "application/json", "text/html", 404, null);
-        runCommand(cn, command, "text/html", "text/html", 404, null, bogusContainerPath);
+        runCommand(cn, command, "application/json", "text/html", HttpStatus.SC_NOT_FOUND, null);
+        runCommand(cn, command, "text/xml", "text/html", HttpStatus.SC_NOT_FOUND, null);
+        runCommand(cn, command, "text/html", "text/html", HttpStatus.SC_NOT_FOUND, null);
+        runCommand(cn, command, "application/json", "text/html", HttpStatus.SC_NOT_FOUND, null);
+        runCommand(cn, command, "text/html", "text/html", HttpStatus.SC_NOT_FOUND, null, bogusContainerPath);
 
         // An API location/command that requires permissions
         log("Testing response content type for 401");
@@ -1431,33 +1432,33 @@ public class ClientAPITest extends BaseWebDriverTest
         command = new SimpleGetCommand("query", "selectRows.api");
 
         // Check that a bad container path produces the right kind of response
-        runCommand(cn, command, "application/json", "application/json", 404, expectedProps, bogusContainerPath);
+        runCommand(cn, command, "application/json", "application/json", HttpStatus.SC_NOT_FOUND, expectedProps, bogusContainerPath);
         // Try again requesting an XML response
         command.setParameters(Map.of("respFormat", "xml"));
-        runCommand(cn, command, "application/json", "text/xml", 404, null, bogusContainerPath);
+        runCommand(cn, command, "application/json", "text/xml", HttpStatus.SC_NOT_FOUND, null, bogusContainerPath);
 
         command = new SimpleGetCommand("query", "selectRows.api");
         // Check that an valid container with bogus parameters also does the right thing for selectRows
         expectedProps.put("exception", "The specified schema does not exist");
         cn = getConnection(true);
-        runCommand(cn, command, "application/json", "application/json", 404, expectedProps);
+        runCommand(cn, command, "application/json", "application/json", HttpStatus.SC_NOT_FOUND, expectedProps);
 
         // Try again requesting an XML response
         command.setParameters(Map.of("respFormat", "xml"));
-        runCommand(cn, command, "application/json", "text/xml", 404, null);
+        runCommand(cn, command, "application/json", "text/xml", HttpStatus.SC_NOT_FOUND, null);
     }
 
     private void validateUnauthorizedResponses(Connection cn, SimpleGetCommand command, Map<String, Object> expectedProps)
     {
-        runCommand(cn, command, "application/json", "application/json", 401, expectedProps);
-        runCommand(cn, command, "text/xml", "application/json", 401, expectedProps);
-        runCommand(cn, command, "text/html", "application/json", 401, expectedProps);
+        runCommand(cn, command, "application/json", "application/json", HttpStatus.SC_UNAUTHORIZED, expectedProps);
+        runCommand(cn, command, "text/xml", "application/json", HttpStatus.SC_UNAUTHORIZED, expectedProps);
+        runCommand(cn, command, "text/html", "application/json", HttpStatus.SC_UNAUTHORIZED, expectedProps);
 
         command.setParameters(Map.of("respFormat", "xml"));
 
-        runCommand(cn, command, "application/json", "text/xml", 401, expectedProps);
-        runCommand(cn, command, "text/xml", "text/xml", 401, expectedProps);
-        runCommand(cn, command, "text/html", "text/xml", 401, expectedProps);
+        runCommand(cn, command, "application/json", "text/xml", HttpStatus.SC_UNAUTHORIZED, expectedProps);
+        runCommand(cn, command, "text/xml", "text/xml", HttpStatus.SC_UNAUTHORIZED, expectedProps);
+        runCommand(cn, command, "text/html", "text/xml", HttpStatus.SC_UNAUTHORIZED, expectedProps);
     }
 
     /**

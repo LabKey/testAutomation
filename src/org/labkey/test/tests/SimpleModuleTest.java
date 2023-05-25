@@ -721,7 +721,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(403, ex.getStatusCode());
+            assertEquals(HttpStatus.SC_FORBIDDEN, ex.getStatusCode());
             //assertEquals("The row is from the wrong container.", ex.getMessage());
         }
 
@@ -805,7 +805,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(403, ex.getStatusCode());
+            assertEquals(HttpStatus.SC_FORBIDDEN, ex.getStatusCode());
         }
     }
 

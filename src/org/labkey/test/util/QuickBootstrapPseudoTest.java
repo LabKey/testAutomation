@@ -1,5 +1,6 @@
 package org.labkey.test.util;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -102,7 +103,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
         }
         catch (IOException | CommandException e)
         {
-            if (e instanceof CommandException && ((CommandException)e).getStatusCode() == 401)
+            if (e instanceof CommandException && ((CommandException)e).getStatusCode() == HttpStatus.SC_UNAUTHORIZED)
             {
                 return true;
             }
