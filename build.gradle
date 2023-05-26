@@ -18,7 +18,7 @@ project.configurations {
 
 project.dependencies {
 
-    implementation "org.xerial:sqlite-jdbc:3.7.2" // declaring SQLite here to be used in TargetedMS test
+    implementation "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}" // declaring SQLite here to be used in TargetedMS test
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
     api("org.assertj:assertj-core:${assertjVersion}")
