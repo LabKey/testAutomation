@@ -8,6 +8,7 @@ import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.html.ValidatingInput;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
@@ -271,13 +272,13 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
-        protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
-        protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
-        protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
+        protected final Input nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(this), getDriver());
+        protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(this), getDriver());
+        protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(this), getDriver());
 
         protected final Select autoLinkDataToStudy = SelectWrapper.Select(Locator.id("entity-autoLinkTargetContainerId"))
                 .findWhenNeeded(this);
-        protected final Input linkedDatasetCategory = Input.Input(Locator.id("entity-autoLinkCategory"), getDriver()).findWhenNeeded(this);
+        protected final Input linkedDatasetCategory = new ValidatingInput(Locator.id("entity-autoLinkCategory").findWhenNeeded(this), getDriver());
 
         Optional<WebElement> optionalWarningAlert()
         {
