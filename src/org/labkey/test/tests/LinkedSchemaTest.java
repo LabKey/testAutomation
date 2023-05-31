@@ -534,7 +534,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
 
         beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-begin.view?schemaName=CommonData&queryName=Demographics");
-        final WebElement error = Locator.tagWithClass("div", "lk-qd-error").waitForElement(shortWait());
+        final WebElement error = Locator.tagWithClass("div", "lk-vq-warn-message").waitForElement(shortWait());
         MatcherAssert.assertThat("Schema browser error.", error.getText(),
                 CoreMatchers.containsString("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map."));
 
