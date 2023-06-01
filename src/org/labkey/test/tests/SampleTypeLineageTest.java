@@ -869,7 +869,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 .setParents(true)
                 .setDepth(1).build();
         LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(), getCurrentContainerPath());
-        assertEquals("don't expect MaterialInput/tablename columns to persist records that have been deleted",
+        assertEquals("Number of initial parents for samples not as expected.",
                 1, lineageResponse.getSeed().getParents().size());
 
         // delete rows A, B
@@ -878,7 +878,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
         List<Map<String, Object>> remainingRows = selectResponse.getRows();
 
-        // now make sure materialInputs derivations don't persist references to deleted records
+        // now make sure the run that created the derived sample is deleted when the parent is deleted
         Map<String, Object> rowE = remainingRows.stream()
                 .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
         LineageCommand linCmd = new LineageCommand.Builder(rowE.get("lsid").toString())
@@ -886,7 +886,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 .setParents(true)
                 .setDepth(1).build();
         LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
-        assertEquals("don't expect MaterialInput/tablename columns to persist records that have been deleted",
+        assertEquals("The number of runs for the child sample whose parent was deleted is not as expected.",
                 0, linResponse.getSeed().getParents().size());
 
         dgen.deleteDomain(createDefaultConnection());
