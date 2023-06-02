@@ -856,7 +856,16 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         sampleGenerator.addCustomRow(Map.of("name", "L", "MaterialInputs/Family", "A,B", "DataInputs/Sources", "S-1,S-2"));
         List<Map<String, Object>> savedSampleRows = sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows()).getRows();;
 
-        // TODO add sample parents to a data class object
+        // add data objects with samples as parents
+        dataGenerator = dataClass.getTestDataGenerator(getProjectName());
+        dataGenerator.addCustomRow(Map.of("Name", "S-6", "MaterialInputs/Family", "A"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-7", "MaterialInputs/Family", "A,B"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-8", "MaterialInputs/Family", "A,C"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-9", "MaterialInputs/Family", "A", "DataInputs/Sources", "S-1"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-10", "MaterialInputs/Family", "D", "DataInputs/Sources", "S-1"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-11", "MaterialInputs/Family", "A,B", "DataInputs/Sources", "S-1,S-2"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-12", "MaterialInputs/Family", "A,D", "DataInputs/Sources", "S-1,S-2"));
+        savedDataRows.addAll(dataGenerator.insertRows(createDefaultConnection(), dataGenerator.getRows()).getRows());
 
         // Refresh the page so the new sample type shows up in the UI.
         refresh();
@@ -866,10 +875,12 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         assertEquals(12, materialsList.getDataRowCount());
 
-        // peel saved rows A and B from the insert response
+        // peel saved rows A, B, and I from the insert response
         List<Map<String, Object>> rowsToDelete = savedSampleRows.stream()
-                .filter((a)-> a.get("name").equals("B") ||
-                        a.get("name").equals("A") || a.get("name").equals("I")
+                .filter((a)->
+                        a.get("name").equals("B") ||
+                        a.get("name").equals("A") ||
+                        a.get("name").equals("I")
                 ).collect(Collectors.toList());
 
         verifyParentRunCount("initial runs for sample with a single parent",
@@ -877,25 +888,29 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         // Verify the initial number of runs for a parent with more than one run
         verifyChildRunCount("the parent sample with more than one derivation run",
-                savedSampleRows, "C", 2);
+                savedSampleRows, "C", 3);
 
-        // delete rows A, B
+        // delete rows A, B, and I
         sampleGenerator.getQueryHelper(createDefaultConnection()).deleteRows(rowsToDelete);
         SelectRowsResponse selectResponse = sampleGenerator.getQueryHelper(createDefaultConnection()).selectRows(
-                List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
+                List.of("rowId", "lsid", "name"));
         List<Map<String, Object>> remainingSamples = selectResponse.getRows();
 
         // When all inputs are deleted, the run should be deleted
         verifyParentRunCount("the child sample whose parent was deleted", remainingSamples, "E", 0);
+        verifyParentRunCount("the child source whose parent was deleted", savedDataRows, "S-6", 0);
 
-        // F had two inputs that were deleted
-        verifyParentRunCount("the child sample whose parent was deleted", remainingSamples, "F", 0);
+        // multiple inputs that were deleted
+        verifyParentRunCount("the child sample with all parents deleted", remainingSamples, "F", 0);
+        verifyParentRunCount("the child source with all parents deleted", savedDataRows, "S-7", 0);
 
         // When a subset of inputs is deleted, the run should be retained
         verifyParentRunCount("the child sample with a subset of parents deleted", remainingSamples, "H", 1);
+        verifyParentRunCount("the child source with a subset of parents deleted", savedDataRows, "S-8", 1);
 
         // when all sample inputs are deleted but data class inputs remain the run should be retained
         verifyParentRunCount("the child sample with all sample parents deleted but data class parents not deleted", remainingSamples, "J", 1);
+        verifyParentRunCount("the child source with all sample parents deleted but data class parents not deleted", savedDataRows, "S-9", 1);
 
         // when all outputs are deleted, the run that produced the output should also be deleted
         Map<String, Object> rowG = verifyChildRunCount("the parent sample with all children deleted", remainingSamples, "G", 0);
@@ -904,15 +919,15 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         sampleGenerator.getQueryHelper(createDefaultConnection()).deleteRows(List.of(rowG));
 
         // the parent of this child should now have one fewer run
-        verifyChildRunCount("the parent sample with all children deleted", remainingSamples, "C", 1);
+        verifyChildRunCount("the parent sample with all children deleted", remainingSamples, "C", 2);
 
-        // delete data class object that is a parent to some samples
+        // delete data class object that is a parent to some samples and data class objects
         rowsToDelete = savedDataRows.stream()
                 .filter((a)-> a.get("name").equals("S-1"))
                 .collect(Collectors.toList());
         dataGenerator.getQueryHelper(createDefaultConnection()).deleteRows(rowsToDelete);
         selectResponse = dataGenerator.getQueryHelper(createDefaultConnection()).selectRows(
-                List.of("rowId", "lsid", "name",  "MaterialInputs/Family", "DataInputs/Source"));
+                List.of("rowId", "lsid", "name"));
         List<Map<String, Object>> remainingData = selectResponse.getRows();
 
         // sample J that now has neither sample nor source parents should have no parent run
@@ -935,6 +950,18 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         dataGenerator.getQueryHelper(createDefaultConnection()).deleteRows(rowsToDelete);
         // source S-4 that has no more children should have no child runs
         verifyChildRunCount("a parent source with all children deleted", remainingData, "S-4", 0);
+
+        // source S-9 has had both sample and source parents deleted
+        verifyParentRunCount("a child source with all sample and source parents deleted", remainingData, "S-9", 0);
+
+        // source S-10 has had source but not sample parents deleted
+        verifyParentRunCount("a child source with all source parents deleted but not all sample parents", remainingData, "S-10", 1);
+
+        // source S-11 has had all sample parents and a subset of source parents deleted
+        verifyParentRunCount("a child source with all sample parents deleted but not all source parents", remainingData, "S-11", 1);
+
+        // source S-12 has had a subset of sample parents and a subset of source parents deleted
+        verifyParentRunCount("a child source with a subset of sample and source parents deleted", remainingData, "S-12", 1);
 
         sampleGenerator.getQueryHelper(createDefaultConnection()).deleteDomain();
         dataGenerator.getQueryHelper(createDefaultConnection()).deleteDomain();
