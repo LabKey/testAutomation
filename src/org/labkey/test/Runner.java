@@ -39,6 +39,9 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.manipulation.Orderable;
+import org.junit.runner.manipulation.Sortable;
+import org.junit.runner.manipulation.Sorter;
 import org.labkey.junit.runner.WebTestProperties;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.serverapi.writer.PrintWriters;
@@ -53,6 +56,7 @@ import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ExportDiagnosticsPseudoTest;
 import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
+import org.labkey.test.util.Order;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WindowsOnlyTest;
@@ -460,7 +464,7 @@ public class Runner extends TestSuite
                     final Set<String> foundTests = new HashSet<>();
                     final Set<String> ignoredTests = new HashSet<>();
 
-                    org.junit.runner.manipulation.Filter testNameFilter = new Filter()
+                    Filter testNameFilter = new Filter()
                     {
                         @Override
                         public boolean shouldRun(Description description)

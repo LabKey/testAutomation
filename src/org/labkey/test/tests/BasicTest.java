@@ -28,7 +28,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Smoke;
-import org.labkey.test.util.Prioritized;
+import org.labkey.test.util.Order;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import java.util.List;
  * Short test to verify installed modules are well-formed
  */
 @Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class, Smoke.class})
-@Prioritized(priority = 1)
+@Order(-1)
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class BasicTest extends BaseWebDriverTest
 {
