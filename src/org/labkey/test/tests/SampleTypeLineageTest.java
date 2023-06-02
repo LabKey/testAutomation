@@ -860,17 +860,29 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         // peel saved rows A and B from the insert response
         List<Map<String, Object>> rowsToDelete = saveRowsResponse.getRows().stream()
                 .filter((a)-> a.get("name").equals("B") ||
-                        a.get("name").equals("A")).collect(Collectors.toList());
+                        a.get("name").equals("A") || a.get("name").equals("I")
+                ).collect(Collectors.toList());
 
         Map<String, Object> E = saveRowsResponse.getRows().stream()
                 .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
-        LineageCommand lineageCommand = new LineageCommand.Builder(E.get("lsid").toString())
+        LineageCommand linCommand = new LineageCommand.Builder(E.get("lsid").toString())
                 .setChildren(false)
                 .setParents(true)
                 .setDepth(1).build();
-        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(), getCurrentContainerPath());
-        assertEquals("Number of initial parents for samples not as expected.",
-                1, lineageResponse.getSeed().getParents().size());
+        LineageResponse linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("Number of initial runs for sample with a single parent not as expected.",
+                1, linResponse.getSeed().getParents().size());
+
+        // Verify the initial number of runs for a parent with more than one run
+        Map<String, Object> rowC = saveRowsResponse.getRows().stream()
+                .filter((a)-> a.get("name").equals("C")).findFirst().orElse(null);
+        linCommand = new LineageCommand.Builder(rowC.get("lsid").toString())
+                .setChildren(true)
+                .setParents(false)
+                .setDepth(1).build();
+        linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The number of runs for the parent sample with more than one derivation run is not as expected.",
+                2, linResponse.getSeed().getChildren().size());
 
         // delete rows A, B
         dgen.deleteRows(createDefaultConnection(), rowsToDelete);
@@ -878,16 +890,61 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
         List<Map<String, Object>> remainingRows = selectResponse.getRows();
 
-        // now make sure the run that created the derived sample is deleted when the parent is deleted
+        // When all inputs are deleted, the run should be deleted
         Map<String, Object> rowE = remainingRows.stream()
                 .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
-        LineageCommand linCmd = new LineageCommand.Builder(rowE.get("lsid").toString())
+        linCommand = new LineageCommand.Builder(rowE.get("lsid").toString())
                 .setChildren(false)
                 .setParents(true)
                 .setDepth(1).build();
-        LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
+        linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
         assertEquals("The number of runs for the child sample whose parent was deleted is not as expected.",
                 0, linResponse.getSeed().getParents().size());
+
+        // F had two inputs that were deleted
+        Map<String, Object> rowF = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("F")).findFirst().orElse(null);
+        linCommand = new LineageCommand.Builder(rowF.get("lsid").toString())
+                .setChildren(false)
+                .setParents(true)
+                .setDepth(1).build();
+        linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The number of runs for the child sample whose parent was deleted is not as expected.",
+                0, linResponse.getSeed().getParents().size());
+
+        // When a subset of inputs is deleted, the run should be retained
+        Map<String, Object> rowH = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("H")).findFirst().orElse(null);
+        linCommand = new LineageCommand.Builder(rowH.get("lsid").toString())
+                .setChildren(false)
+                .setParents(true)
+                .setDepth(1).build();
+        linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The number of runs for the child sample with a subset of parents deleted is not as expected.",
+                1, linResponse.getSeed().getParents().size());
+
+        // when all outputs are deleted, the run that produced the output should also be deleted
+        Map<String, Object> rowG = remainingRows.stream()
+                .filter((a)-> a.get("name").equals("G")).findFirst().orElse(null);
+        linCommand = new LineageCommand.Builder(rowG.get("lsid").toString())
+                .setChildren(true)
+                .setParents(false)
+                .setDepth(1).build();
+        linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The number of runs for the parent sample with all children deleted is not as expected.",
+                0, linResponse.getSeed().getChildren().size());
+
+        // delete child that is now no longer a parent
+        dgen.deleteRows(createDefaultConnection(), List.of(rowG));
+
+        // the parent of this child should now have one fewer run
+        linCommand = new LineageCommand.Builder(rowC.get("lsid").toString())
+                .setChildren(true)
+                .setParents(false)
+                .setDepth(1).build();
+        linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The number of runs for the parent sample with all children deleted is not as expected.",
+                1, linResponse.getSeed().getChildren().size());
 
         dgen.deleteDomain(createDefaultConnection());
     }
