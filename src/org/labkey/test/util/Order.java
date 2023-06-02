@@ -23,7 +23,7 @@ import java.util.Comparator;
  *         public void firstTest() { }
  *
  *         @Order(2)
- *         public void firstTest() { }
+ *         public void secondTest() { }
  *     }
  * }</pre>
  */
