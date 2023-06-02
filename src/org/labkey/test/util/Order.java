@@ -10,10 +10,22 @@ import java.lang.annotation.Target;
 import java.util.Comparator;
 
 /**
- * Use this annotation to control test execution order.</br>
- * Tests will run in order from lowest to highest. Non-annotated tests have an ordering value of zero.</br>
+ * Use this annotation to control test execution order.<br>
+ * Tests will run in order from lowest to highest. Non-annotated tests/classes have an ordering value of zero.<br>
  * In order to use this to control execution order of test methods within a class, annotate the test class with
- * {code}@OrderWith(Order.Sorter.class){/code}
+ * {@code @OrderWith(Order.Sorter.class)} <br><br>
+ * Example:<br>
+ * <pre>{@code
+ *     @OrderWith(Order.Sorter.class)
+ *     public class SomeTest
+ *     {
+ *         @Order(1)
+ *         public void firstTest() { }
+ *
+ *         @Order(2)
+ *         public void firstTest() { }
+ *     }
+ * }</pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
