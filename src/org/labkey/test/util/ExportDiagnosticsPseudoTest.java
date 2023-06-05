@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({})
-@Prioritized(priority = -100) // Export diagnostics last
+@Order(Double.MAX_VALUE) // Export diagnostics last
 public class ExportDiagnosticsPseudoTest extends BaseWebDriverTest
 {
     @Test

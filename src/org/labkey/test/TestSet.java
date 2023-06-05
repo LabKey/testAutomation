@@ -17,7 +17,7 @@
 package org.labkey.test;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.util.Prioritized;
+import org.labkey.test.util.Order;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,35 +94,13 @@ public class TestSet
 
     public List<Class<?>> getSortedTestList()
     {
-        List<Class<?>> firstTests = new ArrayList<>();
-        List<Class<?>> unprioritized = new ArrayList<>();
-        List<Class<?>> lastTests = new ArrayList<>();
-        for (Class<?> next : _tests)
-        {
-            Prioritized annotation = next.getAnnotation(Prioritized.class);
-            double priority = annotation != null ? annotation.priority() : 0;
-            if (priority > 0)
-            {
-                firstTests.add(next);
-            }
-            else if (priority < 0)
-            {
-                lastTests.add(next);
-            }
-            else
-            {
-                unprioritized.add(next);
-            }
-        }
-        firstTests.sort(Comparator.comparingDouble(c -> c.getAnnotation(Prioritized.class).priority()));
-        Collections.reverse(firstTests);
-        lastTests.sort(Comparator.comparingDouble(c -> c.getAnnotation(Prioritized.class).priority()));
-        Collections.reverse(lastTests);
-
-        List<Class<?>> sortedTests = new ArrayList<>(_tests.size());
-        sortedTests.addAll(firstTests);
-        sortedTests.addAll(unprioritized);
-        sortedTests.addAll(lastTests);
+        List<Class<?>> sortedTests = new ArrayList<>(_tests);
+        Comparator<Class<?>> comparator = Comparator.comparingDouble(c -> {
+            Order annotation = c.getAnnotation(Order.class);
+            return annotation == null ? 0.0 : annotation.value();
+        });
+        comparator = comparator.thenComparingInt(c -> _tests.indexOf(c)); // Retain order of un-annotated tests
+        sortedTests.sort(comparator);
         return sortedTests;
     }
 

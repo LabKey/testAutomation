@@ -29,7 +29,7 @@ import org.labkey.test.io.Grep;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
-import org.labkey.test.util.Prioritized;
+import org.labkey.test.util.Order;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -41,7 +41,7 @@ import java.util.TreeMap;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Daily.class, Git.class, CustomModules.class})
-@Prioritized(priority = -1)
+@Order(1)
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
