@@ -573,7 +573,7 @@ public class Ext4Helper
      */
     public void deselectAllParticipantFilter()
     {
-        checkGridRowCheckbox("All");
+        selectAllParticipantFilter();
         uncheckGridRowCheckbox("All");
     }
 
@@ -582,6 +582,7 @@ public class Ext4Helper
      */
     public void selectAllParticipantFilter()
     {
+        _test.waitForElement(Locator.xpath("//*[contains(@class, 'lk-filter-panel-label') and text()='All']"));
         checkGridRowCheckbox("All");
     }
 
