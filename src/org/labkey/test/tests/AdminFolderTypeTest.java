@@ -25,11 +25,11 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
         folderTypePage.setDefaultFolderType(newDefaultFolder).clickSave();
 
         folderTypePage = goToAdminConsole().clickFolderType();
-        checker().verifyEquals("Incorrect default Folder type selected", newDefaultFolder, folderTypePage.getDefaultFolderType());
+        checker().fatal().verifyEquals("Incorrect default Folder type selected", newDefaultFolder, folderTypePage.getDefaultFolderType());
 
         log("Verifying the default folder type while project creation");
         goToCreateProject();
-        checker().verifyTrue("Incorrect default folder type selected",
+        checker().fatal().verifyTrue("Incorrect default folder type selected",
                 RadioButton.RadioButton().withLabel(newDefaultFolder).find(getDriver()).isSelected());
 
         log(String.format("Rollback to the old default folder type '%s'.", oldDefaultFolder));
@@ -44,10 +44,10 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
 
         log("Verifying by default folder is enabled");
         FolderTypePages folderTypePage = goToAdminConsole().clickFolderType();
-        checker().verifyTrue(folderTypeName + " should have been enabled", folderTypePage.isEnabled(folderTypeName));
+        checker().fatal().verifyTrue(folderTypeName + " should have been enabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
-        checker().verifyTrue(folderTypeName + " project is not enabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
+        checker().fatal().verifyTrue(folderTypeName + " project is not enabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
         log("Disabling the folder type " + folderTypeName);
         folderTypePage = goToAdminConsole().clickFolderType();
@@ -55,16 +55,16 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
 
         log("Verifying folder type " + folderTypeName + " is disabled");
         folderTypePage = goToAdminConsole().clickFolderType();
-        checker().verifyFalse(folderTypeName + " should have been disabled", folderTypePage.isEnabled(folderTypeName));
+        checker().fatal().verifyFalse(folderTypeName + " should have been disabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
-        checker().verifyFalse(folderTypeName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
+        checker().fatal().verifyFalse(folderTypeName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
         /* Test coverage for Issue 44995: Filter disabled folder types from folder management admin page */
 
         goToHome();
         goToFolderManagement().goToFolderTypeTab();
-        checker().verifyFalse("Disabled folder " + folderTypeName + " should not be present at Folder Management --> Folder type",
+        checker().fatal().verifyFalse("Disabled folder " + folderTypeName + " should not be present at Folder Management --> Folder type",
                isElementPresent(Locator.radioButtonByNameAndValue("folderType", folderTypeName)));
 
         log("Enabling the folder type " + folderTypeName);
