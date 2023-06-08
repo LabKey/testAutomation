@@ -29,6 +29,7 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
 
         log("Verifying the default folder type while project creation");
         goToCreateProject();
+        waitForElement(Locator.tagWithText("label", "Collaboration"));
         checker().fatal().verifyTrue("Incorrect default folder type selected",
                 RadioButton.RadioButton().withLabel(newDefaultFolder).find(getDriver()).isSelected());
 
@@ -47,7 +48,8 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
         checker().fatal().verifyTrue(folderTypeName + " should have been enabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
-        checker().fatal().verifyTrue(folderTypeName + " project is not enabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
+        waitForElement(Locator.tagWithText("label", "Collaboration"));
+        checker().fatal().verifyTrue(folderTypeName + " project is not visible", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
         log("Disabling the folder type " + folderTypeName);
         folderTypePage = goToAdminConsole().clickFolderType();
@@ -58,7 +60,8 @@ public class AdminFolderTypeTest extends BaseWebDriverTest
         checker().fatal().verifyFalse(folderTypeName + " should have been disabled", folderTypePage.isEnabled(folderTypeName));
 
         goToCreateProject();
-        checker().fatal().verifyFalse(folderTypeName + " project is not disabled", isElementPresent(Locator.tagWithText("label",folderTypeName)));
+        waitForElement(Locator.tagWithText("label", "Collaboration"));
+        checker().fatal().verifyFalse(folderTypeName + " project is not hidden", isElementPresent(Locator.tagWithText("label",folderTypeName)));
 
         /* Test coverage for Issue 44995: Filter disabled folder types from folder management admin page */
 
