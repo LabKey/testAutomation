@@ -17,6 +17,7 @@ package org.labkey.test.components.ext4;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.LazyWebElement;
@@ -24,10 +25,10 @@ import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Window<EC extends Window.ElementCache> extends WebDriverComponent<EC>
 {
@@ -61,9 +62,9 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
      */
     private static WebElement frontmostWindow(WindowFinder finder)
     {
-        finder.waitFor().getComponentElement();
+        finder.waitFor();
         final List<WebElement> allWindows = finder.findAll().stream()
-                .map(Window::getComponentElement).collect(Collectors.toList());
+                .map(Window::getComponentElement).toList();
         if (allWindows.size() > 1)
         {
             return allWindows.stream().max(Comparator.comparingInt(e -> Integer.parseInt(e.getCssValue("z-index")))).get();
@@ -141,7 +142,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
 
     public void waitForClose(int msWait)
     {
-        getWrapper().waitFor(this::isClosed, "Window did not close", msWait);
+        WebDriverWrapper.waitFor(this::isClosed, "Window did not close", msWait);
 
         // Ext4 can reuse the Window element. Hide that from the tests to avoid surprising behavior.
         _window = null;
@@ -154,13 +155,16 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         return (EC) new ElementCache();
     }
 
-    public class ElementCache extends Component.ElementCache
+    public class ElementCache extends Component<?>.ElementCache
     {
-        protected ElementCache() { }
+        protected ElementCache()
+        {
+            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(getComponentElement()));
+        }
 
-        protected WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
-        protected WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
-        WebElement closeButton = new LazyWebElement(Locator.css(".x4-window-header .x4-tool-close"), this);
+        protected WebElement title = new LazyWebElement<>(Locator.css(".x4-window-header-text"), this);
+        protected WebElement body = new LazyWebElement<>(Locator.css(".x4-window-body"), this);
+        WebElement closeButton = new LazyWebElement<>(Locator.css(".x4-window-header .x4-tool-close"), this);
         WebElement findButton(String buttonText)
         {
             return Ext4Helper.Locators.ext4Button(buttonText).findElement(this);
@@ -175,7 +179,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
     {
     }
 
-    public static class WindowFinder extends WebDriverComponentFinder<Window, WindowFinder>
+    public static class WindowFinder extends WebDriverComponentFinder<Window<?>, WindowFinder>
     {
         public WindowFinder(WebDriver driver)
         {
@@ -206,9 +210,9 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         }
 
         @Override
-        protected Window construct(WebElement el, WebDriver driver)
+        protected Window<?> construct(WebElement el, WebDriver driver)
         {
-            return new Window(el, driver);
+            return new Window<>(el, driver);
         }
 
         @Override

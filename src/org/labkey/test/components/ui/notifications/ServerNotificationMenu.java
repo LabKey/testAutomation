@@ -118,6 +118,8 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     public ImportsPage clickViewAll()
     {
         expand();
+        WebDriverWrapper.waitFor(elementCache().viewAllLink::isDisplayed,
+                "View all link did not become visible.", 2_500);
         elementCache().viewAllLink.click();
         return new ImportsPage(getWrapper());
     }
