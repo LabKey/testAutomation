@@ -21,9 +21,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Date;
 import java.util.List;
@@ -56,6 +58,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         _driver.goToHome();
         _driver.goToSiteGroups();
+        WebElement groupNameInput = _driver.shortWait().until(ExpectedConditions.elementToBeClickable(Locator.input("sitegroupsname")));
+
         if (_driver.isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if (failIfAlreadyExists)
@@ -64,11 +68,8 @@ public class UIPermissionsHelper extends PermissionsHelper
                 return;
         }
 
-        Locator l = Locator.xpath("//input[contains(@name, 'sitegroupsname')]");
-        _driver.waitForElement(l, _driver.defaultWaitForPage);
-
-        _driver.setFormElement(l, groupName);
-        _driver.pressEnter(l);
+        _driver.setFormElement(groupNameInput, groupName);
+        groupNameInput.sendKeys(Keys.ENTER);
         _driver._extHelper.waitForExtDialog(groupName + " Information");
     }
 

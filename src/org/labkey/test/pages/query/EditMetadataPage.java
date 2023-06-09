@@ -70,11 +70,13 @@ public class EditMetadataPage extends BaseDomainDesigner<EditMetadataPage.Elemen
 
     protected class ElementCache extends BaseDomainDesigner<EditMetadataPage.ElementCache>.ElementCache
     {
-        protected final WebElement buttonPanel = queryMetadataButtonPanelLocator().findWhenNeeded(this);
-        protected final WebElement aliasFieldBtn = Locator.button("Alias Field").findWhenNeeded(buttonPanel);
-        protected final WebElement editSourceBtn = Locator.button("Edit Source").findWhenNeeded(buttonPanel);
-        protected final WebElement saveBtn = Locator.button("Save").findWhenNeeded(getDriver());
-        protected final WebElement resetToDefaultBtn = Locator.button("Reset To Default").findWhenNeeded(buttonPanel);
+        protected final WebElement buttonPanel = queryMetadataButtonPanelLocator().findWhenNeeded(this)
+                .withTimeout(WAIT_FOR_JAVASCRIPT);
+        protected final WebElement aliasFieldBtn = Locator.button("Alias Field").findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
+        protected final WebElement editSourceBtn = Locator.button("Edit Source").findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
+        protected final WebElement saveBtn = Locator.button("Save").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        protected final WebElement resetToDefaultBtn = Locator.button("Reset To Default").findWhenNeeded(buttonPanel)
+                .withTimeout(WAIT_FOR_JAVASCRIPT);
         DomainFormPanel firstDomainFormPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())   // for situations where there's only one on the page
                 .timeout(WAIT_FOR_JAVASCRIPT)
                 .findWhenNeeded(this);
