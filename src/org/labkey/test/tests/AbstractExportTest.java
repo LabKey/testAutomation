@@ -51,17 +51,35 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected DataRegionTable dataRegion;
     protected DataRegionExportHelper exportHelper;
 
-    /** Return true if the rows can be selected in the grid. */
+    /**
+     * Return true if the rows can be selected in the grid.
+     */
     protected abstract boolean hasSelectors();
+
+    protected abstract boolean hasBrokenLookup();
+
     protected abstract String getTestColumnTitle();
+
+    protected abstract String getTestLookUpColumnHeader();
+
+    protected abstract int getTestLookUpColumnIndex();
+
     protected abstract int getTestColumnIndex();
+
     protected abstract String getExportedXlsTestColumnHeader(ColumnHeaderType exportType); // tsv column headers might be field name, rather than label
+
     protected abstract String getExportedTsvTestColumnHeader(ColumnHeaderType exportType); // tsv column headers might be field name, rather than label
+
     protected abstract String getDataRegionColumnName();
+
     protected abstract String getDataRegionSchemaName();
+
     protected abstract String getDataRegionQueryName();
+
     protected abstract String getExportedFilePrefixRegex();
+
     protected abstract String getDataRegionId();
+
     protected abstract void goToDataRegionPage();
 
     @BeforeClass
@@ -179,13 +197,28 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         expectedExportColumn.add(getExportedXlsTestColumnHeader(ColumnHeaderType.Caption));
         expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()));
 
-        assertEquals(allRows, expectedExportColumn.size()-1);
+        assertEquals(allRows, expectedExportColumn.size() - 1);
 
         // Issue 19854: Check that all rows will be exported when nothing is selected and page size is less than grid row count.
         dataRegion.setMaxRows(2);
         assertEquals(2, dataRegion.getDataRowCount());
         File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
-        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, allRows, expectedExportColumn);
+        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, allRows, expectedExportColumn, getTestColumnIndex());
+    }
+
+    @Test
+    public final void testExportBrokenLookUpExcel()
+    {
+        Assume.assumeTrue("Skipping test since grid doesn't have any broken lookup", hasBrokenLookup());
+
+        dataRegion.setFilter(getTestLookUpColumnHeader(), "Is Not Blank");
+
+        File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
+        assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
+        List<String> expectedExportColumn = new ArrayList<>();
+        expectedExportColumn.add(getTestLookUpColumnHeader());
+        expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestLookUpColumnHeader()));
+        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, dataRegion.getDataRowCount(), expectedExportColumn, getTestLookUpColumnIndex());
     }
 
     @Test
@@ -391,10 +424,10 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             expectedExportColumn.add(getExportedXlsTestColumnHeader(exportHeaderType));
 
         expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
-        assertExcelExportContents(exportHeaderType, exportedFile, expectedDataRowCount, expectedExportColumn);
+        assertExcelExportContents(exportHeaderType, exportedFile, expectedDataRowCount, expectedExportColumn, getTestColumnIndex());
     }
 
-    protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn)
+    protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn, int actualIndex)
     {
         try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
@@ -407,7 +440,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
 
             assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedFileRowCount, sheet.getLastRowNum());
 
-            List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
+            List<String> exportedColumn = ExcelHelper.getColumnData(sheet, actualIndex);
             assertColumnContentsEqual(expectedExportColumn, exportedColumn);
         }
         catch (IOException e)

@@ -49,9 +49,27 @@ public class ListExportTest extends AbstractExportTest
     }
 
     @Override
+    protected boolean hasBrokenLookup()
+    {
+        return true;
+    }
+
+    @Override
     protected String getTestColumnTitle()
     {
         return "Name";
+    }
+
+    @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return "Mother";
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 3;
     }
 
     @Override

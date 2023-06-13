@@ -75,9 +75,27 @@ public class SampleTypeExportTest extends AbstractExportTest
     }
 
     @Override
+    protected boolean hasBrokenLookup()
+    {
+        return false;
+    }
+
+    @Override
     protected String getTestColumnTitle()
     {
         return "Name";
+    }
+
+    @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return null;
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 0;
     }
 
     @Override

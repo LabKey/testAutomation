@@ -49,9 +49,27 @@ public class AssayResultsExportTest extends AbstractExportTest
     }
 
     @Override
+    protected boolean hasBrokenLookup()
+    {
+        return false;
+    }
+
+    @Override
     protected String getTestColumnTitle()
     {
         return "Participant ID";
+    }
+
+    @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return null;
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 0;
     }
 
     @Override
