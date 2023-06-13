@@ -29,6 +29,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -134,22 +135,28 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name(SURVEY_LABEL_NAME), dateSurveyLabel);
 
         // Enter some text values just as a sanity check that the round trip in general is working.
+        // There have been intermittent issues with form elements not actually getting set. Adding assert after each set to validate.
         var txtFieldValue = "Hot!";
         setFormElement(Locator.name(TEXT_FIELD_NAME), txtFieldValue);
+        assertEquals("'Txt Field' not set.", txtFieldValue, getFormElement(Locator.name(TEXT_FIELD_NAME)));
 
         var txtAreaFieldValue = "It is really hot today!";
         setFormElement(Locator.name(TEXT_AREA_FIELD_NAME), txtAreaFieldValue);
+        assertEquals("'Txt Area Field' not set.", txtAreaFieldValue, getFormElement(Locator.name(TEXT_AREA_FIELD_NAME)));
 
         var dateFieldValue = "2021-06-28";
         setFormElement(Locator.name(DATE_FIELD_NAME), dateFieldValue);
+        assertEquals("'Date Field' not set.", dateFieldValue, getFormElement(Locator.name(DATE_FIELD_NAME)));
 
         var dateTimeFieldDateValue = "2021-06-27";
         setFormElement(Locator.name(DATETIME_DATE_FIELD_NAME), dateTimeFieldDateValue);
+        assertEquals("'Date Time Field (date)' not set.", dateTimeFieldDateValue, getFormElement(Locator.name(DATETIME_DATE_FIELD_NAME)));
 
         var dateTimeFieldTimeValue = "12:45";
         final WebElement timeInput = Locator.name(DATETIME_TIME_FIELD_NAME).findElement(getDriver());
         timeInput.clear();
         timeInput.sendKeys(dateTimeFieldTimeValue);
+        assertEquals("'Date Time Field (time)' not set.", dateTimeFieldTimeValue, getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME)));
 
         log("Save the survey.");
         clickSaveButton();
@@ -159,7 +166,7 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText(dateSurveyLabel);
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
-        assertTextPresent(txtFieldValue, txtAreaFieldValue, dateFieldValue, String.format("%s %s", dateTimeFieldDateValue, dateTimeFieldTimeValue));
+        waitForText(WAIT_FOR_JAVASCRIPT, txtFieldValue, txtAreaFieldValue, dateFieldValue, String.format("%s %s", dateTimeFieldDateValue, dateTimeFieldTimeValue));
 
         log("Open the saved survey response and validate that the fields are populated as expected.");
 
