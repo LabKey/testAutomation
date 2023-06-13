@@ -335,7 +335,6 @@ public class ParticipantReportTest extends ReportTest
 
         //Deselect All
         expandReportFilterWindow();
-        waitForElement(Locator.css(".initSelectionComplete"));
         _ext4Helper.deselectAllParticipantFilter();
         click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
@@ -406,7 +405,6 @@ public class ParticipantReportTest extends ReportTest
 
         //Deselect All
         expandReportFilterWindow();
-        waitForElement(Locator.css(".initSelectionComplete"));
         _ext4Helper.deselectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
@@ -587,6 +585,7 @@ public class ParticipantReportTest extends ReportTest
                 .elementToBeClickable(Locator.css(".report-filter-window .x4-tool-expand-right")));
         expander.click();
         waitForElement(Locator.css(".report-filter-window .x4-tool-collapse-left"));
+        waitForElement(Locator.css(".initSelectionComplete"));
         assertElementNotPresent(Locator.css(".report-filter-window.x4-collapsed"));
     }
 
