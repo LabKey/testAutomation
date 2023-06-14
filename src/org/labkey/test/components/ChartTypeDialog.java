@@ -177,24 +177,15 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
     public ChartTypeDialog setYAxisSide(int measureIndex, YAxisSide side)
     {
         WebElement measureEl = elementCache().Y_FIELD_DISPLAY.index(measureIndex).findElement(this);
-        if (!measureEl.getAttribute("class").contains("selected"))
+        WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
+        if (!arrow.isDisplayed())
         {
             Locator.byClass("field-selection-text").findElement(measureEl).click();
+            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(arrow));
         }
+        arrow.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(arrow));
 
-        switch(side)
-        {
-            case Left:
-                final WebElement leftArrow = elementCache().Y_FIELD_SIDE_LEFT.index(measureIndex).findElement(this);
-                leftArrow.click();
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(leftArrow));
-                break;
-            case Right:
-                final WebElement rightArrow = elementCache().Y_FIELD_SIDE_RIGHT.index(measureIndex).findElement(this);
-                rightArrow.click();
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(rightArrow));
-                break;
-        }
         return this;
     }
 
@@ -529,8 +520,6 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
         public Locator Y_FIELD_DISPLAY = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY);
-        public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-left')]");
-        public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-right')]");
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
 
         public final String SERIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Series')]";
