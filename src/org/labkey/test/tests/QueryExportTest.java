@@ -49,12 +49,6 @@ public class QueryExportTest extends AbstractExportTest
     }
 
     @Override
-    protected boolean hasBrokenLookup()
-    {
-        return false;
-    }
-
-    @Override
     protected String getTestColumnTitle()
     {
         return "Name";

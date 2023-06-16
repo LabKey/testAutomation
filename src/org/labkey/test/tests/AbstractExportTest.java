@@ -56,8 +56,6 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
      */
     protected abstract boolean hasSelectors();
 
-    protected abstract boolean hasBrokenLookup();
-
     protected abstract String getTestColumnTitle();
 
     protected abstract String getTestLookUpColumnHeader();
@@ -209,7 +207,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     @Test
     public final void testExportBrokenLookUpExcel()
     {
-        Assume.assumeTrue("Skipping test since grid doesn't have any broken lookup", hasBrokenLookup());
+        Assume.assumeTrue("Skipping test since grid doesn't have any broken lookup", getTestLookUpColumnHeader() != null);
 
         dataRegion.setFilter(getTestLookUpColumnHeader(), "Is Not Blank");
 

@@ -49,12 +49,6 @@ public class AssayResultsExportTest extends AbstractExportTest
     }
 
     @Override
-    protected boolean hasBrokenLookup()
-    {
-        return false;
-    }
-
-    @Override
     protected String getTestColumnTitle()
     {
         return "Participant ID";
@@ -135,10 +129,10 @@ public class AssayResultsExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AssayResultsExportTest initTest = (AssayResultsExportTest)getCurrentTest();
+        AssayResultsExportTest initTest = (AssayResultsExportTest) getCurrentTest();
         initTest.setupTestContainers();
     }
-    
+
     protected void setupTestContainers() throws Exception
     {
         _containerHelper.createProject(getProjectName(), "Assay");
