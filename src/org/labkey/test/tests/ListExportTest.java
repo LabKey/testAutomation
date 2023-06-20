@@ -55,6 +55,18 @@ public class ListExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return "Mother";
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 3;
+    }
+
+    @Override
     protected int getTestColumnIndex()
     {
         return 1;
