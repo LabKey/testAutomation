@@ -52,7 +52,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Flow");
         setupFlowWorkspace();
 
-        testReimport();
+        testReimport(false);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), "Flow subfolder", "Flow");
         setupFlowWorkspace();
 
-        testReimport();
+        testReimport(true);
     }
 
     @Test
@@ -73,13 +73,13 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), "Flow subfolder", "Flow");
         setupFlowWorkspace();
 
-        testReimport();
+        testReimport(true);
     }
 
-    private void testReimport()
+    private void testReimport(boolean hasSubfolders)
     {
         ExportFolderPage exportFolderPage = ExportFolderPage.beginAt(this, getProjectName());
-        exportFolderPage.includeSubfolders(true);
+        exportFolderPage.includeSubfolders(hasSubfolders);
         FileBrowserHelper fileBrowserHelper = exportFolderPage.exportToPipelineAsZip(600_000);
 
         File file;
