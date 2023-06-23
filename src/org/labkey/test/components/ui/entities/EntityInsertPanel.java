@@ -289,8 +289,16 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
                 isElementVisible(elementCache().deleteRowsBtn);
     }
 
+    public boolean hasTabs()
+    {
+        return Locator.tagWithClassContaining("ul", "list-group").existsIn(this);
+    }
+
     public boolean isFileUploadVisible()
     {
+        if (!hasTabs())
+            return optionalFileUploadPanel().isPresent();
+
         return modeSelectListItem("from File").withClass("active").findOptionalElement(this).isPresent() &&
                 optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
@@ -369,6 +377,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel showFileUpload()
     {
+        if (!hasTabs())
+            return this;
+
         if (!isFileUploadVisible())
         {
             var toggle = getFileUploadTab();
@@ -426,12 +437,14 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             waitForLoaded();
         }
 
+        Locator tabContainerLoc = Locator.tagWithClassContaining("ul", "list-group");
         Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
                 Locator.button("Delete rows"),
                 Locator.buttonContainingText("Remove"));
         Locator bulkInsertBtnLoc = Locator.button("Bulk Insert");
         Locator bulkUpdateBtnLoc = Locator.button("Bulk Update");
 
+        WebElement tabContainer = tabContainerLoc.findWhenNeeded(this);
         WebElement bulkInsertBtn = bulkInsertBtnLoc.findWhenNeeded(this).withTimeout(2000);
         WebElement bulkUpdateBtn = bulkUpdateBtnLoc.findWhenNeeded(this).withTimeout(2000);
         WebElement deleteRowsBtn = deleteRowsBtnLoc.findWhenNeeded(this).withTimeout(2000);
