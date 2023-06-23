@@ -437,14 +437,12 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             waitForLoaded();
         }
 
-        Locator tabContainerLoc = Locator.tagWithClassContaining("ul", "list-group");
         Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
                 Locator.button("Delete rows"),
                 Locator.buttonContainingText("Remove"));
         Locator bulkInsertBtnLoc = Locator.button("Bulk Insert");
         Locator bulkUpdateBtnLoc = Locator.button("Bulk Update");
 
-        WebElement tabContainer = tabContainerLoc.findWhenNeeded(this);
         WebElement bulkInsertBtn = bulkInsertBtnLoc.findWhenNeeded(this).withTimeout(2000);
         WebElement bulkUpdateBtn = bulkUpdateBtnLoc.findWhenNeeded(this).withTimeout(2000);
         WebElement deleteRowsBtn = deleteRowsBtnLoc.findWhenNeeded(this).withTimeout(2000);
