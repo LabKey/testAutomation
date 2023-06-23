@@ -52,7 +52,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Flow");
         setupFlowWorkspace();
 
-        testReimport(false);
+        testReimport(false, false);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), "Flow subfolder", "Flow");
         setupFlowWorkspace();
 
-        testReimport(true);
+        testReimport(true, false);
     }
 
     @Test
@@ -73,10 +73,10 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), "Flow subfolder", "Flow");
         setupFlowWorkspace();
 
-        testReimport(true);
+        testReimport(true, true);
     }
 
-    private void testReimport(boolean hasSubfolders)
+    private void testReimport(boolean hasSubfolders, boolean expectError)
     {
         ExportFolderPage exportFolderPage = ExportFolderPage.beginAt(this, getProjectName());
         exportFolderPage.includeSubfolders(hasSubfolders);
@@ -96,7 +96,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         }
 
         goToProjectHome(OTHER_PROJECT);
-        importFolderFromZip(file, false, 1, false, 600_000);
+        importFolderFromZip(file, false, 1, expectError, 600_000);
     }
 
     private void setupFlowWorkspace()
@@ -126,7 +126,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
 
             clickAndWait(Locators.folderTitle);
             clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
-            clickAndWait(Locator.button("Save")); // Domain designer
+            waitAndClickAndWait(Locator.button("Save")); // Domain designer
 
             clickAndWait(Locators.folderTitle);
             clickAndWait(Locator.linkWithText("Upload More Samples"));
