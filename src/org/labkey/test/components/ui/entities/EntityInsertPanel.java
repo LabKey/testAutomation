@@ -50,6 +50,11 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return _driver;
     }
 
+    public boolean hasTargetEntityTypeSelect()
+    {
+        return Locator.tagWithName("input", "targetEntityType").existsIn(this);
+    }
+
     public ReactSelect targetEntityTypeSelect()
     {
         // Which tabs are available and selected can vary so try finding the visible react select
