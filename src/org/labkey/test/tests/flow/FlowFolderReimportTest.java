@@ -51,32 +51,44 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), "Flow");
         setupFlowWorkspace();
+        verifyFlowDashboard(getProjectName());
 
-        testReimport(false, false);
+        exportThenImport(false, false);
+        verifyFlowDashboard(OTHER_PROJECT);
     }
 
     @Test
     public void testReimportSubfolder()
     {
-        _containerHelper.createProject(getProjectName(), "Flow");
-        _containerHelper.createSubfolder(getProjectName(), "Flow subfolder", "Flow");
-        setupFlowWorkspace();
+        String subfolder = "Flow subfolder";
 
-        testReimport(true, false);
+        _containerHelper.createProject(getProjectName(), "Flow");
+        _containerHelper.createSubfolder(getProjectName(), subfolder, "Flow");
+        setupFlowWorkspace();
+        verifyFlowDashboard(getProjectName() + "/" + subfolder);
+
+        exportThenImport(true, false);
+        verifyFlowDashboard(OTHER_PROJECT + "/" + subfolder);
     }
 
     @Test
     public void testReimportNestedWorkspaceFolder()
     {
+        final String subfolder = "Flow subfolder";
+
         _containerHelper.createProject(getProjectName(), "Flow");
         setupFlowWorkspace();
-        _containerHelper.createSubfolder(getProjectName(), "Flow subfolder", "Flow");
+        _containerHelper.createSubfolder(getProjectName(), subfolder, "Flow");
         setupFlowWorkspace();
 
-        testReimport(true, true);
+        exportThenImport(true, true);
+
+        // TODO: enable once import is successful
+        verifyFlowDashboard(OTHER_PROJECT);
+        verifyFlowDashboard(OTHER_PROJECT + "/" + subfolder);
     }
 
-    private void testReimport(boolean hasSubfolders, boolean expectError)
+    private void exportThenImport(boolean hasSubfolders, boolean expectError)
     {
         ExportFolderPage exportFolderPage = ExportFolderPage.beginAt(this, getProjectName());
         exportFolderPage.includeSubfolders(hasSubfolders);
@@ -138,6 +150,20 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         selectOptionByValue(Locator.name("ff_samplePropertyURI"), "Name");
         selectOptionByValue(Locator.name("ff_dataField"), "Name");
         clickAndWait(Locator.lkButton("update"));
+    }
+
+    private void verifyFlowDashboard(String containerPath)
+    {
+        goToProjectHome(containerPath);
+
+        // Flow Summary Webpart
+        assertElementPresent(Locator.linkWithText("FCS Analyses (1 run)"));
+        assertElementPresent(Locator.linkWithText("Samples (72)"));
+        assertElementPresent(Locator.linkWithText("Analysis (1 run)"));
+
+        // Flow Experiment Webpart
+        assertElementPresent(Locator.linkWithText("72 FCS files"));
+        assertElementPresent(Locator.linkWithText("72 sample descriptions in this folder."));
     }
 
     @Override
