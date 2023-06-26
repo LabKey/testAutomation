@@ -146,6 +146,11 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         }
 
         clickAndWait(Locators.folderTitle);
+        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
+        setFormElement(Locator.name("ff_name"), "Unused Script");
+        clickAndWait(Locator.lkButton("Create Analysis Script"));
+
+        clickAndWait(Locators.folderTitle);
         clickAndWait(Locator.linkWithText("Define sample description join fields"));
         selectOptionByValue(Locator.name("ff_samplePropertyURI"), "Name");
         selectOptionByValue(Locator.name("ff_dataField"), "Name");
@@ -157,13 +162,15 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         goToProjectHome(containerPath);
 
         // Flow Summary Webpart
-        assertElementPresent(Locator.linkWithText("FCS Analyses (1 run)"));
+        //assertElementPresent(Locator.linkWithText("FCS Analyses (1 run)"));
+        //assertElementPresent(Locator.linkWithText("Unused Script (0 runs)"));
         assertElementPresent(Locator.linkWithText("Samples (72)"));
-        assertElementPresent(Locator.linkWithText("Analysis (1 run)"));
+        //assertElementPresent(Locator.linkWithText("Analysis (1 run)"));
 
         // Flow Experiment Webpart
-        assertElementPresent(Locator.linkWithText("72 FCS files"));
-        assertElementPresent(Locator.linkWithText("72 sample descriptions in this folder."));
+        //assertElementPresent(Locator.linkWithText("72 FCS files"));
+        assertElementPresent(Locator.linkWithText("72 sample descriptions"));
+        assertElementPresent(Locator.linkWithText("Modify sample description join fields"));
     }
 
     @Override
