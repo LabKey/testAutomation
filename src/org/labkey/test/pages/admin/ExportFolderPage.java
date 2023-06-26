@@ -38,7 +38,8 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     public static final String STUDY = "Study";
     public static final String FILES = "Files";
     public static final String ETLS = "ETL Definitions";
-    public static final String SAMPLE_TYPES_AND_DATA_CLASSES = "Sample Types and Data Classes";
+    public static final String SAMPLE_TYPE_DATA = "Sample Type Data";
+    public static final String DATA_CLASS_DATA = "Data Class Data";
     public static final String QC_STATE_SETTINGS = "QC State Settings";
 
     public ExportFolderPage(WebDriver driver)
@@ -83,9 +84,15 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
-    public ExportFolderPage includeSampleTypeAndDataClasses(boolean checked)
+    public ExportFolderPage includeSampleTypeData(boolean checked)
     {
-        elementCache().sampleTypeAndDataClasses.set(checked);
+        elementCache().sampleTypeData.set(checked);
+        return this;
+    }
+
+    public ExportFolderPage includeDataClassData(boolean checked)
+    {
+        elementCache().dataClassData.set(checked);
         return this;
     }
 
@@ -200,7 +207,8 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
 
         public final Checkbox roleAssighmentsCheckbox = exportItemCheckbox(ROLE_ASSIGNMENTS);
 
-        public final Checkbox sampleTypeAndDataClasses = exportItemCheckbox(SAMPLE_TYPES_AND_DATA_CLASSES);
+        public final Checkbox sampleTypeData = exportItemCheckbox(SAMPLE_TYPE_DATA);
+        public final Checkbox dataClassData = exportItemCheckbox(DATA_CLASS_DATA);
 
         public final Checkbox includeFilesCheckbox = exportItemCheckbox(FILES);
 

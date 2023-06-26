@@ -107,7 +107,8 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
         goToFolderManagement()
                 .goToExportTab();
         File exportArchive = new ExportFolderPage(getDriver())
-                .includeSampleTypeAndDataClasses(true)
+                .includeSampleTypeData(true)
+                .includeDataClassData(true)
                 .exportToBrowserAsZipFile();
 
         log("Navigate into the destination folder and import there");
