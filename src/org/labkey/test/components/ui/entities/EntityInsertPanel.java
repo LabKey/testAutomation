@@ -50,6 +50,11 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return _driver;
     }
 
+    public boolean hasTargetEntityTypeSelect()
+    {
+        return Locator.tagWithName("input", "targetEntityType").existsIn(this);
+    }
+
     public ReactSelect targetEntityTypeSelect()
     {
         // Which tabs are available and selected can vary so try finding the visible react select
@@ -284,8 +289,16 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
                 isElementVisible(elementCache().deleteRowsBtn);
     }
 
+    public boolean hasTabs()
+    {
+        return Locator.tagWithClassContaining("ul", "list-group").existsIn(this);
+    }
+
     public boolean isFileUploadVisible()
     {
+        if (!hasTabs())
+            return optionalFileUploadPanel().isPresent();
+
         return modeSelectListItem("from File").withClass("active").findOptionalElement(this).isPresent() &&
                 optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
@@ -364,6 +377,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel showFileUpload()
     {
+        if (!hasTabs())
+            return this;
+
         if (!isFileUploadVisible())
         {
             var toggle = getFileUploadTab();
