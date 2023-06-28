@@ -151,7 +151,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
             .setFolderType("Template")
             .setTemplateSourceId(containerId)
             .setTemplateIncludeSubfolders(true)
-            .setTemplateWriterTypes("Lists");
+            .setTemplateWriterTypes("List Data");
         createProject(command);
         stopImpersonating();
 
