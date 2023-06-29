@@ -437,11 +437,20 @@ public abstract class Locator extends By
         return element != null && element.isDisplayed();
     }
 
+    /**
+     * Will check if any elements that match this locator are visible.
+     *
+     * @param context Search context.
+     * @return True if there are any elements visible, false otherwise.
+     */
     public boolean areAnyVisible(SearchContext context)
     {
-        WebElement element = findElementOrNull(context);
-        return element != null &&
-                ExpectedConditions.invisibilityOfAllElements(element).apply(getWebDriver(context));
+        List<WebElement> elements = findElements(context);
+
+        // The method invisibilityOfAllElements returns true/false, but visibilityOfAllElements returns a list or null.
+        // Dealing with a true/false response, and taking the not of it, is easier than having to deal with a list that
+        // may or may not be null.
+        return !ExpectedConditions.invisibilityOfAllElements(elements).apply(getWebDriver(context));
     }
 
     protected final List<WebElement> decorateWebElements(List<WebElement> elements)
