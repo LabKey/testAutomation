@@ -168,19 +168,11 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         new FileBrowserHelper(this).waitForFileGridReady();
     }
 
-    public FileBrowserHelper exportToPipelineAsZip()
-    {
-        int timeout = getDefaultWaitForPage();
-        return exportToPipelineAsZip(timeout);
-    }
-
-    public FileBrowserHelper exportToPipelineAsZip(int timeout)
+    public void exportToPipelineAsZip()
     {
         selectExportLocation(ExportLocation.pipelineAsZip);
-        clickAndWait(elementCache().exportBtn, timeout);
-        FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
-        fileBrowserHelper.waitForFileGridReady();
-        return fileBrowserHelper;
+        clickAndWait(elementCache().exportBtn);
+        new FileBrowserHelper(this).waitForFileGridReady();
     }
 
     public File exportToBrowserAsZipFile()
