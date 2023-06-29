@@ -36,6 +36,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Quotes;
 
@@ -434,6 +435,13 @@ public abstract class Locator extends By
     {
         WebElement element = findElementOrNull(context);
         return element != null && element.isDisplayed();
+    }
+
+    public boolean areAnyVisible(SearchContext context)
+    {
+        WebElement element = findElementOrNull(context);
+        return element != null &&
+                ExpectedConditions.invisibilityOfAllElements(element).apply(getWebDriver(context));
     }
 
     protected final List<WebElement> decorateWebElements(List<WebElement> elements)
