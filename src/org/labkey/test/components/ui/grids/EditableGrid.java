@@ -73,7 +73,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return _gridElement;
     }
 
-    public void waitForLoaded()
+    private void waitForLoaded()
     {
         Locators.loadingGrid.waitForElementToDisappear(this, 30000);
         Locators.spinner.waitForElementToDisappear(this, 30000);

@@ -354,7 +354,6 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             WebDriverWrapper.waitFor(() -> isGridVisible(),
                     "the grid did bot become visible", 2000);
         }
-        elementCache().grid.waitForLoaded();
         return this;
     }
     public ResponsiveGrid uploadFileExpectingPreview(File file)
