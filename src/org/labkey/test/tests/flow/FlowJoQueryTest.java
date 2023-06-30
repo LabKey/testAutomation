@@ -138,8 +138,9 @@ public class FlowJoQueryTest extends BaseFlowTest
         new DataRegionTable("query", getDriver()).clickHeaderMenu("Analysis Folder", "All Analysis Folders");
         assertTextNotPresent("No data to show");
         DataRegionTable region = new DataRegionTable("query", this);
-        region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
-        region.setFilter("PercentDifference", "Is Greater Than or Equal To", "2.5", longWaitForPage);
+        region.setUpdateTimeout(longWaitForPage);
+        region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2");
+        region.setFilter("PercentDifference", "Is Greater Than or Equal To", "2.5");
 
         // NOTE: see https://github.com/LabKey/commonAssays/pull/476
         // As part of this PR there were various places we removed range constraints on data values to improve plot consistency.

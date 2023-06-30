@@ -2171,22 +2171,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * Wait for Supplier to return true
+     * Wait for Supplier to return non-null non-false value
      * @param wait milliseconds
-     * @return false if Supplier.get() doesn't return true within 'wait' ms
+     * @return final result of Supplier.get()
      */
     @Contract(pure = true)
-    public static boolean waitFor(Supplier<Boolean> checker, int wait)
+    public static <T> T waitFor(Supplier<T> checker, int wait)
     {
         long startTime = System.currentTimeMillis();
+        T result;
         do
         {
-            if( checker.get() )
-                return true;
+            result = checker.get();
+            if (result != null && !Boolean.FALSE.equals(result))
+                break;
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
 
-        return checker.get();
+        return result;
     }
 
     public static void waitForEquals(String message, Supplier<?> expected, Supplier<?> actual, int wait)
