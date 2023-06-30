@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.search;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.UpdatingComponent;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.ui.grids.GridFilterModal;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -23,9 +24,8 @@ public class EntityFieldFilterModal extends GridFilterModal
     @Override
     protected void waitForReady()
     {
-        getWrapper().shortWait().until(ExpectedConditions.and(
-                ExpectedConditions.visibilityOf(elementCache().querySelectionPanel),
-                ExpectedConditions.invisibilityOfAllElements(BootstrapLocators.loadingSpinner.findElements(this))));
+        getWrapper().shortWait().until(ExpectedConditions
+                .visibilityOf(elementCache().querySelectionPanel));
     }
 
     /**
