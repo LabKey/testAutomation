@@ -4,7 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
@@ -191,17 +191,23 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return new EditableGrid.EditableGridFinder(_driver).findOptional(this);
     }
 
-    public EntityInsertPanel setMergeData(boolean checked)
+    public EntityInsertPanel setMergeData(boolean allowMerge)
     {
         var panel = showFileUpload();
-        if (checked && panel.elementCache().mergeDataCheckbox.isDisplayed())
-            panel.elementCache().mergeDataCheckbox.set(true);
+        if (panel.elementCache().allowMergeRadio.isDisplayed())
+        {
+            if (allowMerge)
+                panel.elementCache().allowMergeRadio.set(true);
+            else
+                panel.elementCache().notAllowMergeRadio.set(true);
+        }
+
         return this;
     }
 
     public boolean hasMergeOption()
     {
-        return elementCache().mergeDataCheckBoxLocator.existsIn(this);
+        return elementCache().allowMergeRadio.isDisplayed();
     }
 
     protected FileUploadPanel fileUploadPanel()
@@ -453,10 +459,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
 
-        Locator mergeDataCheckBoxLocator = Locator.tag("div")
-                .withChild(Locator.tagWithClass("span", "entity-mergeoption-checkbox"))
-            .child("input");
-        Checkbox mergeDataCheckbox = new Checkbox(mergeDataCheckBoxLocator.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        RadioButton allowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "true")).findWhenNeeded(this);
+        RadioButton notAllowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "false")).findWhenNeeded(this);
 
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
 
