@@ -71,6 +71,7 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Collapse filter clauses", "testMultiClausesFilter"),
                     Pair.of("Filter field case insensitive", "testCaseInsensitiveFilterField"),
                     Pair.of("Hide Paging Count", "testHidePagingCount"),
+                    Pair.of("Async Total Rows Count", "testAsyncTotalRowsCount"),
                     Pair.of("Show All Rows", "testShowAllTotalRows"),
                     Pair.of("Use getBaseFilters", "testGetBaseFilters"),
                     Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
