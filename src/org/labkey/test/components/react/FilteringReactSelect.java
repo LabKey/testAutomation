@@ -162,6 +162,8 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     private List<WebElement> setFilter(String value)
     {
+        if (!isOpen())
+            open();
         elementCache().input.sendKeys(value);
         long filterStart = System.currentTimeMillis();
         WebDriverWrapper.waitFor(()-> {
