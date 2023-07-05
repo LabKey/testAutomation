@@ -134,13 +134,13 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         expand();
 
-        // Wait for the listing container to show up.
+        // Wait for the listing container to show up. The listing container is in the open menu, scope the search to that.
         Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
-        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(this).isDisplayed(),
+        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(elementCache().findOpenMenu()).isDisplayed(),
                 "List container did not render.", 500);
 
         // Find again (lambda requires a final reference to the component).
-        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(this);
+        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().findOpenMenu());
 
         // It may be a moment before any notifications show up.
         WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing")
@@ -158,7 +158,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
         // update with the most recent notification the old reference will be stale.
-        return notificationsContainerLocator.findElement(this);
+        return notificationsContainerLocator.waitForElement(elementCache().findOpenMenu(), 1_000);
     }
 
     /**
@@ -236,14 +236,14 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         public final WebElement noNotificationsElement()
         {
-            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(this);
+            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(elementCache().findOpenMenu());
         }
 
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
                     .child(Locator.tagWithClass("div", "server-notifications-link"))
-                    .refindWhenNeeded(this);
+                    .refindWhenNeeded(elementCache().findOpenMenu());
         }
 
         public final WebElement viewAllLink = Locator.tagWithText("div", "View all activity").refindWhenNeeded(this);
