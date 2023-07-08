@@ -13,6 +13,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -76,7 +77,16 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
 
     public String getStatus()
     {
-        return elementCache().statusText.getText();
+        String retVal = null;
+        try
+        {
+            retVal = elementCache().statusText.getText();
+        }
+        catch (StaleElementReferenceException e)
+        {
+            return retVal;
+        }
+        return retVal;
     }
 
     public String getDescription()
