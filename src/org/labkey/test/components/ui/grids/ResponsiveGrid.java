@@ -672,6 +672,19 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return elementCache().getColumnHeaderCell(columnText).getAttribute("title");
     }
 
+    public Optional<String> getGridEmptyMessage()
+    {
+        Optional<String> msg = Optional.empty();
+
+        WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+        if(tr.isDisplayed())
+        {
+            msg = Optional.of(Locator.tag("td").findElement(tr).getText());
+        }
+
+        return msg;
+    }
+
     /**
      * supports chaining between base and derived instances
      * @return  magic
