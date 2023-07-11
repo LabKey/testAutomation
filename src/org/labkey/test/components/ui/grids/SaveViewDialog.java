@@ -5,6 +5,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -54,14 +55,24 @@ public class SaveViewDialog extends ModalDialog
     }
 
     /**
-     * Check or uncheck the 'Make default view' checkbox.
+     * Check the 'Make default view' radio button.
      *
-     * @param checked True to check, false to uncheck.
      * @return This dialog.
      */
-    public SaveViewDialog setMakeDefault(boolean checked)
+    public SaveViewDialog setMakeDefault()
     {
-        elementCache().makeDefault.set(checked);
+        elementCache().makeDefault.check();
+        return this;
+    }
+
+    /**
+     * Check the 'Make custom view' radio button.
+     *
+     * @return This dialog.
+     */
+    public SaveViewDialog setMakeCustom()
+    {
+        elementCache().makeCustom.check();
         return this;
     }
 
@@ -155,7 +166,8 @@ public class SaveViewDialog extends ModalDialog
         protected final Input viewNameInput = Input.Input(Locator.name("gridViewName"), getDriver())
                 .findWhenNeeded(this);
 
-        protected Checkbox makeDefault = new Checkbox(Locator.input("setDefaultView").findWhenNeeded(this));
+        protected RadioButton makeDefault = new RadioButton(Locator.id("defaultView").findWhenNeeded(this));
+        protected RadioButton makeCustom = new RadioButton(Locator.id("customView").findWhenNeeded(this));
         protected Checkbox makeAvailable = new Checkbox(Locator.input("setInherit").findWhenNeeded(this));
 
     }

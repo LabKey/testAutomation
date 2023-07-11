@@ -350,7 +350,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         checker().screenShotIfNewError("testDefaultViewRemoveColumn_Save_View_Dialog_Defaults_Error");
 
-        saveViewDialog.setMakeDefault(true);
+        saveViewDialog.setMakeDefault();
 
         checker().verifyFalse("Setting 'Default for all' should disable the name field, it did not.",
                 saveViewDialog.isViewNameEnabled());
@@ -462,14 +462,14 @@ public class GridPanelViewTest extends GridPanelBaseTest
         {
             log("Save as default view (for everyone).");
             saveViewDialog = grid.saveView();
-            saveViewDialog.setMakeDefault(true);
+            saveViewDialog.setMakeDefault();
         }
         else
         {
             log(String.format("Save as custom view '%s'.", viewName));
             saveViewDialog = grid.saveView();
             saveViewDialog.setViewName(viewName);
-            saveViewDialog.setMakeDefault(false);
+            saveViewDialog.setMakeCustom();
 
             savedViewsForDefaultSampleType.add(viewName);
         }
@@ -617,7 +617,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         {
             log("Save as default view.");
             saveViewDialog = grid.saveView();
-            saveViewDialog.setMakeDefault(true)
+            saveViewDialog.setMakeDefault()
                     .saveView();
         }
         else
@@ -627,7 +627,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
             log(String.format("Save view as '%s'.", viewName));
             saveViewDialog = grid.saveView();
-            saveViewDialog.setMakeDefault(false)
+            saveViewDialog.setMakeCustom()
                     .setViewName(viewName)
                     .saveView();
 
@@ -712,7 +712,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
             // The default checkbox is not checked by default. Maybe a bug?
             log("Checking the 'Default for all' checkbox.");
-            saveViewDialog.setMakeDefault(true);
+            saveViewDialog.setMakeDefault();
 
             saveViewDialog.saveView();
         }
@@ -733,7 +733,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 if(saveViewDialog.getViewName().isEmpty())
                     saveViewDialog.setViewName(viewName);
 
-                saveViewDialog.setMakeDefault(false)
+                saveViewDialog.setMakeCustom()
                         .saveView();
             }
 
@@ -758,7 +758,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
             // In the core-components.view page the checkbox is not checked by default.
             log("Checking 'Make default for all'.");
-            saveViewDialog.setMakeDefault(true);
+            saveViewDialog.setMakeDefault();
 
         }
         else
@@ -858,7 +858,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Use the grid menu to hide column '%s'.", columnToAdd));
         grid.hideColumn(columnToAdd);
         grid.clickSaveButton(true)
-                .setMakeDefault(true)
+                .setMakeDefault()
                 .saveView();
 
         List<String> expectedFields = new ArrayList<>(DEFAULT_COLUMNS);
