@@ -45,6 +45,15 @@ public class SaveViewDialog extends ModalDialog
     }
 
     /**
+     * Check if the View Name field is visible. It should not be displayed if the 'Make default for all' radio option is chosen.
+     * @return True if displayed, false otherwise
+     */
+    public boolean isViewNameInputDisplayed()
+    {
+        return elementCache().viewNameInput.getComponentElement().isDisplayed();
+    }
+
+    /**
      * Check if the View Name field is enabled. It should be disabled if the 'Make default for all' checkbox is checked.
      *
      * @return True if enabled, false otherwise.
