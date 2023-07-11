@@ -388,7 +388,8 @@ public class IssuesTest extends BaseWebDriverTest
 
     /**
      * Test that issues update form displays existing values correctly and saves new values without error.
-     * Issue 48068: Add test coverage for issue notify lists
+     * Issue 48059: Cannot update tickets or issues in issue tracker on labkey.org
+     * Issue 47912: When updating or resolving an issue, fields are changed to default values
      */
     @Test
     public void testIssueUpdate()
