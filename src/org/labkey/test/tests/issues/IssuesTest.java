@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.issues;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -34,9 +35,11 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.issues.BaseIssuePage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
+import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.issues.ResolvePage;
@@ -381,6 +384,65 @@ public class IssuesTest extends BaseWebDriverTest
         listDef.create(createDefaultConnection(), getProjectName());
 
         addLookupValues(issueDefName, fieldName, values);
+    }
+
+    /**
+     * Test that issues update form displays existing values correctly and saves new values without error.
+     * Issue 48068: Add test coverage for issue notify lists
+     */
+    @Test
+    public void testIssueUpdate()
+    {
+        String issue1 = _issuesHelper.addIssue("Referent 1", _userHelper.getDisplayNameForEmail(USER1)).getIssueId();
+        String issue2 = _issuesHelper.addIssue("Referent 2", _userHelper.getDisplayNameForEmail(USER1)).getIssueId();
+
+        String title = "Original Title";
+        String assignedTo = _userHelper.getDisplayNameForEmail(USER1);
+        String type = "Defect";
+        String priority = "0";
+        String related = issue1;
+        String notify = USER3;
+
+        clickTab("Issues");
+        clickButton("New Issue");
+        UpdatePage updatePage = new InsertPage(getDriver());
+        setIssue(updatePage, title, assignedTo, type, priority, related, notify);
+        updatePage.comment().set("Initial comment");
+        updatePage = updatePage.save().clickUpdate();
+
+        log("Verify values persist");
+        assertIssue(updatePage, title, assignedTo, type, priority, related, notify);
+
+        title = "Updated Title";
+        assignedTo = _userHelper.getDisplayNameForEmail(USER3);
+        type = "Todo";
+        priority = "4";
+        related = issue2;
+        notify = USER1;
+        setIssue(updatePage, title, assignedTo, type, priority, related, notify);
+        updatePage.comment().set("Second comment");
+        updatePage = updatePage.save().clickUpdate();
+        assertIssue(updatePage, title, assignedTo, type, priority, related, notify);
+    }
+
+    private void setIssue(UpdatePage page, String title, String assignedTo, String type, String priority, String related, String notify)
+    {
+        page.title().set(title);
+        page.assignedTo().set(assignedTo);
+        page.selectWithName("type").set(type);
+        page.priority().set(priority);
+        page.related().set(related);
+        page.notifyList().set(notify);
+    }
+
+    private void assertIssue(UpdatePage page, String title, String assignedTo, String type, String priority, String related, String notify)
+    {
+        assertEquals("title", title, page.title().get());
+        assertEquals("assignedTo", assignedTo, page.assignedTo().get());
+        assertEquals("type", type, page.selectWithName("type").get());
+        assertEquals("priority", priority, page.priority().get());
+        assertEquals("related", related, page.related().get());
+        Assertions.assertThat(page.notifyList().get()).as("notify").contains(_userHelper.getDisplayNameForEmail(notify));
     }
 
     @Test
