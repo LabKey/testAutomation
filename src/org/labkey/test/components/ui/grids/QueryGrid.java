@@ -417,7 +417,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
         SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
-        dialog.setMakeDefault(false)
+        dialog.setMakeCustom()
                 .setViewName(viewName);
 
         if(makeAvailable)
@@ -455,7 +455,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
         SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
-        dialog.setMakeDefault(true);
+        dialog.setMakeDefault();
 
         if(makeAvailable)
         {
