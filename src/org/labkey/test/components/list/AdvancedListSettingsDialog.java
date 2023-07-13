@@ -1,5 +1,6 @@
 package org.labkey.test.components.list;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -46,7 +47,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     public AdvancedListSettingsDialog indexEntireListAsASingleDocument(boolean checked, String docTitle,
                                                                        SearchIncludeOptions includeOptions,
-                                                                       SearchIndexOptions indexOptions)
+                                                                       SearchIndexOptions indexOptions, @Nullable String customTemplate)
     {
         String labelText = "Index entire list as a single document";
         new Checkbox(this, labelText).set(checked);
@@ -59,13 +60,15 @@ public class AdvancedListSettingsDialog extends ModalDialog
             Input.Input(Locator.id("entireListTitleTemplate"), getDriver()).find().set(docTitle);
             elementCache().radio(includeOptions.toString()).check();
             elementCache().radio(indexOptions.toString()).check();
+            if(indexOptions.equals(SearchIndexOptions.CustomTemplate))
+                Input.Input(Locator.id("entireListBodyTemplate"), getDriver()).find().set(customTemplate);
         }
         return this;
     }
 
     public AdvancedListSettingsDialog disableEntireListIndex()
     {
-        return indexEntireListAsASingleDocument(false, null, null, null);
+        return indexEntireListAsASingleDocument(false, null, null, null, null);
     }
 
     public AdvancedListSettingsDialog indexEachItemAsASeparateDocument(boolean checked, String docTitle, SearchIndexOptions indexOptions)
