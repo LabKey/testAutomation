@@ -7,11 +7,9 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -46,6 +44,9 @@ public class ListIndexingTest extends BaseWebDriverTest
         init.doSetup();
     }
 
+    /*
+       Regression test cases for Issue 48056: More list indexing fixes
+     */
     private void doSetup()
     {
         log("Setup project and list module");
@@ -54,22 +55,15 @@ public class ListIndexingTest extends BaseWebDriverTest
 
         goToProjectHome();
         new PortalHelper(this).addWebPart("Search");
-
-        log("Adding LastIndexed column");
-        _listHelper.goToList(listName);
-        DataRegionTable listTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("query").waitFor();
-        CustomizeView customizeView = listTable.openCustomizeGrid();
-        customizeView.showHiddenItems();
-        customizeView.addColumn("LastIndexed");
-        customizeView.saveCustomView();
     }
 
     @Test
     public void testEachItemIndexing()
     {
+        goToProjectHome();
         EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign("NIMHSlides");
         editListDefinitionPage.openAdvancedListSettings()
-                .indexEachItemAsASeparateDocument(true, "${SubjectId}", AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText)
+                .indexEachItemAsASeparateDocument(true, "Subject Id: ${SubjectId}", AdvancedListSettingsDialog.SearchIndexOptions.NonPhiFields)
                 .clickApply()
                 .clickSave();
 
@@ -111,7 +105,7 @@ public class ListIndexingTest extends BaseWebDriverTest
         editDesign.openAdvancedListSettings()
                 .indexEntireListAsASingleDocument(true, customTitle,
                         AdvancedListSettingsDialog.SearchIncludeOptions.DataOnly,
-                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText, null)
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiFields, null)
                 .clickApply()
                 .clickSave();
 
@@ -119,14 +113,14 @@ public class ListIndexingTest extends BaseWebDriverTest
         editDesign.openAdvancedListSettings()
                 .indexEntireListAsASingleDocument(true, "",
                         AdvancedListSettingsDialog.SearchIncludeOptions.MetadataAndData,
-                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText, null)
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiFields, null)
                 .clickApply()
                 .clickSave();
 
         log("Verifying search result based on advanced settings(Document title, dataOnly and non phi text fields");
         searchFor(getProjectName(), customTitle, 1, null);
-        //searchFor(getProjectName(), "Justin", 2, null);
         searchFor(getProjectName(), "Occupation", 0, null);
+        searchFor(getProjectName(), "10001", 2, null);
 
         _listHelper.goToEditDesign(listName)
                 .openAdvancedListSettings()
@@ -138,7 +132,7 @@ public class ListIndexingTest extends BaseWebDriverTest
         editDesign.openAdvancedListSettings()
                 .indexEntireListAsASingleDocument(true, "",
                         AdvancedListSettingsDialog.SearchIncludeOptions.MetadataOnly,
-                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiFields, null)
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText, null)
                 .clickApply()
                 .clickSave();
 
