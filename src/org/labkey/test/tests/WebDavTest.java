@@ -248,6 +248,7 @@ public class WebDavTest extends BaseWebDriverTest
 
         log("Visit WebDav and WebFiles after project creation");
         WebDavPage.beginAt(this, "");
+        _fileBrowserHelper.waitForFileGridReady();
         assertTextPresent(OTHER_PROJECT);
         WebFilesHtmlViewPage.beginAt(this, "");
         assertTextPresent(OTHER_PROJECT);
