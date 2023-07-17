@@ -5,9 +5,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.openqa.selenium.WebElement;
 
@@ -47,6 +47,13 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     public AdvancedListSettingsDialog indexEntireListAsASingleDocument(boolean checked, String docTitle,
                                                                        SearchIncludeOptions includeOptions,
+                                                                       SearchIndexOptions indexOptions)
+    {
+        return indexEntireListAsASingleDocument(checked, docTitle, includeOptions, indexOptions, null);
+    }
+
+    public AdvancedListSettingsDialog indexEntireListAsASingleDocument(boolean checked, String docTitle,
+                                                                       SearchIncludeOptions includeOptions,
                                                                        SearchIndexOptions indexOptions, @Nullable String customTemplate)
     {
         String labelText = "Index entire list as a single document";
@@ -60,10 +67,36 @@ public class AdvancedListSettingsDialog extends ModalDialog
             Input.Input(Locator.id("entireListTitleTemplate"), getDriver()).find().set(docTitle);
             elementCache().radio(includeOptions.toString()).check();
             elementCache().radio(indexOptions.toString()).check();
-            if(indexOptions.equals(SearchIndexOptions.CustomTemplate))
+            if (indexOptions.equals(SearchIndexOptions.CustomTemplate))
                 Input.Input(Locator.id("entireListBodyTemplate"), getDriver()).find().set(customTemplate);
         }
         return this;
+    }
+
+    public boolean isSearchIncludeSelected(String mainLabel, SearchIncludeOptions searchInclude)
+    {
+        if (new Checkbox(this, mainLabel).isSelected())
+        {
+            WebElement expandCollapsePane = elementCache().collapsibleField(mainLabel);
+            expandPane(expandCollapsePane);
+            if (elementCache().radio(searchInclude.toString()).isSelected())
+                return true;
+        }
+
+        return false;
+    }
+
+    public boolean isSearchIndexSelected(String mainLabel, SearchIndexOptions searchIndex)
+    {
+        if (new Checkbox(this, mainLabel).isSelected())
+        {
+            WebElement expandCollapsePane = elementCache().collapsibleField(mainLabel);
+            expandPane(expandCollapsePane);
+            if (elementCache().radio(searchIndex.toString()).isSelected())
+                return true;
+        }
+
+        return false;
     }
 
     public AdvancedListSettingsDialog disableEntireListIndex()
@@ -97,8 +130,8 @@ public class AdvancedListSettingsDialog extends ModalDialog
     {
         if (!isPaneExpanded(expandCollapsePane))
         {
-            expandCollapsePane.click();
-            WebDriverWrapper.waitFor(()-> isPaneExpanded(expandCollapsePane),
+            elementCache().expandCarat().findElement(expandCollapsePane).click();
+            WebDriverWrapper.waitFor(() -> isPaneExpanded(expandCollapsePane),
                     "the pane did not expand in time", 1000);
         }
     }
@@ -135,7 +168,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
     @Override
     protected ElementCache elementCache()
     {
-        return  (ElementCache) super.elementCache();
+        return (ElementCache) super.elementCache();
     }
 
     protected class ElementCache extends ModalDialog.ElementCache
@@ -144,14 +177,21 @@ public class AdvancedListSettingsDialog extends ModalDialog
         {
             return Locator.tagWithText("label", labelText);
         }
+
         Locator.XPathLocator collapsibleFieldLoc(String checkboxLabelText)
         {
             return Locator.tagWithClass("div", "list__advanced-settings-modal__collapsible-field")
                     .withDescendant(checkBoxLoc(checkboxLabelText));
         }
+
         Locator.XPathLocator collapsibleFieldContainer(String checkboxLabelText)
         {
             return Locator.tag("div").withChild(checkBoxLoc(checkboxLabelText));
+        }
+
+        Locator.XPathLocator expandCarat()
+        {
+            return Locator.tagWithClassContaining("span", "fa-lg"); //Matches both angle right or angle down
         }
 
         RadioButton radio(String labelText)
@@ -170,7 +210,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
 
     public enum SearchIncludeOptions
     {
-        MetadataAndData("Include both metadata and data" ),
+        MetadataAndData("Include both metadata and data"),
         DataOnly("Include data only"),
         MetadataOnly("Include metadata only (name and description of list and fields)");
 

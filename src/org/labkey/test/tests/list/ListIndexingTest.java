@@ -1,6 +1,7 @@
 package org.labkey.test.tests.list;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -86,6 +87,18 @@ public class ListIndexingTest extends BaseWebDriverTest
                 .clickApply()
                 .clickSave();
 
+        editDesign = _listHelper.goToEditDesign(listName);
+        AdvancedListSettingsDialog settingsDialog = editDesign.openAdvancedListSettings();
+        Assert.assertTrue("Search index options did not save",
+                settingsDialog.isSearchIndexSelected("Index entire list as a single document",
+                        AdvancedListSettingsDialog.SearchIndexOptions.CustomTemplate));
+
+        Assert.assertTrue("Search include option did not save",
+                settingsDialog.isSearchIncludeSelected("Index entire list as a single document",
+                        AdvancedListSettingsDialog.SearchIncludeOptions.MetadataAndData));
+        settingsDialog.clickCancel();
+        editDesign.clickCancel();
+
         log("Verifying search result based on advanced settings(Custom template and metadata+data");
         searchFor(getProjectName(), "Justin", 1, "List " + listName);
         searchFor(getProjectName(), "Child", 0, null);
@@ -123,6 +136,12 @@ public class ListIndexingTest extends BaseWebDriverTest
         searchFor(getProjectName(), "10001", 2, null);
 
         _listHelper.goToEditDesign(listName)
+                .openAdvancedListSettings()
+                .disableEntireListIndex()
+                .clickApply()
+                .clickSave();
+
+        _listHelper.goToEditDesign("NIMHSamples")
                 .openAdvancedListSettings()
                 .disableEntireListIndex()
                 .clickApply()
