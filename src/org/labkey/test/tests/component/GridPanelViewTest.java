@@ -352,8 +352,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         saveViewDialog.setMakeDefault();
 
-        checker().verifyFalse("Setting 'Default for all' should disable the name field, it did not.",
-                saveViewDialog.isViewNameEnabled());
+        checker().verifyFalse("Setting 'Default for all' should hide the name field, but it did not.",
+                saveViewDialog.isViewNameInputDisplayed());
 
         checker().screenShotIfNewError("testDefaultViewRemoveColumnFromAppGrid_Save_View_Dialog_Set_Error");
 
