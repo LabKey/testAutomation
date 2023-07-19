@@ -112,7 +112,9 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         goBack();
 
         listsGrid = new ManageListsGrid(getDriver());
+        listsGrid.clearAllFilters();
         listsGrid.setFilter("Container", "Equals One Of (example usage: a;b;c)", LIST_FOLDER_A + ";" + getProjectName());
+        Assert.assertEquals("Incorrect list after container filter", Arrays.asList(LIST_A, LIST_B), listsGrid.getColumnDataAsText("Name"));
         listsGrid.checkAllOnPage();
         File listExport = listsGrid.exportSelectedLists();
         Assert.assertTrue("Empty export file downloaded", listExport.length() > 0);
