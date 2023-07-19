@@ -2,8 +2,9 @@ package org.labkey.test.components.ui.domainproperties.samples;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
-import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.domainproperties.EntityTypeDesigner;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
@@ -47,6 +48,10 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
     public T addParentAlias(String alias, @Nullable String optionDisplayText)
     {
         expandPropertiesPanel();
+
+        WebDriverWrapper.waitFor(elementCache().addAliasButton::isDisplayed,
+                "'Add Parent Alias' button is not visible.", 2_500);
+
         elementCache().addAliasButton.click();
         int initialCount = findEmptyAlias();
         if (optionDisplayText == null)

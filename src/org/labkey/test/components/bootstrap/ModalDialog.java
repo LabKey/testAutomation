@@ -141,12 +141,12 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected class ElementCache extends Component<ElementCache>.ElementCache
     {
-        public final WebElement title = Locators.title.findWhenNeeded(getComponentElement());
+        public final WebElement title = Locators.title.refindWhenNeeded(getComponentElement());
         public final WebElement closeButton = Locator.tagWithClass("button", "close")
                 .withAttribute("data-dismiss", "modal")
-                .findWhenNeeded(getComponentElement());
+                .refindWhenNeeded(getComponentElement());
         public final WebElement body = Locators.body
-                .findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     public static class Locators
