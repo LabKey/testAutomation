@@ -62,87 +62,6 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return getThis();
     }
 
-    public int getParentAliasIndex(String parentAlias)
-    {
-        List<Input> inputs = elementCache().parentAliases();
-        for (int i = 0; i < inputs.size(); i++)
-        {
-            if (inputs.get(i).get().equals(parentAlias))
-            {
-                return i;
-            }
-        }
-        throw new NotFoundException("No such parent alias: " + parentAlias);
-    }
-
-    public List<String> getParentAliasOptions(int index)
-    {
-        expandPropertiesPanel();
-        return elementCache().parentAliasSelect(index).getOptions();
-    }
-
-    public T removeParentAlias(String parentAlias)
-    {
-        expandPropertiesPanel();
-        int aliasIndex = getParentAliasIndex(parentAlias);
-        return removeParentAlias(aliasIndex);
-    }
-
-    public T removeParentAlias(int index)
-    {
-        expandPropertiesPanel();
-        elementCache().removeParentAliasIcon(index).click();
-        return getThis();
-    }
-
-    protected T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
-    {
-        expandPropertiesPanel();
-        elementCache().parentAlias(index).setValue(alias);
-        if (optionDisplayText != null)
-        {
-            elementCache().parentAliasSelect(index).select(optionDisplayText);
-        }
-        return getThis();
-    }
-
-    public T setParentAlias(String alias, String optionDisplayText)
-    {
-        expandPropertiesPanel();
-        int index = getParentAliasIndex(alias);
-        elementCache().parentAliasSelect(index).select(optionDisplayText);
-        return getThis();
-    }
-
-    public String getParentAlias(int index)
-    {
-        expandPropertiesPanel();
-        return elementCache().parentAlias(index).get();
-    }
-
-    public String getParentAliasSelectText(int index)
-    {
-        expandPropertiesPanel();
-        return elementCache().parentAliasSelect(index).getSelections().get(0);
-    }
-
-    protected int findEmptyAlias()
-    {
-        List<Input> aliases = elementCache().parentAliases();
-        int index = -1;
-        for(int i = 0; i < aliases.size(); i++)
-        {
-            if(aliases.get(i).getValue().isEmpty())
-            {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-
-    }
-
     public boolean hasUniqueIdAlert()
     {
         return elementCache().uniqueIdAlert.isDisplayed();
@@ -186,27 +105,5 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
                 .append(Locator.tagWithClassContaining("i", "domain-panel-status-icon-green")).refindWhenNeeded(this);
 
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
-
-        public List<Input> parentAliases()
-        {
-            return Input.Input(Locator.name("alias"), getDriver()).findAll(propertiesPanel);
-        }
-
-        Input parentAlias(int index)
-        {
-            return parentAliases().get(index);
-        }
-
-        ReactSelect parentAliasSelect(int index)
-        {
-            return ReactSelect.finder(getDriver())
-                    .withInputClass("sampleset-insert--parent-select")
-                    .index(index).find(propertiesPanel);
-        }
-
-        WebElement removeParentAliasIcon(int index)
-        {
-            return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
-        }
     }
 }
