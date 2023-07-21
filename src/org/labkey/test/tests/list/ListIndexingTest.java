@@ -10,9 +10,13 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SearchHelper;
+import org.labkey.test.util.search.SearchResultsQueue;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,6 +29,8 @@ public class ListIndexingTest extends BaseWebDriverTest
 {
     private final ListHelper _listHelper = new ListHelper(this);
     private static final String listName = "NIMHDemographics";
+
+    private final SearchHelper _searchHelper = new SearchHelper(this, new SearchResultsQueue()).setMaxTries(6);
 
     @Override
     protected @Nullable String getProjectName()
@@ -68,7 +74,11 @@ public class ListIndexingTest extends BaseWebDriverTest
                 .clickApply()
                 .clickSave();
 
-        searchFor(getProjectName(), "10001", 8, null);
+        SearchResultsPage resultsPage = _searchHelper.searchFor("10001");
+        Assert.assertEquals("Incorrect number of search result", Integer.valueOf(8), resultsPage.getResultCount());
+        List<WebElement> res = resultsPage.getResults();
+        for (WebElement row : res)
+            Assert.assertTrue("Custom title is not applied in results", row.getText().startsWith("Subject Id: 10001"));
     }
 
     @Test
