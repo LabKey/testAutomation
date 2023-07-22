@@ -240,17 +240,6 @@ public class WikiLongTest extends BaseWebDriverTest
         _wikiHelper.saveWikiPage();
         assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
 
-        log("test fixup for unsafe _blank targets, see #33356");
-        _wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), WIKI_PAGE9_NAME);
-        _wikiHelper.setWikiBody(WIKI_PAGE9_CONTENT);
-        _wikiHelper.saveWikiPage();
-        assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
-
-        String renderedPage9 = getHtmlSource();
-        assertTrue("Fixed up link not present", renderedPage9.contains("<a href=\"http://labkey.com\" rel=\"noopener noreferrer\" target=\"_blank\">Fixup</a>"));
-        assertTrue("Safe link mangled", renderedPage9.contains("<a href=\"http://labkey.com\">Safe</a>"));
-
         log("test create new html page with a webpart");
         _wikiHelper.createNewWikiPage("HTML");
 
@@ -518,6 +507,18 @@ public class WikiLongTest extends BaseWebDriverTest
         clickTab("Wiki");
         portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
         assertElementPresent(Locator.linkWithText(PROJECT_NAME));
+
+        log("test fixup for unsafe _blank targets, see #33356");
+        _wikiHelper.createNewWikiPage();
+        setFormElement(Locator.name("name"), WIKI_PAGE9_NAME);
+        _wikiHelper.setWikiBody(WIKI_PAGE9_CONTENT);
+        _wikiHelper.saveWikiPage();
+        assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
+
+        String renderedPage9 = getHtmlSource();
+        assertTrue("Fixed up link not present", renderedPage9.contains("<a href=\"http://labkey.com\" rel=\"noopener noreferrer\" target=\"_blank\">Fixup</a>"));
+        assertTrue("Safe link mangled", renderedPage9.contains("<a href=\"http://labkey.com\">Safe</a>"));
+
         stopImpersonating();
 
         log("delete wiki web part");
