@@ -134,10 +134,14 @@ public class WikiHelper
     {
         String title = Locator.id("wiki-input-title").findElement(_test.getDriver()).getText();
         if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
-        _test.clickButton("Save & Close");
         if (expectSuccess)
         {
+            _test.clickButton("Save & Close");
             _test.waitForElement(Locator.linkWithText(title));
+        }
+        else
+        {
+            _test.clickButton("Save & Close", 0);
         }
     }
 
