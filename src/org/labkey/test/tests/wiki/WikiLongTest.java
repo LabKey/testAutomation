@@ -517,7 +517,14 @@ public class WikiLongTest extends BaseWebDriverTest
 
         String renderedPage9 = getHtmlSource();
         assertTrue("Fixed up link not present", renderedPage9.contains("<a href=\"http://labkey.com\" rel=\"noopener noreferrer\" target=\"_blank\">Fixup</a>"));
-        assertTrue("Safe link mangled", renderedPage9.contains("<a href=\"http://labkey.com\">Safe</a>"));
+        assertTrue("Safe link mangled", renderedPage9.contains("<a href=\"http://labkey.com\">Safe link</a>"));
+
+        log("Ensure non-developer can't save script");
+        _wikiHelper.createNewWikiPage();
+        setFormElement(Locator.name("name"), WIKI_PAGE5_NAME);
+        _wikiHelper.setWikiBody(WIKI_PAGE5_CONTENT);
+        _wikiHelper.saveWikiPage(false);
+        waitForText("There was a problem while saving: Illegal element");
 
         stopImpersonating();
 
