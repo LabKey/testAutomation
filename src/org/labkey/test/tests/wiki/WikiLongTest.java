@@ -521,10 +521,13 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Ensure non-developer can't save script");
         _wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), WIKI_PAGE5_NAME);
+        setFormElement(Locator.name("name"), "Unsaveable");
         _wikiHelper.setWikiBody(WIKI_PAGE5_CONTENT);
         _wikiHelper.saveWikiPage(false);
         waitForText("There was a problem while saving: Illegal element");
+        _wikiHelper.setWikiBody("<a onclick=\"alert('test');\">test</a>");
+        _wikiHelper.saveWikiPage(false);
+        waitForText("There was a problem while saving: Illegal attribute 'onclick' on element");
 
         stopImpersonating();
 
