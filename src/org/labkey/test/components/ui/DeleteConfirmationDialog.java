@@ -62,7 +62,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog setUserComment(String comment)
     {
-        WebElement commentInput = Locator.tag("textarea").findWhenNeeded(this);
+        WebElement commentInput = Locator.tag("textarea").waitForElement(this, 1000);
         commentInput.click();
         commentInput.sendKeys(comment);
         return this;
