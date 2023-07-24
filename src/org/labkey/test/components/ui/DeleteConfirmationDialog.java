@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -34,6 +35,14 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
         super(finder);
         _sourcePage = sourcePage;
         _confirmPageSupplier = confirmPageSupplier;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
+                        !BootstrapLocators.loadingSpinner.existsIn(this),
+                "The 'Choose Samples to Add' dialog did not display.", 1_000);
     }
 
     public SourcePage cancelDelete()
