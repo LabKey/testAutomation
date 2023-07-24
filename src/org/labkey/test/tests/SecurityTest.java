@@ -803,7 +803,7 @@ public class SecurityTest extends BaseWebDriverTest
         setFormElement(Locator.id("password"), shortPassword);
         setFormElement(Locator.id("password2"), shortPassword);
         clickButton("Set Password");
-        assertTextPresent("Your password must be eight characters or more."); // fail, too short
+        assertTextPresent("Your password must be at least eight characters"); // fail, too short
 
         setFormElement(Locator.id("password"), PASSWORDS[0]);
         setFormElement(Locator.id("password2"), PASSWORDS[0]);
@@ -817,7 +817,7 @@ public class SecurityTest extends BaseWebDriverTest
         changePassword(PASSWORDS[1], simplePassword); // fail, too simple
         assertTextPresent("Your password must contain three of the following");
         changePassword(PASSWORDS[1], shortPassword); // fail, too short
-        assertTextPresent("Your password must be eight characters or more.");
+        assertTextPresent("Your password must be at least eight characters");
         changePassword(PASSWORDS[1], PASSWORDS[2]);
         assertTextNotPresent("Choose a new password.");
         changePassword(PASSWORDS[2], PASSWORDS[3]);
