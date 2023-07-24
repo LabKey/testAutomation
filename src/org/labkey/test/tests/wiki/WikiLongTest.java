@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class, Wiki.class})
@@ -121,11 +122,10 @@ public class WikiLongTest extends BaseWebDriverTest
                     ## Subtitle MD
                     *italic text MD*
                     """;
-    private static final String WIKI_PAGE9_CONTENT =
-            """
-            <a href="http://labkey.com" target="_blank">Fixup</a>
-            <a href="http://labkey.com">Safe link</a>
-            """;
+
+    private static final String SAFE_LINK_HTML = "<a href=\"http://labkey.com\">Safe link</a>";
+    private static final String FIXUP_LINK_HTML = "<a href=\"http://labkey.com\" target=\"_blank\">Fixup</a>";
+    private static final String WIKI_PAGE9_CONTENT = SAFE_LINK_HTML + "\n" + FIXUP_LINK_HTML;
 
     private static final String NAVBAR1_CONTENT =
             "{labkey:tree|name=core.currentProject}";
@@ -516,8 +516,9 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
 
         String renderedPage9 = getHtmlSource();
+        assertFalse("Link needing fixup wasn't fixed up", renderedPage9.contains(FIXUP_LINK_HTML));
         assertTrue("Fixed up link not present", renderedPage9.contains("<a href=\"http://labkey.com\" rel=\"noopener noreferrer\" target=\"_blank\">Fixup</a>"));
-        assertTrue("Safe link mangled", renderedPage9.contains("<a href=\"http://labkey.com\">Safe link</a>"));
+        assertTrue("Safe link mangled", renderedPage9.contains(SAFE_LINK_HTML));
 
         log("Ensure non-developer can't save script");
         _wikiHelper.createNewWikiPage();
