@@ -53,11 +53,6 @@ public class DataClassHelper extends WebDriverWrapper
         Locked
     }
 
-    public DataClassHelper(WebDriverWrapper driverWrapper)
-    {
-        this(driverWrapper.getDriver());
-    }
-
     public DataClassHelper(WebDriver driver)
     {
         _driver = driver;
@@ -93,18 +88,6 @@ public class DataClassHelper extends WebDriverWrapper
 
         createPage.addFields(props.getFields());
         createPage.clickSave();
-    }
-
-    public void createDataClass(DataClassDefinition definition, File dataFile)
-    {
-        createDataClass(definition);
-        goToDataClass(definition.getName()).bulkImport(dataFile);
-    }
-
-    public void createDataClass(DataClassDefinition definition, String data)
-    {
-        createDataClass(definition);
-        goToDataClass(definition.getName()).bulkImport(data);
     }
 
     public void createDataClass(DataClassDefinition definition, List<Map<String, String>> data)
@@ -196,34 +179,16 @@ public class DataClassHelper extends WebDriverWrapper
                 .submit();
     }
 
-    public void mergeImport(String tsvData)
-    {
-        startTsvImport(tsvData, DataClassHelper.MERGE_OPTION)
-                .submit();
-    }
-
     public void bulkImport(List<Map<String, String>> data)
     {
         startTsvImport(data, IMPORT_OPTION)
                 .submit();
     }
 
-    public void bulkImportExpectingError(List<Map<String, String>> data, String importOption)
-    {
-        startTsvImport(data, importOption)
-                .submitExpectingError();
-    }
-
     public void mergeImport(List<Map<String, String>> data)
     {
         startTsvImport(data, DataClassHelper.MERGE_OPTION)
                 .submit();
-    }
-
-    public void mergeImportExpectingError(List<Map<String, String>> data)
-    {
-        startTsvImport(data, DataClassHelper.MERGE_OPTION)
-                .submitExpectingError();
     }
 
     private ImportDataPage startTsvImport(String tsv, String importOption)
@@ -245,42 +210,5 @@ public class DataClassHelper extends WebDriverWrapper
             throw new IllegalArgumentException("No data provided");
         }
         return startTsvImport(DataClassAPIHelper.convertMapToTsv(data), importOption);
-    }
-
-    public void deleteDataObjects(DataRegionTable dataClassTable, String expectedTitle)
-    {
-        doAndWaitForPageToLoad(() -> {
-            dataClassTable.clickHeaderButton("Delete");
-            Window.Window(getDriver()).withTitle(expectedTitle).waitFor()
-                    .clickButton("Yes, Delete", false);
-            Window.Window(getDriver()).withTitleContaining("Delete data").waitFor();
-            _ext4Helper.waitForMaskToDisappear();
-        });
-    }
-
-    private void verifyDataRow(Map<String, String> expectedData, int index, DataRegionTable drt)
-    {
-        Map<String, String> actualData = drt.getRowDataAsMap(index);
-
-        for (Map.Entry<String, String> field : expectedData.entrySet())
-        {
-            assertEquals(field.getKey() + " not as expected at index " + index, field.getValue().trim(), actualData.get(field.getKey()));
-        }
-    }
-
-    public void verifyDataValues(List<Map<String, String>> data)
-    {
-        DataRegionTable drt = getDataClassDataRegionTable();
-        for (Map<String, String> expectedRow : data)
-        {
-            int index = drt.getRowIndex("Name", expectedRow.get("Name").trim());
-            verifyDataRow(expectedRow, index, drt);
-        }
-    }
-
-    public String getDetailsFieldValue(String label)
-    {
-        Locator loc = Locator.tag("td").withClass("lk-form-label").withText(label + ":").followingSibling("td");
-        return loc.findElement(getDriver()).getText();
     }
 }
