@@ -127,10 +127,22 @@ public class WikiHelper
 
     public void saveWikiPage()
     {
+        saveWikiPage(true);
+    }
+
+    public void saveWikiPage(boolean expectSuccess)
+    {
         String title = Locator.id("wiki-input-title").findElement(_test.getDriver()).getText();
         if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
-        _test.clickButton("Save & Close");
-        _test.waitForElement(Locator.linkWithText(title));
+        if (expectSuccess)
+        {
+            _test.clickButton("Save & Close");
+            _test.waitForElement(Locator.linkWithText(title));
+        }
+        else
+        {
+            _test.clickButton("Save & Close", 0);
+        }
     }
 
     /**
