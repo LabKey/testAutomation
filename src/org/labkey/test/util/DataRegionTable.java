@@ -1112,7 +1112,8 @@ public class DataRegionTable extends DataRegion
 
         if (filter1 != null && !filter1Type.contains("Blank"))
         {
-            getWrapper().setFormElement(Locator.id("value_1"), filter1);
+            String id = (filter1Type.matches("Contains One Of|Does Not Contain Any Of|Equals One Of|Does Not Equal Any Of")) ? "value_1-1" : "value_1";
+            getWrapper().setFormElement(Locator.id(id), filter1);
         }
 
         if (filter2Type != null && !filter2Type.contains("Blank"))
