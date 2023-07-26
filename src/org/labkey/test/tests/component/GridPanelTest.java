@@ -933,7 +933,7 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().verifyTrue("The second filter expression should be empty.",
                 filterTypes.get(1).getValue().isEmpty());
 
-        List<WebElement> filterValues = Locator.tagWithClass("input", "filter-expression__input").findElements(panelElement);
+        List<WebElement> filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElements(panelElement);
 
         checker().verifyEquals("There should only be one filter value text box.",
                 1, filterValues.size());
@@ -1210,7 +1210,7 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_STRING_COL),
                 "Contains One Of", filterTypes.get(0).getValue());
 
-        filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
+        filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElement(panelElement);
 
         checker().verifyEquals(String.format("The filter value for '%s' is not as expected.", FILTER_STRING_COL),
                 oneOfFilter, getFormElement(filterValues));
