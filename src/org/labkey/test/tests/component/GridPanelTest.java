@@ -939,7 +939,7 @@ public class GridPanelTest extends GridPanelBaseTest
                 1, filterValues.size());
 
         checker().verifyEquals("The filter value is not as expected.",
-                String.format("%s;%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
+                String.format("%s\n%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
 
         checker().screenShotIfNewError("Updated_Filter_Error");
 
@@ -1213,7 +1213,7 @@ public class GridPanelTest extends GridPanelBaseTest
         filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElement(panelElement);
 
         checker().verifyEquals(String.format("The filter value for '%s' is not as expected.", FILTER_STRING_COL),
-                oneOfFilter, getFormElement(filterValues));
+                oneOfFilter.replaceAll(";", "\n"), getFormElement(filterValues));
 
         checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
 
