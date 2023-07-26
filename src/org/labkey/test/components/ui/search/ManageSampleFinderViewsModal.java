@@ -25,20 +25,12 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public void editViewName(String viewName)
     {
-        WebElement editIcon = getViewEditIcon(viewName);
-        if (editIcon != null)
-        {
-            editIcon.click();
-        }
+        getViewEditIcon(viewName).click();
     }
 
     public void deleteView(String viewName)
     {
-        WebElement deleteIcon = getViewDeleteIcon(viewName);
-        if (deleteIcon != null)
-        {
-            deleteIcon.click();
-        }
+        getViewDeleteIcon(viewName).click();
     }
 
     public void deleteAllViews()
@@ -113,6 +105,8 @@ public class ManageSampleFinderViewsModal extends ModalDialog
     public ManageSampleFinderViewsModal setName(String name)
     {
         WebElement input = elementCache().nameInput;
+        WebDriverWrapper.waitFor(input::isDisplayed, "Name input field not visible.", 2_500);
+
         getWrapper().actionClear(input);
         input.sendKeys(name);
         input.sendKeys(Keys.TAB);
