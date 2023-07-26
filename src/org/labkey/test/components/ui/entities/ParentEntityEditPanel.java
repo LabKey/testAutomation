@@ -176,6 +176,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public void clickSave(int waitTime)
     {
+        // Making changes, like to lineage, may cause a slight delay before the save button is enabled.
+        WebDriverWrapper.waitFor(()->elementCache().button("Save").isEnabled(),
+                "Save button is not enabled.", 2_500);
+
         // The wait time is used here to validate the panel exits edit mode.
         clickButtonWaitForPanel(elementCache()
                 .button("Save"),
