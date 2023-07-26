@@ -1038,7 +1038,8 @@ public class DataRegionTable extends DataRegion
         WebElement filterDialogElement = getWrapper().waitForElement(filterDialog);
 
         WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
-                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
+                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())) ||
+                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("textarea", "value_1-1").notHidden())),
                 "Filter Dialog", WAIT_FOR_JAVASCRIPT);
         getWrapper()._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
