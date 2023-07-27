@@ -157,20 +157,22 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
     {
         T _this = getThis();
-        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
-        filterModal.confirm();
+        doAndWaitForUpdate(()->initFilterColumn(columnLabel, operator, value).confirm());
         return _this;
     }
 
     public T filterColumn(String columnLabel, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
     {
         T _this = getThis();
-        GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
-        filterModal.selectExpressionTab().setFilters(
-                new FilterExpressionPanel.Expression(operator1, value1),
-                new FilterExpressionPanel.Expression(operator2, value2)
-        );
-        filterModal.confirm();
+        doAndWaitForUpdate(()-> {
+            GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
+            filterModal.selectExpressionTab().setFilters(
+                    new FilterExpressionPanel.Expression(operator1, value1),
+                    new FilterExpressionPanel.Expression(operator2, value2)
+            );
+            filterModal.confirm();
+        });
+
         return _this;
     }
 
