@@ -1,5 +1,6 @@
 package org.labkey.test.util.exp;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -13,6 +14,7 @@ import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +25,7 @@ public class DataClassAPIHelper
 {
 
     public static final String SCHEMA_NAME = "exp.data";
+    public static final String DATA_CLASS_DATA_REGION_NAME = "DataClass";
 
     /**
      * Create a dataclass in the specified container with the fields provided.
@@ -93,6 +96,23 @@ public class DataClassAPIHelper
                 new HashSet<>(sourceNames), rowIds.keySet());
 
         return rowIds;
+    }
+
+    @NotNull
+    public static String convertMapToTsv(@NotNull List<Map<String, String>> data)
+    {
+        // first the header
+        List<String> rows = new ArrayList<>();
+        rows.add(String.join("\t", data.get(0).keySet()));
+        data.forEach(dataMap -> {
+            StringBuilder row = new StringBuilder();
+            data.get(0).keySet().forEach(key -> {
+                row.append(dataMap.get(key));
+                row.append("\t");
+            });
+            rows.add(row.substring(0, row.lastIndexOf("\t")));
+        });
+        return String.join("\n", rows);
     }
 
 }
