@@ -1038,7 +1038,8 @@ public class DataRegionTable extends DataRegion
         WebElement filterDialogElement = getWrapper().waitForElement(filterDialog);
 
         WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
-                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
+                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())) ||
+                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("textarea", "value_1-1").notHidden())),
                 "Filter Dialog", WAIT_FOR_JAVASCRIPT);
         getWrapper()._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
@@ -1112,7 +1113,8 @@ public class DataRegionTable extends DataRegion
 
         if (filter1 != null && !filter1Type.contains("Blank"))
         {
-            getWrapper().setFormElement(Locator.id("value_1"), filter1);
+            String id = (filter1Type.matches("Contains One Of|Does Not Contain Any Of|Equals One Of|Does Not Equal Any Of")) ? "value_1-1" : "value_1";
+            getWrapper().setFormElement(Locator.id(id), filter1);
         }
 
         if (filter2Type != null && !filter2Type.contains("Blank"))

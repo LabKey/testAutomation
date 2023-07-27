@@ -194,7 +194,7 @@ public class GridPanelTest extends GridPanelBaseTest
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
-        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of (example usage: a;b;c)", String.format("%1$s;%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of", String.format("%1$s;%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
         cv = drtSamples.openCustomizeGrid();
         cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
@@ -933,13 +933,13 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().verifyTrue("The second filter expression should be empty.",
                 filterTypes.get(1).getValue().isEmpty());
 
-        List<WebElement> filterValues = Locator.tagWithClass("input", "filter-expression__input").findElements(panelElement);
+        List<WebElement> filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElements(panelElement);
 
         checker().verifyEquals("There should only be one filter value text box.",
                 1, filterValues.size());
 
         checker().verifyEquals("The filter value is not as expected.",
-                String.format("%s;%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
+                String.format("%s\n%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
 
         checker().screenShotIfNewError("Updated_Filter_Error");
 
@@ -1210,10 +1210,10 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_STRING_COL),
                 "Contains One Of", filterTypes.get(0).getValue());
 
-        filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
+        filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElement(panelElement);
 
         checker().verifyEquals(String.format("The filter value for '%s' is not as expected.", FILTER_STRING_COL),
-                oneOfFilter, getFormElement(filterValues));
+                oneOfFilter.replaceAll(";", "\n"), getFormElement(filterValues));
 
         checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
 
