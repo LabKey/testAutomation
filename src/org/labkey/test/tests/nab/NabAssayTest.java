@@ -409,7 +409,7 @@ public class NabAssayTest extends AbstractAssayTest
         assertTextPresent("ptid 1 C");
         String ptid1c_detailsURL = getAttribute(DataRegionTable.detailsLinkLocator(), "href");
         // TODO: Cant get it to scroll to this filter option...
-        region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
+        region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals One Of", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
         assertTextPresent("ptid 1 A", "ptid 1 B");
         assertTextNotPresent("ptid 1 C", "ptid 5");
 
