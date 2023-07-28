@@ -307,7 +307,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         });
 
         // Issue 42976: SQL wildcard should not be prefixed by '!' in exported scripts
-        dataRegion.setFilter(testColumn, "Contains One Of (example usage: a;b;c)", "under_score;two;");
+        dataRegion.setFilter(testColumn, "Contains One Of", "under_score;two;");
         exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
         {
             assertScriptContentLineCount(javaScriptScript, 35);
@@ -315,7 +315,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         });
 
         // multi-value separator ';' escaping uses json encoded filter value
-        dataRegion.setFilter(testColumn, "Contains One Of (example usage: a;b;c)", "{json:[\"a;b;c\",\"Z\"]}");
+        dataRegion.setFilter(testColumn, "Contains One Of", "{json:[\"a;b;c\",\"Z\"]}");
         exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
         {
             assertScriptContentLineCount(javaScriptScript, 35);
