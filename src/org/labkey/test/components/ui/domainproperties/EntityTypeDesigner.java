@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.domainproperties;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -11,6 +12,7 @@ import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.components.html.ValidatingInput;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -270,6 +272,87 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     }
 
+    protected int findEmptyAlias()
+    {
+        List<Input> aliases = elementCache().parentAliases();
+        int index = -1;
+        for(int i = 0; i < aliases.size(); i++)
+        {
+            if(aliases.get(i).getValue().isEmpty())
+            {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+
+    }
+
+    public int getParentAliasIndex(String parentAlias)
+    {
+        List<Input> inputs = elementCache().parentAliases();
+        for (int i = 0; i < inputs.size(); i++)
+        {
+            if (inputs.get(i).get().equals(parentAlias))
+            {
+                return i;
+            }
+        }
+        throw new NotFoundException("No such parent alias: " + parentAlias);
+    }
+
+    public T removeParentAlias(String parentAlias)
+    {
+        expandPropertiesPanel();
+        int aliasIndex = getParentAliasIndex(parentAlias);
+        return removeParentAlias(aliasIndex);
+    }
+
+    public T removeParentAlias(int index)
+    {
+        expandPropertiesPanel();
+        elementCache().removeParentAliasIcon(index).click();
+        return getThis();
+    }
+
+    public String getParentAlias(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAlias(index).get();
+    }
+
+    public List<String> getParentAliasOptions(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAliasSelect(index).getOptions();
+    }
+
+    protected T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    {
+        expandPropertiesPanel();
+        elementCache().parentAlias(index).setValue(alias);
+        if (optionDisplayText != null)
+        {
+            elementCache().parentAliasSelect(index).select(optionDisplayText);
+        }
+        return getThis();
+    }
+
+    public T setParentAlias(String alias, String optionDisplayText)
+    {
+        expandPropertiesPanel();
+        int index = getParentAliasIndex(alias);
+        elementCache().parentAliasSelect(index).select(optionDisplayText);
+        return getThis();
+    }
+
+    public String getParentAliasSelectText(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAliasSelect(index).getSelections().get(0);
+    }
+
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
         protected final Input nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(this), getDriver());
@@ -306,6 +389,27 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         final Locator uniqueIdMsgLoc = Locator.tagWithClass("div", "uniqueid-msg");
 
+        public List<Input> parentAliases()
+        {
+            return Input.Input(Locator.name("alias"), getDriver()).findAll(propertiesPanel);
+        }
+
+        public Input parentAlias(int index)
+        {
+            return parentAliases().get(index);
+        }
+
+        public WebElement removeParentAliasIcon(int index)
+        {
+            return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
+        }
+
+        public ReactSelect parentAliasSelect(int index)
+        {
+            return ReactSelect.finder(getDriver())
+                    .withInputClass("import-alias--parent-select")
+                    .index(index).find(propertiesPanel);
+        }
     }
 
 }

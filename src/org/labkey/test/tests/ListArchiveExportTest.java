@@ -93,7 +93,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         impersonate(_listUser);
         ManageListsGrid listsGrid = goToManageLists().getGrid();
         listsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
-        listsGrid.setFilter("Container", "Equals One Of (example usage: a;b;c)", LIST_FOLDER_A + ";" + getProjectName());
+        listsGrid.setFilter("Container", "Equals One Of", LIST_FOLDER_A + ";" + getProjectName());
         listsGrid.checkAllOnPage();
         listsGrid.clickHeaderButton("Export List Archive");
         Assert.assertEquals("Invalid error message", "List archive export is only supported for Lists in folders where you are an administrator. Try filtering to select only Lists in the local folder.",
@@ -104,7 +104,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         goToProjectHome();
         listsGrid = goToManageLists().getGrid();
         listsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
-        listsGrid.setFilter("Name", "Equals One Of (example usage: a;b;c)", LIST_A + ";" + LIST_B);
+        listsGrid.setFilter("Name", "Equals One Of", LIST_A + ";" + LIST_B);
         listsGrid.checkAllOnPage();
         listsGrid.clickHeaderButton("Export List Archive");
         Assert.assertEquals("Invalid error message", "'" + LIST_A + "' is already selected, please select Lists with unique names to Export.",
@@ -113,7 +113,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
 
         listsGrid = new ManageListsGrid(getDriver());
         listsGrid.clearAllFilters();
-        listsGrid.setFilter("Container", "Equals One Of (example usage: a;b;c)", LIST_FOLDER_A + ";" + getProjectName());
+        listsGrid.setFilter("Container", "Equals One Of", LIST_FOLDER_A + ";" + getProjectName());
         Assert.assertEquals("Incorrect list after container filter", Arrays.asList(LIST_A, LIST_B), listsGrid.getColumnDataAsText("Name"));
         listsGrid.checkAllOnPage();
         File listExport = listsGrid.exportSelectedLists();

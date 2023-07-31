@@ -67,8 +67,8 @@ public class CustomizeGridViewDialog extends ModalDialog
     }
 
     /**
-     * Get the list of visible fields from the 'Available Fields' panel. Children of an expanded filed only have the name
-     * in the list, this des not include the path.
+     * Get the list of visible fields from the 'Available Fields' panel. Children of an expanded field only have the name
+     * in the list, this does not include the path.
      *
      * @return The list of field names.
      */
