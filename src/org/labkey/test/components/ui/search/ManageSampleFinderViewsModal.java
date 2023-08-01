@@ -45,8 +45,8 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public List<String> getViews()
     {
-        return Locator.tagWithClass("div", "small-margin-bottom")
-                .findElements(getComponentElement())
+        return Locator.tagWithClass("div", "row")
+                .findElements(this)
                 .stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
@@ -54,16 +54,9 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public WebElement getView(String viewName)
     {
-        List<WebElement> webElements = Locator.tagWithClass("div", "small-margin-bottom")
-                .findElements(getComponentElement());
-
-        for (WebElement element : webElements)
-        {
-            if (element.getText().equals(viewName))
-                return element;
-        }
-
-        return null;
+        return Locator.tagWithClass("div", "row")
+                .withText(viewName)
+                .findElement(this);
     }
 
     public WebElement getViewIcon(String reportName, String iconCls)
@@ -99,7 +92,7 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public String getInputValue()
     {
-        return Locator.tag("input").findElement(getComponentElement()).getAttribute("value");
+        return Locator.tag("input").findElement(this).getAttribute("value");
     }
 
     public ManageSampleFinderViewsModal setName(String name)
@@ -140,9 +133,9 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        WebElement errorMsg = Locator.tagWithClassContaining("div", "alert-danger").refindWhenNeeded(getComponentElement());
+        WebElement errorMsg = Locator.tagWithClassContaining("div", "alert-danger").refindWhenNeeded(this);
 
-        WebElement nameInput = Locator.tag("input").refindWhenNeeded(getComponentElement());
+        WebElement nameInput = Locator.tag("input").refindWhenNeeded(this);
 
     }
 }
