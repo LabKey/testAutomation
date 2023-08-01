@@ -848,7 +848,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public static class EditableGridFinder extends WebDriverComponent.WebDriverComponentFinder<EditableGrid, EditableGridFinder>
     {
-        private final Locator _locator = Locator.byClass("table-cellular");
+        private final Locator _locator = Locator.byClass("editable-grid__container").descendant(Locator.byClass("table-cellular"));
 
         public EditableGridFinder(WebDriver driver)
         {
