@@ -23,6 +23,19 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         super(new ModalDialog.ModalDialogFinder(driver).withTitle(title));
     }
 
+    @Override
+    protected void waitForReady()
+    {
+        super.waitForReady();
+
+        WebDriverWrapper.waitFor(()->
+            Locator.tag("input").refindWhenNeeded(this).isDisplayed() ||
+                    Locator.tagWithClass("div", "grey-text").refindWhenNeeded(this). isDisplayed() ||
+                    Locator.tagWithClass("div", "row").refindWhenNeeded(this). isDisplayed(),
+            "Save view dialog did not display in time.",
+            2_500);
+    }
+
     public void editViewName(String viewName)
     {
         getViewEditIcon(viewName).click();
