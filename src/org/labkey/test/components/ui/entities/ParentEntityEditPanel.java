@@ -367,7 +367,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         {
             int selCount = selectParent.getSelections().size();
             selectParent.typeAheadSelect(id);
-            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount, 500);
+            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount,
+                    String.format("Parent '%s' was not added to the list.", parentIds), 2_500);
         }
 
         return this;
