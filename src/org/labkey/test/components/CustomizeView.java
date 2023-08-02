@@ -443,6 +443,10 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         if (!StringUtils.isBlank(filter))
         {
             WebElement valueInput = Locator.css(".item-value input").findElement(clauseRow);
+            if (filter_type.endsWith(" Of"))
+            {
+                valueInput = Locator.css(".item-value textarea").findElement(clauseRow);
+            }
             _driver.setFormElement(valueInput, filter);
             _driver.fireEvent(valueInput, BaseWebDriverTest.SeleniumEvent.blur);
         }
