@@ -7,9 +7,9 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ManageSampleFinderViewsModal extends ModalDialog
 {
@@ -58,20 +58,28 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public List<String> getViews()
     {
+        List<String> views = new ArrayList<>();
+
         // Get all the view names.
-        return Locator.tagWithClass("div", "row")
+        List<WebElement> elements = Locator.tagWithClass("div", "row")
                 .child(Locator.tagWithClass("div", "col-xs-8"))
-                .findElements(this)
-                .stream()
-                .map(WebElement::getText)
-                .collect(Collectors.toList());
+                .findElements(this);
+
+        getWrapper().log(String.format("Found %d views in the dialog.", elements.size()));
+
+        for(WebElement element : elements)
+        {
+            views.add(element.getText());
+        }
+
+        return views;
     }
 
     public WebElement getView(String viewName)
     {
         // Get the row for the given view.
         return Locator.tagWithClass("div", "row")
-                .withDescendant(Locator.tagWithClass("div", "col-xs-8")
+                .withDescendant(Locator.tagWithClass("*", "col-xs-8")
                         .withText(viewName))
                 .findElement(this);
     }
