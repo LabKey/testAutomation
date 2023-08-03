@@ -25,7 +25,13 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     public static final String WEBPART_PROPERTIES_AND_LAYOUT = "Webpart properties and layout";
     public static final String CONTAINER_SPECIFIC_MODULE_PROPERTIES = "Container specific module properties";
     public static final String EXPERIMENTS_AND_RUNS = "Experiments, Protocols, and Runs";
-    public static final String LISTS = "Lists";
+    public static final String EXPERIMENT_RUNS = "Experiment Runs";
+    public static final String LIST_DESIGN = "List Designs";
+    public static final String LIST_DATA = "List Data";
+    public static final String SAMPLE_TYPE_DESIGN = "Sample Type Designs";
+    public static final String SAMPLE_TYPE_DATA = "Sample Type Data";
+    public static final String DATA_CLASS_DESIGNS = "Data Class Designs";
+    public static final String DATA_CLASS_DATA = "Data Class Data";
     public static final String QUERIES = "Queries";
     public static final String GRID_VIEWS = "Grid Views";
     public static final String REPORTS_AND_CHARTS = "Reports and Charts";
@@ -38,8 +44,6 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     public static final String STUDY = "Study";
     public static final String FILES = "Files";
     public static final String ETLS = "ETL Definitions";
-    public static final String SAMPLE_TYPE_DATA = "Sample Type Data";
-    public static final String DATA_CLASS_DATA = "Data Class Data";
     public static final String QC_STATE_SETTINGS = "QC State Settings";
 
     public ExportFolderPage(WebDriver driver)
@@ -72,6 +76,12 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
+    public ExportFolderPage includeExperimentRuns(boolean checked)
+    {
+        elementCache().experimentRuns.set(checked);
+        return this;
+    }
+
     public ExportFolderPage includeQCStateSettings(boolean checked)     // note: this checkbox will only be present for assay and study folder types
     {
         elementCache().qcStateSettingsCheckbox.set(checked);
@@ -90,12 +100,35 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
+    public ExportFolderPage includeSampleTypeDesigns(boolean checked)
+    {
+        elementCache().sampleTypeDesigns.set(checked);
+        return this;
+    }
+
     public ExportFolderPage includeDataClassData(boolean checked)
     {
         elementCache().dataClassData.set(checked);
         return this;
     }
 
+    public ExportFolderPage includeDataClassDesigns(boolean checked)
+    {
+        elementCache().dataClassDesigns.set(checked);
+        return this;
+    }
+
+    public ExportFolderPage includeListData(boolean checked)
+    {
+        elementCache().listData.set(checked);
+        return this;
+    }
+
+    public ExportFolderPage includeListDesigns(boolean checked)
+    {
+        elementCache().listDesigns.set(checked);
+        return this;
+    }
     public ExportFolderPage includeFiles(boolean checked)
     {
         elementCache().includeFilesCheckbox.set(checked);
@@ -208,7 +241,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         }
 
         public final Checkbox experimentsAndRunsCheckbox = exportItemCheckbox(EXPERIMENTS_AND_RUNS);
-
+        public final Checkbox experimentRuns = exportItemCheckbox(EXPERIMENT_RUNS);
         // Use partial label for QC State. Actual label varies depending on enabled modules
         public final Checkbox qcStateSettingsCheckbox = new Checkbox.CheckboxFinder().withLabelContaining(QC_STATE_SETTINGS)
                 .findWhenNeeded(getDriver());
@@ -216,7 +249,11 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         public final Checkbox roleAssighmentsCheckbox = exportItemCheckbox(ROLE_ASSIGNMENTS);
 
         public final Checkbox sampleTypeData = exportItemCheckbox(SAMPLE_TYPE_DATA);
+        public final Checkbox sampleTypeDesigns = exportItemCheckbox(SAMPLE_TYPE_DESIGN);
         public final Checkbox dataClassData = exportItemCheckbox(DATA_CLASS_DATA);
+        public final Checkbox dataClassDesigns = exportItemCheckbox(DATA_CLASS_DESIGNS);
+        public final Checkbox listData = exportItemCheckbox(LIST_DATA);
+        public final Checkbox listDesigns = exportItemCheckbox(LIST_DESIGN);
 
         public final Checkbox includeFilesCheckbox = exportItemCheckbox(FILES);
 
