@@ -26,8 +26,13 @@ public class ManageSampleFinderViewsModal extends ModalDialog
     @Override
     protected void waitForReady()
     {
+        // THis will wait for something to show up in the dialog body and if it is a spinner to wait.
         super.waitForReady();
 
+        // Specifically check for:
+        // An input box (to save a new image).
+        // Or some grey text (get this when you delete all views and the dialog is still up).
+        // Or a list of existing views.
         WebDriverWrapper.waitFor(()->
             Locator.tag("input").refindWhenNeeded(this).isDisplayed() ||
                     Locator.tagWithClass("div", "grey-text").refindWhenNeeded(this). isDisplayed() ||
@@ -58,11 +63,14 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public List<String> getViews()
     {
+
+        // TODO remove.
+        getWrapper().log("getViews Dialog html: " + getComponentElement().getAttribute("innerHTML"));
+
         List<String> views = new ArrayList<>();
 
         // Get all the view names.
-        List<WebElement> elements = Locator.tagWithClass("div", "row")
-                .child(Locator.tagWithClass("div", "col-xs-8"))
+        List<WebElement> elements = Locator.xpath("//div[contains(@class,'row')]//div[1]")
                 .findElements(this);
 
         getWrapper().log(String.format("Found %d views in the dialog.", elements.size()));
@@ -77,10 +85,11 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public WebElement getView(String viewName)
     {
+        // TODO remove.
+        getWrapper().log("getView Dialog html: " + getComponentElement().getAttribute("innerHTML"));
+
         // Get the row for the given view.
-        return Locator.tagWithClass("div", "row")
-                .withDescendant(Locator.tagWithClass("*", "col-xs-8")
-                        .withText(viewName))
+        return Locator.xpath(String.format("//div[text()='%s']/parent::div[contains(@class,'row')]", viewName))
                 .findElement(this);
     }
 
@@ -117,7 +126,7 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public String getInputValue()
     {
-        return Locator.tag("input").findElement(this).getAttribute("value");
+        return Locator.tag("input").findElement(getComponentElement()).getAttribute("value");
     }
 
     public ManageSampleFinderViewsModal setName(String name)
@@ -158,9 +167,9 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        WebElement errorMsg = Locator.tagWithClassContaining("div", "alert-danger").refindWhenNeeded(this);
+        WebElement errorMsg = Locator.tagWithClassContaining("div", "alert-danger").refindWhenNeeded(getComponentElement());
 
-        WebElement nameInput = Locator.tag("input").refindWhenNeeded(this);
+        WebElement nameInput = Locator.tag("input").refindWhenNeeded(getComponentElement());
 
     }
 }

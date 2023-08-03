@@ -69,7 +69,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         elementCache().body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
         WebDriverWrapper.waitFor(() -> !BootstrapLocators.loadingSpinner.areAnyVisible(getDriver()) &&
-                elementCache().body.getText().length() > 0, "Modal dialog not ready.", 2000);
+                elementCache().body.getText().length() > 0, "Modal dialog not ready.", 2_500);
     }
 
     @Override

@@ -690,7 +690,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         }
         catch (StaleElementReferenceException stale)
         {
-            getWrapper().log("Grid empty row was present but has now disappeared.");
+            getWrapper().log("Grid empty message was present but has now gone stale (went away).");
+            msg = Optional.empty();
         }
 
         return msg;
