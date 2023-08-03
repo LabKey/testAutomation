@@ -48,6 +48,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -221,7 +222,7 @@ public class UserTest extends BaseWebDriverTest
 
         log("Validate that only the user who requested the change can use the link");
         goToURL(resetUrl, 30000);
-        assertTextPresent("The current user is not the same user that initiated this request.  Please log in with the account you used to make this email change request.");
+        assertTextPresent("The current user is not the same user that initiated this request.", "Please log in with the account you used to make this email change request.");
         goToHome();
 
         log("Again impersonate user " + SELF_SERVICE_EMAIL_USER + " to validate the confirmation link.");
@@ -237,7 +238,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster and make sure the notification email was there.");
-        assertTrue(null != getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
+        assertNotNull(getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
 
         log("Validate that the old email address has been removed.");
 
