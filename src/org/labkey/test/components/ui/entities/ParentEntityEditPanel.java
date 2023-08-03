@@ -363,12 +363,16 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 .withNamedInput(String.format("parentEntityValue_%s", typeName))
                 .waitFor(this);
 
+        getWrapper().log(String.format("Selections before adding: %s", selectParent.getSelections()));
+
         for (String id : parentIds)
         {
             selectParent.typeAheadSelect(id);
             WebDriverWrapper.waitFor(()-> selectParent.getSelections().contains(id) ,
                     String.format("Parent '%s' was not added to the list.", parentIds), 2_500);
         }
+
+        getWrapper().log(String.format("Selections after adding: %s", selectParent.getSelections()));
 
         return this;
     }
