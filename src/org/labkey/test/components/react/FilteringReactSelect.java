@@ -94,8 +94,11 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             throw sere;
         }
 
-        if (!WebDriverWrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
+        if (Boolean.FALSE.equals(WebDriverWrapper.waitFor(()-> !isExpanded(), 1500)))   // give it a moment to close, blur if it hasn't
         {
+            // Adding for debugging. Trying to see if there is any correlation between this and failures where a "Save"
+            // button is not enabled because it did not see the change even in the select control.
+            log("Firing the blur event on the input control for the react select.");
             getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
 

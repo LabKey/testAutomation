@@ -58,7 +58,9 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public List<String> getViews()
     {
+        // Get all the view names.
         return Locator.tagWithClass("div", "row")
+                .child(Locator.tagWithClass("div", "col-xs-8"))
                 .findElements(this)
                 .stream()
                 .map(WebElement::getText)
@@ -67,8 +69,10 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public WebElement getView(String viewName)
     {
+        // Get the row for the given view.
         return Locator.tagWithClass("div", "row")
-                .withText(viewName)
+                .withDescendant(Locator.tagWithClass("div", "col-xs-8")
+                        .withText(viewName))
                 .findElement(this);
     }
 

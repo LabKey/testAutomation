@@ -16,6 +16,7 @@ import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -679,10 +680,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         Optional<String> msg = Optional.empty();
 
-        WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
-        if(tr.isDisplayed())
+        try
         {
-            msg = Optional.of(Locator.tag("td").findElement(tr).getText());
+            WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+            if (tr.isDisplayed())
+            {
+                msg = Optional.of(Locator.tag("td").findElement(tr).getText());
+            }
+        }
+        catch (StaleElementReferenceException stale)
+        {
+            getWrapper().log("Grid empty row was present but has now disappeared.");
         }
 
         return msg;
