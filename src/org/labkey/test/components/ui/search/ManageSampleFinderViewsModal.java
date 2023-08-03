@@ -61,8 +61,14 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         }
     }
 
+    private static final Locator viewNameLocator = Locator.xpath("//div[contains(@class,'row')]//div[1]");
+
     public List<String> getViews()
     {
+
+        // Wait until some view shows up.
+        WebDriverWrapper.waitFor(()->getWrapper().isElementPresent(viewNameLocator),
+                "No views are present.", 2_500);
 
         // TODO remove.
         getWrapper().log("getViews Dialog html: " + getComponentElement().getAttribute("innerHTML"));
@@ -70,8 +76,7 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         List<String> views = new ArrayList<>();
 
         // Get all the view names.
-        List<WebElement> elements = Locator.xpath("//div[contains(@class,'row')]//div[1]")
-                .findElements(this);
+        List<WebElement> elements = viewNameLocator.findElements(this);
 
         getWrapper().log(String.format("Found %d views in the dialog.", elements.size()));
 
@@ -85,6 +90,11 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public WebElement getView(String viewName)
     {
+
+        // Wait until some view shows up.
+        WebDriverWrapper.waitFor(()->getWrapper().isElementPresent(viewNameLocator),
+                "No views are present.", 2_500);
+
         // TODO remove.
         getWrapper().log("getView Dialog html: " + getComponentElement().getAttribute("innerHTML"));
 
@@ -147,7 +157,7 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public String getErrorMsg()
     {
-        if(WebDriverWrapper.waitFor(()->elementCache().errorMsg.isDisplayed(), 1_000))
+        if(Boolean.TRUE.equals(WebDriverWrapper.waitFor(()->elementCache().errorMsg.isDisplayed(), 1_000)))
             return elementCache().errorMsg.getText();
         else
             return "";
