@@ -26,10 +26,10 @@ public class ManageSampleFinderViewsModal extends ModalDialog
     @Override
     protected void waitForReady()
     {
-        // THis will wait for something to show up in the dialog body and if it is a spinner to wait.
+        // This will wait for something to show up in the dialog body and if it is a spinner it will wait for it to go away.
         super.waitForReady();
 
-        // Specifically check for:
+        // Now, specifically check for:
         // An input box (to save a new image).
         // Or some grey text (get this when you delete all views and the dialog is still up).
         // Or a list of existing views.
@@ -70,9 +70,6 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         WebDriverWrapper.waitFor(()->getWrapper().isElementPresent(viewNameLocator),
                 "No views are present.", 2_500);
 
-        // TODO remove.
-        getWrapper().log("getViews Dialog html: " + getComponentElement().getAttribute("innerHTML"));
-
         List<String> views = new ArrayList<>();
 
         // Get all the view names.
@@ -94,9 +91,6 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         // Wait until some view shows up.
         WebDriverWrapper.waitFor(()->getWrapper().isElementPresent(viewNameLocator),
                 "No views are present.", 2_500);
-
-        // TODO remove.
-        getWrapper().log("getView Dialog html: " + getComponentElement().getAttribute("innerHTML"));
 
         // Get the row for the given view.
         return Locator.xpath(String.format("//div[text()='%s']/parent::div[contains(@class,'row')]", viewName))
