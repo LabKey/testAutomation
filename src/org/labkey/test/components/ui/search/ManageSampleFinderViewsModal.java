@@ -61,11 +61,11 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         }
     }
 
-    private static final Locator viewNameLocator = Locator.xpath("//div[contains(@class,'row')]//div[1]");
+    private static final String viewNameLocatorXpath = "//div[contains(@class,'row')]//div[1]";
 
     public List<String> getViews()
     {
-
+        Locator viewNameLocator = Locator.xpath(viewNameLocatorXpath);
         // Wait until some view shows up.
         WebDriverWrapper.waitFor(()->getWrapper().isElementPresent(viewNameLocator),
                 "No views are present.", 2_500);
@@ -87,8 +87,8 @@ public class ManageSampleFinderViewsModal extends ModalDialog
 
     public WebElement getView(String viewName)
     {
-
         // Wait until some view shows up.
+        Locator viewNameLocator = Locator.xpath(viewNameLocatorXpath);
         WebDriverWrapper.waitFor(()->getWrapper().isElementPresent(viewNameLocator),
                 "No views are present.", 2_500);
 
