@@ -221,7 +221,7 @@ public class UserTest extends BaseWebDriverTest
 
         log("Validate that only the user who requested the change can use the link");
         goToURL(resetUrl, 30000);
-        assertTextPresent("The current user is not the same user that initiated this request.  Please log in with the account you used to make this email change request.");
+        assertTextPresent("The current user is not the same user that initiated this request. Please log in with the account you used to make this email change request.");
         goToHome();
 
         log("Again impersonate user " + SELF_SERVICE_EMAIL_USER + " to validate the confirmation link.");
