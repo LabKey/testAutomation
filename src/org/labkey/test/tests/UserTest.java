@@ -48,7 +48,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -238,7 +237,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster and make sure the notification email was there.");
-        assertNotNull(getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
+        assertTrue(null != getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
 
         log("Validate that the old email address has been removed.");
 
