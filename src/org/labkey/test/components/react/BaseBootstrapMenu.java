@@ -7,6 +7,10 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 /**
  * Wraps basic open/close functionality of 'Dropdown' and 'DropdownButton' components from '@types/react-bootstrap'
@@ -54,6 +58,8 @@ public abstract class BaseBootstrapMenu extends WebDriverComponent<BaseBootstrap
         if (!isExpanded())
         {
             getWrapper().scrollIntoView(elementCache().toggleAnchor);
+            new WebDriverWait(getDriver(), Duration.ofSeconds(2))
+                    .until(ExpectedConditions.elementToBeClickable(elementCache().toggleAnchor));
             for (int retry = 0; retry < _expandRetryCount; retry++)
             {
                 elementCache().toggleAnchor.click();
@@ -73,7 +79,11 @@ public abstract class BaseBootstrapMenu extends WebDriverComponent<BaseBootstrap
     public void collapse()
     {
         if (isExpanded())
+        {
+            new WebDriverWait(getDriver(), Duration.ofSeconds(2))
+                    .until(ExpectedConditions.elementToBeClickable(elementCache().toggleAnchor));
             elementCache().toggleAnchor.click();
+        }
         WebDriverWrapper.waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
