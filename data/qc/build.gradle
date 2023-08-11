@@ -50,6 +50,23 @@ project.tasks.register('transformJar', Jar) {
     }
 }
 
+project.tasks.register('transformIdentityJar', Jar) {
+    group = "QC"
+    description = "Builds no-op transform jar for testing assay transforms"
+
+    from sourceSets.main.output
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName.set("transformIdentity.jar")
+    destinationDirectory = project.projectDir
+    manifest {
+        attributes 'Implementation-Title': 'Assay Validator Jar',
+                'Implementation-Version': project.version,
+                'Built-By': System.getProperty("user.name"),
+                'Main-Class': 'org.labkey.AssayTransformIdentity'
+    }
+}
+
 project.tasks.register('transformWarningJar', Jar) {
     group = "QC"
     description = "Builds jar for doing assay transform warnings"
@@ -72,6 +89,7 @@ var jarTask = project.tasks.named('jar')
 jarTask.configure {
     dependsOn(project.tasks.validatorJar)
     dependsOn(project.tasks.transformJar)
+    dependsOn(project.tasks.transformIdentityJar)
     dependsOn(project.tasks.transformWarningJar)
 }
 

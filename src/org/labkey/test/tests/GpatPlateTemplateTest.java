@@ -10,9 +10,12 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -22,6 +25,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatPlateTemplateTest extends BaseWebDriverTest
 {
+    private static final File TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformIdentity.jar");
     private static final File TEST_PLATE_DATA = TestFileUtils.getSampleData("GPAT/plateData.xlsx");
     private static final File TEST_PLATE_METADATA = TestFileUtils.getSampleData("GPAT/plate-metadata-1.json");
     private static final String ASSAY_NAME = "Assay with plate template";
@@ -36,12 +40,18 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 
     private void doSetup()
     {
+        new QCAssayScriptHelper(this).ensureEngineConfig();
+
         _containerHelper.createProject(getProjectName(), "Assay");
         setPipelineRoot(TestFileUtils.getSampleData("GPAT").getAbsolutePath(), false);
 
         goToProjectHome();
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.createAssayWithPlateSupport(ASSAY_NAME);
+        new UIAssayHelper(this)
+                .createAssayDesign("General", ASSAY_NAME)
+                .setPlateMetadata(true)
+                // Regression check for Issue 48293: Standard Assay with Plate Metadata & Transformation Script throws an error
+                .addTransformScript(TRANSFORM_SCRIPT)
+                .clickFinish();
         createPlateTemplate(templateName, "blank", "Standard", true);
     }
 

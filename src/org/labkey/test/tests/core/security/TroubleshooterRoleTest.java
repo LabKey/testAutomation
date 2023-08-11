@@ -49,6 +49,16 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testAdminAuditLogControlCase()
+    {
+        ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
+        ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
+        auditLogPage.selectView("Domain events"); // Pick something that will have some rows.
+        DataRegionTable logTable = auditLogPage.getLogTable();
+        assertTrue("Troubleshooter should see audit entries", logTable.getDataRowCount() > 0);
+    }
+
+    @Test
     public void testAuditLogsIsAccessible() throws IOException
     {
         impersonate(TROUBLESHOOTER);
