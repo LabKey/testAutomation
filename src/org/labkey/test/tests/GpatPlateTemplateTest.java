@@ -99,7 +99,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
         importRunCommand.setName(runName);
         ImportRunResponse response = importRunCommand.execute(createDefaultConnection(), getProjectName());
 
-        Assert.assertTrue(response.getParsedData().isEmpty());
+        Assert.assertTrue((Boolean)response.getParsedData().get("success"));
     }
 
     @Test
