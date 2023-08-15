@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AssayTransformIdentity extends AbstractAssayValidator
+public class AssayTransformNoOp extends AbstractAssayValidator
 {
     public static void main(String[] args)
     {
@@ -36,7 +36,7 @@ public class AssayTransformIdentity extends AbstractAssayValidator
         File runProperties = new File(args[0]);
         if (runProperties.exists())
         {
-            AssayTransformIdentity transform = new AssayTransformIdentity();
+            AssayTransformNoOp transform = new AssayTransformNoOp();
 
             transform.runTransform(runProperties, args[1], args[2], args[3]);
         }
@@ -50,41 +50,6 @@ public class AssayTransformIdentity extends AbstractAssayValidator
         setPassword(password);
         setHost(host);
         parseRunProperties(inputFile);
-
-        identityTransform();
     }
 
-    private void identityTransform()
-    {
-        try
-        {
-            if (getRunProperties().containsKey(Props.runDataFile.name()))
-            {
-                List<String> inputFileNames = Arrays.asList(getRunProperty(Props.runDataUploadedFile).split(";"));
-                List<File> inputFiles = inputFileNames.stream().map(File::new).collect(Collectors.toList());
-                File transformFile = new File(getTransformFile().get(getRunProperty(Props.runDataFile)));
-
-                try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
-                {
-                    for (File inputFile : inputFiles)
-                    {
-                        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile)))
-                        {
-                            String line;
-                            while ((line = reader.readLine()) != null)
-                            {
-                                writer.println(line);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-                writeError("Unable to locate the runDataFile", "runDataFile");
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
 }

@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AssayTransformWarning extends AssayTransformIdentity
+public class AssayTransformWarning extends AbstractAssayValidator
 {
     public static void main(String[] args)
     {
@@ -44,16 +44,53 @@ public class AssayTransformWarning extends AssayTransformIdentity
             throw new IllegalArgumentException("Input data file does not exist");
     }
 
-    @Override
     public void runTransform(File inputFile, String username, String password, String host)
     {
-        // Run identity transform
-        super.runTransform(inputFile, username, password, host);
+        setEmail(username);
+        setPassword(password);
+        setHost(host);
+        parseRunProperties(inputFile);
+
+        identityTransform();
 
         setMaxSeverity(1);
         try
         {
             writeWarnings();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void identityTransform()
+    {
+        try
+        {
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
+            {
+                List<String> inputFileNames = Arrays.asList(getRunProperty(Props.runDataUploadedFile).split(";"));
+                List<File> inputFiles = inputFileNames.stream().map(File::new).collect(Collectors.toList());
+                File transformFile = new File(getTransformFile().get(getRunProperty(Props.runDataFile)));
+
+                try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
+                    for (File inputFile : inputFiles)
+                    {
+                        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile)))
+                        {
+                            String line;
+                            while ((line = reader.readLine()) != null)
+                            {
+                                writer.println(line);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+                writeError("Unable to locate the runDataFile", "runDataFile");
         }
         catch (IOException e)
         {

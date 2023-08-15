@@ -25,7 +25,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatPlateTemplateTest extends BaseWebDriverTest
 {
-    private static final File TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformIdentity.jar");
+    private static final File TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformNoop.jar");
     private static final File TEST_PLATE_DATA = TestFileUtils.getSampleData("GPAT/plateData.xlsx");
     private static final File TEST_PLATE_METADATA = TestFileUtils.getSampleData("GPAT/plate-metadata-1.json");
     private static final String ASSAY_NAME = "Assay with plate template";

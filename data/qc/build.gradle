@@ -43,27 +43,27 @@ project.tasks.register('transformJar', Jar) {
     archiveFileName.set("transform.jar")
     destinationDirectory = project.projectDir
     manifest {
-        attributes 'Implementation-Title': 'Assay Validator Jar',
+        attributes 'Implementation-Title': 'Assay Transform Testing Jar',
                 'Implementation-Version': project.version,
                 'Built-By': System.getProperty("user.name"),
                 'Main-Class': 'org.labkey.AssayTransform'
     }
 }
 
-project.tasks.register('transformIdentityJar', Jar) {
+project.tasks.register('transformNoopJar', Jar) {
     group = "QC"
     description = "Builds no-op transform jar for testing assay transforms"
 
     from sourceSets.main.output
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveFileName.set("transformIdentity.jar")
+    archiveFileName.set("transformNoop.jar")
     destinationDirectory = project.projectDir
     manifest {
-        attributes 'Implementation-Title': 'Assay Validator Jar',
+        attributes 'Implementation-Title': 'Assay No-Op Transform Jar',
                 'Implementation-Version': project.version,
                 'Built-By': System.getProperty("user.name"),
-                'Main-Class': 'org.labkey.AssayTransformIdentity'
+                'Main-Class': 'org.labkey.AssayTransformNoOp'
     }
 }
 
@@ -77,7 +77,7 @@ project.tasks.register('transformWarningJar', Jar) {
     archiveFileName.set("transformWarning.jar")
     destinationDirectory = project.projectDir
     manifest {
-        attributes 'Implementation-Title': 'Assay Validator Jar',
+        attributes 'Implementation-Title': 'Assay Transform Warning Jar',
                 'Implementation-Version': project.version,
                 'Built-By': System.getProperty("user.name"),
                 'Main-Class': 'org.labkey.AssayTransformWarning'
@@ -89,7 +89,7 @@ var jarTask = project.tasks.named('jar')
 jarTask.configure {
     dependsOn(project.tasks.validatorJar)
     dependsOn(project.tasks.transformJar)
-    dependsOn(project.tasks.transformIdentityJar)
+    dependsOn(project.tasks.transformNoopJar)
     dependsOn(project.tasks.transformWarningJar)
 }
 
