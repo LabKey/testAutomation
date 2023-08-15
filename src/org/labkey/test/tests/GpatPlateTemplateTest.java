@@ -33,6 +33,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 {
     private static final File TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformNoop.jar");
     private static final File TEST_PLATE_DATA = TestFileUtils.getSampleData("GPAT/plateData.xlsx");
+    // Issue 48470: Conversion error during assay API import with plate metadata
     private static final File TEST_PLATE_METADATA = TestFileUtils.getSampleData("GPAT/plate-metadata-1.json");
     private static final String ASSAY_NAME = "Assay with plate template";
     private static final String templateName = "GPAT";
