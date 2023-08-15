@@ -1,9 +1,14 @@
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -20,6 +25,7 @@ import org.labkey.test.util.UIAssayHelper;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -77,6 +83,23 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+    }
+
+    @Test
+    public void testApiWithPlateTemplateAndPlateMetadata() throws Exception
+    {
+        String runName = "ImportRun API with plate template and plate metadata";
+        int assayId = new APIAssayHelper(this).getIdFromAssayName(ASSAY_NAME, getProjectName());
+        File plateDataCopy = new File(TestFileUtils.ensureTestTempDir(), "API_" + TEST_PLATE_DATA.getName());
+
+        FileUtils.copyFile(TEST_PLATE_DATA, plateDataCopy);
+        ImportRunCommand importRunCommand = new ImportRunCommand(assayId, plateDataCopy);
+        importRunCommand.setProperties(Map.of("PlateTemplate", new APIAssayHelper(this).getPlateTemplateLsid(getProjectName(), templateName)));
+        importRunCommand.setPlateMetadata(new JSONObject(TestFileUtils.getFileContents(TEST_PLATE_METADATA)));
+        importRunCommand.setName(runName);
+        ImportRunResponse response = importRunCommand.execute(createDefaultConnection(), getProjectName());
+
+        Assert.assertTrue(response.getParsedData().isEmpty());
     }
 
     @Test
