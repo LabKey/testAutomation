@@ -116,6 +116,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 
         table.setFilter("Run/PlateTemplate", "Does Not Equal", templateName);
         checker().verifyEquals("Only GPAT should be present", 0, table.getDataRowCount());
+        checker().screenShotIfNewError("rowsWithoutPlateTemplate");
         table.clearAllFilters();
 
         table.setFilter("PlateData/control_well_groups", "Is Not Blank");
@@ -123,8 +124,9 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 table.getColumnDataAsText("PlateData/control_well_groups"));
         checker().verifyEquals("Well location is incorrect", Arrays.asList("A11", "A12"),
                 table.getColumnDataAsText("WellLocation"));
-        checker().verifyEquals("Dilution is incorrect", Arrays.asList("0.005", "1.0"),
-                table.getColumnDataAsText(" PlateData/dilution"));
+        checker().verifyEquals("Dilution is incorrect", Arrays.asList("0.005", "1.01"),
+                table.getColumnDataAsText("PlateData/dilution"));
+        checker().screenShotIfNewError("rowsInControlWells");
         table.clearAllFilters();
 
         table.setFilter("PlateData/control_well_groups", "Is Blank");
@@ -134,8 +136,9 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 table.getColumnDataAsText("PlateData/sample_well_groups"));
         checker().verifyEquals("Barcode is incorrect", Arrays.asList("BC_111", "BC_111", "BC_111", "BC_222", "BC_222", "BC_222", "BC_333", "BC_333", "BC_444", "BC_444"),
                 table.getColumnDataAsText("PlateData/Barcode"));
-        checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.0", "1.0", "1.0", "2.0", "2.0", "2.0", "3.0", "3.0", "4.0", "4.0"),
+        checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.01", "1.01", "1.01", "2.01", "2.01", "2.01", "3.01", "3.01", "4.01", "4.01"),
                 table.getColumnDataAsText(" PlateData/dilution"));
+        checker().screenShotIfNewError("rowsOutsideControlWells");
         table.clearAllFilters();
     }
 
