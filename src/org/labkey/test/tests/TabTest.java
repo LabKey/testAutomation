@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -49,7 +50,7 @@ public class TabTest extends SimpleModuleTest
     }
 
     @Override
-    @Test
+    @Ignore
     public void testModuleProperties()
     {
         //do nothing

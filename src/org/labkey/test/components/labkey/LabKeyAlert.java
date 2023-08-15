@@ -85,7 +85,9 @@ public class LabKeyAlert extends ModalDialog implements Alert
 
     public void clickButton(String buttonText)
     {
-        getWrapper().clickAndWait(Locator.linkWithText(buttonText).findElement(this));
+        WebElement button = Locator.linkWithText(buttonText).findElement(this);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(button));
+        getWrapper().clickAndWait(button);
     }
 
     @Override
