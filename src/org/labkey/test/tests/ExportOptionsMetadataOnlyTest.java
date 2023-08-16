@@ -228,6 +228,6 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        _containerHelper.deleteProject(IMPORT_FOLDER);
+        _containerHelper.deleteProject(IMPORT_FOLDER, false);
     }
 }
