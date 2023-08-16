@@ -253,8 +253,10 @@ public class SampleTypeTest extends BaseWebDriverTest
                 .findElement(getDriver());
         assertEquals("expect custom format for me filter",
                 "rgb(244, 78, 59)", meCell.getCssValue("background-color"));
-        assertThat("expect custom format popup for me filter",
-                meCell.getAttribute("onmouseover"), containsString("Formatting applied because column = ~me~"));
+        mouseOver(meCell);
+        WebElement helpDivBody = shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.id("helpDivBody")));
+        assertEquals("expect custom format popup for me filter",
+                helpDivBody.getText(), "Formatting applied because column = ~me~.");
         assertNotEquals("expect cell for other user not to get custom format",
                 "rgb(244, 78, 59)", notMeCell.getCssValue("background-color"));
     }

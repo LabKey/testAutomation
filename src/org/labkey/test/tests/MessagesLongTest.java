@@ -27,6 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.core.FilePicker;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
@@ -702,9 +703,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("rendererType"), "Plain Text");
 
         log("test attachments too");
-        click(Locator.linkContainingText("Attach a file"));
         File attachmentFile = TestFileUtils.getSampleData("fileTypes/docx_sample.docx");
-        setFormElement(Locator.name("formFiles[00]"), attachmentFile);
+        new FilePicker(getDriver()).addAttachment(attachmentFile);
         clickButton("Submit");
         assertTextPresent(attachmentFile.getName(), MSG1_BODY_FIRST);
         clickAndWait(Locator.linkWithText("view message or respond"));
@@ -716,13 +716,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("test edit messages");
         clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.id("body"), MSG1_BODY);
-        assertTextPresent("remove");
-        click(Locator.linkWithText("remove"));
-        waitForText("This cannot be undone");
-        clickButton("OK", 0);
-        waitForTextToDisappear(attachmentFile.getName());
-        assertTextNotPresent(attachmentFile.getName());
+        FilePicker filePicker = new FilePicker(getDriver());
+        filePicker.removeAttachment(0);
         clickButton("Submit");
+        assertTextNotPresent(attachmentFile.getName());
         assertTextPresent(MSG1_BODY);
 
         log("verify a user can subscribe to a thread");
