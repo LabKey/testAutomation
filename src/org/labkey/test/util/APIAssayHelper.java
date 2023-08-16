@@ -40,6 +40,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.assay.AssayDesign;
+import org.openqa.selenium.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -311,12 +312,34 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     public String getPlateTemplateLsid(String folderPath) throws Exception
     {
-        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
-        selectRowsCmd.setColumns(List.of("Lsid"));
-
-        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(), folderPath);
+        SelectRowsResponse resp = getPlateTemplates(folderPath);
 
         return String.valueOf(resp.getRows().get(0).get("Lsid"));
+    }
+
+    public String getPlateTemplateLsid(String folderPath, String name) throws Exception
+    {
+        SelectRowsResponse resp = getPlateTemplates(folderPath);
+        List<String> names = new ArrayList<>();
+        for (Map<String, Object> row : resp.getRows())
+        {
+            String rowName = (String) row.get("name");
+            if (rowName.equals(name))
+            {
+                return (String) row.get("Lsid");
+            }
+            names.add(rowName);
+        }
+
+        throw new NotFoundException("No plate template '%s'. Found: %s".formatted(name, names.toString()));
+    }
+
+    private SelectRowsResponse getPlateTemplates(String folderPath) throws IOException, CommandException
+    {
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
+        selectRowsCmd.setColumns(List.of("Name", "Lsid"));
+
+        return selectRowsCmd.execute(_test.createDefaultConnection(), folderPath);
     }
 
     public List<PropertyDescriptor> inferFieldsFromFile(File file, String containerPath) throws IOException, CommandException
