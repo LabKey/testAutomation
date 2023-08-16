@@ -308,6 +308,13 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
+    public static File ensureTestTempDir() throws IOException
+    {
+        File file = getTestTempDir();
+        FileUtils.forceMkdir(file);
+        return file;
+    }
+
     public static void delete(File file)
     {
         LOG.info("Deleting from filesystem: " + file.toString());
