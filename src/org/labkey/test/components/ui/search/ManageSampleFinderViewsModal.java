@@ -61,7 +61,7 @@ public class ManageSampleFinderViewsModal extends ModalDialog
         }
     }
 
-    private static final String viewNameLocatorXpath = "//div[@class='modal-dialog']//div[contains(@class,'row')]//div[1]";
+    private static final String viewNameLocatorXpath = "//div[@class='modal-body']//div[contains(@class,'row')]//div[1]";
 
     public List<String> getViews()
     {
