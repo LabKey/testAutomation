@@ -1,28 +1,39 @@
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class GpatPlateTemplateTest extends BaseWebDriverTest
 {
+    private static final File TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformNoop.jar");
     private static final File TEST_PLATE_DATA = TestFileUtils.getSampleData("GPAT/plateData.xlsx");
+    // Issue 48470: Conversion error during assay API import with plate metadata
     private static final File TEST_PLATE_METADATA = TestFileUtils.getSampleData("GPAT/plate-metadata-1.json");
     private static final String ASSAY_NAME = "Assay with plate template";
     private static final String templateName = "GPAT";
@@ -36,12 +47,18 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 
     private void doSetup()
     {
+        new QCAssayScriptHelper(this).ensureEngineConfig();
+
         _containerHelper.createProject(getProjectName(), "Assay");
         setPipelineRoot(TestFileUtils.getSampleData("GPAT").getAbsolutePath(), false);
 
         goToProjectHome();
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.createAssayWithPlateSupport(ASSAY_NAME);
+        new UIAssayHelper(this)
+                .createAssayDesign("General", ASSAY_NAME)
+                .setPlateMetadata(true)
+                // Regression check for Issue 48293: Standard Assay with Plate Metadata & Transformation Script throws an error
+                .addTransformScript(TRANSFORM_SCRIPT)
+                .clickFinish();
         createPlateTemplate(templateName, "blank", "Standard", true);
     }
 
@@ -70,6 +87,23 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testApiWithPlateTemplateAndPlateMetadata() throws Exception
+    {
+        String runName = "ImportRun API with plate template and plate metadata";
+        int assayId = new APIAssayHelper(this).getIdFromAssayName(ASSAY_NAME, getProjectName());
+        File plateDataCopy = new File(TestFileUtils.ensureTestTempDir(), "API_" + TEST_PLATE_DATA.getName());
+
+        FileUtils.copyFile(TEST_PLATE_DATA, plateDataCopy);
+        ImportRunCommand importRunCommand = new ImportRunCommand(assayId, plateDataCopy);
+        importRunCommand.setProperties(Map.of("PlateTemplate", new APIAssayHelper(this).getPlateTemplateLsid(getProjectName(), templateName)));
+        importRunCommand.setPlateMetadata(new JSONObject(TestFileUtils.getFileContents(TEST_PLATE_METADATA)));
+        importRunCommand.setName(runName);
+        ImportRunResponse response = importRunCommand.execute(createDefaultConnection(), getProjectName());
+
+        Assert.assertTrue((Boolean)response.getParsedData().get("success"));
+    }
+
+    @Test
     public void testWithPlateTemplateAndPlateMetadata()
     {
         String assayId = "Run Data with plate template and plate metadata";
@@ -83,6 +117,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
 
         table.setFilter("Run/PlateTemplate", "Does Not Equal", templateName);
         checker().verifyEquals("Only GPAT should be present", 0, table.getDataRowCount());
+        checker().screenShotIfNewError("rowsWithoutPlateTemplate");
         table.clearAllFilters();
 
         table.setFilter("PlateData/control_well_groups", "Is Not Blank");
@@ -90,8 +125,9 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 table.getColumnDataAsText("PlateData/control_well_groups"));
         checker().verifyEquals("Well location is incorrect", Arrays.asList("A11", "A12"),
                 table.getColumnDataAsText("WellLocation"));
-        checker().verifyEquals("Dilution is incorrect", Arrays.asList("0.005", "1.0"),
-                table.getColumnDataAsText(" PlateData/dilution"));
+        checker().verifyEquals("Dilution is incorrect", Arrays.asList("0.005", "1.01"),
+                table.getColumnDataAsText("PlateData/dilution"));
+        checker().screenShotIfNewError("rowsInControlWells");
         table.clearAllFilters();
 
         table.setFilter("PlateData/control_well_groups", "Is Blank");
@@ -101,8 +137,9 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 table.getColumnDataAsText("PlateData/sample_well_groups"));
         checker().verifyEquals("Barcode is incorrect", Arrays.asList("BC_111", "BC_111", "BC_111", "BC_222", "BC_222", "BC_222", "BC_333", "BC_333", "BC_444", "BC_444"),
                 table.getColumnDataAsText("PlateData/Barcode"));
-        checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.0", "1.0", "1.0", "2.0", "2.0", "2.0", "3.0", "3.0", "4.0", "4.0"),
+        checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.01", "1.01", "1.01", "2.01", "2.01", "2.01", "3.01", "3.01", "4.01", "4.01"),
                 table.getColumnDataAsText(" PlateData/dilution"));
+        checker().screenShotIfNewError("rowsOutsideControlWells");
         table.clearAllFilters();
     }
 
