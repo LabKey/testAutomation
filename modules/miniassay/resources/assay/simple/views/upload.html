@@ -55,10 +55,10 @@
 <br/>
 <div id='runs_div'></div>
 
-<script type="application/javascript" nonce="<%=scriptNonce%>">
+<script type="text/javascript" nonce="<%=scriptNonce%>">
   document.getElementById("X-LABKEY-CSRF").value = LABKEY.CSRF;
 </script>
-<script type="application/javascript" nonce="<%=scriptNonce%>">
+<script type="text/javascript" nonce="<%=scriptNonce%>">
 function setDirty(dirty) {
   LABKEY.setDirty(dirty);
   var save_btns = Ext.DomQuery.select("a:has(span:contains(Save))");
