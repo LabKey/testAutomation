@@ -12,7 +12,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -115,39 +114,22 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         return new ElementCache();
     }
 
-    public Optional<MultiMenu> optionalMoreMenu()
-    {
-        return elementCache().gridMoreMenu();
-    }
-
     public MultiMenu clickAssayMenu()
     {
-        MultiMenu menu;
-        if (optionalMoreMenu().isPresent())
-        {
-            menu = optionalMoreMenu().get();
-            optionalMoreMenu().get().openMenuTo("Import Assay Data");
-        }
-        else
-            menu = elementCache().gridAssayMenu;
+        if (elementCache().gridAssayMenuFinder.findOptional().isPresent())
+            return elementCache().gridAssayMenu;
 
+        MultiMenu menu = elementCache().gridMoreMenu;
+        menu.openMenuTo("Import Assay Data");
         return menu;
-    }
-    public void clickAssay(String assayName)
-    {
-        MultiMenu menu = clickAssayMenu();
-        menu.clickSubMenu(getWrapper().defaultWaitForPage, assayName);
     }
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        MultiMenu.MultiMenuFinder gridMoreMenuFinder = new MultiMenu.MultiMenuFinder(getDriver()).withText("More");
-        Optional<MultiMenu> gridMoreMenu()
-        {
-            return gridMoreMenuFinder.findOptional(this);
-        }
+        MultiMenu gridMoreMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("More").findWhenNeeded();
 
-        MultiMenu gridAssayMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Assay").findWhenNeeded(this);
+        MultiMenu.MultiMenuFinder gridAssayMenuFinder = new MultiMenu.MultiMenuFinder(getDriver()).withText("Assay");
+        MultiMenu gridAssayMenu = gridAssayMenuFinder.findWhenNeeded(this);
 
         final WebElement body = Locator.tagWithClass("div", "tabbed-grid-panel__body")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);

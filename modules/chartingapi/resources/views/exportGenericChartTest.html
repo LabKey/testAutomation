@@ -1,8 +1,8 @@
 <div id="buttons">
-    <input type="button" id="next-btn" name="next-btn" onclick="nextChart();" value="Next" />
+    <input type="button" id="next-btn" name="next-btn" value="Next" />
 </div>
 <div id="testDiv"></div>
-<script type="text/javascript" nonce="<%=getScriptNonce()%>">
+<script type="text/javascript" nonce="<%=scriptNonce%>">
     var data = {
     	"schemaName":"study",
     	"queryName":"Lab Results",
@@ -119,4 +119,7 @@
             renderChart(data, charts[chartIdx]);
         });
     }, null, true);
+
+
+document.getElementById("next-btn")['onclick'] = nextChart;
 </script>

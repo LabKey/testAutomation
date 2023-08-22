@@ -1232,7 +1232,7 @@ public class ListTest extends BaseWebDriverTest
                 .openAdvancedListSettings()
                 .indexEntireListAsASingleDocument(true, "",
                         AdvancedListSettingsDialog.SearchIncludeOptions.MetadataAndData,
-                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText)
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText, null)
                 .setIndexFileAttachments(true)
                 .clickApply()
                 .clickSave();

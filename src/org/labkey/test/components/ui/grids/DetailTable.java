@@ -1,7 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
@@ -123,7 +122,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     {
         // Should not click the container, it could be a td which would miss the clickable element.
         // Maybe this shouldn't assume an anchor but should be a generic(*)?
-        Locator.tag("a").findElement(getField(fieldCaption)).click();
+        Locator.tag("a").waitForElement(getField(fieldCaption), 1500).click();
     }
 
     /**
