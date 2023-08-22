@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Modified Since No Source Multi Step</name>
+    <description>Multi Step using Modified Since filter and SP with no SP source</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target</description>
+            <source schemaName="etltest" queryName="source" />
+            <destination schemaName="etltest" queryName="target" bulkLoad="true" targetOption="append">
+                <alternateKeys>
+                    <column name="id"/>
+                </alternateKeys>
+            </destination>
+        </transform>
+        <transform id="step2" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlTest" useTransaction="false">
+                <parameter name="@testMode" value="1"/>
+                <parameter name="testInOutParam" value="before"/>
+            </procedure>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+    <schedule>
+        <poll interval="60m" />
+    </schedule>
+</etl>
