@@ -110,10 +110,10 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         {
             deleteLibXml();
         }
-        verifyAdhocReportDependencies("Strings",
-                "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
-                "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js;\r\n" +
-                "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"
+
+            verifyAdhocReportDependencies("Strings",
+                "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js;\r\n" +
+                "https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
         );
     }
 
