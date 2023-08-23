@@ -191,9 +191,15 @@ function toggleRecorder(checkbox)
             <td><%=h(m.getHeaderValue("To"))%></td>
             <td><%=h(m.getHeaderValue("From"))%></td>
             <td><%=formatDateTime(m.getCreatedTimestamp())%></td>
-            <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
+            <%
+                var idSubject = "subject_" + rowIndex;
+                var idHeaders = "headers_" + rowIndex;
+                addHandler(idSubject, "click", "toggleBody('email_body_" + rowIndex + "'); return false;");
+                addHandler(idHeaders, "click", "toggleBody('email_headers_" + rowIndex + "'); return false;");
+            %>
+            <td><a id="<%=h(idSubject)%>"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><hr><%=body%></div></td>
-            <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
+            <td><a id="<%=h(idHeaders)%>">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=unsafe(headers.toString())%></div></td>
             <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD())%>
             <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD())%>
@@ -208,8 +214,9 @@ function toggleRecorder(checkbox)
 <%
     if (getUser().hasRootAdminPermission())
     {
+        addHandler("emailRecordOn", "click", "toggleRecorder(this); return false;");
 %>
-        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);"<%=checked(recorder)%>> Record email messages sent
+        <input name="emailRecordOn" type="checkbox" <%=checked(recorder)%>> Record email messages sent
 <%
     }
 %>

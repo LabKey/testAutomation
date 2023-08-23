@@ -6,9 +6,8 @@
     <reportType>
         <R>
             <dependencies>
-                <dependency path="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"/>
-                <dependency path="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"/>
-                <dependency path="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"/>
+                <dependency path="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"/>
+                <dependency path="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
             </dependencies>
         </R>
     </reportType>

@@ -284,7 +284,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         assertEquals("expect underlying value to be present when mv-flag has been cleared","ABCDEF", eCell.getText());
         dIndex = materialsList.getRowIndex("Name", "D");
         dCell = materialsList.findCell(dIndex, "MV Field");
-        assertEquals("expect cell to be mv-flagged", " labkey-mv-indicator", dCell.getAttribute("class"));
+        assertAttributeContains(dCell, "class", "labkey-mv-indicator");
         assertEquals("expect mv-indicator value instead of underlying value", "Q", dCell.getText());
 
         dgen.deleteDomain(createDefaultConnection());
