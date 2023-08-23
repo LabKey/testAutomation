@@ -159,6 +159,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public final static int WAIT_FOR_PAGE = 60000;
 
+    @lombok.Getter
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public int longWaitForPage = defaultWaitForPage * 5;
 
@@ -1474,8 +1475,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void fireEvent(WebElement el, SeleniumEvent event)
     {
-        executeScript("" +
-                "var element = arguments[0];" +
+        executeScript("var element = arguments[0];" +
                 "var eventType = arguments[1];" +
                 "var myEvent = document.createEvent('UIEvent');" +
                 "myEvent.initEvent(" +
@@ -1819,7 +1819,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getTextInNonDataRegionTable(String title, int row, int column)
     {
-        return getTableCellText(Locator.xpath("//div/h3/a/span[text()='" + title + "']/../../../../div/table"), row, column);
+        Locator.XPathLocator tableLoc = Locator.tagWithAttribute("div", "name", "webpart")
+                .withDescendant(Locator.tagWithClass("span", "labkey-wp-title-text").withText(title))
+                .descendant(Locator.tagWithClass("table", "labkey-data-region-legacy"));
+        return getTableCellText(tableLoc, row, column);
     }
 
     public void assertTableRowInNonDataRegionTable(String title, String textToCheck, int row, int column)
@@ -1943,8 +1946,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void waitForDocument()
     {
-        waitFor(() -> null != executeScript("" +
-                "try {return document.documentElement;}" +
+        waitFor(() -> null != executeScript("try {return document.documentElement;}" +
                 "catch(e) {return null;}"), "Document did not load", getDefaultWaitForPage());
     }
 
@@ -3930,11 +3932,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public String getAttribute(Locator locator, String attributeName)
     {
         return locator.findElement(getDriver()).getAttribute(attributeName);
-    }
-
-    public int getDefaultWaitForPage()
-    {
-        return defaultWaitForPage;
     }
 
     public void setDefaultWaitForPage(int defaultWaitForPage)
