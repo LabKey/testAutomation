@@ -159,7 +159,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public final static int WAIT_FOR_PAGE = 60000;
 
-    @lombok.Getter
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public int longWaitForPage = defaultWaitForPage * 5;
 
@@ -3932,6 +3931,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public String getAttribute(Locator locator, String attributeName)
     {
         return locator.findElement(getDriver()).getAttribute(attributeName);
+    }
+
+    public int getDefaultWaitForPage()
+    {
+        return defaultWaitForPage;
     }
 
     public void setDefaultWaitForPage(int defaultWaitForPage)
