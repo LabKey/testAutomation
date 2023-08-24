@@ -1,6 +1,7 @@
 package org.labkey.test.components.react;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -83,22 +84,35 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
 
     private void clickTime(LocalTime time)
     {
-        int hour = time.getHour();
-        String amPm = "AM";
-        if (hour == 0)
-            hour = 12;
-        else if (hour == 12)
-            amPm = "PM";
-        else if (hour > 12)
-        {
-            hour -= 12;
-            amPm = "PM";
-        }
-        String timeStr = "%d:%s %s".formatted(hour, withLeadingZero(time.getMinute()), amPm);
-        WebElement liElement = Locator.tagWithClass("ul", "react-datepicker__time-list")
-                .child(Locator.tagWithText("li", timeStr)).findElement(elementCache().popup);
-        getWrapper().fireEvent(liElement, WebDriverWrapper.SeleniumEvent.click);
+        String timeStr;
 
+        // If the time value "13:00" is available, then presume this ReactDatePicker is configured for 24-hour time.
+        if (elementCache().datePickerTime("13:00") != null)
+        {
+            // Expected format is "HH:mm"
+            timeStr = "%s:%s".formatted(withLeadingZero(time.getHour()), withLeadingZero(time.getMinute()));
+        }
+        else
+        {
+            int hour = time.getHour();
+            String amPm = "AM";
+
+            if (hour == 0)
+                hour = 12;
+            else if (hour == 12)
+                amPm = "PM";
+            else if (hour > 12)
+            {
+                hour -= 12;
+                amPm = "PM";
+            }
+
+            // Expected format is "h:mm a"
+            timeStr = "%d:%s %s".formatted(hour, withLeadingZero(time.getMinute()), amPm);
+        }
+
+        WebElement timeElement = elementCache().datePickerTime(timeStr);
+        getWrapper().fireEvent(timeElement, WebDriverWrapper.SeleniumEvent.click);
         WebDriverWrapper.waitFor(()-> !isExpanded(), "Date picker didn't close", 1000);
     }
 
@@ -143,6 +157,13 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         WebElement datePickerDateCell(int day)
         {
             return datePickerDateLoc(withLeadingZero(day)).findElement(popup);
+        }
+
+        @Nullable WebElement datePickerTime(String timeStr)
+        {
+            return Locator.tagWithClass("li", "react-datepicker__time-list-item")
+                    .withText(timeStr)
+                    .findElementOrNull(elementCache().popup);
         }
     }
 
