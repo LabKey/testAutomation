@@ -5,8 +5,8 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
-import org.openqa.selenium.WebElement;
 
 import java.util.function.Supplier;
 
@@ -41,6 +41,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
+                        Locator.tagWithClass("textarea", "form-control").existsIn(this) &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
                 "The 'Choose Samples to Add' dialog did not display.", 1_000);
     }
@@ -71,9 +72,9 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog setUserComment(String comment)
     {
-        WebElement commentInput = Locator.tag("textarea").waitForElement(this, 1000);
-        commentInput.click();
-        commentInput.sendKeys(comment);
+        var commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
+                .refindWhenNeeded(this);
+        commentInput.set(comment);
         return this;
     }
 }
