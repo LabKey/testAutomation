@@ -37,7 +37,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
     protected void testQWPDemoPage()
     {
         log("Begin testing QWPDemo page");
-        beginAt("/query/" + getProjectName() + "/QWPDemo.view");
+        beginAt("/simpletest/" + getProjectName() + "/QWPDemo.view");
 
         log("Drop and reload QWPDemo test data");
         clickButton("Drop schema and clear test data");
@@ -58,7 +58,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         getTabSignalsPairs().stream().forEach(this::testQWPTab);
 
         log("Drop QWPDemo test data");
-        beginAt("/query/" + getProjectName() + "/QWPDemo.view");
+        beginAt("/simpletest/" + getProjectName() + "/QWPDemo.view");
         clickButton("Drop schema and clear test data"); // drop domain, needed for clean up project
     }
 
