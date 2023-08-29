@@ -41,7 +41,6 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
-                        Locator.tagWithClass("textarea", "form-control").existsIn(this) &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
                 "The 'Choose Samples to Add' dialog did not display.", 1_000);
     }
