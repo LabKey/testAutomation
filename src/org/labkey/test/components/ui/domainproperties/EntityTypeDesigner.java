@@ -144,7 +144,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         // Protect against scenarios where the genId banner takes a moment to show up.
         waitFor(()->elementCache().genIdAlert.isDisplayed(),
-                "The GenId banner is not visible.", 1_000);
+                "The GenId banner is not visible.", 5_000);
 
         String rawText = elementCache().genIdAlert.getText().split("\n")[0];
         rawText = rawText.substring(rawText.indexOf(":")+1);
@@ -160,7 +160,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         // There is code that checks to see if the Edit genId button should be shown. Try to protect against that.
         waitFor(()->elementCache().editGenIdButton.isDisplayed(),
-                "The 'Edit GenId' is not visible.", 1_000);
+                "The 'Edit GenId' is not visible.", 5_000);
 
         elementCache().editGenIdButton.click();
         return new GenIdDialog();
@@ -185,7 +185,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         // There is code that checks to see if the Reset genId button should be shown. Try to protect against that.
         waitFor(()->elementCache().resetGenIdButton.isDisplayed(),
-                "The 'Reset GenId' is not visible.", 1_000);
+                "The 'Reset GenId' is not visible.", 5_000);
 
         elementCache().resetGenIdButton.click();
         return new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Are you sure you want to reset genId").waitFor();
