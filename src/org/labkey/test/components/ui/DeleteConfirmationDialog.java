@@ -5,8 +5,8 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
-import org.openqa.selenium.WebElement;
 
 import java.util.function.Supplier;
 
@@ -71,9 +71,9 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog setUserComment(String comment)
     {
-        WebElement commentInput = Locator.tag("textarea").waitForElement(this, 1000);
-        commentInput.click();
-        commentInput.sendKeys(comment);
+        var commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
+                .refindWhenNeeded(this);
+        commentInput.set(comment);
         return this;
     }
 }
