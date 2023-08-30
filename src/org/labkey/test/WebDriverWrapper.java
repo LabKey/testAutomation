@@ -1474,8 +1474,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void fireEvent(WebElement el, SeleniumEvent event)
     {
-        executeScript("" +
-                "var element = arguments[0];" +
+        executeScript("var element = arguments[0];" +
                 "var eventType = arguments[1];" +
                 "var myEvent = document.createEvent('UIEvent');" +
                 "myEvent.initEvent(" +
@@ -1819,7 +1818,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getTextInNonDataRegionTable(String title, int row, int column)
     {
-        return getTableCellText(Locator.xpath("//div/h3/a/span[text()='" + title + "']/../../../../div/table"), row, column);
+        Locator.XPathLocator tableLoc = Locator.tagWithAttribute("div", "name", "webpart")
+                .withDescendant(Locator.tagWithClass("span", "labkey-wp-title-text").withText(title))
+                .descendant(Locator.tagWithClass("table", "labkey-data-region-legacy"));
+        return getTableCellText(tableLoc, row, column);
     }
 
     public void assertTableRowInNonDataRegionTable(String title, String textToCheck, int row, int column)
@@ -1943,8 +1945,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void waitForDocument()
     {
-        waitFor(() -> null != executeScript("" +
-                "try {return document.documentElement;}" +
+        waitFor(() -> null != executeScript("try {return document.documentElement;}" +
                 "catch(e) {return null;}"), "Document did not load", getDefaultWaitForPage());
     }
 

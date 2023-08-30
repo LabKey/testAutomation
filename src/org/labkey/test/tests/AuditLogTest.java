@@ -191,7 +191,7 @@ public class AuditLogTest extends BaseWebDriverTest
         return auditLog;
     }
 
-    protected void compareAuditLogFileEntries(ArrayList<String> auditLogBefore, ArrayList<String> auditLogAfter, ArrayList<String> expectedValues) throws IOException
+    protected void compareAuditLogFileEntries(List<String> auditLogBefore, List<String> auditLogAfter, List<String> expectedValues) throws IOException
     {
         boolean pass = true;
         StringBuilder stringBuilder = new StringBuilder();
@@ -259,9 +259,9 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void userAuditTest() throws IOException
     {
-        ArrayList<String> auditLogBefore;
-        ArrayList<String> auditLogAfter;
-        ArrayList<String> expectedLogValues = new ArrayList<>();
+        List<String> auditLogBefore;
+        List<String> auditLogAfter;
+        List<String> expectedLogValues = new ArrayList<>();
 
         auditLogBefore = getAuditLogFromFile();
         // Use UI helper to avoid unexpected events from API authentication
@@ -321,8 +321,8 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void groupAuditTest() throws IOException
     {
-        ArrayList<String> auditLogBefore;
-        ArrayList<String> auditLogAfter;
+        List<String> auditLogBefore;
+        List<String> auditLogAfter;
 
         auditLogBefore = getAuditLogFromFile();
 
@@ -336,7 +336,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _userHelper.deleteUsers(true, AUDIT_TEST_USER);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
-        ArrayList<String> expectedLogValues = new ArrayList<>();
+        List<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add("Project " + AUDIT_TEST_PROJECT + " was created");
         expectedLogValues.add("A new security group named " + AUDIT_SECURITY_GROUP + " was created.");
         expectedLogValues.add("The group Guests was removed from the security role No Permissions.");
@@ -345,6 +345,8 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add("User: " + AUDIT_TEST_USER + " was added as a member to Group: " + AUDIT_SECURITY_GROUP);
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
         expectedLogValues.add("Project /" + AUDIT_TEST_PROJECT + " was deleted");
+        expectedLogValues.add("A new security policy was established for " + AUDIT_TEST_PROJECT + ". It will no longer inherit permissions from /");
+        expectedLogValues.add("The group Guests was assigned to the security role No Permissions.");
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), 10);
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), 10);
