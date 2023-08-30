@@ -16,6 +16,7 @@ import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -60,9 +61,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public Boolean isLoaded()
     {
         return getComponentElement().isDisplayed() &&
-                !Locators.loadingGrid.existsIn(this) &&
+                (!Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this);
+                Locator.tag("td").existsIn(this)) ||
+                getGridEmptyMessage().isPresent();
     }
 
     protected void waitForLoaded()
@@ -157,20 +159,22 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
     {
         T _this = getThis();
-        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
-        filterModal.confirm();
+        doAndWaitForUpdate(()->initFilterColumn(columnLabel, operator, value).confirm());
         return _this;
     }
 
     public T filterColumn(String columnLabel, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
     {
         T _this = getThis();
-        GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
-        filterModal.selectExpressionTab().setFilters(
-                new FilterExpressionPanel.Expression(operator1, value1),
-                new FilterExpressionPanel.Expression(operator2, value2)
-        );
-        filterModal.confirm();
+        doAndWaitForUpdate(()-> {
+            GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
+            filterModal.selectExpressionTab().setFilters(
+                    new FilterExpressionPanel.Expression(operator1, value1),
+                    new FilterExpressionPanel.Expression(operator2, value2)
+            );
+            filterModal.confirm();
+        });
+
         return _this;
     }
 
@@ -676,10 +680,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         Optional<String> msg = Optional.empty();
 
-        WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
-        if(tr.isDisplayed())
+        try
         {
-            msg = Optional.of(Locator.tag("td").findElement(tr).getText());
+            WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+            if (tr.isDisplayed())
+            {
+                msg = Optional.of(Locator.tag("td").findElement(tr).getText());
+            }
+        }
+        catch (StaleElementReferenceException stale)
+        {
+            getWrapper().log("Grid empty message was present but has now gone stale (went away).");
+            msg = Optional.empty();
         }
 
         return msg;

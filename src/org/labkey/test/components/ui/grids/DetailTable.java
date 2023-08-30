@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
@@ -120,9 +121,15 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      **/
     public void clickField(String fieldCaption)
     {
+        String urlBefore = getWrapper().getCurrentRelativeURL().toLowerCase();
+
         // Should not click the container, it could be a td which would miss the clickable element.
         // Maybe this shouldn't assume an anchor but should be a generic(*)?
         Locator.tag("a").waitForElement(getField(fieldCaption), 1500).click();
+
+        WebDriverWrapper.waitFor(()->!urlBefore.equals(getWrapper().getCurrentRelativeURL().toLowerCase()),
+                String.format("Clicking field (link) '%s' did not navigate.", fieldCaption), 500);
+
     }
 
     /**

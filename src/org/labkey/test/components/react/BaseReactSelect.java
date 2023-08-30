@@ -273,7 +273,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     private void attemptRemove(String value)
     {
-        WebElement removeBtn = Locators.removeMultiSelectValueButton(value).findElement(getComponentElement());
+        WebElement removeBtn = Locators.removeMultiSelectValueButton(value)
+                .waitForElement(getComponentElement(), 1_000);
         removeBtn.click();
 
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));

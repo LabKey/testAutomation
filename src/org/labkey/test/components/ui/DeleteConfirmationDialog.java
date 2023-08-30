@@ -42,7 +42,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
-                "The 'Choose Samples to Add' dialog did not display.", 1_000);
+                "The delete confirmation dialog did not become ready.", 1_000);
     }
 
     public SourcePage cancelDelete()

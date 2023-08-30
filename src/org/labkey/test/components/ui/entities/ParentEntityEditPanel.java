@@ -176,6 +176,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public void clickSave(int waitTime)
     {
+        // Making changes, like to lineage, may cause a slight delay before the save button is enabled.
+        WebDriverWrapper.waitFor(()->elementCache().button("Save").isEnabled(),
+                "Save button is not enabled.", 2_500);
+
         // The wait time is used here to validate the panel exits edit mode.
         clickButtonWaitForPanel(elementCache()
                 .button("Save"),
@@ -359,12 +363,18 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 .withNamedInput(String.format("parentEntityValue_%s", typeName))
                 .waitFor(this);
 
+        // Adding for debugging (trying to understand why save button is not enabled after setting).
+        getWrapper().log(String.format("Selections before adding: %s", selectParent.getSelections()));
+
         for (String id : parentIds)
         {
-            int selCount = selectParent.getSelections().size();
             selectParent.typeAheadSelect(id);
-            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount, 500);
+            WebDriverWrapper.waitFor(()-> selectParent.getSelections().contains(id) ,
+                    String.format("Parent '%s' was not added to the list.", parentIds), 2_500);
         }
+
+        // Adding for debugging (trying to understand why save button is not enabled after setting).
+        getWrapper().log(String.format("Selections after adding: %s", selectParent.getSelections()));
 
         return this;
     }
