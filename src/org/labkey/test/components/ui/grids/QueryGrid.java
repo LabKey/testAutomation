@@ -675,7 +675,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public WebElement showChart(String chartName)
     {
         elementCache().chartsMenu.clickSubMenu(false, chartName);
-        return elementCache().svgChart;
+        return elementCache().svgChart();
     }
 
     public void closeChart()
@@ -736,9 +736,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         final WebElement chartPanel = Locator.byClass("chart-panel").refindWhenNeeded(this);
 
-        final WebElement svgChart = Locator.byClass("svg-chart")
-                .refindWhenNeeded(chartPanel)
-                .withTimeout(WAIT_FOR_JAVASCRIPT);
+        public WebElement svgChart()
+        {
+            return Locator.byClass("svg-chart").waitForElement(elementCache().chartPanel, WAIT_FOR_JAVASCRIPT);
+        }
 
         final WebElement closeButton = Locator.tagContainingText("button", "Close").refindWhenNeeded(chartPanel);
 
