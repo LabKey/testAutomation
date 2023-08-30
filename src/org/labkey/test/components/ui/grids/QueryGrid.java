@@ -672,6 +672,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    public WebElement showChart(String chartName)
+    {
+        elementCache().chartsMenu.clickSubMenu(false, chartName);
+        return elementCache().svgChart();
+    }
+
+    public void closeChart()
+    {
+        elementCache().closeButton.click();
+    }
+
     /**
      * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
      * use this to test which one so we can fork behavior until QGP is gone
@@ -720,6 +731,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         {
             return Locator.xpath("preceding-sibling::div[contains(@class,'panel-heading')]").findWhenNeeded(this);
         }
+
+        final BootstrapMenu chartsMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Charts").findWhenNeeded(this);
+
+        final WebElement chartPanel = Locator.byClass("chart-panel").refindWhenNeeded(this);
+
+        public WebElement svgChart()
+        {
+            return Locator.byClass("svg-chart").waitForElement(elementCache().chartPanel, WAIT_FOR_JAVASCRIPT);
+        }
+
+        final WebElement closeButton = Locator.tagContainingText("button", "Close").refindWhenNeeded(chartPanel);
 
     }
 
