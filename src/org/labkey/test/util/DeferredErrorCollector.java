@@ -7,7 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
 import org.labkey.test.BaseWebDriverTest;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.support.ui.FluentWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,10 +29,9 @@ public class DeferredErrorCollector
 
     private final ArtifactCollector artifactCollector;
     private final List<DeferredError> allErrors = new ArrayList<>();
-    private final Set<Class<? extends Throwable>> errorTypes = new HashSet<>();
+    protected final Set<Class<? extends Throwable>> errorTypes = new HashSet<>();
 
     private int errorMark = 0;
-    private FatalErrorCollector _fatalErrorCollector;
 
     /**
      * For wrapper classes. Avoids resetting error types in wrapped collector.
@@ -85,11 +87,7 @@ public class DeferredErrorCollector
      */
     public DeferredErrorCollector fatal()
     {
-        if (_fatalErrorCollector == null)
-        {
-            _fatalErrorCollector = new FatalErrorCollector(this);
-        }
-        return _fatalErrorCollector;
+        return new DeferredErrorCollectorWrapper(this).fatal();
     }
 
     /**
@@ -100,7 +98,7 @@ public class DeferredErrorCollector
      */
     public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        return new DeferredErrorCollectorWithScreenshot(this, screenshotName);
+        return new DeferredErrorCollectorWrapper(this).withScreenshot(screenshotName);
     }
 
     /**
@@ -111,6 +109,17 @@ public class DeferredErrorCollector
     public final DeferredErrorCollector withScreenshot()
     {
         return withScreenshot("recordedError");
+    }
+
+    /**
+     * Create temporary error collector that waits for assertions to succeed. Assertions will be invoked repeatedly
+     * until they succeed within the specified timeout.
+     *
+     * @return Wrapped error collector. Intended to be used only once.
+     */
+    public DeferredErrorCollector awaiting(Duration timeout)
+    {
+        return new DeferredErrorCollectorWrapper(this).awaiting(timeout);
     }
 
     /**
@@ -181,7 +190,7 @@ public class DeferredErrorCollector
      * @return <code>true</code> if <code>wrappedAssertion</code> does not throw, <code>false</code> if an error was recorded,
      * otherwise rethrow exception thrown by <code>wrappedAssertion</code>
      */
-    public final boolean wrapAssertion(Runnable wrappedAssertion)
+    public boolean wrapAssertion(Runnable wrappedAssertion)
     {
         try
         {
@@ -422,26 +431,49 @@ public class DeferredErrorCollector
 /**
  * Wraps an existing error collector. Any errors will be recorded within the wrapped collector.
  */
-abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
+class DeferredErrorCollectorWrapper extends DeferredErrorCollector
 {
     private final DeferredErrorCollector wrappedCollector;
 
+    private boolean fatal = false;
+    private Duration timeout = null;
+    private String screenshotName = null;
+
     protected DeferredErrorCollectorWrapper(DeferredErrorCollector collector)
     {
-        super();
         wrappedCollector = collector;
     }
 
     @Override
-    public final DeferredErrorCollector fatal()
+    public DeferredErrorCollector fatal()
     {
-        return wrappedCollector.fatal();
+        fatal = true;
+        return this;
     }
 
     @Override
     public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        return wrappedCollector.withScreenshot(screenshotName);
+        this.screenshotName = screenshotName;
+        return this;
+    }
+
+    @Override
+    public DeferredErrorCollector awaiting(Duration timeout)
+    {
+        this.timeout = timeout;
+        return this;
+    }
+
+    @Override
+    public boolean wrapAssertion(Runnable wrappedAssertion)
+    {
+        return super.wrapAssertion(timeout == null
+                ? wrappedAssertion
+                : () -> new FluentWait<>(Void.TYPE).ignoreAll(wrappedCollector.errorTypes).withTimeout(timeout).until((v) -> {
+                    wrappedAssertion.run();
+                    return true;
+                }));
     }
 
     @Override
@@ -495,84 +527,38 @@ abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     @Override
     protected boolean isErrorDeferrable(Throwable err)
     {
-        return wrappedCollector.isErrorDeferrable(err);
+        if (fatal)
+        {
+            return false;
+        }
+        if (timeout == null)
+        {
+            return wrappedCollector.isErrorDeferrable(err);
+        }
+        else
+        {
+            return err instanceof TimeoutException && wrappedCollector.isErrorDeferrable(err.getCause());
+        }
     }
 
     @Override
-    public void recordError(Throwable cause)
+    public void recordError(Throwable error)
     {
-        wrappedCollector.recordError(cause);
+        if (timeout != null)
+        {
+            error = error.getCause();
+        }
+        wrappedCollector.recordError(error);
+        if (screenshotName != null)
+        {
+            screenShotIfNewError(screenshotName);
+        }
     }
 
     @Override
     public void reportResults()
     {
         wrappedCollector.reportResults();
-    }
-}
-
-/**
- * Will never defer any errors.
- */
-class FatalErrorCollector extends DeferredErrorCollectorWrapper
-{
-    protected FatalErrorCollector(DeferredErrorCollector collector)
-    {
-        super(collector);
-    }
-
-    /**
-     * Fatal errors will take screenshots automatically
-     */
-    @Override
-    public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
-    {
-        return this;
-    }
-
-    @Override
-    public void recordError(Throwable cause)
-    {
-        if (cause instanceof Error e)
-        {
-            throw e;
-        }
-        else if (cause instanceof RuntimeException e)
-        {
-            throw e;
-        }
-        else
-        {
-            // Only reachable if called from outside DeferredErrorCollector.
-            throw new AssertionError(cause);
-        }
-    }
-
-    @Override
-    protected boolean isErrorDeferrable(Throwable err)
-    {
-        return false;
-    }
-}
-
-/**
- * Wraps an error collector and takes a screenshot if any errors are recorded.
- */
-class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
-{
-    private final String _screenshotName;
-
-    protected DeferredErrorCollectorWithScreenshot(DeferredErrorCollector collector, String screenshotName)
-    {
-        super(collector);
-        _screenshotName = screenshotName;
-    }
-
-    @Override
-    public void recordError(Throwable error)
-    {
-        super.recordError(error);
-        super.screenShotIfNewError(_screenshotName);
     }
 }
 
@@ -634,9 +620,8 @@ class DeferredError
         return screenshotName;
     }
 
-    public DeferredError setScreenshotName(String screenshotName)
+    public void setScreenshotName(String screenshotName)
     {
         this.screenshotName = screenshotName;
-        return this;
     }
 }
