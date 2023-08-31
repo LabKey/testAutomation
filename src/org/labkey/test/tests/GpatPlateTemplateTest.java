@@ -137,7 +137,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 table.getColumnDataAsText("PlateData/sample_well_groups"));
         checker().verifyEquals("Barcode is incorrect", Arrays.asList("BC_111", "BC_111", "BC_111", "BC_222", "BC_222", "BC_222", "BC_333", "BC_333", "BC_444", "BC_444"),
                 table.getColumnDataAsText("PlateData/Barcode"));
-        checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.01", "1.01", "1.01", "2.01", "2.01", "2.01", "3.01", "3.01", "4.01", "4.01"),
+        checker().verifyEquals("Dilution is incorrect", Arrays.asList("1.0", "1.0", "1.0", "2.0", "2.0", "2.0", "3.0", "3.0", "4.0", "4.0"),
                 table.getColumnDataAsText(" PlateData/dilution"));
         checker().screenShotIfNewError("rowsOutsideControlWells");
         table.clearAllFilters();
