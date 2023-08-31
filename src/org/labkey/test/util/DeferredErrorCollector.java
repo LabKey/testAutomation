@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
 import org.labkey.test.BaseWebDriverTest;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -17,6 +15,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.awaitility.Awaitility.await;
 
 /**
  * Allows tests to record non-fatal errors without failing the test immediately.
@@ -469,12 +469,8 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     @Override
     public boolean wrapAssertion(Runnable wrappedAssertion)
     {
-        return super.wrapAssertion(timeout == null
-                ? wrappedAssertion
-                : () -> new FluentWait<>(Void.TYPE).ignoreAll(wrappedCollector.errorTypes).withTimeout(timeout).until((v) -> {
-                    wrappedAssertion.run();
-                    return true;
-                }));
+        return super.wrapAssertion(timeout == null ? wrappedAssertion
+                : () -> await().atMost(timeout).ignoreExceptionsMatching(wrappedCollector::isErrorDeferrable).untilAsserted(wrappedAssertion::run));
     }
 
     @Override
@@ -528,27 +524,12 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     @Override
     protected boolean isErrorDeferrable(Throwable err)
     {
-        if (fatal)
-        {
-            return false;
-        }
-        if (timeout == null)
-        {
-            return wrappedCollector.isErrorDeferrable(err);
-        }
-        else
-        {
-            return err instanceof TimeoutException && wrappedCollector.isErrorDeferrable(err.getCause());
-        }
+        return !fatal && wrappedCollector.isErrorDeferrable(err);
     }
 
     @Override
     public void recordError(Throwable error)
     {
-        if (timeout != null)
-        {
-            error = error.getCause();
-        }
         wrappedCollector.recordError(error);
         if (screenshotName != null)
         {
