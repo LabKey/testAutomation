@@ -1,6 +1,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,7 @@ import java.util.Set;
 public class DeferredErrorCollector
 {
     private static final Set<Class<? extends Throwable>> defaultRecordableErrorTypes =
-            Set.of(AssertionError.class);
+            Set.of(AssertionError.class, ConditionTimeoutException.class);
 
     private final ArtifactCollector artifactCollector;
     private final List<DeferredError> allErrors = new ArrayList<>();
