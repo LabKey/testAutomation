@@ -985,11 +985,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void switchToWindow(int index)
     {
-        waitFor(() -> getDriver().getWindowHandles().size() > index, WAIT_FOR_JAVASCRIPT);
+        Timer timer = new Timer(Duration.ofMillis(defaultWaitForPage));
+        waitFor(() -> getDriver().getWindowHandles().size() > index, "New window didn't appear", WAIT_FOR_JAVASCRIPT);
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
         try
         {
             getDriver().switchTo().window(windows.get(index));
+            waitForPageToLoad(null, timer);
         }
         catch (StackOverflowError soe)
         {
@@ -1882,16 +1884,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void waitForPageToLoad(WebElement toBeStale, Timer timer)
     {
-        try
+        if (toBeStale != null)
         {
-            new WebDriverWait(getDriver(), timer.timeRemaining())
-                    .ignoring(NullPointerException.class)
-                    .withMessage("waiting for browser to navigate")
-                    .until(ExpectedConditions.stalenessOf(toBeStale));
-        }
-        catch (TimeoutException ex)
-        {
-            throw new TestTimeoutException(ex); // Triggers thread dump.
+            try
+            {
+                new WebDriverWait(getDriver(), timer.timeRemaining())
+                        .ignoring(NullPointerException.class)
+                        .withMessage("waiting for browser to navigate")
+                        .until(ExpectedConditions.stalenessOf(toBeStale));
+            }
+            catch (TimeoutException ex)
+            {
+                throw new TestTimeoutException(ex); // Triggers thread dump.
+            }
         }
 
         // WebDriver usually does this automatically, but not always.
