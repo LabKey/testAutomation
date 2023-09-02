@@ -611,8 +611,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             verifyInitialUserError(email, null, null, "You must enter a password.");
             verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
             verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password must be at least six characters and cannot contain spaces.");
-            verifyInitialUserError(email, email, email, "Your password must not match your email address.");
+            verifyInitialUserError(email, "short", "short", "Your password is not complex enough.");
+            verifyInitialUserError(email, email, email, "Your password is not complex enough.");
             verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
 
             log("Register the first user");
