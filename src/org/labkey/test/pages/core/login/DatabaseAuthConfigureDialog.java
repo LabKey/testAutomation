@@ -82,7 +82,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         {
             JSONObject params = new JSONObject();
             params.put("expiration", oldExpiration != null ? oldExpiration.name() : PasswordExpiration.Never.name());
-            params.put("strength", oldStrength != null ? oldStrength.name() : PasswordStrength.Strong.name());
+            params.put("strength", oldStrength != null ? oldStrength.name() : PasswordStrength.Good.name());
             SimplePostCommand postCommand = new SimplePostCommand("login", "SaveDbLoginProperties");
             postCommand.setJsonObject(params);
             try
@@ -100,8 +100,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
 
     public enum PasswordStrength implements OptionSelect.SelectOption
     {
-        Weak,
-        Strong;
+        Weak, Good, Strong;
 
         @Override
         public String getValue()
