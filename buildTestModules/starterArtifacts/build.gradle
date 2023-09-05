@@ -69,7 +69,7 @@ dependencies {
     modules ("org.labkey.module:dataintegration:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:duo:${labkeyVersion}@module") {
+    modules ("org.labkey.module:mfa:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:ldap:${labkeyVersion}@module") {
