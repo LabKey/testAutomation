@@ -84,6 +84,7 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
             {
                 lastException = e;
             }
+            sleep(500);
         } while (!timer.isTimedOut());
 
         throw new RuntimeException("Server not done starting up.", lastException);
