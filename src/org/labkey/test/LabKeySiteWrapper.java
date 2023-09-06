@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -170,7 +169,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
                 // If we get redirected here the message is not indicated as an error
-                if (errors.length() == 0 && null != getUrlParam("message", true))
+                if (errors.isEmpty() && null != getUrlParam("message", true))
                     errors = getUrlParam("message", true);
 
                 if (errors.contains("The email address and password you entered did not match any accounts on file."))
@@ -611,8 +610,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             verifyInitialUserError(email, null, null, "You must enter a password.");
             verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
             verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password must be at least six characters and cannot contain spaces.");
-            verifyInitialUserError(email, email, email, "Your password must not match your email address.");
+            verifyInitialUserError(email, "short", "short", "Your password is not complex enough.");
+            verifyInitialUserError(email, email, email, "Your password is not complex enough.");
             verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
 
             log("Register the first user");
@@ -759,7 +758,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickAndWait(Locator.linkWithText("Next"), 90000); // Initial user creation blocks during upgrade script execution
 
         if (null != expectedError)
+        {
             assertEquals("Wrong error message.", expectedError, Locator.css(".labkey-error").findElement(getDriver()).getText());
+        }
+        else
+        {
+            WebElement element = Locator.css(".labkey-error").findElementOrNull(getDriver());
+            if (null != element)
+                fail("Unexpected error: " + element.getText());
+        }
     }
 
     private void verifyInitialUserRedirects()

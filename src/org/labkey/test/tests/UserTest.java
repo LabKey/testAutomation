@@ -36,6 +36,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -56,7 +57,7 @@ import static org.junit.Assert.assertTrue;
 public class UserTest extends BaseWebDriverTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};
-    private static final String TEST_PASSWORD = "0asdfgh!";
+    private static final String TEST_PASSWORD = PasswordUtil.getPassword();
 
     /**copied from LoginController.EMAIL_PASSWORDMISMATCH_ERROR, but needs to be broken into multiple separate sentences,
      *  the search function can't handle the line breaks

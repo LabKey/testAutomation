@@ -24,6 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class SecurityApiTest extends BaseWebDriverTest
     private static final String GROUP_1 = "testgroup1";
     private static final String GROUP_2 = "testgroup2";
     private static final String ADMIN_USER = "security-api@clientapi.test";
-    private static final String ADMIN_USER_PWD = "Pa$$w0rd";
+    private static final String ADMIN_USER_PWD = PasswordUtil.getPassword();
     private static final String USER_CREATED_BY_API = "api-created-user@securityapi.test"; // This email value is found in the security-api.xml file for the "create new user" test.
 
     protected File[] getTestFiles()

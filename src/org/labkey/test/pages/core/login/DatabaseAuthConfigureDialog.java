@@ -10,7 +10,6 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 
@@ -32,9 +31,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     // get password strength
     public PasswordStrength getPasswordStrength()
     {
-        if (elementCache().weakButton.getAttribute("class").contains("active"))
-            return PasswordStrength.Weak;
-        else return PasswordStrength.Strong;
+        return PasswordStrength.valueOf(elementCache().passwordStrengthSelect.getSelection().getValue());
     }
 
     public DatabaseAuthConfigureDialog setPasswordStrength(PasswordStrength newStrength)
@@ -42,13 +39,10 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         if (getPasswordStrength().equals(newStrength))
             return this;
 
-        if (newStrength.equals(PasswordStrength.Strong))
-            elementCache().strongButton.click();
-        else
-            elementCache().weakButton.click();
-
+        elementCache().passwordStrengthSelect.selectOption(newStrength);
         WebDriverWrapper.waitFor(()-> getPasswordStrength().equals(newStrength),
-                "the password strength was not set to desired state ["+newStrength.toString()+"] in time", 1000);
+                "the password strength was not set to desired state ["+ newStrength +"] in time", 1000);
+
         return this;
     }
 
@@ -60,7 +54,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
 
     public PasswordExpiration getPasswordExpiration()
     {
-        return  PasswordExpiration.valueOf(elementCache().passwordExpirationSelect.getSelection().getValue());
+        return PasswordExpiration.valueOf(elementCache().passwordExpirationSelect.getSelection().getValue());
     }
 
     @Override
@@ -88,7 +82,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         {
             JSONObject params = new JSONObject();
             params.put("expiration", oldExpiration != null ? oldExpiration.name() : PasswordExpiration.Never.name());
-            params.put("strength", oldStrength != null ? oldStrength.name() : PasswordStrength.Strong.name());
+            params.put("strength", oldStrength != null ? oldStrength.name() : PasswordStrength.Good.name());
             SimplePostCommand postCommand = new SimplePostCommand("login", "SaveDbLoginProperties");
             postCommand.setJsonObject(params);
             try
@@ -104,7 +98,17 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         }
     }
 
-    public enum PasswordStrength {Weak, Strong}
+    public enum PasswordStrength implements OptionSelect.SelectOption
+    {
+        Weak, Good, Strong;
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+    }
+
     public enum PasswordExpiration implements OptionSelect.SelectOption
     {
         Never, FiveSeconds, ThreeMonths, SixMonths, OneYear;
@@ -140,11 +144,9 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     protected class ElementCache extends AuthDialogBase.ElementCache
     {
         OptionSelect<PasswordExpiration> passwordExpirationSelect = new OptionSelect<>(Locator.tagWithName("select", "expiration")
-                .findWhenNeeded(this).withTimeout(2000));
+            .findWhenNeeded(this).withTimeout(2000));
 
-        WebElement strongButton = Locator.button("Strong").refindWhenNeeded(this).withTimeout(4000);
-        WebElement weakButton = Locator.button("Weak").refindWhenNeeded(this).withTimeout(4000);
+        OptionSelect<PasswordStrength> passwordStrengthSelect = new OptionSelect<>(Locator.tagWithName("select", "strength")
+            .findWhenNeeded(this).withTimeout(2000));
     }
-
-
 }
