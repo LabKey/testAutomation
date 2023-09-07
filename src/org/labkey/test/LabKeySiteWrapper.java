@@ -344,12 +344,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
     }
 
+    // Use default password
+    public void signIn(String email)
+    {
+        signIn(email, PasswordUtil.getPassword());
+    }
+
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
     public void signIn(String email, String password)
     {
         attemptSignIn(email, password);
         Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
         WebTestHelper.saveSession(email, getDriver());
+    }
+
+    public void attemptSignIn(String email)
+    {
+        attemptSignIn(email, PasswordUtil.getPassword());
     }
 
     public void attemptSignIn(String email, String password)
@@ -393,7 +404,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 
-    protected void setInitialPassword(String user, String password)
+    protected String setInitialPassword(String user)
+    {
+        return setInitialPassword(user, PasswordUtil.getPassword());
+    }
+
+    // Don't call this unless you're actually testing password-related functionality
+    protected String setInitialPassword(String user, String password)
     {
         beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", user)));
         // Get setPassword URL from notification email.
@@ -405,6 +422,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         setFormElement(Locator.id("password2"), password);
 
         clickButton("Set Password");
+
+        return password;
     }
 
     protected String getPasswordResetUrl(String username)
