@@ -358,6 +358,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         WebTestHelper.saveSession(email, getDriver());
     }
 
+    public void attemptSignIn()
+    {
+        attemptSignIn(PasswordUtil.getUsername());
+    }
+
     public void attemptSignIn(String email)
     {
         attemptSignIn(email, PasswordUtil.getPassword());
@@ -409,7 +414,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return setInitialPassword(user, PasswordUtil.getPassword());
     }
 
-    // Don't call this unless you're actually testing password-related functionality
+    // Don't call this unless you're actually testing authentication functionality
     protected String setInitialPassword(String user, String password)
     {
         beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", user)));
