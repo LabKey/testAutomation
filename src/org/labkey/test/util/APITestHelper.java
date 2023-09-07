@@ -65,7 +65,12 @@ public class APITestHelper
 
     public void runApiTests() throws Exception
     {
-        runApiTests(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        runApiTests(PasswordUtil.getUsername());
+    }
+
+    public void runApiTests(String username) throws Exception
+    {
+        runApiTests(username, PasswordUtil.getPassword());
     }
 
     public void runApiTests(String username, String password) throws Exception

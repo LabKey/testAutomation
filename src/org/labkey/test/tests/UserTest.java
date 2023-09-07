@@ -57,7 +57,6 @@ import static org.junit.Assert.assertTrue;
 public class UserTest extends BaseWebDriverTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};
-    private static final String TEST_PASSWORD = PasswordUtil.getPassword();
 
     /**copied from LoginController.EMAIL_PASSWORDMISMATCH_ERROR, but needs to be broken into multiple separate sentences,
      *  the search function can't handle the line breaks
@@ -166,7 +165,7 @@ public class UserTest extends BaseWebDriverTest
     public void testChangeUserEmail()
     {
         new UIUserHelper(this).cloneUser(CHANGE_EMAIL_USER, NORMAL_USER);
-        setInitialPassword(CHANGE_EMAIL_USER, TEST_PASSWORD);
+        setInitialPassword(CHANGE_EMAIL_USER);
 
         //change their email address
         changeUserEmail(CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE);
@@ -174,12 +173,12 @@ public class UserTest extends BaseWebDriverTest
         signOut();
 
         //verify can log in with new address
-        signIn(CHANGE_EMAIL_USER_ALTERNATE, TEST_PASSWORD);
+        signIn(CHANGE_EMAIL_USER_ALTERNATE);
 
         signOut();
 
         //verify can't log in with old address
-        signInShouldFail(CHANGE_EMAIL_USER, TEST_PASSWORD, EMAIL_PASSWORD_MISMATCH_ERROR);
+        signInShouldFail(CHANGE_EMAIL_USER, PasswordUtil.getPassword(), EMAIL_PASSWORD_MISMATCH_ERROR);
 
         simpleSignIn();
 
@@ -200,7 +199,7 @@ public class UserTest extends BaseWebDriverTest
 
         log("Create a new user.");
         _userHelper.createUser(SELF_SERVICE_EMAIL_USER, true, true);
-        setInitialPassword(SELF_SERVICE_EMAIL_USER, TEST_PASSWORD);
+        setInitialPassword(SELF_SERVICE_EMAIL_USER);
 
         goToHome();
 
@@ -208,7 +207,7 @@ public class UserTest extends BaseWebDriverTest
         impersonate(SELF_SERVICE_EMAIL_USER);
 
         log("Goto the account maintenance page and change the email address.");
-        changeEmailAddress(SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED, TEST_PASSWORD);
+        changeEmailAddress(SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
 
         goToHome();
 
@@ -264,7 +263,7 @@ public class UserTest extends BaseWebDriverTest
     public void testCustomFieldLogin()
     {
         String customFieldValue = "loginCredentials";
-        setInitialPassword(NORMAL_USER, TEST_PASSWORD);
+        setInitialPassword(NORMAL_USER);
 
         goToSiteUsers();
         DataRegionTable table = new DataRegionTable("Users", getDriver());
@@ -286,11 +285,11 @@ public class UserTest extends BaseWebDriverTest
         signOut();
 
         log("Sign in using custom field value");
-        attemptSignIn(customFieldValue, TEST_PASSWORD);
+        attemptSignIn(customFieldValue);
         Assert.assertEquals("Logged in as wrong user", NORMAL_USER, getCurrentUser());
     }
 
-    private void changeEmailAddress(String currentEmail, String newEmail, String password)
+    private void changeEmailAddress(String currentEmail, String newEmail)
     {
         goToMyAccount();
 
@@ -301,7 +300,7 @@ public class UserTest extends BaseWebDriverTest
 
         assertTextPresent(currentEmail);
 
-        setFormElement(Locator.css("#password"), password);
+        setFormElement(Locator.css("#password"), PasswordUtil.getPassword());
         clickButton("Submit");
     }
 
@@ -415,7 +414,7 @@ public class UserTest extends BaseWebDriverTest
             ensureRequiredFieldsSet();
 
             _userHelper.createUserAndNotify(BLANK_USER);
-            setInitialPassword(BLANK_USER, TEST_PASSWORD);
+            setInitialPassword(BLANK_USER);
 
             DomainDesignerPage domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
             DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -441,7 +440,7 @@ public class UserTest extends BaseWebDriverTest
             domainDesignerPage.clickFinish();
 
             signOut();
-            attemptSignIn(BLANK_USER, TEST_PASSWORD);
+            attemptSignIn(BLANK_USER);
             waitForElement(Locator.name("quf_FirstName"));
 
             clickButton("Submit");
