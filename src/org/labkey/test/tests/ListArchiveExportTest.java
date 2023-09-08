@@ -110,10 +110,12 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         Assert.assertEquals("Invalid error message", "'" + LIST_A + "' is already selected, please select Lists with unique names to Export.",
                 Locator.tagWithClass("div", "labkey-error").findElement(getDriver()).getText());
         goBack();
+        refresh();
 
         listsGrid = new ManageListsGrid(getDriver());
         listsGrid.clearAllFilters();
         listsGrid.setFilter("Container", "Equals One Of", LIST_FOLDER_A + ";" + getProjectName());
+        Assert.assertEquals("Incorrect list row count", 2, listsGrid.getDataRowCount());
         Assert.assertEquals("Incorrect list after container filter", Arrays.asList(LIST_A, LIST_B), listsGrid.getColumnDataAsText("Name"));
         listsGrid.checkAllOnPage();
         File listExport = listsGrid.exportSelectedLists();
