@@ -15,6 +15,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -369,6 +370,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailDataPanel clickSave()
     {
         String title = getSourceTitle();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
         elementCache().saveButton.click();
 
         // If save causes some update, wait until it is completed.

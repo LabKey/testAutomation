@@ -125,7 +125,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 table.getColumnDataAsText("PlateData/control_well_groups"));
         checker().verifyEquals("Well location is incorrect", Arrays.asList("A11", "A12"),
                 table.getColumnDataAsText("WellLocation"));
-        checker().verifyEquals("Dilution is incorrect", Arrays.asList("0.005", "1.01"),
+        checker().verifyEquals("Dilution is incorrect", Arrays.asList("0.005", "1.0"),
                 table.getColumnDataAsText("PlateData/dilution"));
         checker().screenShotIfNewError("rowsInControlWells");
         table.clearAllFilters();

@@ -226,7 +226,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         setFormElement(Locator.id("password2"), PasswordUtil.getPassword());
         clickButton("Set Password");
         signOut();
-        signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword());
+        signIn(GAMMA_PROJECT_ADMIN_USER);
         clickProject(PERM_PROJECT_NAME);
         impersonate(GAMMA_READER_USER);
         WebElement projectTree = projectMenu().expandProjectFully(PERM_PROJECT_NAME);
