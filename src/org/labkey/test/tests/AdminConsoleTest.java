@@ -44,7 +44,6 @@ import static org.junit.Assert.assertTrue;
 public class AdminConsoleTest extends BaseWebDriverTest
 {
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
-    protected static final String APP_ADMIN_USER_PASS = PasswordUtil.getPassword();
 
     @Override
     public String getProjectName()
@@ -110,9 +109,9 @@ public class AdminConsoleTest extends BaseWebDriverTest
         
         // log out as siteAdmin, log in as appAdmin
         signOut();
-        signIn(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
+        signIn(APP_ADMIN_USER);
 
-        // verify that all of the following links are visible to AppAdmin:
+        // verify that all the following links are visible to AppAdmin:
         goToAdminConsole().goToSettingsSection();
         List<String> expectedLinkTexts = new ArrayList<>(Arrays.asList("change user properties",
                 "folder types",
@@ -271,7 +270,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
     private void createTestUser()
     {
         _userHelper.createUser(APP_ADMIN_USER, true, false);
-        setInitialPassword(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
+        setInitialPassword(APP_ADMIN_USER);
 
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");

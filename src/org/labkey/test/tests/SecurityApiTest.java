@@ -41,7 +41,6 @@ public class SecurityApiTest extends BaseWebDriverTest
     private static final String GROUP_1 = "testgroup1";
     private static final String GROUP_2 = "testgroup2";
     private static final String ADMIN_USER = "security-api@clientapi.test";
-    private static final String ADMIN_USER_PWD = PasswordUtil.getPassword();
     private static final String USER_CREATED_BY_API = "api-created-user@securityapi.test"; // This email value is found in the security-api.xml file for the "create new user" test.
 
     protected File[] getTestFiles()
@@ -83,7 +82,7 @@ public class SecurityApiTest extends BaseWebDriverTest
 
         // Create the admin user that will be used to call the APIs.
         _userHelper.createUserAndNotify(ADMIN_USER);
-        setInitialPassword(ADMIN_USER, ADMIN_USER_PWD);
+        setInitialPassword(ADMIN_USER);
         apiPermissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
 
     }
@@ -148,7 +147,7 @@ public class SecurityApiTest extends BaseWebDriverTest
         APITestHelper apiTester = new APITestHelper(this);
         apiTester.setTestFiles(getTestFiles());
         apiTester.setIgnoredElements(getIgnoredElements());
-        apiTester.runApiTests(ADMIN_USER, ADMIN_USER_PWD);
+        apiTester.runApiTests(ADMIN_USER);
     }
 
     @Override
@@ -156,5 +155,4 @@ public class SecurityApiTest extends BaseWebDriverTest
     {
         return Arrays.asList("query");
     }
-
 }

@@ -1,7 +1,7 @@
 {
   "control" : {
     "positive" : {"dilution":  0.005},
-    "negative" : {"dilution":  1.01}
+    "negative" : {"dilution":  1.00}
   },
   "sample" : {
     "SA01" : {"dilution": 1.00, "ID" : 111, "Barcode" : "BC_111", "Concentration" : 0.0125},

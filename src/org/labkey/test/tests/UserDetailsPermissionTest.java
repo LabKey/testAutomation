@@ -99,9 +99,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         _userHelper.createUser(USER_INFO_VIEWER, true, true);
         _userHelper.createUser(IMPERSONATED_USER, true, true);
         _userHelper.createUser(CHECKED_USER, true, true);
-        setInitialPassword(ADMIN_USER, PasswordUtil.getPassword());
-        setInitialPassword(USER_INFO_VIEWER, PasswordUtil.getPassword());
-        setInitialPassword(IMPERSONATED_USER, PasswordUtil.getPassword());
+        setInitialPassword(ADMIN_USER);
+        setInitialPassword(USER_INFO_VIEWER);
+        setInitialPassword(IMPERSONATED_USER);
 
         _containerHelper.createProject(getProjectName(), null);
 

@@ -58,7 +58,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     {
         _userHelper.createUser(USER);
         _userHelper.createUserAndNotify(APP_ADMIN, true);
-        setInitialPassword(APP_ADMIN, PasswordUtil.getPassword());
+        setInitialPassword(APP_ADMIN);
 
         new ApiPermissionsHelper(this).addUserAsAppAdmin(APP_ADMIN);
     }
