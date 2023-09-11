@@ -4013,4 +4013,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitFor(() -> count == loc.findElements(getDriver()).size(), wait);
         assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
     }
+
+    public void clearTooltips()
+    {
+        // hack, but there might be a tooltip in the way that we need to clear by moving the mouse first
+        Locator.XPathLocator headerLoc = Locator.byClass("header-logo");
+        if (isElementPresent(headerLoc))
+            mouseOver(headerLoc);
+    }
 }
