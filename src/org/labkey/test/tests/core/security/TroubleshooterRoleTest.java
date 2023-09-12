@@ -11,12 +11,12 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,6 +39,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, TROUBLESHOOTER);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     private void doSetup()
@@ -46,11 +47,15 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         _userHelper.createUser(TROUBLESHOOTER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER,"Troubleshooter", PermissionsHelper.MemberType.user,"/");
+        _containerHelper.createProject(getProjectName());
     }
 
     @Test
-    public void testAuditLogsIsAccessible() throws IOException
+    public void testAuditLogsIsAccessible() throws Exception
     {
+        // Ensure that there is at least on event to see
+        new IntListDefinition("AuditList", "id").create(createDefaultConnection(), getProjectName());
+
         impersonate(TROUBLESHOOTER);
         ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
 
@@ -60,7 +65,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
 
         log("Verify the export file is non empty");
         ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
-        auditLogPage.selectView("Domain events"); // Pick something that will have some rows.
+        auditLogPage.selectView("Domain events");
         DataRegionTable logTable = auditLogPage.getLogTable();
         assertTrue("Troubleshooter should see audit entries", logTable.getDataRowCount() > 0);
         File exportedFile = logTable.expandExportPanel().exportText();
