@@ -27,6 +27,7 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -645,7 +646,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
         // Wait until grid.getRows().size() gets an updated count.
-        checker().addRecordableErrorType(WebDriverException.class).wrapAssertion(()->
+        checker().addRecordableErrorType(WebDriverException.class);
+        checker().wrapAssertion(()->
                 waitFor(()->grid.getRows().size() > rowCountBefore,
                         "Filter was removed but number of rows in grid did not increase.", 5_000));
 
