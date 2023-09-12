@@ -17,7 +17,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
