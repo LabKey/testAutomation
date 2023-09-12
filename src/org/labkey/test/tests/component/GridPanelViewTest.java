@@ -634,7 +634,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             savedViewsForDefaultSampleType.add(viewName);
         }
 
-        int rowCount = grid.getRows().size();
+        int rowCountBefore = grid.getRows().size();
 
         log("Now that the filters have been save as a view validate filter pills.");
         validateFilterPills(testName, grid, expectedFilterPills);
@@ -644,8 +644,10 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
-        checker().verifyTrue("Filter was removed but number of rows in grid did not increase.",
-                grid.getRows().size() > rowCount);
+        // Wait until grid.getRows().size() gets an updated count.
+        checker().wrapAssertion(()->
+                waitFor(()->grid.getRows().size() > rowCountBefore,
+                        "Filter was removed but number of rows in grid did not increase.", 5_000));
 
         // Use different screenshot name based on view type.
         checker().screenShotIfNewError(viewName.isEmpty() ?
@@ -663,7 +665,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         validateGridHeader(testName, grid, "", false);
 
         checker().verifyEquals("Number of rows after clicking 'Undo' not as expected'.",
-                rowCount, grid.getRows().size());
+                rowCountBefore, grid.getRows().size());
 
         checker().screenShotIfNewError(viewName.isEmpty() ?
                 String.format("%s_Undo_Remove_Filter_Default_Error", testName) :
