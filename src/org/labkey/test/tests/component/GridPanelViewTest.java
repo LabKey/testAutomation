@@ -645,7 +645,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
         // Wait until grid.getRows().size() gets an updated count.
-        checker().wrapAssertion(()->
+        checker().addRecordableErrorType(WebDriverException.class).wrapAssertion(()->
                 waitFor(()->grid.getRows().size() > rowCountBefore,
                         "Filter was removed but number of rows in grid did not increase.", 5_000));
 
