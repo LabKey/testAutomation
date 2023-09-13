@@ -643,6 +643,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Remove the filter '%s' and validate grid is now in '%s' mode.", expectedFilter1Text, EDITED_ALERT));
         grid.removeFilter(expectedFilter1Text);
 
+        // On MSSQL/Windows grid.getRows isn't always updated, pause just a moment to let the test code catch up.
+        sleep(500);
+
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
         // Wait until grid.getRows().size() gets an updated count.
@@ -659,6 +662,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate 'Undo' resets as expected.");
 
         grid.clickUndoButton();
+
+        sleep(500);
 
         log("Validate filter pills go back to expected state.");
         validateFilterPills(testName, grid, expectedFilterPills);
@@ -683,6 +688,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         // To update a filter that has been applied by a view the filter must first be removed, then added back with the changes.
         grid.removeFilter(expectedFilter2Text);
+
+        sleep(500);
 
         filterDialog = grid.getGridBar().openFilterDialog();
         filterDialog.selectField(filterCol2);
