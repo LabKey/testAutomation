@@ -27,6 +27,7 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -634,7 +635,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             savedViewsForDefaultSampleType.add(viewName);
         }
 
-        int rowCount = grid.getRows().size();
+        int rowCountBefore = grid.getRows().size();
 
         log("Now that the filters have been save as a view validate filter pills.");
         validateFilterPills(testName, grid, expectedFilterPills);
@@ -642,10 +643,16 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Remove the filter '%s' and validate grid is now in '%s' mode.", expectedFilter1Text, EDITED_ALERT));
         grid.removeFilter(expectedFilter1Text);
 
+        // On MSSQL/Windows grid.getRows isn't always updated, pause just a moment to let the test code catch up.
+        sleep(500);
+
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
-        checker().verifyTrue("Filter was removed but number of rows in grid did not increase.",
-                grid.getRows().size() > rowCount);
+        // Wait until grid.getRows().size() gets an updated count.
+        checker().addRecordableErrorType(WebDriverException.class);
+        checker().wrapAssertion(()->
+                waitFor(()->grid.getRows().size() > rowCountBefore,
+                        "Filter was removed but number of rows in grid did not increase.", 5_000));
 
         // Use different screenshot name based on view type.
         checker().screenShotIfNewError(viewName.isEmpty() ?
@@ -656,6 +663,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         grid.clickUndoButton();
 
+        sleep(500);
+
         log("Validate filter pills go back to expected state.");
         validateFilterPills(testName, grid, expectedFilterPills);
 
@@ -663,7 +672,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         validateGridHeader(testName, grid, "", false);
 
         checker().verifyEquals("Number of rows after clicking 'Undo' not as expected'.",
-                rowCount, grid.getRows().size());
+                rowCountBefore, grid.getRows().size());
 
         checker().screenShotIfNewError(viewName.isEmpty() ?
                 String.format("%s_Undo_Remove_Filter_Default_Error", testName) :
@@ -679,6 +688,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         // To update a filter that has been applied by a view the filter must first be removed, then added back with the changes.
         grid.removeFilter(expectedFilter2Text);
+
+        sleep(500);
 
         filterDialog = grid.getGridBar().openFilterDialog();
         filterDialog.selectField(filterCol2);
