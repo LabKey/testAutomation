@@ -113,17 +113,6 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Create temporary error collector that waits for assertions to succeed. Assertions will be invoked repeatedly
-     * until they succeed within the specified timeout.
-     *
-     * @return Wrapped error collector. Intended to be used only once.
-     */
-    public DeferredErrorCollector awaiting(Duration timeout)
-    {
-        return new DeferredErrorCollectorWrapper(this).awaiting(timeout);
-    }
-
-    /**
      * Check if any errors have been recorded.
      *
      * @return Return true if an error has been recorded.
@@ -191,7 +180,7 @@ public class DeferredErrorCollector
      * @return <code>true</code> if <code>wrappedAssertion</code> does not throw, <code>false</code> if an error was recorded,
      * otherwise rethrow exception thrown by <code>wrappedAssertion</code>
      */
-    public boolean wrapAssertion(Runnable wrappedAssertion)
+    public final boolean wrapAssertion(Runnable wrappedAssertion)
     {
         try
         {
@@ -219,6 +208,20 @@ public class DeferredErrorCollector
             }
         }
         return false;
+    }
+
+    /**
+     * Record an error if the provided assertion doesn't succeed within the specified timeout.
+     *
+     * @param timeout maximum duration to wait for assertion
+     * @param wrappedAssertion {@link Runnable} that might throw an error that shouldn't fail a test immediately
+     * @return <code>true</code> if the assertion succeeded within the specified timeout
+     */
+    public boolean awaiting(Duration timeout, Runnable wrappedAssertion)
+    {
+        return wrapAssertion(() ->
+                await().atMost(timeout).ignoreExceptionsMatching(this::isErrorDeferrable)
+                        .untilAsserted(wrappedAssertion::run));
     }
 
     /**
@@ -437,7 +440,6 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     private final DeferredErrorCollector wrappedCollector;
 
     private boolean fatal = false;
-    private Duration timeout = null;
     private String screenshotName = null;
 
     protected DeferredErrorCollectorWrapper(DeferredErrorCollector collector)
@@ -457,20 +459,6 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     {
         this.screenshotName = screenshotName;
         return this;
-    }
-
-    @Override
-    public DeferredErrorCollector awaiting(Duration timeout)
-    {
-        this.timeout = timeout;
-        return this;
-    }
-
-    @Override
-    public boolean wrapAssertion(Runnable wrappedAssertion)
-    {
-        return super.wrapAssertion(timeout == null ? wrappedAssertion
-                : () -> await().atMost(timeout).ignoreExceptionsMatching(wrappedCollector::isErrorDeferrable).untilAsserted(wrappedAssertion::run));
     }
 
     @Override
