@@ -435,7 +435,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
                 dialog.setMakeAvailable(false);
         }
 
-        doAndWaitForUpdate(()-> dialog.saveView());
+        dialog.saveView();
     }
 
     /**
