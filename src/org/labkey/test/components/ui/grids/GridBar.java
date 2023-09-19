@@ -432,13 +432,18 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public GridBar clearSearch()
     {
-        if(!elementCache().searchBox.get().isEmpty())
+        if (elementCache().clearSearchButton.isDisplayed())
         {
-            _queryGrid.doAndWaitForUpdate(()->
+            _queryGrid.doAndWaitForUpdate(() ->
             {
-                elementCache().searchBox.set("");
-                elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+                elementCache().clearSearchButton.click();
             });
+        }
+        else if (!elementCache().searchBox.get().isEmpty())
+        {
+            // Sometimes the search box has something in it, but the filter isn't set, so the clear button isn't visible
+            // This happens when we use beginAt to navigate to the page we're already on.
+            elementCache().searchBox.set("");
         }
         return this;
     }
@@ -476,6 +481,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                 Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
 
         protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
+        protected final WebElement clearSearchButton = Locator.byClass("fa-remove").findWhenNeeded(this);
     }
 
     protected static abstract class Locators

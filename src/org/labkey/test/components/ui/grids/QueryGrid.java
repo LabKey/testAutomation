@@ -249,7 +249,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         String currentSearchExp = getGridBar().getSearchExpression();
         if (!currentSearchExp.isBlank())
-            doAndWaitForUpdate(()-> getGridBar().clearSearch());
+            getGridBar().clearSearch();
 
         return this;
     }
