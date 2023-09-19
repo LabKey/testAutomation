@@ -659,7 +659,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             manageViews().revertDefaultView().dismiss();
         }
 
-        selectView("Default");
+        // If the panelHeader is visible then we probably have a non-default view
+        if (elementCache().panelHeader().isDisplayed())
+            selectView("Default");
 
         // If after selecting the 'Default' view there is still a 'Undo' button visible it means the current view is the
         // default view that has been modified but not saved.
