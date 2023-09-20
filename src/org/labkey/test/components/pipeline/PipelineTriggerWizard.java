@@ -252,17 +252,18 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         getWrapper().clickAndWait(elementCache().saveButton);
     }
 
-    public void saveAndExpectError(String error)
+    public PipelineTriggerWizard saveAndExpectError(String error)
     {
         goToConfiguration();
-        elementCache().saveButton.click();
+        doAndWaitForElementToRefresh(() -> elementCache().saveButton.click(), Locator.tagWithClass("div", "alert-danger"), 10);
         assertTrue("Pipeline Trigger Wizard did not produce an error as expected", elementCache().error.getText().contains(error));
+        return this;
     }
 
     public void cancelEditing()
     {
         goToConfiguration();
-        getWrapper().clickAndWait(elementCache().cancelButton);
+        getWrapper().doAndAcceptUnloadAlert(() -> elementCache().cancelButton.click());
     }
 
     @Override
