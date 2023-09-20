@@ -1159,7 +1159,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'resultImage')]"));
         click(Locator.tagWithAttributeContaining("img", "src", "minus.gif"));
         log("Verify comment based output regex substitution syntax");
-        assertElementPresent(Locator.tagWithText("a", "Text output file (click to download)"));
+        assertElementPresent(Locator.tagWithText("a", "do_render.gct"));
         log("Verify comment based input file substitution syntax");
         assertTextPresent("Adam", "Britt", "Dave");
 
