@@ -27,6 +27,7 @@ import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DataClassHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
@@ -221,6 +222,24 @@ public class DataClassTest extends BaseWebDriverTest
         domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
+    }
+
+    @Test // Issue 48705
+    public void testLongFieldNames()
+    {
+        goToProjectHome();
+
+        String name = "Long Field Names Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(name);
+
+        log("Add a field name > 49 characters");
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields("This_field_name_is_longer_than_50_characters_for_testing");
+        createPage.clickSave();
+
+        DataClassHelper sourceHelper = DataClassHelper.beginAtDataClassesList(this, getProjectName());
+        assertEquals("Data class grid should have zero rows", 0, sourceHelper.goToDataClass(name).getDataCount());
     }
 
     private CreateDataClassPage goToCreateNewDataClass()
