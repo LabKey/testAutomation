@@ -89,7 +89,7 @@ public class DataReportsTest extends ReportTest
     private final static String R_SCRIPT1_TEXT1 = "1965-03-06";
     private final static String R_SCRIPT1_TEXT2 = "1980-08-01";
     private final static String R_SCRIPT1_IMG = "resultImage";
-    private final static String R_SCRIPT1_PDF = "PDF output file (click to download)";
+    private final static String R_SCRIPT1_PDF = "study.pdf";
     private final static String R_FILTERED = "999320565";
     private final static String R_SORT = "DEMsex";
     private final static String R_SORT1 = "Male";
