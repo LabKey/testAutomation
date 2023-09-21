@@ -55,7 +55,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void select(String option)
     {
-        waitForLoaded();
+        waitForReady();
         scrollIntoView();
         open();
         clickOption(option);
@@ -64,11 +64,11 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void typeOptionThenSelect(String option)
     {
-        waitForLoaded();
+        waitForReady();
         scrollIntoView();
         open();
         enterValueInTextbox(option);
-        waitForLoaded();
+        waitForReady();
 
         waitFor(()->getOptions().contains(option), String.format("Option '%s' is not in the list of options.", option), 1_000);
 
