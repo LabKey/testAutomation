@@ -24,6 +24,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -252,17 +253,24 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         getWrapper().clickAndWait(elementCache().saveButton);
     }
 
-    public void saveAndExpectError(String error)
+    public PipelineTriggerWizard saveAndExpectError(String error)
     {
         goToConfiguration();
-        elementCache().saveButton.click();
+        doAndWaitForElementToRefresh(() -> elementCache().saveButton.click(), Locator.tagWithClass("div", "alert-danger"), 10);
         assertTrue("Pipeline Trigger Wizard did not produce an error as expected", elementCache().error.getText().contains(error));
+        return this;
     }
 
     public void cancelEditing()
     {
         goToConfiguration();
-        getWrapper().clickAndWait(elementCache().cancelButton);
+        elementCache().cancelButton.click();
+
+        // Depending on browser there may or may not be a dirty page alert
+        Alert alert = getWrapper().getAlertIfPresent();
+        if (alert != null) {
+            alert.accept();
+        }
     }
 
     @Override
