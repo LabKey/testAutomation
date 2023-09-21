@@ -13,6 +13,8 @@ import org.labkey.remoteapi.issues.IssueResponseModel;
 import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.categories.Issues;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
@@ -31,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
-@Category({})
+@Category({Issues.class, Daily.class})
 public class IssueAPITest extends BaseWebDriverTest
 {
     IssuesHelper _issuesHelper = new IssuesHelper(this);
