@@ -75,6 +75,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -701,6 +702,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 };
             }
 
+            private void clearLocalStorage()
+            {
+                // Clears browser localStorage. Needed in order to reset some state such as grid filters/sorts/etc.
+                // which are sticky, but can interfere with what tests expect.
+                WebDriver driver = getDriver();
+
+                if (driver instanceof WebStorage webStorage)
+                {
+                    webStorage.getLocalStorage().clear();
+                }
+            }
+
             @Override
             protected void starting(Description description)
             {
@@ -712,6 +725,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 setUp(); // Instantiate new WebDriver if needed
                 ensureSignedInAsPrimaryTestUser();
+                clearLocalStorage();
+
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
