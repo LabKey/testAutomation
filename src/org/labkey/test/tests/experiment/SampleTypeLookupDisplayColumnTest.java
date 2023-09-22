@@ -7,6 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-@Category({})
+@Category({Daily.class})
 public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
 {
     private final String TEST_LOOKUP_SAMPLETYPE = "lookupsampletype";

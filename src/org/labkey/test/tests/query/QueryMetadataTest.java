@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.query.EditMetadataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -16,11 +17,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@Category({})
+@Category({Daily.class})
 public class QueryMetadataTest extends BaseWebDriverTest
 {
     static public String TEST_LIST = "queryMetadataTestList";
     static public String TEST_SAMPLES = "queryMetadataSamples";
+    static public String TEST_ASSAY = "queryMetadataAssay";
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -50,8 +52,8 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 .create(createDefaultConnection(), getProjectName())
                 .withGeneratedRows(10);
         samplesDgen.insertRows();
-        // create a list
 
+        // create a list
         List<FieldDefinition> listColumns = Arrays.asList(
                 new FieldDefinition("name", FieldDefinition.ColumnType.String),
                 new FieldDefinition("value", FieldDefinition.ColumnType.Integer),
@@ -61,6 +63,10 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 new FieldDefinition("selfLookup", new FieldDefinition.IntLookup(getProjectName(),"lists", TEST_LIST)));
         var dgen = new IntListDefinition(TEST_LIST, "Key").setFields(listColumns)
                 .create(createDefaultConnection(), getProjectName());
+
+        // create a standard assay design
+        goToManageAssays();
+        _assayHelper.createAssayDesignWithDefaults("General", TEST_ASSAY);
     }
 
     @Before
@@ -113,6 +119,8 @@ public class QueryMetadataTest extends BaseWebDriverTest
         checker().withScreenshot("xml_mismatch")
                 .verifyEquals("expect xml to show only the delta for value description",
                 expectedXml, queryPage.getMetadataXml());
+
+        verifyMetadataXMLAfterResave("lists", TEST_LIST, expectedXml);
     }
 
     @Test
@@ -138,6 +146,8 @@ public class QueryMetadataTest extends BaseWebDriverTest
         checker().withScreenshot("xml_mismatch")
                 .verifyEquals("expect xml to show only the delta for value description",
                 expectedXml, queryPage.getMetadataXml());
+
+        verifyMetadataXMLAfterResave("lists", TEST_LIST, expectedXml);
     }
 
     /*
@@ -210,7 +220,6 @@ public class QueryMetadataTest extends BaseWebDriverTest
         editPage.clickSave();
 
         var queryXmlPage = editPage.clickEditSource();
-        var actualXml = queryXmlPage.getMetadataXml();
         String expectedColumnPart = "<table tableName=\"queryMetadataTestList\" tableDbType=\"NOT_IN_DB\">\n" +
                 "    <columns>\n" +
                 "      <column columnName=\"Created\">\n" +
@@ -218,9 +227,63 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 "      </column>\n" +
                 "    </columns>\n" +
                 "  </table>";
-        assertThat(actualXml)
+        assertThat(queryXmlPage.getMetadataXml())
                 .as("expect only the field edited in this test to appear in the query xml")
                 .contains(expectedColumnPart);
+
+        verifyMetadataXMLAfterResave("lists", TEST_LIST, expectedColumnPart);
+    }
+
+    /*
+        Regression coverage for Issue 48598
+     */
+    @Test
+    public void testAssayQueryMetadata()
+    {
+        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
+        editPage.fieldsPanel().getField("Created")
+                .setDateFormat("Date");
+        editPage.aliasField("Row Id");
+        editPage.clickSave();
+
+        var queryXmlPage = editPage.clickEditSource();
+        String expectedXml = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+                "  <table tableName=\"Data\" tableDbType=\"NOT_IN_DB\">\n" +
+                "    <columns>\n" +
+                "      <column columnName=\"Created\">\n" +
+                "        <formatString>Date</formatString>\n" +
+                "      </column>\n" +
+                "      <column columnName=\"WrappedRowId\" wrappedColumnName=\"RowId\">\n" +
+                "        <isHidden>true</isHidden>\n" +
+                "        <shownInInsertView>false</shownInInsertView>\n" +
+                "        <shownInUpdateView>false</shownInUpdateView>\n" +
+                "        <measure>false</measure>\n" +
+                "        <columnTitle>WrappedRowId</columnTitle>\n" +
+                "        <fk>\n" +
+                "          <fkDbSchema>assay.General.queryMetadataAssay</fkDbSchema>\n" +
+                "          <fkTable>Data</fkTable>\n" +
+                "          <fkColumnName>RowId</fkColumnName>\n" +
+                "        </fk>\n" +
+                "      </column>\n" +
+                "    </columns>\n" +
+                "  </table>\n" +
+                "</tables>";
+        assertThat(queryXmlPage.getMetadataXml())
+                .as("expect field edited and wrapped aliasto appear in the query xml")
+                .contains(expectedXml);
+
+        verifyMetadataXMLAfterResave("assay.General." + TEST_ASSAY, "Data", expectedXml);
+    }
+
+    private void verifyMetadataXMLAfterResave(String schemaName, String queryName, String expectedColumnXml)
+    {
+        // Issue 48598: verify that previous updates aren't removed on re-save
+        var queryXmlPage = EditMetadataPage.beginAt(this, getProjectName(), schemaName, queryName)
+                .clickSave()
+                .clickEditSource();
+        assertThat(queryXmlPage.getMetadataXml())
+                .as("metadata overrides should not be cleared on second save")
+                .contains(expectedColumnXml);
     }
 
     @Override
