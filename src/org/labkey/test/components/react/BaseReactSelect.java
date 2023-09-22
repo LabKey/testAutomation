@@ -36,8 +36,8 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     private static final String LOADING_TEXT = "loading...";
     protected static final String SELECTOR_CLASS = "select-input-container";
 
-    protected int READY_TIMEOUT = WAIT_FOR_JAVASCRIPT;
-    protected int OPEN_TIMEOUT = 4_000;
+    protected int _readyTimeout = WAIT_FOR_JAVASCRIPT;
+    protected int _openTimeout = 4_000;
 
 
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
@@ -57,7 +57,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      */
     public T setReadyTimeout(int msec)
     {
-        READY_TIMEOUT = msec;
+        _readyTimeout = msec;
         return getThis();
     }
 
@@ -70,7 +70,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      */
     public T setOpenTimeout(int msec)
     {
-        OPEN_TIMEOUT = msec;
+        _openTimeout = msec;
         return getThis();
     }
 
@@ -197,7 +197,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     protected void waitForReady()
     {
         waitFor(() -> getComponentElement().isDisplayed() && !isLoading(),
-                "Took too long to become ready", READY_TIMEOUT);
+                "Took too long to become ready", _readyTimeout);
     }
 
     protected T waitForInteractive()
@@ -241,7 +241,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             getWrapper().fireEvent(elementCache().arrow, WebDriverWrapper.SeleniumEvent.click);
         }
 
-        waitFor(this::isExpanded, "Select didn't expand.", OPEN_TIMEOUT);
+        waitFor(this::isExpanded, "Select didn't expand.", _openTimeout);
         getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
         return getThis();
     }
