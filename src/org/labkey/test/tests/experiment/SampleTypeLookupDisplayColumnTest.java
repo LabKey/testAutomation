@@ -64,13 +64,12 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
         // create a sampleType with a lookup column to the issue tracker
         List<FieldDefinition> testColumns = Arrays.asList(
                 new FieldDefinition("comment", FieldDefinition.ColumnType.String),
-                new FieldDefinition("amount", FieldDefinition.ColumnType.Decimal),
                 new FieldDefinition("ingredient", new FieldDefinition.LookupInfo(init.getProjectName(), "lists", init.TEST_INGREDIENT_LIST)
                         .setTableType(FieldDefinition.ColumnType.Integer)));
         SampleTypeDefinition sampleTypeDef = new SampleTypeDefinition(init.TEST_LOOKUP_SAMPLETYPE)
                 .setFields(testColumns)
                 .setNameExpression("S-${genId}");
-        var dataGenerator = SampleTypeAPIHelper.createEmptySampleType(init.getProjectName(), sampleTypeDef);
+        SampleTypeAPIHelper.createEmptySampleType(init.getProjectName(), sampleTypeDef);
 
         new PortalHelper(init.getDriver()).addBodyWebPart("Sample Types");
     }
@@ -136,7 +135,7 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
         if (name != null)   // for update, name field is disabled
             insertPage.setField("Name", name);
         insertPage.setField("comment", comment);
-        insertPage.setField("amount", amount);
+        insertPage.setField("StoredAmount", amount);
         insertPage.setField("ingredient", ingredient);
         insertPage.submit();
     }
