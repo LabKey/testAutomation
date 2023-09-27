@@ -507,7 +507,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
         if (!containerPath.equals(initialValue))
         {
-            getWrapper().scrollIntoView(elementCache().lookupContainerSelect.getWrappedElement());
+            getWrapper().scrollIntoView(elementCache().lookupContainerSelect.getWrappedElement(), true);
             elementCache().lookupContainerSelect.selectByValue(containerPath);
             getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
@@ -530,7 +530,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
         if (!schemaName.equals(initialValue))
         {
-            getWrapper().scrollIntoView(elementCache().getLookupSchemaSelect().getWrappedElement());
+            getWrapper().scrollIntoView(elementCache().getLookupSchemaSelect().getWrappedElement(), true);
             elementCache().getLookupSchemaSelect().selectByVisibleText(schemaName);
             getWrapper().shortWait().withMessage("Query select didn't update after selecting lookup schema")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
@@ -684,7 +684,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setTextChoiceValues(List<String> values)
     {
         WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
-        getWrapper().scrollIntoView(button);
+        getWrapper().scrollIntoView(button, true);
         button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
