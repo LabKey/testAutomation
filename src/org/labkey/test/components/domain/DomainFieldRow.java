@@ -1102,6 +1102,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setSampleType(String sampleTypeName)
     {
         expand();
+        getWrapper().scrollIntoView(elementCache().getLookupSampleTypeSelect().getWrappedElement(), true);
         elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
         return this;
     }
