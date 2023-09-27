@@ -1107,7 +1107,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setAliquotOption(ExpSchema.DerivationDataScopeType option)
     {
         expand();
-        elementCache().aliquotOption(option).check();
+        RadioButton button = elementCache().aliquotOption(option);
+        getWrapper().scrollIntoView(button.getComponentElement(), true);
+        button.check();
         return this;
     }
 
