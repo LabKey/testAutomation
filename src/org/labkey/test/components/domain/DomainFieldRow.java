@@ -755,7 +755,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow selectTextChoiceValue(String value)
     {
-        Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this).click();
+        WebElement element = Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this);
+        getWrapper().scrollIntoView(element, true);
+        element.click();
         return this;
     }
 
