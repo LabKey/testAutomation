@@ -59,6 +59,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
     {
         if (isExpanded() != expand)
         {
+            getWrapper().scrollIntoView(elementCache().expandToggle);
             elementCache().expandToggle.click();
             getWrapper().shortWait()
                     .until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
