@@ -243,7 +243,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            getWrapper().scrollIntoView(elementCache().collapseToggle);
             elementCache().collapseToggle.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
             WebDriverWrapper.waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
@@ -684,7 +683,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setTextChoiceValues(List<String> values)
     {
         WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
-        getWrapper().scrollIntoView(button, true);
         button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
@@ -756,7 +754,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow selectTextChoiceValue(String value)
     {
         WebElement element = Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this);
-        getWrapper().scrollIntoView(element, true);
         element.click();
         return this;
     }
@@ -1111,7 +1108,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         RadioButton button = elementCache().aliquotOption(option);
-        getWrapper().scrollIntoView(button.getComponentElement(), true);
         button.check();
         return this;
     }
