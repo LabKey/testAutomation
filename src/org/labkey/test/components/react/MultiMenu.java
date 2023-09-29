@@ -22,9 +22,17 @@ import java.util.Optional;
 
 public class MultiMenu extends BootstrapMenu
 {
+    private int _menuWaitTmeout = 500;
+
     protected MultiMenu(WebElement element, WebDriver driver)
     {
         super(driver, element);
+    }
+
+    public MultiMenu setMenuWait(int menuWait)
+    {
+        _menuWaitTmeout = menuWait;
+        return this;
     }
 
     private WebElement getMenuList()
@@ -35,7 +43,7 @@ public class MultiMenu extends BootstrapMenu
     public WebElement getMenuItem(String text)
     {
         return Locator.tag("li").withChild(Locator.tagWithAttribute("a", "role", "menuitem")
-                .withText(text)).findElement(getMenuList());
+                    .withText(text)).waitForElement(getMenuList(), _menuWaitTmeout);
     }
 
     public boolean isMenuItemDisabled(String text)
