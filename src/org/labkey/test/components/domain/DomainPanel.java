@@ -100,7 +100,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         public ElementCache()
         {
             // Add a little speed bump to prevent form initialization from clearing out entered values
-            WebDriverWrapper.sleep(250);
+            WebDriverWrapper.sleep(500);
         }
 
         protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn, .domain-form-collapse-btn")
