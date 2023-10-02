@@ -204,8 +204,17 @@ public class ReclickingWebElement extends WebElementDecorator
         }
         catch (WebDriverException ignore) {}
 
-        boolean blockedByFloatingHeader = new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
-        if (!blockedByFloatingHeader)
+        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
+        // Check that we're not blocked by sticky form buttons
+        boolean blockResolved = scrollUtil.scrollUnderStickyFormButtons(el);
+
+        if (!blockResolved)
+        {
+            // Then check that we're not blocked by a floating header
+            blockResolved = new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
+        }
+
+        if (!blockResolved)
         {
             Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
             if (interceptingElLoc != null)

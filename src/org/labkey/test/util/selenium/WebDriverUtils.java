@@ -29,6 +29,7 @@ import org.openqa.selenium.WrapsElement;
 import org.openqa.selenium.interactions.Locatable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class WebDriverUtils
@@ -68,11 +69,36 @@ public abstract class WebDriverUtils
             _webDriver = webDriver;
         }
 
+        public boolean scrollUnderStickyFormButtons(WebElement blockedElement)
+        {
+            Optional<WebElement> formButtons = Locator.css(".form-buttons").findOptionalElement(_webDriver);
+
+            if (formButtons.isPresent())
+            {
+                int elY = blockedElement.getLocation().getY();
+                int height = blockedElement.getSize().getHeight();
+                int bottom = elY + height;
+                int formButtonsY = formButtons.get().getLocation().getY();
+
+                // If the bottom of our element is past the top of the FormButtons element, then it's at least partially
+                // obscured, so we should scroll the element into view.
+                if (bottom > formButtonsY)
+                {
+                    TestLogger.debug("Scrolled under sticky form buttons");
+                    scrollIntoView(blockedElement);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public boolean scrollUnderFloatingHeader(WebElement blockedElement)
         {
             List<WebElement> floatingHeaders = Locator.findElements(_webDriver,
                 Locators.floatingHeaderContainer(),
                 Locators.appFloatingHeader(),
+                Locators.domainDesignerFloatingHeader(),
                 DataRegionTable.Locators.floatingHeader().notHidden());
 
             int headerHeight = 0;

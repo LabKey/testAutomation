@@ -96,7 +96,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn, .domain-form-collapse-btn")
+        protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         protected final WebElement headerStatusIcon = Locator.css(".domain-panel-status-icon > svg").findWhenNeeded(this);
         protected final WebElement panelTitle = panelTitleLocator.findWhenNeeded(this);
