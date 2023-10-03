@@ -178,12 +178,12 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
 
     protected class ElementCache extends EntityTypeDesigner<T>.ElementCache
     {
-        protected final WebElement uniqueIdAlert = Locator.tagWithClassContaining("div","uniqueid-alert").refindWhenNeeded(propertiesPanel);
+        protected final WebElement uniqueIdAlert = Locator.tagWithClassContaining("div","uniqueid-alert").refindWhenNeeded(getDriver());
         protected final WebElement uniqueIdAlertAddButton = Locator.tagWithClassContaining("div","uniqueid-alert")
-                .append(Locator.tag("button")).refindWhenNeeded(propertiesPanel);
-        protected final WebElement uniqueIdMsg = Locator.tagWithClass("div","uniqueid-msg").refindWhenNeeded(propertiesPanel);
+                .append(Locator.tag("button")).refindWhenNeeded(getDriver());
+        protected final WebElement uniqueIdMsg = Locator.tagWithClass("div","uniqueid-msg").refindWhenNeeded(getDriver());
         protected final WebElement uniqueIdMsgCheckIcon = Locator.tagWithClass("div","uniqueid-msg")
-                .append(Locator.tagWithClassContaining("i", "domain-panel-status-icon-green")).refindWhenNeeded(propertiesPanel);
+                .append(Locator.tagWithClassContaining("i", "domain-panel-status-icon-green")).refindWhenNeeded(getDriver());
 
         protected final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(propertiesPanel);
 
