@@ -174,7 +174,7 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
     {
         _clickReportTab();
         // Handle occasional problem where Firefox terminates requests with an HTTP status of 0
-        if (false && Locators.labkeyError.containing("Status:  (0)").existsIn(getDriver()))
+        if (Locators.labkeyError.containing("Status:  (0)").existsIn(getDriver()))
         {
             clickSourceTab();
             String oldValue = getEditor().getCodeMirrorValue();
