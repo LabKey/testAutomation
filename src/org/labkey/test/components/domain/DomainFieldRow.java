@@ -243,7 +243,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         if (isExpanded())
         {
-            getWrapper().scrollIntoView(elementCache().collapseToggle);
             elementCache().collapseToggle.click();
             getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
             WebDriverWrapper.waitFor(() -> elementCache().expandToggleLoc.existsIn(this),
@@ -507,6 +506,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
         if (!containerPath.equals(initialValue))
         {
+            getWrapper().scrollIntoView(elementCache().lookupContainerSelect.getWrappedElement(), true);
             elementCache().lookupContainerSelect.selectByValue(containerPath);
             getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
@@ -529,6 +529,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
         if (!schemaName.equals(initialValue))
         {
+            getWrapper().scrollIntoView(elementCache().getLookupSchemaSelect().getWrappedElement(), true);
             elementCache().getLookupSchemaSelect().selectByVisibleText(schemaName);
             getWrapper().shortWait().withMessage("Query select didn't update after selecting lookup schema")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
@@ -681,7 +682,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setTextChoiceValues(List<String> values)
     {
-        Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this).click();
+        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
         addValuesDialog.addValues(values);
@@ -751,7 +753,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow selectTextChoiceValue(String value)
     {
-        Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this).click();
+        WebElement element = Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this);
+        element.click();
         return this;
     }
 
@@ -1096,6 +1099,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setSampleType(String sampleTypeName)
     {
         expand();
+        getWrapper().scrollIntoView(elementCache().getLookupSampleTypeSelect().getWrappedElement(), true);
         elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
         return this;
     }
@@ -1103,7 +1107,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setAliquotOption(ExpSchema.DerivationDataScopeType option)
     {
         expand();
-        elementCache().aliquotOption(option).check();
+        RadioButton button = elementCache().aliquotOption(option);
+        button.check();
         return this;
     }
 

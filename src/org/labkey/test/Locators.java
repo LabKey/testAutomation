@@ -44,6 +44,11 @@ public abstract class Locators
         return Locator.tag("div").withClass("app-navigation");
     }
 
+    public static Locator.XPathLocator domainDesignerFloatingHeader()
+    {
+        return Locator.byClass("domain-floating-hdr");
+    }
+
     public static Locator.XPathLocator bodyPanel()
     {
         return Locator.tagWithClass("div", "lk-body-ct");
