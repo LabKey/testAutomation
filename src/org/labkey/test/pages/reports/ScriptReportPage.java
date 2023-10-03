@@ -6,18 +6,18 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -174,8 +174,10 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
     {
         _clickReportTab();
         // Handle occasional problem where Firefox terminates requests with an HTTP status of 0
-        if (Locators.labkeyError.containing("Status:  (0)").existsIn(getDriver()))
+        Optional<WebElement> errorEl = Locators.labkeyError.containing("Failed to retrieve report results").findOptionalElement(getDriver());
+        if (errorEl.isPresent())
         {
+            TestLogger.warn(errorEl.get().getText());
             clickSourceTab();
             String oldValue = getEditor().getCodeMirrorValue();
             getEditor().setCodeMirrorValue(oldValue + " "); // Force report to run again
