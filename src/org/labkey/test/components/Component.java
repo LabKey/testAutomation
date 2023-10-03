@@ -45,13 +45,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     @Override
     public WebElement findElement(By by)
     {
-        return getComponentElement().findElement(by);
+        return elementCache().findElement(by);
     }
 
     @Override
     public List<WebElement> findElements(By by)
     {
-        return getComponentElement().findElements(by);
+        return elementCache().findElements(by);
     }
 
     private EC _elementCache;
