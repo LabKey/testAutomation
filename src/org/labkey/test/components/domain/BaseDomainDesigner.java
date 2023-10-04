@@ -83,18 +83,8 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        protected final WebElement buttonPanel = buttonPanelLocator().findWhenNeeded(this);
+        protected final WebElement buttonPanel = Locator.byClass("form-buttons").findWhenNeeded(this);
         public final WebElement cancelButton = Locator.byClass("cancel-button").findWhenNeeded(buttonPanel);
-        public final WebElement saveButton = saveButtonLocator().findWhenNeeded(buttonPanel);
-
-        protected Locator.XPathLocator saveButtonLocator()
-        {
-            return Locator.byClass("save-button");
-        }
-
-        protected Locator.XPathLocator buttonPanelLocator()
-        {
-            return Locator.byClass("form-buttons");
-        }
+        public final WebElement saveButton = Locator.byClass("save-button").findWhenNeeded(buttonPanel);
     }
 }
