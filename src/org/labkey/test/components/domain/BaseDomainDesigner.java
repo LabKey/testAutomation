@@ -85,7 +85,12 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
     {
         protected final WebElement buttonPanel = buttonPanelLocator().findWhenNeeded(this);
         public final WebElement cancelButton = Locator.byClass("cancel-button").findWhenNeeded(buttonPanel);
-        public final WebElement saveButton = Locator.byClass("save-button").findWhenNeeded(buttonPanel);
+        public final WebElement saveButton = saveButtonLocator().findWhenNeeded(buttonPanel);
+
+        protected Locator.XPathLocator saveButtonLocator()
+        {
+            return Locator.byClass("save-button");
+        }
 
         protected Locator.XPathLocator buttonPanelLocator()
         {

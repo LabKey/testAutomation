@@ -76,6 +76,12 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
         }
 
         @Override
+        protected Locator.XPathLocator saveButtonLocator()
+        {
+            return Locator.byClass("btn-primary");
+        }
+
+        @Override
         protected Locator.XPathLocator buttonPanelLocator()
         {
             return Locator.byClass("query-metadata-editor-buttons");
