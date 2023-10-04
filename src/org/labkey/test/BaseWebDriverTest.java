@@ -869,6 +869,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             try
             {
+                dumpConsoleLogs();
+            }
+            catch (WebDriverException e)
+            {
+                log("Unable to dump console log");
+                TestLogger.error(e.getMessage(), e);
+            }
+            try
+            {
                 if (isTestRunningOnTeamCity())
                 {
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
@@ -1068,6 +1077,37 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         }
         return null;
+    }
+
+    private void dumpConsoleLogs()
+    {
+        List<?> logEntries = executeScript("return console.everything;", List.class);
+        if (logEntries != null)
+        {
+            if (logEntries.isEmpty())
+            {
+                log("No JavaScript console logs to dump");
+            }
+            else
+            {
+                StringBuilder logStr = new StringBuilder();
+                logStr.append("Dumping JavaScript console log\n");
+                for (Object logEntry : logEntries)
+                {
+                    Map entry = (Map) logEntry;
+
+                    logStr.append("    console.")
+                            .append(StringUtils.rightPad((String) entry.get("type"), 6))
+                            .append(entry.get("datetime")).append("  ")
+                            .append(entry.get("value")).append("\n");
+                }
+                log(logStr.toString());
+            }
+        }
+        else
+        {
+            log("Unable to dump JavaScript console");
+        }
     }
 
     protected void disablePageUnloadEvents()

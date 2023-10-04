@@ -4,11 +4,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainDesigner;
-import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.react.FilteringReactSelect;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.study.AdvancedDatasetSettingsDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
@@ -266,7 +266,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
         return new ElementCache();
     }
 
-    protected class ElementCache extends DomainDesigner.ElementCache
+    protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
         public WebElement advancedSettingsButton = Locator.tagWithText("button", "Advanced Settings")
                 .findWhenNeeded(propertiesPanel);

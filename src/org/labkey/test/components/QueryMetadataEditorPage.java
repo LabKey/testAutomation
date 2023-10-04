@@ -58,7 +58,7 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
         return new QueryMetadataEditorPage.ElementCache();
     }
 
-    public class ElementCache extends DomainDesigner.ElementCache
+    public class ElementCache extends DomainDesigner<?>.ElementCache
     {
         private final WebElement resetButton = Locator.button("Reset To Default")
                 .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
