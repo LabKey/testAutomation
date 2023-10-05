@@ -2,7 +2,7 @@ package org.labkey.test.components;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.domain.DomainDesigner;
+import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.query.AliasFieldDialog;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,11 +12,32 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 /**
  * Automates the platform component defined in: query/src/client/QueryMetadataEditor/QueryMetadataEditor.tsx
  */
-public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorPage.ElementCache>
+public class QueryMetadataEditorPage extends WebDriverComponent<QueryMetadataEditorPage.ElementCache>
 {
+    private final WebElement el;
+    private final WebDriver driver;
+
     public QueryMetadataEditorPage(WebDriver driver)
     {
-        super(driver);
+        this.driver = driver;
+        el = Locator.id("app").findElement(this.driver); // Full page component
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return el;
+    }
+
+    @Override
+    public WebDriver getDriver()
+    {
+        return driver;
+    }
+
+    public DomainFormPanel getFieldsPanel()
+    {
+        return elementCache().fieldsPanel.expand();
     }
 
     public void resetToDefault()
@@ -42,7 +63,6 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
         return new AliasFieldDialog(this);
     }
 
-    @Override
     public QueryMetadataEditorPage clickSave()
     {
         elementCache().saveButton.click();
@@ -53,13 +73,18 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
     }
 
     @Override
-    protected QueryMetadataEditorPage.ElementCache newElementCache()
+    protected ElementCache newElementCache()
     {
-        return new QueryMetadataEditorPage.ElementCache();
+        return new ElementCache();
     }
 
-    public class ElementCache extends DomainDesigner.ElementCache
+    public class ElementCache extends Component<?>.ElementCache
     {
+        protected final DomainFormPanel fieldsPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())
+                .timeout(1000).findWhenNeeded();
+
+        protected final WebElement buttonPanel = Locator.byClass("query-metadata-editor-buttons").findWhenNeeded(this);
+
         private final WebElement resetButton = Locator.button("Reset To Default")
                 .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
         private final WebElement aliasFieldButton = Locator.button("Alias Field")
@@ -68,17 +93,8 @@ public class QueryMetadataEditorPage extends DomainDesigner<QueryMetadataEditorP
                 .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
         private final WebElement editSourceButton = Locator.button("Edit Source")
                 .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
+        public final WebElement saveButton = Locator.byClass("save-button")
+                .findWhenNeeded(buttonPanel).withTimeout(WAIT_FOR_JAVASCRIPT);
 
-        @Override
-        protected int getFieldPanelIndex()
-        {
-            return 0;
-        }
-
-        @Override
-        protected Locator.XPathLocator buttonPanelLocator()
-        {
-            return Locator.byClass("query-metadata-editor-buttons");
-        }
     }
 }
