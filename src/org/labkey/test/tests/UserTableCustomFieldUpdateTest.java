@@ -33,7 +33,7 @@ public class UserTableCustomFieldUpdateTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return getClass().getSimpleName() + " Project";
+        return null;
     }
 
     @Override
