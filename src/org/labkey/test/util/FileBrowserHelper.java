@@ -389,6 +389,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             setFormElement(Locator.name("Flag/Comment"), description);
             propWindow.clickButton("Save", true);
             _ext4Helper.waitForMaskToDisappear();
+            Locators.gridRow(fileName).childTag("td").withText(description).waitForElement(getDriver(), 5_000);
         });
     }
 
