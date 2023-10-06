@@ -270,6 +270,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         if (hasSelection())
         {
             var clear = Locators.clear.waitForElement(getComponentElement(), 1_500);
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(clear));
             clear.click();
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(clear));
         }
