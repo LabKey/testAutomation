@@ -157,7 +157,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         WebElement sortMenuLink = Locator.tagWithClass("a", "x4-menu-item-link")
                 .withDescendant(Locator.tagWithClass("span", "x4-menu-item-text").withText(sortText))
                 .waitForElement(getDriver(), 1500);
-        doAndWaitForFileListRefresh(()-> sortMenuLink.click());
+        doAndWaitForFileListRefresh(sortMenuLink::click);
 
         assertThat("Did not get expected sort for column ["+columnText+"]",
                 getSortDirection(headerLoc), is(sortDirection));
@@ -294,24 +294,28 @@ public class FileBrowserHelper extends WebDriverWrapper
     public void renameFile(String currentName, String newName)
     {
         selectFileBrowserItem(currentName);
-        clickFileBrowserButton(BrowserAction.RENAME);
-        Window renameWindow = Window(getDriver()).withTitle("Rename").waitFor();
-        setFormElement(Locator.name("renameText-inputEl").findElement(renameWindow), newName);
-        renameWindow.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.RENAME);
+            Window renameWindow = Window(getDriver()).withTitle("Rename").waitFor();
+            setFormElement(Locator.name("renameText-inputEl").findElement(renameWindow), newName);
+            renameWindow.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
         waitForElement(fileGridCell.withText(newName));
     }
 
     public void moveFile(String fileName, String destinationPath)
     {
         selectFileBrowserItem(fileName);
-        clickFileBrowserButton(BrowserAction.MOVE);
-        Window moveWindow = Window(getDriver()).withTitle("Choose Destination").waitFor();
-        //NOTE:  this doesn't yet support nested folders
-        WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
-        shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
-        sleep(500);
-        folder.click();
-        moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.MOVE);
+            Window moveWindow = Window(getDriver()).withTitle("Choose Destination").waitFor();
+            //NOTE:  this doesn't yet support nested folders
+            WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
+            shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
+            sleep(500);
+            folder.click();
+            moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
 
         waitForElementToDisappear(fileGridCell.withText(fileName));
     }
@@ -319,9 +323,11 @@ public class FileBrowserHelper extends WebDriverWrapper
     public void deleteFile(String fileName)
     {
         selectFileBrowserItem(fileName);
-        clickFileBrowserButton(BrowserAction.DELETE);
-        Window(getDriver()).withTitle("Delete Files").waitFor()
-                .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.DELETE);
+            Window(getDriver()).withTitle("Delete Files").waitFor()
+                    .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
         waitForElementToDisappear(fileGridCell.withText(fileName));
     }
 
@@ -368,18 +374,23 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public void createFolder(String folderName)
     {
-        clickFileBrowserButton(BrowserAction.NEW_FOLDER);
-        setFormElement(Locator.name("folderName"), folderName);
-        clickButton("Submit", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.NEW_FOLDER);
+            setFormElement(Locator.name("folderName"), folderName);
+            clickButton("Submit", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
         waitForElement(fileGridCell.withText(folderName));
     }
 
     public void setDescription(String fileName, String description)
     {
-        Window propWindow = editProperty(fileName);
-        setFormElement(Locator.name("Flag/Comment"), description);
-        propWindow.clickButton("Save", true);
-        _ext4Helper.waitForMaskToDisappear();
+        doAndWaitForFileListRefresh(() -> {
+            Window propWindow = editProperty(fileName);
+            setFormElement(Locator.name("Flag/Comment"), description);
+            propWindow.clickButton("Save", true);
+            _ext4Helper.waitForMaskToDisappear();
+            Locators.gridRow(fileName).childTag("td").withText(description).waitForElement(getDriver(), 5_000);
+        });
     }
 
     public String getFileDescription(String fileName)
@@ -569,16 +580,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         assertEquals("Description didn't clear after upload", "", getFormElement(Locator.name("description")));
     }
 
-    /**
-     *
-     * @param file
-     */
-    @Override
-    @LogMethod
-    public void dragAndDropFileInDropZone(@LoggedParam File file)
+    private void dragAndDropFileInDropZone(File file)
     {
-        waitForFileGridReady();
-
         //Offsets for the drop zone
         int offsetX = 0;
         int offsetY = 0;
@@ -690,10 +693,10 @@ public class FileBrowserHelper extends WebDriverWrapper
         ADMIN("cog", "Admin", "customize"),
         CREATE_RUN("sitemap", "Create Run", "createRun");
 
-        private String _iconName;
-        private String _buttonText;
-        private String _extId; // from Browser.js
-        private boolean _triggersPageLoad;
+        private final String _iconName;
+        private final String _buttonText;
+        private final String _extId; // from Browser.js
+        private final boolean _triggersPageLoad;
 
         BrowserAction(String iconName, String buttonText, String extId, boolean triggersPageLoad)
         {
