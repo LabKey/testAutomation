@@ -20,9 +20,7 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -33,10 +31,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.PermissionsEditor;
-import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
-import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.pages.user.ShowUsersPage;
-import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -48,9 +43,9 @@ import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.UIUserHelper;
+import org.labkey.test.util.core.login.DbLoginUtils;
 import org.openqa.selenium.WebElement;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,10 +53,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -83,8 +76,6 @@ public class SecurityTest extends BaseWebDriverTest
     private static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
     private static final String ADDED_USER = "fromprojectusers@security.test";
-    private static final String STRENGTH_USER = "password_strength@security.test";
-    protected static final String STRONG_PASSWORD = "We'reSo$tr0ng@yekbal1!";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
@@ -123,12 +114,12 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER, STRENGTH_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER);
 
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
-        DatabaseAuthConfigureDialog.resetDbLoginConfig(cn);
+        DbLoginUtils.resetDbLoginConfig(cn);
     }
 
     @Test
@@ -140,7 +131,6 @@ public class SecurityTest extends BaseWebDriverTest
         }
 
         clonePermissionsTest();
-        displayNameTest();
         tokenAuthenticationTest();
         if (!isQuickTest())
         {
@@ -163,13 +153,10 @@ public class SecurityTest extends BaseWebDriverTest
         if (!isQuickTest())
         {
             cantReachAdminToolFromUserAccount();
-            passwordStrengthTest();
             dumbsterTest();
             loginSelfRegistrationEnabledTest();
             loginSelfRegistrationDisabledTest();
         }
-        passwordResetTest();
-        passwordParameterTest();
     }
 
     /**
@@ -240,65 +227,6 @@ public class SecurityTest extends BaseWebDriverTest
         }
     }
 
-    /**
-     *
-     * preconditions:  NORMAL_USER exists with password NORMAL_USER_PASSWORD.  Currently logged in as admin
-     * post conditions
-     */
-    @LogMethod
-    public void passwordResetTest()
-    {
-        LoginConfigurePage.beginAt(this)
-                .getPrimaryConfigurationRow("Standard database authentication")
-                .clickEdit(new DatabaseAuthenticationProvider())
-                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Weak,
-                        DatabaseAuthConfigureDialog.PasswordExpiration.Never);
-
-        //get user a password
-        String username = NORMAL_USER;
-        String password = STRONG_PASSWORD;
-
-        password = adminPasswordResetTest(username, password+"adminReset");
-        
-        String resetUrl = userForgotPasswordWorkflowTest(username, password);
-        
-        userPasswordResetTest(resetUrl);
-
-        ensureSignedInAsPrimaryTestUser();
-    }
-
-    @LogMethod
-    public void passwordParameterTest()
-    {
-        // 31000: fail login actions if parameters present on URL
-        SimplePostCommand command = new SimplePostCommand("login", "loginAPI");
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("email", NORMAL_USER);
-        params.put("password", STRONG_PASSWORD);
-        params.put("foo", "bar");
-
-        command.setParameters(params);
-        boolean rejectedProperly = false;
-
-        try
-        {
-            Connection cn = createDefaultConnection();
-            command.execute(cn, null);
-        }
-        catch (CommandException e)
-        {
-            if (HttpServletResponse.SC_BAD_REQUEST == e.getStatusCode())
-                rejectedProperly = true;
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to connect to login-loginAPI.api action.", e);
-        }
-
-        assertTrue("Expected email/password in URL to be rejected.", rejectedProperly);
-    }
-
     @LogMethod
     private void dumbsterTest()
     {
@@ -318,111 +246,6 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    /**
-     * Preconditions: able to reset user's password at resetUrl, db in weak-password mode
-     */
-    @LogMethod
-    protected void userPasswordResetTest(String resetUrl)
-    {
-        ensureSignedOut();
-
-        beginAt(resetUrl);
-
-        attemptSetInvalidPassword("fooba", "fooba", "Your password must be at least six characters and cannot contain spaces.");
-        attemptSetInvalidPassword("foobar", "foobar2", "Your password entries didn't match.");
-
-        resetPassword(resetUrl, NORMAL_USER, STRONG_PASSWORD);
-    }
-
-    @LogMethod
-    protected void attemptSetInvalidPassword(String password1, String password2, String... errors)
-    {
-        setFormElement(Locator.id("password"), password1);
-        setFormElement(Locator.id("password2"), password2);
-        clickButton("Set Password");
-        assertTextPresent(errors);
-    }
-
-    /**
-     * preconditions: there exists user username with password password
-     * postcondtions:  user can reset password at return value, not signed in
-     *
-     * @param username  user's username
-     * @param password user's password
-     * @return URL to use to reset user password
-     */
-    //issue 3876
-    @LogMethod
-    private String userForgotPasswordWorkflowTest(String username, String password)
-    {
-        ensureSignedOut();
-
-        String resetUrl = userInitiatePasswordReset(username);
-
-        signOut();
-
-        //attempt sign in with old password- should succeed
-        signIn(username, password);
-        signOut();
-
-        return resetUrl;
-    }
-
-    @LogMethod
-    public String userInitiatePasswordReset(String username)
-    {
-        goToHome();
-        ensureSignedOut();
-
-        clickAndWait(Locator.linkWithText("Sign In"));
-        clickAndWait(Locator.linkContainingText("Forgot password"));
-        setFormElement(Locator.id("email"), username);
-        clickButtonContainingText("Reset", 0);
-
-        signIn();
-        return getPasswordResetUrl(username);
-    }
-
-    String[] wrongPasswordEntered =
-                new String[] {"The email address and password you entered did not match any accounts on file.",
-                "Note: Passwords are case sensitive; make sure your Caps Lock is off."};
-
-    /**
-     *
-     * preconditions: logged in as admin
-     * postconditions:  not signed in, username's password is return value
-     *
-     * @param username username to initiate password rest for
-     * @param password user's current password (before test starts)
-     * @return user's new password
-     */
-    @LogMethod
-    private String adminPasswordResetTest(String username, String password)
-    {
-        String newPassword = password +"1";
-        goToSiteUsers();
-        filterUsersForEmail(username);
-        clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(username)));
-        clickButton("Reset Password");
-        assertTextPresent("You are about to clear the user's current password");
-        clickAndWait(Locator.lkButton("OK"));
-
-        String url = getPasswordResetUrl(username);
-
-        //make sure user can't log in with current password
-        signOut();
-        signInShouldFail(username, password, wrongPasswordEntered);
-
-        resetPassword(url, username, newPassword);
-        
-        signOut();
-        
-        //attempt to log in with old password (should fail)
-        signInShouldFail(username, password, wrongPasswordEntered);
-        
-        return newPassword;
-    }
-
     private void filterUsersForEmail(String email)
     {
         DataRegionTable users = new DataRegionTable("Users", getDriver());
@@ -432,16 +255,17 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void addRemoveSiteAdminTest()
     {
-        // test for issue 13921
+        // Issue 13921:
         goToSiteAdmins();
         setFormElement(Locator.name("names"), NORMAL_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         assertTextPresent(NORMAL_USER);
         checkCheckbox(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
-        clickButton("Update Group Membership", 0);
-        assertAlert("Are you sure you want to permanently remove the selected user from this group?");
-        sleep(1000);
+        doAndWaitForPageToLoad(() -> {
+            clickButton("Update Group Membership", 0);
+            assertAlert("Are you sure you want to permanently remove the selected user from this group?");
+        });
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         goToProjectHome();
     }
@@ -486,23 +310,6 @@ public class SecurityTest extends BaseWebDriverTest
 
         signIn();
         ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", false);
-    }
-
-    @LogMethod
-    protected void displayNameTest()
-    {
-        final UIUserHelper uiUserHelper = new UIUserHelper(this);
-
-        String newDisplayName = "changeDisplayTest";
-
-        uiUserHelper.setDisplayName(NORMAL_USER, newDisplayName);
-        assertTextPresent(newDisplayName);
-
-        String injectDisplayName = "displayName" + INJECT_CHARS_1;
-
-        uiUserHelper.setDisplayName(NORMAL_USER, injectDisplayName);
-        assertTextPresent(injectDisplayName);
-        assertTextNotPresent(newDisplayName);
     }
 
     @LogMethod
@@ -788,67 +595,6 @@ public class SecurityTest extends BaseWebDriverTest
         _ext4Helper.clickTabContainingText("Project Groups");
         assertTextPresent("Total Users");
         stopImpersonating();
-    }
-
-
-    @LogMethod
-    protected void passwordStrengthTest()
-    {
-        String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
-        String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
-        String goodPassword = "Yekbal1!"; // 8 characters long. 3+ character types.
-        LoginConfigurePage configurePage = LoginConfigurePage.beginAt(this);
-        configurePage
-                .getPrimaryConfigurationRow("Standard database authentication")
-                .clickEdit(new DatabaseAuthenticationProvider())
-                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Strong,
-                                DatabaseAuthConfigureDialog.PasswordExpiration.Never);
-        // don't click 'Save and Finish' here; setting to good/never in dbAuth doesn't require a page-level submit
-
-        _userHelper.createUser(STRENGTH_USER);
-
-        setInitialPassword(STRENGTH_USER, simplePassword);
-        assertTextPresent("Your password is not complex enough."); // fail, too simple
-
-        setFormElement(Locator.id("password"), shortPassword);
-        setFormElement(Locator.id("password2"), shortPassword);
-        clickButton("Set Password");
-        assertTextPresent("Your password is not complex enough."); // fail, too short
-
-        setFormElement(Locator.id("password"), goodPassword);
-        setFormElement(Locator.id("password2"), goodPassword);
-        assertTextPresent("Your password is not complex enough."); // fail, not complex enough
-
-        setFormElement(Locator.id("password"), STRONG_PASSWORD);
-        setFormElement(Locator.id("password2"), STRONG_PASSWORD);
-        clickButton("Set Password");
-        assertSignedInNotImpersonating();
-        //success
-        impersonate(STRENGTH_USER);
-
-        changePassword(STRONG_PASSWORD, simplePassword); // fail, too simple
-        assertTextPresent("Your password is not complex enough.");
-        changePassword(STRONG_PASSWORD, shortPassword); // fail, too short
-        assertTextPresent("Your password is not complex enough.");
-        changePassword(STRONG_PASSWORD, goodPassword); // fail, not complex enough
-        assertTextPresent("Your password is not complex enough.");
-        String currentPassword = STRONG_PASSWORD + 0;
-        changePassword(STRONG_PASSWORD, currentPassword);
-        assertTextNotPresent("Choose a new password.");
-        int i = 1;
-        for (; i < 9; i++)
-        {
-            changePassword(currentPassword, STRONG_PASSWORD + i);
-            currentPassword = STRONG_PASSWORD + i;
-            assertTextNotPresent("Choose a new password.");
-        }
-        changePassword(currentPassword, STRONG_PASSWORD + 0); // fail, used 9 passwords ago.
-        assertTextPresent("Your password must not match a recently used password.");
-        changePassword(STRONG_PASSWORD + i, STRONG_PASSWORD);
-        assertTextNotPresent("Choose a new password.");
-
-        stopImpersonating();
-        DatabaseAuthConfigureDialog.resetDbLoginConfig(createDefaultConnection());
     }
 
     @LogMethod

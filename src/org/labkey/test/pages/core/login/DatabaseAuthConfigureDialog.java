@@ -1,18 +1,15 @@
 package org.labkey.test.pages.core.login;
 
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-
-import java.io.IOException;
+import org.labkey.test.util.core.login.DbLoginUtils;
+import org.labkey.test.util.core.login.DbLoginUtils.DbLoginProperties;
+import org.labkey.test.util.core.login.DbLoginUtils.PasswordExpiration;
+import org.labkey.test.util.core.login.DbLoginUtils.PasswordStrength;
 
 public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConfigureDialog>
 {
@@ -20,10 +17,7 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
     public DatabaseAuthConfigureDialog(LoginConfigRow row)
     {
         super(new ModalDialogFinder(row.getDriver()).withTitle("Configure Database Authentication"));
-        if (oldLoginProperties == null)
-        {
-            oldLoginProperties = new DbLoginProperties(getPasswordStrength(), getPasswordExpiration());
-        }
+        DbLoginUtils.initDbLoginConfig(this);
     }
 
     // get password strength
@@ -61,9 +55,14 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         Locator.findAnyElement("Finish or Apply button", this,
                 Locators.dismissButton("Finish"), Locators.dismissButton("Apply")).click();
         waitForClose(4);
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription("Standard database authentication").waitFor();
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver())
+                .withDescription(new DatabaseAuthenticationProvider().getProviderDescription()).waitFor();
     }
 
+    public void setDbLoginConfig(DbLoginProperties properties)
+    {
+        setDbLoginConfig(properties.strength(), properties.expiration());
+    }
 
     @LogMethod
     public void setDbLoginConfig(@LoggedParam PasswordStrength newStrength, PasswordExpiration newExpiration)
@@ -73,83 +72,10 @@ public class DatabaseAuthConfigureDialog extends AuthDialogBase<DatabaseAuthConf
         clickApply();
     }
 
-    @LogMethod
-    public static void getDbLoginConfig(Connection connection)
+    public DbLoginProperties getDbLoginConfig()
     {
-        if (oldLoginProperties != null)
-        {
-            SimplePostCommand postCommand = new SimplePostCommand("login", "getDbLoginProperties");
-            try
-            {
-                CommandResponse response = postCommand.execute(connection, "/");
-                oldLoginProperties = new DbLoginProperties(
-                        PasswordStrength.valueOf(response.getProperty("currentSettings.strength")),
-                        PasswordExpiration.valueOf(response.getProperty("currentSettings.expiration")));
-            }
-            catch (IOException | CommandException e)
-            {
-                throw new RuntimeException("Failed to get login configuration", e);
-            }
-        }
+        return new DbLoginProperties(getPasswordStrength(), getPasswordExpiration());
     }
-
-    @LogMethod
-    public static void setDbLoginConfig(Connection connection, PasswordStrength strength, PasswordExpiration expiration)
-    {
-        if (oldLoginProperties == null)
-        {
-            getDbLoginConfig(connection);
-        }
-        JSONObject params = new JSONObject();
-        params.put("strength", strength);
-        params.put("expiration", expiration);
-        SimplePostCommand postCommand = new SimplePostCommand("login", "SaveDbLoginProperties");
-        postCommand.setJsonObject(params);
-        try
-        {
-            postCommand.execute(connection, "/");
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @LogMethod
-    public static void resetDbLoginConfig(Connection connection)
-    {
-        if (oldLoginProperties != null)
-        {
-            setDbLoginConfig(connection, oldLoginProperties.strength, oldLoginProperties.expiration);
-            oldLoginProperties = null;
-        }
-    }
-
-    private record DbLoginProperties(@NotNull PasswordStrength strength, @NotNull PasswordExpiration expiration) { }
-
-    public enum PasswordStrength implements OptionSelect.SelectOption
-    {
-        Weak, Good, Strong;
-
-        @Override
-        public String getValue()
-        {
-            return name();
-        }
-    }
-
-    public enum PasswordExpiration implements OptionSelect.SelectOption
-    {
-        Never, FiveSeconds, ThreeMonths, SixMonths, OneYear;
-
-        @Override
-        public String getValue()
-        {
-            return name();
-        }
-    }
-
-    private static DbLoginProperties oldLoginProperties = null;
 
     @Override
     protected DatabaseAuthConfigureDialog getThis()
