@@ -8,7 +8,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.list.ManageListsGrid;
@@ -112,6 +111,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         goBack();
 
         listsGrid = new ManageListsGrid(getDriver());
+        listsGrid.uncheckAllOnPage();
         listsGrid.clearAllFilters();
         listsGrid.setFilter("Container", "Equals One Of", LIST_FOLDER_A + ";" + getProjectName());
         Assert.assertEquals("Incorrect list after container filter", Arrays.asList(LIST_A, LIST_B), listsGrid.getColumnDataAsText("Name"));
