@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -31,6 +32,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.pages.user.ShowUsersPage;
@@ -44,6 +46,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
+import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
 
@@ -80,8 +83,8 @@ public class SecurityTest extends BaseWebDriverTest
     private static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
     private static final String ADDED_USER = "fromprojectusers@security.test";
-    protected static final String[] PASSWORDS = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
-    protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
+    private static final String STRENGTH_USER = "password_strength@security.test";
+    protected static final String STRONG_PASSWORD = "We'reSo$tr0ng@yekbal1!";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
@@ -99,10 +102,15 @@ public class SecurityTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected BrowserType bestBrowser()
+    @BeforeClass
+    public static void setupProject()
     {
-        return BrowserType.CHROME;
+        ((SecurityTest)getCurrentTest()).doSetup();
+    }
+
+    protected void doSetup()
+    {
+        _containerHelper.createProject(PROJECT_NAME, null);
     }
 
     protected boolean isQuickTest()
@@ -115,11 +123,12 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER, STRENGTH_USER);
 
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection();
         ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+        DatabaseAuthConfigureDialog.resetDbLoginConfig(cn);
     }
 
     @Test
@@ -131,8 +140,6 @@ public class SecurityTest extends BaseWebDriverTest
         }
 
         clonePermissionsTest();
-        addUserAsProjAdmin();
-        dontAddUserAsFolderAdmin();
         displayNameTest();
         tokenAuthenticationTest();
         if (!isQuickTest())
@@ -146,12 +153,11 @@ public class SecurityTest extends BaseWebDriverTest
         if (!TestProperties.isWithoutTestModules())
         {
             log("Check welcome emails [6 new users]");
-            goToModule("Dumbster");
 
-            EmailRecordTable table = new EmailRecordTable(this);
-            assertEquals("Notification emails.", 14, table.getEmailCount());
+            EmailRecordTable table = goToEmailRecord();
+            assertEquals("Notification emails.", 12, table.getEmailCount());
             // Once in the message itself, plus copies in the headers
-            assertTextPresent(": Welcome", 21);
+            assertTextPresent(": Welcome", 18);
         }
 
         if (!isQuickTest())
@@ -250,7 +256,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         //get user a password
         String username = NORMAL_USER;
-        String password = NORMAL_USER_PASSWORD;
+        String password = STRONG_PASSWORD;
 
         password = adminPasswordResetTest(username, password+"adminReset");
         
@@ -269,7 +275,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         Map<String, Object> params = new HashMap<>();
         params.put("email", NORMAL_USER);
-        params.put("password", NORMAL_USER_PASSWORD);
+        params.put("password", STRONG_PASSWORD);
         params.put("foo", "bar");
 
         command.setParameters(params);
@@ -325,7 +331,7 @@ public class SecurityTest extends BaseWebDriverTest
         attemptSetInvalidPassword("fooba", "fooba", "Your password must be at least six characters and cannot contain spaces.");
         attemptSetInvalidPassword("foobar", "foobar2", "Your password entries didn't match.");
 
-        resetPassword(resetUrl, NORMAL_USER, NORMAL_USER_PASSWORD);
+        resetPassword(resetUrl, NORMAL_USER, STRONG_PASSWORD);
     }
 
     @LogMethod
@@ -502,6 +508,7 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void clonePermissionsTest()
     {
+        UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
         UIUserHelper uiUserHelper = new UIUserHelper(this);
         // create admin templates, plus test bogus & duplicate email addresses
         uiUserHelper.createUser(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, true, false);
@@ -510,9 +517,7 @@ public class SecurityTest extends BaseWebDriverTest
         //nav trail check
         assertElementPresent(Locator.tagWithClass("ol", "breadcrumb").child("li").child(Locator.tagContainingText("a", "Site Users")));
 
-        // create the project and set permissions
-        _containerHelper.createProject(PROJECT_NAME, null);
-
+        goToProjectHome();
         // Add permissions for a site group
         _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
         // Add a non-group permission
@@ -560,7 +565,8 @@ public class SecurityTest extends BaseWebDriverTest
         assertNavTrail("Site Users", "User Details", "Permissions");
     }
 
-    protected void addUserAsProjAdmin()
+    @Test
+    public void testAddUserAsProjAdmin()
     {
         beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
         impersonateRoles(PROJECT_ADMIN_ROLE);
@@ -576,7 +582,8 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    protected void dontAddUserAsFolderAdmin()
+    @Test
+    public void testCantAddUserAsFolderAdmin()
     {
         beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
         impersonateRoles(FOLDER_ADMIN_ROLE);
@@ -777,7 +784,7 @@ public class SecurityTest extends BaseWebDriverTest
         // 17037 Regression
         impersonate(PROJECT_ADMIN_USER);
         clickProject(PROJECT_NAME);
-        _permissionsHelper.enterPermissionsUI();
+        PermissionsEditor.enterPermissionsUI(this);
         _ext4Helper.clickTabContainingText("Project Groups");
         assertTextPresent("Total Users");
         stopImpersonating();
@@ -789,56 +796,55 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
         String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
+        String goodPassword = "Yekbal1!"; // 8 characters long. 3+ character types.
         LoginConfigurePage configurePage = LoginConfigurePage.beginAt(this);
         configurePage
                 .getPrimaryConfigurationRow("Standard database authentication")
                 .clickEdit(new DatabaseAuthenticationProvider())
-                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Good,
+                .setDbLoginConfig(DatabaseAuthConfigureDialog.PasswordStrength.Strong,
                                 DatabaseAuthConfigureDialog.PasswordExpiration.Never);
         // don't click 'Save and Finish' here; setting to good/never in dbAuth doesn't require a page-level submit
 
-        setInitialPassword(NORMAL_USER, simplePassword);
-        assertTextPresent("Your password must contain three of the following"); // fail, too simple
+        _userHelper.createUser(STRENGTH_USER);
+
+        setInitialPassword(STRENGTH_USER, simplePassword);
+        assertTextPresent("Your password is not complex enough."); // fail, too simple
 
         setFormElement(Locator.id("password"), shortPassword);
         setFormElement(Locator.id("password2"), shortPassword);
         clickButton("Set Password");
-        assertTextPresent("Your password must be at least eight characters"); // fail, too short
+        assertTextPresent("Your password is not complex enough."); // fail, too short
 
-        setFormElement(Locator.id("password"), PASSWORDS[0]);
-        setFormElement(Locator.id("password2"), PASSWORDS[0]);
+        setFormElement(Locator.id("password"), goodPassword);
+        setFormElement(Locator.id("password2"), goodPassword);
+        assertTextPresent("Your password is not complex enough."); // fail, not complex enough
+
+        setFormElement(Locator.id("password"), STRONG_PASSWORD);
+        setFormElement(Locator.id("password2"), STRONG_PASSWORD);
         clickButton("Set Password");
         assertSignedInNotImpersonating();
         //success
-        impersonate(NORMAL_USER);
+        impersonate(STRENGTH_USER);
 
-        changePassword(PASSWORDS[0], PASSWORDS[1]);
+        changePassword(STRONG_PASSWORD, simplePassword); // fail, too simple
+        assertTextPresent("Your password is not complex enough.");
+        changePassword(STRONG_PASSWORD, shortPassword); // fail, too short
+        assertTextPresent("Your password is not complex enough.");
+        changePassword(STRONG_PASSWORD, goodPassword); // fail, not complex enough
+        assertTextPresent("Your password is not complex enough.");
+        String currentPassword = STRONG_PASSWORD + 0;
+        changePassword(STRONG_PASSWORD, currentPassword);
         assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[1], simplePassword); // fail, too simple
-        assertTextPresent("Your password must contain three of the following");
-        changePassword(PASSWORDS[1], shortPassword); // fail, too short
-        assertTextPresent("Your password must be at least eight characters");
-        changePassword(PASSWORDS[1], PASSWORDS[2]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[2], PASSWORDS[3]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[3], PASSWORDS[4]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[4], PASSWORDS[5]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[5], PASSWORDS[6]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[6], PASSWORDS[7]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[7], PASSWORDS[8]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[8], PASSWORDS[9]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[9], PASSWORDS[10]);
-        assertTextNotPresent("Choose a new password.");
-        changePassword(PASSWORDS[10], PASSWORDS[1]); // fail, used 9 passwords ago.
+        int i = 1;
+        for (; i < 9; i++)
+        {
+            changePassword(currentPassword, STRONG_PASSWORD + i);
+            currentPassword = STRONG_PASSWORD + i;
+            assertTextNotPresent("Choose a new password.");
+        }
+        changePassword(currentPassword, STRONG_PASSWORD + 0); // fail, used 9 passwords ago.
         assertTextPresent("Your password must not match a recently used password.");
-        changePassword(PASSWORDS[10], PASSWORDS[0]);
+        changePassword(STRONG_PASSWORD + i, STRONG_PASSWORD);
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();

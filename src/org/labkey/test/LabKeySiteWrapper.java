@@ -632,11 +632,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             log("Testing bad passwords");
             String email = PasswordUtil.getUsername();
             verifyInitialUserError(email, null, null, "You must enter a password.");
-            verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
-            verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password is not complex enough.");
+            verifyInitialUserError(email, PasswordUtil.getPassword(), null, "You must enter a password.");
+            verifyInitialUserError(email, null, PasswordUtil.getPassword(), "You must enter a password.");
+            verifyInitialUserError(email, "short", "short", "Your password is not complex enough."); // less than weak
+            verifyInitialUserError(email, "LongEnough", "LongEnough", "Your password is not complex enough."); // Weak
+            verifyInitialUserError(email, "Yekbal1!", "Yekbal1!", "Your password is not complex enough."); // Good
             verifyInitialUserError(email, email, email, "Your password is not complex enough.");
-            verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
+            verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword() + "ButDontMatch", "Your password entries didn't match.");
 
             log("Register the first user");
             pushLocation();
