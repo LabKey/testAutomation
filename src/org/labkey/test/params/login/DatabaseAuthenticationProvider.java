@@ -15,7 +15,7 @@ public class DatabaseAuthenticationProvider extends AuthenticationProvider<Datab
     @Override
     public String getProviderDescription()
     {
-        return "Standard Database authentication";
+        return "Standard database authentication";
     }
 
     @Override
