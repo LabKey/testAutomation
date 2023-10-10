@@ -144,6 +144,7 @@ public class PasswordTest extends BaseWebDriverTest
         String currentPassword = STRONG_PASSWORD + 0;
         changePassword(STRONG_PASSWORD, currentPassword);
         assertTextNotPresent("Choose a new password.");
+        assertEquals("Signed in as", USER, getCurrentUser());
     }
 
     @Test
