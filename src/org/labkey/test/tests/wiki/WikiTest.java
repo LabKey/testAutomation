@@ -24,11 +24,14 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
+import org.labkey.test.util.search.SearchResultsQueue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,7 +42,8 @@ import java.util.List;
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
-
+    private static final SearchResultsQueue SEARCH_RESULTS_QUEUE = new SearchResultsQueue();
+    private final SearchHelper _searchHelper = new SearchHelper(this, SEARCH_RESULTS_QUEUE).setMaxTries(6);
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
@@ -196,6 +200,32 @@ public class WikiTest extends BaseWebDriverTest
         EditPage editWikiPage = wikiHelper.editWikiPage();
         editWikiPage.clickShowPageTree();
         assertElementPresent(Locator.id("wiki-toc-tree").append(Locator.linkContainingText(WIKI_PAGE_TITLE + " (" + WIKI_PAGE_NAME + ")")));
+    }
+
+    /*
+        Regression coverage for
+         :https://www.labkey.org/home/Developer/issues/Secure/issues-details.view?issueId=48019
+
+     */
+    @Test
+    public void testWikiWithComma()
+    {
+        String wikiName = "Wiki with comma's";
+        String wikiTitle = "Comma in the content";
+        String wikiContent = "This is my HTML, with commas";
+
+        goToProjectHome();
+        log("Creating the wiki " + wikiTitle);
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        numberOfWikiCreated++;
+        setFormElement(Locator.name("name"), wikiName);
+        setFormElement(Locator.name("title"), wikiTitle);
+        wikiHelper.setWikiBody(wikiContent);
+        wikiHelper.saveWikiPage();
+
+        _searchHelper.searchFor("commas");
+        Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent),getTexts(new SearchResultsPage(getDriver()).getResults()));
     }
 
     protected void verifyWikiPagePresent()
