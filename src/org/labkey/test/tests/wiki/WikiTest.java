@@ -204,7 +204,7 @@ public class WikiTest extends BaseWebDriverTest
 
     /*
         Regression coverage for
-         :https://www.labkey.org/home/Developer/issues/Secure/issues-details.view?issueId=48019
+        https://www.labkey.org/home/Developer/issues/Secure/issues-details.view?issueId=48019
 
      */
     @Test
@@ -225,7 +225,7 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.saveWikiPage();
 
         _searchHelper.searchFor("commas");
-        Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent),getTexts(new SearchResultsPage(getDriver()).getResults()));
+        Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
     }
 
     protected void verifyWikiPagePresent()
