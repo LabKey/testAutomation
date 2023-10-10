@@ -2298,9 +2298,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         assertEquals("Wrong number of files downloaded to " + downloadDir, expectedFileCount, newFiles.length);
 
-        if (getDriver() instanceof FirefoxDriver)
-            Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
-
         return newFiles;
     }
 
