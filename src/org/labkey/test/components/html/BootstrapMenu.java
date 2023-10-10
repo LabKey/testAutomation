@@ -198,8 +198,8 @@ public class BootstrapMenu extends BaseBootstrapMenu
 
         private static Locator.XPathLocator dropdownMenu(Locator.XPathLocator toggleLoc)
         {
-            return Locator.byClass("dropdown")
-                    .withChild(toggleLoc)
+
+            return Locator.XPathLocator.union(Locator.byClass("dropup"), Locator.byClass("dropdown")).withChild(toggleLoc)
                     .withChild(Locator.tag("ul"));
         }
     }
