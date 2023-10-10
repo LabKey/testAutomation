@@ -28,10 +28,8 @@ import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
-import org.labkey.test.util.search.SearchResultsQueue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -42,8 +40,6 @@ import java.util.List;
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
-    private static final SearchResultsQueue SEARCH_RESULTS_QUEUE = new SearchResultsQueue();
-    private final SearchHelper _searchHelper = new SearchHelper(this, SEARCH_RESULTS_QUEUE).setMaxTries(6);
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
@@ -221,10 +217,11 @@ public class WikiTest extends BaseWebDriverTest
         numberOfWikiCreated++;
         setFormElement(Locator.name("name"), wikiName);
         setFormElement(Locator.name("title"), wikiTitle);
-        wikiHelper.setWikiBody(wikiContent);
+        wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
         wikiHelper.saveWikiPage();
 
-        _searchHelper.searchFor("commas");
+
+        searchFor(PROJECT_NAME, "commas", numberOfWikiCreated, wikiTitle);
         Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
     }
 
