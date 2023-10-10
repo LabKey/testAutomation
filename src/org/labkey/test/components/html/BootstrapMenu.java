@@ -196,40 +196,26 @@ public class BootstrapMenu extends BaseBootstrapMenu
             return dropdownMenu(dropdownToggle());
         }
 
-        private static Locator.XPathLocator dropdownMenu(Locator.XPathLocator toggleLoc, boolean isDropup)
-        {
-
-            return Locator.byClass(isDropup ? "dropup" : "dropdown")
-                    .withChild(toggleLoc)
-                    .withChild(Locator.tag("ul"));
-        }
-
         private static Locator.XPathLocator dropdownMenu(Locator.XPathLocator toggleLoc)
         {
-            return dropdownMenu(toggleLoc, false);
+
+            return Locator.XPathLocator.union(Locator.byClass("dropup"), Locator.byClass("dropdown")).withChild(toggleLoc)
+                    .withChild(Locator.tag("ul"));
         }
     }
 
     public static class BootstrapMenuFinder extends WebDriverComponentFinder<BootstrapMenu, BootstrapMenu.BootstrapMenuFinder>
     {
         private Locator _locator = Locators.dropdownMenu();
-        private boolean _isDropup = false;
 
         public BootstrapMenuFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public BootstrapMenuFinder(WebDriver driver, boolean isDropup)
-        {
-            super(driver);
-            _isDropup = isDropup;
-            _locator = Locators.dropdownMenu(Locators.dropdownToggle(), _isDropup);
-        }
-
         public BootstrapMenuFinder withToggleId(String id)
         {
-            _locator = Locators.dropdownMenu(Locators.dropdownToggle().withAttribute("id", id), _isDropup);
+            _locator = Locators.dropdownMenu(Locators.dropdownToggle().withAttribute("id", id));
             return this;
         }
 
