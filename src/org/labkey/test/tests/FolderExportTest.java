@@ -73,6 +73,10 @@ public class FolderExportTest extends BaseWebDriverTest
     private static final String folderFromTemplate = "4 Folder From Template";
     private static final String folderWithPermissions = "5 Folder From Zip With Permissions";
     private static final String folderInheritingPermissions = "6 Inheriting";
+
+    private static final String exportImportSourceProject = "Source_Folder~,!@#$%%++_)(&+=[{";
+    private static final String exportImportTargetProject = "Target_Folder~!@#$%%++_)(&+=]},";
+
     private static final String folderArchive = "SampleWithSubfolders.folder";
     private static final String folderZip = folderArchive + ".zip";
     private static final String projectPermsZip = "ProjectWithPerms.folder.zip";
@@ -158,18 +162,16 @@ public class FolderExportTest extends BaseWebDriverTest
     @Test
     public void testExportImportWithSpecialCharactersInFileName()
     {
-        String sourceFolder = "Source_Folder~,!@#$%%++_)(&+=[{";
-        String targetFolder = "Target_Folder~!@#$%%++_)(&+=]},";
         String dir = "test~!@#$%(%)+-_=+_[]{}";
         String uploadFileName = "pdf_sample_with+%$@+%%+#-+=.pdf";
 
         goToHome();
 
-        log("Creating " + sourceFolder);
-        _containerHelper.createProject(sourceFolder, "Collaboration");
+        log("Creating " + exportImportSourceProject);
+        _containerHelper.createProject(exportImportSourceProject, "Collaboration");
 
         log("Creating dir " + dir + " in Files webpart");
-        goToProjectHome(sourceFolder);
+        goToProjectHome(exportImportSourceProject);
         goToModule("FileContent");
         _fileBrowserHelper.createFolder(dir);
 
@@ -177,16 +179,16 @@ public class FolderExportTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem("/" + dir + "/");
         _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
 
-        goToProjectHome(sourceFolder);
+        goToProjectHome(exportImportSourceProject);
 
-        log("Exporting " + sourceFolder);
-        File sourceZip = exportFolderAsZip(sourceFolder, false, false, false, true);
+        log("Exporting " + exportImportSourceProject);
+        File sourceZip = exportFolderAsZip(exportImportSourceProject, false, false, false, true);
 
-        log("Creating " + targetFolder);
-        _containerHelper.createProject(targetFolder, "Collaboration");
+        log("Creating " + exportImportTargetProject);
+        _containerHelper.createProject(exportImportTargetProject, "Collaboration");
 
-        log("Importing " + sourceZip.getName() + " to " + targetFolder);
-        goToProjectHome(targetFolder);
+        log("Importing " + sourceZip.getName() + " to " + exportImportTargetProject);
+        goToProjectHome(exportImportTargetProject);
         importFolderFromZip(sourceZip, false, 1);
 
         log("Verify presence of " + uploadFileName);
@@ -196,7 +198,7 @@ public class FolderExportTest extends BaseWebDriverTest
         assertEquals("Expected file '" + uploadFileName + "' did not get downloaded", uploadFileName, downloadedFile.getName());
 
         log("Test Drag and Drop zip folder '" + sourceZip.getName() + "'");
-        _fileBrowserHelper.dragAndDropFileInDropZone(sourceZip);
+        _fileBrowserHelper.dragDropUpload(sourceZip);
     }
 
     @Test
@@ -679,6 +681,8 @@ public class FolderExportTest extends BaseWebDriverTest
         {
             _containerHelper.deleteProject(importProject, false);
         }
+        _containerHelper.deleteProject(exportImportSourceProject, false);
+        _containerHelper.deleteProject(exportImportTargetProject, false);
         _userHelper.deleteUsers(false, testUsers);
     }
 
