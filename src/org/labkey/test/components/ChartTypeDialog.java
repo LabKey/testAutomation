@@ -182,9 +182,10 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
             Locator.byClass("field-selection-text").findElement(measureEl).click();
         }
         WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
-        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(arrow));
+        WebDriverWait quickWait = new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(2));
+        quickWait.until(ExpectedConditions.visibilityOf(arrow));
         arrow.click();
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(arrow));
+        quickWait.until(ExpectedConditions.stalenessOf(arrow));
 
         return this;
     }
