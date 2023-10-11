@@ -1,5 +1,6 @@
 package org.labkey.test.tests.list;
 
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -19,6 +20,7 @@ import org.labkey.test.util.search.SearchResultsQueue;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,10 @@ public class ListIndexingTest extends BaseWebDriverTest
                 .clickSave();
 
         SearchResultsPage resultsPage = _searchHelper.searchFor("10001");
-        Assert.assertEquals("Incorrect number of search result", Integer.valueOf(8), resultsPage.getResultCount());
+        Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+            refresh();
+            Assert.assertEquals("Incorrect number of search result", Integer.valueOf(8), resultsPage.getResultCount());
+        });
         List<WebElement> res = resultsPage.getResults();
         for (WebElement row : res)
             Assert.assertTrue("Custom title is not applied in results", row.getText().startsWith("Subject Id: 10001"));
