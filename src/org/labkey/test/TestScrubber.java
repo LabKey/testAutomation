@@ -22,10 +22,10 @@ import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
-import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.core.login.DbLoginUtils;
 import org.labkey.test.util.login.AuthenticationAPIUtils;
 import org.openqa.selenium.WebDriverException;
 
@@ -88,7 +88,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            DatabaseAuthConfigureDialog.resetDbLoginConfig(connection);
+            DbLoginUtils.resetDbLoginConfig(connection);
         }
         catch (RuntimeException e)
         {
