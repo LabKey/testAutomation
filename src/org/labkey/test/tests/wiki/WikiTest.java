@@ -214,14 +214,14 @@ public class WikiTest extends BaseWebDriverTest
         log("Creating the wiki " + wikiTitle);
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
-        numberOfWikiCreated++;
         setFormElement(Locator.name("name"), wikiName);
         setFormElement(Locator.name("title"), wikiTitle);
         wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
         wikiHelper.saveWikiPage();
+        numberOfWikiCreated++;
 
 
-        searchFor(PROJECT_NAME, "commas", numberOfWikiCreated, wikiTitle);
+        searchFor(PROJECT_NAME, "commas", 1, wikiTitle);
         Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
     }
 
