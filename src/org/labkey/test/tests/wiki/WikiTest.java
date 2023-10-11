@@ -220,8 +220,7 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.saveWikiPage();
         numberOfWikiCreated++;
 
-
-        searchFor(PROJECT_NAME, "commas", 1, wikiTitle);
+        searchFor(PROJECT_NAME, "commas", 1, null);
         Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
     }
 
