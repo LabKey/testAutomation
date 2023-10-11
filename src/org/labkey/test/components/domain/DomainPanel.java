@@ -1,7 +1,6 @@
 package org.labkey.test.components.domain;
 
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -99,12 +98,6 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        public ElementCache()
-        {
-            // Add a little speed bump to prevent form initialization from clearing out entered values
-            WebDriverWrapper.sleep(500);
-        }
-
         protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn, .domain-form-collapse-btn")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         protected final WebElement headerStatusIcon = Locator.css(".domain-panel-status-icon > svg").findWhenNeeded(this);

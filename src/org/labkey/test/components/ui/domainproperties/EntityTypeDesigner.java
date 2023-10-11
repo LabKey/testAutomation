@@ -272,6 +272,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
+        public ElementCache()
+        {
+            // Add a little speed bump to prevent form initialization from clearing out entered values
+            WebDriverWrapper.sleep(500);
+        }
+
         protected final Input nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(propertiesPanel), getDriver());
         protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(propertiesPanel), getDriver());
         protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(propertiesPanel), getDriver());
