@@ -632,10 +632,12 @@ public class FolderExportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Notifications"));
         waitForText("Default settings");
 
-        String messagesDefault = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO).find(getDriver()).getValue();
+        ComboBox messagesCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO).find(getDriver());
+        String messagesDefault = shortWait().until(wd -> StringUtils.trimToNull(messagesCombo.getValue()));
         assertEquals("Wrong default value for message notification emails.", "All conversations", messagesDefault);
 
-        String fileDefault = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.FILES_DEFAULT_COMBO).find(getDriver()).getValue();
+        ComboBox filesCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.FILES_DEFAULT_COMBO).find(getDriver());
+        String fileDefault = shortWait().until(wd -> StringUtils.trimToNull(filesCombo.getValue()));
         assertEquals("Wrong default value for file notification emails.", "Daily digest", fileDefault);
 
         verifySubfolderImport(importedFolderName, false);

@@ -177,14 +177,15 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
     public ChartTypeDialog setYAxisSide(int measureIndex, YAxisSide side)
     {
         WebElement measureEl = elementCache().Y_FIELD_DISPLAY.index(measureIndex).findElement(this);
-        WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
-        if (!arrow.isDisplayed())
+        if (!measureEl.getAttribute("class").contains("selected"))
         {
             Locator.byClass("field-selection-text").findElement(measureEl).click();
-            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(arrow));
         }
+        WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
+        WebDriverWait quickWait = new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(2));
+        quickWait.until(ExpectedConditions.visibilityOf(arrow));
         arrow.click();
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(arrow));
+        quickWait.until(ExpectedConditions.stalenessOf(arrow));
 
         return this;
     }
