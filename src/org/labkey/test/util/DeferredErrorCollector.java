@@ -1,7 +1,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
@@ -9,14 +8,11 @@ import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
 import org.labkey.test.BaseWebDriverTest;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.awaitility.Awaitility.await;
 
 /**
  * Allows tests to record non-fatal errors without failing the test immediately.
@@ -26,13 +22,14 @@ import static org.awaitility.Awaitility.await;
 public class DeferredErrorCollector
 {
     private static final Set<Class<? extends Throwable>> defaultRecordableErrorTypes =
-            Set.of(AssertionError.class, ConditionTimeoutException.class);
+            Set.of(AssertionError.class);
 
     private final ArtifactCollector artifactCollector;
     private final List<DeferredError> allErrors = new ArrayList<>();
-    protected final Set<Class<? extends Throwable>> errorTypes = new HashSet<>();
+    private final Set<Class<? extends Throwable>> errorTypes = new HashSet<>();
 
     private int errorMark = 0;
+    private FatalErrorCollector _fatalErrorCollector;
 
     /**
      * For wrapper classes. Avoids resetting error types in wrapped collector.
@@ -88,7 +85,11 @@ public class DeferredErrorCollector
      */
     public DeferredErrorCollector fatal()
     {
-        return new DeferredErrorCollectorWrapper(this).fatal();
+        if (_fatalErrorCollector == null)
+        {
+            _fatalErrorCollector = new FatalErrorCollector(this);
+        }
+        return _fatalErrorCollector;
     }
 
     /**
@@ -99,7 +100,7 @@ public class DeferredErrorCollector
      */
     public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        return new DeferredErrorCollectorWrapper(this).withScreenshot(screenshotName);
+        return new DeferredErrorCollectorWithScreenshot(this, screenshotName);
     }
 
     /**
@@ -208,20 +209,6 @@ public class DeferredErrorCollector
             }
         }
         return false;
-    }
-
-    /**
-     * Record an error if the provided assertion doesn't succeed within the specified timeout.
-     *
-     * @param timeout maximum duration to wait for assertion
-     * @param wrappedAssertion {@link Runnable} that might throw an error that shouldn't fail a test immediately
-     * @return <code>true</code> if the assertion succeeded within the specified timeout
-     */
-    public boolean awaiting(Duration timeout, Runnable wrappedAssertion)
-    {
-        return wrapAssertion(() ->
-                await().atMost(timeout).ignoreExceptionsMatching(this::isErrorDeferrable)
-                        .untilAsserted(wrappedAssertion::run));
     }
 
     /**
@@ -435,30 +422,26 @@ public class DeferredErrorCollector
 /**
  * Wraps an existing error collector. Any errors will be recorded within the wrapped collector.
  */
-class DeferredErrorCollectorWrapper extends DeferredErrorCollector
+abstract class DeferredErrorCollectorWrapper extends DeferredErrorCollector
 {
     private final DeferredErrorCollector wrappedCollector;
 
-    private boolean fatal = false;
-    private String screenshotName = null;
-
     protected DeferredErrorCollectorWrapper(DeferredErrorCollector collector)
     {
+        super();
         wrappedCollector = collector;
     }
 
     @Override
-    public DeferredErrorCollector fatal()
+    public final DeferredErrorCollector fatal()
     {
-        fatal = true;
-        return this;
+        return wrappedCollector.fatal();
     }
 
     @Override
     public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
     {
-        this.screenshotName = screenshotName;
-        return this;
+        return wrappedCollector.withScreenshot(screenshotName);
     }
 
     @Override
@@ -512,23 +495,84 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     @Override
     protected boolean isErrorDeferrable(Throwable err)
     {
-        return !fatal && wrappedCollector.isErrorDeferrable(err);
+        return wrappedCollector.isErrorDeferrable(err);
     }
 
     @Override
-    public void recordError(Throwable error)
+    public void recordError(Throwable cause)
     {
-        wrappedCollector.recordError(error);
-        if (screenshotName != null)
-        {
-            screenShotIfNewError(screenshotName);
-        }
+        wrappedCollector.recordError(cause);
     }
 
     @Override
     public void reportResults()
     {
         wrappedCollector.reportResults();
+    }
+}
+
+/**
+ * Will never defer any errors.
+ */
+class FatalErrorCollector extends DeferredErrorCollectorWrapper
+{
+    protected FatalErrorCollector(DeferredErrorCollector collector)
+    {
+        super(collector);
+    }
+
+    /**
+     * Fatal errors will take screenshots automatically
+     */
+    @Override
+    public DeferredErrorCollector withScreenshot(@NotNull String screenshotName)
+    {
+        return this;
+    }
+
+    @Override
+    public void recordError(Throwable cause)
+    {
+        if (cause instanceof Error e)
+        {
+            throw e;
+        }
+        else if (cause instanceof RuntimeException e)
+        {
+            throw e;
+        }
+        else
+        {
+            // Only reachable if called from outside DeferredErrorCollector.
+            throw new AssertionError(cause);
+        }
+    }
+
+    @Override
+    protected boolean isErrorDeferrable(Throwable err)
+    {
+        return false;
+    }
+}
+
+/**
+ * Wraps an error collector and takes a screenshot if any errors are recorded.
+ */
+class DeferredErrorCollectorWithScreenshot extends DeferredErrorCollectorWrapper
+{
+    private final String _screenshotName;
+
+    protected DeferredErrorCollectorWithScreenshot(DeferredErrorCollector collector, String screenshotName)
+    {
+        super(collector);
+        _screenshotName = screenshotName;
+    }
+
+    @Override
+    public void recordError(Throwable error)
+    {
+        super.recordError(error);
+        super.screenShotIfNewError(_screenshotName);
     }
 }
 
@@ -590,8 +634,9 @@ class DeferredError
         return screenshotName;
     }
 
-    public void setScreenshotName(String screenshotName)
+    public DeferredError setScreenshotName(String screenshotName)
     {
         this.screenshotName = screenshotName;
+        return this;
     }
 }
