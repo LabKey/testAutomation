@@ -122,7 +122,7 @@ public class SaveViewDialog extends ModalDialog
      *
      * @return True if it is checked, false otherwise.
      */
-    public boolean istMakeAvailableChecked()
+    public boolean isMakeAvailableChecked()
     {
         return elementCache().makeAvailable.isChecked();
     }
@@ -135,6 +135,39 @@ public class SaveViewDialog extends ModalDialog
     public boolean isMakeAvailableVisible()
     {
         return elementCache().makeAvailable.isDisplayed();
+    }
+
+
+    /**
+     * Check or uncheck the 'Make this grid available in child folders' checkbox.
+     *
+     * @param checked True to check, false to uncheck.
+     * @return This dialog.
+     */
+    public SaveViewDialog setMakeShared(boolean checked)
+    {
+        elementCache().makeShared.set(checked);
+        return this;
+    }
+
+    /**
+     * Get the checked status of the 'Make this grid available in child folders' checkbox.
+     *
+     * @return True if it is checked, false otherwise.
+     */
+    public boolean isMakeSharedChecked()
+    {
+        return elementCache().makeShared.isChecked();
+    }
+
+    /**
+     * Is the 'Make this grid available in child folders' checkbox visible.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isMakeSharedVisible()
+    {
+        return elementCache().makeShared.isDisplayed();
     }
 
     /**
@@ -178,6 +211,7 @@ public class SaveViewDialog extends ModalDialog
         protected RadioButton makeDefault = new RadioButton(Locator.id("defaultView").findWhenNeeded(this));
         protected RadioButton makeCustom = new RadioButton(Locator.id("customView").findWhenNeeded(this));
         protected Checkbox makeAvailable = new Checkbox(Locator.input("setInherit").findWhenNeeded(this));
+        protected Checkbox makeShared = new Checkbox(Locator.input("setShared").findWhenNeeded(this));
 
     }
 
