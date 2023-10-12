@@ -384,14 +384,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public String getFileDescription(String fileName)
     {
-        List<String> fileList = getFileList();
-        int fileInd = fileList.indexOf(fileName);
-        if (fileInd > -1)
-        {
-            return Locators.gridRow(fileName).childTag("td").position(7).findElement(getDriver()).getText();
-        }
-
-        return null;
+        return Locators.gridRow(fileName).childTag("td").position(7).refindWhenNeeded(getDriver()).getText();
     }
 
     public Window editProperty(String fileName)
