@@ -152,6 +152,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.webdriver.headless"));
     }
 
+    public static boolean isDumpBrowserConsole()
+    {
+        return "true".equals(System.getProperty("webtest.dump.browser.console"));
+    }
+
     public static double getTimeoutMultiplier()
     {
         try
