@@ -630,6 +630,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             saveViewDialog = grid.saveView();
             saveViewDialog.setMakeCustom()
                     .setViewName(viewName)
+                    .setMakeShared(false)
                     .saveView();
 
             savedViewsForDefaultSampleType.add(viewName);
