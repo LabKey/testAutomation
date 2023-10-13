@@ -182,6 +182,7 @@ public abstract class WebDriverUtils
         }
         catch (WebDriverException retry)
         {
+            // Script might throw if the document tree is modified during iteration. Retry once.
             nodeTexts = (List<Object>) executor.executeScript(script, element);
         }
 
