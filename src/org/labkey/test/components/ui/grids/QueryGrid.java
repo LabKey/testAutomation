@@ -384,6 +384,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return new CustomizeGridViewDialog(getDriver(), this);
     }
 
+    public QueryGrid saveViewViaButton()
+    {
+        elementCache().saveViewButton.click();
+        return this;
+    }
+
     /**
      * Save the grid view. Use the 'Save Grid View' menu option which will always show the save dialog.
      *
@@ -721,6 +727,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
+
+        WebElement saveViewButton = Locator.button("Save").findWhenNeeded(getDriver());
 
         final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Views").findWhenNeeded(this);
 
