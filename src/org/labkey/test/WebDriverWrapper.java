@@ -1882,10 +1882,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
+            toBeStale.isEnabled();
             new WebDriverWait(getDriver(), timer.timeRemaining())
-                    .ignoring(NullPointerException.class)
                     .withMessage("waiting for browser to navigate")
                     .until(ExpectedConditions.stalenessOf(toBeStale));
+        }
+        catch (StaleElementReferenceException | NoSuchElementException | NullPointerException ignore)
+        {
+            // `ExpectedConditions.stalenessOf(toBeStale)` sometimes chokes when coming from a blank page (about:blank)
         }
         catch (TimeoutException ex)
         {
