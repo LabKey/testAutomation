@@ -122,7 +122,7 @@ public class SaveViewDialog extends ModalDialog
      */
     public void saveView()
     {
-        dismiss("Save", 1);
+        grid.doAndWaitForUpdate(() -> dismiss("Save", 1));
     }
 
     /**
