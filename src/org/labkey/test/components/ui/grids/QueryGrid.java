@@ -384,6 +384,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return new CustomizeGridViewDialog(getDriver(), this);
     }
 
+    public QueryGrid saveViewViaButton()
+    {
+        elementCache().saveViewButton.click();
+        return this;
+    }
+
     /**
      * Save the grid view. Use the 'Save Grid View' menu option which will always show the save dialog.
      *
@@ -403,17 +409,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public void saveView(String viewName)
     {
-        saveView(viewName, false);
+        saveView(viewName, false, false);
     }
 
     /**
-     * Use the grid menu to save a view with the given name. View will not be default or
-     * shared with sub folders.
+     * Use the grid menu to save a view with the given name. View will not be default. It may be
+     * shared with sub folders and may be shared with all users.
      *
-     * @param viewName The name to save the view as.
+     * @param viewName      The name to save the view as.
      * @param makeAvailable Make the view available to sub folders.
+     * @param makeShared    Make the view shared with all users
      */
-    public void saveView(String viewName, boolean makeAvailable)
+    public void saveView(String viewName, boolean makeAvailable, boolean makeShared)
     {
         elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
         SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
@@ -433,6 +440,17 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             // the view will not be visible to sub folders by default.
             if(dialog.isMakeAvailableVisible())
                 dialog.setMakeAvailable(false);
+        }
+
+        if (makeShared)
+        {
+            Assert.assertTrue("The option to make the view shared is not present on the dialog.", dialog.isMakeSharedVisible());
+            dialog.setMakeShared(true);
+        }
+        else
+        {
+            if (dialog.isMakeSharedVisible())
+                dialog.setMakeShared(false);
         }
 
         dialog.saveView();
@@ -709,6 +727,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
+
+        WebElement saveViewButton = Locator.button("Save").findWhenNeeded(getDriver());
 
         final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Views").findWhenNeeded(this);
 

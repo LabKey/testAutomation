@@ -469,9 +469,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
         {
             log(String.format("Save as custom view '%s'.", viewName));
             saveViewDialog = grid.saveView();
-            saveViewDialog.setViewName(viewName);
             saveViewDialog.setMakeCustom();
-
+            saveViewDialog.setViewName(viewName);
+            saveViewDialog.setMakeShared(false);
             savedViewsForDefaultSampleType.add(viewName);
         }
 
@@ -630,6 +630,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             saveViewDialog = grid.saveView();
             saveViewDialog.setMakeCustom()
                     .setViewName(viewName)
+                    .setMakeShared(false)
                     .saveView();
 
             savedViewsForDefaultSampleType.add(viewName);
