@@ -22,6 +22,7 @@ project.dependencies {
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
     api("org.assertj:assertj-core:${assertjVersion}")
+    implementation("org.awaitility:awaitility:${awaitilityVersion}")
     implementation("commons-io:commons-io:${commonsIoVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
     implementation("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")

@@ -854,7 +854,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             try
             {
-                dumpConsoleLogs();
+                if (TestProperties.isDumpBrowserConsole())
+                {
+                    dumpBrowserConsole();
+                }
             }
             catch (WebDriverException e)
             {
@@ -1064,7 +1067,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return null;
     }
 
-    private void dumpConsoleLogs()
+    private void dumpBrowserConsole()
     {
         List<?> logEntries = executeScript("return console.everything;", List.class);
         if (logEntries != null)
