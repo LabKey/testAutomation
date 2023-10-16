@@ -81,8 +81,13 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public T setName(String name)
     {
+        return setName(name, false);
+    }
+
+    public T setName(String name, boolean validateValue)
+    {
         expandPropertiesPanel();
-        elementCache().nameInput.set(name);
+        elementCache().nameInput.set(name, validateValue);
         return getThis();
     }
 
@@ -357,7 +362,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
-        protected final Input nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(this), getDriver());
+        protected final ValidatingInput nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(this), getDriver());
         protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(this), getDriver());
         protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(this), getDriver());
 
