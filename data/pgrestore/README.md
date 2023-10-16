@@ -8,6 +8,8 @@
 - Compress dump for sharing (e.g. `.zip`)
 
 ### Restore db dump
+- Obtain DB dump
+  - Stored on [Google Drive](https://drive.google.com/drive/folders/10moBiQ2Nnmxuc3HIdB3gHv-2iy4YLK3_)
 - _Note for docker_: when using a large dataset, some queries require more shared memory than docker makes available by default. Increase by running the postgres container with `--shm-size 1G`
 - Restore database dump (after extracting, if necessary)
   - Using PgAdmin
