@@ -40,7 +40,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return getCurrentTestClass().getSimpleName() + " Project";
+        return getClass().getSimpleName() + " Project";
     }
 
     @Override

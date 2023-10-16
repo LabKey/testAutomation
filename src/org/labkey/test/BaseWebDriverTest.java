@@ -244,7 +244,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return currentTest;
     }
 
-    public static Class<? extends BaseWebDriverTest> getCurrentTestClass()
+    private static Class<? extends BaseWebDriverTest> getCurrentTestClass()
     {
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
     }
