@@ -45,8 +45,8 @@ psql -ew -c "UPDATE prop.properties p1 SET value = 'NONE'
     AND p1.name = 'usageReportingLevel' AND p2.category = 'SiteConfig';"
 
 ## Update authentication settings
-# Disable reporting usage to mothership
-psql -ew -c "UPDATE prop.properties p1 SET value = 'localhost'
+# Update default login domain
+psql -ew -c "UPDATE prop.properties p1 SET value = 'labkey.com'
     FROM prop.propertysets p2 WHERE p1.set = p2.set
     AND p1.name = 'DefaultDomain' AND p2.category = 'Authentication';"
 # Disable autoredirect for all authentication configs (usually just CAS)
