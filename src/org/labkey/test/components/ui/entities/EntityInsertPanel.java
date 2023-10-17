@@ -136,8 +136,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public EntityInsertPanel addRecords(List<Map<String, Object>> records)
     {
         showGrid();
-        getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(records.size()));
-        elementCache().addRowsButton.click();
+        elementCache().grid.addRows(records.size());
 
         List<Integer> rowIndices = elementCache().grid.getEditableRowIndices();
 
@@ -239,60 +238,34 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public EntityInsertPanel setAddRows(int numOfRows)
     {
         showGrid();
-        getWrapper().setFormElement(elementCache().addRowsTxtBox, Integer.toString(numOfRows));
+        elementCache().grid.setAddRows(numOfRows);
         return this;
     }
 
-    public EntityInsertPanel clickAddRows()
+    public EntityInsertPanel addRows(int count)
     {
         showGrid();
-        elementCache().addRowsButton.click();
+        elementCache().grid.addRows(count);
         return this;
     }
 
     public EntityInsertPanel clickRemove()
     {
         showGrid();
-        getEditableGrid().doAndWaitForUpdate(()->
-                elementCache().deleteRowsBtn.click());
+        elementCache().grid.clickRemove();
         return this;
     }
 
     public EntityBulkInsertDialog clickBulkInsert()
     {
         showGrid();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn));
-        elementCache().bulkInsertBtn.click();
-        return new EntityBulkInsertDialog(getDriver());
-    }
-
-    public boolean isBulkInsertVisible()
-    {
-        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
-                elementCache().bulkInsertBtnLoc.existsIn(this) &&
-                isElementVisible(elementCache().bulkInsertBtn);
+        return elementCache().grid.clickBulkInsert();
     }
 
     public EntityBulkUpdateDialog clickBulkUpdate()
     {
         showGrid();
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkUpdateBtn));
-        elementCache().bulkUpdateBtn.click();
-        return new EntityBulkUpdateDialog(getDriver());
-    }
-
-    public boolean isBulkUpdateVisible()
-    {
-        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
-                elementCache().bulkUpdateBtnLoc.existsIn(this) &&
-                isElementVisible(elementCache().bulkUpdateBtn);
-    }
-
-    public boolean isDeleteRowsVisible()
-    {
-        return modeSelectListItem("from Grid").withClass("active").findOptionalElement(this).isPresent() &&
-                elementCache().deleteRowsBtnLoc.existsIn(this) &&
-                isElementVisible(elementCache().deleteRowsBtn);
+        return elementCache().grid.clickBulkUpdate();
     }
 
     public boolean hasTabs()
@@ -397,7 +370,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             var newPanel = new EntityInsertPanel.EntityInsertPanelFinder(getDriver()).findWhenNeeded(getDriver());
             
             newPanel.clearElementCache();
-            newPanel.waitForLoaded();
+            newPanel.waitForReady();
             WebDriverWrapper.waitFor(() -> newPanel.isFileUploadVisible(),
                     "the file upload panel did bot become visible", 2000);
 
@@ -406,7 +379,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
-    private void waitForLoaded()
+    @Override
+    protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> {
             try
@@ -439,24 +413,6 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public ElementCache()
-        {
-            waitForLoaded();
-        }
-
-        Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
-                Locator.button("Delete rows"),
-                Locator.buttonContainingText("Remove"));
-        Locator bulkInsertBtnLoc = Locator.button("Bulk Insert");
-        Locator bulkUpdateBtnLoc = Locator.button("Bulk Update");
-
-        WebElement bulkInsertBtn = bulkInsertBtnLoc.findWhenNeeded(this).withTimeout(2000);
-        WebElement bulkUpdateBtn = bulkUpdateBtnLoc.findWhenNeeded(this).withTimeout(2000);
-        WebElement deleteRowsBtn = deleteRowsBtnLoc.findWhenNeeded(this).withTimeout(2000);
-
-        WebElement addRowsTxtBox = Locator.tagWithName("input", "addCount").findWhenNeeded(this);
-        WebElement addRowsButton = Locator.buttonContainingText("Add").findWhenNeeded(this);
-
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
 

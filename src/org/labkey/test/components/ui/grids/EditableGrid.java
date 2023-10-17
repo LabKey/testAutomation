@@ -6,8 +6,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactDatePicker;
 import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
+import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -79,6 +82,32 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
+    public void clickRemove()
+    {
+        doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
+    }
+
+    public EntityBulkInsertDialog clickBulkInsert()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn));
+        elementCache().bulkInsertBtn.click();
+
+        return new EntityBulkInsertDialog(getDriver());
+    }
+
+    public EntityBulkUpdateDialog clickBulkUpdate()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkUpdateBtn));
+        elementCache().bulkUpdateBtn.click();
+
+        return new EntityBulkUpdateDialog(getDriver());
+    }
+
+    public ExportMenu getExportMenu()
+    {
+        return elementCache().exportMenu;
+    }
+
     public List<String> getColumnNames()
     {
         return elementCache().getColumnNames();
@@ -130,7 +159,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private List<WebElement> getRows()
     {
         waitForLoaded();
-        return Locators.rows.findElements(getComponentElement());
+        return Locators.rows.findElements(elementCache().table);
     }
 
     public List<Map<String, String>> getGridData(String... columns)
@@ -753,16 +782,26 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
-    public void doAndWaitForUpdate(Runnable func)
+    public void setAddRows(int count)
     {
-        func.run();
-        waitForUpdate();
+        elementCache().addCountInput.set(String.valueOf(count));
     }
 
-    private void waitForUpdate()
+    public void addRows(int count)
     {
-        waitForLoaded();
-        clearElementCache();
+        setAddRows(count);
+        doAndWaitForUpdate(() -> {
+            elementCache().addRowsButton.click();
+        });
+    }
+
+    private void doAndWaitForUpdate(Runnable func)
+    {
+        int initialCount = getRowCount();
+
+        func.run();
+
+        waitFor(() -> getRowCount() != initialCount, "Failed to add/remove rows", 5_000);
     }
 
     @Override
@@ -773,7 +812,18 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
+        final WebElement topControls = Locator.byClass("QueryGrid-bottom-spacing").findWhenNeeded(this);
+
+        final WebElement bulkInsertBtn = Locator.button("Bulk Insert").findWhenNeeded(topControls);
+        final WebElement bulkUpdateBtn = Locator.button("Bulk Update").findWhenNeeded(topControls);
+        final WebElement deleteRowsBtn =  Locator.XPathLocator
+                .union(Locator.button("Delete rows"), Locator.buttonContainingText("Remove"))
+                .findWhenNeeded(topControls);
+        final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
+
+        final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
+
+        private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
 
         private final List<String> columnNames = new ArrayList<>();
 
@@ -781,7 +831,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             if (columnNames.isEmpty())
             {
-                List<WebElement> headerCells = Locators.headerCells.waitForElements(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+                List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
 
                 for (WebElement el : headerCells)
                 {
@@ -812,22 +862,25 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public WebElement inputCell()
         {
-            return Locators.inputCell.findElement(getComponentElement());
+            return Locators.inputCell.findElement(table);
         }
 
         public ReactSelect lookupSelect(WebElement cell)
         {
             Locator.byClass("cell-menu-selector").findOptionalElement(cell).ifPresent(WebElement::click);
-            ReactSelect lookupSelect = ReactSelect.finder(getDriver()).timeout(2_000).find(getComponentElement());
+            ReactSelect lookupSelect = ReactSelect.finder(getDriver()).timeout(2_000).find(table);
             waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
             return lookupSelect;
         }
 
         public ReactDatePicker datePicker()
         {
-            return new ReactDatePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(getComponentElement());
+            return new ReactDatePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(table);
         }
 
+        final WebElement addRowsPanel = Locator.byClass("editable-grid__controls").findWhenNeeded(this);
+        final Input addCountInput = Input.Input(Locator.name("addCount"), getDriver()).findWhenNeeded(addRowsPanel);
+        final WebElement addRowsButton = Locator.byClass("btn-primary").findWhenNeeded(addRowsPanel);
     }
 
     protected abstract static class Locators
@@ -848,7 +901,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public static class EditableGridFinder extends WebDriverComponent.WebDriverComponentFinder<EditableGrid, EditableGridFinder>
     {
-        private final Locator _locator = Locator.byClass("editable-grid__container").descendant(Locator.byClass("table-cellular"));
+        private final Locator _locator = Locator.byClass("editable-grid__container").parent();
 
         public EditableGridFinder(WebDriver driver)
         {
