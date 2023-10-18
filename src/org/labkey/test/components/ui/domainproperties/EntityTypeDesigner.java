@@ -357,13 +357,20 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
-        protected final Input nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(this), getDriver());
-        protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(this), getDriver());
-        protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(this), getDriver());
+        public ElementCache()
+        {
+            // Add a little speed bump to prevent form initialization from clearing out entered values
+            WebDriverWrapper.sleep(500);
+        }
+
+        protected final Input nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(propertiesPanel), getDriver());
+        protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(propertiesPanel), getDriver());
+        protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(propertiesPanel), getDriver());
 
         protected final Select autoLinkDataToStudy = SelectWrapper.Select(Locator.id("entity-autoLinkTargetContainerId"))
-                .findWhenNeeded(this);
-        protected final Input linkedDatasetCategory = new ValidatingInput(Locator.id("entity-autoLinkCategory").findWhenNeeded(this), getDriver());
+                .findWhenNeeded(propertiesPanel);
+        protected final Input linkedDatasetCategory = new ValidatingInput(Locator.id("entity-autoLinkCategory")
+                .findWhenNeeded(propertiesPanel), getDriver());
 
         Optional<WebElement> optionalWarningAlert()
         {
