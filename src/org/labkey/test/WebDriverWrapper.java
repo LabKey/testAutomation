@@ -153,6 +153,7 @@ import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
+import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_LOG_PROPERTY;
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
@@ -435,7 +436,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 String logFileName = new SimpleDateFormat("'geckodriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
                 log("Saving geckodriver log to: " + logPath);
-                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, logPath);
+                System.setProperty(GECKO_DRIVER_LOG_PROPERTY, logPath);
                 return;
             }
             else
@@ -443,7 +444,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
-        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+        System.setProperty(GECKO_DRIVER_LOG_PROPERTY, "/dev/null");
     }
 
     public boolean isFirefox()
