@@ -146,7 +146,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
 
         clonePermissionsPage.setCloneUser(CLONED_SOURCE_SITE_USER);
         Assert.assertEquals("App admin should not be able to clone from site admin",
-                "Only site administrators can clone from users with site administration permissions",
+                "Only site administrators can clone from users assigned a privileged role",
                 clonePermissionsPage.clonePermissionExpectingError());
 
         clonePermissionsPage = new ClonePermissionsPage(getDriver());
