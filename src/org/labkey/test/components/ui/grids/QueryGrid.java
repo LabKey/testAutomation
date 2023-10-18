@@ -12,6 +12,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -563,15 +564,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         //
         // If this proves to be unreliable it might be easier/safer to return the panel header text and let the test do
         // a .contains() on it to see if it has the expected header.
-        if(elementCache().panelHeader().isDisplayed())
+        WebElement panelHeader = elementCache().panelHeader();
+        if(panelHeader.isDisplayed())
         {
-            String alertText = getEditAlertText();
-            String headerText = elementCache().panelHeader().getText();
-            headerText = headerText.contains(alertText) ? headerText.substring(alertText.length()) : headerText;
-            String buttonText = "Undo\nSave";
-            headerText = headerText.contains(buttonText) ? headerText.substring(0, headerText.indexOf(buttonText)) : headerText;
-            String appButtonText = "UndoSave";
-            viewName = headerText.contains(appButtonText) ? headerText.substring(0, headerText.indexOf(appButtonText)) : headerText;
+            // The view name in the header is not in a separate element.
+            viewName = WebDriverUtils.getTextNodeWithin(panelHeader);
         }
         else
         {
