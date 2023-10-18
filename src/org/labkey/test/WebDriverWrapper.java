@@ -153,6 +153,7 @@ import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
+import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_LOG_PROPERTY;
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
@@ -435,7 +436,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 String logFileName = new SimpleDateFormat("'geckodriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
                 log("Saving geckodriver log to: " + logPath);
-                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, logPath);
+                System.setProperty(GECKO_DRIVER_LOG_PROPERTY, logPath);
                 return;
             }
             else
@@ -443,7 +444,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
-        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+        System.setProperty(GECKO_DRIVER_LOG_PROPERTY, "/dev/null");
     }
 
     public boolean isFirefox()
@@ -1884,10 +1885,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
+            toBeStale.isEnabled();
             new WebDriverWait(getDriver(), timer.timeRemaining())
-                    .ignoring(NullPointerException.class)
                     .withMessage("waiting for browser to navigate")
                     .until(ExpectedConditions.stalenessOf(toBeStale));
+        }
+        catch (StaleElementReferenceException | NoSuchElementException | NullPointerException ignore)
+        {
+            // `ExpectedConditions.stalenessOf(toBeStale)` sometimes chokes when coming from a blank page (about:blank)
         }
         catch (TimeoutException ex)
         {
@@ -1899,32 +1904,35 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 .withMessage("waiting for document to be ready")
                 .until(wd -> Objects.equals(executeScript("return document.readyState;"), "complete"));
         Locators.documentRoot.waitForElement(getDriver(), (int) timer.timeRemaining().toMillis());
-        executeScript("""
-                if (console.everything === undefined)
-                {
-                    console.everything = [];
+        if (TestProperties.isDumpBrowserConsole())
+        {
+            executeScript("""
+                    if (console.everything === undefined)
+                    {
+                        console.everything = [];
 
-                    console.defaultLog = console.log.bind(console);
-                    console.log = function(){
-                        console.everything.push({"type":"log", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
-                        console.defaultLog.apply(console, arguments);
-                    }
-                    console.defaultError = console.error.bind(console);
-                    console.error = function(){
-                        console.everything.push({"type":"error", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
-                        console.defaultError.apply(console, arguments);
-                    }
-                    console.defaultWarn = console.warn.bind(console);
-                    console.warn = function(){
-                        console.everything.push({"type":"warn", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
-                        console.defaultWarn.apply(console, arguments);
-                    }
-                    console.defaultDebug = console.debug.bind(console);
-                    console.debug = function(){
-                        console.everything.push({"type":"debug", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
-                        console.defaultDebug.apply(console, arguments);
-                    }
-                }""");
+                        console.defaultLog = console.log.bind(console);
+                        console.log = function(){
+                            console.everything.push({"type":"log", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultLog.apply(console, arguments);
+                        }
+                        console.defaultError = console.error.bind(console);
+                        console.error = function(){
+                            console.everything.push({"type":"error", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultError.apply(console, arguments);
+                        }
+                        console.defaultWarn = console.warn.bind(console);
+                        console.warn = function(){
+                            console.everything.push({"type":"warn", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultWarn.apply(console, arguments);
+                        }
+                        console.defaultDebug = console.debug.bind(console);
+                        console.debug = function(){
+                            console.everything.push({"type":"debug", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultDebug.apply(console, arguments);
+                        }
+                    }""");
+        }
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
@@ -2298,9 +2306,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             log("  File downloaded: " + newFile.getName());
         }
         assertEquals("Wrong number of files downloaded to " + downloadDir, expectedFileCount, newFiles.length);
-
-        if (getDriver() instanceof FirefoxDriver)
-            Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
 
         return newFiles;
     }
