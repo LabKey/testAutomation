@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Wraps the functionality of the LabKey ui component defined in domainproperties/CollapsiblePanelHeader.tsx
@@ -60,8 +61,9 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         if (isExpanded() != expand)
         {
             elementCache().expandToggle.click();
+            waitFor(() -> isExpanded() == expand, "Panel failed to " + (expand ? "expand" : "collapse"), 2_000);
             getWrapper().shortWait()
-                    .until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
+                    .until(LabKeyExpectedConditions.animationIsDone(elementCache().panelBody)); // wait for transition to happen
         }
         return getThis();
     }

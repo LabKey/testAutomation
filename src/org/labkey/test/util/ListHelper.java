@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.Locator.tag;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class ListHelper extends LabKeySiteWrapper
@@ -190,6 +189,7 @@ public class ListHelper extends LabKeySiteWrapper
         String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         beginAt(url);
         clickButton("Confirm Delete");
+        assertNoLabKeyErrors();
     }
 
     /**

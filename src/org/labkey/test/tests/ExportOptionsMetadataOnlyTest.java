@@ -38,7 +38,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return getCurrentTestClass().getSimpleName() + " Project";
+        return getClass().getSimpleName() + " Project";
     }
 
     @BeforeClass

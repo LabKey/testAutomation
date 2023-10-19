@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 @Category({Daily.class})
@@ -70,7 +71,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         if (apiException == null)
             fail("App Admin was able to assign Site Admin role");
 
-        assertEquals("Wrong error", "You do not have permission to modify the Site Admin role or permission.", apiException.getMessage());
+        assertEquals("Wrong error", "You do not have permission to modify the Site Administrator role.", apiException.getMessage());
     }
 
     @Test
@@ -80,7 +81,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         if (apiException == null)
             fail("App Admin was able to assign Platform Developer role");
 
-        assertEquals("Wrong error", "You do not have permission to modify the Platform Developer role or permission.", apiException.getMessage());
+        assertEquals("Wrong error", "You do not have permission to modify the Platform Developer role.", apiException.getMessage());
     }
 
     @Test
@@ -96,7 +97,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         impersonate(APP_ADMIN);
         _containerHelper.createProject("AppAdminTestProject", "Collaboration");
         _containerHelper.deleteProject("AppAdminTestProject");
-        assertEquals("Container AppAdminTestProject not deleted.", false, _containerHelper.doesContainerExist("AppAdminTestProject"));
+        assertFalse("Container AppAdminTestProject not deleted.", _containerHelper.doesContainerExist("AppAdminTestProject"));
         goToHome();
         stopImpersonating();
     }
