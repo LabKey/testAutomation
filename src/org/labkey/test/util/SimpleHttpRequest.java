@@ -185,11 +185,25 @@ public class SimpleHttpRequest
                     params.put(param[0], param.length == 2 ? StringUtils.strip(param[1], "\"") : null);
                 }
                 String responseFilename = params.get("filename");
+                if (responseFilename == null)
+                {
+                    // Sometimes filename includes encoding information
+                    // attachment; filename*=UTF-8''diagnostics_2023-10-19_14-39-56.zip
+                    responseFilename = params.get("filename*");
+                    if (responseFilename != null)
+                    {
+                        String[] split = responseFilename.split("'", 3);
+                        if (split.length == 3)
+                        {
+                            responseFilename = split[2];
+                        }
+                    }
+                }
                 if (fileName == null)
                 {
                     if (responseFilename == null)
                     {
-                        throw new IOException("Unable to determine filename for download.");
+                        throw new IOException("Unable to determine filename for download. Content-Disposition = " + contentDisposition);
                     }
                     fileName = responseFilename;
                     targetFile = new File(targetFile, fileName);
@@ -204,7 +218,8 @@ public class SimpleHttpRequest
                     }
                 }
                 FileUtils.copyInputStreamToFile(con.getInputStream(), targetFile);
-                TestLogger.info("%s: Downloaded [%s] from %s".formatted(targetFile.getName(), FileUtils.byteCountToDisplaySize(targetFile.length()), _url));
+                TestLogger.info("%s: Downloaded [%s] from %s -> %s".formatted(targetFile.getName(),
+                        FileUtils.byteCountToDisplaySize(targetFile.length()), _url, targetFile.getAbsolutePath()));
                 return targetFile;
             }
         }
