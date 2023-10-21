@@ -347,18 +347,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     /**
      * <p>
-     *     For the identified row set the value in the identified column.
+     * For the identified row set the value in the identified column.
      * </p>
      * <p>
-     *     If the column to be updated is a look-up, the value passed in must be a list, even if it is just one value.
-     *     This is needed so the function knows how to set the value.
+     * If the column to be updated is a look-up, the value passed in must be a list, even if it is just one value.
+     * This is needed so the function knows how to set the value.
      * </p>
      *
-     * @param row Index of the row (0 based).
+     * @param row        Index of the row (0 based).
      * @param columnName Name of the column to update.
-     * @param value If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
+     * @param value      If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
+     * @return cell WebElement
      */
-    public void setCellValue(int row, String columnName, Object value)
+    public WebElement setCellValue(int row, String columnName, Object value)
     {
         // Normalize date values
         if (value instanceof LocalDate ld)
@@ -412,6 +413,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             WebDriverWrapper.waitFor(() -> gridCell.getText().contains(str),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
         }
+        return gridCell;
     }
 
     /**
@@ -620,19 +622,36 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 .getData(DataFlavor.stringFlavor);
     }
 
-    private EditableGrid selectCellRange(WebElement startCell, WebElement endCell)
+    public void dragFill(WebElement startCell, WebElement endCell)
     {
-        selectCell(startCell);
-        getWrapper().scrollIntoView(endCell);
-        // now drag mouse from start to end cell
-        Actions selectRange = new Actions(getDriver());
-        selectRange.dragAndDrop(startCell, endCell)
-                .build()
-                .perform();
+        Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
+        WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
+        dragToCell(selectionHandle, endCell);
+        selectionHandleLoc.waitForElement(endCell, 5_000);
+    }
+
+    public void selectCellRange(WebElement startCell, WebElement endCell)
+    {
+        dragToCell(startCell, endCell);
 
         WebDriverWrapper.waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
                 "Cell range did not become selected", 2000);
-        return this;
+    }
+
+    private void dragToCell(WebElement elementToDrag, WebElement destinationCell)
+    {
+        var size = destinationCell.getSize();
+
+        new Actions(getDriver())
+                // WebDriver doesn't calculate correct location to click the cell selection handle
+                .moveToElement(elementToDrag, 0, 7)
+                .clickAndHold()
+                .moveToElement(destinationCell)
+                // Extra wiggle to get it to stick
+                .moveByOffset(0, -size.getHeight())
+                .moveByOffset(0, size.getHeight())
+                .release()
+                .perform();
     }
 
     private void selectAllCells()

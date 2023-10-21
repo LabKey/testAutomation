@@ -9,6 +9,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -84,6 +85,24 @@ public class EditableGridTest extends BaseWebDriverTest
         assertEquals("Didn't get correct values", List.of("42", "41", "40", "39", "38"), pastedColData);
         assertThat("expect other column to remain empty",
                 unpastedColData, everyItem(is("")));
+    }
+
+    @Test
+    public void testDragFillIncrementingIntegers()
+    {
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
+
+        testGrid.addRows(6);
+        WebElement cell1 = testGrid.setCellValue(0, "Description", "2");
+        WebElement cell2 = testGrid.setCellValue(1, "Description", "4");
+        WebElement cell3 = testGrid.getCell(4, "Description");
+
+        testGrid.selectCellRange(cell1, cell2);
+        testGrid.dragFill(cell2, cell3);
+
+        List<String> actualValues = testGrid.getColumnData("Description");
+        assertEquals("Drag-fill should have extrapolated values", List.of("2", "4", "6", "8", "10", ""), actualValues);
     }
 
     @Override
