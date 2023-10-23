@@ -307,7 +307,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
         // this is only shown when inferring fields from a file
         protected ToggleButton autoImportToggle()
         {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").waitFor(fieldsPanel);
+            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Yes").waitFor(fieldsPanel);
         }
 
         protected FilteringReactSelect columnMapSelect(String labelText)

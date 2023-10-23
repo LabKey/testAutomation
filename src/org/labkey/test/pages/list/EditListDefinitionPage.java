@@ -189,7 +189,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
         protected ToggleButton autoImportSlider()
         {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").find(fieldsPanel);
+            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Yes").find(fieldsPanel);
         }
     }
 }
