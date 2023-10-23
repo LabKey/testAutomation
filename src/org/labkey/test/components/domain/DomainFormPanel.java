@@ -394,11 +394,11 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public String getMode()
     {
-        return elementCache().customFieldsViewToggle.getSelectedStatus(); // will be either "Summary mode" or "Detail mode"
+        return elementCache().customFieldsViewToggle.getSelectedStatus(); // will be either "Summary" or "Detail"
     }
 
     /**
-     * Selects the desired mode.  Possible values are "Detail mode" and "Summary mode"
+     * Selects the desired mode.  Possible values are "Summary" and "Detail"
      * @param name The name of the desired mode, or the text to appear in the toggle in its desired state
      * @return an instance of the current DomainFormPanel
      */
@@ -406,9 +406,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     {
         if (!getMode().equalsIgnoreCase(name))
         {
-            // get the current mode (on/off), assume the opposite state is desired
-            Boolean modeState = elementCache().customFieldsViewToggle.get();
-            elementCache().customFieldsViewToggle.set(!modeState);
+            boolean isSummary = elementCache().customFieldsViewToggle.isEnabled();
+            elementCache().customFieldsViewToggle.set(!isSummary);
         }
         WebDriverWrapper.waitFor(()-> getMode().equalsIgnoreCase(name),
                 "the mode select toggle did not become [" +name+ "] as expected", 2000);
@@ -421,7 +420,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     */
     public boolean isSummaryMode()
     {
-        return getMode().equalsIgnoreCase("Summary Mode");
+        return getMode().equalsIgnoreCase("Summary");
     }
 
     /*
@@ -429,7 +428,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public ResponsiveGrid getSummaryModeGrid()
     {
-        switchMode("Summary mode");
+        switchMode("Summary");
         return new ResponsiveGrid.ResponsiveGridFinder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "domain-field-toolbar").followingSibling("div").followingSibling("div"))
                 .waitFor(this);
@@ -459,7 +458,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public boolean isDetailMode()
     {
-        return getMode().equalsIgnoreCase("Detail Mode");   
+        return getMode().equalsIgnoreCase("Detail");
     }
 
     /*
@@ -467,7 +466,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public int getRowcountInSummaryMode()
     {
-        switchMode("Summary Mode");
+        switchMode("Summary");
 
         return getSummaryModeGrid().getRows().size();
     }
@@ -564,7 +563,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         public final WebElement toggleButton = Locator.tagWithAttributeContaining("div", "id", "domain-toggle-summary").
                 findWhenNeeded(this);
         public final ToggleButton customFieldsViewToggle = new ToggleButton.ToggleButtonFinder(getDriver())
-                .withState("Detail mode").timeout(5000).findWhenNeeded(this);
+                .withState("Detail").timeout(5000).findWhenNeeded(this);
 
         protected WebElement addFieldButton = new WebElementWrapper()
         {

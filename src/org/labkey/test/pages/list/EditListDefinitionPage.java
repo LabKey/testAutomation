@@ -141,7 +141,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
     public boolean getAutoImport()
     {
-        return elementCache().autoImportSlider().get();
+        return elementCache().autoImportSlider().isEnabled();
     }
 
     public void setColumnPhiLevel(String name, FieldDefinition.PhiSelectType phiLevel)

@@ -58,7 +58,7 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
 
     public boolean isEnabled()
     {
-        return elementCache().enableToggle.get();
+        return elementCache().enableToggle.isEnabled();
     }
 
     public T clickApplyExpectingError()

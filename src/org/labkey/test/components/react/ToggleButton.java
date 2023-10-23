@@ -32,31 +32,57 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
     public ToggleButton set(boolean enabled)
     {
         String desiredState = enabled ? "enabled" : "disabled";
-        if (get() != enabled)
-            getComponentElement().click();
-        WebDriverWrapper.waitFor(()-> get() == enabled,
+        if (enabled && isDisabled())
+        {
+            if (hasButtons()) selectFirst();
+            else getComponentElement().click();
+        }
+        else if (!enabled && isEnabled())
+        {
+            if (hasButtons()) selectSecond();
+            else getComponentElement().click();
+        }
+        WebDriverWrapper.waitFor(()-> isEnabled() == enabled,
                 "the toggle button did not become " + desiredState, 2000);
         return this;
     }
 
-    /*
-        The componentElement will get the 'off' class when the slider is grayed out.
-     */
-    public boolean get()
+    public boolean isEnabled()
     {
-        return !getComponentElement().getAttribute("class").contains("off");
+        return getComponentElement().getAttribute("class").contains("toggle-on");
+    }
+
+    public boolean isDisabled()
+    {
+        return getComponentElement().getAttribute("class").contains("toggle-off");
     }
 
     /*
-        the 'off' status causes the child span with 'toggle-off' class to be shown; otherwise,
-        the one with 'toggle-on' is shown.
+        the 'off' status causes the 2nd button to be active; otherwise, the one 1st button is active
      */
     public String getSelectedStatus()
     {
-        if (get())
-            return Locator.tagWithClass("span", "toggle-on").findElement(this).getText();
+        if (isEnabled())
+            return Locator.tag("button").index(0).findElement(this).getText();
         else
-            return Locator.tagWithClass("span", "toggle-off").findElement(this).getText();
+            return Locator.tag("button").index(1).findElement(this).getText();
+    }
+
+    public ToggleButton selectFirst()
+    {
+        Locator.tag("button").index(0).findElement(this).click();
+        return this;
+    }
+
+    public ToggleButton selectSecond()
+    {
+        Locator.tag("button").index(1).findElement(this).click();
+        return this;
+    }
+
+    private boolean hasButtons()
+    {
+        return Locator.tag("button").findElementOrNull(this) != null;
     }
 
     public static class ToggleButtonFinder extends WebDriverComponentFinder<ToggleButton, ToggleButtonFinder>
@@ -98,7 +124,7 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
             }
             if (_state != null)
             {
-                locator = locator.withDescendant(Locator.tagWithText("span", _state));
+                locator = locator.withDescendant(Locator.tagWithText("button", _state));
             }
 
             return locator;
