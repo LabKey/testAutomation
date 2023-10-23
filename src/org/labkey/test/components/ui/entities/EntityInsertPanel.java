@@ -29,8 +29,10 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.ElementCache>
 {
-    private WebDriver _driver;
+    private final WebDriver _driver;
     private final WebElement _editingDiv;
+
+    private int _readyTimeout = WAIT_FOR_JAVASCRIPT;
 
     public EntityInsertPanel(WebElement element, WebDriver driver)
     {
@@ -330,7 +332,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             modeSelectListItem("from Grid")
                     .waitForElement(this, 2000).click();
             clearElementCache();
-            WebDriverWrapper.waitFor(() -> isGridVisible(),
+            WebDriverWrapper.waitFor(this::isGridVisible,
                     "the grid did bot become visible", 2000);
         }
         elementCache().grid.waitForLoaded();
@@ -371,11 +373,17 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             
             newPanel.clearElementCache();
             newPanel.waitForReady();
-            WebDriverWrapper.waitFor(() -> newPanel.isFileUploadVisible(),
+            WebDriverWrapper.waitFor(newPanel::isFileUploadVisible,
                     "the file upload panel did bot become visible", 2000);
 
             return newPanel;
         }
+        return this;
+    }
+
+    public EntityInsertPanel setReadyTimeout(int readyTimeout)
+    {
+        _readyTimeout = readyTimeout;
         return this;
     }
 
@@ -392,7 +400,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             {
                 return false;
             }
-        }, "The insert panel did not become loaded", WAIT_FOR_JAVASCRIPT);
+        }, "The insert panel did not become loaded", _readyTimeout);
     }
 
     /**
