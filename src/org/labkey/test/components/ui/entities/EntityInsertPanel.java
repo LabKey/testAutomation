@@ -29,7 +29,7 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.ElementCache>
 {
-    private WebDriver _driver;
+    private final WebDriver _driver;
     private final WebElement _editingDiv;
 
     public EntityInsertPanel(WebElement element, WebDriver driver)
@@ -48,6 +48,21 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public WebDriver getDriver()
     {
         return _driver;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        WebDriverWrapper.waitFor(()-> {
+            try{
+                return isFileUploadVisible() ||
+                        isGridVisible() ||
+                        hasTabs();
+            } catch (NoSuchElementException retry)
+            {
+                return false;
+            }
+        }, 10000);
     }
 
     public boolean hasTargetEntityTypeSelect()
@@ -357,8 +372,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             modeSelectListItem("from Grid")
                     .waitForElement(this, 2000).click();
             clearElementCache();
-            WebDriverWrapper.waitFor(() -> isGridVisible(),
-                    "the grid did bot become visible", 2000);
+            WebDriverWrapper.waitFor(this::isGridVisible,
+                    "the grid did not become visible", 2000);
         }
         elementCache().grid.waitForLoaded();
         return this;
