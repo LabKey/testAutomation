@@ -31,6 +31,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 {
     private final WebDriver _driver;
     private final WebElement _editingDiv;
+    private int _readyTimeout = 10000;
 
     public EntityInsertPanel(WebElement element, WebDriver driver)
     {
@@ -56,13 +57,17 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebDriverWrapper.waitFor(()-> {
             try{
                 return isFileUploadVisible() ||
-                        isGridVisible() ||
-                        hasTabs();
+                        isGridVisible();
             } catch (NoSuchElementException retry)
             {
                 return false;
             }
-        }, 10000);
+        }, "The Insert panel did not become ready in time", _readyTimeout);
+    }
+
+    public void setReadyTimeout(int readyTimeout)
+    {
+        _readyTimeout = readyTimeout;
     }
 
     public boolean hasTargetEntityTypeSelect()
