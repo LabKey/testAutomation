@@ -65,9 +65,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         }, "The Insert panel did not become ready in time", _readyTimeout);
     }
 
-    public void setReadyTimeout(int readyTimeout)
+    public EntityInsertPanel setReadyTimeout(int readyTimeout)
     {
         _readyTimeout = readyTimeout;
+        return this;
     }
 
     public boolean hasTargetEntityTypeSelect()
