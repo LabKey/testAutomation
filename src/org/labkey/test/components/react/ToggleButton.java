@@ -44,7 +44,7 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
         }
         else
         {
-            throw new IllegalStateException("Unable to determine toggle state: " + getComponentElement());
+            throw new IllegalStateException("Unable to toggle state to " + desiredState + ". It may already be in that state.");
         }
         WebDriverWrapper.waitFor(()-> isOn() == enabled,
                 "the toggle button did not become " + desiredState, 2000);
