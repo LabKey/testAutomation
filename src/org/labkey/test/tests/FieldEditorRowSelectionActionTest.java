@@ -96,7 +96,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         log("Verifying the toggle between summary view and detail view list domain");
         checker().verifyTrue("Incorrect default display mode", domainFormPanel.isDetailMode());
 
-        domainFormPanel.switchMode("Summary");
+        domainFormPanel.selectSummaryMode();
         checker().verifyTrue("Did not switch to Summary Mode", domainFormPanel.isSummaryMode());
         checker().wrapAssertion(()-> assertThat(domainFormPanel.getSummaryModeColumns())
                 .as("Incorrect header values in summary mode in list domain")
@@ -134,7 +134,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         log("Verifying the toggle between summary view and detail view");
         checker().verifyTrue("Incorrect default display mode", domainFormPanel.isDetailMode());
 
-        domainFormPanel.switchMode("Summary");
+        domainFormPanel.selectSummaryMode();
         checker().verifyTrue("Did not switch to Summary Mode", domainFormPanel.isSummaryMode());
         checker().wrapAssertion(()-> assertThat(domainFormPanel.getSummaryModeColumns())
                         .as("Incorrect columns in summary mode")
@@ -210,7 +210,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
         log("Verifying the toggle between summary view and detail view for Results domain");
         checker().verifyTrue("Incorrect default display mode for result domain", domainFormPanel.isDetailMode());
 
-        domainFormPanel.switchMode("Summary");
+        domainFormPanel.selectSummaryMode();
         checker().verifyTrue("Did not switch to Summary Mode", domainFormPanel.isSummaryMode());
         List<String> actualHeaders = domainFormPanel.getSummaryModeColumns();
         checker().wrapAssertion(()-> assertThat(actualHeaders)

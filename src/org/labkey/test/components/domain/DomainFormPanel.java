@@ -392,7 +392,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         in 'Summary mode', fields are shown in a grid, with columns representing field attributes like 'name', 'range uri', etc
         in 'Detail mode', fields appear as editable, in FieldRows
      */
-    public String getMode()
+    private String getMode()
     {
         return elementCache().customFieldsViewToggle.getSelectedStatus(); // will be either "Summary" or "Detail"
     }
@@ -402,7 +402,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      * @param name The name of the desired mode, or the text to appear in the toggle in its desired state
      * @return an instance of the current DomainFormPanel
      */
-    public DomainFormPanel switchMode(String name)
+    private DomainFormPanel switchMode(String name)
     {
         if (!getMode().equalsIgnoreCase(name))
         {
@@ -423,12 +423,17 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return getMode().equalsIgnoreCase("Summary");
     }
 
+    public DomainFormPanel selectSummaryMode()
+    {
+        return switchMode("Summary");
+    }
+
     /*
         gets the grid containing row data/metadata in summary view
      */
     public ResponsiveGrid getSummaryModeGrid()
     {
-        switchMode("Summary");
+        selectSummaryMode();
         return new ResponsiveGrid.ResponsiveGridFinder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "domain-field-toolbar").followingSibling("div").followingSibling("div"))
                 .waitFor(this);
@@ -461,13 +466,17 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return getMode().equalsIgnoreCase("Detail");
     }
 
+    public DomainFormPanel selectDetailMode()
+    {
+        return switchMode("Detail");
+    }
+
     /*
         Summary mode shows a table containing a row per field, with columns representing field attributes
      */
     public int getRowcountInSummaryMode()
     {
-        switchMode("Summary");
-
+        selectSummaryMode();
         return getSummaryModeGrid().getRows().size();
     }
 
