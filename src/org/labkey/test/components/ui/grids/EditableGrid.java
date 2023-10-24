@@ -831,7 +831,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement topControls = Locator.byClass("QueryGrid-bottom-spacing").findWhenNeeded(this);
+        final WebElement topControls = Locator.byClass("editable-grid-buttons__action-buttons").findWhenNeeded(this);
 
         final WebElement bulkInsertBtn = Locator.button("Bulk Insert").findWhenNeeded(topControls);
         final WebElement bulkUpdateBtn = Locator.button("Bulk Update").findWhenNeeded(topControls);
