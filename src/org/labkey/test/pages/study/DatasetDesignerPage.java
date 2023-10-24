@@ -243,7 +243,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
 
     public boolean getAutoImport()
     {
-        return elementCache().autoImportToggle().isEnabled();
+        return elementCache().autoImportToggle().isOn();
     }
 
     public DatasetDesignerPage setPreviewMappedColumn(String columnLabel, String value)

@@ -32,29 +32,28 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
     public ToggleButton set(boolean enabled)
     {
         String desiredState = enabled ? "enabled" : "disabled";
-        if (enabled && isDisabled())
+        if (enabled && !isOn())
         {
             if (hasButtons()) selectFirst();
             else getComponentElement().click();
         }
-        else if (!enabled && isEnabled())
+        else if (!enabled && isOn())
         {
             if (hasButtons()) selectSecond();
             else getComponentElement().click();
         }
-        WebDriverWrapper.waitFor(()-> isEnabled() == enabled,
+        else
+        {
+            throw new IllegalStateException("Unable to determine toggle state: " + getComponentElement());
+        }
+        WebDriverWrapper.waitFor(()-> isOn() == enabled,
                 "the toggle button did not become " + desiredState, 2000);
         return this;
     }
 
-    public boolean isEnabled()
+    public boolean isOn()
     {
         return getComponentElement().getAttribute("class").contains("toggle-on");
-    }
-
-    public boolean isDisabled()
-    {
-        return getComponentElement().getAttribute("class").contains("toggle-off");
     }
 
     /*
@@ -62,27 +61,30 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
      */
     public String getSelectedStatus()
     {
-        if (isEnabled())
+        if (isOn())
             return Locator.tag("button").index(0).findElement(this).getText();
         else
             return Locator.tag("button").index(1).findElement(this).getText();
     }
 
-    public ToggleButton selectFirst()
+    private ToggleButton selectFirst()
     {
         Locator.tag("button").index(0).findElement(this).click();
         return this;
     }
 
-    public ToggleButton selectSecond()
+    private ToggleButton selectSecond()
     {
         Locator.tag("button").index(1).findElement(this).click();
         return this;
     }
 
+    private Boolean hasButtons = null;
     private boolean hasButtons()
     {
-        return Locator.tag("button").findElementOrNull(this) != null;
+        if (hasButtons == null)
+            hasButtons = Locator.tag("button").existsIn(this);
+        return hasButtons;
     }
 
     public static class ToggleButtonFinder extends WebDriverComponentFinder<ToggleButton, ToggleButtonFinder>

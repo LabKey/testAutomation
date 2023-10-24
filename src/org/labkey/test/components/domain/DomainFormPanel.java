@@ -406,7 +406,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     {
         if (!getMode().equalsIgnoreCase(name))
         {
-            boolean isSummary = elementCache().customFieldsViewToggle.isEnabled();
+            boolean isSummary = elementCache().customFieldsViewToggle.isOn();
             elementCache().customFieldsViewToggle.set(!isSummary);
         }
         WebDriverWrapper.waitFor(()-> getMode().equalsIgnoreCase(name),
