@@ -9,6 +9,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,11 +54,11 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
         String wideShape = "Too wide\tACME\tthing\tanother\televen\toff the map\tMoar columns\n";
 
-        clickButton("Add Row", 0);
+        testGrid.addRows(1);
         testGrid.pasteFromCell(0, "Description", wideShape);
-        assertThat("Expect cell error to explain that paste cannot add columns",
-                testGrid.getCellPopoverText(0, "Description"),
-                is("Unable to paste. Cannot paste columns beyond the columns found in the grid."));
+        assertEquals("Expect cell error to explain that paste cannot add columns",
+                "Unable to paste. Cannot paste columns beyond the columns found in the grid.",
+                testGrid.getCellPopoverText(0, "Description"));
         assertThat("Expect failed paste to leave data unchanged",
                 testGrid.getColumnData("Name"), everyItem(is("")));
     }
@@ -67,22 +68,41 @@ public class EditableGridTest extends BaseWebDriverTest
     {
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
-        String tallShape = "42\n" +
-                "41\n" +
-                "40\n" +
-                "39\n" +
-                "38";
+        String tallShape = """
+                42
+                41
+                40
+                39
+                38""";
 
-        assertThat(testGrid.getRowCount(), is(0));
-        clickButton("Add Row", 0);
+        assertEquals("Initial editable grid row count", 0, testGrid.getRowCount());
+        testGrid.addRows(1);
         testGrid.pasteFromCell(0, "Description", tallShape);
         List<String> pastedColData = testGrid.getColumnData("Description");
         List<String> unpastedColData = testGrid.getColumnData("Name");
 
-        assertThat(testGrid.getRowCount(), is(5));
+        assertEquals("Editable grid row count after paste", 5, testGrid.getRowCount());
         assertEquals("Didn't get correct values", List.of("42", "41", "40", "39", "38"), pastedColData);
         assertThat("expect other column to remain empty",
                 unpastedColData, everyItem(is("")));
+    }
+
+    @Test
+    public void testDragFillIncrementingIntegers()
+    {
+        CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
+        EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
+
+        testGrid.addRows(6);
+        WebElement cell1 = testGrid.setCellValue(0, "Description", "2");
+        WebElement cell2 = testGrid.setCellValue(1, "Description", "4");
+        WebElement cell3 = testGrid.getCell(4, "Description");
+
+        testGrid.selectCellRange(cell1, cell2);
+        testGrid.dragFill(cell2, cell3);
+
+        List<String> actualValues = testGrid.getColumnData("Description");
+        assertEquals("Drag-fill should have extrapolated values", List.of("2", "4", "6", "8", "10", ""), actualValues);
     }
 
     @Override

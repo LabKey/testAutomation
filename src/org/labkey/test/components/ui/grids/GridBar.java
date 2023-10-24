@@ -14,7 +14,6 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -60,28 +59,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public File exportData(ExportType exportType)
     {
-        WebElement exportButton = getExportButton(exportType);
-        return getWrapper().doAndWaitForDownload(exportButton::click);
-    }
-
-    private WebElement getExportButton(ExportType exportType)
-    {
-        WebElement downloadBtn = Locator.tagWithClass("span", "fa-download").findElement(this);
-
-        if(!downloadBtn.isDisplayed())
-            throw new ElementNotInteractableException("File export button is not visible.");
-
-        downloadBtn.click();
-
-        return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
+        return elementCache().exportMenu.exportData(exportType);
     }
 
     public TabSelectionExportDialog openExcelTabsModal()
     {
-        WebElement exportButton = getExportButton(ExportType.EXCEL);
-        exportButton.click();
-
-        return new TabSelectionExportDialog(this.getDriver());
+        return elementCache().exportMenu.openExcelTabsModal();
     }
 
     /**
@@ -467,6 +450,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
+        private final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(this);
 
         private final Map<String, MultiMenu> menus = new HashMap<>();
         protected MultiMenu findMenu(String buttonText)
