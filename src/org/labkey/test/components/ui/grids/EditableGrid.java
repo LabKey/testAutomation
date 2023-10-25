@@ -833,11 +833,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         final WebElement topControls = Locator.byClass("editable-grid-buttons__action-buttons").findWhenNeeded(this);
 
-        final WebElement bulkInsertBtn = Locator.button("Bulk Insert").findWhenNeeded(topControls);
-        final WebElement bulkUpdateBtn = Locator.button("Bulk Update").findWhenNeeded(topControls);
-        final WebElement deleteRowsBtn =  Locator.XPathLocator
-                .union(Locator.button("Delete rows"), Locator.buttonContainingText("Remove"))
-                .findWhenNeeded(topControls);
+        final WebElement bulkInsertBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
+        final WebElement bulkUpdateBtn = Locator.byClass("bulk-update-button").findWhenNeeded(topControls);
+        final WebElement deleteRowsBtn =  Locator.byClass("bulk-remove-button").findWhenNeeded(topControls);
         final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
 
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
