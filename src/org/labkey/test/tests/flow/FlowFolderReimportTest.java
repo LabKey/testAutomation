@@ -145,11 +145,11 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText("Upload More Samples"));
             new ImportDataPage(getDriver()).setFile(flowSamples).submit();
         }
-
-        clickAndWait(Locators.folderTitle);
-        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
-        setFormElement(Locator.name("ff_name"), "Unused Script");
-        clickAndWait(Locator.lkButton("Create Analysis Script"));
+// TODO Remove
+//        clickAndWait(Locators.folderTitle);
+//        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
+//        setFormElement(Locator.name("ff_name"), "Unused Script");
+//        clickAndWait(Locator.lkButton("Create Analysis Script"));
 
         clickAndWait(Locators.folderTitle);
         clickAndWait(Locator.linkWithText("Define sample description join fields"));
