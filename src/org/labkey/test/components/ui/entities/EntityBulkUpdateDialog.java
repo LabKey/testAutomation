@@ -43,7 +43,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public boolean isFieldEnabled(String columnTitle)
     {
-        return elementCache().getToggle(columnTitle).get();
+        return elementCache().getToggle(columnTitle).isOn();
     }
 
     public EntityBulkUpdateDialog setEditableState(String columnTitle, boolean enable)
