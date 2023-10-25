@@ -160,8 +160,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     /** Click the 'Cancel' button. This will make the edit panel go away. */
     public void clickCancel()
     {
-        clickButtonWaitForPanel(elementCache()
-                .button("Cancel"));
+        clickButtonWaitForPanel(elementCache().cancelButton);
     }
 
     /** Click the 'Save' button. */
@@ -177,13 +176,11 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public void clickSave(int waitTime)
     {
         // Making changes, like to lineage, may cause a slight delay before the save button is enabled.
-        WebDriverWrapper.waitFor(()->elementCache().button("Save").isEnabled(),
+        WebDriverWrapper.waitFor(()->elementCache().saveButton.isEnabled(),
                 "Save button is not enabled.", 2_500);
 
         // The wait time is used here to validate the panel exits edit mode.
-        clickButtonWaitForPanel(elementCache()
-                .button("Save"),
-                waitTime);
+        clickButtonWaitForPanel(elementCache().saveButton, waitTime);
 
         // After the panel exits edit mode the page might still be updating, wait for that to happen.
         WebElement progressbar = Locator.tagWithClass("div", "progress-bar").findWhenNeeded(getDriver());
@@ -199,9 +196,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public String clickSaveExpectingError()
     {
-        elementCache()
-                .button("Save")
-                .click();
+        elementCache().saveButton.click();
         return BootstrapLocators.errorBanner.waitForElement(this, 1_000).getText();
     }
 
@@ -213,9 +208,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public boolean isSaveButtonEnabled()
     {
         // If element is enabled the disabled attribute will not be there and getAttribute will return null.
-        return null == elementCache()
-                .button("Save")
-                .getAttribute("disabled");
+        return null == elementCache().saveButton.getAttribute("disabled");
     }
 
     /**
@@ -492,18 +485,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        // The 'Save' and 'Cancel' buttons are actually on the page and not the panel, so the search context needs
-        // to be the entire page. This is has a dependence that only one entity panel can be in edit mode at a time.
-        WebElement button(String buttonText)
-        {
-            return Locator.tagWithClass("span", "detail__edit--heading")
-                    .parent("div")
-                    .parent("div")
-                    .followingSibling("div")
-                    .childTag("button")
-                    .withText(buttonText)
-                    .findElement(getDriver());
-        }
+        final WebElement saveButton = Locator.byClass("btn-success").withText("Save").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").findWhenNeeded(this);
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator
