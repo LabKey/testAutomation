@@ -207,8 +207,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public boolean isSaveButtonEnabled()
     {
-        // If element is enabled the disabled attribute will not be there and getAttribute will return null.
-        return null == elementCache().saveButton.getAttribute("disabled");
+        return elementCache().saveButton.isEnabled();
     }
 
     /**
