@@ -21,6 +21,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.admin.ElnSettingsPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.openqa.selenium.WebDriver;
@@ -226,6 +227,13 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().creditsLink);
     }
 
+    public ElnSettingsPage clickNotebookSettings()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().notebookSettingsLink);
+        return new ElnSettingsPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -262,6 +270,8 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
         protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
         protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
+
+        protected WebElement notebookSettingsLink = Locator.linkWithText("Notebook settings").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {
