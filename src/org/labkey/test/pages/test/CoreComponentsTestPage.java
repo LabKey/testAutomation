@@ -4,11 +4,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.components.ui.entities.EntityUpdateFromFilePanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.ui.entities.EntityInsertPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 
@@ -30,23 +28,9 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
         return new CoreComponentsTestPage(webDriverWrapper.getDriver());
     }
 
-    public ReactSelect getComponentSelect()
+    private ReactSelect getComponentSelect()
     {
         return ReactSelect.finder(getDriver()).waitFor();
-    }
-
-    public EntityInsertPanel getEntityInsertPanel()
-    {
-        getComponentSelect().select("EntityInsertPanel");
-        return new EntityInsertPanel.EntityInsertPanelFinder(getDriver())
-                .waitFor();
-    }
-
-    public EntityUpdateFromFilePanel getEntityInsertPanelForUpdate()
-    {
-        getComponentSelect().select("EntityInsertPanelForUpdate");
-        return new EntityUpdateFromFilePanel.EntityUpdateFromFilePanelFinder(getDriver())
-                .waitFor();
     }
 
     public EditableGrid getEditableGrid(String schema, String query)

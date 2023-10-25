@@ -141,7 +141,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
     public boolean getAutoImport()
     {
-        return elementCache().autoImportSlider().get();
+        return elementCache().autoImportSlider().isOn();
     }
 
     public void setColumnPhiLevel(String name, FieldDefinition.PhiSelectType phiLevel)
@@ -189,7 +189,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
         protected ToggleButton autoImportSlider()
         {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").find(fieldsPanel);
+            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Yes").find(fieldsPanel);
         }
     }
 }
