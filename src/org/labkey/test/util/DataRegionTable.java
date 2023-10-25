@@ -1037,7 +1037,7 @@ public class DataRegionTable extends DataRegion
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         WebElement filterDialogElement = getWrapper().waitForElement(filterDialog);
 
-        WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
+        WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.tagWithText("span","[All]")).notHidden()) ||
                         getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())) ||
                         getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("textarea", "value_1-1").notHidden())),
                 "Filter Dialog", WAIT_FOR_JAVASCRIPT);
@@ -1148,9 +1148,9 @@ public class DataRegionTable extends DataRegion
         assertEquals("Faceted filter tab should be selected.", "Choose Values", getWrapper().getText(Locator.css(".x-tab-strip-active")));
         if (!getWrapper().isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
         {
-            getWrapper().click(Locator.linkWithText("[All]"));
+            getWrapper().click(Locator.tagWithText("span","[All]"));
         }
-        getWrapper().click(Locator.linkWithText("[All]"));
+        getWrapper().click(Locator.tagWithText("span", "[All]"));
 
         if (values.length > 1)
         {
