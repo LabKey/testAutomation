@@ -24,9 +24,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.PermissionsHelper.MemberType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,11 +42,18 @@ public class AppAdminRoleTest extends BaseWebDriverTest
 {
     private static final String APP_ADMIN = "appadmin@appadmin.test";
     private static final String USER = "user@appadmin.test";
+    private static final String ADMIN_GROUP = "Custom Admin Group";
+    private static final String DEV_GROUP = "Custom Developer Group";
+    private static final String IT_GROUP = "Custom IT Group";
+    private static final String SITE_GROUP = "Custom Site Group";
+    private static final String APP_ADMIN_TEST_PROJECT = "AppAdminTestProject";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        _containerHelper.deleteProject(APP_ADMIN_TEST_PROJECT, false);
         _userHelper.deleteUsers(false, APP_ADMIN, USER);
+        deleteSiteGroups(new ApiPermissionsHelper(this));
     }
 
     @BeforeClass
@@ -64,10 +73,31 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         new ApiPermissionsHelper(this).addUserAsAppAdmin(APP_ADMIN);
     }
 
+    private void deleteSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
+    {
+        apiPermissionsHelper.deleteGroup(ADMIN_GROUP, "/", false);
+        apiPermissionsHelper.deleteGroup(SITE_GROUP, "/", false);
+        apiPermissionsHelper.deleteGroup(DEV_GROUP, "/", false);
+        apiPermissionsHelper.deleteGroup(IT_GROUP, "/", false);
+    }
+
+    @LogMethod
+    private void recreateSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
+    {
+        deleteSiteGroups(apiPermissionsHelper);
+        apiPermissionsHelper.createGlobalPermissionsGroup(SITE_GROUP);
+        apiPermissionsHelper.createGlobalPermissionsGroup(ADMIN_GROUP);
+        apiPermissionsHelper.addMemberToRole(ADMIN_GROUP, "Site Administrator", MemberType.group, "/");
+        apiPermissionsHelper.createGlobalPermissionsGroup(DEV_GROUP);
+        apiPermissionsHelper.addMemberToRole(DEV_GROUP, "Platform Developer", MemberType.group, "/");
+        apiPermissionsHelper.createGlobalPermissionsGroup(IT_GROUP);
+        apiPermissionsHelper.addMemberToRole(IT_GROUP, "Impersonating Troubleshooter", MemberType.group, "/");
+    }
+
     @Test
     public void testAppAdminAssignSiteAdmin()
     {
-        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(USER, "Site Admin", PermissionsHelper.MemberType.user, "/"));
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(USER, "Site Admin", MemberType.user, "/"));
         if (apiException == null)
             fail("App Admin was able to assign Site Admin role");
 
@@ -75,9 +105,21 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testAssignGroupSiteAdmin()
+    {
+        recreateSiteGroups(new ApiPermissionsHelper(this));
+
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(SITE_GROUP, "Site Admin", MemberType.group, "/"));
+        if (apiException == null)
+            fail("App Admin was able to assign group to Site Admin role");
+
+        assertEquals("Wrong error", "You do not have permission to modify the Site Administrator role.", apiException.getMessage());
+    }
+
+    @Test
     public void testAppAdminAssignPlatformDeveloper()
     {
-        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(USER, "Platform Developer", PermissionsHelper.MemberType.user, "/"));
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(USER, "Platform Developer", MemberType.user, "/"));
         if (apiException == null)
             fail("App Admin was able to assign Platform Developer role");
 
@@ -85,21 +127,76 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testAssignGroupPlatformDeveloper()
+    {
+        recreateSiteGroups(new ApiPermissionsHelper(this));
+
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(SITE_GROUP, "Platform Developer", MemberType.group, "/"));
+        if (apiException == null)
+            fail("App Admin was able to assign group to Platform Developer role");
+
+        assertEquals("Wrong error", "You do not have permission to modify the Platform Developer role.", apiException.getMessage());
+    }
+
+    @Test
     public void testAppAdminAssignReader()
     {
-        permissionsApiAsAppAdmin().addMemberToRole(USER, "Reader", PermissionsHelper.MemberType.user, "home");
+        permissionsApiAsAppAdmin().addMemberToRole(USER, "Reader", MemberType.user, "home");
     }
 
     @Test
     public void testAppAdminCanCreateAndDeleteFolder()
     {
-        goToHome();
         impersonate(APP_ADMIN);
-        _containerHelper.createProject("AppAdminTestProject", "Collaboration");
-        _containerHelper.deleteProject("AppAdminTestProject");
-        assertFalse("Container AppAdminTestProject not deleted.", _containerHelper.doesContainerExist("AppAdminTestProject"));
-        goToHome();
-        stopImpersonating();
+        _containerHelper.createProject(APP_ADMIN_TEST_PROJECT, "Collaboration");
+        _containerHelper.deleteProject(APP_ADMIN_TEST_PROJECT);
+        assertFalse("Container AppAdminTestProject not deleted.", _containerHelper.doesContainerExist(APP_ADMIN_TEST_PROJECT));
+    }
+
+    @Test
+    public void testModifyPrivilegedGroup()
+    {
+        recreateSiteGroups(new ApiPermissionsHelper(this));
+
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addUserToSiteGroup(USER, ADMIN_GROUP));
+        if (apiException == null)
+            fail("App Admin was able to modify privileged group");
+
+        assertEquals("Wrong error", "Can not update members of a group assigned a privileged role: " + ADMIN_GROUP, apiException.getMessage());
+    }
+
+    @Test
+    public void testPermissionsUi()
+    {
+        recreateSiteGroups(new ApiPermissionsHelper(this));
+        impersonate(APP_ADMIN);
+        PermissionsEditor permissionsEditor;
+
+        log("Test adding roles");
+        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor.setSiteGroupPermissions(SITE_GROUP, "Site Administrator");
+        permissionsEditor.clickSaveExpectingError().close();
+
+        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor.setSiteGroupPermissions(SITE_GROUP, "Platform Developer");
+        permissionsEditor.clickSaveExpectingError().close();
+
+        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor.setSiteGroupPermissions(SITE_GROUP, "Impersonating Troubleshooter");
+        permissionsEditor.clickSaveExpectingError().close();
+
+        log("Test removing roles");
+        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor.removeSiteGroupPermission(ADMIN_GROUP, "Site Administrator");
+        permissionsEditor.clickSaveExpectingError().close();
+
+        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor.removeSiteGroupPermission(DEV_GROUP, "Platform Developer");
+        permissionsEditor.clickSaveExpectingError().close();
+
+        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor.removeSiteGroupPermission(IT_GROUP, "Impersonating Troubleshooter");
+        permissionsEditor.clickSaveExpectingError().close();
     }
 
     private ApiPermissionsHelper permissionsApiAsAppAdmin()
@@ -116,8 +213,8 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         }
         catch (RuntimeException ex)
         {
-            if (ex.getCause() != null && ex.getCause() instanceof CommandException)
-                return (CommandException) ex.getCause();
+            if (ex.getCause() instanceof CommandException ce)
+                return ce;
             throw ex;
         }
     }
