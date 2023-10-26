@@ -30,11 +30,15 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.io.IOException;
@@ -306,6 +310,126 @@ public class GpatAssayTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Data", getDriver());
         table.assertPaginationText(1, 100, 603);
 
+    }
+
+    @Test
+    public void testRenameAssayDesign()
+    {
+        String originalAssayName = "A Assay Name";
+        log(String.format("Create an assay named '%s'.", originalAssayName));
+        startCreateGpatAssay(GPAT_ASSAY_XLS, originalAssayName);
+        setAssayResultsProperties();
+
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
+
+        String newAssayName = "Updated Assay Name";
+        log(String.format("Edit the assay design and rename it to '%s'.", newAssayName));
+
+
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(false);
+        checker().fatal()
+                .verifyTrue("The 'Name' field should be enabled and editable. Fatal error.",
+                        assayDesignerPage.isNameEnabled());
+
+        assayDesignerPage.setName(newAssayName);
+        assayDesignerPage.clickFinish();
+
+        log("Validate the new name is shown in the header.");
+        WebElement header = Locator.tagWithText("h3", String.format("%s Runs", newAssayName)).refindWhenNeeded(getDriver());
+        checker().withScreenshot()
+                .verifyTrue(String.format("New name '%s' is not shown on the assays runs page.", newAssayName),
+                        waitFor(header::isDisplayed, 5_000));
+
+        AssayBeginPage assayBeginPage = AssayBeginPage.beginAt(this);
+
+        log("Validate the new name is shown in the lists of assays.");
+        List<String> actualValues = assayBeginPage.getAssayList().getColumnDataAsText("Name");
+
+        checker().fatal()
+                .verifyTrue(String.format("New assay name '%s' is not in the assay list. Fatal error.", newAssayName),
+                        actualValues.contains(newAssayName));
+
+        log("Validate that clicking the assay name navigates as expected.");
+        assayBeginPage.clickAssay(newAssayName);
+
+        checker().withScreenshot()
+                .verifyTrue(String.format("Clicking assay name '%s' did not navigate as expected.", newAssayName),
+                        waitFor(header::isDisplayed, 5_000));
+
+    }
+
+    @Test
+    public void testRenameSharedAssayDesign()
+    {
+        String otherProject = "Testing_Shared_Assay_Rename";
+
+        _containerHelper.deleteProject(otherProject, false);
+
+        log(String.format("Create another project named '%s'.", otherProject));
+
+        _containerHelper.createProject(otherProject, "Assay");
+
+        goToProjectHome();
+
+        String originalAssayName = "A Shared Assay Name";
+        log(String.format("Create an assay named '%s' and put it in the shared folder.", originalAssayName));
+        startCreateGpatAssay(GPAT_ASSAY_XLS, originalAssayName);
+
+        Locator gwtSelectLocator = Locator.xpath("//h3[@title='Assay Properties']/ancestor::div[contains(@class,'panel-portal')]//select[@class='gwt-ListBox']");
+        Select location = SelectWrapper.Select(gwtSelectLocator).findWhenNeeded(getDriver());
+        location.selectByVisibleText("Shared Folder");
+
+        setAssayResultsProperties();
+
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
+
+        log("Validate assay is visible in other project.");
+        goToProjectHome(otherProject);
+        AssayBeginPage assayBeginPage = AssayBeginPage.beginAt(this, otherProject);
+
+        List<String> actualValues = assayBeginPage.getAssayList().getColumnDataAsText("Name");
+
+        checker().fatal()
+                .verifyTrue(String.format("Original assay name '%s' is not visible in the project '%s'. Fatal error.", originalAssayName, otherProject),
+                        actualValues.contains(originalAssayName));
+
+        log("Go back to the original project and rename the assay.");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(originalAssayName));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
+        checker().fatal()
+                .verifyTrue("The 'Name' field should be enabled and editable. Fatal error.",
+                        assayDesignerPage.isNameEnabled());
+
+        String newAssayName = "Updated Shared Assay Name";
+        assayDesignerPage.setName(newAssayName);
+        assayDesignerPage.clickFinish();
+
+        WebElement header = Locator.tagWithText("h3", String.format("%s Runs", newAssayName)).refindWhenNeeded(getDriver());
+        checker().withScreenshot()
+                .verifyTrue(String.format("New name '%s' is not shown on the assays runs page.", newAssayName),
+                        waitFor(header::isDisplayed, 5_000));
+
+        log(String.format("Go to project '%s' and validate the new assay name.", otherProject));
+        assayBeginPage = AssayBeginPage.beginAt(this, otherProject);
+
+        actualValues = assayBeginPage.getAssayList().getColumnDataAsText("Name");
+
+        checker().fatal()
+                .verifyTrue(String.format("New assay name '%s' is not in the assay list in project '%s'. Fatal error.", newAssayName, otherProject),
+                        actualValues.contains(newAssayName));
+
+        assayBeginPage.clickAssay(newAssayName);
+
+        checker().withScreenshot()
+                .verifyTrue(String.format("Clicking assay name '%s' did not navigate as expected.", newAssayName),
+                        waitFor(header::isDisplayed, 5_000));
+
+        // Be a good corporate citizen and delete the assay from the shared folder.
+        log("Delete the assay from the shared folder.");
+        _assayHelper.deleteAssayDesign();
     }
 
     private void uploadAssayFile(File guavaFile, int fileNumber)

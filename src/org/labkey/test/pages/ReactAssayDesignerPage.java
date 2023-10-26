@@ -58,8 +58,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return elementCache().nameInput.get();
     }
 
-    // I think the name field is the only field that can be enabled/disabled.
-    // For example once an assay is created you can't change it's name so the field will be disabled.
     public boolean isNameEnabled()
     {
         expandPropertiesPanel();
