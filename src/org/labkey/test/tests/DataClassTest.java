@@ -29,6 +29,7 @@ import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataClassHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -240,6 +241,64 @@ public class DataClassTest extends BaseWebDriverTest
 
         DataClassHelper sourceHelper = DataClassHelper.beginAtDataClassesList(this, getProjectName());
         assertEquals("Data class grid should have zero rows", 0, sourceHelper.goToDataClass(name).getDataCount());
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        goToProjectHome();
+
+        String dataClassName = "Unique Constraint Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(dataClassName);
+
+        log("Add a field with a unique constraint");
+        String fieldName1 = "field Name1";
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields(fieldName1)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field with a unique constraint");
+        String fieldName2 = "fieldName_2";
+        domainFormPanel.addField(fieldName2)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field which does not have a unique constraint");
+        String fieldName3 = "FieldName@3";
+        domainFormPanel.addField(fieldName3);
+        createPage.clickSave();
+
+        viewRawTableMetadata(dataClassName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+
+        log("Remove a field unique constraint and add a new one");
+        goToProjectHome();
+        CreateDataClassPage updatePage = goToDataClass(dataClassName);
+        domainFormPanel = updatePage.getDomainEditor();
+        domainFormPanel.getField(fieldName2)
+                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        domainFormPanel.getField(fieldName3)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        updatePage.clickSave();
+        viewRawTableMetadata(dataClassName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_test_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String dataClassName)
+    {
+        beginAt("/" + EscapeUtil.encode(getProjectName()) + "/query-rawTableMetaData.view?schemaName=exp.data&query.queryName=" + dataClassName);
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("lsid");
+        suffixes.add("name_classid");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     private CreateDataClassPage goToCreateNewDataClass()
