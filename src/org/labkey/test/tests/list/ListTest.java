@@ -70,6 +70,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1311,6 +1312,67 @@ public class ListTest extends BaseWebDriverTest
             .clickRemoveField(true);
         listDefinitionPage.clickSave();
         AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        String listName = "Unique Constraint List";
+        String fieldName1 = "field Name1";
+        String fieldName2 = "fieldName_2";
+        String fieldName3 = "FieldName@3";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
+                new FieldDefinition(fieldName1, ColumnType.String),
+                new FieldDefinition(fieldName2, ColumnType.DateAndTime),
+                new FieldDefinition(fieldName3, ColumnType.Boolean)
+        );
+
+        // verify initial set of indices
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", Collections.emptyList());
+
+        // set two fields to have unique constraints
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName1).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.clickSave();
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
+        assertTextNotPresent("unique_constraint_list_fieldname_3");
+
+        // remove a field unique constraint and add a new one
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName3).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.clickSave();
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_list_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String listName)
+    {
+        goToSchemaBrowser();
+        selectQuery("lists", listName);
+        waitAndClickAndWait(Locator.linkWithText("view raw table metadata"));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("pk");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     //
