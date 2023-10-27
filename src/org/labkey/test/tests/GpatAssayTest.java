@@ -427,9 +427,11 @@ public class GpatAssayTest extends BaseWebDriverTest
                 .verifyTrue(String.format("Clicking assay name '%s' did not navigate as expected.", newAssayName),
                         waitFor(header::isDisplayed, 5_000));
 
-        // Be a good corporate citizen and delete the assay from the shared folder.
-        log("Delete the assay from the shared folder.");
+        // Be a good corporate citizen and clean up after the test.
+        log("Delete the extra project and the shared assay.");
         _assayHelper.deleteAssayDesign();
+        _containerHelper.deleteProject(otherProject, false);
+
     }
 
     private void uploadAssayFile(File guavaFile, int fileNumber)
