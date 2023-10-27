@@ -31,10 +31,6 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
 
     public ToggleButton set(boolean enabled)
     {
-        // if we can't determine the current state of the toggle, then throw without proceeding
-        if (!isOn() && !isOff())
-            throw new IllegalStateException("Unable to determine the current state of the toggle.");
-
         String desiredState = enabled ? "enabled" : "disabled";
         if (enabled && !isOn())
         {
@@ -53,12 +49,13 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
 
     public boolean isOn()
     {
-        return getComponentElement().getAttribute("class").contains("toggle-on");
-    }
-
-    public boolean isOff()
-    {
-        return getComponentElement().getAttribute("class").contains("toggle-off");
+        String buttonCls = getComponentElement().getAttribute("class");
+        if (buttonCls.contains("toggle-on"))
+            return true;
+        else if (buttonCls.contains("toggle-off"))
+            return false;
+        else
+            throw new IllegalStateException("Unable to determine the current state of the toggle.");
     }
 
     /*
