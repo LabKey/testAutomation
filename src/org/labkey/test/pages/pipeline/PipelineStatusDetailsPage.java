@@ -185,8 +185,8 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         {
             doAndWaitForPageToLoad(() -> {
                 log("Process done, clicking and waiting for redirect");
-                log("Redirected on success as expected: " + getDriver().getCurrentUrl());
             });
+            log("Redirected on success as expected: " + getDriver().getCurrentUrl());
         }
 
         return this;
