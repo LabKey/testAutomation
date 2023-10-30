@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.ObjectUtils;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.GuestCredentialsProvider;
 import org.labkey.remoteapi.security.GetRolesCommand;
 import org.labkey.remoteapi.security.GetRolesResponse;
 import org.labkey.test.WebTestHelper;
@@ -35,6 +34,11 @@ import static org.junit.Assert.fail;
  */
 public abstract class PermissionsHelper
 {
+    public static final String SITE_ADMIN_ROLE = "Site Administrator";
+    public static final String APP_ADMIN_ROLE = "Application Admin";
+    public static final String DEVELOPER_ROLE = "Platform Developer";
+    public static final String IMP_TROUBLESHOOTER_ROLE = "Impersonating Troubleshooter";
+
     public static String toRole(final String name)
     {
         if (name.contains("."))

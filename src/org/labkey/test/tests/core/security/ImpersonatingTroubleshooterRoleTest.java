@@ -18,12 +18,12 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.IMP_TROUBLESHOOTER_ROLE;
 import static org.labkey.test.util.PermissionsHelper.toRole;
 
 @Category({Daily.class})
 public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
 {
-    private static final String ROLE = "Impersonating Troubleshooter";
     private static final String USER = "user@imptrouble.test";
 
     private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
@@ -45,7 +45,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
     @Override
     protected String getRole()
     {
-        return ROLE;
+        return IMP_TROUBLESHOOTER_ROLE;
     }
 
     /**
