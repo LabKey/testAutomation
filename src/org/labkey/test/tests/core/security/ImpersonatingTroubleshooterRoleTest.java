@@ -1,76 +1,94 @@
 package org.labkey.test.tests.core.security;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.user.ImpersonateRolesCommand;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({})
-public class ImpersonatingTroubleshooterRoleTest extends BaseWebDriverTest
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.toRole;
+
+@Category({Daily.class})
+public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
 {
-    private static final String IMP_T = "impersonating_troubleshooter@imptrouble.test";
+    private static final String ROLE = "Impersonating Troubleshooter";
     private static final String USER = "user@imptrouble.test";
-    private static final String ADMIN_GROUP = "Custom Admin Group";
-    private static final String DEV_GROUP = "Custom Developer Group";
-    private static final String IT_GROUP = "Custom IT Group";
-    private static final String SITE_GROUP = "Custom Site Group";
+
+    private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _userHelper.deleteUsers(afterTest, USER, IMP_T);
+        super.doCleanup(afterTest);
+        _userHelper.deleteUsers(afterTest, USER);
     }
 
-    @BeforeClass
-    public static void setupProject()
+    @Override
+    protected void doSetup()
     {
-        ImpersonatingTroubleshooterRoleTest init = (ImpersonatingTroubleshooterRoleTest) getCurrentTest();
-
-        init.doSetup();
+        super.doSetup();
+        setInitialPassword(TROUBLESHOOTER);
     }
 
-    private void doSetup()
+    @Override
+    protected String getRole()
     {
-        _containerHelper.createProject(getProjectName(), null);
-        _userHelper.createUser(USER);
-        _userHelper.createUser(IMP_T);
-        setInitialPassword(IMP_T);
-        new ApiPermissionsHelper(this).addMemberToRole(IMP_T, "Impersonating Troubleshooter", PermissionsHelper.MemberType.user, "/");
+        return ROLE;
     }
 
-    private void deleteSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
-    {
-        apiPermissionsHelper.deleteGroup(ADMIN_GROUP, "/", false);
-        apiPermissionsHelper.deleteGroup(SITE_GROUP, "/", false);
-        apiPermissionsHelper.deleteGroup(DEV_GROUP, "/", false);
-        apiPermissionsHelper.deleteGroup(IT_GROUP, "/", false);
-    }
-
-    @LogMethod
-    private void recreateSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
-    {
-        deleteSiteGroups(apiPermissionsHelper);
-        apiPermissionsHelper.createGlobalPermissionsGroup(SITE_GROUP);
-        apiPermissionsHelper.createGlobalPermissionsGroup(ADMIN_GROUP);
-        apiPermissionsHelper.addMemberToRole(ADMIN_GROUP, "Site Administrator", PermissionsHelper.MemberType.group, "/");
-        apiPermissionsHelper.createGlobalPermissionsGroup(DEV_GROUP);
-        apiPermissionsHelper.addMemberToRole(DEV_GROUP, "Platform Developer", PermissionsHelper.MemberType.group, "/");
-        apiPermissionsHelper.createGlobalPermissionsGroup(IT_GROUP);
-        apiPermissionsHelper.addMemberToRole(IT_GROUP, "Impersonating Troubleshooter", PermissionsHelper.MemberType.group, "/");
-    }
-
+    /**
+     * "Impersonating Troubleshooter" should not be able to modify permissions for privileged roles (e.g. Site Admin)
+     * They should be able to do so when impersonating a Site Admin.
+     */
     @Test
-    public void testSomething()
+    public void testModifyPrivilegedPermission() throws Exception
     {
-        Assert.fail("Write some tests");
+        _userHelper.createUser(USER);
+        Assertions.assertThatThrownBy(() -> apiAsTroubleshooter().addMemberToRole(USER, "Site Admin", PermissionsHelper.MemberType.user, "/"))
+                .as("Impersonating Troubleshooter assigning Site Admin over API").cause()
+                .isInstanceOf(CommandException.class)
+                .hasMessage("User does not have permission to perform this operation.");
+
+        apiAsImpersonatingSiteAdmin().addMemberToRole(USER, "Site Admin", PermissionsHelper.MemberType.user, "/");
+        Assertions.assertThat(_apiPermissionsHelper.getUserRoles("/", USER)).contains(PermissionsHelper.toRole("Site Administrator"));
+    }
+
+    @Override
+    @Test
+    public void testAdminConsoleVisibility()
+    {
+        signOut();
+        signIn(TROUBLESHOOTER);
+        log("Verify permissions from troubleshooter");
+        verifySitePermissionSetting(false);
+
+        impersonateRole("Site Administrator");
+        log("Verify the permissions while impersonating admin");
+        verifySitePermissionSetting(true);
+    }
+
+    private ApiPermissionsHelper apiAsTroubleshooter()
+    {
+        return new ApiPermissionsHelper(this, () -> new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER, PasswordUtil.getPassword()));
+    }
+
+    private ApiPermissionsHelper apiAsImpersonatingSiteAdmin() throws IOException, CommandException
+    {
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER, PasswordUtil.getPassword());
+        new ImpersonateRolesCommand(toRole("Site Administrator")).execute(connection, "/");
+        return new ApiPermissionsHelper(this, () -> connection);
     }
 
     @Override

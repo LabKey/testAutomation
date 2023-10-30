@@ -70,7 +70,9 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         _userHelper.createUserAndNotify(APP_ADMIN, true);
         setInitialPassword(APP_ADMIN);
 
-        new ApiPermissionsHelper(this).addUserAsAppAdmin(APP_ADMIN);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.addUserAsAppAdmin(APP_ADMIN);
+        createSiteGroups(apiPermissionsHelper);
     }
 
     private void deleteSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
@@ -82,7 +84,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void recreateSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
+    private void createSiteGroups(ApiPermissionsHelper apiPermissionsHelper)
     {
         deleteSiteGroups(apiPermissionsHelper);
         apiPermissionsHelper.createGlobalPermissionsGroup(SITE_GROUP);
@@ -107,8 +109,6 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testAssignGroupSiteAdmin()
     {
-        recreateSiteGroups(new ApiPermissionsHelper(this));
-
         CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(SITE_GROUP, "Site Admin", MemberType.group, "/"));
         if (apiException == null)
             fail("App Admin was able to assign group to Site Admin role");
@@ -129,8 +129,6 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testAssignGroupPlatformDeveloper()
     {
-        recreateSiteGroups(new ApiPermissionsHelper(this));
-
         CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(SITE_GROUP, "Platform Developer", MemberType.group, "/"));
         if (apiException == null)
             fail("App Admin was able to assign group to Platform Developer role");
@@ -156,8 +154,6 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testModifyPrivilegedGroup()
     {
-        recreateSiteGroups(new ApiPermissionsHelper(this));
-
         CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addUserToSiteGroup(USER, ADMIN_GROUP));
         if (apiException == null)
             fail("App Admin was able to modify privileged group");
@@ -168,7 +164,6 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testPermissionsUi()
     {
-        recreateSiteGroups(new ApiPermissionsHelper(this));
         impersonate(APP_ADMIN);
         PermissionsEditor permissionsEditor;
 

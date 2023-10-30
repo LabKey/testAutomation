@@ -18,8 +18,10 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.ObjectUtils;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.GuestCredentialsProvider;
 import org.labkey.remoteapi.security.GetRolesCommand;
 import org.labkey.remoteapi.security.GetRolesResponse;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,32 +35,30 @@ import static org.junit.Assert.fail;
  */
 public abstract class PermissionsHelper
 {
-    private static final String permissionClassPkg = "org.labkey.api.security.roles.";
-    public String toRole(final String perm)
+    public static String toRole(final String name)
     {
-        if (perm.contains("."))
-            return perm;
+        if (name.contains("."))
+            return name;
 
-        Map<String, String> specialRoleClasses = new HashMap<>();
-        specialRoleClasses.put("See Audit Log Events", permissionClassPkg + "CanSeeAuditLogRole");
+        String roleClassName = name.replaceAll("[- ]", "").replace("Administrator", "Admin") + "Role";
 
-        String roleClassName = perm.replaceAll("[- ]", "").replace("Administrator", "Admin") + "Role";
+        String role = ObjectUtils.firstNonNull(
+                getRoles().get(name),
+                getRoles().get(roleClassName));
+        if (role == null)
+            throw new RuntimeException("No role found matching '" + name + "'");
 
-        return ObjectUtils.firstNonNull(
-                specialRoleClasses.get(perm),
-                getRoles().get(perm),
-                getRoles().get(roleClassName),
-                permissionClassPkg + roleClassName);
+        return role;
     }
 
-    private Map<String, String> _roles;
-    private Map<String, String> getRoles()
+    private static Map<String, String> _roles;
+    private static Map<String, String> getRoles()
     {
         if (_roles == null)
         {
             _roles = new HashMap<>();
             GetRolesCommand command = new GetRolesCommand();
-            Connection connection = getConnection();
+            Connection connection = WebTestHelper.getRemoteApiConnection();
 
             try
             {
@@ -66,9 +66,10 @@ public abstract class PermissionsHelper
                 List<GetRolesResponse.Role> roles = response.getRoles();
                 for (GetRolesResponse.Role role : roles)
                 {
-                    String[] roleParts = role.getUniqueName().split("\\.");
-                    _roles.put(roleParts[roleParts.length - 1], role.getUniqueName());
-                    _roles.put(role.getName(), role.getUniqueName());
+                    String uniqueName = role.getUniqueName();
+                    String simpleRoleClassName = uniqueName.substring(uniqueName.lastIndexOf(".") + 1);
+                    _roles.put(simpleRoleClassName, uniqueName);
+                    _roles.put(role.getName(), uniqueName);
                 }
             }
             catch (IOException | CommandException e)

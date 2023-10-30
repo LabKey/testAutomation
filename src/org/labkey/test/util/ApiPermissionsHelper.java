@@ -299,7 +299,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return getUserPerms(container, user).getProperty("container.groups");
     }
 
-    private List<String> getUserRoles(String container, String user)
+    public List<String> getUserRoles(String container, String user)
     {
         try
         {
