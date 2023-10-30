@@ -90,14 +90,14 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(getProjectName(), "Comparison", TestFileUtils.getFileContents(new File(sampledataDir, "Comparison.sql")), TestFileUtils.getFileContents(new File(sampledataDir, "Comparison.xml")), true);
 
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("1 run"));
+        clickAndWait(Locator.linkContainingText("1 run"));
         new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "PassFail");
 
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
 
         goToFlowDashboard();
-        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false);
+        importAnalysis(new ImportAnalysisOptions(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false, true));
 
         int runId;
         String currentURL = getCurrentRelativeURL();
@@ -175,7 +175,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
     private void verifyWSPImport()
     {
-        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("/advanced"), "Windows File", false, true);
+        importAnalysis(new ImportAnalysisOptions(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("/advanced"), "Windows File", false, true, true));
         assertTextPresent("931115-B02- Sample 01.fcs");
     }
 
@@ -193,9 +193,8 @@ public class FlowJoQueryTest extends BaseFlowTest
     private void verifyFilterOnImport()
     {
         setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
-        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "FilterAnalysis", false, true);
+        importAnalysis(new ImportAnalysisOptions(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "FilterAnalysis", false, true, true));
         DataRegionTable queryTable = new DataRegionTable("query", this);
         assertEquals(1, queryTable.getDataRowCount());
     }
-
 }
