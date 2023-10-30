@@ -9,7 +9,6 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.study.AdvancedDatasetSettingsDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.openqa.selenium.WebDriver;
@@ -237,13 +236,13 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
     // note: auto-import slider is only shown when you've inferred fields from file
     public DatasetDesignerPage setAutoImport(boolean autoImport)
     {
-        elementCache().autoImportToggle().set(autoImport);
+        elementCache().autoImportToggle.set(autoImport);
         return this;
     }
 
     public boolean getAutoImport()
     {
-        return elementCache().autoImportToggle().isOn();
+        return elementCache().autoImportToggle.isChecked();
     }
 
     public DatasetDesignerPage setPreviewMappedColumn(String columnLabel, String value)
@@ -305,10 +304,8 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
                 .findWhenNeeded(propertiesPanel));
 
         // this is only shown when inferring fields from a file
-        protected ToggleButton autoImportToggle()
-        {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Yes").waitFor(fieldsPanel);
-        }
+        protected final Checkbox autoImportToggle = new Checkbox(Locator.inputById("domain__import-data__file-enabled")
+                .findWhenNeeded(fieldsPanel));
 
         protected FilteringReactSelect columnMapSelect(String labelText)
         {   // find the row with the specified label span, then get the select in it
