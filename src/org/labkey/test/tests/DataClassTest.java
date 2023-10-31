@@ -256,14 +256,17 @@ public class DataClassTest extends BaseWebDriverTest
         String fieldName1 = "field Name1";
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(fieldName1)
+                .setType(FieldDefinition.ColumnType.Integer)
                 .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
         log("Add another field with a unique constraint");
         String fieldName2 = "fieldName_2";
         domainFormPanel.addField(fieldName2)
+                .setType(FieldDefinition.ColumnType.DateAndTime)
                 .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
         log("Add another field which does not have a unique constraint");
         String fieldName3 = "FieldName@3";
-        domainFormPanel.addField(fieldName3);
+        domainFormPanel.addField(fieldName3)
+                .setType(FieldDefinition.ColumnType.Boolean);
         createPage.clickSave();
 
         viewRawTableMetadata(dataClassName);

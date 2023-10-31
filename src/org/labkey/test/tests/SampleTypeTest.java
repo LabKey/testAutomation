@@ -1526,14 +1526,17 @@ public class SampleTypeTest extends BaseWebDriverTest
         String fieldName1 = "field Name1";
         DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
         domainFormPanel.manuallyDefineFields(fieldName1)
+                .setType(ColumnType.Integer)
                 .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
         log("Add another field with a unique constraint");
         String fieldName2 = "fieldName_2";
         domainFormPanel.addField(fieldName2)
+                .setType(ColumnType.DateAndTime)
                 .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
         log("Add another field which does not have a unique constraint");
         String fieldName3 = "FieldName@3";
-        domainFormPanel.addField(fieldName3);
+        domainFormPanel.addField(fieldName3)
+                .setType(ColumnType.Boolean);
         createPage.clickSave();
 
         viewRawTableMetadata(sampleTypeName);

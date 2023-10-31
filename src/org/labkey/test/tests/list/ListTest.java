@@ -1322,7 +1322,7 @@ public class ListTest extends BaseWebDriverTest
         String fieldName2 = "fieldName_2";
         String fieldName3 = "FieldName@3";
         _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
-                new FieldDefinition(fieldName1, ColumnType.String),
+                new FieldDefinition(fieldName1, ColumnType.Integer),
                 new FieldDefinition(fieldName2, ColumnType.DateAndTime),
                 new FieldDefinition(fieldName3, ColumnType.Boolean)
         );
