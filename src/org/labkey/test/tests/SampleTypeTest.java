@@ -49,6 +49,7 @@ import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -1508,6 +1509,69 @@ public class SampleTypeTest extends BaseWebDriverTest
                 sampleNames.size(),
                 sampleHelper.getSampleCount());
 
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        String sampleTypeName = "Unique Constraint Test";
+
+        clickProject(PROJECT_NAME);
+        CreateSampleTypePage createPage = sampleHelper
+                .goToCreateNewSampleType()
+                .setName(sampleTypeName);
+
+        log("Add a field with a unique constraint");
+        String fieldName1 = "field Name1";
+        DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
+        domainFormPanel.manuallyDefineFields(fieldName1)
+                .setType(ColumnType.Integer)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field with a unique constraint");
+        String fieldName2 = "fieldName_2";
+        domainFormPanel.addField(fieldName2)
+                .setType(ColumnType.DateAndTime)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field which does not have a unique constraint");
+        String fieldName3 = "FieldName@3";
+        domainFormPanel.addField(fieldName3)
+                .setType(ColumnType.Boolean);
+        createPage.clickSave();
+
+        viewRawTableMetadata(sampleTypeName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+
+        log("Remove a field unique constraint and add a new one");
+        goToProjectHome();
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+        domainFormPanel = updatePage.getFieldsPanel();
+        domainFormPanel.getField(fieldName2)
+                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        domainFormPanel.getField(fieldName3)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        updatePage.clickSave();
+        viewRawTableMetadata(sampleTypeName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_test_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String sampleTypeName)
+    {
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "samples", "query.queryName", sampleTypeName)));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("lsid");
+        suffixes.add("name");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     private void setFileAttachment(int index, File attachment)
