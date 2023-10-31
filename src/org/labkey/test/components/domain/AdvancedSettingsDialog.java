@@ -165,6 +165,19 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
+    public boolean isUniqueConstraint()
+    {
+        return elementCache().uniqueConstraint.get();
+    }
+
+    public AdvancedSettingsDialog setUniqueConstraint(boolean checked)
+    {
+        elementCache().uniqueConstraint.set(checked);
+        getWrapper().waitFor(()-> elementCache().uniqueConstraint.get().equals(checked),
+                "uniqueConstraint checkbox was not set as expected", 1000);
+        return this;
+    }
+
     public boolean missingValuesEnabled()
     {
         return elementCache().enableMissingValues.get();
@@ -233,6 +246,8 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-recommendedVariable").findWhenNeeded(this));
         public Checkbox enableMissingValues = new Checkbox(
                 Locator.input("domainpropertiesrow-mvEnabled").findWhenNeeded(this));
+        public Checkbox uniqueConstraint = new Checkbox(
+                Locator.input("domainpropertiesrow-uniqueConstraint").findWhenNeeded(this));
     }
 
 }
