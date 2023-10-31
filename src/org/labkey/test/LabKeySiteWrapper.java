@@ -632,7 +632,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             log("Testing bad passwords");
             String email = PasswordUtil.getUsername();
             verifyInitialUserError(email, null, null, "You must enter a password.");
-            verifyInitialUserError(email, PasswordUtil.getPassword(), null, "You must enter a password.");
+            verifyInitialUserError(email, PasswordUtil.getPassword(), null, "You must confirm your password.");
             verifyInitialUserError(email, null, PasswordUtil.getPassword(), "You must enter a password.");
             verifyInitialUserError(email, "short", "short", "Your password is not complex enough."); // less than weak
             verifyInitialUserError(email, "LongEnough", "LongEnough", "Your password is not complex enough."); // Weak
