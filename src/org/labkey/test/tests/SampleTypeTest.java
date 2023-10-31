@@ -1560,7 +1560,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     private void viewRawTableMetadata(String sampleTypeName)
     {
-        beginAt("/" + EscapeUtil.encode(getProjectName()) + "/query-rawTableMetaData.view?schemaName=samples&query.queryName=" + sampleTypeName);
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "samples", "query.queryName", sampleTypeName)));
     }
 
     private void verifyTableIndices(String prefix, List<String> indexSuffixes)

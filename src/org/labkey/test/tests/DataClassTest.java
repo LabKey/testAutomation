@@ -22,6 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -36,6 +37,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -290,7 +292,7 @@ public class DataClassTest extends BaseWebDriverTest
 
     private void viewRawTableMetadata(String dataClassName)
     {
-        beginAt("/" + EscapeUtil.encode(getProjectName()) + "/query-rawTableMetaData.view?schemaName=exp.data&query.queryName=" + dataClassName);
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "exp.data", "query.queryName", dataClassName)));
     }
 
     private void verifyTableIndices(String prefix, List<String> indexSuffixes)
