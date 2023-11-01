@@ -18,6 +18,9 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -32,11 +35,18 @@ public class PermissionsEditor
 {
     private static final String READY_SIGNAL = "policyRendered";
     private static final Locator SIGNAL_LOC = Locators.pageSignal(READY_SIGNAL);
-    protected BaseWebDriverTest _test;
 
-    public PermissionsEditor(BaseWebDriverTest test)
+    private final WebDriverWrapper _test;
+
+    public PermissionsEditor(WebDriverWrapper test)
     {
         _test = test;
+    }
+
+    public static PermissionsEditor beginAt(WebDriverWrapper wdw, String containerPath)
+    {
+        wdw.beginAt(WebTestHelper.buildURL("security", containerPath, "permissions"));
+        return new PermissionsEditor(wdw);
     }
 
     public void selectFolder(String folderName)
@@ -84,6 +94,12 @@ public class PermissionsEditor
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
+    public Window<?> clickSaveExpectingError()
+    {
+        _test.clickButton("Save", 0);
+        return new Window.WindowFinder(_test.getDriver()).withTitle("Error").waitFor();
+    }
+
     @LogMethod
     public void setPermissions(@LoggedParam String groupName, @LoggedParam String... permissionStrings)
     {
@@ -91,7 +107,6 @@ public class PermissionsEditor
         {
             _setPermissions(groupName, permissionString, "pGroup");
         }
-        savePermissions();
     }
 
     @LogMethod
@@ -101,7 +116,6 @@ public class PermissionsEditor
         {
             _setPermissions(groupName, permissionString, "pSite");
         }
-        savePermissions();
     }
 
     @LogMethod
@@ -111,7 +125,6 @@ public class PermissionsEditor
         {
             _setPermissions(userName, permissionString, "pUser");
         }
-        savePermissions();
     }
 
     private void _setPermissions(String userOrGroupName, String permissionString, String className)
@@ -159,7 +172,6 @@ public class PermissionsEditor
         {
             _test.click(close);
             _test.waitForElementToDisappear(close);
-            savePermissions();
         }
     }
 
@@ -179,7 +191,7 @@ public class PermissionsEditor
         return enterPermissionsUI(_test);
     }
 
-    public static PermissionsEditor enterPermissionsUI(BaseWebDriverTest test)
+    public static PermissionsEditor enterPermissionsUI(WebDriverWrapper test)
     {
         if (!test.isElementPresent(SIGNAL_LOC))
         {
