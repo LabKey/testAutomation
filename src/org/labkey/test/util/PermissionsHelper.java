@@ -75,6 +75,8 @@ public abstract class PermissionsHelper
                     _roles.put(simpleRoleClassName, uniqueName);
                     _roles.put(role.getName(), uniqueName);
                 }
+                _roles.putIfAbsent("NoPermissionsRole", "org.labkey.api.security.roles.NoPermissionsRole");
+                _roles.putIfAbsent("No Permissions", "org.labkey.api.security.roles.NoPermissionsRole");
             }
             catch (IOException | CommandException e)
             {
