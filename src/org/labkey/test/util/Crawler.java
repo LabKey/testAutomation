@@ -1224,8 +1224,8 @@ public class Crawler
 
     public static final String injectedAlert = "8(";
     public static final String maliciousScript = "alert('" + injectedAlert + "')";
-    public static final String injectScriptBlock = "-->\">'>'\"<script>" + maliciousScript + "</script>";
-    public static final String injectAttributeScript = "-->\">'>'\"</script><img src=\"xss\" onerror=\"" + maliciousScript + "\">";
+    public static final String injectScriptBlock = "\">'>'\"<script>" + maliciousScript + "</script>";
+    public static final String injectAttributeScript = "\">'>'\"</script><img src=\"x\" onerror=\"" + maliciousScript + "\">";
 
     public static void tryInject(WebDriverWrapper test, Runnable r)
     {
