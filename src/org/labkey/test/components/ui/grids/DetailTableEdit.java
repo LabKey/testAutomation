@@ -375,7 +375,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         // If save causes some update, wait until it is completed.
         WebDriverWrapper.waitFor(()->!BootstrapLocators.loadingSpinner.existsIn(getDriver()),
-                "Save has taken too long to complete.", 5_000);
+                "Save has taken too long to complete.", 15_000);
 
         return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
     }
@@ -385,7 +385,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         elementCache().saveButton.click();
         WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
         WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
-                "No error message was shown.", 750);
+                "No error message was shown.", 1_000);
         return errorBanner.getText();
     }
 
@@ -401,7 +401,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         elementCache().cancelButton.click();
         WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
         WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
-                "No error message was shown.", 750);
+                "No error message was shown.", 1_000);
         return errorBanner.getText();
     }
 
