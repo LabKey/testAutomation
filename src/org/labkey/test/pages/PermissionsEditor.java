@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -27,6 +28,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import java.util.List;
@@ -148,11 +150,17 @@ public class PermissionsEditor
 
     private void _selectPermission(String userOrGroupName, String group, String permissionString)
     {
-        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+        Locator.XPathLocator roleCombo = rolePanelLoc(permissionString);
         _test.waitForElement(roleCombo);
         _test.scrollIntoView(roleCombo);
         _test._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         _test.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
+    }
+
+    @NotNull
+    private static Locator.XPathLocator rolePanelLoc(String permissionString)
+    {
+        return Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
     }
 
     public void removeSiteGroupPermission(String groupName, String permissionString)
@@ -173,6 +181,24 @@ public class PermissionsEditor
             _test.click(close);
             _test.waitForElementToDisappear(close);
         }
+    }
+
+    public boolean isRoleEditable(String roleName)
+    {
+        WebElement rolePanel = rolePanelLoc(roleName).findElement(_test.getDriver());
+        boolean canAddMembers = Locator.tag("input").findElement(rolePanel).isEnabled();
+        List<WebElement> memberButton = Locator.tagWithClass("a", "x4-btn").findElements(rolePanel);
+        for (WebElement button : memberButton)
+        {
+            // Ensure consistency between adding and removing members
+            if (button.getAttribute("class").contains("disabled") == canAddMembers)
+            {
+                String able = canAddMembers ? "add" : "remove";
+                String unable = canAddMembers ? "remove" : "add";
+                throw new IllegalStateException("Able to %s members to role '%s' but can't %s them".formatted(able, roleName, unable));
+            }
+        }
+        return canAddMembers;
     }
 
     /**

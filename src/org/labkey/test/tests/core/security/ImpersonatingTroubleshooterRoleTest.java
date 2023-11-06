@@ -7,7 +7,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.user.ImpersonateRolesCommand;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.Daily;
+import org.labkey.test.categories.Git;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
@@ -16,12 +16,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.labkey.test.util.PermissionsHelper.IMP_TROUBLESHOOTER_ROLE;
 import static org.labkey.test.util.PermissionsHelper.toRole;
 
-@Category({Daily.class})
+@Category({Git.class})
 public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
 {
     private static final String USER = "user@imptrouble.test";
