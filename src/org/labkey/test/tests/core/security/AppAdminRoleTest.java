@@ -36,6 +36,10 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.DEVELOPER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.IMP_TROUBLESHOOTER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
 
 @Category({Daily.class})
 public class AppAdminRoleTest extends BaseWebDriverTest
@@ -89,11 +93,11 @@ public class AppAdminRoleTest extends BaseWebDriverTest
         deleteSiteGroups(apiPermissionsHelper);
         apiPermissionsHelper.createGlobalPermissionsGroup(SITE_GROUP);
         apiPermissionsHelper.createGlobalPermissionsGroup(ADMIN_GROUP);
-        apiPermissionsHelper.addMemberToRole(ADMIN_GROUP, "Site Administrator", MemberType.group, "/");
+        apiPermissionsHelper.addMemberToRole(ADMIN_GROUP, SITE_ADMIN_ROLE, MemberType.group, "/");
         apiPermissionsHelper.createGlobalPermissionsGroup(DEV_GROUP);
-        apiPermissionsHelper.addMemberToRole(DEV_GROUP, "Platform Developer", MemberType.group, "/");
+        apiPermissionsHelper.addMemberToRole(DEV_GROUP, DEVELOPER_ROLE, MemberType.group, "/");
         apiPermissionsHelper.createGlobalPermissionsGroup(IT_GROUP);
-        apiPermissionsHelper.addMemberToRole(IT_GROUP, "Impersonating Troubleshooter", MemberType.group, "/");
+        apiPermissionsHelper.addMemberToRole(IT_GROUP, IMP_TROUBLESHOOTER_ROLE, MemberType.group, "/");
     }
 
     @Test
@@ -169,29 +173,12 @@ public class AppAdminRoleTest extends BaseWebDriverTest
 
         log("Test adding roles");
         permissionsEditor = PermissionsEditor.beginAt(this, "/");
-        permissionsEditor.setSiteGroupPermissions(SITE_GROUP, "Site Administrator");
-        permissionsEditor.clickSaveExpectingError().close();
+        for (String role : List.of(SITE_ADMIN_ROLE, DEVELOPER_ROLE, IMP_TROUBLESHOOTER_ROLE))
+        {
+            checker().verifyFalse("App admin user shouldn't be able to modify " + role + " role", permissionsEditor.isRoleEditable(role));
+        }
 
-        permissionsEditor = PermissionsEditor.beginAt(this, "/");
-        permissionsEditor.setSiteGroupPermissions(SITE_GROUP, "Platform Developer");
-        permissionsEditor.clickSaveExpectingError().close();
-
-        permissionsEditor = PermissionsEditor.beginAt(this, "/");
-        permissionsEditor.setSiteGroupPermissions(SITE_GROUP, "Impersonating Troubleshooter");
-        permissionsEditor.clickSaveExpectingError().close();
-
-        log("Test removing roles");
-        permissionsEditor = PermissionsEditor.beginAt(this, "/");
-        permissionsEditor.removeSiteGroupPermission(ADMIN_GROUP, "Site Administrator");
-        permissionsEditor.clickSaveExpectingError().close();
-
-        permissionsEditor = PermissionsEditor.beginAt(this, "/");
-        permissionsEditor.removeSiteGroupPermission(DEV_GROUP, "Platform Developer");
-        permissionsEditor.clickSaveExpectingError().close();
-
-        permissionsEditor = PermissionsEditor.beginAt(this, "/");
-        permissionsEditor.removeSiteGroupPermission(IT_GROUP, "Impersonating Troubleshooter");
-        permissionsEditor.clickSaveExpectingError().close();
+        checker().verifyTrue("App admin user should be able to modify " + APP_ADMIN_ROLE + " role", permissionsEditor.isRoleEditable(APP_ADMIN_ROLE));
     }
 
     private ApiPermissionsHelper permissionsApiAsAppAdmin()
