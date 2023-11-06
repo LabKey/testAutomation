@@ -165,8 +165,6 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 .getField("value")
                 .setLabel("ValueLabel");
         editPage.clickSave();
-        // verify/confirm success
-        editPage.waitForSuccess();
         var queryPage = editPage.clickEditSource();
         String expectedXml = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
                 "  <table tableName=\"queryMetadataTestList\" tableDbType=\"NOT_IN_DB\">\n" +

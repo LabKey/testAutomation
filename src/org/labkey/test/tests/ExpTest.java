@@ -25,9 +25,9 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
-import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
+import org.labkey.test.pages.query.EditMetadataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
@@ -134,15 +134,15 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
         clickButton("Edit Metadata", 6000);
-        QueryMetadataEditorPage designerPage = new QueryMetadataEditorPage(getDriver());
+        EditMetadataPage designerPage = new EditMetadataPage(getDriver());
 
-        DomainFieldRow domainRow = designerPage.getFieldsPanel().getField("Created");
+        DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
         domainRow.setDateFormat("ddd MMM dd yyyy");
         designerPage.clickSave();
 
         // Verify that it ended up in the XML version of the metadata
-        designerPage.editSource();
+        designerPage.clickEditSource();
         _ext4Helper.clickExt4Tab("XML Metadata");
         assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddd MMM dd yyyy</formatString>");
 
@@ -158,13 +158,13 @@ public class ExpTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickAndWait(Locator.linkWithText("edit metadata"));
 
-        designerPage = new QueryMetadataEditorPage(getDriver());
-        designerPage.aliasField().selectAliasField("Row Id").clickApply();
+        designerPage = new EditMetadataPage(getDriver());
+        designerPage.clickAliasField().selectAliasField("Row Id").clickApply();
 
         // Make it a lookup into our custom query
-        int fieldCount = designerPage.getFieldsPanel().fieldNames().size();
+        int fieldCount = designerPage.fieldsPanel().fieldNames().size();
         assertTrue(fieldCount > 0);
-        domainRow = designerPage.getFieldsPanel().getField(fieldCount-1);
+        domainRow = designerPage.fieldsPanel().getField(fieldCount-1);
         domainRow.setLookup(new FieldDefinition.IntLookup("exp", "dataCustomQuery"));
 
         // Save it
@@ -187,7 +187,7 @@ public class ExpTest extends BaseWebDriverTest
         // Wait for query to load
         waitForText("edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
-        designerPage = new QueryMetadataEditorPage(getDriver());
+        designerPage = new EditMetadataPage(getDriver());
         designerPage.resetToDefault();
     }
 }
