@@ -28,8 +28,10 @@ import java.util.Map;
 
 public abstract class AbstractUserHelper
 {
-    private WebDriverWrapper _driverWrapper;
-    protected static final Map<String, String> usersAndDisplayNames = new HashMap<>();
+    private static final int DISPLAY_NAME_LENGTH = 64;
+    private static final Map<String, String> usersAndDisplayNames = new HashMap<>();
+
+    private final WebDriverWrapper _driverWrapper;
 
     protected AbstractUserHelper(WebDriverWrapper driverWrapper)
     {
@@ -72,8 +74,14 @@ public abstract class AbstractUserHelper
     @LogMethod
     public final String setInjectionDisplayName(@LoggedParam String email)
     {
-        String newDisplayName = getDefaultDisplayName(email) +
-                (WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2);
+        String prefix = getDefaultDisplayName(email);
+        String suffix = WebTestHelper.RANDOM.nextBoolean() ? BaseWebDriverTest.INJECT_CHARS_1 : BaseWebDriverTest.INJECT_CHARS_2;
+        int tooLongBy = prefix.length() + suffix.length() - DISPLAY_NAME_LENGTH;
+        if (tooLongBy > 0)
+        {
+            prefix = prefix.substring(tooLongBy);
+        }
+        String newDisplayName = prefix + suffix;
         setDisplayName(email, newDisplayName);
         return newDisplayName;
     }

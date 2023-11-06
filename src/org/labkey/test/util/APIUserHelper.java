@@ -28,7 +28,7 @@ import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.user.UpdateUserDetailsPage;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -75,10 +75,15 @@ public class APIUserHelper extends AbstractUserHelper
             throw new IllegalArgumentException("No such user: " + email);
         }
 
-        // TODO: Update via API
-        final UpdateUserDetailsPage updateUserDetailsPage = UpdateUserDetailsPage.beginAt(getWrapper(), userId);
-        updateUserDetailsPage.setDisplayName(newDisplayName);
-        updateUserDetailsPage.clickSubmit();
+        try
+        {
+            new QueryApiHelper(getWrapper().createDefaultConnection(), "/", "core", "siteusers")
+                    .updateRows(List.of(Maps.of("userId", userId, "DisplayName", newDisplayName)));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to set display name for user:" + email, e);
+        }
     }
 
     @Override
