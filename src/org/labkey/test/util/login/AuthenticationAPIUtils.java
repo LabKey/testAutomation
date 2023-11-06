@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class AuthenticationAPIUtils
 {
@@ -78,12 +77,6 @@ public class AuthenticationAPIUtils
       }
     }
      */
-
-    public static Map<String, Integer> getConfigurationIds(Connection connection)
-    {
-        return getAllConfigurations(connection).stream()
-                .collect(Collectors.toMap(Configuration::getDescription, Configuration::getConfiguration));
-    }
 
     private static List<Configuration> getAllConfigurations(Connection connection)
     {
