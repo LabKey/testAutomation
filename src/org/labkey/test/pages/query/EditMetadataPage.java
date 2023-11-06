@@ -45,6 +45,7 @@ public class EditMetadataPage extends BaseDomainDesigner<EditMetadataPage.Elemen
     public EditMetadataPage clickSave()
     {
         elementCache().saveBtn.click();
+        waitForSuccess();
         return this;
     }
 
