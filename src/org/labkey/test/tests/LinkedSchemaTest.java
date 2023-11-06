@@ -30,7 +30,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.pages.list.EditListDefinitionPage;
-import org.labkey.test.pages.query.EditMetadataPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -573,10 +573,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private void wrapField(String schema, String query, String fieldToWrap, String aliasFieldName)
     {
         navigateToMetadataQuery(schema, query);
-        EditMetadataPage editMetadataPage = new EditMetadataPage(getDriver());
-        editMetadataPage.clickAliasField().selectAliasField(fieldToWrap).clickApply();
-        editMetadataPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
-        editMetadataPage.clickSave();
+        QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
+        queryMetadataEditorPage.clickAliasField().selectAliasField(fieldToWrap).clickApply();
+        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickSave();
     }
 
     private String getCustomFilterMetadata(String familyName)

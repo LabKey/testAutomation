@@ -27,7 +27,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
-import org.labkey.test.pages.query.EditMetadataPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 
@@ -134,7 +134,7 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
         clickButton("Edit Metadata", 6000);
-        EditMetadataPage designerPage = new EditMetadataPage(getDriver());
+        QueryMetadataEditorPage designerPage = new QueryMetadataEditorPage(getDriver());
 
         DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
@@ -158,7 +158,7 @@ public class ExpTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickAndWait(Locator.linkWithText("edit metadata"));
 
-        designerPage = new EditMetadataPage(getDriver());
+        designerPage = new QueryMetadataEditorPage(getDriver());
         designerPage.clickAliasField().selectAliasField("Row Id").clickApply();
 
         // Make it a lookup into our custom query
@@ -187,7 +187,7 @@ public class ExpTest extends BaseWebDriverTest
         // Wait for query to load
         waitForText("edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
-        designerPage = new EditMetadataPage(getDriver());
+        designerPage = new QueryMetadataEditorPage(getDriver());
         designerPage.resetToDefault();
     }
 }

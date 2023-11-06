@@ -2,14 +2,14 @@ package org.labkey.test.components.query;
 
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.ReactSelect;
-import org.labkey.test.pages.query.EditMetadataPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 
 
 public class AliasFieldDialog extends ModalDialog
 {
-    private final EditMetadataPage _page;
+    private final QueryMetadataEditorPage _page;
 
-    public AliasFieldDialog(EditMetadataPage page)
+    public AliasFieldDialog(QueryMetadataEditorPage page)
     {
         super(new ModalDialogFinder(page.getDriver()).withTitle("Choose a field to wrap"));
         _page = page;
@@ -21,7 +21,7 @@ public class AliasFieldDialog extends ModalDialog
         return this;
     }
 
-    public EditMetadataPage clickApply()
+    public QueryMetadataEditorPage clickApply()
     {
         dismiss("OK");
         return _page;

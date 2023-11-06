@@ -9,7 +9,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFormPanel;
-import org.labkey.test.pages.query.EditMetadataPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -60,7 +60,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
         selectQuery("lists", listName);
         clickAndWait(Locator.linkWithText("edit metadata"));
 
-        EditMetadataPage metadataPage = new EditMetadataPage(getDriver());
+        QueryMetadataEditorPage metadataPage = new QueryMetadataEditorPage(getDriver());
         DomainFormPanel formPanel = metadataPage.fieldsPanel();
 
         log("Verifying new alias field is added");

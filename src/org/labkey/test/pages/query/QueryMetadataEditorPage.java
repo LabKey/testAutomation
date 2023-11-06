@@ -19,22 +19,22 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
  * Automates the platform component defined in: query/src/client/QueryMetadataEditor/QueryMetadataEditor.tsx
  * Generally rendered by "query-metadataQuery.view"
  */
-public class EditMetadataPage extends WebDriverComponent<EditMetadataPage.ElementCache>
+public class QueryMetadataEditorPage extends WebDriverComponent<QueryMetadataEditorPage.ElementCache>
 {
     private final WebElement el;
     private final WebDriver driver;
 
-    public EditMetadataPage(WebDriver driver)
+    public QueryMetadataEditorPage(WebDriver driver)
     {
         this.driver = driver;
         el = Locator.id("app").findElement(this.driver); // Full page component
     }
 
-    public static EditMetadataPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
+    public static QueryMetadataEditorPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery",
                 Map.of("schemaName", schemaName, "query.queryName", queryName)));
-        return new EditMetadataPage(webDriverWrapper.getDriver());
+        return new QueryMetadataEditorPage(webDriverWrapper.getDriver());
     }
 
     @Override
@@ -78,7 +78,7 @@ public class EditMetadataPage extends WebDriverComponent<EditMetadataPage.Elemen
         return new AliasFieldDialog(this);
     }
 
-    public EditMetadataPage aliasField(String fieldName)
+    public QueryMetadataEditorPage aliasField(String fieldName)
     {
         AliasFieldDialog dialog = clickAliasField();
         dialog.selectAliasField(fieldName);
@@ -87,7 +87,7 @@ public class EditMetadataPage extends WebDriverComponent<EditMetadataPage.Elemen
         return this;
     }
 
-    public EditMetadataPage clickSave()
+    public QueryMetadataEditorPage clickSave()
     {
         elementCache().saveButton.click();
         WebDriverWrapper.waitFor(()->  Locator.tagWithClass("div", "alert-success")
