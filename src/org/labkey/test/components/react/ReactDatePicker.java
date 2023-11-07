@@ -1,7 +1,6 @@
 package org.labkey.test.components.react;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -87,7 +86,7 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         String timeStr;
 
         // If the time value "13:00" is available, then presume this ReactDatePicker is configured for 24-hour time.
-        if (elementCache().datePickerTime("13:00") != null)
+        if (elementCache().datePickerTime("13:00").isDisplayed())
         {
             // Expected format is "HH:mm"
             timeStr = "%s:%s".formatted(withLeadingZero(time.getHour()), withLeadingZero(time.getMinute()));
@@ -159,17 +158,19 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
             return datePickerDateLoc(withLeadingZero(day)).findElement(popup);
         }
 
-        @Nullable WebElement datePickerTime(String timeStr)
+        WebElement datePickerTime(String timeStr)
         {
             return Locator.tagWithClass("li", "react-datepicker__time-list-item")
                     .withText(timeStr)
-                    .findElementOrNull(elementCache().popup);
+                    .findWhenNeeded(elementCache().popup);
         }
     }
 
     static Locator.XPathLocator datePickerDateLoc(String datePart)
     {
-        return Locator.tagWithClass("div", "react-datepicker__day--0" + datePart);
+        return Locator.tagWithClass("div", "react-datepicker__day--0" + datePart)
+                // Don't get day from previous month
+                .withoutClass("react-datepicker__day--outside-month");
     }
 
     public static class ReactDateInputFinder extends WebDriverComponentFinder<ReactDatePicker, ReactDateInputFinder>
