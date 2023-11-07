@@ -99,6 +99,7 @@ public class FlowSpecimenTest extends BaseFlowTest
 
     private void verifyDeleteConfirmation()
     {
+        // Add check for shared selection contexts between FCSFiles/FCSAnalysis table types Issue #49062
         String fcsFilename = "version";
         String fcsAnalysisName = "microFCS.xml";
         log("** Attempt Specimen run delete, confirm usage before delete ");
