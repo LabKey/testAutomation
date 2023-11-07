@@ -132,7 +132,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         MultiMenu gridAssayMenu = gridAssayMenuFinder.findWhenNeeded(this);
 
         final WebElement body = Locator.tagWithClass("div", "tabbed-grid-panel__body")
-                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         final Locator navTab = Locator.tagWithClass("ul", "nav-tabs")
                 .child(Locator.tag("li").withChild(Locator.tag("a")));
 
