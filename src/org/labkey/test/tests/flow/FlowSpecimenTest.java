@@ -108,6 +108,11 @@ public class FlowSpecimenTest extends BaseFlowTest
         doAndWaitForPageToLoad(() -> fcsDRT.clickHeaderButton("Delete"));
         assertTextPresent("Confirm Deletion");
         assertTextNotPresent("One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
+        clickAndWait(Locator.lkButton("Confirm Delete"));
+        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        DataRegionTable table = new DataRegionTable(getDriver().getCurrentUrl().contains("dataset.view") ? "Dataset" : "query", this);
+        assertEquals("Dataset data not as expected after FCSFile delete", 2, table.getDataRowCount());
+        log("Non-Study data delete successful");
 
         goToFlowDashboard();
         log("Check that delete confirmation shows study linkage");
@@ -126,7 +131,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         assertTextPresent("No data to show.");
         beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
         assertTextPresent("No data to show.");
-        log("Delete successful");
+        log("Study linked data delete successful");
     }
 
     @Override
