@@ -93,6 +93,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         // Issue 16945: flow specimen FK doesn't work for 'fake' FCS file wells created during FlowJo import
         verifyFlowDatasetSpecimenFK();
 
+        // Issue 48308: Flow: warn when deleting flow run with fcs files linked to study
         verifyDeleteConfirmation();
     }
 
@@ -100,20 +101,32 @@ public class FlowSpecimenTest extends BaseFlowTest
     {
         log("** Attempt Specimen run delete, confirm usage before delete ");
         goToFlowDashboard();
+        log("check that delete confirmation for unconnected files does not show Study linkage text");
+        clickAndWait(Locator.linkContainingText("FCS Files ("));
+        final DataRegionTable fcsDRT = new DataRegionTable("query", this);
+        fcsDRT.checkCheckbox(0);
+        doAndWaitForPageToLoad(() -> fcsDRT.clickHeaderButton("Delete"));
+        assertTextPresent("Confirm Deletion");
+        assertTextNotPresent("One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
+
+        goToFlowDashboard();
+        log("Check that delete confirmation shows study linkage");
         clickAndWait(Locator.linkContainingText("FCS Analyses"));
         final DataRegionTable drt = new DataRegionTable("query", this);
         drt.checkCheckbox(0);
         doAndWaitForPageToLoad(() -> drt.clickHeaderButton("Delete"));
         assertTextPresent("Confirm Deletion", "One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
         clickAndWait(Locator.lkButton("Cancel"));
-        drt.uncheckCheckbox(0);
-        goToFlowDashboard();
-        clickAndWait(Locator.linkContainingText("FCS Files ("));
-        final DataRegionTable fcsDRT = new DataRegionTable("query", this);
-        fcsDRT.checkCheckbox(0);
+        log("Cancel works...");
+
+        drt.checkCheckbox(0);
         doAndWaitForPageToLoad(() -> drt.clickHeaderButton("Delete"));
-        assertTextPresent("Confirm Deletion");
-        assertTextNotPresent("One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
+        assertTextPresent("Confirm Deletion", "One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
+        clickAndWait(Locator.lkButton("Confirm Delete"));
+        assertTextPresent("No data to show.");
+        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        assertTextPresent("No data to show.");
+        log("Delete successful");
     }
 
     @Override
