@@ -315,9 +315,11 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testRenameAssayDesign()
     {
+        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
+
         String originalAssayName = "A Assay Name";
         log(String.format("Create an assay named '%s'.", originalAssayName));
-        startCreateGpatAssay(GPAT_ASSAY_XLS, originalAssayName);
+        startCreateGpatAssay(trialData, originalAssayName);
         setAssayResultsProperties();
 
         clickButton("Next", defaultWaitForPage);
@@ -363,6 +365,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     public void testRenameSharedAssayDesign()
     {
         String otherProject = "Testing_Shared_Assay_Rename";
+        File trialData = TestFileUtils.getSampleData("GPAT/renameSharedAssayTrial.xls");
 
         _containerHelper.deleteProject(otherProject, false);
 
@@ -374,7 +377,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         String originalAssayName = "A Shared Assay Name";
         log(String.format("Create an assay named '%s' and put it in the shared folder.", originalAssayName));
-        startCreateGpatAssay(GPAT_ASSAY_XLS, originalAssayName);
+        startCreateGpatAssay(trialData, originalAssayName);
 
         Locator gwtSelectLocator = Locator.xpath("//h3[@title='Assay Properties']/ancestor::div[contains(@class,'panel-portal')]//select[@class='gwt-ListBox']");
         Select location = SelectWrapper.Select(gwtSelectLocator).findWhenNeeded(getDriver());
