@@ -327,6 +327,12 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel showGrid()
     {
+        /* either this is a grid-only insert panel, or there will be a mode-select list-item to
+            allow the user to select the grid. Await one or the other to be present   */
+        WebDriverWrapper.waitFor(()-> isGridVisible() ||
+                modeSelectListItem("from Grid").existsIn(this),
+                "Neither the grid nor its selector appeared within the ready timeout", _readyTimeout);
+
         if (!isGridVisible())
         {
             modeSelectListItem("from Grid")
