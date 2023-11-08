@@ -10,6 +10,7 @@ import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 
 import java.time.LocalDate;
@@ -17,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -38,6 +41,13 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final String FILL_STRING = "Filling String";
     private static final String FILL_INT = "Filling Int";
     private static final String FILL_DATE = "Filling Date";
+
+    private static final String PASTING_SAMPLE_TYPE = "PastingSampleType";
+    private static final String PASTE_1 = "Paste Column 1";
+    private static final String PASTE_2 = "Paste Column 2";
+    private static final String PASTE_3 = "Paste Column 3";
+    private static final String PASTE_4 = "Paste Column 4";
+    private static final String PASTE_5 = "Paste Column 5";
 
     @BeforeClass
     public static void setupProject() throws Exception
@@ -66,6 +76,16 @@ public class EditableGridTest extends BaseWebDriverTest
                                 new FieldDefinition(FILL_STRING, FieldDefinition.ColumnType.String),
                                 new FieldDefinition(FILL_INT, FieldDefinition.ColumnType.Integer),
                                 new FieldDefinition(FILL_DATE, FieldDefinition.ColumnType.DateAndTime)
+                        ))
+                .create(connection, getProjectName());
+        new SampleTypeDefinition(PASTING_SAMPLE_TYPE)
+                .setFields(
+                        List.of(
+                                new FieldDefinition(PASTE_1, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(PASTE_2, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(PASTE_3, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(PASTE_4, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(PASTE_5, FieldDefinition.ColumnType.String)
                         ))
                 .create(connection, getProjectName());
     }
@@ -165,7 +185,7 @@ public class EditableGridTest extends BaseWebDriverTest
     @Test
     public void testDragFillSingleRow()
     {
-        final LocalDateTime now = LocalDate.of(2019, 1, 30).atStartOfDay();
+        final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(16, 30);
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
@@ -195,7 +215,7 @@ public class EditableGridTest extends BaseWebDriverTest
     @Test
     public void testDragFillMultipleRows()
     {
-        final LocalDateTime now = LocalDate.of(2019, 1, 30).atStartOfDay();
+        final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(14, 30);
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
@@ -219,6 +239,154 @@ public class EditableGridTest extends BaseWebDriverTest
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         ""),
                 testGrid.getColumnData(FILL_DATE));
+    }
+
+    @Test
+    public void testExpandedPaste() throws Exception
+    {
+        final List<List<String>> clipRows = List.of(
+                List.of("A", "B"),
+                List.of("C", "D"));
+
+        EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        testGrid.addRows(5);
+
+        log("Test wide");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(1, PASTE_4));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(2, 1, clipRows), getActualPaste(testGrid));
+        testGrid.clearAllCells();
+
+        log("Test tall");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(3, PASTE_2));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 2, clipRows), getActualPaste(testGrid));
+        testGrid.clearAllCells();
+
+        log("Test wide and tall");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(3, PASTE_4));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(2, 2, clipRows), getActualPaste(testGrid));
+        testGrid.clearAllCells();
+    }
+
+    @Test
+    public void testInvalidExpandedPaste() throws Exception
+    {
+        final List<List<String>> clipRows = List.of(
+                List.of("A", "B"),
+                List.of("C", "D"));
+
+        EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        testGrid.addRows(5);
+
+        log("Test invalid selection width");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(1, PASTE_5));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 1, clipRows), getActualPaste(testGrid));
+        testGrid.clearAllCells();
+
+        log("Test invalid selection height");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(4, PASTE_2));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 1, clipRows), getActualPaste(testGrid));
+        testGrid.clearAllCells();
+
+        log("Test invalid width and height");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(4, PASTE_5));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 1, clipRows), getActualPaste(testGrid));
+    }
+
+    @Test
+    public void testExpandedPasteIntoSkinnySelection() throws Exception
+    {
+        final List<List<String>> clipRows = List.of(
+                List.of("A", "B"),
+                List.of("C", "D"),
+                List.of("E", "F"));
+
+        EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        testGrid.addRows(7);
+        Dimension size = new Dimension(5, 7);
+
+        log("Test expand right");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(1, PASTE_4));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(2, 1, size, clipRows), getActualPaste(testGrid));
+        testGrid.clearAllCells();
+
+        log("Test expand down");
+        testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(5, PASTE_1));
+        actionPaste(null, rowsToString(clipRows));
+        assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 2, size, clipRows), getActualPaste(testGrid));
+    }
+
+    private String getActualPaste(EditableGrid testGrid)
+    {
+        List<Map<String, String>> gridData = testGrid.getGridData(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
+        List<List<String>> rows = gridData.stream().map(r -> List.of(r.get(PASTE_1), r.get(PASTE_2), r.get(PASTE_3), r.get(PASTE_4), r.get(PASTE_5))).toList();
+        return rowsToString(rows);
+    }
+
+    private static String getExpectedPaste(int colMultiplier, int rowMultiplier, List<List<String>> rows)
+    {
+        return getExpectedPaste(colMultiplier, rowMultiplier, new Dimension(5, 5), rows);
+    }
+
+    private static String getExpectedPaste(int colMultiplier, int rowMultiplier, Dimension size, List<List<String>> clipRows)
+    {
+        List<List<String>> wideRows = new ArrayList<>();
+        for (List<String> row : clipRows)
+        {
+            List<String> wideRow = new ArrayList<>();
+            for (int i = 0; i < colMultiplier; i++)
+            {
+                wideRow.addAll(row);
+            }
+
+            while (wideRow.size() < size.getWidth())
+            {
+                wideRow.add(""); // add padding
+            }
+            wideRows.add(wideRow);
+        }
+
+        List<List<String>> tallRows = new ArrayList<>();
+        for (int i = 0; i < rowMultiplier; i++)
+        {
+            tallRows.addAll(wideRows);
+        }
+        if (tallRows.size() < size.getHeight())
+        {
+            List<String> paddingRow = new ArrayList<>();
+            for (int i = 0; i < size.getWidth(); i++)
+            {
+                paddingRow.add("");
+            }
+            while (tallRows.size() < size.getHeight())
+            {
+                tallRows.add(paddingRow);
+            }
+        }
+
+        return rowsToString(tallRows);
+    }
+
+    private static String rowsToString(List<List<String>> rows)
+    {
+        return rows.stream()
+                .map(row -> String.join("\t", row))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private static void duplicateRow(StringBuilder sb, String row, int count)
+    {
+        for (int i = 0; i < count - 1; i++)
+        {
+            sb.append(row).append("\t");
+        }
+        sb.append(row);
     }
 
     private static List<WebElement> setCellValues(EditableGrid testGrid, String ascString, Object... values)

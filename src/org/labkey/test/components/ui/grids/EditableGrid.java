@@ -609,6 +609,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return selection;
     }
 
+    /**
+     * Selects all cells in the table, then deletes their content
+     */
+    public void clearAllCells() throws IOException, UnsupportedFlavorException
+    {
+        selectAllCells();
+        new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
+    }
+
     public String copyCurrentSelection() throws IOException, UnsupportedFlavorException
     {
         // now copy the contents of the current selection to the clipboard
