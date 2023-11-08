@@ -15,15 +15,20 @@
  */
 package org.labkey.test.pages;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import java.util.List;
@@ -32,11 +37,18 @@ public class PermissionsEditor
 {
     private static final String READY_SIGNAL = "policyRendered";
     private static final Locator SIGNAL_LOC = Locators.pageSignal(READY_SIGNAL);
-    protected BaseWebDriverTest _test;
 
-    public PermissionsEditor(BaseWebDriverTest test)
+    private final WebDriverWrapper _test;
+
+    public PermissionsEditor(WebDriverWrapper test)
     {
         _test = test;
+    }
+
+    public static PermissionsEditor beginAt(WebDriverWrapper wdw, String containerPath)
+    {
+        wdw.beginAt(WebTestHelper.buildURL("security", containerPath, "permissions"));
+        return new PermissionsEditor(wdw);
     }
 
     public void selectFolder(String folderName)
@@ -84,6 +96,12 @@ public class PermissionsEditor
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
+    public Window<?> clickSaveExpectingError()
+    {
+        _test.clickButton("Save", 0);
+        return new Window.WindowFinder(_test.getDriver()).withTitle("Error").waitFor();
+    }
+
     @LogMethod
     public void setPermissions(@LoggedParam String groupName, @LoggedParam String... permissionStrings)
     {
@@ -91,7 +109,6 @@ public class PermissionsEditor
         {
             _setPermissions(groupName, permissionString, "pGroup");
         }
-        savePermissions();
     }
 
     @LogMethod
@@ -101,7 +118,6 @@ public class PermissionsEditor
         {
             _setPermissions(groupName, permissionString, "pSite");
         }
-        savePermissions();
     }
 
     @LogMethod
@@ -111,7 +127,6 @@ public class PermissionsEditor
         {
             _setPermissions(userName, permissionString, "pUser");
         }
-        savePermissions();
     }
 
     private void _setPermissions(String userOrGroupName, String permissionString, String className)
@@ -135,11 +150,17 @@ public class PermissionsEditor
 
     private void _selectPermission(String userOrGroupName, String group, String permissionString)
     {
-        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+        Locator.XPathLocator roleCombo = rolePanelLoc(permissionString);
         _test.waitForElement(roleCombo);
         _test.scrollIntoView(roleCombo);
         _test._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         _test.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
+    }
+
+    @NotNull
+    private static Locator.XPathLocator rolePanelLoc(String permissionString)
+    {
+        return Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
     }
 
     public void removeSiteGroupPermission(String groupName, String permissionString)
@@ -159,8 +180,25 @@ public class PermissionsEditor
         {
             _test.click(close);
             _test.waitForElementToDisappear(close);
-            savePermissions();
         }
+    }
+
+    public boolean isRoleEditable(String roleName)
+    {
+        WebElement rolePanel = rolePanelLoc(roleName).findElement(_test.getDriver());
+        boolean canAddMembers = Locator.tag("input").findElement(rolePanel).isEnabled();
+        List<WebElement> memberButton = Locator.tagWithClass("a", "x4-btn").findElements(rolePanel);
+        for (WebElement button : memberButton)
+        {
+            // Ensure consistency between adding and removing members
+            if (button.getAttribute("class").contains("disabled") == canAddMembers)
+            {
+                String able = canAddMembers ? "add" : "remove";
+                String unable = canAddMembers ? "remove" : "add";
+                throw new IllegalStateException("Able to %s members to role '%s' but can't %s them".formatted(able, roleName, unable));
+            }
+        }
+        return canAddMembers;
     }
 
     /**
@@ -179,7 +217,7 @@ public class PermissionsEditor
         return enterPermissionsUI(_test);
     }
 
-    public static PermissionsEditor enterPermissionsUI(BaseWebDriverTest test)
+    public static PermissionsEditor enterPermissionsUI(WebDriverWrapper test)
     {
         if (!test.isElementPresent(SIGNAL_LOC))
         {

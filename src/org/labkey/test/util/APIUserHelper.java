@@ -26,6 +26,7 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
+import org.labkey.remoteapi.security.GetUsersResponse.UserInfo;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.query.QueryApiHelper;
@@ -37,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -52,17 +54,21 @@ public class APIUserHelper extends AbstractUserHelper
     @Override
     public String getDisplayNameForEmail(@NotNull String email)
     {
-        GetUsersResponse users = getUsers(true);
-        Optional<GetUsersResponse.UserInfo> user = users.getUsersInfo().stream()
-                .filter(userInfo -> email.equals(userInfo.getEmail())).findFirst();
-        if (user.isPresent())
+        Map<String, String> displayNames = getDisplayNames();
+        if (displayNames.containsKey(email))
         {
-            return user.get().getDisplayName();
+            return displayNames.get(email);
         }
         else
         {
             return super.getDisplayNameForEmail(email);
         }
+    }
+
+    public Map<String, String> getDisplayNames()
+    {
+        GetUsersResponse users = getUsers(true);
+        return users.getUsersInfo().stream().collect(Collectors.toMap(UserInfo::getEmail, UserInfo::getDisplayName));
     }
 
     @Override
@@ -177,8 +183,8 @@ public class APIUserHelper extends AbstractUserHelper
     public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeDeactivated)
     {
         Map<String, Integer> userIds = new HashMap<>();
-        List<GetUsersResponse.UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
-        for (GetUsersResponse.UserInfo userInfo : usersInfo)
+        List<UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
+        for (UserInfo userInfo : usersInfo)
         {
             if (userEmails.contains(userInfo.getEmail()))
                 userIds.put(userInfo.getEmail(), userInfo.getUserId());

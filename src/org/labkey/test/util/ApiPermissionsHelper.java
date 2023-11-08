@@ -299,7 +299,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return getUserPerms(container, user).getProperty("container.groups");
     }
 
-    private List<String> getUserRoles(String container, String user)
+    public List<String> getUserRoles(String container, String user)
     {
         try
         {
@@ -696,22 +696,20 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    private static final String APP_ADMIN = "Application Admin";
-
     public void addUserAsAppAdmin(String userEmail)
     {
         if(!isUserAppAdmin(userEmail))
-            addMemberToRole(userEmail, APP_ADMIN, PermissionsHelper.MemberType.user, "/");
+            addMemberToRole(userEmail, APP_ADMIN_ROLE, PermissionsHelper.MemberType.user, "/");
     }
 
     public void removeUserFromAppAdmin(String userEmail)
     {
         if (isUserAppAdmin(userEmail))
-            removeUserRoleAssignment(userEmail, APP_ADMIN, "/");
+            removeUserRoleAssignment(userEmail, APP_ADMIN_ROLE, "/");
     }
 
     private boolean isUserAppAdmin(String userEmail)
     {
-        return doesUserHaveRole(userEmail, APP_ADMIN, "/");
+        return doesUserHaveRole(userEmail, APP_ADMIN_ROLE, "/");
     }
 }

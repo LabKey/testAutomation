@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TroubleshooterRoleTest extends BaseWebDriverTest
 {
-    private static final String TROUBLESHOOTER = "troubleshooter@troubleshooter.test";
+    protected static final String TROUBLESHOOTER = "troubleshooter@troubleshooter.test";
 
     @BeforeClass
     public static void setupProject()
@@ -42,12 +42,17 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
-    private void doSetup()
+    protected void doSetup()
     {
         _userHelper.createUser(TROUBLESHOOTER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER,"Troubleshooter", PermissionsHelper.MemberType.user,"/");
+        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, getRole(), PermissionsHelper.MemberType.user,"/");
         _containerHelper.createProject(getProjectName());
+    }
+
+    protected String getRole()
+    {
+        return "Troubleshooter";
     }
 
     @Test
@@ -71,6 +76,12 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         File exportedFile = logTable.expandExportPanel().exportText();
         int exportedRowCount = IteratorUtils.size(FileUtils.lineIterator(exportedFile)) - 1;
         assertTrue("Empty downloaded [" + exportedFile.getName() + "]", exportedRowCount > 0);
+    }
+
+    @Test
+    public void testAdminConsoleVisibility()
+    {
+        impersonate(TROUBLESHOOTER);
 
         log("Verify permissions from troubleshooter");
         verifySitePermissionSetting(false);
@@ -79,7 +90,6 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         log("Verify the permissions for admin ");
         goToHome();
         verifySitePermissionSetting(true);
-
     }
 
     /**
@@ -98,7 +108,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         assertTextPresent("You do not have permission to see this data.");
     }
 
-    private void verifySitePermissionSetting(boolean canSave)
+    protected void verifySitePermissionSetting(boolean canSave)
     {
         log("Verify permissions for look and feel setting");
         goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
