@@ -380,15 +380,6 @@ public class EditableGridTest extends BaseWebDriverTest
                 .collect(Collectors.joining("\n"));
     }
 
-    private static void duplicateRow(StringBuilder sb, String row, int count)
-    {
-        for (int i = 0; i < count - 1; i++)
-        {
-            sb.append(row).append("\t");
-        }
-        sb.append(row);
-    }
-
     private static List<WebElement> setCellValues(EditableGrid testGrid, String ascString, Object... values)
     {
         List<WebElement> cells = new ArrayList<>();
