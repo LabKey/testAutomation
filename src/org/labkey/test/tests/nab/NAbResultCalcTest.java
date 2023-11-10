@@ -8,6 +8,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DataRegionTable;
@@ -16,7 +18,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({})
+@Category({Daily.class, Assays.class})
 public class NAbResultCalcTest extends BaseWebDriverTest
 {
     protected static final String TEST_ASSAY_NAB = "TestAssayNab";
