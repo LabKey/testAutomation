@@ -189,7 +189,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     private Optional<EditableGrid> optionalGrid()
     {
-        return new EditableGrid.EditableGridFinder(_driver).findOptional(this);
+        return elementCache().optionalGrid();
     }
 
     public EntityInsertPanel setMergeData(boolean allowMerge)
@@ -213,7 +213,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     protected FileUploadPanel fileUploadPanel()
     {
-        return new FileUploadPanel.FileUploadPanelFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
+        return elementCache().fileUploadPanel();
     }
 
     private Optional<FileUploadPanel> optionalFileUploadPanel()
@@ -272,7 +272,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public boolean hasTabs()
     {
-        return Locator.tagWithClassContaining("ul", "list-group").existsIn(this);
+        return elementCache().hasTabs();
     }
 
     public boolean isFileUploadVisible()
@@ -329,8 +329,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     {
         /* either this is a grid-only insert panel, or there will be a mode-select list-item to
             allow the user to select the grid. Await one or the other to be present   */
-        WebDriverWrapper.waitFor(()-> isGridVisible() ||
-                modeSelectListItem("from Grid").existsIn(this),
+        WebDriverWrapper.waitFor(()-> isGridVisible() || hasTabs(),
                 "Neither the grid nor its selector appeared within the ready timeout", _readyTimeout);
 
         if (!isGridVisible())
@@ -435,8 +434,28 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
         EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
 
+        private Optional<EditableGrid> optionalGrid()
+        {
+            return new EditableGrid.EditableGridFinder(_driver).findOptional(this);
+        }
+
+        private Optional<FileUploadPanel> optionalFileUploadPanel()
+        {
+            return new FileUploadPanel.FileUploadPanelFinder(getDriver()).findOptional();
+        }
+
+        protected FileUploadPanel fileUploadPanel()
+        {
+            return new FileUploadPanel.FileUploadPanelFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).waitFor(this);
+        }
+
         WebElement formatString = Locator.tagWithClass("div","file-form-formats")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+
+        public boolean hasTabs()
+        {
+            return Locator.tagWithClassContaining("ul", "list-group").existsIn(elementCache());
+        }
     }
 
     public static class EntityInsertPanelFinder extends WebDriverComponent.WebDriverComponentFinder<EntityInsertPanel, EntityInsertPanelFinder>
