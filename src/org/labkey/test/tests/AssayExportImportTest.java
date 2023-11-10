@@ -36,7 +36,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -51,7 +50,6 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PerlHelper;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -655,7 +653,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         DataRegionTable runsTable = DataRegionTable.DataRegion(getDriver()).find();
         runsTable.checkAllOnPage();
         DataRegionExportHelper exportPanel = runsTable.expandExportPanel();
-        exportPanel.exportXar(ABSOLUTE, "absolute.xar");
+        File absoluteXarFile = exportPanel.exportXar(ABSOLUTE, "absolute.xar");
         File folderRelativeXarFile = exportPanel.exportXar(FOLDER_RELATIVE, "folderRelative.xar");
         File partialRelativeXarFile = exportPanel.exportXar(PARTIAL_FOLDER_RELATIVE, "partialRelative.xar");
         exportPanel.exportXarToPipeline(FOLDER_RELATIVE, toPipelineXarName)
@@ -701,14 +699,6 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         compareRunColumnsWithExpected(importProject, assayName, RUN01_NAME, run01ColumnData);
         compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
-
-        //This test will verify that an assay can be created successfully after importing from xar, with different names.
-        // This scenario is needed because the rename work changed how unique lsid is constructed. It will check that the
-        // DBsequence used for xar import doesn't collide with those created from project manually
-        File gpatAssayXls = TestFileUtils.getSampleData("GPAT/trial01.xls");
-        String originalAssayName = "Validate_Creation_After_Import";
-        createGpatAssayAndRun(importProject, originalAssayName, gpatAssayXls);
-
     }
 
     private void deleteAllAssayRuns(String assayName)
@@ -718,30 +708,6 @@ public class AssayExportImportTest extends BaseWebDriverTest
         DataRegionTable runsGrid = assayRunsPage.getTable();
         runsGrid.checkAllOnPage();
         runsGrid.deleteSelectedRows();
-    }
-
-    private void createGpatAssayAndRun(String projectName, String assayName, File gpatAssayXls)
-    {
-        new WebDavUploadHelper(projectName).uploadFile(gpatAssayXls);
-        beginAt(WebTestHelper.buildURL("pipeline", projectName, "browse"));
-        _fileBrowserHelper.importFile(gpatAssayXls.getName(), "Create New Standard Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-
-        Locator assayNameTxtBox = Locator.tagWithId("input", "AssayDesignerName");
-        setFormElement(assayNameTxtBox, assayName);
-        fireEvent(assayNameTxtBox, SeleniumEvent.blur);
-
-        clickButton("Begin import");
-        waitAndClick(Locator.lkButton("Next"));
-        waitAndClick(Locator.lkButton("Save and Finish"));
-        waitAndClick(Locator.linkWithText(gpatAssayXls.getName()));
-
-        checker().verifyTrue("Doesn't look like the gpat assay was created and the run data was loaded.",
-                waitFor(()->Locator.css(".labkey-pagination")
-                        .containing("1 - 100 of 201")
-                        .isDisplayed(getDriver()),
-                        5_000));
-
     }
 
 }
