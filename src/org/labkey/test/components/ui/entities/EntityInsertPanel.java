@@ -187,11 +187,6 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return panel.fileUploadPanel();
     }
 
-    private Optional<EditableGrid> optionalGrid()
-    {
-        return elementCache().optionalGrid();
-    }
-
     public EntityInsertPanel setMergeData(boolean allowMerge)
     {
         var panel = showFileUpload();
@@ -233,7 +228,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public boolean isGridVisible()
     {
-        var optionalGrid = optionalGrid();
+        var optionalGrid = elementCache().optionalGrid();
         return optionalGrid.isPresent() && optionalGrid.get().isDisplayed();
     }
 
