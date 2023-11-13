@@ -374,6 +374,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    public List<String> getViewMenuText()
+    {
+        BootstrapMenu menu = elementCache().viewMenu;
+        menu.expand();
+        return menu.findVisibleMenuItems().stream().map(WebElement::getText)
+                .toList();
+    }
+
     /**
      * Customize the view. Use the 'Customize Grid VIew' menu option.
      *
