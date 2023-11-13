@@ -24,7 +24,7 @@ project.tasks.register('validatorJar', Jar) {
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName.set("validator.jar")
-    destinationDirectory = project.projectDir
+    destinationDirectory.set(project.projectDir)
     manifest {
         attributes 'Implementation-Title': 'Assay Validator Jar',
                 'Implementation-Version': project.version,
@@ -41,7 +41,7 @@ project.tasks.register('transformJar', Jar) {
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName.set("transform.jar")
-    destinationDirectory = project.projectDir
+    destinationDirectory.set(project.projectDir)
     manifest {
         attributes 'Implementation-Title': 'Assay Transform Testing Jar',
                 'Implementation-Version': project.version,
@@ -58,7 +58,7 @@ project.tasks.register('transformNoopJar', Jar) {
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName.set("transformNoop.jar")
-    destinationDirectory = project.projectDir
+    destinationDirectory.set(project.projectDir)
     manifest {
         attributes 'Implementation-Title': 'Assay No-Op Transform Jar',
                 'Implementation-Version': project.version,
@@ -75,7 +75,7 @@ project.tasks.register('transformWarningJar', Jar) {
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName.set("transformWarning.jar")
-    destinationDirectory = project.projectDir
+    destinationDirectory.set(project.projectDir)
     manifest {
         attributes 'Implementation-Title': 'Assay Transform Warning Jar',
                 'Implementation-Version': project.version,
