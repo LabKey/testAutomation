@@ -55,7 +55,7 @@ public class NAbResultCalcTest extends BaseWebDriverTest
     @Test // Issue 49036
     public void testPercentNeutralizationCalcsForDilution()
     {
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        waitAndClickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                 assayId("Method Dilution").
@@ -69,7 +69,7 @@ public class NAbResultCalcTest extends BaseWebDriverTest
                 runFile(TEST_ASSAY_NAB_FILE).
                 build()).doImport();
 
-        clickAndWait(Locator.linkWithText("View Results"));
+        waitAndClickAndWait(Locator.linkWithText("View Results"));
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addColumn("PercentNeutralizationInitialDilution", "Percent Neutralization Initial Dilution");
@@ -86,7 +86,7 @@ public class NAbResultCalcTest extends BaseWebDriverTest
     @Test // Issue 49036
     public void testPercentNeutralizationCalcsForConcentration()
     {
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        waitAndClickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                 assayId("Method Concentration").
@@ -100,7 +100,7 @@ public class NAbResultCalcTest extends BaseWebDriverTest
                 runFile(TEST_ASSAY_NAB_FILE).
                 build()).doImport();
 
-        clickAndWait(Locator.linkWithText("View Results"));
+        waitAndClickAndWait(Locator.linkWithText("View Results"));
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addColumn("PercentNeutralizationInitialDilution", "Percent Neutralization Initial Dilution");
