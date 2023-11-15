@@ -59,7 +59,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.*;
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.ABSOLUTE;
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.FOLDER_RELATIVE;
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.PARTIAL_FOLDER_RELATIVE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
