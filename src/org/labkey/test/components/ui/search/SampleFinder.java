@@ -358,7 +358,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     /**
      * Represents a single filter card. Don't expose outside this class because its lifecycle is confusing
      */
-    private class FilterCard extends Component<Component<?>.ElementCache>
+    public class FilterCard extends Component<Component<?>.ElementCache>
     {
         private final WebElement cardEl;
         private final WebElement name = Locator.byClass("primary-text").findWhenNeeded(this);
