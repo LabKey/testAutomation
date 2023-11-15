@@ -61,16 +61,19 @@ public abstract class SpecimenBaseTest extends StudyBaseTest
         waitAndClick(Locator.linkWithText("Manage Study"));
         waitAndClick(Locator.linkWithText("Manage Requestability Rules"));
         // Verify that LOCKED_IN_REQUEST is the last rule
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-grid3-row-last')]//div[text()='Locked In Request Check']"));
-        click(Locator.xpath("//div[contains(@class, 'x-grid3-row-last')]//div[text()='Locked In Request Check']"));
 
-        click(Locator.xpath("//div[contains(@class, 'x-grid3-col-numberer') and text()='2']"));
+        // TODO: Restore the below once we figure out how to find the last row in Ext4 grids
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"));
+//        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid3-row-last')]//div[text()='Locked In Request Check']"));
+//        click(Locator.xpath("//div[contains(@class, 'x4-grid3-row-last')]//div[text()='Locked In Request Check']"));
+
+        click(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner-row-numberer') and text()='2']"));
 
         clickButton("Add Rule", 0);
         click(Locator.menuItem("Custom Query"));
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[@id='x-form-el-userQuery_schema']"), "study" );
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[@id='x-form-el-userQuery_query']"), REQUESTABILITY_QUERY );
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[@id='x-form-el-userQuery_action']"), "Unavailable" );
+        _extHelper.selectComboBoxItem(Locator.id("userQuery_schema-inputEl"), "study" );
+        _extHelper.selectComboBoxItem(Locator.id("userQuery_query-inputEl"), REQUESTABILITY_QUERY );
+        _extHelper.selectComboBoxItem(Locator.id("userQuery_action-inputEl"), "Unavailable" );
         clickButton("Submit",0);
         clickButton("Save");
     }
