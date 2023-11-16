@@ -71,9 +71,9 @@ public abstract class SpecimenBaseTest extends StudyBaseTest
 
         clickButton("Add Rule", 0);
         click(Locator.menuItem("Custom Query"));
-        _extHelper.selectComboBoxItem(Locator.id("userQuery_schema-inputEl"), "study" );
-        _extHelper.selectComboBoxItem(Locator.id("userQuery_query-inputEl"), REQUESTABILITY_QUERY );
-        _extHelper.selectComboBoxItem(Locator.id("userQuery_action-inputEl"), "Unavailable" );
+        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_schema-bodyEl"), "study" );
+        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_query-bodyEl"), REQUESTABILITY_QUERY );
+        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_action-bodyEl"), "Unavailable" );
         clickButton("Submit",0);
         clickButton("Save");
     }
