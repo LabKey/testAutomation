@@ -98,9 +98,10 @@ public class AliquotTest extends SpecimenBaseTest
         clickButton("Add Rule", 0);
         click(Locator.menuItem("Locked While Processing Check"));
 
-        // Remove Locked In Request
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-grid3-row')]//div[text()='Locked In Request Check']"));
-        click(Locator.xpath("//div[contains(@class, 'x-grid3-row')]//div[text()='Locked In Request Check']"));
+        // Remove "Locked In Request" rule
+        Locator lockedInRequestRow = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]//div[text()='Locked In Request Check']");
+        waitForElement(lockedInRequestRow);
+        click(lockedInRequestRow);
         clickButton("Remove Rule", 0);
 
         clickButton("Save");
