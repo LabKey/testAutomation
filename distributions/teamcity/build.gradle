@@ -59,7 +59,7 @@ else
     List pathList = []
     project.rootProject.allprojects.each {
         Project otherProject ->
-            if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
+            if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && BuildUtils.shouldDoBuild(otherProject, false))
             {
                 project.evaluationDependsOn(otherProject.path)
                 if (otherProject.plugins.hasPlugin('org.labkey.module') ||
