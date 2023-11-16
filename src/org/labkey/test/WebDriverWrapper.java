@@ -22,6 +22,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -452,7 +453,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return getDriver().getClass().isAssignableFrom(FirefoxDriver.class);
     }
 
-    public Object executeScript(String script, Object... arguments)
+    public Object executeScript(@Language("JavaScript") String script, Object... arguments)
     {
         return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
     }
@@ -461,7 +462,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wrapper for executing JavaScript through WebDriver and verifying return type.
      * @param <T> See {@link JavascriptExecutor#executeScript(java.lang.String, java.lang.Object...)} for valid return types
      */
-    public <T> T executeScript(String script, Class<T> expectedResultType, Object... arguments)
+    public <T> T executeScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
         Object o = executeScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
@@ -474,7 +475,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wrapper for synchronous execution of asynchronous JavaScript. This wrapper extracts the 'callback' from the argument list
      * See {@link JavascriptExecutor#executeAsyncScript(java.lang.String, java.lang.Object...)} for details
      */
-    public Object executeAsyncScript(String script, Object... arguments)
+    public Object executeAsyncScript(@Language("XPath") String script, Object... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
                 "try {" +
@@ -1475,15 +1476,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void fireEvent(WebElement el, SeleniumEvent event)
     {
-        executeScript("var element = arguments[0];" +
-                "var eventType = arguments[1];" +
-                "var myEvent = document.createEvent('UIEvent');" +
-                "myEvent.initEvent(" +
-                "   eventType, /* event type */" +
-                "   true,      /* can bubble? */" +
-                "   true       /* cancelable? */" +
-                ");" +
-                "element.dispatchEvent(myEvent);", el, event.toString());
+        executeScript("""
+                var element = arguments[0];
+                var eventType = arguments[1];
+                var myEvent = document.createEvent('UIEvent');
+                myEvent.initEvent(
+                   eventType, /* event type */
+                   true,      /* can bubble? */
+                   true       /* cancelable? */
+                );
+                element.dispatchEvent(myEvent);""", el, event.toString());
     }
 
     public void assertTitleEquals(String match)
