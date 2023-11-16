@@ -75,7 +75,7 @@ public abstract class SpecimenBaseTest extends StudyBaseTest
 
         // Verify that LOCKED_IN_REQUEST is the last rule
         log(gridRef.getFieldValue(rowCount, "name").toString());
-        Assert.assertEquals("Locked In Request Check", gridRef.getFieldValue(rowCount, "name"));
+        Assert.assertEquals("Last requestability rule", "Locked In Request Check", gridRef.getFieldValue(rowCount, "name"));
 
         click(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner-row-numberer') and text()='2']"));
 
