@@ -93,30 +93,7 @@ public class AliquotTest extends SpecimenBaseTest
     @LogMethod
     protected void setupRequestabilityRules()
     {
-        // Create custom query to test requestability rules.
-        goToSchemaBrowser();
-        createNewQuery("study", SPECIMEN_DETAIL);
-        setFormElement(Locator.name("ff_newQueryName"), REQUESTABILITY_QUERY);
-        clickAndWait(Locator.lkButton("Create and Edit Source"));
-        setCodeEditorValue("queryText",
-                "SELECT \n" +
-                        SPECIMEN_DETAIL + ".GlobalUniqueId AS GlobalUniqueId\n" +
-                        "FROM " + SPECIMEN_DETAIL + "\n" +
-                        "WHERE " + SPECIMEN_DETAIL + ".GlobalUniqueId='" + UNREQUESTABLE_SAMPLE + "'");
-        clickButton("Save", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "Saved");
-
-        clickFolder(getFolderName());
-        waitAndClick(Locator.linkWithText("Manage Study"));
-        waitAndClick(Locator.linkWithText("Manage Requestability Rules"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-grid3-row')]//div[text()='Locked In Request Check']"));
-
-        clickButton("Add Rule", 0);
-        click(Locator.menuItem("Custom Query"));
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[@id='x-form-el-userQuery_schema']"), "study" );
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[@id='x-form-el-userQuery_query']"), REQUESTABILITY_QUERY );
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[@id='x-form-el-userQuery_action']"), "Unavailable" );
-        clickButton("Submit", 0);
+        super.setupRequestabilityRules();
 
         clickButton("Add Rule", 0);
         click(Locator.menuItem("Locked While Processing Check"));

@@ -43,6 +43,7 @@ public abstract class SpecimenBaseTest extends StudyBaseTest
         super.doCleanup(afterTest);
     }
 
+    // Callers must click the Save button
     @LogMethod
     protected void setupRequestabilityRules()
     {
@@ -84,7 +85,6 @@ public abstract class SpecimenBaseTest extends StudyBaseTest
         _ext4Helper.selectComboBoxItem(Locator.id("userQuery_query"), REQUESTABILITY_QUERY );
         _ext4Helper.selectComboBoxItem(Locator.id("userQuery_action"), "Unavailable" );
         clickButton("Submit",0);
-        clickButton("Save");
     }
 
     @LogMethod
