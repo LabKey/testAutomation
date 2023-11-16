@@ -16,10 +16,12 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 
@@ -60,20 +62,27 @@ public abstract class SpecimenBaseTest extends StudyBaseTest
         clickFolder(getFolderName());
         waitAndClick(Locator.linkWithText("Manage Study"));
         waitAndClick(Locator.linkWithText("Manage Requestability Rules"));
-        // Verify that LOCKED_IN_REQUEST is the last rule
 
-        // TODO: Restore the below once we figure out how to find the last row in Ext4 grids
-        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"));
-//        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid3-row-last')]//div[text()='Locked In Request Check']"));
-//        click(Locator.xpath("//div[contains(@class, 'x4-grid3-row-last')]//div[text()='Locked In Request Check']"));
+        // Wait for grid to render
+        waitForElement(Locator.xpath("//table[contains(@class, 'x4-grid-table')]"));
+        Ext4GridRef gridRef = _ext4Helper.queryOne("panel[title='Active Rules']", Ext4GridRef.class);
+
+        // Expect three rows
+        int rowCount = gridRef.getRowCount();
+        log("How many rows? " + rowCount);
+        Assert.assertEquals(3, rowCount);
+
+        // Verify that LOCKED_IN_REQUEST is the last rule
+        log(gridRef.getFieldValue(rowCount, "name").toString());
+        Assert.assertEquals("Locked In Request Check", gridRef.getFieldValue(rowCount, "name"));
 
         click(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner-row-numberer') and text()='2']"));
 
         clickButton("Add Rule", 0);
         click(Locator.menuItem("Custom Query"));
-        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_schema-bodyEl"), "study" );
-        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_query-bodyEl"), REQUESTABILITY_QUERY );
-        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_action-bodyEl"), "Unavailable" );
+        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_schema"), "study" );
+        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_query"), REQUESTABILITY_QUERY );
+        _ext4Helper.selectComboBoxItem(Locator.id("userQuery_action"), "Unavailable" );
         clickButton("Submit",0);
         clickButton("Save");
     }
