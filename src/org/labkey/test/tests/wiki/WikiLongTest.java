@@ -499,7 +499,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
-        clickButton("Save and Finish");
+        clickButtonContainingText("Save and Finish");
 
         log("make sure the changes went through");
         impersonate(USER1);
@@ -530,7 +530,7 @@ public class WikiLongTest extends BaseWebDriverTest
         _wikiHelper.saveWikiPage(false);
         waitForText("There was a problem while saving: Illegal attribute 'onclick' on element <a>");
 
-        stopImpersonating();
+        stopImpersonatingWithUnloadAlert(false);
 
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);
