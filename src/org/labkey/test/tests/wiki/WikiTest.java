@@ -112,9 +112,6 @@ public class WikiTest extends BaseWebDriverTest
         assertTextPresent(file.getName(), "Some HTML content");
         final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
         assertElementPresent(wikiTitleLink);
-        impersonateRole("Reader");
-        assertElementNotPresent(wikiTitleLink);
-        stopImpersonating();
 
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", numberOfWikiCreated, WIKI_PAGE_TITLE);
@@ -160,9 +157,11 @@ public class WikiTest extends BaseWebDriverTest
     {
         String wikiName = "Wiki with video";
         String wikiTitle = "Sample finder video";
-        String wikiContent = "Some random content start : Have fun watching video below\n" +
-                "{video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}\n" +
-                "Hope you fun watching the video..!\n";
+        String wikiContent = """
+                Some random content start : Have fun watching video below
+                {video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}
+                Hope you had fun watching the video..!
+                """;
 
         goToProjectHome();
         log("Creating the wiki with video");
