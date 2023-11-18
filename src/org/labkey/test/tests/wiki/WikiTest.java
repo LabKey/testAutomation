@@ -278,10 +278,12 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
-        executeScript("if (!tinyMCE) {throw 'tinyMCE API is not available'}" +
-                "editor = tinyMCE.getInstanceById(arguments[0]);" +
-                "if (!editor) {throw 'No tinyMCE instance: ' + arguments[0];}" +
-                "editor.setContent(arguments[1]);", editorId, content);
+        executeScript("if (!tinymce) {throw 'tinymce API is not available'}" +
+                "editor = tinymce.get(arguments[0]);" +
+                "if (!editor) {throw 'No tinymce instance: ' + arguments[0];}" +
+                "editor.setContent(arguments[1]);" +
+                "editor.setDirty(true);"         // Explicitly setDirty as the setContent doesn't by default
+                , editorId, content);
     }
 
     @Override
