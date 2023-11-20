@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
@@ -59,6 +60,7 @@ public abstract class Locator extends By
     private String _description;
 
     // XPATH fragments
+    @Language("XPath")
     public static final String HIDDEN = "ancestor-or-self::*[" +
             "contains(@style,'display: none') or " +
             "contains(@style,'visibility: hidden') or " +
@@ -66,8 +68,11 @@ public abstract class Locator extends By
             "contains(@class, 'x4-hide-offsets') or " +
             "contains(@class, 'x-hide-offsets')] or " +
             "(@type = 'hidden')";
+    @Language("XPath")
     public static final String NOT_HIDDEN = "not(" + HIDDEN + ")";
+    @Language("XPath")
     public static final String DISABLED = "ancestor-or-self::*[contains(@class, 'disabled')]";
+    @Language("XPath")
     public static final String ENABLED = "not(" + DISABLED + ")";
     public static final String NBSP = "\u00A0";
 
@@ -574,7 +579,7 @@ public abstract class Locator extends By
         return new CssLocator(selector);
     }
 
-    public static XPathLocator xpath(String xpathExpr)
+    public static XPathLocator xpath(@Language("XPath") String xpathExpr)
     {
         return new XPathLocator(xpathExpr);
     }
@@ -1176,7 +1181,7 @@ public abstract class Locator extends By
 
     public static class XPathLocator extends Locator
     {
-        protected XPathLocator(String loc)
+        protected XPathLocator(@Language("XPath") String loc)
         {
             super(loc);
         }
@@ -1229,7 +1234,7 @@ public abstract class Locator extends By
 
         public XPathLocator withoutText()
         {
-            return this.withPredicate("string-length() == 0");
+            return this.withPredicate("string-length() = 0");
         }
 
         public XPathLocator withTextMatching(String regex)
@@ -1321,7 +1326,7 @@ public abstract class Locator extends By
             return withPredicate("last()");
         }
 
-        public XPathLocator append(String clause)
+        public XPathLocator append(@Language("XPath") String clause)
         {
             return new XPathLocator(getLoc() + clause);
         }
@@ -1357,12 +1362,12 @@ public abstract class Locator extends By
             return this.withPredicate(descendant.getLoc());
         }
 
-        public XPathLocator withPredicate(String predicate)
+        public XPathLocator withPredicate(@Language("XPath") String predicate)
         {
             return this.append("[" + getRelativeXPath(predicate) + "]");
         }
 
-        public XPathLocator withoutPredicate(String predicate)
+        public XPathLocator withoutPredicate(@Language("XPath") String predicate)
         {
             return this.append("[not(" + getRelativeXPath(predicate) + ")]");
         }
@@ -1525,7 +1530,7 @@ public abstract class Locator extends By
             return getRelativeXPath(getLoc());
         }
 
-        private String getRelativeXPath(String xpath)
+        private String getRelativeXPath(@Language("XPath") String xpath)
         {
             if (xpath.startsWith("//") || xpath.startsWith("(//"))
                 xpath = xpath.replaceFirst("//", ".//");
