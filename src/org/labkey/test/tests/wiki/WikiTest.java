@@ -231,7 +231,8 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void doTestInlineEditor()
     {
-        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']");
+        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']")
+                .withDescendant(Locator.tagWithClassContaining("div", "tox-edit-area"));
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
@@ -284,6 +285,7 @@ public class WikiTest extends BaseWebDriverTest
                 "editor.setContent(arguments[1]);" +
                 "editor.setDirty(true);"         // Explicitly setDirty as the setContent doesn't by default
                 , editorId, content);
+        log(String.format("Content [%1$s] set on editor: %2$s", content,  editorId));
     }
 
     @Override
