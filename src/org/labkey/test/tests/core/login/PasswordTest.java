@@ -55,6 +55,7 @@ public class PasswordTest extends BaseWebDriverTest
     private static final String SIMPLE_PASSWORD = "3asdfghi"; // Only two character types. 8 characters long.
     private static final String GOOD_PASSWORD = "Yekbal1!"; // 8 characters long. 3+ character types.
     private static final String STRONG_PASSWORD = "We'reSo$tr0ng@yekbal1!";
+    private static final String GUIDANCE_PLACEHOLDER = "Password Strength Gauge";
 
     @Override
     public List<String> getAssociatedModules()
@@ -117,18 +118,20 @@ public class PasswordTest extends BaseWebDriverTest
                 PasswordExpiration.Never);
 
         setInitialPassword(USER, SIMPLE_PASSWORD);
+        assertPasswordStrengthGauge("", GUIDANCE_PLACEHOLDER);
         assertTextPresent("Your password is not complex enough."); // fail, too simple
 
-        setFormElement(Locator.id("password"), SHORT_PASSWORD);
+        assertPasswordStrengthGauge(SHORT_PASSWORD, "Very Weak");
         setFormElement(Locator.id("password2"), SHORT_PASSWORD);
         clickButton("Set Password");
         assertTextPresent("Your password is not complex enough."); // fail, too short
 
-        setFormElement(Locator.id("password"), GOOD_PASSWORD);
+        // Password is good enough for "GOOD" strength setting; not actually rated as "Good" by entropy calculation
+        assertPasswordStrengthGauge(GOOD_PASSWORD, "Weak");
         setFormElement(Locator.id("password2"), GOOD_PASSWORD);
         assertTextPresent("Your password is not complex enough."); // fail, not complex enough
 
-        setFormElement(Locator.id("password"), STRONG_PASSWORD);
+        assertPasswordStrengthGauge(STRONG_PASSWORD, "Very Strong");
         setFormElement(Locator.id("password2"), STRONG_PASSWORD);
         clickButton("Set Password");
         assertSignedInNotImpersonating();
@@ -137,6 +140,13 @@ public class PasswordTest extends BaseWebDriverTest
 
         changePassword(STRONG_PASSWORD, SIMPLE_PASSWORD); // fail, too simple
         assertTextPresent("Your password is not complex enough.");
+
+        // Test password gauge while we're on this page
+        assertPasswordStrengthGauge(SIMPLE_PASSWORD, "Very Weak");
+        assertPasswordStrengthGauge(SHORT_PASSWORD, "Very Weak");
+        assertPasswordStrengthGauge(GOOD_PASSWORD, "Weak");
+        assertPasswordStrengthGauge(STRONG_PASSWORD, "Very Strong");
+
         changePassword(STRONG_PASSWORD, SHORT_PASSWORD); // fail, too short
         assertTextPresent("Your password is not complex enough.");
         changePassword(STRONG_PASSWORD, GOOD_PASSWORD); // fail, not complex enough
@@ -145,6 +155,15 @@ public class PasswordTest extends BaseWebDriverTest
         changePassword(STRONG_PASSWORD, currentPassword);
         assertTextNotPresent("Choose a new password.");
         assertEquals("Signed in as", USER, getCurrentUser());
+    }
+
+    private void assertPasswordStrengthGauge(String shortPassword, String expectedGuidance)
+    {
+        setFormElement(Locator.id("password"), shortPassword);
+        String strengthGuidance = Locator.id("strengthGuidance").findElement(getDriver()).getText();
+        strengthGuidance = strengthGuidance.substring(strengthGuidance.indexOf(':') + 1).trim();
+
+        assertEquals("Strength guidance for password", expectedGuidance, strengthGuidance);
     }
 
     @Test
