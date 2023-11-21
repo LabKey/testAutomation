@@ -41,9 +41,9 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
-                        !elementCache().title.getText().isEmpty() &&
                         !BootstrapLocators.loadingSpinner.existsIn(this) &&
-                        elementCache().commentInput.getComponentElement().isDisplayed(),
+                        (elementCache().commentInput.getComponentElement().isDisplayed() ||
+                                elementCache().title.getText().toLowerCase().contains("cannot")),
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
