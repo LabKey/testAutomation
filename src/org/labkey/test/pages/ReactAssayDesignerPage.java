@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -207,15 +208,20 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
-        return setTransformScript(transformScript, false);
+        return setTransformScript(transformScript, false, null);
     }
 
     public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload)
     {
-        return setTransformScript(transformScript, usingFileUpload);
+        return setTransformScript(transformScript, usingFileUpload, null);
     }
 
-    private ReactAssayDesignerPage setTransformScript(File transformScript, boolean usingFileUpload)
+    public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload, @Nullable String expectedError)
+    {
+        return setTransformScript(transformScript, usingFileUpload, expectedError);
+    }
+
+    private ReactAssayDesignerPage setTransformScript(File transformScript, boolean usingFileUpload, @Nullable String expectedError)
     {
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
 
@@ -234,9 +240,18 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
             getWrapper().clickButton("Apply", 0);
         }
 
-        String finalTargetPath = targetPath;
-        getWrapper().waitFor(()-> Locator.tagWithClass("div", "attachment-card__description").endsWith(finalTargetPath).isDisplayed(this),
-                "Transform script card with expected file not found", WAIT_FOR_JAVASCRIPT);
+        if (expectedError == null)
+        {
+            String finalTargetPath = targetPath;
+            getWrapper().waitFor(()-> Locator.tagWithClass("div", "attachment-card__description").endsWith(finalTargetPath).isDisplayed(this),
+                    "Transform script card with expected file not found", WAIT_FOR_JAVASCRIPT);
+        }
+        else
+        {
+            getWrapper().waitFor(()-> Locator.tagWithClass("div", "alert-danger").withText(expectedError).isDisplayed(this),
+                    "Transform script expected error not found", WAIT_FOR_JAVASCRIPT);
+            getWrapper().click(Locator.tagWithClass("i", "container--removal-icon"));
+        }
 
         return this;
     }

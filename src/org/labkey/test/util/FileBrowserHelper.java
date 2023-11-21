@@ -369,7 +369,12 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public List<String> getFileList()
     {
-        return getTexts(Locators.gridRow().childTag("td").position(3).findElements(getDriver()));
+        return getFileList(true);
+    }
+
+    public List<String> getFileList(boolean hasCheckboxColumn)
+    {
+        return getTexts(Locators.gridRow().childTag("td").position(hasCheckboxColumn ? 3 : 2).findElements(getDriver()));
     }
 
     public void createFolder(String folderName)

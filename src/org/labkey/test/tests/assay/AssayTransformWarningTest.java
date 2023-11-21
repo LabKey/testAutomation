@@ -27,6 +27,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -46,6 +47,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     public static final File JAVA_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/transformWarning.jar");
     public static final File R_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/assayTransformWarning.R");
     public static final File R_TRANSFORM_ERROR_SCRIPT = TestFileUtils.getSampleData("qc/assayTransformError.R");
+    public static final File JAVA_INVALID_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/src/org/labkey/AssayTransformNoOp.java");
 
     @Override
     public List<String> getAssociatedModules()
@@ -191,7 +193,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String runName = "R transform run";
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
-                .addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true);
+                .addTransformScript(R_TRANSFORM_ERROR_SCRIPT);
         assayDesignerPage.goToRunFields()
                 .addField("myFile")
                 .setLabel("My File")
@@ -209,5 +211,30 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         assertTextPresent("There are errors in the input file");
         assertElementPresent(Locator.tag("td").containing("Col1"));
         assertElementPresent(Locator.tag("td").containing("test2"));
+    }
+
+    @Test
+    public void testTransformScriptValidation()
+    {
+        String assayName = "transformInvalid";
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
+
+        // verify check for valid script engine defined for the file extension
+        assayDesignerPage.addTransformScript(JAVA_INVALID_TRANSFORM_SCRIPT, true, "Script engine for the extension '.java' has not been registered.");
+        assayDesignerPage.addTransformScript(JAVA_INVALID_TRANSFORM_SCRIPT, false, "Script engine for the extension '.java' has not been registered.");
+
+        // verify check for duplicate file in @scripts dir
+        assayDesignerPage.addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true);
+        assayDesignerPage.addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true, "File already exists: assayTransformError.R");
+
+        // verify file exists in @scripts dir via webdav page
+        WebDavPage webDavPage = WebDavPage.beginAt(this, getProjectName() + "/@scripts");
+        webDavPage.getFileBrowserHelper().waitForFileGridReady();
+        assertTrue("Transform script file not present in file system.", webDavPage.getFileBrowserHelper().getFileList(false).contains(R_TRANSFORM_ERROR_SCRIPT.getName()));
+        goToProjectHome();
+        impersonateRole("Folder Administrator");
+        WebDavPage.beginAt(this, getProjectName() + "/@scripts");
+        waitForElement(Locators.labkeyErrorHeading.withText("/_webdav/" + getProjectName() + "/@scripts"));
+        stopImpersonatingHTTP();
     }
 }
