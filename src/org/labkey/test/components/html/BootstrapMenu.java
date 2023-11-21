@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -110,6 +111,18 @@ public class BootstrapMenu extends BaseBootstrapMenu
         getWrapper().scrollIntoView(item);
 
         getWrapper().clickAndWait(item, timeout);
+
+        if (0 == timeout)   // if we aren't waiting to navigate, wait for the menu to close
+            WebDriverWrapper.waitFor(()-> {
+                try
+                {
+                    return !isExpanded();
+                }
+                catch (StaleElementReferenceException success)
+                {
+                    return true;
+                }
+            }, 1000);
     }
 
     @LogMethod(quiet = true)
