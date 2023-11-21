@@ -100,7 +100,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String runName = "java transform run";
 
         _assayHelper.createAssayDesign("General", assayName)
-            .addTransformScript(JAVA_TRANSFORM_SCRIPT)
+            .addTransformScript(JAVA_TRANSFORM_SCRIPT, true)
             .clickFinish();
 
         clickAndWait(Locator.linkWithText(assayName));
@@ -136,7 +136,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String runName = "R transform run";
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
-            .addTransformScript(R_TRANSFORM_SCRIPT);
+            .addTransformScript(R_TRANSFORM_SCRIPT, true);
         assayDesignerPage.goToRunFields()
             .addField("myFile")
             .setLabel("My File")
@@ -191,7 +191,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String runName = "R transform run";
 
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
-                .addTransformScript(R_TRANSFORM_ERROR_SCRIPT);
+                .addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true);
         assayDesignerPage.goToRunFields()
                 .addField("myFile")
                 .setLabel("My File")

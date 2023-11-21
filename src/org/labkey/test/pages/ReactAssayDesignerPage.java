@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.SelectWrapper.Select;
@@ -206,23 +207,37 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
-        expandPropertiesPanel();
-        int index = Locator.xpath("//input[starts-with(@id, 'assay-design-protocolTransformScripts')]").findElements(getDriver()).size();
-        getWrapper().click(Locator.tagWithClass("span", "btn").containing("Add Script"));
-        return setTransformScript(transformScript, index);
+        return setTransformScript(transformScript, false);
     }
 
-    public ReactAssayDesignerPage setTransformScript(File transformScript)
+    public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload)
     {
-        expandPropertiesPanel();
-        return setTransformScript(transformScript, 0);
+        return setTransformScript(transformScript, usingFileUpload);
     }
 
-    public ReactAssayDesignerPage setTransformScript(File transformScript, int index)
+    private ReactAssayDesignerPage setTransformScript(File transformScript, boolean usingFileUpload)
     {
-        expandPropertiesPanel();
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
-        getWrapper().setFormElement(Locator.xpath("//input[@id='assay-design-protocolTransformScripts" + index + "']"), transformScript.getAbsolutePath());
+
+        expandPropertiesPanel();
+        getWrapper().click(Locator.tagWithClass("span", "btn").containing("Add Script"));
+        String targetPath = transformScript.getAbsolutePath();
+        if (usingFileUpload)
+        {
+            getWrapper().setFormElement(Locator.tagWithClass("input", "file-upload--input"), transformScript);
+            targetPath = "/@scripts/" + transformScript.getName();
+        }
+        else
+        {
+            getWrapper().checkRadioButton(Locator.radioButtonByNameAndValue("transformScriptAddType", "path"));
+            getWrapper().setFormElement(Locator.tagWithClass("div", "transform-script-add--path").child(Locator.tag("input")), transformScript.getAbsolutePath());
+            getWrapper().clickButton("Apply", 0);
+        }
+
+        String finalTargetPath = targetPath;
+        getWrapper().waitFor(()-> Locator.tagWithClass("div", "attachment-card__description").endsWith(finalTargetPath).isDisplayed(this),
+                "Transform script card with expected file not found", WAIT_FOR_JAVASCRIPT);
+
         return this;
     }
 
