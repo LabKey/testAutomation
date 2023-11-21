@@ -227,10 +227,13 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         assayDesignerPage.addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true);
         assayDesignerPage.addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true, "File already exists: assayTransformError.R");
 
-        // verify file exists in @scripts dir via webdav page
+        // verify that removing the transform script path does not remove file from file system
+        assayDesignerPage.removeTransformScript(R_TRANSFORM_ERROR_SCRIPT.getName());
         WebDavPage webDavPage = WebDavPage.beginAt(this, getProjectName() + "/@scripts");
         webDavPage.getFileBrowserHelper().waitForFileGridReady();
         assertTrue("Transform script file not present in file system.", webDavPage.getFileBrowserHelper().getFileList(false).contains(R_TRANSFORM_ERROR_SCRIPT.getName()));
+
+        // verify file exists in @scripts dir via webdav page
         goToProjectHome();
         impersonateRole("Folder Administrator");
         WebDavPage.beginAt(this, getProjectName() + "/@scripts");

@@ -23,6 +23,7 @@ import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -31,6 +32,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.io.File;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
@@ -253,6 +255,16 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
             getWrapper().click(Locator.tagWithClass("i", "container--removal-icon"));
         }
 
+        return this;
+    }
+
+    public ReactAssayDesignerPage removeTransformScript(String fileName)
+    {
+        int beforeCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
+        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withFile(fileName).find(this);
+        card.clickRemove();
+        int afterCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
+        assertEquals("Transform script count not as expected after remove.", beforeCount - 1, afterCount);
         return this;
     }
 

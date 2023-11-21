@@ -68,6 +68,8 @@ public class ElispotAssayTest extends AbstractAssayTest
     protected static final File TEST_ASSAY_ELISPOT_FILE5 = TestFileUtils.getSampleData("Elispot/AID_0161456 W8.txt");
     protected static final File TEST_ASSAY_ELISPOT_FILE6 = TestFileUtils.getSampleData("Elispot/AID_TNTC.txt");
 
+    private static final File TRANSFORM_SCRIPT_FILE = TestFileUtils.getSampleData("qc/transform.jar");
+
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
     protected static final String TEST_ASSAY_FLUOROSPOT = "TestAssayFluorospot";
@@ -495,7 +497,7 @@ public class ElispotAssayTest extends AbstractAssayTest
 
 
         ReactAssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
-        assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"), true);
+        assayDesigner.addTransformScript(TRANSFORM_SCRIPT_FILE, true);
         assayDesigner.clickFinish();
         DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
 
@@ -525,9 +527,9 @@ public class ElispotAssayTest extends AbstractAssayTest
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
-        waitAndClick(Locator.tagWithClass("i", "container--removal-icon")); // TODO add a specific class to the transform script removal icon
-        assayDesignerPage.clickFinish();
+        _assayHelper.clickEditAssayDesign()
+                .removeTransformScript(TRANSFORM_SCRIPT_FILE.getName())
+                .clickFinish();
         DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
     }
 
