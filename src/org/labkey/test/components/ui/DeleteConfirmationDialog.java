@@ -41,8 +41,9 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
-                !elementCache().title.getText().isEmpty() &&
-                !BootstrapLocators.loadingSpinner.existsIn(this),
+                        !elementCache().title.getText().isEmpty() &&
+                        !BootstrapLocators.loadingSpinner.existsIn(this) &&
+                        elementCache().commentInput.getComponentElement().isDisplayed(),
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
@@ -82,9 +83,29 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog setUserComment(String comment)
     {
-        var commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
-                .refindWhenNeeded(this);
-        commentInput.set(comment);
+        elementCache().commentInput.set(comment);
         return this;
     }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    protected class ElementCache extends ModalDialog.ElementCache
+    {
+
+        Input commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
+                .refindWhenNeeded(this);
+
+    }
+
+
 }
