@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.query.EditMetadataPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
@@ -73,7 +73,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     public void resetToDefault()
     {
         // visit the metadata edit page for the test list, clear whatever open edits it might have
-        EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST).resetToDefault();
+        QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST).resetToDefault();
     }
 
     /*
@@ -82,7 +82,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @Test
     public void testUpdateLookupFields()
     {
-        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
+        var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
         editPage.fieldsPanel()
                 .getField("selfLookup")
                 .setLabel("SelfLookup")
@@ -126,7 +126,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @Test
     public void testSaveDescriptionUpdate()
     {
-        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
+        var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
         editPage.fieldsPanel()
                 .getField("value")
                 .setDescription("has new description");
@@ -157,7 +157,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @Test
     public void testResetToDefault()
     {
-        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
+        var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
         editPage.fieldsPanel()
                 .getField("date")
                 .setDescription("has new description");
@@ -165,8 +165,6 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 .getField("value")
                 .setLabel("ValueLabel");
         editPage.clickSave();
-        // verify/confirm success
-        editPage.waitForSuccess();
         var queryPage = editPage.clickEditSource();
         String expectedXml = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
                 "  <table tableName=\"queryMetadataTestList\" tableDbType=\"NOT_IN_DB\">\n" +
@@ -188,7 +186,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
         queryPage.clickSave();
         queryPage.goBack();
 
-        editPage = new EditMetadataPage(getDriver());
+        editPage = new QueryMetadataEditorPage(getDriver());
 
         // now ensure that 'reset to default' clears the xml delta
         editPage.resetToDefault();
@@ -214,7 +212,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @Test
     public void testEnsureOnlyModifiedColumnAppearsInMetadataXML()
     {
-        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
+        var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
         editPage.fieldsPanel().getField("Created")
                 .setDateFormat("Date");
         editPage.clickSave();
@@ -240,7 +238,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @Test
     public void testAssayQueryMetadata()
     {
-        var editPage = EditMetadataPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
+        var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
         editPage.fieldsPanel().getField("Created")
                 .setDateFormat("Date");
         editPage.aliasField("Row Id");
@@ -278,7 +276,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     private void verifyMetadataXMLAfterResave(String schemaName, String queryName, String expectedColumnXml)
     {
         // Issue 48598: verify that previous updates aren't removed on re-save
-        var queryXmlPage = EditMetadataPage.beginAt(this, getProjectName(), schemaName, queryName)
+        var queryXmlPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), schemaName, queryName)
                 .clickSave()
                 .clickEditSource();
         assertThat(queryXmlPage.getMetadataXml())

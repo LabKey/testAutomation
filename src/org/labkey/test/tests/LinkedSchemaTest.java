@@ -29,8 +29,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -574,8 +574,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         navigateToMetadataQuery(schema, query);
         QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
-        queryMetadataEditorPage.aliasField().selectAliasField(fieldToWrap).clickApply();
-        queryMetadataEditorPage.getFieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickAliasField().selectAliasField(fieldToWrap).clickApply();
+        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
         queryMetadataEditorPage.clickSave();
     }
 
