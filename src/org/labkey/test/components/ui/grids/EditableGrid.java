@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -47,6 +48,7 @@ import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
+    public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     public static final String SELECT_COLUMN_HEADER = "<select>";
     public static final String ROW_NUMBER_COLUMN_HEADER = "<row number>";
 
@@ -605,6 +607,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return copyCurrentSelection();
         }
         return selection;
+    }
+
+    /**
+     * Selects all cells in the table, then deletes their content
+     */
+    public void clearAllCells() throws IOException, UnsupportedFlavorException
+    {
+        selectAllCells();
+        new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
     }
 
     public String copyCurrentSelection() throws IOException, UnsupportedFlavorException

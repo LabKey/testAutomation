@@ -8,7 +8,9 @@ import org.labkey.test.util.DataRegion;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -51,8 +53,13 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
      */
     public DataRegionTable viewData()
     {
-        doAndWaitForPageSignal(this::clickDataTab, DataRegion.UPDATE_SIGNAL);
-        return DataRegionTable.DataRegion(getDriver()).timeout(WAIT_FOR_JAVASCRIPT * 3).waitFor();
+        return viewData(Duration.ofSeconds(10));
+    }
+
+    public DataRegionTable viewData(Duration timeout)
+    {
+        doAndWaitForPageSignal(this::clickDataTab, DataRegion.UPDATE_SIGNAL, new WebDriverWait(getDriver(), timeout));
+        return DataRegionTable.DataRegion(getDriver()).waitFor();
     }
 
     private void clickDataTab()
