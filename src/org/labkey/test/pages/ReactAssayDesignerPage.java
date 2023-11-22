@@ -260,8 +260,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage removeTransformScript(String fileName)
     {
+        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withFile(fileName).waitFor(this);
         int beforeCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
-        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withFile(fileName).find(this);
         card.clickRemove();
         int afterCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
         assertEquals("Transform script count not as expected after remove.", beforeCount - 1, afterCount);
