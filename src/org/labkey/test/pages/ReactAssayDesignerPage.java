@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -22,6 +23,7 @@ import org.labkey.test.components.domain.DomainPanel;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -30,7 +32,9 @@ import org.openqa.selenium.support.ui.Select;
 import java.io.File;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.SelectWrapper.Select;
@@ -206,23 +210,61 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
-        expandPropertiesPanel();
-        int index = Locator.xpath("//input[starts-with(@id, 'assay-design-protocolTransformScripts')]").findElements(getDriver()).size();
-        getWrapper().click(Locator.tagWithClass("span", "btn").containing("Add Script"));
-        return setTransformScript(transformScript, index);
+        return setTransformScript(transformScript, false, null);
     }
 
-    public ReactAssayDesignerPage setTransformScript(File transformScript)
+    public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload)
     {
-        expandPropertiesPanel();
-        return setTransformScript(transformScript, 0);
+        return setTransformScript(transformScript, usingFileUpload, null);
     }
 
-    public ReactAssayDesignerPage setTransformScript(File transformScript, int index)
+    public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload, @Nullable String expectedError)
     {
-        expandPropertiesPanel();
+        return setTransformScript(transformScript, usingFileUpload, expectedError);
+    }
+
+    private ReactAssayDesignerPage setTransformScript(File transformScript, boolean usingFileUpload, @Nullable String expectedError)
+    {
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
-        getWrapper().setFormElement(Locator.xpath("//input[@id='assay-design-protocolTransformScripts" + index + "']"), transformScript.getAbsolutePath());
+
+        expandPropertiesPanel();
+        getWrapper().click(Locator.tagWithClass("span", "btn").containing("Add Script"));
+        String targetPath = transformScript.getAbsolutePath();
+        if (usingFileUpload)
+        {
+            getWrapper().setFormElement(Locator.tagWithClass("input", "file-upload--input"), transformScript);
+            targetPath = "/@scripts/" + transformScript.getName();
+        }
+        else
+        {
+            getWrapper().checkRadioButton(Locator.radioButtonByNameAndValue("transformScriptAddType", "path"));
+            getWrapper().setFormElement(Locator.tagWithClass("div", "transform-script-add--path").child(Locator.tag("input")), transformScript.getAbsolutePath());
+            getWrapper().clickButton("Apply", 0);
+        }
+
+        if (expectedError == null)
+        {
+            String finalTargetPath = targetPath;
+            getWrapper().waitFor(()-> Locator.tagWithClass("div", "attachment-card__description").endsWith(finalTargetPath).isDisplayed(this),
+                    "Transform script card with expected file not found", WAIT_FOR_JAVASCRIPT);
+        }
+        else
+        {
+            getWrapper().waitFor(()-> Locator.tagWithClass("div", "alert-danger").withText(expectedError).isDisplayed(this),
+                    "Transform script expected error not found", WAIT_FOR_JAVASCRIPT);
+            getWrapper().click(Locator.tagWithClass("i", "container--removal-icon"));
+        }
+
+        return this;
+    }
+
+    public ReactAssayDesignerPage removeTransformScript(String fileName)
+    {
+        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withFile(fileName).waitFor(this);
+        int beforeCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
+        card.clickRemove();
+        int afterCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
+        assertEquals("Transform script count not as expected after remove.", beforeCount - 1, afterCount);
         return this;
     }
 

@@ -702,7 +702,7 @@ public class NabAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         _assayHelper.clickEditAssayDesign()
-                .addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"))
+                .addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"), true)
                 .clickFinish();
 
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);

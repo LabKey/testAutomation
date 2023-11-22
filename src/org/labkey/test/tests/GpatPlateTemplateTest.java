@@ -57,7 +57,7 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
                 .createAssayDesign("General", ASSAY_NAME)
                 .setPlateMetadata(true)
                 // Regression check for Issue 48293: Standard Assay with Plate Metadata & Transformation Script throws an error
-                .addTransformScript(TRANSFORM_SCRIPT)
+                .addTransformScript(TRANSFORM_SCRIPT, true)
                 .clickFinish();
         createPlateTemplate(templateName, "blank", "Standard", true);
     }
