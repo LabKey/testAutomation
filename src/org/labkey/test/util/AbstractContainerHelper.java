@@ -41,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -86,9 +85,9 @@ public abstract class AbstractContainerHelper
     public final void ensureContainer(String containerPath)
     {
         List<String> pathParts = Arrays.stream(containerPath.split("/"))
-                .map(StringUtils::trimToEmpty)
-                .filter(part -> !part.isEmpty())
-                .collect(Collectors.toList());
+            .map(StringUtils::trimToEmpty)
+            .filter(part -> !part.isEmpty())
+            .toList();
 
         StringBuilder currentPath = new StringBuilder();
 

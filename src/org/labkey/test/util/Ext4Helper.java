@@ -400,9 +400,9 @@ public class Ext4Helper
         _test.executeScript(script, columnName, columnVal, idx, gridEl, keepExisting);
     }
 
-    public void selectGridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
+    public void selectGridItem(String columnName, String columnVal, int idx, String gridMarkerCls, boolean keepExisting)
     {
-        WebElement grid = Locator.css("." + markerCls).findElement(_test.getDriver());
+        WebElement grid = Locator.css("." + gridMarkerCls).findElement(_test.getDriver());
         selectGridItem(columnName, columnVal, idx, grid, keepExisting);
     }
 
