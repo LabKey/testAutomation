@@ -281,6 +281,7 @@ public class WikiHelper
             if (_test.isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
             {
                 _test.click(Locator.css("#wiki-tab-visual > a"));
+                _test.waitAndClick(Locator.tagWithText("span","Yes"));
                 _test.waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
             }
         }
