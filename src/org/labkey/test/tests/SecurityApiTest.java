@@ -24,7 +24,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.util.Arrays;
@@ -128,12 +127,12 @@ public class SecurityApiTest extends BaseWebDriverTest
      * JSON output. A little ways down is a comment "Actual:" with the actual JSON output (go figure). It might be easier
      * to compare the expected vs. actual results from this log output.
      *
-     * The expected output comes from the security-api.xml file. If this is a role and/or permission error odds are you
+     * The expected output comes from the security-api.xml file. If this is a role and/or permission error, odds are you
      * will need to make a change to that file. Try to make the smallest change possible. If you are changing permissions,
      * either adding or removing, you will need to update the value(s) in the effectivePermissions collection for a given role.
      *
      * For example, under the Editor role ("roleLabel": "Editor") there is a effectivePermissions collections that shows
-     * the permissions for that role ("effectivePermissions": ["org.labkey.api.security.permissions.InsertPermission",etc...).
+     * the permissions for that role ("effectivePermissions": ["org.labkey.api.security.permissions.InsertPermission", etc...).
      * This collection is what you would most likely be modifying.
      *
      * If you still have a hard time getting the test to pass locally try running with a bootstrapped database. That is

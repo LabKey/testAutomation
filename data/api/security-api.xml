@@ -21,12 +21,7 @@
                             "isProjectGroup": false,
                             "type": "g",
                             "effectivePermissions": [],
-                            "groups": [{
-                                "isSystemGroup": true,
-                                "name": "Developers",
-                                "id": -4,
-                                "isProjectGroup": false
-                            }],
+                            "groups": []
                         },
                         {
                             "role": "NO_PERMISSIONS",
@@ -142,12 +137,6 @@
         <url>security/Security%20Api%20Test%20Project/getGroupsForCurrentUser.view?</url>
         <response>
             {"groups": [
-                    {
-                        "id": -4,
-                        "name": "Developers",
-                        "isSystemGroup": true,
-                        "isProjectGroup": false
-                    },
                     {
                         "id": -3,
                         "name": "Guests",
