@@ -17,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Input.Input;
 
 /**
@@ -69,8 +70,8 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
     @LogMethod
     public void assertPasswordStrengthGauge()
     {
-        assertPasswordStrengthGauge("", GUIDANCE_PLACEHOLDER);
         assertPasswordStrengthGauge(SIMPLE_PASSWORD, "Very Weak");
+        assertPasswordStrengthGauge("", GUIDANCE_PLACEHOLDER);
         assertPasswordStrengthGauge(SHORT_PASSWORD, "Very Weak");
         // Password is good enough for "GOOD" strength setting; not actually rated as "Good" by entropy calculation
         assertPasswordStrengthGauge(GOOD_PASSWORD, "Weak");
@@ -80,7 +81,10 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
     @LogMethod(quiet = true)
     public void assertPasswordStrengthGauge(@LoggedParam String password, @LoggedParam String expectedGuidance)
     {
+        String previousGuidance = elementCache().strengthGuidance.getText();
         setPassword1(password);
+        //noinspection ResultOfMethodCallIgnored
+        waitFor(() -> !previousGuidance.equals(elementCache().strengthGuidance.getText()), 5_000);
         String strengthGuidance = elementCache().strengthGuidance.getText();
         strengthGuidance = strengthGuidance.substring(strengthGuidance.indexOf(':') + 1).trim();
 
