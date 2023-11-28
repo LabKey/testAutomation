@@ -26,10 +26,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.core.login.DbLoginUtils;
 import org.labkey.test.util.core.login.DbLoginUtils.DbLoginProperties;
 import org.labkey.test.util.core.login.DbLoginUtils.PasswordExpiration;
@@ -44,18 +47,16 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.components.core.login.SetPasswordForm.GOOD_PASSWORD;
+import static org.labkey.test.components.core.login.SetPasswordForm.SHORT_PASSWORD;
+import static org.labkey.test.components.core.login.SetPasswordForm.SIMPLE_PASSWORD;
+import static org.labkey.test.components.core.login.SetPasswordForm.STRONG_PASSWORD;
 
 @Category(BVT.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class PasswordTest extends BaseWebDriverTest
 {
     private static final String USER = "user_passwordtest@password.test";
-
-    private static final String SHORT_PASSWORD = "4asdfg!"; // Only 7 characters long. 3 character types.
-    private static final String SIMPLE_PASSWORD = "3asdfghi"; // Only two character types. 8 characters long.
-    private static final String GOOD_PASSWORD = "Yekbal1!"; // 8 characters long. 3+ character types.
-    private static final String STRONG_PASSWORD = "We'reSo$tr0ng@yekbal1!";
-    private static final String GUIDANCE_PLACEHOLDER = "Password Strength Gauge";
 
     @Override
     public List<String> getAssociatedModules()
@@ -117,53 +118,45 @@ public class PasswordTest extends BaseWebDriverTest
                 PasswordStrength.Strong,
                 PasswordExpiration.Never);
 
-        setInitialPassword(USER, SIMPLE_PASSWORD);
-        assertPasswordStrengthGauge("", GUIDANCE_PLACEHOLDER);
-        assertTextPresent("Your password is not complex enough."); // fail, too simple
+        SetPasswordForm setPasswordForm = SetPasswordForm.goToInitialPasswordForUser(this, USER);
+        log("Verify strength gauge for 'SetPasswordAction'");
+        setPasswordForm.assertPasswordStrengthGauge();
 
-        assertPasswordStrengthGauge(SHORT_PASSWORD, "Very Weak");
-        setFormElement(Locator.id("password2"), SHORT_PASSWORD);
-        clickButton("Set Password");
-        assertTextPresent("Your password is not complex enough."); // fail, too short
+        setPasswordForm = setPasswordForm.setNewPassword(SIMPLE_PASSWORD)
+                .clickSubmitExpectingError("Your password is not complex enough."); // fail, too simple
+        setPasswordForm = setPasswordForm.setNewPassword(SHORT_PASSWORD)
+                .clickSubmitExpectingError("Your password is not complex enough."); // fail, too short
+        setPasswordForm = setPasswordForm.setNewPassword(GOOD_PASSWORD)
+                .clickSubmitExpectingError("Your password is not complex enough."); // fail, not complex enough
 
-        // Password is good enough for "GOOD" strength setting; not actually rated as "Good" by entropy calculation
-        assertPasswordStrengthGauge(GOOD_PASSWORD, "Weak");
-        setFormElement(Locator.id("password2"), GOOD_PASSWORD);
-        assertTextPresent("Your password is not complex enough."); // fail, not complex enough
-
-        assertPasswordStrengthGauge(STRONG_PASSWORD, "Very Strong");
-        setFormElement(Locator.id("password2"), STRONG_PASSWORD);
-        clickButton("Set Password");
+        setPasswordForm.setNewPassword(STRONG_PASSWORD).clickSubmit();
         assertSignedInNotImpersonating();
         //success
         impersonate(USER);
 
-        changePassword(STRONG_PASSWORD, SIMPLE_PASSWORD); // fail, too simple
-        assertTextPresent("Your password is not complex enough.");
+        SetPasswordForm changePasswordForm = goToChangePassword();
+        log("Verify strength gauge for 'ChangePasswordAction'");
+        changePasswordForm.assertPasswordStrengthGauge();
 
-        // Test password gauge while we're on this page
-        assertPasswordStrengthGauge(SIMPLE_PASSWORD, "Very Weak");
-        assertPasswordStrengthGauge(SHORT_PASSWORD, "Very Weak");
-        assertPasswordStrengthGauge(GOOD_PASSWORD, "Weak");
-        assertPasswordStrengthGauge(STRONG_PASSWORD, "Very Strong");
+        changePasswordForm = changePasswordForm
+                .setOldPassword(STRONG_PASSWORD)
+                .setNewPassword(SIMPLE_PASSWORD)// fail, too simple
+                .clickSubmitExpectingError("Your password is not complex enough.");
+        changePasswordForm = changePasswordForm
+                .setOldPassword(STRONG_PASSWORD)
+                .setNewPassword(SHORT_PASSWORD) // fail, too short
+                .clickSubmitExpectingError("Your password is not complex enough.");
+        changePasswordForm = changePasswordForm
+                .setOldPassword(STRONG_PASSWORD)
+                .setNewPassword(GOOD_PASSWORD) // fail, not complex enough
+                .clickSubmitExpectingError("Your password is not complex enough.");
 
-        changePassword(STRONG_PASSWORD, SHORT_PASSWORD); // fail, too short
-        assertTextPresent("Your password is not complex enough.");
-        changePassword(STRONG_PASSWORD, GOOD_PASSWORD); // fail, not complex enough
-        assertTextPresent("Your password is not complex enough.");
         String currentPassword = STRONG_PASSWORD + 0;
-        changePassword(STRONG_PASSWORD, currentPassword);
+        changePasswordForm.setOldPassword(STRONG_PASSWORD)
+                .setNewPassword(currentPassword)
+                .clickSubmit();
         assertTextNotPresent("Choose a new password.");
         assertEquals("Signed in as", USER, getCurrentUser());
-    }
-
-    private void assertPasswordStrengthGauge(String shortPassword, String expectedGuidance)
-    {
-        setFormElement(Locator.id("password"), shortPassword);
-        String strengthGuidance = Locator.id("strengthGuidance").findElement(getDriver()).getText();
-        strengthGuidance = strengthGuidance.substring(strengthGuidance.indexOf(':') + 1).trim();
-
-        assertEquals("Strength guidance for password", expectedGuidance, strengthGuidance);
     }
 
     @Test
@@ -179,15 +172,18 @@ public class PasswordTest extends BaseWebDriverTest
         impersonate(USER);
 
         int i = 1;
-        for (; i < 9; i++)
+        for (; i <= 10; i++)
         {
             changePassword(currentPassword, STRONG_PASSWORD + i);
             currentPassword = STRONG_PASSWORD + i;
             assertTextNotPresent("Choose a new password.");
         }
-        changePassword(currentPassword, STRONG_PASSWORD + 0); // fail, used 9 passwords ago.
-        assertTextPresent("Your password must not match a recently used password.");
-        changePassword(STRONG_PASSWORD + i, STRONG_PASSWORD);
+        // fail, used 9 passwords ago.
+        goToChangePassword()
+                .setOldPassword(currentPassword)
+                .setNewPassword(STRONG_PASSWORD + 1)
+                .clickSubmitExpectingError("Your password must not match a recently used password.");
+        changePassword(currentPassword, STRONG_PASSWORD + 0);
         assertTextNotPresent("Choose a new password.");
 
         stopImpersonating();
@@ -255,12 +251,12 @@ public class PasswordTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void attemptSetInvalidPassword(String password1, String password2, String... errors)
+    protected void attemptSetInvalidPassword(String password1, String password2, String error)
     {
-        setFormElement(Locator.id("password"), password1);
-        setFormElement(Locator.id("password2"), password2);
-        clickButton("Set Password");
-        assertTextPresent(errors);
+        new SetPasswordForm(getDriver())
+                .setPassword1(password1)
+                .setPassword2(password2)
+                .clickSubmitExpectingError(error);
     }
 
     /**
@@ -342,6 +338,34 @@ public class PasswordTest extends BaseWebDriverTest
         signInShouldFail(username, password, wrongPasswordEntered);
 
         return newPassword;
+    }
+
+    protected String setInitialPassword(String user, String password)
+    {
+        SetPasswordForm.goToInitialPasswordForUser(this, user)
+                .setNewPassword(password)
+                .clickSubmit();
+
+        return password;
+    }
+
+    @LogMethod (quiet = true)
+    protected void changePassword(String oldPassword, @LoggedParam String password)
+    {
+        goToChangePassword()
+                .setOldPassword(oldPassword)
+                .setNewPassword(password)
+                .clickSubmit();
+    }
+
+    private SetPasswordForm goToChangePassword()
+    {
+        if (PasswordUtil.getUsername().equals(getCurrentUser()))
+            throw new IllegalArgumentException("Don't change the primary site admin user's password");
+
+        goToMyAccount();
+        clickButton("Change Password");
+        return new SetPasswordForm(getDriver());
     }
 
 }

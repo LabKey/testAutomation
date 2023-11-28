@@ -47,6 +47,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.core.ProjectMenu;
+import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.ui.navigation.UserMenu;
@@ -411,22 +412,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected String setInitialPassword(String user)
     {
-        return setInitialPassword(user, PasswordUtil.getPassword());
-    }
-
-    // Don't call this unless you're actually testing authentication functionality
-    protected String setInitialPassword(String user, String password)
-    {
-        beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", user)));
-        // Get setPassword URL from notification email.
-        WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(getDriver());
-
-        clickAndWait(resetLink, WAIT_FOR_PAGE);
-
-        setFormElement(Locator.id("password"), password);
-        setFormElement(Locator.id("password2"), password);
-
-        clickButton("Set Password");
+        String password = PasswordUtil.getPassword();
+        SetPasswordForm.goToInitialPasswordForUser(this, user)
+                .setNewPassword(password)
+                .clickSubmit();
 
         return password;
     }
@@ -453,23 +442,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 "Your password must be at least six characters and cannot contain spaces or match your email address."
         );
 
-        setFormElement(Locator.id("password"), newPassword);
-        setFormElement(Locator.id("password2"), newPassword);
-
-        clickButton("Set Password");
-    }
-
-    @LogMethod protected void changePassword(String oldPassword, @LoggedParam String password)
-    {
-        if (PasswordUtil.getUsername().equals(getCurrentUser()))
-            throw new IllegalArgumentException("Don't change the primary site admin user's password");
-
-        goToMyAccount();
-        clickButton("Change Password");
-
-        setFormElement(Locator.id("oldPassword"), oldPassword);
-        setFormElement(Locator.id("password"), password);
-        setFormElement(Locator.id("password2"), password);
+        new SetPasswordForm(getDriver())
+                .setNewPassword(newPassword);
 
         clickButton("Set Password");
     }
@@ -625,6 +599,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             log("Need to bootstrap");
             verifyInitialUserRedirects();
 
+            log("Verify strength gauge for 'ChangePasswordAction'");
+            new SetPasswordForm(getDriver()).assertPasswordStrengthGauge();
+
             log("Testing bad email addresses");
             verifyInitialUserError(null, null, null, "Invalid email address");
             verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
@@ -772,26 +749,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedError)
     {
+        SetPasswordForm setPasswordForm = new SetPasswordForm(getDriver());
         if (null != email)
-            setFormElement(Locator.id("email"), email);
+            setPasswordForm.setEmail(email);
 
         if (null != password1)
-            setFormElement(Locator.id("password"), password1);
+            setPasswordForm.setPassword1(password1);
 
         if (null != password2)
-            setFormElement(Locator.id("password2"), password2);
-
-        clickAndWait(Locator.linkWithText("Next"), 90000); // Initial user creation blocks during upgrade script execution
+            setPasswordForm.setPassword2(password2);
 
         if (null != expectedError)
         {
-            assertEquals("Wrong error message.", expectedError, Locator.css(".labkey-error").findElement(getDriver()).getText());
+            setPasswordForm.clickSubmitExpectingError(expectedError);
         }
         else
         {
-            WebElement element = Locator.css(".labkey-error").findElementOrNull(getDriver());
-            if (null != element)
-                fail("Unexpected error: " + element.getText());
+            setPasswordForm.clickSubmit(90_000); // Initial user creation blocks during upgrade script execution
         }
     }
 
