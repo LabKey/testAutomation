@@ -1,5 +1,6 @@
 package org.labkey.test.components.core.login;
 
+import org.awaitility.Awaitility;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -14,10 +15,10 @@ import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Input.Input;
 
 /**
@@ -81,14 +82,9 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
     @LogMethod(quiet = true)
     public void assertPasswordStrengthGauge(@LoggedParam String password, @LoggedParam String expectedGuidance)
     {
-        String previousGuidance = elementCache().strengthGuidance.getText();
         setPassword1(password);
-        //noinspection ResultOfMethodCallIgnored
-        waitFor(() -> !previousGuidance.equals(elementCache().strengthGuidance.getText()), 5_000);
-        String strengthGuidance = elementCache().strengthGuidance.getText();
-        strengthGuidance = strengthGuidance.substring(strengthGuidance.indexOf(':') + 1).trim();
-
-        assertEquals("Strength guidance for password", expectedGuidance, strengthGuidance);
+        Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted(() ->
+                assertEquals("Strength guidance for password", expectedGuidance, elementCache().strengthGuidance.getText()));
     }
 
     public SetPasswordForm setEmail(String email)
