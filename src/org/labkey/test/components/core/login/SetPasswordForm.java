@@ -16,6 +16,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -27,9 +30,10 @@ import static org.labkey.test.components.html.Input.Input;
 public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementCache>
 {
     public static final String SHORT_PASSWORD = "4asdfg!"; // Only 7 characters long. 3 character types.
-    public static final String SIMPLE_PASSWORD = "3asdfghi"; // Only two character types. 8 characters long.
-    public static final String GOOD_PASSWORD = "Yekbal1!"; // 8 characters long. 3+ character types.
-    public static final String STRONG_PASSWORD = "We'reSo$tr0ng@yekbal1!";
+    public static final String VERY_WEAK_PASSWORD = "3asdfghi"; // Only two character types. 8 characters long.
+    public static final String WEAK_PASSWORD = "Yekbal1!"; // 8 characters long. 3+ character types.
+    public static final String STRONG_PASSWORD = "We'reSo$tr0";
+    public static final String VERY_STRONG_PASSWORD = "We'reSo$tr0ng@yekbal1!";
     public static final String GUIDANCE_PLACEHOLDER = "Password Strength Gauge";
 
     private final WebElement _el;
@@ -68,20 +72,34 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         return _driver;
     }
 
+    /**
+     * Verify password strength guidance for various passwords
+     * @param ignoredSubstrings strings that should be ignored when calculating password strength (e.g. user's email)
+     */
     @LogMethod
-    public void assertPasswordStrengthGauge()
+    public void verifyPasswordStrengthGauge(String... ignoredSubstrings)
     {
-        assertPasswordStrengthGauge(SIMPLE_PASSWORD, "Very Weak");
-        assertPasswordStrengthGauge("", GUIDANCE_PLACEHOLDER);
-        assertPasswordStrengthGauge(SHORT_PASSWORD, "Very Weak");
-        // Password is good enough for "GOOD" strength setting; not actually rated as "Good" by entropy calculation
-        assertPasswordStrengthGauge(GOOD_PASSWORD, "Weak");
-        assertPasswordStrengthGauge(STRONG_PASSWORD, "Very Strong");
+        List<String> substringList = new ArrayList<>();
+        substringList.add("");
+        substringList.addAll(Arrays.asList(ignoredSubstrings));
+
+        for (String substring : substringList)
+        {
+            assertPasswordGuidance(substring, substring.isEmpty() ? GUIDANCE_PLACEHOLDER : "Very Weak");
+            assertPasswordGuidance(WEAK_PASSWORD + substring, "Weak");
+            assertPasswordGuidance(VERY_WEAK_PASSWORD + substring, "Very Weak");
+            assertPasswordGuidance(STRONG_PASSWORD + substring, "Strong");
+            assertPasswordGuidance(SHORT_PASSWORD + substring, "Very Weak");
+            assertPasswordGuidance(VERY_STRONG_PASSWORD + substring, "Very Strong");
+        }
     }
 
     @LogMethod(quiet = true)
-    public void assertPasswordStrengthGauge(@LoggedParam String password, @LoggedParam String expectedGuidance)
+    public void assertPasswordGuidance(@LoggedParam String password, @LoggedParam String expectedGuidance)
     {
+        if (!password.isEmpty() && elementCache().strengthGuidance.getText().equals(expectedGuidance))
+            assertPasswordGuidance("", GUIDANCE_PLACEHOLDER); // Clear out previous guidance
+
         setPassword1(password);
         Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted(() ->
                 assertEquals("Strength guidance for password", expectedGuidance, elementCache().strengthGuidance.getText()));
@@ -103,6 +121,8 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
 
     public SetPasswordForm setPassword1(String password1)
     {
+        // Make sure correct events fire for blank password
+        getWrapper().actionClear(elementCache().password.getComponentElement());
         elementCache().password.set(password1);
 
         return this;

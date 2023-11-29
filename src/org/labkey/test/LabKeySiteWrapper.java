@@ -594,20 +594,22 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         // check to see if we're the first user:
         if (isTextPresent("Welcome! We see that this is your first time logging in."))
         {
+            String email = PasswordUtil.getUsername();
             bootstrapped = true;
             assertTitleEquals("Account Setup");
             log("Need to bootstrap");
             verifyInitialUserRedirects();
 
             log("Verify strength gauge for 'ChangePasswordAction'");
-            new SetPasswordForm(getDriver()).assertPasswordStrengthGauge();
+            SetPasswordForm setPasswordForm = new SetPasswordForm(getDriver());
+            setPasswordForm.setEmail(email);
+            setPasswordForm.verifyPasswordStrengthGauge(email);
 
             log("Testing bad email addresses");
             verifyInitialUserError(null, null, null, "Invalid email address");
             verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
 
             log("Testing bad passwords");
-            String email = PasswordUtil.getUsername();
             verifyInitialUserError(email, null, null, "You must enter a password.");
             verifyInitialUserError(email, PasswordUtil.getPassword(), null, "You must confirm your password.");
             verifyInitialUserError(email, null, PasswordUtil.getPassword(), "You must enter a password.");
