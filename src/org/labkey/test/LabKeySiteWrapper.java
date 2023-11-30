@@ -604,6 +604,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             SetPasswordForm setPasswordForm = new SetPasswordForm(getDriver());
             setPasswordForm.setEmail(email);
             setPasswordForm.verifyPasswordStrengthGauge(email);
+            refresh(); // Clear form
 
             log("Testing bad email addresses");
             verifyInitialUserError(null, null, null, "Invalid email address");
