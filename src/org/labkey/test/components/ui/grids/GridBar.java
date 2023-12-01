@@ -196,12 +196,13 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
         Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
 
-        if(clearBtn.findOptionalElement(this).isPresent())
+        if(WebDriverWrapper.waitFor(()->
+                clearBtn.findOptionalElement(_queryGrid.getComponentElement()).isPresent(), 5_000)) // give it time to appear, else no-op
         {
-            WebElement btn = clearBtn.waitForElement(this, 5_000);
+            WebElement btn = clearBtn.findElement(_queryGrid.getComponentElement());
             btn.click();
 
-            WebDriverWrapper.waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
+            WebDriverWrapper.waitFor(() -> clearBtn.findOptionalElement(_queryGrid.getComponentElement()).isEmpty(),
                     WAIT_FOR_JAVASCRIPT);
         }
 
