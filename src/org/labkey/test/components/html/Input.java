@@ -20,8 +20,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.selenium.WebDriverUtils;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.Arrays;
 
@@ -93,9 +96,14 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
 
     public void setWithPaste(String value)
     {
-        getWrapper().actionClear(getComponentElement());
+        Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
+        getWrapper().scrollIntoView(getComponentElement());
+        new Actions(getWrapper().getDriver())
+            .keyDown(cmdKey)
+            .sendKeys(getComponentElement(), "a")
+            .keyUp(cmdKey)
+            .perform();
         getWrapper().actionPaste(getComponentElement(), value);
-        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.change);
     }
 
     public void blur()
