@@ -267,7 +267,9 @@ public class WikiHelper
         {
             if (_test.isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
             {
-                _test.click(Locator.css("#wiki-tab-source > a"));
+                Locator tab = Locator.css("#wiki-tab-source > a");
+                _test.waitForElementToBeVisible(tab);
+                _test.click(tab);
                 _test.waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
             }
         }
@@ -280,7 +282,13 @@ public class WikiHelper
         {
             if (_test.isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
             {
-                _test.click(Locator.css("#wiki-tab-visual > a"));
+                Locator tab = Locator.css("#wiki-tab-visual > a");
+                _test.waitForElementToBeVisible(tab);
+                _test.click(tab);
+
+                Locator yesButton = Locator.tagWithText("span","Yes");
+                _test.waitForElementToBeVisible(yesButton);
+                _test.waitAndClick(yesButton);
                 _test.waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
             }
         }
