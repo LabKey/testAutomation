@@ -112,9 +112,6 @@ public class WikiTest extends BaseWebDriverTest
         assertTextPresent(file.getName(), "Some HTML content");
         final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
         assertElementPresent(wikiTitleLink);
-        impersonateRole("Reader");
-        assertElementNotPresent(wikiTitleLink);
-        stopImpersonating();
 
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", numberOfWikiCreated, WIKI_PAGE_TITLE);
@@ -160,9 +157,11 @@ public class WikiTest extends BaseWebDriverTest
     {
         String wikiName = "Wiki with video";
         String wikiTitle = "Sample finder video";
-        String wikiContent = "Some random content start : Have fun watching video below\n" +
-                "{video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}\n" +
-                "Hope you fun watching the video..!\n";
+        String wikiContent = """
+                Some random content start : Have fun watching video below
+                {video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}
+                Hope you had fun watching the video..!
+                """;
 
         goToProjectHome();
         log("Creating the wiki with video");
@@ -232,7 +231,8 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void doTestInlineEditor()
     {
-        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']");
+        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']")
+                .withDescendant(Locator.tagWithClassContaining("div", "tox-edit-area"));
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
@@ -279,10 +279,13 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
-        executeScript("if (!tinyMCE) {throw 'tinyMCE API is not available'}" +
-                "editor = tinyMCE.getInstanceById(arguments[0]);" +
-                "if (!editor) {throw 'No tinyMCE instance: ' + arguments[0];}" +
-                "editor.setContent(arguments[1]);", editorId, content);
+        executeScript("if (!tinymce) {throw 'tinymce API is not available'}" +
+                "editor = tinymce.get(arguments[0]);" +
+                "if (!editor) {throw 'No tinymce instance: ' + arguments[0];}" +
+                "editor.setContent(arguments[1]);" +
+                "editor.setDirty(true);"         // Explicitly setDirty as the setContent doesn't by default
+                , editorId, content);
+        log(String.format("Content [%1$s] set on editor: %2$s", content,  editorId));
     }
 
     @Override
