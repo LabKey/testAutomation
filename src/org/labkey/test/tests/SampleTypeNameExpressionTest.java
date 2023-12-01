@@ -238,8 +238,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         log("Validate save worked. Should be sent back to the project begin page and there should be a link with the sample type name.");
 
         checker().fatal()
-                .verifyTrue("Did not successfully save the sample type. Fatal error.",
-                        waitFor(()->Locator.linkWithText(sampleTypeName).findWhenNeeded(getDriver()).isDisplayed(), 1_000));
+                .verifyTrue(String.format("Did not find link with text '%s' for sample type. Fatal error.", sampleTypeName),
+                        waitFor(()->Locator.linkWithText(sampleTypeName).findWhenNeeded(getDriver()).isDisplayed(), 5_000));
 
         log("Create some samples and validate the name(s).");
 
@@ -490,8 +490,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         String intVal = "987";
         String derivedSampleName = deriveSample(PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE, sampleType, flagString, intVal);
 
-        checker().verifyTrue("Name of derived sample doesn't look correct.", derivedSampleName.contains("Parent Sample"));
-        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
+        checker().verifyTrue("Name of derived sample doesn't look correct. Should contain 'Parent Sample'.",
+                derivedSampleName.contains("Parent Sample"));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
+                isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
 
         final String ancestorNameExpression = String.format("GrandChild_${MaterialInputs/%s/..[MaterialInputs/%s]/Str}_${genId}", sampleType, PARENT_SAMPLE_TYPE);
         log("Change the sample type name expression to support grandparent property lookup: " + ancestorNameExpression);
@@ -506,8 +508,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         String flagStringGD = "grand child sample.";
         String intValGD = "567";
         String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType, flagStringGD, intValGD);
-        checker().verifyTrue("Name of derived sample doesn't look correct.", grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
-        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(derivedSampleName)));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
+                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
+                isElementPresent(Locator.linkWithText(derivedSampleName)));
 
         String flagStringBulkImport = "bulk imported grand child.";
         log("Derive a sample using bulk import but give it no name. The name expression should be used to name the derived sample.");
@@ -527,9 +531,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         click(Locator.tagWithText("td", grandImportChildSampleName));
         waitForElement(Locator.tagWithText("td", flagStringBulkImport));
 
-        grandImportChildSampleName = Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
-        checker().verifyTrue("Name of derived sample doesn't look correct.", grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
-        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(derivedSampleName)));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
+                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
+                isElementPresent(Locator.linkWithText(derivedSampleName)));
     }
 
     private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, String strVal, String intVal) throws IOException, CommandException
@@ -768,11 +773,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         actualMsg = dialog.getBodyText();
         log("Dialog text: " + actualMsg);
 
-        checker().verifyTrue("Warning dialog does not have example name.", actualMsg.contains(nameExpression));
+        checker().verifyTrue(String.format("Warning dialog does not have example text '%s'.", nameExpression),
+                actualMsg.contains(nameExpression));
 
         expectedMsg = "The 'genId' substitution pattern starting at position 6 should be preceded by the string '${'.";
 
-        checker().verifyTrue("Warning dialog does not have expected warning message.", actualMsg.contains(expectedMsg));
+        checker().verifyTrue(String.format("Warning dialog does not have expected warning message '%s'.", expectedMsg),
+                actualMsg.contains(expectedMsg));
 
         checker().screenShotIfNewError("Warning_Dialog_Error");
 
@@ -1023,8 +1030,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
 
-        log("The displayed genId should have incremented normall regardless of the minValue.");
-        checker().verifyEquals("After makin minValue smaller the value for the next genId is not as expected.",
+        log("The displayed genId should have incremented normally regardless of the minValue.");
+        checker().verifyEquals("After making minValue smaller the value for the next genId is not as expected.",
                 Integer.toString(nextGenId), updatePage.getCurrentGenId());
 
         minValue = 500;
