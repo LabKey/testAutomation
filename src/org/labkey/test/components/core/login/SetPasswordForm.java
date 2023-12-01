@@ -121,9 +121,15 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
 
     public SetPasswordForm setPassword1(String password1)
     {
-        // Make sure correct events fire for blank password
-        getWrapper().actionClear(elementCache().password.getComponentElement());
-        elementCache().password.set(password1);
+        if (password1.isEmpty())
+        {
+            // Make sure correct event fires for blank password to update strength guidance
+            getWrapper().actionClear(elementCache().password.getComponentElement());
+        }
+        else
+        {
+            elementCache().password.set(password1);
+        }
 
         return this;
     }
