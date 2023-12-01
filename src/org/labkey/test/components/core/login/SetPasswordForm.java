@@ -118,14 +118,12 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
 
     public SetPasswordForm setPassword1(String password1)
     {
-        if (password1.isEmpty())
+        // Make sure correct event fires for blank password to update strength guidance
+        getWrapper().actionClear(elementCache().password);
+
+        if (!password1.isEmpty())
         {
-            // Make sure correct event fires for blank password to update strength guidance
-            getWrapper().actionClear(elementCache().password.getComponentElement());
-        }
-        else
-        {
-            elementCache().password.set(password1);
+            elementCache().password.sendKeys(password1);
         }
 
         return this;
@@ -176,7 +174,7 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         // For ChangePasswordAction
         final Input oldPassword = Input(Locator.id("oldPassword"), getDriver()).findWhenNeeded(this);
 
-        final Input password = Input(Locator.id("password"), getDriver()).findWhenNeeded(this);
+        final WebElement password = Locator.id("password").findWhenNeeded(this);
         final Input password2 = Input(Locator.id("password2"), getDriver()).findWhenNeeded(this);
         final WebElement strengthGuidance = Locator.id("strengthGuidance").findWhenNeeded(this);
         final WebElement submitButton = Locator.name("set").findWhenNeeded(this);
