@@ -97,9 +97,6 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
     @LogMethod(quiet = true)
     public void assertPasswordGuidance(@LoggedParam String password, @LoggedParam String expectedGuidance)
     {
-        if (!password.isEmpty() && elementCache().strengthGuidance.getText().equals(expectedGuidance))
-            assertPasswordGuidance("", GUIDANCE_PLACEHOLDER); // Clear out previous guidance
-
         setPassword1(password);
         Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted(() ->
                 assertEquals("Strength guidance for password", expectedGuidance, elementCache().strengthGuidance.getText()));
