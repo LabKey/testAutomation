@@ -125,12 +125,14 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         {
             // `WebElement.clear()` doesn't trigger `oninput`
             // Need to use this method to update strength guidance
-            getWrapper().actionClear(elementCache().password.getComponentElement());
+            getWrapper().actionClear(elementCache().password);
         }
         else
         {
-            // Set with a single operation to avoid triggering 'oninput' twice
-            elementCache().password.setWithPaste(password1);
+            // Won't trigger 'oninput'
+            elementCache().password.clear();
+            // Paste to avoid triggering 'oninput' twice
+            getWrapper().actionPaste(elementCache().password, password1);
         }
 
         return this;
@@ -181,7 +183,7 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         // For ChangePasswordAction
         final Input oldPassword = Input(Locator.id("oldPassword"), getDriver()).findWhenNeeded(this);
 
-        final Input password = Input(Locator.id("password"), getDriver()).findWhenNeeded(this);
+        final WebElement password = Locator.id("password").findWhenNeeded(this);
         final Input password2 = Input(Locator.id("password2"), getDriver()).findWhenNeeded(this);
         final WebElement strengthGuidance = Locator.id("strengthGuidance").findWhenNeeded(this);
         final WebElement submitButton = Locator.name("set").findWhenNeeded(this);
