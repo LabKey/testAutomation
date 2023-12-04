@@ -71,6 +71,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return elementCache().secondaryMenuFinder.findOptional(getDriver()).isPresent();
     }
 
+    public boolean isSecondaryConfOptionEnabled(String option)
+    {
+        toggleSecondaryConfiguration();
+        return elementCache().secondaryMenuFinder.isOptionEnabled("option");
+    }
+
     private boolean isPrimarySelected()
     {
         return elementCache().panelTab1.getAttribute("aria-selected").equals("true");

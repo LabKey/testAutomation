@@ -255,6 +255,11 @@ public class MultiMenu extends BootstrapMenu
             return this;
         }
 
+        public boolean isOptionEnabled(String option)
+        {
+          return construct(find().getComponentElement(), getDriver()).isMenuItemDisabled(option);
+        }
+
         @Override
         protected MultiMenuFinder getThis()
         {
