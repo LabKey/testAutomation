@@ -74,7 +74,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public boolean isSecondaryConfOptionEnabled(String option)
     {
         toggleSecondaryConfiguration();
-        return elementCache().secondaryMenuFinder.isOptionEnabled("option");
+        return !elementCache().addSecondaryMenu.isMenuItemDisabled(option);
     }
 
     private boolean isPrimarySelected()
@@ -203,7 +203,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         BootstrapMenu addPrimaryMenu = primaryMenuFinder.findWhenNeeded(this);
         MultiMenu.MultiMenuFinder secondaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
                 .withText("Add New Secondary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
-        BootstrapMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
+        MultiMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
 
         WebElement globalSettingsPanel()
         {

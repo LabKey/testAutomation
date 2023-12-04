@@ -254,12 +254,6 @@ public class MultiMenu extends BootstrapMenu
             _locator = Locators.menuContainer().withChild(BootstrapMenu.Locators.dropdownToggle().withChild(Locator.byClass(iconClass)));
             return this;
         }
-
-        public boolean isOptionEnabled(String option)
-        {
-          return construct(find().getComponentElement(), getDriver()).isMenuItemDisabled(option);
-        }
-
         @Override
         protected MultiMenuFinder getThis()
         {
