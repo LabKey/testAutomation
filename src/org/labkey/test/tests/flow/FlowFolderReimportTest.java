@@ -116,7 +116,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
     {
         clickAndWait(Locator.linkWithText("Import FlowJo Workspace Analysis"));
         // 1. Select Workspace
-        setFormElement(Locator.id("workspace.file"), FLOW_WORKSPACE);
+        setFormElement(Locator.id("workspace_file"), FLOW_WORKSPACE);
         clickAndWait(Locator.lkButton("Next"));
         // 2. Select FCS Files
         clickAndWait(Locator.lkButton("Next"));
