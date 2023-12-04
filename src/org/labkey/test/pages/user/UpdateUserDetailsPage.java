@@ -90,6 +90,7 @@ public class UpdateUserDetailsPage extends LabKeyPage<UpdateUserDetailsPage.Elem
     public void clickSubmit()
     {
         clickAndWait(elementCache().submitButton);
+        assertNoLabKeyErrors();
     }
 
     @Override
