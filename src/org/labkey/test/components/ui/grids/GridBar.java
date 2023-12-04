@@ -7,7 +7,6 @@ package org.labkey.test.components.ui.grids;
 import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
@@ -164,49 +162,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     {
         pager().clickPrevious();
         return _queryGrid;
-    }
-
-    /**
-     * Click the 'Select All' button in the grid bar.
-     *
-     * @return This grid bar.
-     */
-    public GridBar selectAllRows()
-    {
-        Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
-        Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");   // n of n
-        Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-        WebElement btn = selectBtn.waitForElement(_queryGrid, 5_000);
-        btn.click();
-
-        WebDriverWrapper.waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
-                        selectBtn.findOptionalElement(this).isEmpty() &&
-                                selectedText.findOptionalElement(this).isPresent() ,
-                WAIT_FOR_JAVASCRIPT);
-
-        return this;
-    }
-
-    /**
-     * Click the 'Clear All' button in the grid bar.
-     * @return This grid bar.
-     */
-    public GridBar clearAllSelections()
-    {
-        // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
-        Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
-
-        if(WebDriverWrapper.waitFor(()->
-                clearBtn.findOptionalElement(_queryGrid.getComponentElement()).isPresent(), 5_000)) // give it time to appear, else no-op
-        {
-            WebElement btn = clearBtn.findElement(_queryGrid.getComponentElement());
-            btn.click();
-
-            WebDriverWrapper.waitFor(() -> clearBtn.findOptionalElement(_queryGrid.getComponentElement()).isEmpty(),
-                    WAIT_FOR_JAVASCRIPT);
-        }
-
-        return this;
     }
 
     /**
