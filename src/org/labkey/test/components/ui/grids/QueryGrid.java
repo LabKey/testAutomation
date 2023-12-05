@@ -292,26 +292,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid selectAllRows()
     {
-        if (isGridPanel())
+        WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(elementCache());
+        if (selectAllBtn.isDisplayed())
         {
-            WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(elementCache());
-            if (selectAllBtn.isDisplayed())
-            {
-                doAndWaitForUpdate(selectAllBtn::click);
-            }
-            else
-            {
-                ReactCheckBox selectAll = selectAllBox();
-                if (selectAll.isIndeterminate() || !selectAll.isChecked())
-                {
-                    doAndWaitForUpdate(() -> selectAllOnPage(true, null));
-                }
-            }
+            doAndWaitForUpdate(selectAllBtn::click);
         }
         else
         {
-            doAndWaitForUpdate(() ->
-                    getGridBar().selectAllRows());
+            ReactCheckBox selectAll = selectAllBox();
+            if (selectAll.isIndeterminate() || !selectAll.isChecked())
+            {
+                doAndWaitForUpdate(() -> selectAllOnPage(true, null));
+            }
         }
 
         return this;
@@ -334,22 +326,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         if(hasItemsSelected())
         {
-            if (isGridPanel())
+            WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(elementCache());
+            if (clearBtn.isDisplayed())
             {
-                WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(elementCache());
-                if (clearBtn.isDisplayed())
-                {
-                    doAndWaitForUpdate(clearBtn::click);
-                }
-                else
-                {
-                    doAndWaitForUpdate(() -> selectAllOnPage(false));
-                }
+                doAndWaitForUpdate(clearBtn::click);
             }
             else
             {
-                doAndWaitForUpdate(() ->
-                        getGridBar().clearAllSelections());
+                doAndWaitForUpdate(() -> selectAllOnPage(false));
             }
         }
 
@@ -706,15 +690,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public void closeChart()
     {
         elementCache().closeButton.click();
-    }
-
-    /**
-     * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
-     * use this to test which one so we can fork behavior until QGP is gone
-     */
-    private boolean isGridPanel()
-    {
-        return elementCache().selectionStatusContainerLoc.existsIn(elementCache());
     }
 
     @Override
