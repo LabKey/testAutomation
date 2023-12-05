@@ -79,15 +79,16 @@ public class CspLogUtil
                 StringBuilder errorMessage = new StringBuilder()
                         .append("Detected CSP violations on the following actions (See log for more detail: ")
                         .append(recentWarningsFile.getAbsolutePath())
-                        .append("):\n");
+                        .append("):");
                 for (Crawler.ControllerActionId actionId : violoations.keySet())
                 {
+                    errorMessage.append("\n\t");
                     Collection<String> urls = violoations.get(actionId);
                     errorMessage.append(actionId);
                     if (urls.size() > 1)
                     {
-                        errorMessage.append("\n\t");
-                        errorMessage.append(String.join("\n\t", urls));
+                        errorMessage.append("\n\t\t");
+                        errorMessage.append(String.join("\n\t\t", urls));
                     }
                     else
                     {
