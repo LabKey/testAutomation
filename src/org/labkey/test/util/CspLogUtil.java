@@ -36,7 +36,7 @@ public class CspLogUtil
 
         long logSize = logFile.length();
         long modified = logFile.lastModified();
-        if (logSize > lastSize || modified > lastModified)
+        if (logSize > 0 && (logSize > lastSize || modified > lastModified))
         {
             try
             {
