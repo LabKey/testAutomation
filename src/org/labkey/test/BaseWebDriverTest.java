@@ -599,7 +599,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
-            checker().withScreenshot("startupLeaks").wrapAssertion(() -> checkLeaks());
+            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().wrapAssertion(() -> CspLogUtil.checkNewCspWarnings(getArtifactCollector()));
             checker().resetErrorTypes();
             _checkedLeaksAndErrors = true;
         }
@@ -1140,6 +1141,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (isTestRunningOnTeamCity())
             checkActionCoverage();
+
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
 
         checkLinks();
 
