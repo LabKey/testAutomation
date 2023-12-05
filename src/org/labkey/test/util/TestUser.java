@@ -3,15 +3,11 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
-import org.openqa.selenium.WebElement;
+import org.labkey.test.components.core.login.SetPasswordForm;
 
 import java.io.IOException;
-import java.util.Map;
 
-import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 import static org.labkey.test.util.TestLogger.log;
 
 public class TestUser
@@ -73,17 +69,9 @@ public class TestUser
     {
         if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
         {
-            //... borrowed from LKSW's setInitialPassword - in the future, do via API
-            getWrapper().beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", _email)));
-            // Get setPassword URL from notification email.
-            WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(getWrapper().getDriver());
-
-            getWrapper().clickAndWait(resetLink, WAIT_FOR_PAGE);
-
-            getWrapper().setFormElement(Locator.id("password"), password);
-            getWrapper().setFormElement(Locator.id("password2"), password);
-
-            getWrapper().clickButton("Set Password");
+            SetPasswordForm.goToInitialPasswordForUser(getWrapper(), _email)
+                    .setNewPassword(password)
+                    .clickSubmit();
         }
         else
         {
@@ -98,9 +86,9 @@ public class TestUser
         return _password;
     }
 
-    public TestUser addPermission(String role, String containerContext)
+    public TestUser addPermission(String role, String containerPath)
     {
-        new ApiPermissionsHelper(getWrapper()).addMemberToRole(getEmail(), role, PermissionsHelper.MemberType.user, containerContext);
+        new ApiPermissionsHelper(getWrapper()).addMemberToRole(getEmail(), role, PermissionsHelper.MemberType.user, containerPath);
 
         return this;
     }

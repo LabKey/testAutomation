@@ -23,6 +23,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -202,6 +203,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public BaseWebDriverTest()
     {
+        Awaitility.pollInSameThread(); // We don't do cross thread selenium testing.
+
         _artifactCollector = new ArtifactCollector(this);
         _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);

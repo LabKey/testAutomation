@@ -11,9 +11,9 @@ import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
-import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.core.login.SetPasswordForm;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -117,10 +117,10 @@ public class QuickBootstrapPseudoTest extends BaseWebDriverTest
     private void createInitialUser()
     {
         beginAt(WebTestHelper.buildURL("login", "initialUser"));
-        setFormElement(Locator.id("email"), PasswordUtil.getUsername());
-        setFormElement(Locator.id("password"), PasswordUtil.getPassword());
-        setFormElement(Locator.id("password2"), PasswordUtil.getPassword());
-        clickAndWait(Locator.lkButton("Next"));
+        new SetPasswordForm(getDriver())
+                .setEmail(PasswordUtil.getUsername())
+                .setNewPassword(PasswordUtil.getPassword())
+                .clickSubmit(90_000);
     }
 
     /**
