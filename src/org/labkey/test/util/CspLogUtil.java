@@ -1,5 +1,7 @@
 package org.labkey.test.util;
 
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -10,7 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,18 +59,42 @@ public class CspLogUtil
                     throw new RuntimeException("Failed to read recent CSP violations.", e);
                 }
 
-                List<String> violations = new ArrayList<>();
+                MultiValuedMap<Crawler.ControllerActionId, String> violoations = new HashSetValuedHashMap<>();
                 for (String line : warningLines)
                 {
                     String[] split = line.split("ContentSecurityPolicy warning on page: ");
                     if (split.length > 1)
                     {
-                        violations.add(split[1]);
+                        String url = split[1];
+                        Crawler.ControllerActionId actionId = new Crawler.ControllerActionId(url);
+                        violoations.put(actionId, url);
                     }
                 }
 
-                throw new AssertionError("Detected CSP violations on the following pages (See log for more detail: %s):\n%s"
-                        .formatted(recentWarningsFile.getAbsolutePath(), String.join("\n", violations)));
+                if (violoations.isEmpty())
+                {
+                    throw new AssertionError("Detected CSP violations but unable to parse log file: " + recentWarningsFile.getAbsolutePath());
+                }
+
+                StringBuilder errorMessage = new StringBuilder()
+                        .append("Detected CSP violations on the following actions (See log for more detail: ")
+                        .append(recentWarningsFile.getAbsolutePath())
+                        .append("):\n");
+                for (Crawler.ControllerActionId actionId : violoations.keySet())
+                {
+                    Collection<String> urls = violoations.get(actionId);
+                    errorMessage.append(actionId);
+                    if (urls.size() > 1)
+                    {
+                        errorMessage.append("\n\t");
+                        errorMessage.append(String.join("\n\t", urls));
+                    }
+                    else
+                    {
+                        errorMessage.append(": ").append(urls.iterator().next());
+                    }
+                }
+                throw new AssertionError(errorMessage);
             }
             finally
             {
