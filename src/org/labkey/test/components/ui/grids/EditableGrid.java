@@ -541,7 +541,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         int initialRowCount = getRowCount();
         WebElement gridCell = getCell(row, columnName);
         String indexValue = gridCell.getText();
-        selectCell(gridCell);
+        selectCell(row, columnName);
 
         getWrapper().actionPaste(null, pasteText);
 
@@ -670,7 +670,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         if (!areAllInSelection())
         {
             int indexOffset = hasSelectColumn() ? 1 : 0;
-            selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
+            selectCell(0, getColumnNames().get(1 + indexOffset));    // forces the index cell into selected state
                                                                 // this resets the grid state to a known base condition
             // use 'ctrl-a' to select the entire grid
             Keys cmdKey = MODIFIER_KEY;
@@ -682,12 +682,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private WebElement selectCell(int row, String columnName)
     {
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        WebElement cell = getCell(row, columnName);
 
-        // Select the cell.
-        selectCell(gridCell);
-        return gridCell;
+        if (!isCellSelected(cell))
+        {
+            cell.click();
+            // For some reason while doing this waitFor the cell was going stale, so we need to call getCell every time
+            WebDriverWrapper.waitFor(()->  isCellSelected(getCell(row, columnName)),
+                    "the target cell did not become selected", 4000);
+        }
+
+        return getCell(row, columnName);
     }
 
     /**
