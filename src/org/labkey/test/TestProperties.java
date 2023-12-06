@@ -122,6 +122,12 @@ public abstract class TestProperties
         return "false".equals(System.getProperty("queryCheck", "true"));
     }
 
+    public static boolean isCspCheckSkipped()
+    {
+        // Skip by default
+        return "false".equals(System.getProperty("webtest.cspCheck", "false"));
+    }
+
     public static boolean isNewWebDriverForEachTest()
     {
         return !"true".equals(System.getProperty("selenium.reuseWebDriver", "false"));
@@ -219,6 +225,11 @@ public abstract class TestProperties
     public static boolean isTrialServer()
     {
         return "true".equals(System.getProperty("webtest.server.trial"));
+    }
+
+    public static boolean isEmbeddedTomcat()
+    {
+        return System.getProperties().containsKey("useEmbeddedTomcat");
     }
 
     public static boolean isCheckerFatal()

@@ -151,6 +151,18 @@ public abstract class TestFileUtils
         return _labkeyRoot.toString();
     }
 
+    public static File getServerLogDir()
+    {
+        if (TestProperties.isEmbeddedTomcat())
+        {
+            return new File(getDefaultDeployDir(), "embedded/logs");
+        }
+        else
+        {
+            return new File(TestProperties.getTomcatHome(), "logs");
+        }
+    }
+
     public static File getTestRoot()
     {
         if (_testRoot == null)
