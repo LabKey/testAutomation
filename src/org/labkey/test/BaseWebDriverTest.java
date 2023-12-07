@@ -194,6 +194,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
+    public static final String DISMISSED_STORAGE_PREFIX = "__release_notes_dismissed__";
+
     static final Set<String> urlsSeen = new HashSet<>();
 
     static
@@ -2599,6 +2601,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void flash(WebElement element)
     {
         DebugUtils.flash(getDriver(), element, 3);
+    }
+
+    public void dismissReleaseBanner(String productName)
+    {
+        String lkVersion = (String) executeScript("return LABKEY.versionString;");
+        String dismissBannerKey = DISMISSED_STORAGE_PREFIX + productName + lkVersion;
+        executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
     }
 
     @Target(ElementType.TYPE)
