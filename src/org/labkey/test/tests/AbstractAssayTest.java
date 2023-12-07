@@ -112,7 +112,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
             "AssayTestControl1\te\t5\tfalse\t16\t2000-05-05\n" +
             "AssayTestControl2\tf\tg\tfalse\t15\t2000-06-06";
     protected static final String TEST_RUN2_DATA2 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "AAA07XK5-05\t\ttrue\t20\t2000-01-01\n" +
+            "AAA07XK5-05\t\t\ttrue\t20\t2000-01-01\n" +
             "AAA07XMC-02\t\t\ttrue\t19\t2000-02-02\n" +
             "AAA07XMC-04\t\t\ttrue\t18\t2000-03-03\n" +
             "AAA07XSF-02\t\t\tfalse\t17\t2000-04-04\n" +
