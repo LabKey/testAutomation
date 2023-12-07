@@ -255,8 +255,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public WebElement getCell(int row, String column)
     {
         int columNumber = getColumnIndex(column) + 1;
-        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columNumber + ")"));
-        return gridCell;
+        return Locator.css("td:nth-of-type(" + columNumber + ")").findElement(getRow(row));
     }
 
     public boolean isCellReadOnly(int row, String column)
@@ -541,7 +540,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         int initialRowCount = getRowCount();
         WebElement gridCell = getCell(row, columnName);
         String indexValue = gridCell.getText();
-        selectCell(row, columnName);
+        selectCell(gridCell);
 
         getWrapper().actionPaste(null, pasteText);
 
@@ -670,7 +669,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         if (!areAllInSelection())
         {
             int indexOffset = hasSelectColumn() ? 1 : 0;
-            selectCell(0, getColumnNames().get(1 + indexOffset));    // forces the index cell into selected state
+            selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
                                                                 // this resets the grid state to a known base condition
             // use 'ctrl-a' to select the entire grid
             Keys cmdKey = MODIFIER_KEY;
@@ -682,20 +681,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private WebElement selectCell(int row, String columnName)
     {
-        WebElement cell = getCell(row, columnName);
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
 
-        if (!isCellSelected(cell))
-        {
-            // FIXME: We shouldn't have to do this, ReclickingWebElement should be using
-            //  WebDriverUtils::scrollUnderStickyFormButtons, which should scroll the element into view for us.
-            getWrapper().scrollIntoView(cell, true);
-            cell.click();
-            // For some reason while doing this waitFor the cell was going stale, so we need to call getCell every time
-            WebDriverWrapper.waitFor(()->  isCellSelected(getCell(row, columnName)),
-                    "the target cell did not become selected", 4000);
-        }
-
-        return getCell(row, columnName);
+        // Select the cell.
+        selectCell(gridCell);
+        return gridCell;
     }
 
     /**
