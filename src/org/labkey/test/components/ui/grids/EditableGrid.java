@@ -686,6 +686,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         if (!isCellSelected(cell))
         {
+            // FIXME: We shouldn't have to do this, ReclickingWebElement should be using
+            //  WebDriverUtils::scrollUnderStickyFormButtons, which should scroll the element into view for us.
+            getWrapper().scrollIntoView(cell, true);
             cell.click();
             // For some reason while doing this waitFor the cell was going stale, so we need to call getCell every time
             WebDriverWrapper.waitFor(()->  isCellSelected(getCell(row, columnName)),
