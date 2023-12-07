@@ -41,9 +41,8 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
     protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
-                        !BootstrapLocators.loadingSpinner.existsIn(this) &&
-                        (elementCache().commentInput.getComponentElement().isDisplayed() ||
-                                elementCache().title.getText().toLowerCase().contains("cannot")),
+                !elementCache().title.getText().isEmpty() &&
+                !BootstrapLocators.loadingSpinner.existsIn(this),
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
@@ -83,6 +82,10 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog setUserComment(String comment)
     {
+
+        WebDriverWrapper.waitFor(()-> elementCache().commentInput.getComponentElement().isDisplayed(),
+                "The 'Comment' field is not visible.", 2_500);
+
         elementCache().commentInput.set(comment);
         return this;
     }
