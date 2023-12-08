@@ -216,7 +216,7 @@ function toggleRecorder(checkbox)
     {
         addHandler("emailRecordOn", "click", "toggleRecorder(this);");
 %>
-        <input id="emailRecordOn" type="checkbox" <%=checked(recorder)%>> Record email messages sent
+        <input id="emailRecordOn" name="emailRecordOn" type="checkbox" <%=checked(recorder)%>> Record email messages sent
 <%
     }
 %>
