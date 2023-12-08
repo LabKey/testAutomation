@@ -77,6 +77,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.WebStorage;
+import org.openqa.selenium.html5.LocalStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -717,7 +718,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 if (driver instanceof WebStorage webStorage)
                 {
+                    LocalStorage localStorage = webStorage.getLocalStorage();
+                    Map<String, String> keep = new HashMap<>();
+                    for (String key : localStorage.keySet())
+                    {
+                        // keep dismiss banner settings
+                        if (key.startsWith(DISMISSED_STORAGE_PREFIX))
+                        {
+                            keep.put(key, localStorage.getItem(key));
+                        }
+                    }
+
                     webStorage.getLocalStorage().clear();
+                    for (String key : keep.keySet())
+                        webStorage.getLocalStorage().setItem(key, keep.get(key));
                 }
             }
 
