@@ -718,20 +718,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 if (driver instanceof WebStorage webStorage)
                 {
-                    LocalStorage localStorage = webStorage.getLocalStorage();
-                    Map<String, String> keep = new HashMap<>();
-                    for (String key : localStorage.keySet())
-                    {
-                        // keep dismiss banner settings
-                        if (key.startsWith(DISMISSED_STORAGE_PREFIX))
-                        {
-                            keep.put(key, localStorage.getItem(key));
-                        }
-                    }
-
                     webStorage.getLocalStorage().clear();
-                    for (String key : keep.keySet())
-                        webStorage.getLocalStorage().setItem(key, keep.get(key));
                 }
             }
 
@@ -2617,11 +2604,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         DebugUtils.flash(getDriver(), element, 3);
     }
 
-    public void dismissReleaseBanner(String productName)
+    public void dismissReleaseBanner(String productName, boolean dismiss)
     {
         String lkVersion = (String) executeScript("return LABKEY.versionString;");
         String dismissBannerKey = DISMISSED_STORAGE_PREFIX + productName + lkVersion;
-        executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
+        if (dismiss)
+            executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
+        else
+            executeScript("localStorage.removeItem('" + dismissBannerKey + "')");
     }
 
     @Target(ElementType.TYPE)
