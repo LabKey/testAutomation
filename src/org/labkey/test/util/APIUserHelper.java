@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.hamcrest.text.IsEqualIgnoringCase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -135,7 +134,7 @@ public class APIUserHelper extends AbstractUserHelper
                     TestLogger.error(response.getParsedData().get("htmlErrors").toString());
                     Assert.fail("Not able to create the user " + userName + " because " + response.getParsedData().get("htmlErrors").toString());
                 }
-                assertThat(userName, IsEqualIgnoringCase.equalToIgnoringCase(response.getEmail()));
+                assertEquals(userName, response.getEmail());
                 assertNotNull("Invalid userId", response.getUserId());
             }
 
