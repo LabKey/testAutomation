@@ -72,7 +72,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     }
 
     @Test
-    public void testKnitrMarkupFormat() throws Exception
+    public void testKnitrMarkupFormat()
     {
         Locator.XPathLocator plotLocator = Locator.xpath("//div[@class='labkey-knitr']//img");
         Locator[] reportContains = {Locator.tag("h1").withText("A Minimal Example for Markdown"),
@@ -128,7 +128,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     }
 
     @Test
-    public void testRmarkdownV2Support() throws Exception
+    public void testRmarkdownV2Support()
     {
         markdownV2();
     }
