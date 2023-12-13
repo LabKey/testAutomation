@@ -214,9 +214,9 @@ function toggleRecorder(checkbox)
 <%
     if (getUser().hasRootAdminPermission())
     {
-        addHandler("emailRecordOn", "click", "toggleRecorder(this); return false;");
+        addHandler("emailRecordOn", "click", "toggleRecorder(this);");
 %>
-        <input name="emailRecordOn" type="checkbox" <%=checked(recorder)%>> Record email messages sent
+        <input id="emailRecordOn" name="emailRecordOn" type="checkbox" <%=checked(recorder)%>> Record email messages sent
 <%
     }
 %>
