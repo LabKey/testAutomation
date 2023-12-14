@@ -1,9 +1,9 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.WebTestHelper;
-import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
