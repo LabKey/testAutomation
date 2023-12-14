@@ -77,6 +77,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.WebStorage;
+import org.openqa.selenium.html5.LocalStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -193,6 +194,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
+
+    public static final String DISMISSED_STORAGE_PREFIX = "__release_notes_dismissed__";
 
     static final Set<String> urlsSeen = new HashSet<>();
 
@@ -2599,6 +2602,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void flash(WebElement element)
     {
         DebugUtils.flash(getDriver(), element, 3);
+    }
+
+    public void dismissReleaseBanner(String productName, boolean dismiss)
+    {
+        String lkVersion = (String) executeScript("return LABKEY.versionString;");
+        String dismissBannerKey = DISMISSED_STORAGE_PREFIX + productName + lkVersion;
+        if (dismiss)
+            executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
+        else
+            executeScript("localStorage.removeItem('" + dismissBannerKey + "')");
     }
 
     @Target(ElementType.TYPE)
