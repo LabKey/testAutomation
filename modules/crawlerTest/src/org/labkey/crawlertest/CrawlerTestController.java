@@ -70,7 +70,7 @@ public class CrawlerTestController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class ExternalLinkAction extends SimpleViewAction<Object>
+    public static class ExternalLinkAction extends SimpleViewAction<Object>
     {
         @Override
         public ModelAndView getView(Object form, BindException errors)

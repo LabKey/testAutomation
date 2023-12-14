@@ -224,7 +224,7 @@ public class ViabilityTest extends AbstractViabilityTest
     protected void runResultSpecimenLookupTest()
     {
         log("** Checking ResultSpecimens lookups");
-        beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=assay&query.queryName=" + getAssayName() + " ResultSpecimens");
+        beginAt("/" + getProjectName() + "/" + getFolderName() + "/query-executeQuery.view?schemaName=assay&query.queryName=" + getAssayName() + " ResultSpecimens");
         DataRegionTable table = new DataRegionTable("query", this);
         assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
 
