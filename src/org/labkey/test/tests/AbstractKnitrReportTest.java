@@ -34,12 +34,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
- * User: tgaluhn
- * Date: 9/20/2017
- *
  * Split helper methods and tests from KnitrReportTest so a subset of those test cases can be run in RSandboxTest
  */
 public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
@@ -57,7 +54,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
         reportSource = TestFileUtils.getFileContents(reportFile);
 
-        assertTrue("No data in report file [" + reportFile.getFileName() + "]", reportSource.length() > 0);
+        assertFalse("No data in report file [" + reportFile.getFileName() + "]", reportSource.isEmpty());
 
         return reportSource;
     }

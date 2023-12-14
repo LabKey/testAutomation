@@ -77,7 +77,6 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
         clickButton("Create Study");
     }
 
-
     protected void importSpecimens()
     {
         importSpecimens(getFolderName(), TestFileUtils.getSampleData("viability/specimens.txt"));

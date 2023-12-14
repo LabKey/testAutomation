@@ -465,7 +465,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickButton("Submit");
     }
 
-
     protected void setSystemMaintenance(boolean enable)
     {
         // Not available in production mode
