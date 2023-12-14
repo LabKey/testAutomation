@@ -687,6 +687,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().svgChart();
     }
 
+    public WebElement showRReport(String reportName)
+    {
+        elementCache().chartsMenu.clickSubMenu(false, reportName);
+        return elementCache().rReport();
+    }
+
     public void closeChart()
     {
         elementCache().closeButton.click();
@@ -741,6 +747,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         public WebElement svgChart()
         {
             return Locator.byClass("svg-chart").waitForElement(elementCache().chartPanel, WAIT_FOR_JAVASCRIPT);
+        }
+
+        public WebElement rReport()
+        {
+            return Locator.byClass("r-report").waitForElement(elementCache().chartPanel, WAIT_FOR_JAVASCRIPT);
         }
 
         final WebElement closeButton = Locator.tagContainingText("button", "Close").refindWhenNeeded(chartPanel);
