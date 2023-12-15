@@ -140,10 +140,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 infoCount <= 1);
 
         // A reference to the editing header title
-        WebElement editorHeading = Locator.tagWithClass("div", "panel-heading").startsWith("Editing").refindWhenNeeded(getDriver());
+        Locator editingLocator = Locator.tagWithClass("div", "panel-heading").startsWith("Editing");
 
-        Assert.assertTrue("Cannot find a panel with 'Editing' in the header. There isn't a panel in edit mode.",
-                editorHeading.isDisplayed());
+        Assert.assertEquals("Cannot find a panel with 'Editing' in the header. There isn't a panel in edit mode.",
+                1, editingLocator.findElements(getDriver()).size());
 
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
@@ -156,7 +156,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         // Wait until the counts of panels not in edit mode increases and the editor heading is no longer visible.
         WebDriverWrapper.waitFor(()->
-                        (defaultPanel.findElements(getDriver()).size() > defaultCount) && !editorHeading.isDisplayed(),
+                        defaultPanel.findElements(getDriver()).size() > defaultCount &&
+                                editingLocator.findElements(getDriver()).isEmpty(),
                 "Panel did not change state.", wait);
     }
 
