@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
@@ -94,10 +95,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
                 classValue = "-disabled";
         }
 
-        if(classValue.contains("-disabled"))
-            return false;
-        else
-            return true;
+        return !classValue.contains("-disabled");
     }
 
     public List<String> getListOfChartTypes()
@@ -182,7 +180,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
             Locator.byClass("field-selection-text").findElement(measureEl).click();
         }
         WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
-        WebDriverWait quickWait = new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(2));
+        WebDriverWait quickWait = new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(4));
         quickWait.until(ExpectedConditions.visibilityOf(arrow));
         arrow.click();
         quickWait.until(ExpectedConditions.stalenessOf(arrow));
@@ -313,7 +311,8 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         WebElement column = elementCache().getColumn(columnName, columnGridCls);
         getWrapper().scrollIntoView(column);
         column.click();
-        getWrapper().waitFor(() -> {
+        getWrapper();
+        WebDriverWrapper.waitFor(() -> {
             return target.isDisplayed();
         }, "Target element is not displayed", 5000);
         getWrapper().actionClick(target); // The drop text may be obscured, just need to click the location
