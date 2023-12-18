@@ -93,10 +93,17 @@ function setUpDomains() {
                 {"Alias":  'alias 6', "Id": 6, "Sort": 50,  "Tag": 'blue'}];
     var rows2 =[ {"Alias":  'alias 2-1', "Id": 201, "Sort": 1000, "Tag": 'square'}];
     var rows3 =[ {"Alias":  'alias 3-1', "Id": 301, "Sort": 500,  "Tag": 'Hispanic'}];
+    const manyRows = [];
+    const numRows = 5_001;
+    for (let i = 0; i < numRows; i++) {
+        manyRows.push({ Alias: `alias 5k-${i}`, Id: numRows + i, Name: `Sample 5k-${i}`, Sort: numRows + i, Tag: 'many rows' });
+    }
     sampleSetDomainTypeTest('sampleDataTest1', rows1, 'A sample type with color tags', function() {
         sampleSetDomainTypeTest('sampleDataTest2', rows2, 'A sample type with shape tags', function(){
             sampleSetDomainTypeTest('sampleDataTest3', rows3, 'A sample type with race tags', function(){
-                location.reload();
+                sampleSetDomainTypeTest('sampleDataTest5k', manyRows, `A sample type with ${manyRows.length.toLocaleString()} rows`, function(){
+                    location.reload();
+                });
             });
         });
     }, ([
@@ -113,7 +120,7 @@ function setUpDomains() {
 
 function dropDomains() {
     var completeCt = 0;
-    var queries = ["sampleDataTest1", "sampleDataTest2", "sampleDataTest3"];
+    var queries = ['sampleDataTest1', 'sampleDataTest2', 'sampleDataTest3', 'sampleDataTest5k'];
     var dropSuccess = function() {
         dropComplete('dropped');
     };

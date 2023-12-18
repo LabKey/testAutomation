@@ -32,7 +32,8 @@
             testFilterOnSortColumn: testFilterOnSortColumn,
             testButtonBarConfig: testButtonBarConfig,
             testRespectExcludingPrefixes: testRespectExcludingPrefixes,
-            testGetSelected: testGetSelected
+            testAllRowsLimit: testAllRowsLimit,
+            testGetSelected: testGetSelected,
         };
 
         var PAGE_OFFSET = 4;
@@ -136,11 +137,11 @@
                 renderTo: RENDERTO,
                 success: function() {
                     var results = $("a:contains('sampleDataTest')");
-                    if (!results || results.length < 3) {
+                    if (!results || results.length < 4) {
                         alert('Failed to list out all queries in Samples schema');
                     }
                     else {
-                        LABKEY.Utils.signalWebDriverTest("testSchemaOnly");
+                        LABKEY.Utils.signalWebDriverTest('testSchemaOnly');
                     }
                 },
                 failure: function() {
@@ -764,6 +765,7 @@
         }
 
         function testShowAllTotalRows() {
+            var loadCount = 0;
             new LABKEY.QueryWebPart({
                 title: 'Show All Rows',
                 schemaName: 'Samples',
@@ -774,17 +776,19 @@
                 },
                 listeners: {
                     render: function(dr) {
-                        if (dr.maxRows != -1) {
+                        loadCount++;
+
+                        if (loadCount === 1) {
                             dr.showAllRows();
-                        }
-                        else {
-                            if (!dr.totalRows)
-                            {
+                        } else if (loadCount === 2) {
+                            if (!dr.totalRows) {
                                 alert('Failed test: Show All Rows. totalRows is not set correctly with Show All.');
+                                return;
                             }
-                            else {
-                                LABKEY.Utils.signalWebDriverTest("testShowAllTotalRows");
-                            }
+
+                            LABKEY.Utils.signalWebDriverTest('testShowAllTotalRows');
+                        } else {
+                            alert('Failed test: Unexpected number of requests made.');
                         }
                     }
                 }
@@ -977,6 +981,58 @@
                                 }
                             }
                         }, 100);
+                    }
+                }
+            });
+        }
+
+        // Issue 48715: Limit Data Region "Show all" to a maximum number of rows
+        function testAllRowsLimit() {
+            var loadCount = 0;
+            new LABKEY.QueryWebPart({
+                title: 'Show All Rows Limit (Regression #48715)',
+                schemaName: 'Samples',
+                queryName: 'sampleDataTest5k',
+                removeableFilters: [
+                    // Initialize with a user filter
+                    LABKEY.Filter.create('Name', 'Sample 5k-5000')
+                ],
+                renderTo: RENDERTO,
+                failure: function() {
+                    alert('Failed test: testAllRowsLimit failed to load');
+                },
+                listeners: {
+                    render: function(qwp) {
+                        loadCount++;
+
+                        if (loadCount === 1) {
+                            // Set the QWP to show all rows
+                            qwp.showAllRows();
+                        } else if (loadCount === 2) {
+                            // Clear the user filter
+                            qwp.clearFilter('Name');
+                        } else if (loadCount === 3) {
+                            if (qwp.totalRows !== 5_001) {
+                                alert('Failed test: Expected 5,001 results in query.');
+                                return;
+                            }
+
+                            if (qwp.maxRows !== 5_000) {
+                                alert('Failed test: Expected maxRows to be set to 5,000');
+                                return;
+                            }
+
+                            // Expect to be bound by the "Show all" configuration displaying a maximum amount of rows
+                            const message = qwp.getMessage('info');
+                            if (!message || message.indexOf('Displaying the first 5,000 rows. Use paging to see more results.') === -1) {
+                                alert('Failed test: Expected message regarding "Show all" boundary did not appear.');
+                                return;
+                            }
+
+                            LABKEY.Utils.signalWebDriverTest('testAllRowsLimit');
+                        } else {
+                            alert('Failed test: Unexpected number of requests made.');
+                        }
                     }
                 }
             });
