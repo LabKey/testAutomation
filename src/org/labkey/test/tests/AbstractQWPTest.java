@@ -22,7 +22,9 @@ import org.labkey.test.Locators;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -44,7 +46,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         waitForElement(Locator.button("Populate test data"));
         clickButton("Populate test data");
         WebElement populateMessage = Locator.id("populatemessage").waitForElement(shortWait());
-        longWait().until(ExpectedConditions.visibilityOf(populateMessage)).getText();
+        new WebDriverWait(getDriver(), Duration.ofSeconds(60)).until(ExpectedConditions.visibilityOf(populateMessage)).getText();
         assertEquals("Test data is populated!", populateMessage.getText());
 
         log("Testing " + QWP_SCHEMA_LISTING.getLeft());
