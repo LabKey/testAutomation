@@ -146,21 +146,23 @@ public class DataClassTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields("created");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'created' is a reserved name."),
+                "'created' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("rowid");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'rowid' is a reserved name."),
+                "'rowid' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("name");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'name' is a reserved name."),
+                "'name' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
-        domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
     }
