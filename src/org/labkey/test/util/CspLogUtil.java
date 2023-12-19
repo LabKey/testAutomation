@@ -3,20 +3,21 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
 
 public class CspLogUtil
 {
@@ -25,16 +26,20 @@ public class CspLogUtil
 
     private static long lastSize = 0;
     private static long lastModified = 0;
+    private static boolean missingLog = false;
 
     private CspLogUtil() { }
 
     public static void checkNewCspWarnings(ArtifactCollector artifactCollector)
     {
-        if (TestProperties.isCspCheckSkipped())
+        if (TestProperties.isCspCheckSkipped() || TestProperties.isServerRemote() || missingLog)
             return;
 
-        assertFalse("Cannot check CSP log on remote server", TestProperties.isServerRemote());
-        assertThat(logFile).as("CSP log file").isFile();
+        if (!logFile.isFile())
+        {
+            missingLog = true; // Only fail one test if CSP check is enabled but log is missing.
+            assertThat(logFile).as("CSP log file").isFile(); // Should fail
+        }
 
         long logSize = logFile.length();
         long modified = logFile.lastModified();
@@ -47,12 +52,13 @@ public class CspLogUtil
                 List<String> warningLines;
                 File recentWarningsFile = new File(artifactCollector.ensureDumpDir(), logName);
 
-                try (FileInputStream fIn = new FileInputStream(logFile))
+                try (FileInputStream fIn = new FileInputStream(logFile);
+                     Writer writer = PrintWriters.getPrintWriter(new FileOutputStream(recentWarningsFile, true)))
                 {
                     //noinspection ResultOfMethodCallIgnored
                     fIn.skip(lastSize);
                     warningLines = IOUtils.readLines(fIn, Charset.defaultCharset());
-                    TestFileUtils.writeFile(recentWarningsFile, StringUtils.join(warningLines.toArray(), System.lineSeparator()));
+                    IOUtils.writeLines(warningLines, System.lineSeparator(), writer);
                 }
                 catch (IOException e)
                 {
