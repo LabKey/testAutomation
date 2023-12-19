@@ -1303,22 +1303,23 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Verify error message for reserved field names");
         domainFormPanel.manuallyDefineFields("created");
         checker().verifyEquals("Sample Type reserved field name error",
-                Arrays.asList("Property name 'created' is a reserved name."),
+                Arrays.asList("'created' is a reserved field name in 'ReservedFieldNameValidation'.",
+                        "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("rowid");
         checker().verifyEquals("Sample Type reserved field name error",
-                Arrays.asList("Property name 'rowid' is a reserved name."),
+                Arrays.asList("'rowid' is a reserved field name in 'ReservedFieldNameValidation'.",
+                        "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("name");
         checker().verifyEquals("Sample Type 'name' field name error",
-                Arrays.asList(
-                "The field name 'Name' is already taken. Please provide a unique name for each field.",
-                "Please correct errors in Fields before saving."),
+                Arrays.asList("The field name 'Name' is already taken. Please provide a unique name for each field.",
+                        "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
@@ -1327,7 +1328,6 @@ public class SampleTypeTest extends BaseWebDriverTest
         checker().verifyEquals("Sample Type SampleId field name error",
                 Arrays.asList("The SampleID field name is reserved for imported or generated sample ids."),
                 createPage.clickSaveExpectingErrors());
-        domainFormPanel.removeAllFields(false);
     }
 
     @Test
