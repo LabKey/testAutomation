@@ -44,6 +44,7 @@
             <div class="tab"><a href="#testFilterOnSortColumn">Filter on "Sort" column</a></div>
             <div class="tab"><a href="#testButtonBarConfig">Use onRender via ButtonBarOptions</a></div>
             <div class="tab"><a href="#testRespectExcludingPrefixes">Exclude "skipPrefixes"</a></div>
+            <div class="tab"><a href="#testAllRowsLimit">Show All Rows Limit (Regression #48715)</a></div>
             <div class="tab"><a href="#testGetSelected">Get Selected (Regression #41705)</a></div>
         </td>
         <td valign="top">
@@ -67,7 +68,11 @@
             LABKEY.Domain.get(function() {
                 LABKEY.Domain.get(function() {
                     LABKEY.Domain.get(function() {
-                        showPopulateSuccess(true);
+                        LABKEY.Domain.get(function() {
+                            showPopulateSuccess(true);
+                        }, function() {
+                            showPopulateButton(true);
+                        }, 'Samples', 'sampleDataTest5k');
                     }, function() {
                         showPopulateButton(true);
                     }, 'Samples', 'sampleDataTest3');
