@@ -27,8 +27,8 @@
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
-<%@ page import="javax.mail.MessagingException" %>
-<%@ page import="javax.mail.internet.MimeMessage" %>
+<%@ page import="jakarta.mail.MessagingException" %>
+<%@ page import="jakarta.mail.internet.MimeMessage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
