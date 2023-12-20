@@ -65,8 +65,8 @@ public abstract class TestProperties
         }
         catch (IOException ioe)
         {
-            TestLogger.log("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
-            ioe.printStackTrace(System.out);
+            TestLogger.error("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
+            ioe.printStackTrace(System.err);
         }
     }
 
