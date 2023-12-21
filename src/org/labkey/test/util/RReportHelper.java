@@ -560,7 +560,7 @@ public class RReportHelper
         if (reportNotContains != null)
         {
             String reportText = reportDiv.getText();
-            _test.log(reportText); // Temporary: log text to track down CSP violation. TODO: Remove this
+            _test.log(reportDiv.getAttribute("innerHTML")); // Temporary: log HTML to track down CSP violation. TODO: Remove this
 
             for (String text : reportNotContains)
             {
