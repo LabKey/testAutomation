@@ -35,6 +35,9 @@ import java.util.stream.Stream;
 
 public abstract class TestProperties
 {
+
+    private static final String USE_EMBEDDED_TOMCAT = "useEmbeddedTomcat";
+
     static
     {
         // https://github.com/SeleniumHQ/selenium/issues/11750#issuecomment-1470357124
@@ -68,6 +71,26 @@ public abstract class TestProperties
             TestLogger.error("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
             ioe.printStackTrace(System.err);
         }
+
+        File serverPropFile = new File(TestFileUtils.getLabKeyRoot(), "gradle.properties");
+        if (!System.getProperties().containsKey(USE_EMBEDDED_TOMCAT) && serverPropFile.isFile())
+        {
+            // Gradle properties don't get pulled into tests when running in IntelliJ
+            try (Reader serverPropReader = Readers.getReader(serverPropFile))
+            {
+                TestLogger.log("Loading properties from " + propFile.getName());
+                Properties properties = new Properties();
+                properties.load(serverPropReader);
+                if (properties.containsKey(USE_EMBEDDED_TOMCAT))
+                    System.setProperty(USE_EMBEDDED_TOMCAT, "");
+            }
+            catch (IOException ioe)
+            {
+                TestLogger.error("Failed to load " + serverPropFile.getName() + " file. Ignoring");
+                ioe.printStackTrace(System.err);
+            }
+        }
+
     }
 
     public static void load()
@@ -229,7 +252,7 @@ public abstract class TestProperties
 
     public static boolean isEmbeddedTomcat()
     {
-        return System.getProperties().containsKey("useEmbeddedTomcat");
+        return System.getProperties().containsKey(USE_EMBEDDED_TOMCAT);
     }
 
     public static boolean isCheckerFatal()

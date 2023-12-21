@@ -1,16 +1,20 @@
 package org.labkey.test.tests;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.PermissionsHelper.MemberType;
 import org.openqa.selenium.UnhandledAlertException;
 
@@ -95,6 +99,15 @@ public class CrawlerTest extends BaseWebDriverTest
         }
     }
 
+    @Test (expected = CspLogUtil.CspWarningDetectedException.class)
+    public void testCspWarning()
+    {
+        Assume.assumeFalse("Can't test for CSP report", TestProperties.isCspCheckSkipped());
+
+        beginAt(WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "cspWarning"));
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+    }
+
     // Crawler should flag external links without the correct 'rel' attribute
     // https://www.labkey.org/home/Developer/issues/Secure/issues-details.view?issueId=40708
     @Test
@@ -142,6 +155,12 @@ public class CrawlerTest extends BaseWebDriverTest
     private String getInjectUrl(String injectionParam)
     {
         return WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "injectJsp", Map.of("inject", injectionParam));
+    }
+
+    @After
+    public void postTest()
+    {
+        CspLogUtil.resetCspLogMark();
     }
 
     @Override
