@@ -77,6 +77,7 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
                     Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig"),
                     Pair.of("Exclude \"skipPrefixes\"", "testRespectExcludingPrefixes"),
+                    Pair.of("Show All Rows Limit (Regression #48715)", "testAllRowsLimit"),
                     Pair.of("Get Selected (Regression #41705)", "testGetSelected")
                     );
 
