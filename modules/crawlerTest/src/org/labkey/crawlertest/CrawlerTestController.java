@@ -84,6 +84,21 @@ public class CrawlerTestController extends SpringActionController
         { }
     }
 
+    @RequiresPermission(ReadPermission.class)
+    public static class CspWarningAction extends SimpleViewAction<Object>
+    {
+        @Override
+        public ModelAndView getView(Object form, BindException errors)
+        {
+            getPageConfig().setTitle("CSP Warning Test Page");
+            return new JspView<>("/org/labkey/crawlertest/view/cspWarning.jsp");
+        }
+
+        @Override
+        public void addNavTrail(NavTree root)
+        { }
+    }
+
     public static class InjectForm
     {
         private String _inject;
