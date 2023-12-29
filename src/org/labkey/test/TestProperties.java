@@ -43,9 +43,6 @@ public abstract class TestProperties
         //TODO: DO NOT MERGE! FORCING FIREFOX VERSION FOR VALIDATION
         System.setProperty("selenium.firefox.binary", System.getenv("FIREFOX115"));
 
-        // https://github.com/SeleniumHQ/selenium/issues/11750#issuecomment-1470357124
-        System.setProperty("webdriver.http.factory", "jdk-http-client");
-
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
