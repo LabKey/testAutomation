@@ -82,9 +82,33 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public DeleteConfirmationDialog setUserComment(String comment)
     {
-        var commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
-                .refindWhenNeeded(this);
-        commentInput.set(comment);
+
+        WebDriverWrapper.waitFor(()-> elementCache().commentInput.getComponentElement().isDisplayed(),
+                "The 'Comment' field is not visible.", 2_500);
+
+        elementCache().commentInput.set(comment);
         return this;
     }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    protected class ElementCache extends ModalDialog.ElementCache
+    {
+
+        Input commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
+                .refindWhenNeeded(this);
+
+    }
+
+
 }

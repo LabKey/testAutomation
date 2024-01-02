@@ -6,6 +6,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class StatusPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
                     }
                 },
                 "The 'Pipeline Status' page did not load in time.",
-                2_500);
+                5_000);
     }
 
     public String getPageHeader()
