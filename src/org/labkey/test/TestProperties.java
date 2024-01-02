@@ -40,6 +40,7 @@ public abstract class TestProperties
 
     static
     {
+
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
