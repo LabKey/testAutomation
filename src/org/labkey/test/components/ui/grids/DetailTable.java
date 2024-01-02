@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 /**
  * This is a 'special' table that has only two columns, and no header. An example of this table can be seen in the
  * Sample Detail page. The first column contains the list of attributes for a given sample, and the second column
@@ -25,11 +27,18 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 {
     private final WebElement _tableElement;
     private final WebDriver _driver;
+    private Integer _queryWaitMsec = WAIT_FOR_JAVASCRIPT;
 
     protected DetailTable(WebElement tableElement, WebDriver driver)
     {
         _tableElement = tableElement;
         _driver = driver;
+    }
+
+    public DetailTable setQueryWait(int queryWaitMsec)
+    {
+        _queryWaitMsec = queryWaitMsec;
+        return this;
     }
 
     @Override
@@ -125,7 +134,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 
         // Should not click the container, it could be a td which would miss the clickable element.
         // Maybe this shouldn't assume an anchor but should be a generic(*)?
-        Locator.tag("a").waitForElement(getField(fieldCaption), 1500).click();
+        Locator.tag("a").waitForElement(getField(fieldCaption), _queryWaitMsec).click();
 
         WebDriverWrapper.waitFor(()->!urlBefore.equals(getWrapper().getCurrentRelativeURL().toLowerCase()),
                 String.format("Clicking field (link) '%s' did not navigate.", fieldCaption), 500);
