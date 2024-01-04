@@ -864,3 +864,7 @@ ALTER TABLE vehicle.ThirdFKTable ADD CONSTRAINT FK_SecondFKTable_CycleCol FOREIG
 /* 21.xxx SQL scripts */
 
 ALTER TABLE vehicle.Vehicles ADD TriggerScriptContainer ENTITYID;
+
+/* 22.xxx SQL scripts */
+
+ALTER TABLE vehicle.Vehicles ADD COLUMN IF NOT EXISTS TriggerScriptContainer ENTITYID;
