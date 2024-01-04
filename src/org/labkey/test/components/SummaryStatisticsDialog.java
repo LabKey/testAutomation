@@ -29,11 +29,17 @@ import static org.junit.Assert.assertEquals;
 public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.ElementCache>
 {
     private static final String DIALOG_TITLE = "Summary Statistics";
+    private final int timeoutMs;
+
+    public SummaryStatisticsDialog(WebDriver driver, int timeoutMs)
+    {
+        super(DIALOG_TITLE, driver);
+        this.timeoutMs = timeoutMs;
+    }
 
     public SummaryStatisticsDialog(WebDriver driver)
     {
-        super(DIALOG_TITLE, driver);
-        elementCache().statTableLoc.waitForElement(this, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        this(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void apply()
@@ -108,8 +114,13 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
         return new ElementCache();
     }
 
-    protected class ElementCache extends Window.ElementCache
+    protected class ElementCache extends Window<?>.ElementCache
     {
+        public ElementCache()
+        {
+            statTableLoc.waitForElement(this, timeoutMs);
+        }
+
         Locator.XPathLocator statTableLoc = Locator.tagWithClass("table", "stat-table");
         Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClassContaining("tr", "lk-stats-row"));
         Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "lk-stats-label"));
