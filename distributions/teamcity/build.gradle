@@ -62,9 +62,9 @@ else
             if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
             {
                 project.evaluationDependsOn(otherProject.path)
-                if (otherProject.plugins.hasPlugin('org.labkey.module') ||
-                    otherProject.plugins.hasPlugin('org.labkey.fileModule') ||
-                    otherProject.plugins.hasPlugin('org.labkey.javaModule'))
+                if (otherProject.plugins.hasPlugin('org.labkey.build.module') ||
+                    otherProject.plugins.hasPlugin('org.labkey.build.fileModule') ||
+                    otherProject.plugins.hasPlugin('org.labkey.build.javaModule'))
                     pathList += otherProject.path
             }
     }
