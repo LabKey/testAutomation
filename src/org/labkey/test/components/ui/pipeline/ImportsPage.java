@@ -34,7 +34,7 @@ public class ImportsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
                     }
                 },
                 "The 'Background Imports' page did not load in time.",
-                2_500);
+                15_000);
     }
 
     public static ImportsPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)

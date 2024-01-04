@@ -11,6 +11,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -316,11 +317,21 @@ public class CustomizeGridViewDialog extends ModalDialog
     public CustomizeGridViewDialog removeColumn(String column, int index)
     {
         WebElement listItem = getShownInGridListItems(column).get(index);
-        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+
+        // Make sure the mouse is on the identified row. Tests that remove columns one after another can show the mouse
+        // hovering for a moment over the remove icon of the previous row.
+        listItem.click();
+
+        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findElement(listItem);
+        getWrapper().mouseOver(removeIcon);
         removeIcon.click();
 
-        WebDriverWrapper.waitFor(()->!removeIcon.isDisplayed(),
-                String.format("Column '%s' was not removed from list.", column), 500);
+        // Move the mouse over the dialog title.
+        getWrapper().mouseOver(Locator.tagWithClass("h4", "modal-title").findElement(this));
+
+        getWrapper().shortWait()
+                .withMessage(String.format("Column '%s' was not removed from list.", column))
+                .until(ExpectedConditions.stalenessOf(listItem));
 
         return this;
     }
