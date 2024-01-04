@@ -16,13 +16,13 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
@@ -46,8 +46,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -55,31 +53,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 
 public class ArtifactCollector
 {
-    private static final Map<Class<?>, Integer> _shotCounters = new HashMap<>();
+    private static final Map<String, Integer> _shotCounters = new HashMap<>();
 
-    private final BaseWebDriverTest _test;
     private final WebDriverWrapper _driver;
+    private final String _dumpDirName;
 
     // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
     private static List<Pair<File, FileFilter>> pipelineDirs = new CopyOnWriteArrayList<>();
     private static long _testStart;
-    private static boolean _dumpedHeap = false;
+
+    public ArtifactCollector(WebDriverWrapper driver, String dumpDirName)
+    {
+        _driver = driver;
+        _dumpDirName = dumpDirName;
+    }
+
+    public ArtifactCollector(WebDriverWrapper driver, ArtifactCollector otherBrowserCollector)
+    {
+        this(driver, otherBrowserCollector._dumpDirName);
+    }
 
     public ArtifactCollector(BaseWebDriverTest test)
     {
-        this(test, test);
-    }
-
-    public ArtifactCollector(BaseWebDriverTest test, WebDriverWrapper driver)
-    {
-        _test = test;
-        _driver = driver;
+        this(test, test.getClass().getSimpleName());
     }
 
     public static void init()
@@ -90,19 +91,10 @@ public class ArtifactCollector
 
     public File ensureDumpDir()
     {
-        String currentTestClassName;
-        try
-        {
-            currentTestClassName = _test.getClass().getSimpleName();
-        }
-        catch (NullPointerException e)
-        {
-            currentTestClassName = "UnknownTest";
-        }
-        return ensureDumpDir(currentTestClassName);
+        return ensureDumpDir(_dumpDirName);
     }
 
-    public File ensureDumpDir(String testClassName)
+    public static File ensureDumpDir(String testClassName)
     {
         File dumpDir = new File(TestProperties.getDumpDir(), testClassName);
         if ( !dumpDir.exists() )
@@ -161,8 +153,8 @@ public class ArtifactCollector
 
     private int getAndIncrementShotCounter()
     {
-        Integer shotCounter = _shotCounters.getOrDefault(_test.getClass(), 0);
-        _shotCounters.put(_test.getClass(), shotCounter + 1);
+        Integer shotCounter = _shotCounters.getOrDefault(_dumpDirName, 0);
+        _shotCounters.put(_dumpDirName, shotCounter + 1);
         return shotCounter;
     }
 
@@ -174,7 +166,7 @@ public class ArtifactCollector
     public String dumpPageSnapshot(String snapshotName, @Nullable String subdir)
     {
         File dumpDir = ensureDumpDir();
-        if (subdir != null && subdir.length() > 0)
+        if (!StringUtils.isBlank(subdir))
         {
             dumpDir = new File(dumpDir, subdir);
             if ( !dumpDir.exists() )
@@ -189,47 +181,6 @@ public class ArtifactCollector
         dumpPdf(dumpDir, baseName);
 
         return baseName;
-    }
-
-    public void dumpHeap()
-    {
-        if (_dumpedHeap || // Only one heap dump per suite (don't want to overload TeamCity)
-            !isLocalServer() ||
-            _test.isGuestModeTest() ||
-            !isHeapDumpCollectionEnabled()
-        )
-        {
-            return;
-        }
-
-        _driver.pushLocation();
-
-        // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
-        _driver.beginAt("/admin/dumpHeap.view");
-        String dumpMsg = Locators.bodyPanel().childTag("div").findElement(_driver.getDriver()).getText();
-        String filePrefix = "Heap dumped to ";
-        int prefixIndex = dumpMsg.indexOf(filePrefix);
-        if (prefixIndex < 0)
-        {
-            _test.checker().error("Unable to extract heap dump filename from page body. 'ArtifactCollector.dumpHeap' may need to be updated.\n" + dumpMsg);
-            return;
-        }
-        String filename = dumpMsg.substring(prefixIndex + filePrefix.length());
-        File heapDump = new File(filename);
-        File destFile = new File(ensureDumpDir(), heapDump.getName());
-        try
-        {
-            Files.move(heapDump.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            publishArtifact(destFile);
-            _dumpedHeap = true;
-        }
-        catch (IOException e)
-        {
-            TestLogger.error("Failed to move HeapDump file to test logs directory.");
-            e.printStackTrace();
-        }
-
-        _driver.popLocation(); // go back to get screenshot if needed.
     }
 
     public File dumpScreen(File dir, String baseName)
@@ -251,12 +202,6 @@ public class ArtifactCollector
 
     public File dumpPdf(File dir, String baseName)
     {
-        if (_test != _driver || _test.getBrowserType() == WebDriverWrapper.BrowserType.CHROME && !TestProperties.isRunWebDriverHeadless())
-        {
-            // Avoid error: "PrintToPDF is only supported in headless mode"
-            return null;
-        }
-
         File pdfFile = new File(dir, baseName + ".pdf");
         try
         {
@@ -302,8 +247,8 @@ public class ArtifactCollector
     public File dumpHtml(File dir, String baseName)
     {
         String pageHtml;
-        if (_test == _driver)
-            pageHtml = _test.getLastPageText();
+        if (_driver instanceof BaseWebDriverTest test)
+            pageHtml = test.getLastPageText();
         else
             pageHtml = _driver.getHtmlSource();
 

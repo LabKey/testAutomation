@@ -43,18 +43,19 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Runner;
 import org.labkey.test.SuiteFactory;
 import org.labkey.test.TestProperties;
-import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.UnitTests;
+import org.labkey.test.util.ApiBootstrapHelper;
 import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.QuickBootstrapPseudoTest;
 import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
@@ -108,46 +109,35 @@ public class JUnitTest extends TestSuite
         return getClass().getName();
     }
 
-    public static class JUnitSeleniumHelper extends BaseWebDriverTest
-    {
-        @Override
-        protected String getProjectName() {return null;}
-        @Override
-        protected void doCleanup(boolean afterTest) throws TestTimeoutException
-        { }
-        @Override
-        public List<String> getAssociatedModules() { return null; }
-
-        @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
-    }
-
     // Use WebDriver to ensure we're upgraded
     @LogMethod
     private static void upgradeHelper(boolean skipInitialUserChecks)
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
-        BaseWebDriverTest helper;
+
+        ExtraSiteWrapper bootstrapBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX,
+                ArtifactCollector.ensureDumpDir(JUnitTest.class.getSimpleName()));
         if (skipInitialUserChecks)
         {
-            helper = new QuickBootstrapPseudoTest();
+            bootstrapBrowser = new ApiBootstrapHelper(bootstrapBrowser.getDriver());
         }
-        else
-        {
-            helper = new JUnitSeleniumHelper();
-        }
+
         try
         {
-            helper.setUp();
             // sign in performs upgrade if necessary
-            helper.signIn();
+            bootstrapBrowser.signIn();
         }
         catch (Throwable t)
         {
-            if (helper.getWrappedDriver() != null)
+            if (bootstrapBrowser.getWrappedDriver() != null)
             {
-                helper.getArtifactCollector().dumpPageSnapshot("ServerBootstrap", null);
+                new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName()).dumpPageSnapshot("ServerBootstrap", null);
             }
             throw t;
+        }
+        finally
+        {
+            bootstrapBrowser.close();
         }
     }
 

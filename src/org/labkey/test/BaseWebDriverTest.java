@@ -142,6 +142,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
 import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
@@ -154,9 +155,11 @@ import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.teamcity.TeamCityUtils.publishArtifact;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -189,6 +192,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private String _lastPageText = null;
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
+    private static boolean _dumpedHeap = false;
     private final ArtifactCollector _artifactCollector;
     private final DeferredErrorCollector _errorCollector;
 
@@ -1067,7 +1071,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                             .filter(s -> !s.isEmpty()).toList();
                         TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
                     }
-                    getArtifactCollector().dumpHeap();
+                    dumpHeap();
                 }
                 catch (IOException e)
                 {
@@ -1112,6 +1116,47 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         }
         return null;
+    }
+
+    public void dumpHeap()
+    {
+        if (_dumpedHeap || // Only one heap dump per suite (don't want to overload TeamCity)
+                !isLocalServer() ||
+                isGuestModeTest() ||
+                !isHeapDumpCollectionEnabled()
+        )
+        {
+            return;
+        }
+
+        pushLocation();
+
+        // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
+        beginAt(WebTestHelper.buildURL("admin", "dumpHeap"));
+        String dumpMsg = Locators.bodyPanel().childTag("div").findElement(getDriver()).getText();
+        String filePrefix = "Heap dumped to ";
+        int prefixIndex = dumpMsg.indexOf(filePrefix);
+        if (prefixIndex < 0)
+        {
+            checker().error("Unable to extract heap dump filename from page body.\n" + dumpMsg);
+            return;
+        }
+        String filename = dumpMsg.substring(prefixIndex + filePrefix.length());
+        File heapDump = new File(filename);
+        File destFile = new File(getArtifactCollector().ensureDumpDir(), heapDump.getName());
+        try
+        {
+            Files.move(heapDump.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            publishArtifact(destFile, null);
+            _dumpedHeap = true;
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to move HeapDump file to test logs directory.");
+            e.printStackTrace();
+        }
+
+        popLocation(); // go back to get screenshot if needed.
     }
 
     private void dumpBrowserConsole()
@@ -1349,7 +1394,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             if (newLeak != null)
             {
-                getArtifactCollector().dumpHeap();
+                dumpHeap();
                 ArtifactCollector.dumpThreads();
                 fail(String.format("Found memory leak: %s [1 of %d, MAX:%d]\nSee test artifacts for more information.", newLeak, leakCount, MAX_LEAK_LIMIT));
             }
@@ -2689,7 +2734,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         private void setUp(BaseWebDriverTest test)
         {
             WebDriver oldWebDriver = getWebDriver();
-            File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
+            File newDownloadDir = new File(ArtifactCollector.ensureDumpDir(test.getClass().getSimpleName()), "downloads");
             _driverAndService = test.createNewWebDriver(_driverAndService, test.BROWSER_TYPE, newDownloadDir);
             if (getWebDriver() != oldWebDriver) // downloadDir only changes when a new WebDriver is started.
                 _downloadDir = newDownloadDir;

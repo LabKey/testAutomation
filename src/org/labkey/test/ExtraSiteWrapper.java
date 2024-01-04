@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.service.DriverService;
@@ -29,6 +30,12 @@ public class ExtraSiteWrapper extends LabKeySiteWrapper implements AutoCloseable
     {
         super();
         this.extraDriver = createNewWebDriver(browserType, downloadDir);
+    }
+
+    public ExtraSiteWrapper(WebDriver driver)
+    {
+        super();
+        this.extraDriver = new ImmutablePair<>(driver, null);
     }
 
     @Override
