@@ -18,6 +18,7 @@ package org.labkey.test.components;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -31,15 +32,10 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
     private static final String DIALOG_TITLE = "Summary Statistics";
     private final int timeoutMs;
 
-    public SummaryStatisticsDialog(WebDriver driver, int timeoutMs)
+    public SummaryStatisticsDialog(DataRegionTable drt)
     {
-        super(DIALOG_TITLE, driver);
-        this.timeoutMs = timeoutMs;
-    }
-
-    public SummaryStatisticsDialog(WebDriver driver)
-    {
-        this(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        super(DIALOG_TITLE, drt.getDriver());
+        this.timeoutMs = drt.getUpdateTimeout();
     }
 
     public void apply()
