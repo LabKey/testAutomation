@@ -101,7 +101,7 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 
 if (project.hasProperty("teamcity"))
 {
-    apply plugin: 'org.labkey.teamCity'
+    apply plugin: 'org.labkey.build.teamCity'
 }
 
 // If this configuration for the default jar file is included when syncing with IntelliJ
