@@ -79,7 +79,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     public void testTomcatLogs() throws Exception
     {
         File logDir = TestFileUtils.getServerLogDir();
-        assertTrue("Server log directory does not exist: " + logDir, logDir.isFile());
+        assertTrue("Server log directory does not exist: " + logDir, logDir.isDirectory());
         File[] logs = logDir.listFiles();
         Map<File, Integer> contaminatedLogs = Grep.grep(PasswordUtil.getPassword(), logs);
         Map<String, String> failureFiles = new TreeMap<>();
