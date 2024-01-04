@@ -27,6 +27,8 @@ CREATE TABLE vehicle.Colors
     CONSTRAINT PK_Colors PRIMARY KEY (Name)
 );
 
+ALTER TABLE vehicle.Colors ADD TriggerScriptProperty NVARCHAR(100);
+
 CREATE TABLE vehicle.Manufacturers
 (
     RowId INT IDENTITY(1,1),
@@ -44,6 +46,15 @@ CREATE TABLE vehicle.Models
     CONSTRAINT PK_Models PRIMARY KEY (RowId),
     CONSTRAINT FK_Models_Manufacturers FOREIGN KEY (ManufacturerId) REFERENCES vehicle.Manufacturers(RowId)
 );
+
+/* vehicle-16.30-17.10.sql */
+
+ALTER TABLE vehicle.Models
+    ADD InitialReleaseYear INT;
+
+ALTER TABLE vehicle.Models ADD ThumbnailImage NVARCHAR(60);
+ALTER TABLE vehicle.Models ADD Image NVARCHAR(60);
+ALTER TABLE vehicle.Models ADD PopupImage NVARCHAR(60);
 
 CREATE TABLE vehicle.Vehicles
 (
@@ -72,6 +83,7 @@ CREATE TABLE vehicle.Vehicles
 ALTER TABLE vehicle.Vehicles
     ADD CONSTRAINT FK_Vehicles_Container FOREIGN KEY (Container) REFERENCES core.Containers (EntityId);
 
+ALTER TABLE vehicle.Vehicles ADD TriggerScriptContainer ENTITYID;
 /* vehicle-12.30-13.10.sql */
 
 CREATE TABLE vehicle.emissiontest (
@@ -105,6 +117,8 @@ CONSTRAINT PK_etlsource PRIMARY KEY (rowid),
 );
 
 
+-- Drop tables / procedures for ETL testing from this schema; they've been moved to the etltest schema.
+DROP TABLE vehicle.etl_source;
 CREATE TABLE vehicle.etl_target(
   RowId INT IDENTITY(1,1),
   container entityid,
@@ -119,265 +133,6 @@ CREATE TABLE vehicle.etl_target(
   CONSTRAINT AK_etltarget UNIQUE (container,id),
   CONSTRAINT FK_etltarget_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
 );
-
-CREATE TABLE vehicle.etl_target2
-(
-  RowId INT NOT NULL,
-  container entityid,
-  created DATETIME,
-  modified DATETIME,
-
-  id VARCHAR(9),
-  name VARCHAR(100),
-  diTransformRunId INT,
-
-  CONSTRAINT PK_etltarget2 PRIMARY KEY (rowid),
-  CONSTRAINT AK_etltarget2 UNIQUE (container,id),
-  CONSTRAINT FK_etltarget2_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
-);
-
-CREATE TABLE vehicle.Owner
-(
-  RowId INT IDENTITY(1,1),
-  container ENTITYID,
-  created DATETIME,
-  createdby USERID,
-  modified DATETIME,
-  modifiedby USERID,
-
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  email VARCHAR(100),
-  gender VARCHAR(10),
-  race VARCHAR(100),
-  city VARCHAR(100),
-  state VARCHAR(100),
-  zip VARCHAR(10),
-  text VARCHAR(1000),
-  birth_date DATETIME,
-  CONSTRAINT PK_owner PRIMARY KEY (container,rowid)
-);
-
-
-CREATE TABLE vehicle.OwnerBackup
-(
-  RowId INT IDENTITY(1,1),
-  container ENTITYID,
-  created DATETIME,
-  createdby USERID,
-  modified DATETIME,
-  modifiedby USERID,
-
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  email VARCHAR(100),
-  gender VARCHAR(10),
-  race VARCHAR(100),
-  city VARCHAR(100),
-  state VARCHAR(100),
-  zip VARCHAR(10),
-  text VARCHAR(1000),
-  birth_date DATETIME,
-  diTransformRunId INT,
-
-  CONSTRAINT PK_ownerbackup PRIMARY KEY (container,rowid)
-);
-
-/* vehicle-13.20-13.30.sql */
-
-CREATE TABLE vehicle.Transfer
-(
-    RowId INT NOT NULL,
-    TransferStart DATETIME NOT NULL,
-	transferComplete DATETIME NULL,
-	schemaName NVARCHAR(100) NOT NULL,
-	description NVARCHAR(1000) NULL,
-	log NTEXT NULL,
-	status NVARCHAR(10) NULL,
-	container dbo.ENTITYID NULL
-);
-
-/* vehicle-13.30-14.10.sql */
-
-ALTER TABLE vehicle.Transfer  ADD CONSTRAINT FK_etltransfer_container FOREIGN KEY(container)
-	REFERENCES core.Containers (EntityId)
-ALTER TABLE vehicle.transfer ADD CONSTRAINT PK_transfer PRIMARY KEY (rowid);
-GO
-
-
-CREATE PROCEDURE vehicle.etlMissingTransformRunId
-AS
-BEGIN
-	SELECT 1
-END
-
-GO
-
-/* vehicle-15.00-15.01.sql */
-
-CREATE PROCEDURE [vehicle].[etlTestResultSet]
- 	@transformRunId int,
- 	@containerId varchar(100) = NULL OUTPUT,
- 	@rowsInserted int = 0 OUTPUT,
- 	@rowsDeleted int = 0 OUTPUT,
- 	@rowsModified int = 0 OUTPUT,
- 	@returnMsg varchar(100) = 'default message' OUTPUT,
- 	@debug varchar(1000) = '',
- 	@filterRunId int = null,
- 	@filterStartTimeStamp datetime = null OUTPUT,
- 	@filterEndTimeStamp datetime = null OUTPUT,
- 	@testMode int,
- 	@testInOutParam varchar(10) = null OUTPUT,
- 	@runCount int = 1 OUTPUT,
- 	@previousFilterRunId int = null OUTPUT,
- 	@previousFilterStartTimeStamp datetime = null OUTPUT,
- 	@previousFilterEndTimeStamp datetime = null OUTPUT
- AS
- BEGIN
-
- IF @testMode = 9
- BEGIN
- 	SELECT * FROM vehicle.etl_source WHERE container = @containerId
- END
-
- IF @testInOutParam IS NOT NULL SET @testInOutParam = 'after'
-
- RETURN 0
-
- END
-
- GO
-
-/* vehicle-15.10-15.11.sql */
-
-CREATE TABLE vehicle.etl_delete
-(
-  RowId INT IDENTITY(1,1),
-  container entityid,
-  created DATETIME,
-  modified DATETIME,
-
-  id VARCHAR(9),
-  name VARCHAR(100),
-  TransformRun INT,
-  rowversion rowversion,
-  CONSTRAINT PK_etldelete PRIMARY KEY (rowid),
-  CONSTRAINT AK_etldelete UNIQUE (container,id),
-  CONSTRAINT FK_etldelete_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
-);
-GO
-
-/* vehicle-15.20-15.21.sql */
-
--- =============================================
--- Author:		Tony Galuhn
--- Create date: 11/22/2013 / modified 1/28/2014
--- Description:	sp for ETL testing
--- =============================================
-CREATE PROCEDURE vehicle.etlTest
-	@transformRunId int,
-	@containerId entityId = NULL OUTPUT,
-	@rowsInserted int = 0 OUTPUT,
-	@rowsDeleted int = 0 OUTPUT,
-	@rowsModified int = 0 OUTPUT,
-	@returnMsg varchar(100) = 'default message' OUTPUT,
-	@debug varchar(1000) = '',
-	@filterRunId int = null,
-	@filterStartTimeStamp datetime = null,
-	@filterEndTimeStamp datetime = null,
-	@testMode int,
-	@testInOutParam varchar(10) = null OUTPUT,
-	@runCount int = 1 OUTPUT,
-	@previousFilterRunId int = null OUTPUT,
-	@previousFilterStartTimeStamp datetime = null OUTPUT,
-	@previousFilterEndTimeStamp datetime = null OUTPUT
-AS
-BEGIN
-
-/*
-	Test modes
-	1	normal operation
-	2	return code > 0
-	3	raise error
-	4	input/output parameter persistence
-	5	override of persisted input/output parameter
-	6	Run filter strategy, require @filterRunId. Test persistence.
-	7	Modified since filter strategy, require @filterStartTimeStamp & @filterEndTimeStamp. Test persistence.
-
-*/
-
-IF @testMode IS NULL
-BEGIN
-	SET @returnMsg = 'No testMode set'
-	RETURN 1
-END
-
-IF @testMode = 1
-BEGIN
-	print 'Test print statement logging'
-	SET @rowsInserted = 1
-	SET @rowsDeleted = 2
-	SET @rowsModified = 4
-	SET @returnMsg = 'Test returnMsg logging'
-	RETURN 0
-END
-
-IF @testMode = 2 RETURN 1
-
-IF @testMode = 3
-BEGIN
-	SET @returnMsg = 'Intentional SQL Exception From Inside Proc'
-	RAISERROR(@returnMsg, 11, 1)
-END
-
-IF @testMode = 4 AND @testInOutParam != 'after' AND @runCount > 1
-BEGIN
-	SET @returnMsg = 'Expected value "after" for @testInOutParam on run count = ' + convert(varchar, @runCount) + ', but was ' + @testInOutParam
-	RETURN 1
-END
-
-IF @testMode = 5 AND @testInOutParam != 'before' AND @runCount > 1
-BEGIN
-	SET @returnMsg = 'Expected value "before" for @testInOutParam on run count = ' + convert(varchar, @runCount) + ', but was ' + @testInOutParam
-	RETURN 1
-END
-
-IF @testMode = 6
-BEGIN
-	IF @filterRunId IS NULL
-	BEGIN
-		SET @returnMsg = 'Required @filterRunId value not supplied'
-		RETURN 1
-	END
-	IF @runCount > 1 AND (@previousFilterRunId IS NULL OR @previousFilterRunId <= @filterRunId)
-	BEGIN
-		SET @returnMsg = 'Required @filterRunId was not persisted from previous run.'
-		RETURN 1
-	END
-	SET @previousFilterRunId = @filterRunId
-END
-
-IF @testMode = 7
-BEGIN
-	IF @runCount > 1 AND (@previousFilterStartTimeStamp IS NULL OR @previousFilterEndTimeStamp IS NULL
-							OR @previousFilterStartTimeStamp <= @filterStartTimeStamp OR @previousFilterEndTimeStamp <= @filterEndTimeStamp)
-	BEGIN
-		SET @returnMsg = 'Required @filterStartTimeStamp or @filterEndTimeStamp were not persisted from previous run.'
-		RETURN 1
-	END
-	SET @previousFilterStartTimeStamp = @filterStartTimeStamp
-	SET @previousFilterEndTimeStamp = @filterEndTimeStamp
-END
-
--- set value for persistence tests
-IF @testInOutParam IS NOT NULL SET @testInOutParam = 'after'
-
-RETURN 0
-
-END
-GO
-
-/* vehicle-16.20-16.30.sql */
 
 -- For testing merge, need to have the PK on this table not be IDENTITY
 DROP TABLE vehicle.etl_target;
@@ -395,6 +150,85 @@ CREATE TABLE vehicle.etl_target(
   CONSTRAINT FK_etltarget_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
 );
 
+
+-- Undo change to this table from the 16.20-16.21 script. Make the merge test use etl_target2 instead
+DROP TABLE vehicle.etl_target;
+CREATE TABLE vehicle.etl_target(
+  RowId INT IDENTITY(1,1),
+  container entityid,
+  created DATETIME,
+  modified DATETIME,
+  id VARCHAR(9),
+  name VARCHAR(100),
+  diTransformRunId INT,
+
+  CONSTRAINT PK_etltarget PRIMARY KEY (rowid),
+  CONSTRAINT AK_etltarget UNIQUE (container,id),
+  CONSTRAINT FK_etltarget_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
+);
+
+DROP TABLE vehicle.etl_target;
+CREATE TABLE vehicle.etl_target2
+(
+  RowId INT NOT NULL,
+  container entityid,
+  created DATETIME,
+  modified DATETIME,
+
+  id VARCHAR(9),
+  name VARCHAR(100),
+  diTransformRunId INT,
+
+  CONSTRAINT PK_etltarget2 PRIMARY KEY (rowid),
+  CONSTRAINT AK_etltarget2 UNIQUE (container,id),
+  CONSTRAINT FK_etltarget2_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
+);
+
+TRUNCATE TABLE vehicle.etl_target2;
+ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT PK_etltarget2;
+ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT AK_etltarget2;
+ALTER TABLE vehicle.etl_target2 ALTER COLUMN container entityid NOT NULL;
+GO
+ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT AK_etltarget2 UNIQUE (Container, id);
+ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT PK_etltarget2 PRIMARY KEY (RowId, container);
+
+DROP TABLE vehicle.etl_target2;
+CREATE TABLE vehicle.Transfer
+(
+    RowId INT NOT NULL,
+    TransferStart DATETIME NOT NULL,
+	transferComplete DATETIME NULL,
+	schemaName NVARCHAR(100) NOT NULL,
+	description NVARCHAR(1000) NULL,
+	log NTEXT NULL,
+	status NVARCHAR(10) NULL,
+	container dbo.ENTITYID NULL
+);
+
+ALTER TABLE vehicle.Transfer ADD CONSTRAINT FK_etltransfer_container FOREIGN KEY(container)
+	REFERENCES core.Containers (EntityId)
+ALTER TABLE vehicle.transfer ADD CONSTRAINT PK_transfer PRIMARY KEY (rowid);
+GO
+
+DROP TABLE vehicle.transfer;
+CREATE TABLE vehicle.etl_delete
+(
+  RowId INT IDENTITY(1,1),
+  container entityid,
+  created DATETIME,
+  modified DATETIME,
+
+  id VARCHAR(9),
+  name VARCHAR(100),
+  TransformRun INT,
+  rowversion rowversion,
+  CONSTRAINT PK_etldelete PRIMARY KEY (rowid),
+  CONSTRAINT AK_etldelete UNIQUE (container,id),
+  CONSTRAINT FK_etldelete_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
+);
+GO
+
+DROP TABLE vehicle.etl_delete;
 
 CREATE TABLE vehicle.etl_180column_source(
   RowId int IDENTITY(1,1) NOT NULL,
@@ -582,6 +416,7 @@ CREATE TABLE vehicle.etl_180column_source(
   CONSTRAINT FK_etl_180column_source_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
 );
 
+DROP TABLE vehicle.etl_180column_source;
 CREATE TABLE vehicle.etl_180column_target(
   RowId int NOT NULL,
   container dbo.ENTITYID NULL,
@@ -768,69 +603,13 @@ CREATE TABLE vehicle.etl_180column_target(
   CONSTRAINT FK_etl_180column_target_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
 );
 
--- Undo change to this table from the 16.20-16.21 script. Make the merge test use etl_target2 instead
-DROP TABLE vehicle.etl_target;
-CREATE TABLE vehicle.etl_target(
-  RowId INT IDENTITY(1,1),
-  container entityid,
-  created DATETIME,
-  modified DATETIME,
-  id VARCHAR(9),
-  name VARCHAR(100),
-  diTransformRunId INT,
-
-  CONSTRAINT PK_etltarget PRIMARY KEY (rowid),
-  CONSTRAINT AK_etltarget UNIQUE (container,id),
-  CONSTRAINT FK_etltarget_container FOREIGN KEY (container) REFERENCES core.containers (entityid)
-);
-
-TRUNCATE TABLE vehicle.etl_target2;
-ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT PK_etltarget2;
-ALTER TABLE vehicle.etl_target2 DROP CONSTRAINT AK_etltarget2;
-ALTER TABLE vehicle.etl_target2 ALTER COLUMN container entityid NOT NULL;
-GO
-ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT AK_etltarget2 UNIQUE (Container, id);
-ALTER TABLE vehicle.etl_target2 ADD CONSTRAINT PK_etltarget2 PRIMARY KEY (RowId, container);
-
 TRUNCATE TABLE vehicle.etl_180column_target;
 ALTER TABLE vehicle.etl_180column_target DROP CONSTRAINT PK_etl_180column_target;
 ALTER TABLE vehicle.etl_180column_target ALTER COLUMN container entityid NOT NULL;
 GO
 ALTER TABLE vehicle.etl_180column_target ADD CONSTRAINT PK_etl_180column_target PRIMARY KEY (RowId, container);
 
-/* vehicle-16.30-17.10.sql */
-
-ALTER TABLE vehicle.Models
-    ADD InitialReleaseYear INT;
-
--- Drop tables / procedures for ETL testing from this schema; they've been moved to the etltest schema.
-DROP TABLE vehicle.etl_source;
-DROP TABLE vehicle.etl_target;
-DROP TABLE vehicle.etl_target2;
-DROP TABLE vehicle.transfer;
-DROP TABLE vehicle.etl_180column_source;
 DROP TABLE vehicle.etl_180column_target;
-DROP TABLE vehicle.etl_delete;
-
-DROP PROCEDURE vehicle.etlTest;
-DROP PROCEDURE vehicle.etlTestResultSet;
--- This procedure wasn't being used
-DROP PROCEDURE vehicle.etlMissingTransformRunId
-
--- These two tables seem to have been introduced for ETL testing, but were never used
-DROP TABLE vehicle.owner;
-DROP TABLE vehicle.ownerbackup;
-
-/* vehicle-17.10-17.20.sql */
-
-ALTER TABLE vehicle.Colors ADD TriggerScriptProperty NVARCHAR(100);
-
-/* vehicle-18.20-18.30.sql */
-
-ALTER TABLE vehicle.Models ADD ThumbnailImage NVARCHAR(60);
-ALTER TABLE vehicle.Models ADD Image NVARCHAR(60);
-ALTER TABLE vehicle.Models ADD PopupImage NVARCHAR(60);
-
 /* vehicle-19.20-19.30.sql */
 
 CREATE TABLE vehicle.FirstFKTable
@@ -849,6 +628,7 @@ CREATE TABLE vehicle.SecondFKTable
     CONSTRAINT PK_SecondFKTable PRIMARY KEY (RowId)
 );
 
+ALTER TABLE vehicle.FirstFKTable ADD CONSTRAINT FK_SecondFKTable_StartCycleCol FOREIGN KEY (StartCycleCol) REFERENCES vehicle.SecondFKTable (StartCycleCol);
 CREATE TABLE vehicle.ThirdFKTable
 (
     RowId INT IDENTITY(1,1),
@@ -857,17 +637,6 @@ CREATE TABLE vehicle.ThirdFKTable
     CONSTRAINT PK_ThirdFKTable PRIMARY KEY (RowId)
 );
 
-ALTER TABLE vehicle.FirstFKTable ADD CONSTRAINT FK_SecondFKTable_StartCycleCol FOREIGN KEY (StartCycleCol) REFERENCES vehicle.SecondFKTable (StartCycleCol);
 ALTER TABLE vehicle.SecondFKTable ADD CONSTRAINT FK_ThirdFKTable_CycleCol FOREIGN KEY (CycleCol) REFERENCES vehicle.ThirdFKTable (CycleCol);
 ALTER TABLE vehicle.ThirdFKTable ADD CONSTRAINT FK_SecondFKTable_CycleCol FOREIGN KEY (CycleCol) REFERENCES vehicle.SecondFKTable (CycleCol);
 
-/* 21.xxx SQL scripts */
-
-ALTER TABLE vehicle.Vehicles ADD TriggerScriptContainer ENTITYID;
-
-/* 22.xxx SQL scripts */
-
-IF COL_LENGTH('vehicle.Vehicles', 'TriggerScriptContainer') IS NULL
-BEGIN
-ALTER TABLE vehicle.Vehicles ADD TriggerScriptContainer ENTITYID;
-END;
