@@ -1,11 +1,13 @@
 package org.labkey.test.components.domain;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Optional;
 
@@ -62,8 +64,11 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         {
             elementCache().expandToggle.click();
             waitFor(() -> isExpanded() == expand, "Panel failed to " + (expand ? "expand" : "collapse"), 2_000);
-            getWrapper().shortWait()
-                    .until(LabKeyExpectedConditions.animationIsDone(elementCache().panelBody)); // wait for transition to happen
+
+            // wait for transition to happen and no spinners to be present
+            getWrapper().longWait()
+                    .until(ExpectedConditions.and(LabKeyExpectedConditions.animationIsDone(elementCache().panelBody),
+                            ExpectedConditions.numberOfElementsToBe(BootstrapLocators.loadingSpinner, 0)));
         }
         return getThis();
     }

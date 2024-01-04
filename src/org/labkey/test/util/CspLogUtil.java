@@ -101,13 +101,30 @@ public class CspLogUtil
                         errorMessage.append(": ").append(urls.iterator().next());
                     }
                 }
-                throw new AssertionError(errorMessage);
+                throw new CspWarningDetectedException(errorMessage);
             }
             finally
             {
                 lastSize = logSize;
                 lastModified = modified;
             }
+        }
+    }
+
+    public static void resetCspLogMark()
+    {
+        if (TestProperties.isCspCheckSkipped() || TestProperties.isServerRemote() || !logFile.isFile())
+            return;
+
+        lastSize = logFile.length();
+        lastModified = logFile.lastModified();
+    }
+
+    public static class CspWarningDetectedException extends AssertionError
+    {
+        public CspWarningDetectedException(Object detailMessage)
+        {
+            super(detailMessage);
         }
     }
 }

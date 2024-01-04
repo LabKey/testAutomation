@@ -63,7 +63,31 @@ import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
-import org.labkey.test.util.*;
+import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.AbstractAssayHelper;
+import org.labkey.test.util.AbstractContainerHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.ArtifactCollector;
+import org.labkey.test.util.ComponentQuery;
+import org.labkey.test.util.Crawler;
+import org.labkey.test.util.CspLogUtil;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DebugUtils;
+import org.labkey.test.util.DeferredErrorCollector;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.Log4jUtils;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.ReadOnlyTest;
+import org.labkey.test.util.SecurityHelper;
+import org.labkey.test.util.SimpleHttpResponse;
+import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.query.QueryUtils;
@@ -77,7 +101,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.WebStorage;
-import org.openqa.selenium.html5.LocalStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -602,6 +625,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 // Running locally, pre-test errors are unlikely to be interesting. Clear them out.
                 resetErrors();
+                CspLogUtil.resetCspLogMark();
             }
             checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
@@ -1541,6 +1565,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 throw new AssertionError("Crawler triggered some server-side errors.");
             }
             goToHome(); // Make sure crawler doesn't leave browser on a bad page
+
+            CspLogUtil.checkNewCspWarnings(getArtifactCollector());
         }
     }
 

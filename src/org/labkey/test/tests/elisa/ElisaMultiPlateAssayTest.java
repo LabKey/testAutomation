@@ -15,13 +15,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayDataPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.elisa.ElisaRunDetailsPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -29,10 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -41,7 +37,6 @@ import static org.junit.Assert.assertTrue;
 @Category({Daily.class, Assays.class})
 public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
 {
-    public final String EXP_FEATURE = "elisaMultiPlateSupport";
     static final File TEST_ASSAY_ELISA_FILE1 = TestFileUtils.getSampleData("Elisa/biotek_01.xlsx");
     static final File THREE_PLATE_MSD = TestFileUtils.getSampleData("Elisa/3plateMSD.csv");
 
@@ -77,57 +72,12 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testHighSpeedPlateTemplateIsNotAvailableWithoutExpFlagEnabled()
-    {
-        String highSpeedTemplateName = "new 384 well (16x24) ELISA high-throughput (multi plate) template";
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
-        PlateTemplateListPage listPage = PlateTemplateListPage.beginAt(this, getProjectName());
-        assertThat("don't expect to see high-throughput ELISA options if exp feature is disabled",
-                listPage.getTemplateOptions(), not(hasItem(highSpeedTemplateName)));
-
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
-        listPage = PlateTemplateListPage.beginAt(this, getProjectName());
-        assertThat("expect to see high-throughput ELISA option now with exp feature enabled",
-                listPage.getTemplateOptions(), hasItem(highSpeedTemplateName));
-    }
-
-    @Test
-    public void testExpFlagChangesAssayOptions() throws Exception
-    {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
-        String assayName = "test_assay_for_input_format_options";
-        String plateName = "high_speed_384";
-        createPlateTemplate(16, 24, "high-throughput (multi plate)", plateName );
-
-        Protocol newAssay = getProtocolWithPlateTemplate(assayName, "ELISA", plateName);
-        saveProtocol(createDefaultConnection(), newAssay);
-        ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
-
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(assayName));
-
-        ReactAssayDesignerPage designerPage = _assayHelper.clickEditAssayDesign();
-        assertFalse("metadata input format is not present if exp flag is not set",
-                designerPage.isMetadataInputFormatSelectPresent());
-
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
-        refresh();
-        designerPage = new ReactAssayDesignerPage(getDriver());
-        assertTrue("metadata input format should be present if exp flag is set",
-                designerPage.isMetadataInputFormatSelectPresent());
-
-        assertThat("default input format should be Manual",
-                designerPage.getMetadataInputFormat(), is("Manual"));
-    }
-
-    @Test
     public void testDetailsViewResiliencyWithRenamedFields() throws Exception
     {
         // arrange
         String assayName = "test_AssayWithDifferentFieldNames";
         String plateTemplateName = "high_speed_tangent";
         String runId = "has different spot and plate";
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
 
         createPlateTemplate(16, 24, "high-throughput (multi plate)", plateTemplateName);
         Protocol newAssayProtocol = getProtocolWithPlateTemplate(assayName, "ELISA", plateTemplateName);
@@ -170,7 +120,6 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
         String assayName = "test_high_throughput_assay_with_4_Param";
         String plateTemplateName = "high_speed_fancy";
         String runId = "high-speed multiplate 4Param";
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
 
         createPlateTemplate(16, 24, "high-throughput (multi plate)", plateTemplateName);
         Protocol newAssayProtocol = getProtocolWithPlateTemplate(assayName, "ELISA", plateTemplateName);
@@ -212,7 +161,6 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
         String assayName = "test_high_throughput_assay_with_linear_curve";
         String plateTemplateName = "high_speed_regular";
         String runId = "high-speed multiplate Linear";
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
 
         createPlateTemplate(16, 24, "high-throughput (multi plate)", plateTemplateName);
         Protocol newAssayProtocol = getProtocolWithPlateTemplate(assayName, "ELISA", plateTemplateName);
@@ -252,7 +200,6 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
     {
         String assayName = "test_regular_assay_with_linear_curve";
         String plateTemplateName = "new 96 well template";
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(), EXP_FEATURE);
 
         createPlateTemplate(8, 12, "default", plateTemplateName);
         Protocol newAssayProtocol = getProtocolWithPlateTemplate(assayName, "ELISA", plateTemplateName);

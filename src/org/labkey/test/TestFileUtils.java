@@ -72,7 +72,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Static methods for finding finding and reading test-related files
+ * Static methods for finding and reading test-related files
  */
 public abstract class TestFileUtils
 {
