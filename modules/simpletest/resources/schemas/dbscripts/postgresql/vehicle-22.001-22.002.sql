@@ -1,1 +1,0 @@
-ALTER TABLE vehicle.Vehicles ADD COLUMN IF NOT EXISTS TriggerScriptContainer ENTITYID;
