@@ -33,7 +33,6 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -175,7 +174,7 @@ public class AuditLogTest extends BaseWebDriverTest
     protected ArrayList<String> getAuditLogFromFile() throws IOException
     {
         ArrayList<String> auditLog = new ArrayList<>();
-        File auditLogFile = new File(TestProperties.getTomcatHome(), "logs/labkey-audit.log");
+        File auditLogFile = new File(TestFileUtils.getServerLogDir(), "labkey-audit.log");
 
         try (FileReader fileReader = new FileReader(auditLogFile))
         {
