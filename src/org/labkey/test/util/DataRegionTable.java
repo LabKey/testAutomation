@@ -975,7 +975,7 @@ public class DataRegionTable extends DataRegion
         TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + getDataRegionName() + " for " + columnName);
         clickColumnMenu(columnName, false, "Summary Statistics...");
 
-        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(this);
 
         if (expectedValue != null)
             assertEquals("Stat value not as expected for: " + stat, expectedValue, statsWindow.getValue(stat));
@@ -991,7 +991,7 @@ public class DataRegionTable extends DataRegion
     public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue, String filterDescription)
     {
         clickColumnMenu(columnName, false, "Summary Statistics...");
-        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(this);
         assertEquals("Stat value not as expected for " + stat + " with filter " + filterDescription, expectedValue, statsWindow.getValue(stat));
         statsWindow.cancel();
     }
