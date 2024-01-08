@@ -1576,7 +1576,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             final List<String> descriptions = pipelineStatusTable.getColumnDataAsText("Description");
             fail("Timed out waiting for pipeline job to start. Waiting on " + (descriptions.isEmpty() ? "<unknown>" : descriptions));
         }
-        assertEquals("Running pipeline jobs were found.  Timeout:" + timeoutMilliseconds + "sec", 0, statusValues.size() - getFinishedCount(statusValues));
+        assertEquals("Running pipeline jobs were found. Timeout: " + timeoutMilliseconds + "ms", 0, statusValues.size() - getFinishedCount(statusValues));
 
         return statusValues;
     }

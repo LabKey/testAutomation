@@ -3,9 +3,9 @@ subprojects { Project p ->
     if (p.getProjectDir().exists())
     {
         if (p.file("src").exists())
-            apply plugin: 'org.labkey.module'
+            apply plugin: 'org.labkey.build.module'
         else
-            apply plugin: 'org.labkey.fileModule'
+            apply plugin: 'org.labkey.build.fileModule'
     }
 }
 
