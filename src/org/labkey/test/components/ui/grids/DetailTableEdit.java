@@ -30,6 +30,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebElement _formElement;
     private final WebDriver _driver;
     private String _title;
+    private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -54,6 +55,12 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         if (_title == null)
             _title = elementCache().header.getText();
         return _title;
+    }
+
+    public DetailTableEdit setReadyTimeout(int readyTimeout)
+    {
+        _readyTimeout = readyTimeout;
+        return this;
     }
 
     /**
@@ -264,18 +271,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return reactSelect.getValue();
     }
 
-    /**
-     * clears the selections from the specified reactSelect
-     * @param fieldCaption The label text for the select box
-     * @return A reference to the current object
-     */
-    public DetailTableEdit clearSelectionValues(String fieldCaption)
-    {
-        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
-        reactSelect.clearSelection();
-        return this;
-    }
-
     /*
         This allows you to query a given select in the edit panel to see what options it offers
      */
@@ -329,7 +324,10 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        elementCache().findSelect(fieldCaption).clearSelection();
+        var select = elementCache().findSelect(fieldCaption);
+        WebDriverWrapper.waitFor(()-> select.hasSelection(),
+            String.format("The %s select did not have any selection in time", fieldCaption), _readyTimeout);
+        select.clearSelection();
         return this;
     }
 
