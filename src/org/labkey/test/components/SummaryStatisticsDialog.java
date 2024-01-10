@@ -18,6 +18,7 @@ package org.labkey.test.components;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -29,11 +30,12 @@ import static org.junit.Assert.assertEquals;
 public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.ElementCache>
 {
     private static final String DIALOG_TITLE = "Summary Statistics";
+    private final int timeoutMs;
 
-    public SummaryStatisticsDialog(WebDriver driver)
+    public SummaryStatisticsDialog(DataRegionTable drt)
     {
-        super(DIALOG_TITLE, driver);
-        elementCache().statTableLoc.waitForElement(this, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        super(DIALOG_TITLE, drt.getDriver());
+        this.timeoutMs = drt.getUpdateTimeout();
     }
 
     public void apply()
@@ -108,8 +110,13 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
         return new ElementCache();
     }
 
-    protected class ElementCache extends Window.ElementCache
+    protected class ElementCache extends Window<?>.ElementCache
     {
+        public ElementCache()
+        {
+            statTableLoc.waitForElement(this, timeoutMs);
+        }
+
         Locator.XPathLocator statTableLoc = Locator.tagWithClass("table", "stat-table");
         Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClassContaining("tr", "lk-stats-row"));
         Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "lk-stats-label"));
