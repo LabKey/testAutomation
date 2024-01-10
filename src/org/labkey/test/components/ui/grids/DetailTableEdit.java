@@ -329,7 +329,10 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        elementCache().findSelect(fieldCaption).clearSelection();
+        var select = elementCache().findSelect(fieldCaption);
+        WebDriverWrapper.waitFor(()-> select.hasSelection(),
+            String.format("The %s select did not have any selection in time"), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        select.clearSelection();
         return this;
     }
 
