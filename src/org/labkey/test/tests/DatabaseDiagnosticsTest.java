@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestProperties;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.CustomModules;
@@ -27,9 +27,9 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
-import org.labkey.test.util.Order;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -78,11 +78,8 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void testTomcatLogs() throws Exception
     {
-        File tomcatHome = TestProperties.getTomcatHome();
-        assertTrue("Specified tomcat.home does not exist: " + tomcatHome +
-                "\nMake sure CATALINA_HOME is set or specify 'tomcat.home' when running tests",
-                tomcatHome != null && tomcatHome.exists());
-        File logDir = new File(tomcatHome, "logs");
+        File logDir = TestFileUtils.getServerLogDir();
+        assertTrue("Server log directory does not exist: " + logDir, logDir.isDirectory());
         File[] logs = logDir.listFiles();
         Map<File, Integer> contaminatedLogs = Grep.grep(PasswordUtil.getPassword(), logs);
         Map<String, String> failureFiles = new TreeMap<>();
@@ -90,7 +87,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 file -> failureFiles.put(file.getName(), "line " + contaminatedLogs.get(file)));
 
         assertTrue(String.format("These tomcat logs (in %s) contained unwanted text [%s]:\n%s",
-                tomcatHome.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles.toString()),
+                logDir.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles.toString()),
                 failureFiles.isEmpty());
     }
 
