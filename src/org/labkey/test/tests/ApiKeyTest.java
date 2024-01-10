@@ -33,13 +33,21 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.TestUser;
 import org.labkey.test.util.URLBuilder;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,11 +71,13 @@ public class ApiKeyTest extends BaseWebDriverTest
     private static final String APIKEYS_TABLE = "APIKeys";
     private static final String CRYPT_COLUMN = "crypt";
     private static final String API_USERNAME = "apikey";
+    private static final TestUser EDITOR_USER = new TestUser("editor@apikey.test");
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+        _userHelper.deleteUsers(false, EDITOR_USER);
     }
 
     @BeforeClass
@@ -81,6 +91,10 @@ public class ApiKeyTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
+
+        EDITOR_USER.create(this)
+                .setPassword(PasswordUtil.getPassword())
+                .addPermission("Editor", getProjectName());
     }
 
     @Test
@@ -94,6 +108,13 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         String apiKey = generateSessionKey();
 
+        verifyValidAPIKey(apiKey);
+
+        log("Verify session key remains valid if key generation is turned off");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowSessionKeys(false)
+                .save();
         verifyValidAPIKey(apiKey);
 
         signOut();
@@ -134,7 +155,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         try
         {
             GetSchemasCommand cmd = new GetSchemasCommand();
-            GetSchemasResponse resp = cmd.execute(cn, getProjectName());
+            cmd.execute(cn, getProjectName());
             if (isSessionKey)
                 fail("Session key didn't invalidate after logout");
             else
@@ -145,6 +166,29 @@ public class ApiKeyTest extends BaseWebDriverTest
             assertEquals("Wrong response for invalid " + (isSessionKey ? "session" : "API") + " key", HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
             log("Success: command failed as expected.");
         }
+    }
+
+    @Test
+    public void testNonAdminUser() throws IOException
+    {
+        log("Ensure apiKey generation is enabled.");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
+                .save();
+        signOut();
+
+        log("Log in as non-admin user.");
+        signIn(EDITOR_USER.getEmail(), EDITOR_USER.getPassword());
+        String apiKey = generateAPIKey();
+        verifyValidAPIKey(apiKey);
+
+        QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
+        int beforeDeleteCount = grid.getRecordCount();
+        grid = deleteAPIKeyViaUI();
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
+        verifyInvalidAPIKey(apiKey);
     }
 
     @Test
@@ -163,12 +207,25 @@ public class ApiKeyTest extends BaseWebDriverTest
         verifyValidAPIKey(apiKey);
         log("Verify active API key via basic authentication");
         verifyValidAPIKey(apiKey, true);
+
+        log("Generate two other keys for use in testing deletion.");
+        generateAPIKey();
+        generateAPIKey();
+        QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
+        int beforeDeleteCount = grid.getRecordCount();
+        grid = deleteAPIKeyViaUI();
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
+
         log("Verify existing active API key with disabled api key setting");
         goToAdminConsole()
                 .clickSiteSettings()
                 .setAllowApiKeys(false)
                 .save();
         verifyValidAPIKey(apiKey);
+
+        log("Verify key deletion via UI with disabled api key generation works.");
+        grid = deleteAPIKeyViaUI();
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-2, grid.getRecordCount());
 
         // skip testing api key expiration since it's already covered in unit test and 10 seconds expiration option is dev mode only
 
@@ -178,7 +235,30 @@ public class ApiKeyTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAPIKeysPermissions() throws IOException
+    public void testApiKeysImpersonation() throws IOException
+    {
+        log("Verify key table and generation are not available while impersonating");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
+                .save()
+                .clickSiteSettings()
+                .setAllowSessionKeys(true)
+                .save();
+        List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
+        generateAPIKey(_generatedApiKeys);
+        goToProjectHome();
+        impersonate(EDITOR_USER.getEmail());
+        goToExternalToolPage();
+        List<WebElement> banners = Locator.byClass(BootstrapLocators.BannerType.WARNING.getCss()).findElements(this.getDriver());
+        assertEquals("Number of warning banners not as expected", 2, banners.size());
+        assertEquals("API key generation warning not as expected", "API key generation is not available while impersonating.", banners.get(0).getText());
+        assertEquals("Session key generation warning not as expected", "Session key generation is not available while impersonating.", banners.get(1).getText());
+    }
+
+    @Test
+    public void testAPIKeysTablePermissions() throws IOException
     {
         log("Verify " + APIKEYS_TABLE + " table is accessible for admin");
         verifyAPIKeysTablePresence(true);
@@ -262,6 +342,18 @@ public class ApiKeyTest extends BaseWebDriverTest
         assertEquals(isAdmin, isElementPresent(apiTableLoc));
     }
 
+    private QueryGrid deleteAPIKeyViaUI()
+    {
+        goToExternalToolPage();
+        waitForText("API keys are used to authorize");
+        QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
+        grid.selectRow(0, true);
+        grid.getGridBar().clickButton("Delete");
+        ModalDialog dialog = new ModalDialog.ModalDialogFinder(this.getDriver()).find();
+        dialog.dismiss("Yes, Delete");
+        return new QueryGrid.QueryGridFinder(getDriver()).waitFor();
+    }
+
     private void deleteAPIKeys(List<Map<String, Object>> _generatedApiKeys) throws IOException
     {
         Connection cn = WebTestHelper.getRemoteApiConnection();
@@ -281,17 +373,22 @@ public class ApiKeyTest extends BaseWebDriverTest
     {
         goToExternalToolPage();
         waitForText("API keys are used to authorize");
-        clickButton("Generate session key", 0);
-        waitForFormElementToNotEqual(Locator.inputById("session-token"), "");
-        return Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
+        clickButton("Generate Session Key", 0);
+        waitForFormElementToNotEqual(Locator.inputByNameContaining("session_token"), "");
+        return Locator.inputByNameContaining("session_token").findElement(getDriver()).getAttribute("value");
+    }
+
+    private String generateAPIKey()
+    {
+        goToExternalToolPage();
+        clickButton("Generate API Key", 0);
+        waitForFormElementToNotEqual(Locator.inputByNameContaining("apikey_token"), "");
+        return Locator.inputByNameContaining("apikey_token").findElement(getDriver()).getAttribute("value");
     }
 
     private String generateAPIKey(List<Map<String, Object>> _generatedApiKeys) throws IOException
     {
-        goToExternalToolPage();
-        clickButton("Generate API key", 0);
-        waitForFormElementToNotEqual(Locator.inputById("apikey-token"), "");
-        String apiKey = Locator.inputById("apikey-token").findElement(getDriver()).getAttribute("value");
+        String apiKey = generateAPIKey();
         // get record
         _generatedApiKeys.add(getLastAPIKeyRecord());
         return apiKey;
