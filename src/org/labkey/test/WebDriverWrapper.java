@@ -264,6 +264,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
                     options.addArguments("disable-infobars");
+                    options.addArguments("short-reporting-delay");
                     if (TestProperties.isRunWebDriverHeadless())
                     {
                         TestLogger.warn("Launching Chrome in headless mode. This is still experimental");

@@ -40,7 +40,7 @@ project.dependencies {
     implementation("com.google.guava:guava:${guavaVersion}")
     api("org.apache.httpcomponents.core5:httpcore5:${httpcore5Version}")
     api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
-    api("org.hamcrest:hamcrest-core:${hamcrestCoreVersion}")
+    api("org.hamcrest:hamcrest:${hamcrestVersion}")
     implementation("org.apache.commons:commons-text:${commonsTextVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
