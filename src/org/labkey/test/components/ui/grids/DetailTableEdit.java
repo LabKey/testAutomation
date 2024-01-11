@@ -30,7 +30,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebElement _formElement;
     private final WebDriver _driver;
     private String _title;
-    private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+    private int _readyTimeout = 1000;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
