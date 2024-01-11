@@ -324,23 +324,28 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        return clearSelectValue(fieldCaption, true);
+        return clearSelectValue(fieldCaption, true, true);
     }
 
     /**
      * Clear a given select field
      * @param fieldCaption The caption/label of the field to clear.
      * @param waitForSelection If true, wait for the select to have a selection before clearing it
-     *                         and assert if no selection appears
+     * @param assertSelection  If true, assert if no selection appears (note: does nothing if waitForSelection is not true)
      * @return
      */
-    public DetailTableEdit clearSelectValue(String fieldCaption, boolean waitForSelection)
+    public DetailTableEdit clearSelectValue(String fieldCaption, boolean waitForSelection, boolean assertSelection)
     {
         var select = elementCache().findSelect(fieldCaption);
         if (waitForSelection)
         {
-            WebDriverWrapper.waitFor(() -> select.hasSelection(),
-                    String.format("The %s select did not have any selection in time", fieldCaption), _readyTimeout);
+            if (assertSelection) {
+                WebDriverWrapper.waitFor(() -> select.hasSelection(),
+                        String.format("The %s select did not have any selection in time", fieldCaption), _readyTimeout);
+            }
+            else {
+                WebDriverWrapper.waitFor(() -> select.hasSelection(), _readyTimeout);
+            }
         }
         select.clearSelection();
         return this;
