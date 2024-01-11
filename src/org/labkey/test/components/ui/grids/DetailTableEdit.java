@@ -30,7 +30,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebElement _formElement;
     private final WebDriver _driver;
     private String _title;
-    private int _readyTimeout = 1000;
+    private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -344,7 +344,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                         String.format("The %s select did not have any selection in time", fieldCaption), _readyTimeout);
             }
             else {
-                WebDriverWrapper.waitFor(() -> select.hasSelection(), _readyTimeout);
+                WebDriverWrapper.waitFor(() -> select.hasSelection(), 1000);
             }
         }
         select.clearSelection();
