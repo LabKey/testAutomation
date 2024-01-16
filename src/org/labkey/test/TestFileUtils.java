@@ -81,6 +81,7 @@ public abstract class TestFileUtils
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;
+    private static File _baseFileRoot = null;
     private static Set<File> _sampledataDirs = null;
 
     public static String getFileContents(String rootRelativePath)
@@ -186,6 +187,20 @@ public abstract class TestFileUtils
         return _buildDir;
     }
 
+    private static File getBaseFileRoot()
+    {
+        if (_baseFileRoot == null)
+        {
+            _baseFileRoot = new File(getDefaultDeployDir(), "files");
+            if (TestProperties.isEmbeddedTomcat() && !_baseFileRoot.isDirectory())
+            {
+                // File root when deploying from embedded distribution
+                _baseFileRoot = new File(getDefaultDeployDir(), "server/files");
+            }
+        }
+        return _baseFileRoot;
+    }
+
     public static File getGradleReportDir()
     {
         return new File(getTestBuildDir(), "test/logs/reports");
@@ -198,12 +213,12 @@ public abstract class TestFileUtils
 
     public static File getDefaultFileRoot(String containerPath)
     {
-        return new File(getLabKeyRoot(), "build/deploy/files/" + containerPath + "/@files");
+        return new File(getBaseFileRoot(), containerPath + "/@files");
     }
 
     public static String getDefaultWebAppRoot()
     {
-        File path = new File(getLabKeyRoot(), "build/deploy/labkeyWebapp");
+        File path = new File(getDefaultDeployDir(), "labkeyWebapp");
         return path.toString();
     }
 
