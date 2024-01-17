@@ -3410,8 +3410,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void actionClear(WebElement input)
     {
-        String osName = System.getProperty("os.name");
-        Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
         scrollIntoView(input);
         new Actions(getDriver())
             .keyDown(cmdKey)
@@ -3429,8 +3428,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void actionPaste(WebElement input, String text)
     {
-        String osName = System.getProperty("os.name");
-        Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
 
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         StringSelection sel = new StringSelection(text);

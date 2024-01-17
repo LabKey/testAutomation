@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.labkey.remoteapi.NetrcFileParser;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.WebTestHelper;
@@ -84,7 +85,7 @@ public class PasswordUtil
 
     private static File getNetrcFile()
     {
-        return new File(System.getProperty("user.home"), System.getProperty("os.name").toLowerCase().contains("win") ? "_netrc" : ".netrc");
+        return new File(System.getProperty("user.home"), SystemUtils.IS_OS_WINDOWS ? "_netrc" : ".netrc");
     }
 
     private static String getHost()
