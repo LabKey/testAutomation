@@ -81,7 +81,7 @@ public abstract class TestFileUtils
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;
-    private static File _baseFileRoot = null;
+    private static File _modulesDir = null;
     private static Set<File> _sampledataDirs = null;
 
     public static String getFileContents(String rootRelativePath)
@@ -189,16 +189,8 @@ public abstract class TestFileUtils
 
     private static File getBaseFileRoot()
     {
-        if (_baseFileRoot == null)
-        {
-            _baseFileRoot = new File(getDefaultDeployDir(), "files");
-            if (TestProperties.isEmbeddedTomcat() && !_baseFileRoot.isDirectory())
-            {
-                // File root when deploying from embedded distribution
-                _baseFileRoot = new File(getDefaultDeployDir(), "embedded/server/files");
-            }
-        }
-        return _baseFileRoot;
+        // Files are a sibling of the modules directory
+        return new File(getModulesDir().getParentFile(), "files");
     }
 
     public static File getGradleReportDir()
@@ -206,9 +198,27 @@ public abstract class TestFileUtils
         return new File(getTestBuildDir(), "test/logs/reports");
     }
 
-    public static File getDefaultDeployDir()
+    /**
+     * Private because deployment structure varies between Non-embedded, locally built embedded, and deployed embedded
+     * distribution.
+     */
+    private static File getDefaultDeployDir()
     {
         return new File(getLabKeyRoot(), "build/deploy");
+    }
+
+    public static File getModulesDir()
+    {
+        if (_modulesDir == null)
+        {
+            _modulesDir = new File(getDefaultDeployDir(), "modules");
+            if (TestProperties.isEmbeddedTomcat() && !_modulesDir.isDirectory())
+            {
+                // Module root when deploying from embedded distribution
+                _modulesDir = new File(getDefaultDeployDir(), "embedded/server/modules");
+            }
+        }
+        return _modulesDir;
     }
 
     public static File getDefaultFileRoot(String containerPath)
@@ -218,7 +228,12 @@ public abstract class TestFileUtils
 
     public static String getDefaultWebAppRoot()
     {
-        File path = new File(getDefaultDeployDir(), "labkeyWebapp");
+        File path = new File(getModulesDir().getParentFile(), "labkeyWebapp");
+        if (!path.isDirectory())
+        {
+            // Casing is different when deployed from an embedded distribution
+            path = new File(getModulesDir().getParentFile(), "labkeywebapp");
+        }
         return path.toString();
     }
 
