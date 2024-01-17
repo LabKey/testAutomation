@@ -30,6 +30,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebElement _formElement;
     private final WebDriver _driver;
     private String _title;
+    private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -54,6 +55,12 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         if (_title == null)
             _title = elementCache().header.getText();
         return _title;
+    }
+
+    public DetailTableEdit setReadyTimeout(int readyTimeout)
+    {
+        _readyTimeout = readyTimeout;
+        return this;
     }
 
     /**
@@ -264,18 +271,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return reactSelect.getValue();
     }
 
-    /**
-     * clears the selections from the specified reactSelect
-     * @param fieldCaption The label text for the select box
-     * @return A reference to the current object
-     */
-    public DetailTableEdit clearSelectionValues(String fieldCaption)
-    {
-        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
-        reactSelect.clearSelection();
-        return this;
-    }
-
     /*
         This allows you to query a given select in the edit panel to see what options it offers
      */
@@ -329,7 +324,30 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        elementCache().findSelect(fieldCaption).clearSelection();
+        return clearSelectValue(fieldCaption, true, true);
+    }
+
+    /**
+     * Clear a given select field
+     * @param fieldCaption The caption/label of the field to clear.
+     * @param waitForSelection If true, wait for the select to have a selection before clearing it
+     * @param assertSelection  If true, assert if no selection appears (note: does nothing if waitForSelection is not true)
+     * @return
+     */
+    public DetailTableEdit clearSelectValue(String fieldCaption, boolean waitForSelection, boolean assertSelection)
+    {
+        var select = elementCache().findSelect(fieldCaption);
+        if (waitForSelection)
+        {
+            if (assertSelection) {
+                WebDriverWrapper.waitFor(() -> select.hasSelection(),
+                        String.format("The %s select did not have any selection in time", fieldCaption), _readyTimeout);
+            }
+            else {
+                WebDriverWrapper.waitFor(() -> select.hasSelection(), 1000);
+            }
+        }
+        select.clearSelection();
         return this;
     }
 
