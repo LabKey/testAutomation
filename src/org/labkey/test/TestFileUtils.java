@@ -195,7 +195,7 @@ public abstract class TestFileUtils
             if (TestProperties.isEmbeddedTomcat() && !_baseFileRoot.isDirectory())
             {
                 // File root when deploying from embedded distribution
-                _baseFileRoot = new File(getDefaultDeployDir(), "server/files");
+                _baseFileRoot = new File(getDefaultDeployDir(), "embedded/server/files");
             }
         }
         return _baseFileRoot;
