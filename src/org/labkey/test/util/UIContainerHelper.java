@@ -44,6 +44,18 @@ public class UIContainerHelper extends AbstractContainerHelper
     @LogMethod
     protected void doCreateProject(String projectName, String folderType)
     {
+        doCreateProject(projectName, folderType, null);
+    }
+
+    @LogMethod
+    public void createProjectFromTemplate(String projectName, String templateFolder)
+    {
+        doCreateProject(projectName, "Create From Template Folder", templateFolder);
+    }
+
+    @LogMethod
+    private void doCreateProject(String projectName, String folderType, String templateFolder)
+    {
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();
         _test.goToCreateProject();
@@ -51,7 +63,17 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.setFormElement(Locator.name("name"), projectName);
 
         if (null != folderType && !folderType.equals("None"))
-            _test.click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
+        {
+            _test.click(Locator.xpath("//td[./label[text()='" + folderType + "']]/input"));
+            if (folderType.equals("Create From Template Folder"))
+            {
+                _test._ext4Helper.waitForMaskToDisappear();
+                _test._ext4Helper.selectComboBoxItem(Locator.xpath("//div")
+                        .withClass("labkey-wizard-header")
+                        .withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
+                _test._ext4Helper.checkCheckbox("Include Subfolders");
+            }
+        }
         else
         {
             _test.click(Locator.xpath("//td[./label[text()='Custom']]/input"));

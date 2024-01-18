@@ -99,7 +99,7 @@ public class SecurityLDAPTest extends BaseWebDriverTest
         }
         signOut();
 
-        // test: attempt login via ladap and confirm message displayed on login screen
+        // test: attempt login via LDAP and confirm message displayed on login screen
         attemptSignIn(LDAP_USER, LDAP_USER_PASSWORD);
         assertTitleEquals("Sign In");
         assertTextPresent("to have your account created.");

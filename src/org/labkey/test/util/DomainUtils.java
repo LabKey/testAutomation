@@ -3,9 +3,8 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
-import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
@@ -54,10 +53,10 @@ public final class DomainUtils
     public static boolean doesDomainExist(final String containerPath, final String schema, final String queryName)
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        GetDomainCommand cmd = new GetDomainCommand(schema, queryName);
+        GetDomainDetailsCommand cmd = new GetDomainDetailsCommand(schema, queryName);
         try
         {
-            DomainResponse response = cmd.execute(connection, containerPath);
+            cmd.execute(connection, containerPath);
             return true;
         }
         catch (CommandException ce)

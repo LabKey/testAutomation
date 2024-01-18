@@ -4,7 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.components.react.MultiMenu;
-import org.openqa.selenium.NoSuchElementException;
+import org.labkey.test.components.ui.pipeline.ImportsPage;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -36,8 +36,8 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         String text = "0";
         boolean stale = true;
 
-        // Bit of a challenge to get the count. The element can update (because, you know it's async) if it does then a
-        // StaleElementException will happen. Try to protect against that by getting the element again f stale.
+        // Bit of a challenge to get the count. The element can update (because, you know, it's async) if it does then a
+        // StaleElementException will happen. Try to protect against that by getting the element again if stale.
         // If it is not there at all it will return null and exit the loop gracefully.
         while(stale)
         {
@@ -115,6 +115,15 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         elementCache().markAll().click();
     }
 
+    public ImportsPage clickViewAll()
+    {
+        expand();
+        WebDriverWrapper.waitFor(elementCache().viewAllLink::isDisplayed,
+                "View all link did not become visible.", 2_500);
+        elementCache().viewAllLink.click();
+        return new ImportsPage(getWrapper());
+    }
+
     /**
      * Private helper to make sure that the list of notifications has been populated.
      *
@@ -125,27 +134,18 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         expand();
 
-        // Wait for the listing container to show up.
+        // Wait for the listing container to show up. The listing container is in the open menu, scope the search to that.
         Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
-        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(this).isDisplayed(),
+        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(elementCache().findOpenMenu()).isDisplayed(),
                 "List container did not render.", 500);
 
-        WebElement listContainer = notificationsContainerLocator.findElement(this);
-        Locator notificationListLocator = Locator.tagWithClass("ul", "server-notifications-listing");
+        // Find again (lambda requires a final reference to the component).
+        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().findOpenMenu());
 
         // It may be a moment before any notifications show up.
-        WebDriverWrapper.waitFor(()->
-
-                {
-                    try
-                    {
-                        return notificationListLocator.findElement(listContainer).isDisplayed();
-                    }
-                    catch (NoSuchElementException | StaleElementReferenceException exception)
-                    {
-                        return false;
-                    }
-                },
+        WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing")
+                        .refindWhenNeeded(listContainer)
+                        .isDisplayed(),
                 "There are no notifications in the drop down.", 1_000);
 
         // Just wait for a moment in case the list is slow to update with the most recent notification.
@@ -158,7 +158,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
         // update with the most recent notification the old reference will be stale.
-        return notificationsContainerLocator.findElement(this);
+        return notificationsContainerLocator.waitForElement(elementCache().findOpenMenu(), 1_000);
     }
 
     /**
@@ -236,15 +236,17 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         public final WebElement noNotificationsElement()
         {
-            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(this);
+            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(elementCache().findOpenMenu());
         }
 
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
                     .child(Locator.tagWithClass("div", "server-notifications-link"))
-                    .refindWhenNeeded(this);
+                    .refindWhenNeeded(elementCache().findOpenMenu());
         }
+
+        public final WebElement viewAllLink = Locator.tagWithText("div", "View all activity").refindWhenNeeded(this);
 
     }
 

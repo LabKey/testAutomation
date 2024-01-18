@@ -168,7 +168,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         doubleClick(FileBrowserHelper.Locators.gridRow(textFile.getName()));
 
         switchToWindow(1);
-        assertTextPresent("Sample text file");
+        waitForText("Sample text file");
         getDriver().close();
         switchToMainWindow();
     }

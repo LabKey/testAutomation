@@ -15,8 +15,7 @@
  */
 package org.labkey.test;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -162,7 +161,7 @@ public class AssayAPITest extends BaseWebDriverTest
                 .setEditableRuns(true);
         SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
         ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, getCurrentContainerPath());
-        Long protocolId = saveProtocolResponse.getProtocol().getProtocolId();
+        Integer protocolId = saveProtocolResponse.getProtocol().getProtocolId();
 
         assertEquals(assayDescription, saveProtocolResponse.getProtocol().getDescription());
         assertTrue(saveProtocolResponse.getProtocol().getQcEnabled());
@@ -188,7 +187,7 @@ public class AssayAPITest extends BaseWebDriverTest
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
-            assayId = assayHelper.createAssayDesignWithDefaults(getProjectName(), "General", assayName).getProtocolId().intValue();
+            assayId = assayHelper.createAssayDesignWithDefaults(getProjectName(), "General", assayName).getProtocolId();
 
         // First, simulate file already being uploaded to the server by copying to the pipeline root
         List<String> lines1 = Arrays.asList(
@@ -411,8 +410,7 @@ public class AssayAPITest extends BaseWebDriverTest
         }
         resetErrors();
 
-        JSONParser parser = new JSONParser();
-        run.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
+        run.setPlateMetadata(new JSONObject(PLATE_METADATA));
 
         try
         {
@@ -493,8 +491,7 @@ public class AssayAPITest extends BaseWebDriverTest
 
         ImportRunCommand cmd = new ImportRunCommand(assayId, resultRows);
         cmd.setProperties(Maps.of("PlateTemplate", lsid));
-        JSONParser parser = new JSONParser();
-        cmd.setPlateMetadata((JSONObject)parser.parse(PLATE_METADATA));
+        cmd.setPlateMetadata(new JSONObject(PLATE_METADATA));
         cmd.setName(runName);
         cmd.execute(createDefaultConnection(), folderPath);
 

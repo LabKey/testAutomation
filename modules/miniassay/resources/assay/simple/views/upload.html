@@ -45,7 +45,7 @@
       </form>
     </td>
     <td>
-      <a href='javascript:void(0)' onclick='saveBatch();return false;' class='labkey-disabled-button'>
+      <a id='btnSaveBatch' href='#' class='labkey-disabled-button'>
         <span>Save</span>
       </a>
     </td>
@@ -55,11 +55,10 @@
 <br/>
 <div id='runs_div'></div>
 
-<script type="text/javascript" nonce="<%=getScriptNonce()%>">
-  LABKEY.requiresScript("FileUploadField.js");
+<script type="text/javascript" nonce="<%=scriptNonce%>">
   document.getElementById("X-LABKEY-CSRF").value = LABKEY.CSRF;
 </script>
-<script type="text/javascript" nonce="<%=getScriptNonce()%>">
+<script type="text/javascript" nonce="<%=scriptNonce%>">
 function setDirty(dirty) {
   LABKEY.setDirty(dirty);
   var save_btns = Ext.DomQuery.select("a:has(span:contains(Save))");
@@ -338,5 +337,7 @@ function handleRunContent(run, content)
   saveBatch();
 }
 
-init();
+LABKEY.requiresScript("FileUploadField.js", init);
+
+document.getElementById('btnSaveBatch')['onclick'] = function(){saveBatch();return false;};
 </script>

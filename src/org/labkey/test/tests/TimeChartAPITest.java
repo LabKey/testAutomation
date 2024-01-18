@@ -264,8 +264,8 @@ public class TimeChartAPITest extends TimeChartTest
     }
 
     @SafeVarargs
-    private final void testVisApi(File htmlPage, String[] testTitles, @Nullable int[] testRowCounts, @Nullable String[][] testColumnNames,
-                                  @Nullable String[] testOutputTexts, List<Pair<String, List<Object>>>... colsForAllTests)
+    private void testVisApi(File htmlPage, String[] testTitles, @Nullable int[] testRowCounts, @Nullable String[][] testColumnNames,
+                            @Nullable String[] testOutputTexts, List<Pair<String, List<Object>>>... colsForAllTests)
     {
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);

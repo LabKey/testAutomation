@@ -358,24 +358,56 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         verifyThumbnail(chart, null);
     }
 
+    private String getThumbnail(String chart)
+    {
+        sleep(500);
+        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
+        mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
+        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
+        waitForElement(thumbnail);
+        sleep(500);
+        return WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+    }
+
     @LogMethod
     protected void verifyThumbnail(String chart, String expected)
     {
         // Trying to protect against a possible race condition when icon is there but thumbnail has not yet been generated.
         sleep(500);
         goToDataViews();
-        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
-        mouseOver(Locator.xpath("//a[text()='"+chart+"']"));
-        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
-        waitForElement(thumbnail);
-        String thumbnailData;
-        thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+
+        // Trying to work around flaky test failures on Windows.
+        String osName = System.getProperty("os.name").toLowerCase();
+        if(osName.contains("windows"))
+        {
+            refresh();
+        }
+
+        String thumbnailData = getThumbnail(chart);
 
         if (null == expected)
-            checker().withScreenshot("ReportThumbnailTest_ThumbnailStillDefault").verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+        {
+            // If the thumbnail isn't different, refresh/revisit the page and try again. (Issue 47143)
+            if(THUMBNAIL_DATA.equals(thumbnailData) && osName.contains("windows"))
+            {
+                log("The thumbnail was not updated as expecting. Trying a 'refresh' to get the updated image.");
+                sleep(1_500);
+                refresh();
+                sleep(1_500);
+                thumbnailData = getThumbnail(chart);
+            }
+
+            // If the thumbnail is still not as expected after a refresh then record an error.
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailStillDefault")
+                    .verifyFalse("Thumbnail is still default value.", THUMBNAIL_DATA.equals(thumbnailData));
+        }
         else
-            checker().withScreenshot("ReportThumbnailTest_ThumbnailNotPersisted").verifyTrue("Thumbnail wasn't persisted correctly.", expected.equals(thumbnailData) ||
-                    new LevenshteinDistance().apply(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
+        {
+            checker().withScreenshot("ReportThumbnailTest_ThumbnailNotPersisted")
+                    .verifyTrue("Thumbnail wasn't persisted correctly.",
+                            expected.equals(thumbnailData) || new LevenshteinDistance().apply(expected.substring(0, 5000),
+                                    thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
+        }
 
         THUMBNAIL_DATA = thumbnailData;
     }

@@ -1,15 +1,18 @@
 package org.labkey.test.components.domain;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Wraps the functionality of the LabKey ui component defined in domainproperties/CollapsiblePanelHeader.tsx
@@ -60,8 +63,12 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
         if (isExpanded() != expand)
         {
             elementCache().expandToggle.click();
-            getWrapper().shortWait()
-                    .until(LabKeyExpectedConditions.animationIsDone(getComponentElement())); // wait for transition to happen
+            waitFor(() -> isExpanded() == expand, "Panel failed to " + (expand ? "expand" : "collapse"), 2_000);
+
+            // wait for transition to happen and no spinners to be present
+            getWrapper().longWait()
+                    .until(ExpectedConditions.and(LabKeyExpectedConditions.animationIsDone(elementCache().panelBody),
+                            ExpectedConditions.numberOfElementsToBe(BootstrapLocators.loadingSpinner, 0)));
         }
         return getThis();
     }
@@ -96,7 +103,7 @@ public abstract class DomainPanel<EC extends DomainPanel<EC, T>.ElementCache, T 
 
     public abstract class ElementCache extends Component<EC>.ElementCache
     {
-        protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn, .domain-form-collapse-btn")
+        protected final WebElement expandToggle = Locator.css(".domain-form-expand-btn")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         protected final WebElement headerStatusIcon = Locator.css(".domain-panel-status-icon > svg").findWhenNeeded(this);
         protected final WebElement panelTitle = panelTitleLocator.findWhenNeeded(this);

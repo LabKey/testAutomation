@@ -147,7 +147,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         // Elements in the first <div> under the <li>.
         private final WebElement _toggleArrow = Locator.xpath("./div[1]/div[1]").findWhenNeeded(this);
         private final WebElement _checkboxContainer = Locator.xpath("./div/span").withClass("filetree-checkbox-container").findWhenNeeded(this);
-        private final WebElement _icon = Locator.css("svg.filetree-folder-icon").findWhenNeeded(_checkboxContainer);
+        private final WebElement _icon = Locator.css("span.filetree-folder-icon").findWhenNeeded(_checkboxContainer);
         private final WebElement _directoryName = Locator.byClass("filetree-directory-name").findWhenNeeded(this);
 
         // Second <div> under the <li>

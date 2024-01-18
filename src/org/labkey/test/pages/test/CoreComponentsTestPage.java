@@ -5,10 +5,8 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.grids.EditableGrid;
-import org.labkey.test.components.ui.heatmap.HeatMap;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.ui.entities.EntityInsertPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 
@@ -30,16 +28,9 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
         return new CoreComponentsTestPage(webDriverWrapper.getDriver());
     }
 
-    public ReactSelect getComponentSelect()
+    private ReactSelect getComponentSelect()
     {
         return ReactSelect.finder(getDriver()).waitFor();
-    }
-
-    public EntityInsertPanel getEntityInsertPanel()
-    {
-        getComponentSelect().select("EntityInsertPanel");
-        return new EntityInsertPanel.EntityInsertPanelFinder(getDriver())
-                .waitFor();
     }
 
     public EditableGrid getEditableGrid(String schema, String query)
@@ -67,12 +58,6 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
         Input.Input(Locator.input("schemaName"), getDriver()).waitFor().set(schema);
         Input.Input(Locator.input("queryName"), getDriver()).waitFor().set(query);
         Locator.button("Apply").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
-    }
-
-    public HeatMap getHeatMap()
-    {
-        getComponentSelect().select("HeatMap");
-        return new HeatMap.HeatMapFinder(getDriver()).waitFor();
     }
 
     /**

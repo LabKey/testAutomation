@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -41,10 +43,10 @@ import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.ZipUtil;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -99,6 +101,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME_2, null);
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         new ApiPermissionsHelper(this).checkInheritedPermissions();
+
     }
 
     // create an issues list in projects and subfolder to test ContainerFilters.
@@ -131,13 +134,6 @@ public class RlabkeyTest extends BaseWebDriverTest
         issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
     }
 
-    private void setupAssays()
-    {
-        log("Create a GPAT assay design");
-        goToManageAssays();
-        _assayHelper.createAssayDesign("General", "Rlabkey GPAT Test").clickFinish();
-    }
-
     /**
      * Create a new issues list and override the default assigned to group
      */
@@ -165,7 +161,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         // Dummy files for saveBatch API test
         _fileBrowserHelper.createFolder("data.tsv");
         _fileBrowserHelper.createFolder("result.txt");
-        setupAssays();
+        new APIAssayHelper(this).createAssayDesignWithDefaults(getProjectName(), "General", "Rlabkey GPAT Test");
 
         doRLabkeyTest(RLABKEY_API_EXPERIMENT);
     }
@@ -186,9 +182,9 @@ public class RlabkeyTest extends BaseWebDriverTest
     public void testRlabkeyQueryApi() throws Exception
     {
         log("Import Lists");
-        File listArchive = new File(RReportHelper.getRLibraryPath(), "/listArchive.zip");
+        final File listArchive = TestFileUtils.getSampleData("lists/rlabkey.lists");
         goToProjectHome();
-        _listHelper.importListArchive(listArchive);
+        goToManageLists().importListArchive(new ZipUtil(listArchive).tempZip());
 
         setupIssues();
         doRLabkeyTest(RLABKEY_API_QUERY);
@@ -214,7 +210,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         // verify the expected pipeline jobs where run and completed
         goToProjectHome();
         PipelineStatusTable pipelineStatusTable = goToDataPipeline();
-        assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("@files/sample (Rlabkey RCopy Test 1)"));
+        assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("@files/sample (Rlabkey RCopy Test 1) (sample.txt)"));
         assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("test pipe desc"));
     }
 
@@ -276,22 +272,17 @@ public class RlabkeyTest extends BaseWebDriverTest
             clickProject(getProjectName());
             goToManageViews().clickAddReport("R Report");
 
-            List<String> errors = new ArrayList<>();
-
-            // we want to load the Rlabkey package from the override location
-            File libPath = RReportHelper.getRLibraryPath();
-            String pathCmd = TestProperties.isServerRemote()
-                ? ""
-                : String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+            String pathCmd = getLibPathOverride();
 
             for (APITestHelper.ApiTestCase test : tests)
             {
                 StringBuilder sb = new StringBuilder(pathCmd);
 
-                sb.append('\n');
+                sb.append(String.format("\nprint(\"Test Case: %s - %s\")\n", testData.getName(), test.getName()));
                 String expectedOutput = test.getResponse().trim()
                         .replaceAll("\n +", "\n")
-                        .replaceAll("%projectName%", getProjectName());
+                        .replaceAll("%projectName%", getProjectName())
+                        .replaceAll("%contextPath%", WebTestHelper.getContextPath());
                 {
                     String testScript = test.getUrl().trim()
                             .replaceAll("\n +", "\n")
@@ -316,7 +307,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 {
                     TestLogger.error("Expected results for test case: " + test.getName() + ":\n" + expectedOutput);
                     TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb.toString());
-                    errors.add(test.getName());
+                    checker().withScreenshot(testData.getName()).error(test.getName());
                 }
                 else if ("DEBUG".equalsIgnoreCase(test.getType()))
                 {
@@ -327,11 +318,23 @@ public class RlabkeyTest extends BaseWebDriverTest
             }
             _rReportHelper.clickSourceTab();
             clickButton("Cancel");
-            assertTrue("Failed executing R script for test case(s): " + String.join(", ", errors) + ". See log for details.", errors.isEmpty());
         }
         else
         {
             throw new IllegalStateException("No test cases found in " + testData.getAbsolutePath());
+        }
+    }
+
+    protected String getLibPathOverride()
+    {
+        // we want to load the Rlabkey package from the override location
+        if (TestProperties.isServerRemote())
+        {
+            return "";
+        }
+        else
+        {
+            return String.format(LIBPATH_OVERRIDE, RReportHelper.getRLibraryPath().getAbsolutePath().replaceAll("\\\\", "/"));
         }
     }
 
@@ -360,6 +363,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     }
 
     @Override
+    @NotNull
     protected String getProjectName()
     {
         return PROJECT_NAME;

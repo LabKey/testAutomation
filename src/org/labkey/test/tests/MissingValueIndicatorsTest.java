@@ -33,13 +33,15 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
 {
-    public static final Locator.XPathLocator MV_LOCATOR = Locator.tagWithClass("td", "labkey-mv-indicator");
+    private static final String MV_LOCATOR_CLASS = "labkey-mv-indicator";
 
     @LogMethod
     protected void setupMVIndicators()
@@ -65,32 +67,61 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("Save");
     }
 
-    protected void validateSingleColumnData()
+    protected void checkDataregionData(DataRegionTable dataRegion, Map<String, List<String>> expectedValues)
     {
-        assertNoLabKeyErrors();
-        assertMvIndicatorPresent();
-        assertTextPresent("Ted", "Alice", "Bob", "Q", "N", "male", "female", "17");
+        for(Map.Entry<String, List<String>> entry : expectedValues.entrySet())
+        {
+            List<String> actualValues = dataRegion.getColumnDataAsText(entry.getKey());
+            checker().verifyEquals(String.format("Values in column '%s' not as expected.", entry.getKey()),
+                    entry.getValue(), actualValues);
+        }
+        checker().screenShotIfNewError(getProjectName()+ "_DataRegion_Data_Error");
     }
 
-    protected void validateTwoColumnData(String dataRegionName, String columnName)
+    protected void checkMvIndicatorPresent(DataRegionTable dataRegion, Map<String, List<Integer>> expectedMVCells)
     {
-        assertNoLabKeyErrors();
-        assertMvIndicatorPresent();
-        assertTextPresent("Franny", "Zoe", "J.D.", "Q", "N", "male", "female", "50");
-        assertTextNotPresent("'25'");
-        DataRegionTable dataRegion = new DataRegionTable(dataRegionName, this);
-        dataRegion.setFilter(columnName, "Equals", "Zoe");
-        assertTextNotPresent("'25'");
-        assertTextPresent("Zoe", "female");
-        assertMvIndicatorPresent();
-        click(MV_LOCATOR.append("/font/a"));
-        assertTextPresent("'25'");
-        dataRegion.clearAllFilters(columnName);
+
+        int numOfRows = dataRegion.getDataRowCount();
+
+        for(Map.Entry<String, List<Integer>> entry : expectedMVCells.entrySet())
+        {
+            List<Integer> actualMVCells = new ArrayList<>();
+            for(int row = 0; row < numOfRows; row++)
+            {
+                WebElement cell = dataRegion.findCell(row, entry.getKey());
+                if(cell.getAttribute("class").equals(MV_LOCATOR_CLASS))
+                {
+                    actualMVCells.add(row);
+                }
+            }
+
+            checker().verifyEquals(String.format("Rows with MV indicator in column '%s' not as expected.", entry.getKey()),
+                    entry.getValue(), actualMVCells);
+        }
+
+        checker().screenShotIfNewError(getProjectName()+ "_MV_Indicator_Error");
+
     }
 
-    protected void assertMvIndicatorPresent()
+    protected void checkOriginalValuePopup(DataRegionTable dataRegion, String column, int row, String expectedValue)
     {
-        assertElementPresent(MV_LOCATOR);
+        WebElement origValueMsg = Locator.tagWithId("span", "helpDivBody").findWhenNeeded(getDriver());
+
+        WebElement cell = dataRegion.findCell(row, column);
+
+        WebElement popupLink = Locator.tagWithClass("a", "_helpPopup").findWhenNeeded(cell);
+
+        popupLink.click();
+
+        if(checker().verifyTrue("'Original Value' popup did not show.",
+                waitFor(origValueMsg::isDisplayed, 1_000)))
+        {
+            checker().verifyEquals("'Original Value' message not as expected.",
+                    String.format("The value as originally entered was: '%s'.", expectedValue), origValueMsg.getText());
+        }
+
+        checker().screenShotIfNewError(getProjectName()+ "_MV_Popup_Error");
+
     }
 
     @LogMethod
@@ -101,7 +132,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
         String noMviFilter = "Does not have a missing value indicator";
         DataRegionTable dataRegionTable = DataRegion(getDriver()).find();
         List<String> columns = dataRegionTable.getColumnNames();
-        Assert.assertThat("Didn't find expected MV enabled columns.", columns, CoreMatchers.hasItems(expectedMvColumns.toArray(new String[]{})));
+        assertThat("Didn't find expected MV enabled columns.", columns, CoreMatchers.hasItems(expectedMvColumns.toArray(new String[]{})));
         for (String colName: columns)
         {
             if (expectedMvColumns.contains(colName))

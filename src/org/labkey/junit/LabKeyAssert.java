@@ -1,9 +1,8 @@
 package org.labkey.junit;
 
-import org.junit.Assert;
+import org.assertj.core.api.Assertions;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class LabKeyAssert
 {
@@ -17,14 +16,6 @@ public class LabKeyAssert
      */
     public static <T> void assertEqualsSorted(String message, Collection<T> expected, Collection<T> actual)
     {
-        if (expected != null)
-        {
-            expected = expected.stream().sorted().collect(Collectors.toList());
-        }
-        if (actual != null)
-        {
-            actual = actual.stream().sorted().collect(Collectors.toList());
-        }
-        Assert.assertEquals(message, expected, actual);
+        Assertions.assertThat(actual).as(message).containsExactlyInAnyOrderElementsOf(expected);
     }
 }

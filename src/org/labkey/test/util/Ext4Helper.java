@@ -27,12 +27,14 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
@@ -398,9 +400,9 @@ public class Ext4Helper
         _test.executeScript(script, columnName, columnVal, idx, gridEl, keepExisting);
     }
 
-    public void selectGridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
+    public void selectGridItem(String columnName, String columnVal, int idx, String gridMarkerCls, boolean keepExisting)
     {
-        WebElement grid = Locator.css("." + markerCls).findElement(_test.getDriver());
+        WebElement grid = Locator.css("." + gridMarkerCls).findElement(_test.getDriver());
         selectGridItem(columnName, columnVal, idx, grid, keepExisting);
     }
 
@@ -571,7 +573,7 @@ public class Ext4Helper
      */
     public void deselectAllParticipantFilter()
     {
-        checkGridRowCheckbox("All");
+        selectAllParticipantFilter();
         uncheckGridRowCheckbox("All");
     }
 
@@ -580,6 +582,7 @@ public class Ext4Helper
      */
     public void selectAllParticipantFilter()
     {
+        _test.waitForElement(Locator.xpath("//*[contains(@class, 'lk-filter-panel-label') and text()='All']"));
         checkGridRowCheckbox("All");
     }
 
@@ -696,7 +699,7 @@ public class Ext4Helper
             try
             {
                 Object result = _test.executeAsyncScript("Ext4.onReady(callback);");
-                return result == null; // If executeAsyncScript returned something, there was probably an error.
+                return result == null || result.equals(Map.of("single", true)); // If executeAsyncScript returned something, there was probably an error.
             }
             catch (WebDriverException scriptError)
             {
@@ -767,7 +770,11 @@ public class Ext4Helper
     public void closeExtTab(String tabName)
     {
         _test.log("Closing Ext tab " + tabName);
-        _test.click(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]"));
+        WebElement closeButton = _test.shortWait().until(ExpectedConditions
+                .elementToBeClickable(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]")));
+        _test.mouseOver(closeButton);
+        closeButton.click();
+        _test.shortWait().until(ExpectedConditions.stalenessOf(closeButton));
     }
 
     public static class Locators
@@ -803,27 +810,24 @@ public class Ext4Helper
         }
 
         /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         * Consider using {@link org.labkey.test.components.ext4.Window}
          */
-        @Deprecated
         public static Locator.XPathLocator window()
         {
             return Window.Locators.window();
         }
 
         /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         * Consider using {@link org.labkey.test.components.ext4.Window}
          */
-        @Deprecated
         public static Locator.XPathLocator window(String title)
         {
             return window().withDescendant(Window.Locators.title().withText(title));
         }
 
         /**
-         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         * Consider using {@link org.labkey.test.components.ext4.Window}
          */
-        @Deprecated
         public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)
         {
             return window(windowTitle).append(ext4Button(buttonText));

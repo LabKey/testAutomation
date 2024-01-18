@@ -335,11 +335,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             importAnalysis_begin(options.getContainerPath());
             importAnalysis_uploadWorkspace(options.getContainerPath(), options.getWorkspacePath());
         }
-        importAnalysis_selectFCSFiles(options.getContainerPath(), options.getSelectFCSFilesOption(), options.getKeywordDirs());
-        assertFormElementEquals(Locator.name("selectFCSFilesOption"), options.getSelectFCSFilesOption().name());
 
-        boolean resolving = options.getSelectFCSFilesOption() == SelectFCSFileOption.Previous;
-        importAnalysis_reviewSamples(options.getContainerPath(), resolving, options.getSelectedGroupNames(), options.getSelectedSampleIds());
+        if (!options.canAccelerateWizard())
+        {
+            importAnalysis_selectFCSFiles(options.getContainerPath(), options.getSelectFCSFilesOption(), options.getKeywordDirs());
+            assertFormElementEquals(Locator.name("selectFCSFilesOption"), options.getSelectFCSFilesOption().name());
+
+            boolean resolving = options.getSelectFCSFilesOption() == SelectFCSFileOption.Previous;
+            importAnalysis_reviewSamples(options.getContainerPath(), resolving, options.getSelectedGroupNames(), options.getSelectedSampleIds());
+        }
 
         importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
@@ -527,6 +531,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         private final boolean _viaPipeline;
         private final List<String> _expectedErrors;
 
+        private final boolean _accelerateWizard;
 
         public ImportAnalysisOptions(
                 String containerPath,
@@ -535,7 +540,22 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 List<String> keywordDirs,
                 String analysisName,
                 boolean existingAnalysisFolder,
-                boolean viaPipeline)
+                boolean viaPipeline
+        )
+        {
+            this(containerPath, workspacePath, selectFCSFilesOption, keywordDirs, analysisName, existingAnalysisFolder, viaPipeline, false);
+        }
+
+        public ImportAnalysisOptions(
+                String containerPath,
+                String workspacePath,
+                SelectFCSFileOption selectFCSFilesOption,
+                List<String> keywordDirs,
+                String analysisName,
+                boolean existingAnalysisFolder,
+                boolean viaPipeline,
+                boolean accelerateWizard
+                )
         {
             _containerPath = containerPath;
             _workspacePath = workspacePath;
@@ -547,6 +567,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
             _expectedErrors = new ArrayList<>();
+            _accelerateWizard = accelerateWizard;
         }
 
         public ImportAnalysisOptions(
@@ -571,6 +592,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
             _expectedErrors = expectedErrors;
+            _accelerateWizard = false;
         }
 
         public String getContainerPath()
@@ -620,6 +642,11 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         public List<String> getExpectedErrors()
         {
             return _expectedErrors;
+        }
+
+        public boolean canAccelerateWizard()
+        {
+            return _accelerateWizard;
         }
 
     }

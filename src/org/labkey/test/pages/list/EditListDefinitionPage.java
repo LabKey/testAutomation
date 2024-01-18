@@ -21,9 +21,9 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
-import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
@@ -135,13 +135,13 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
     // note: auto-import slider is only shown when you've inferred fields from file
     public EditListDefinitionPage setAutoImport(boolean autoImport)
     {
-        elementCache().autoImportSlider().set(autoImport);
+        elementCache().autoImportToggle.set(autoImport);
         return this;
     }
 
     public boolean getAutoImport()
     {
-        return elementCache().autoImportSlider().get();
+        return elementCache().autoImportToggle.isChecked();
     }
 
     public void setColumnPhiLevel(String name, FieldDefinition.PhiSelectType phiLevel)
@@ -187,9 +187,7 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
         protected final WebElement advancedSettingsBtn = Locator.tagWithClass("button", "domain-field-float-right")
                 .withText("Advanced Settings").findWhenNeeded(propertiesPanel);
 
-        protected ToggleButton autoImportSlider()
-        {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).withState("Import Data").find(fieldsPanel);
-        }
+        protected final Checkbox autoImportToggle = new Checkbox(Locator.inputById("domain__import-data__file-enabled")
+                .findWhenNeeded(fieldsPanel));
     }
 }

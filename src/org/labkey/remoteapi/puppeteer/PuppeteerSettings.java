@@ -17,6 +17,9 @@ package org.labkey.remoteapi.puppeteer;
 
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
+import org.labkey.test.util.TestLogger;
+
+import java.util.Map;
 
 public class PuppeteerSettings
 {
@@ -35,22 +38,14 @@ public class PuppeteerSettings
         this();
         _enabled = json.getBoolean("enabled");
         _mode = json.getString("mode");
-        _dockerImage = json.getString("docker.image");
-
-        try
-        {
-            _dockerPort = Integer.parseInt(json.getString("docker.port"));
-        }
-        catch (NumberFormatException ignored)
-        {
-        }
-
+        _dockerImage = json.optString("docker.image", null);
+        _dockerPort = json.optInt("docker.port");
         _remoteUrl = json.getString("remote.url");
     }
 
     public PuppeteerSettings(CommandResponse response)
     {
-        this(new JSONObject(response.getParsedData().get("data")));
+        this(new JSONObject((Map<String, Object>)response.getParsedData().get("data")));
     }
 
     public Boolean getEnabled()
@@ -103,9 +98,9 @@ public class PuppeteerSettings
         _remoteUrl = remoteUrl;
     }
 
-    public org.json.simple.JSONObject toJSON()
+    public JSONObject toJSON()
     {
-        var settings = new org.json.simple.JSONObject();
+        var settings = new JSONObject();
 
         if (getEnabled() != null)
             settings.put("enabled", getEnabled());
@@ -118,7 +113,7 @@ public class PuppeteerSettings
         if (getRemoteUrl() != null)
             settings.put("remote.url", getRemoteUrl());
 
-        var payload = new org.json.simple.JSONObject();
+        var payload = new JSONObject();
         payload.put("settings", settings);
 
         return payload;

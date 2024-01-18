@@ -1,0 +1,11 @@
+DisplayFld	TextFld	IntFld	DoubleFld	DateTimeFld	BooleanFld	LongTextFld	AttachmentFld	RequiredText	RequiredInt	Category
+Row 1	some text here	99	987.654	2/14/2010	FALSE	Could be some very long text		I have to fill this out	42	PLAIN
+Row 2 Empty Vals					FALSE			Cannot be empty	55	
+Row 3 (plain)	More plane values	-34	98123.45	1/1/1999	FALSE	The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  		no attachment	88	PLAIN
+row 4 (the n word)	null NULL NA and na	123	44.33	2/20/2002	FALSE			lots of words for empty	456	EMPTY
+Row 5 (na)	NA				TRUE	na		NULL	1	EMPTY
+Row 6 bad chars	forward/slash				TRUE	back\slash		"single ' double "" "	2	EMPTY
+Updated from R	NA	777	12.345	3/1/2010	FALSE	Four score and seven years ago		"Veni, vidi, vici"	0	LOOKUP2
+Inserted from R	how its done	98	12.345	3/1/2010	FALSE	Four score and seven years ago		"Veni, vidi, vici"	0	LOOKUP2
+Inserted from R	how its done	98	12.345	3/1/2010	FALSE	Four score and seven years ago		"Veni, vidi, vici"	0	LOOKUP2
+Inserted from R	how its done	98	12.345	3/1/2010	FALSE	Four score and seven years ago		"Veni, vidi, vici"	0	LOOKUP2

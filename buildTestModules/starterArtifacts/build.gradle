@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'org.labkey.module'
+apply plugin: 'org.labkey.build.module'
 
 dependencies { 
     // add dependencies on starter modules, not including those that come through from transitive dependencies:
@@ -7,9 +7,6 @@ dependencies {
     // N.B.  The explicit setting of transitive = true is necessary here.
     // It seems that the default value is not transitive for non-jar extensions
     modules ("org.labkey.module:api:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:internal:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:audit:${labkeyVersion}@module") {
@@ -72,7 +69,7 @@ dependencies {
     modules ("org.labkey.module:dataintegration:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:duo:${labkeyVersion}@module") {
+    modules ("org.labkey.module:mfa:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:ldap:${labkeyVersion}@module") {
@@ -88,7 +85,6 @@ dependencies {
     // add dependencies on all starter API artifacts
     implementation "org.labkey.api:core:${labkeyVersion}"
     implementation "org.labkey.api:assay:${labkeyVersion}"
-    implementation "org.labkey.api:issues:${labkeyVersion}"
     implementation "org.labkey.api:ms2:${labkeyVersion}"
     implementation "org.labkey.api:targetedms:${labkeyVersion}"
     implementation "org.labkey.api:dataintegration:${labkeyVersion}"

@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
@@ -58,9 +60,7 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE7_NAME= "Page 7 Name For Markdown Test " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE8_TITLE = "Page 8 Title For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
-
-    private static final String WIKI_PAGE1_TITLE_LINK = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name";
-    private static final String WIKI_PAGE1_TITLE_LINK_COPY = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name1";
+    private static final String WIKI_PAGE9_NAME= "Page 9 _blank " + BaseWebDriverTest.INJECT_CHARS_1;
 
     private static final String DISC1_TITLE = "Let's Talk";
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
@@ -92,39 +92,52 @@ public class WikiLongTest extends BaseWebDriverTest
             "[Welcome to the WikiLongTest|" + WIKI_PAGE1_NAME + "]";
 
     private static final String WIKI_PAGE3_CONTENT =
-            "<b>Some HTML content</b>\n" +
-                    "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
-                    "queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>\n";
+            """
+                    <b>Some HTML content</b>
+                    <b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>
+                    """;
     private static final String WIKI_PAGE3_CONTENT_NO_QUERY =
-            "<b>Some HTML content</b>\n" +
-                    "<b>No query part</b>\n";
+            """
+                    <b>Some HTML content</b>
+                    <b>No query part</b>
+                    """;
 
     private static final String WIKI_PAGE4_CONTENT =
             "This is wiki page <i>4</i><br/>${labkey.webPart(partName='Wiki TOC')}";
 
     private static final String WIKI_PAGE5_CONTENT =
-            "    <script>\n" +
-            "        var foo = \"<form>Test</form>\";\n" +
-            "    </script>";
+            """
+                        <script>
+                            var foo = "<form>Test</form>";
+                        </script>
+                    """;
 
     private static final String WIKI_PAGE6_CONTENT =
             "The " + WIKI_SEARCH_TERM +
             " was called the African unicorn by Europeans and wasn't widely known to exist until 1901.\n";
 
     private static final String WIKI_PAGE7_CONTENT =
-            "# Title MD\n" +
-            "## Subtitle MD\n" +
-            "*italic text MD*\n";
+            """
+                    # Title MD
+                    ## Subtitle MD
+                    *italic text MD*
+                    """;
+
+    private static final String SAFE_LINK_HTML = "<a href=\"http://labkey.com\">Safe link</a>";
+    private static final String FIXUP_LINK_HTML = "<a href=\"http://labkey.com\" target=\"_blank\">Fixup</a>";
+    private static final String WIKI_PAGE9_CONTENT = SAFE_LINK_HTML + "\n" + FIXUP_LINK_HTML;
 
     private static final String NAVBAR1_CONTENT =
             "{labkey:tree|name=core.currentProject}";
 
     private static final String NAVBAR2_CONTENT =
-            "{labkey:tree|name=core.currentProject}\n" +
-                    "{labkey:tree|name=core.projects}\n"+
-                    "{labkey:tree|name=core.folderAdmin}\n" +
-                    "{labkey:tree|name=core.projectAdmin}\n" +
-                    "{labkey:tree|name=core.siteAdmin}\n";
+            """
+                    {labkey:tree|name=core.currentProject}
+                    {labkey:tree|name=core.projects}
+                    {labkey:tree|name=core.folderAdmin}
+                    {labkey:tree|name=core.projectAdmin}
+                    {labkey:tree|name=core.siteAdmin}
+                    """;
 
     private static final String HEADER_CONTENT =
             "Yo! This is the header!";
@@ -417,8 +430,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Create fake user for permissions check");
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.clickManageGroup(USERS_GROUP);
-        setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.name("sendEmail"));
+        setFormElement(Locator.name("names"), USER1);
         clickButton("Update Group Membership");
 
         log("Check if permissions work");
@@ -486,7 +499,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
-        clickButton("Save and Finish");
+        clickButtonContainingText("Save and Finish");
 
         log("make sure the changes went through");
         impersonate(USER1);
@@ -494,7 +507,30 @@ public class WikiLongTest extends BaseWebDriverTest
         clickTab("Wiki");
         portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
         assertElementPresent(Locator.linkWithText(PROJECT_NAME));
-        stopImpersonating();
+
+        log("test fixup for unsafe _blank targets, see #33356");
+        _wikiHelper.createNewWikiPage();
+        setFormElement(Locator.name("name"), WIKI_PAGE9_NAME);
+        _wikiHelper.setWikiBody(WIKI_PAGE9_CONTENT);
+        _wikiHelper.saveWikiPage();
+        assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
+
+        String renderedPage9 = getHtmlSource();
+        assertFalse("Link needing fixup wasn't fixed up", renderedPage9.contains(FIXUP_LINK_HTML));
+        assertTrue("Fixed up link not present", renderedPage9.contains("<a href=\"http://labkey.com\" rel=\"noopener noreferrer\" target=\"_blank\">Fixup</a>"));
+        assertTrue("Safe link mangled", renderedPage9.contains(SAFE_LINK_HTML));
+
+        log("Ensure non-developer can't save script");
+        _wikiHelper.createNewWikiPage();
+        setFormElement(Locator.name("name"), "Unsaveable");
+        _wikiHelper.setWikiBody(WIKI_PAGE5_CONTENT);
+        _wikiHelper.saveWikiPage(false);
+        waitForText("There was a problem while saving: Illegal element <script>. For permissions to use this element, contact your system administrator.");
+        _wikiHelper.setWikiBody("<a onclick=\"alert('test');\">test</a>");
+        _wikiHelper.saveWikiPage(false);
+        waitForText("There was a problem while saving: Illegal attribute 'onclick' on element <a>");
+
+        stopImpersonating(false);
 
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);

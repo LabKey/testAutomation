@@ -147,7 +147,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
     {
         getWrapper().log("Attempting to show tab [" + getName() + "]");
         String text = getText();
-        getMenu().clickSubMenu(false,"Show");
+        getMenu().clickSubMenu(true,"Show");
         return PortalTab.find(text, getDriver());
     }
 
@@ -155,7 +155,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
     {
         getWrapper().log("Attempting to hide tab [" + getName() + "]");
         String text = getText();
-        getMenu().clickSubMenu(false,"Hide");
+        getMenu().clickSubMenu(true,"Hide");
         return PortalTab.find(text, getDriver());
     }
 
@@ -163,7 +163,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
     {
         getWrapper().log("Attempting to delete tab [" + getName() + "]");
         String text = getText();
-        getMenu().clickSubMenu(false,"Delete");
+        getMenu().clickSubMenu(true,"Delete");
     }
 
     /* clicking 'rename' will pop a form to take the name */
@@ -203,7 +203,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         WebElement anchor = Locator.xpath("./a").findElement(getComponentElement());
     }

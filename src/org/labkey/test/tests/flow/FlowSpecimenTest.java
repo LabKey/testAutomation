@@ -92,6 +92,64 @@ public class FlowSpecimenTest extends BaseFlowTest
 
         // Issue 16945: flow specimen FK doesn't work for 'fake' FCS file wells created during FlowJo import
         verifyFlowDatasetSpecimenFK();
+
+        // Issue 48308: Flow: warn when deleting flow run with fcs files linked to study
+        verifyDeleteConfirmation();
+    }
+
+    private void verifyDeleteConfirmation()
+    {
+        // Add check for shared selection contexts between FCSFiles/FCSAnalysis table types Issue #49062
+        String fcsFilename = "version";
+        String fcsAnalysisName = "microFCS.xml";
+        log("** Attempt Specimen run delete, confirm usage before delete ");
+        log("check that table selection for the \"different\" run types are separated");
+        goToFlowDashboard();
+        clickAndWait(Locator.linkContainingText("FCS Files ("));
+        final DataRegionTable fcsDRT = new DataRegionTable("query", this);
+        fcsDRT.checkCheckbox(1);
+        doAndWaitForPageToLoad(() -> fcsDRT.clickHeaderButton("Delete"));
+        assertElementPresent(Locator.linkWithText(fcsFilename));
+        assertTextPresent("Confirm Deletion");
+        assertTextNotPresent(fcsAnalysisName);
+        clickAndWait(Locator.lkButton("Cancel"));
+        goToFlowDashboard();
+        clickAndWait(Locator.linkContainingText("FCS Analyses"));
+        final DataRegionTable fcsAnalysisDRT = new DataRegionTable("query", this);
+        fcsAnalysisDRT.checkCheckbox(0);
+        doAndWaitForPageToLoad(() -> fcsAnalysisDRT.clickHeaderButton("Delete"));
+        assertTextPresent("Confirm Deletion", "One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER), fcsAnalysisName);
+        assertElementNotPresent(Locator.linkWithText(fcsFilename));
+        clickAndWait(Locator.lkButton("Cancel"));
+        log("Cancel works...");
+
+        log("check that delete confirmation for unconnected files does not show Study linkage text");
+        goToFlowDashboard();
+        clickAndWait(Locator.linkContainingText("FCS Files ("));
+        final DataRegionTable fcsDeleteDRT = new DataRegionTable("query", this);
+        fcsDeleteDRT.checkCheckbox(1);
+        doAndWaitForPageToLoad(() -> fcsDeleteDRT.clickHeaderButton("Delete"));
+        assertElementPresent(Locator.linkWithText(fcsFilename));
+        assertTextPresent("Confirm Deletion");
+        assertTextNotPresent("One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER), fcsAnalysisName);
+        clickAndWait(Locator.lkButton("Confirm Delete"));
+        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        DataRegionTable table = new DataRegionTable(getDriver().getCurrentUrl().contains("dataset.view") ? "Dataset" : "query", this);
+        assertEquals("Dataset data not as expected after FCSFile delete", 2, table.getDataRowCount());
+        log("Non-Study data delete successful");
+
+        goToFlowDashboard();
+        log("Check that delete confirmation shows study linkage");
+        clickAndWait(Locator.linkContainingText("FCS Analyses"));
+        final DataRegionTable fcsAnalysisDeleteDRT = new DataRegionTable("query", this);
+        fcsAnalysisDeleteDRT.checkCheckbox(0);
+        doAndWaitForPageToLoad(() -> fcsAnalysisDeleteDRT.clickHeaderButton("Delete"));
+        assertTextPresent("Confirm Deletion", "One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
+        clickAndWait(Locator.lkButton("Confirm Delete"));
+        assertTextPresent("No data to show.");
+        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        assertTextPresent("No data to show.");
+        log("Study linked data delete successful");
     }
 
     @Override

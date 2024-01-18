@@ -60,9 +60,9 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
     }
 
     @Override
-    public OptionSelect related()
+    public Input related()
     {
-        return (OptionSelect) super.related();
+        return (Input) super.related();
     }
 
     @Override

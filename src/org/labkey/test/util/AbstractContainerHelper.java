@@ -16,9 +16,8 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.junit.AssumptionViolatedException;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.admin.GetModulesCommand;
@@ -27,7 +26,6 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
@@ -43,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -88,9 +85,9 @@ public abstract class AbstractContainerHelper
     public final void ensureContainer(String containerPath)
     {
         List<String> pathParts = Arrays.stream(containerPath.split("/"))
-                .map(StringUtils::trimToEmpty)
-                .filter(part -> !part.isEmpty())
-                .collect(Collectors.toList());
+            .map(StringUtils::trimToEmpty)
+            .filter(part -> !part.isEmpty())
+            .toList();
 
         StringBuilder currentPath = new StringBuilder();
 

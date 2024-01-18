@@ -38,7 +38,7 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.net.URL;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @Category({Daily.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)

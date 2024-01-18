@@ -64,17 +64,20 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Set Paging to 3 with config", "testPagingConfig"),
                     Pair.of("Set Paging to 2 with API", "testSetPaging"),
                     Pair.of("Parameterized Queries", "testParameterizedQueries"),
+                    Pair.of("Issue #47735: Date filter format", "testDateFilterFormat"),
                     Pair.of("Regression #25337", "test25337"),
                     Pair.of("Change Page Offset", "testPageOffset"),
                     Pair.of("Keep Removable Filters", "testRemovableFilters"),
                     Pair.of("Collapse filter clauses", "testMultiClausesFilter"),
                     Pair.of("Filter field case insensitive", "testCaseInsensitiveFilterField"),
                     Pair.of("Hide Paging Count", "testHidePagingCount"),
+                    Pair.of("Async Total Rows Count", "testAsyncTotalRowsCount"),
                     Pair.of("Show All Rows", "testShowAllTotalRows"),
                     Pair.of("Use getBaseFilters", "testGetBaseFilters"),
                     Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
                     Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig"),
                     Pair.of("Exclude \"skipPrefixes\"", "testRespectExcludingPrefixes"),
+                    Pair.of("Show All Rows Limit (Regression #48715)", "testAllRowsLimit"),
                     Pair.of("Get Selected (Regression #41705)", "testGetSelected")
                     );
 

@@ -17,7 +17,7 @@ package org.labkey.remoteapi.security;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 import java.util.ArrayList;
@@ -42,16 +42,6 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
     private BulkUpdateGroupCommand()
     {
         super("security", "bulkUpdateGroup");
-    }
-
-    public BulkUpdateGroupCommand(BulkUpdateGroupCommand source)
-    {
-        this();
-        _groupId = source._groupId;
-        _groupName = source._groupName;
-        _members = source._members;
-        _createGroup = source._createGroup;
-        _method = source._method;
     }
 
     public BulkUpdateGroupCommand(@NotNull String groupName)
@@ -127,17 +117,13 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
     @Override
     protected BulkUpdateGroupResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new BulkUpdateGroupResponse(text, status, contentType, json, this);
+        return new BulkUpdateGroupResponse(text, status, contentType, json);
     }
 
     @Override
     public JSONObject getJsonObject()
     {
-        JSONObject result = super.getJsonObject();
-        if (result == null)
-        {
-            result = new JSONObject();
-        }
+        JSONObject result = new JSONObject();
         if (_groupId != null) result.put("groupId", _groupId);
         if (_groupName != null) result.put("groupName", _groupName);
         result.put("createGroup", _createGroup);
@@ -152,9 +138,4 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
         return 16.1;
     }
 
-    @Override
-    public PostCommand copy()
-    {
-        return new BulkUpdateGroupCommand(this);
-    }
 }

@@ -62,9 +62,9 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
                 .refindWhenNeeded(this).withTimeout(4000);
         WebElement logoFileInput = Locator.tagWithClass("input", "file-upload--input")
                 .refindWhenNeeded(this).withTimeout(4000);
-        WebElement logoImageContainer = Locator.tagWithClass("div", "sso-fields__image-holder")
+        WebElement logoImageContainer = Locator.byClass("sso-fields__image-holder")
                 .refindWhenNeeded(this).withTimeout(4000);
-        WebElement logoImageRemoveBtn = Locator.tag("svg").withClass("sso-fields__delete-img")
+        WebElement logoImageRemoveBtn = Locator.byClass("sso-fields__delete-img")
                 .refindWhenNeeded(this).withTimeout(4000);
 
         Locator attachedFile(File file)

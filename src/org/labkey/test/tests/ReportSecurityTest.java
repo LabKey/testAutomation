@@ -99,7 +99,7 @@ public class ReportSecurityTest extends ReportTest
             click(Locator.lkButton("Update Type"));
         });
 
-        click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
+        click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
         selectOptionByText(Locator.name("dataset.1"), "Reader");

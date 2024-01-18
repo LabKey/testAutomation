@@ -18,8 +18,10 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -96,6 +98,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ShowAuditLogPage(getDriver());
     }
 
+    public void clickAuditLogMaintenance()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().auditLogMaintenanceLink);
+    }
     public LoginConfigurePage clickAuthentication()
     {
         goToSettingsSection();
@@ -110,6 +117,20 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
+    public ComplianceSettingsAccountsPage clickComplianceSettings()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().complianceSettings);
+        return new ComplianceSettingsAccountsPage(getDriver());
+    }
+
+    public DomainDesignerPage clickChangeUserProperties()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().changeUserPropertiesLink);
+        return new DomainDesignerPage(getDriver());
+    }
+
     public void clickEmailCustomization()
     {
         goToSettingsSection();
@@ -121,6 +142,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         goToSettingsSection();
         clickAndWait(elementCache().notificationServiceAdminLink);
     }
+
     public ConfigureFileSystemAccessPage clickFiles()
     {
         goToSettingsSection();
@@ -198,6 +220,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ConfigureReportsAndScriptsPage(this);
     }
 
+    public void clickCredits()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().creditsLink);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -214,8 +242,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
         protected WebElement externalRedirectHostLink = Locator.linkWithText("External Redirect Hosts").findElement(this);
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
+        protected WebElement auditLogMaintenanceLink = Locator.linkWithText("Audit Log Maintenance").findWhenNeeded(this);
         protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
         protected WebElement configurePageElements = Locator.linkWithText("configure page elements").findWhenNeeded(this);
+        protected WebElement complianceSettings = Locator.linkWithText("Compliance Settings").findWhenNeeded(this);
+        protected WebElement changeUserPropertiesLink = Locator.linkWithText("change user properties").findWhenNeeded(this);
         protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
         protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
@@ -230,6 +261,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement systemMaintenanceLink = Locator.linkWithText("system maintenance").findWhenNeeded(this);
         protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
         protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
+        protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {

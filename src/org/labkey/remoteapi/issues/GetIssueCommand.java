@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 public class GetIssueCommand extends PostCommand<GetIssueResponse>
@@ -16,7 +16,7 @@ public class GetIssueCommand extends PostCommand<GetIssueResponse>
     @Override
     protected GetIssueResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new GetIssueResponse(text, status, contentType, json, this);
+        return new GetIssueResponse(text, status, contentType, json);
     }
 
     @Override

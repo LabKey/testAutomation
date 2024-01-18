@@ -17,7 +17,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -26,9 +26,10 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
+import org.labkey.remoteapi.security.GetUsersResponse.UserInfo;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.user.UpdateUserDetailsPage;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -52,17 +53,21 @@ public class APIUserHelper extends AbstractUserHelper
     @Override
     public String getDisplayNameForEmail(@NotNull String email)
     {
-        GetUsersResponse users = getUsers(true);
-        Optional<GetUsersResponse.UserInfo> user = users.getUsersInfo().stream()
-                .filter(userInfo -> email.equals(userInfo.getEmail())).findFirst();
-        if (user.isPresent())
+        Map<String, String> displayNames = getDisplayNames();
+        if (displayNames.containsKey(email))
         {
-            return user.get().getDisplayName();
+            return displayNames.get(email);
         }
         else
         {
             return super.getDisplayNameForEmail(email);
         }
+    }
+
+    public Map<String, String> getDisplayNames()
+    {
+        GetUsersResponse users = getUsers(true);
+        return users.getUsersInfo().stream().collect(Collectors.toMap(UserInfo::getEmail, UserInfo::getDisplayName));
     }
 
     @Override
@@ -75,10 +80,15 @@ public class APIUserHelper extends AbstractUserHelper
             throw new IllegalArgumentException("No such user: " + email);
         }
 
-        // TODO: Update via API
-        final UpdateUserDetailsPage updateUserDetailsPage = UpdateUserDetailsPage.beginAt(getWrapper(), userId);
-        updateUserDetailsPage.setDisplayName(newDisplayName);
-        updateUserDetailsPage.clickSubmit();
+        try
+        {
+            new QueryApiHelper(getWrapper().createDefaultConnection(), "/", "core", "siteusers")
+                    .updateRows(List.of(Maps.of("userId", userId, "DisplayName", newDisplayName)));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to set display name for user:" + email, e);
+        }
     }
 
     @Override
@@ -125,7 +135,7 @@ public class APIUserHelper extends AbstractUserHelper
                     Assert.fail("Not able to create the user " + userName + " because " + response.getParsedData().get("htmlErrors").toString());
                 }
                 assertEquals(userName, response.getEmail());
-                assertTrue("Invalid userId", response.getUserId() != null);
+                assertNotNull("Invalid userId", response.getUserId());
             }
 
             return response;
@@ -172,8 +182,8 @@ public class APIUserHelper extends AbstractUserHelper
     public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeDeactivated)
     {
         Map<String, Integer> userIds = new HashMap<>();
-        List<GetUsersResponse.UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
-        for (GetUsersResponse.UserInfo userInfo : usersInfo)
+        List<UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
+        for (UserInfo userInfo : usersInfo)
         {
             if (userEmails.contains(userInfo.getEmail()))
                 userIds.put(userInfo.getEmail(), userInfo.getUserId());

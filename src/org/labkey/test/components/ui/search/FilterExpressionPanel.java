@@ -53,7 +53,7 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
      */
     public void setFilter(Expression expression)
     {
-        setFilter(0, expression);
+        setFilter(0, expression._operator, expression._value1, expression._value2);
     }
 
     /**
@@ -61,8 +61,8 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
      */
     public void setFilters(Expression expression0, Expression expression1)
     {
-        setFilter(0, expression0);
-        setFilter(1, expression1);
+        setFilter(0, expression0._operator, expression0._value1, expression0._value2);
+        setFilter(1, expression1._operator, expression1._value1, expression1._value2);
     }
 
     public void clearFilter()
@@ -74,12 +74,8 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         elementCache().filterTypeSelects.get(0).clearSelection();
     }
 
-    private void setFilter(int index, Expression expression)
+    public void setFilter(int index, Object operator, Object value1, Object value2)
     {
-        Operator operator = expression._operator;
-        Object value1 = expression._value1;
-        Object value2 = expression._value2;
-
         setFilterType(index, operator);
         if (value1 != null)
         {
@@ -121,16 +117,27 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         }
     }
 
-    private void setFilterType(int index, Operator operator)
+    private void setFilterType(int index, Object op)
     {
-        if (filterTypesLabelOverrides.containsKey(operator))
+        if (op instanceof Operator operator)
         {
-            elementCache().filterTypeSelects.get(index).select(filterTypesLabelOverrides.get(operator));
+            if (filterTypesLabelOverrides.containsKey(operator))
+            {
+                elementCache().filterTypeSelects.get(index).select(filterTypesLabelOverrides.get(operator));
+            }
+            else
+            {
+                elementCache().filterTypeSelects.get(index).select(operator.getDisplayValue());
+            }
         }
         else
-        {
-            elementCache().filterTypeSelects.get(index).select(operator.getDisplayValue());
-        }
+            elementCache().filterTypeSelects.get(index).select(op.toString());
+
+    }
+
+    public boolean hasFilterType(int index, String filterCaption)
+    {
+        return elementCache().filterTypeSelects.get(index).getOptions().contains(filterCaption);
     }
 
     @Override

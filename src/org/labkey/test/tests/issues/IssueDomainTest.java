@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
-import org.labkey.remoteapi.domain.DomainResponse;
-import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.DomainDetailsResponse;
+import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -88,8 +88,8 @@ public class IssueDomainTest extends BaseWebDriverTest
         List<String> mandatoryFields = Arrays.asList("title", "notifylist", "assignedto", "resolution");
         for (String mandatoryField : mandatoryFields)
         {
-            GetDomainCommand getCmd = new GetDomainCommand(DOMAIN_NAME, ISSUES_NAME);
-            DomainResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(), getContainerPath());
+            GetDomainDetailsCommand getCmd = new GetDomainDetailsCommand(DOMAIN_NAME, ISSUES_NAME);
+            DomainDetailsResponse getDomainResponse = getCmd.execute(this.createDefaultConnection(), getContainerPath());
             List<PropertyDescriptor> getDomainCols = getDomainResponse.getDomain().getFields();
             ListIterator<PropertyDescriptor> getDomainColsIterator = getDomainCols.listIterator();
 

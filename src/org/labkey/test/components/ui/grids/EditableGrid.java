@@ -1,18 +1,24 @@
 package org.labkey.test.components.ui.grids;
 
-import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactDatePicker;
 import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
+import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.annotation.Nullable;
@@ -21,19 +27,28 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
+    public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     public static final String SELECT_COLUMN_HEADER = "<select>";
     public static final String ROW_NUMBER_COLUMN_HEADER = "<row number>";
 
@@ -44,6 +59,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         _gridElement = editableGrid;
         _driver = driver;
+    }
+
+    protected EditableGrid(EditableGrid wrappedGrid)
+    {
+        this(wrappedGrid.getComponentElement(), wrappedGrid.getDriver());
     }
 
     @Override
@@ -58,39 +78,41 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return _gridElement;
     }
 
-    private void waitForLoaded()
+    public void waitForLoaded()
     {
         Locators.loadingGrid.waitForElementToDisappear(this, 30000);
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
+    public void clickRemove()
+    {
+        doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
+    }
+
+    public EntityBulkInsertDialog clickBulkInsert()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn));
+        elementCache().bulkInsertBtn.click();
+
+        return new EntityBulkInsertDialog(getDriver());
+    }
+
+    public EntityBulkUpdateDialog clickBulkUpdate()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkUpdateBtn));
+        elementCache().bulkUpdateBtn.click();
+
+        return new EntityBulkUpdateDialog(getDriver());
+    }
+
+    public ExportMenu getExportMenu()
+    {
+        return elementCache().exportMenu;
+    }
+
     public List<String> getColumnNames()
     {
-        List<String> columns = new ArrayList<>();
-        List<WebElement> headerCells = Locators.headerCells.waitForElements(getComponentElement(), WAIT_FOR_JAVASCRIPT);
-        for (WebElement el : headerCells)
-        {
-            columns.add(el.getText().trim());
-        }
-
-        int rowNumberColumn;
-
-        if (hasSelectColumn())
-        {
-            columns.set(0, SELECT_COLUMN_HEADER);
-            rowNumberColumn = 1;
-        }
-        else
-        {
-            rowNumberColumn = 0;
-        }
-
-        if (columns.get(rowNumberColumn).trim().isEmpty())
-        {
-            columns.set(rowNumberColumn, ROW_NUMBER_COLUMN_HEADER);
-        }
-
-        return columns;
+        return elementCache().getColumnNames();
     }
 
     protected Integer getColumnIndex(String columnHeader)
@@ -99,9 +121,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         for (int i=0; i< columnTexts.size(); i++ )
         {
             if (columnTexts.get(i).equalsIgnoreCase(columnHeader))
-                return i + 1; // Zero (0) based index in the list, one (1) based index with the control collection.
+                return i;
         }
-        return -1;
+        throw new NotFoundException("Column not found in grid: " + columnHeader + ". Found: " + columnTexts);
     }
 
     private boolean hasSelectColumn()
@@ -139,45 +161,49 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private List<WebElement> getRows()
     {
         waitForLoaded();
-        return Locators.rows.findElements(getComponentElement());
+        return Locators.rows.findElements(elementCache().table);
     }
 
-    public List<Map<String, String>> getGridData()
+    public List<Map<String, String>> getGridData(String... columns)
     {
         List<Map<String, String>> gridData = new ArrayList<>();
 
         List<String> columnNames = getColumnNames();
-        int numOfRows = getRowCount();
-
-        for (int rowIndex = 0; rowIndex < numOfRows; rowIndex++)
+        Set<Integer> includedColIndices = new HashSet<>();
+        if (columns.length > 0)
         {
-            WebElement row = getRow(rowIndex);
-            List<WebElement> cells = row.findElements(By.tagName("td"));
-            Map<String, String> mapData = new HashMap<>();
-
-            int index = 0;
-            String columnName;
-            for (WebElement cell : cells)
+            Assertions.assertThat(columnNames).as("Editable grid columns").contains(columns);
+            for (String col : columns)
             {
-                columnName = columnNames.get(index);
+                int colIndex = columnNames.indexOf(col);
+                includedColIndices.add(colIndex);
+            }
+        }
 
-                if (columnName.equals(SELECT_COLUMN_HEADER))
+        for (WebElement row : getRows())
+        {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+            Map<String, String> rowMap = new HashMap<>();
+
+            for (int i = 0; i < cells.size(); i++)
+            {
+                if (includedColIndices.isEmpty() || includedColIndices.contains(i))
                 {
-                    // Special case the checkbox.
-                    if (null == cell.findElement(By.tagName("input")).getAttribute("checked"))
-                        mapData.put(columnName, "false");
+                    WebElement cell = cells.get(i);
+                    String columnName = columnNames.get(i);
+
+                    if (columnName.equals(SELECT_COLUMN_HEADER))
+                    {
+                        rowMap.put(columnName, String.valueOf(cell.findElement(By.tagName("input")).isSelected()));
+                    }
                     else
-                        mapData.put(columnName, cell.findElement(By.tagName("input")).getAttribute("checked").trim().toLowerCase());
+                    {
+                        rowMap.put(columnName, cell.getText());
+                    }
                 }
-                else
-                {
-                    mapData.put(columnName, cell.getText());
-                }
-
-                index++;
             }
 
-            gridData.add(mapData);
+            gridData.add(rowMap);
         }
 
         return gridData;
@@ -185,7 +211,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public List<String> getColumnData(String columnLabel)
     {
-        return getGridData().stream().map(a-> a.get(columnLabel)).collect(Collectors.toList());
+        return getGridData(columnLabel).stream().map(a-> a.get(columnLabel)).collect(Collectors.toList());
     }
 
     private WebElement getRow(int index)
@@ -194,18 +220,42 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Find the first row index containing the text value in the given column.
+     * If not found -1 is returned.
+     *
+     * @param columnLabel Column label to look at.
+     * @param text Text to look for (must match exactly).
+     * @return The first row index where found, -1 if not found.
+     */
+    public Integer getRowIndex(String columnLabel, String text)
+    {
+        int index = -1;
+
+        List<String> columnData = getColumnData(columnLabel);
+        for(int i = 0; i < columnData.size(); i++)
+        {
+            if(columnData.get(i).equals(text))
+            {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+
+    /**
      * Get the td element for a cell.
      *
      * @param row The 0 based row index.
      * @param column The name of the column to get the cell.
      * @return A {@link WebElement} that is the td for the cell.
      */
-    private WebElement getCell(int row, String column)
+    public WebElement getCell(int row, String column)
     {
-        int columnIndex = getColumnIndex(column);
-        WebElement gridCell = getRow(row).findElement(By.cssSelector("td:nth-of-type(" + columnIndex + ")"));
-        getWrapper().scrollIntoView(gridCell);
-        return gridCell;
+        int columNumber = getColumnIndex(column) + 1;
+        return Locator.css("td:nth-of-type(" + columNumber + ")").findElement(getRow(row));
     }
 
     public boolean isCellReadOnly(int row, String column)
@@ -272,11 +322,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return new ArrayList<>(Arrays.asList(unPopulatedRows, populatedRows));
     }
 
-    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet)
-    {
-        setCellValue(columnNameToSearch, valueToSearch, columnNameToSet, valueToSet, false);
-    }
-
     /**
      * <p>
      *     For a given column, 'columnNameToSet', set the cell in the row if value in column 'columnNameToSearch'
@@ -295,62 +340,47 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param valueToSearch The value to check for in 'columnNameToSearch' to see if the row should be updated.
      * @param columnNameToSet The column to update in a row.
      * @param valueToSet The new value to put into column 'columnNameToSet'.
-     * @param useDatePicker For date field, use datepicker instead of keyboard
      */
-    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet, boolean useDatePicker)
+    public void setCellValue(String columnNameToSearch, String valueToSearch, String columnNameToSet, Object valueToSet)
     {
-        List<Map<String, String>> gridData = getGridData();
-        int index = 0;
-
-        for (Map<String, String> rowData : gridData)
-        {
-            if (rowData.get(columnNameToSearch).equals(valueToSearch))
-            {
-                setCellValue(index, columnNameToSet, valueToSet, useDatePicker);
-                break;
-            }
-            index++;
-        }
-    }
-
-    public void setCellValue(int row, String columnName, Object value)
-    {
-        setCellValue(row, columnName, value, false);
+        setCellValue(getRowIndex(columnNameToSearch, valueToSearch), columnNameToSet, valueToSet);
     }
 
     /**
      * <p>
-     *     For the identified row set the value in the identified column.
+     * For the identified row set the value in the identified column.
      * </p>
      * <p>
-     *     If the column to be updated is a look-up, the value passed in must be a list, even if it is just one value.
-     *     This is needed so the function knows how to set the value.
+     * If the column to be updated is a look-up, the value passed in must be a list, even if it is just one value.
+     * This is needed so the function knows how to set the value.
      * </p>
      *
-     * @param row Index of the row (0 based).
+     * @param row        Index of the row (0 based).
      * @param columnName Name of the column to update.
-     * @param value If the cell is a lookup, value should be List.of(value(s))
-     * @param useDatePicker For date field, use datepicker instead of keyboard, only works with yyyy-MM-dd format
+     * @param value      If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
+     * @return cell WebElement
      */
-    public void setCellValue(int row, String columnName, Object value, boolean useDatePicker)
+    public WebElement setCellValue(int row, String columnName, Object value)
     {
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        // Normalize date values
+        if (value instanceof LocalDate ld)
+        {
+            value = ld.atStartOfDay();
+        }
+        else if (value instanceof Date date)
+        {
+            value = LocalDateTime.ofInstant(date.toInstant(), TimeZone.getDefault().toZoneId());
+        }
 
-        // Select the cell.
-        selectCell(gridCell);
-
-        // Activate the cell.
-        activateCell(gridCell);
+        WebElement gridCell = selectCell(row, columnName);
 
         if (value instanceof List)
         {
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
-            ReactSelect lookupSelect = elementCache().lookupSelect();
+            ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
-            waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
             lookupSelect.open();
 
             for (String _value : values)
@@ -359,40 +389,47 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
 
         }
+        else if (value instanceof LocalDateTime localDateTime)
+        {
+            // Activate the cell.
+            activateCell(gridCell);
+
+            ReactDatePicker datePicker = elementCache().datePicker();
+            datePicker.select(localDateTime);
+        }
         else
         {
-            // Treat the object being sent in as a string.
-            // Get the inputCell enter the text and then make the inputCell go away (hit RETURN).
+            new Actions(getDriver()).sendKeys(" ").perform(); // Type into no particular element to activate input
 
-            boolean isUnsupportedDateFormat = false;
-            if (useDatePicker)
-            {
-                ReactDatePicker datePicker = elementCache().datePicker();
-                isUnsupportedDateFormat = !datePicker.select((String) value);
+            String str = value.toString();
+            WebElement inputCell = elementCache().inputCell();
+            inputCell.sendKeys(Keys.BACK_SPACE, str, Keys.RETURN); // Add the RETURN to close the inputCell.
 
-                if (!isUnsupportedDateFormat)
-                {
-                    WebElement inputCell = elementCache().inputCell();
-                    inputCell.sendKeys(Keys.RETURN);
-                }
-            }
-
-            if (isUnsupportedDateFormat || !useDatePicker)
-            {
-                WebElement inputCell = elementCache().inputCell();
-                inputCell.clear();
-                inputCell.sendKeys(Keys.END + value.toString() + Keys.RETURN); // Add the RETURN to close the inputCell.
-            }
-
-            getWrapper().waitForElementToDisappear(Locators.inputCell, WAIT_FOR_JAVASCRIPT);
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
             // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
             // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
             // of the existing value so the new value should exist somewhere in the cell text value not necessarily
             // at the end of it.
-            WebDriverWrapper.waitFor(() -> gridCell.getText().contains(value.toString()),
+            WebDriverWrapper.waitFor(() -> gridCell.getText().contains(str),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
         }
+        return gridCell;
+    }
+
+    /**
+     * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
+     * @param row   the row
+     * @param columnName    name of the column
+     * @param value     value to insert
+     */
+    public void setNewSelectValue(int row, String columnName, String value)
+    {
+        WebElement gridCell = selectCell(row, columnName);
+
+        ReactSelect createSelect = elementCache().lookupSelect(gridCell);
+
+        createSelect.createValue(value);
     }
 
     /**
@@ -404,18 +441,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public void clearCellValue(String columnNameToSearch, String valueToSearch, String columnNameToClear)
     {
-        List<Map<String, String>> gridData = getGridData();
-        int index = 0;
-
-        for (Map<String, String> rowData : gridData)
-        {
-            if (rowData.get(columnNameToSearch).equals(valueToSearch))
-            {
-                clearCellValue(index, columnNameToClear);
-                break;
-            }
-            index++;
-        }
+        clearCellValue(getRowIndex(columnNameToSearch, valueToSearch), columnNameToClear);
     }
 
 
@@ -427,7 +453,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public void clearCellValue(int row, String columnName)
     {
-        pasteFromCell(row, columnName, "");
+        selectCell(row, columnName);
+        new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
     }
 
     /**
@@ -455,7 +482,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid dismissDropdownList()
     {
-        elementCache().lookupSelect().close();
+        ReactSelect.finder(getDriver()).find(getComponentElement()).close();
 
         return this;
     }
@@ -484,21 +511,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public List<String> getFilteredDropdownListForCell(int row, String columnName, @Nullable String filterText)
     {
 
-        // Get a reference to the cell.
-        WebElement gridCell = getCell(row, columnName);
+        WebElement gridCell = selectCell(row, columnName);
 
-        selectCell(gridCell);
+        ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
-        // Double click to make the ReactSelect active. This may expand the list.
-        getWrapper().doubleClick(gridCell);
-
-        ReactSelect lookupSelect = elementCache().lookupSelect();
-
-        // If the double click did not expand the select this will.
+        // If the click did not expand the select this will.
         // This will have no effect if the list is expended.
         lookupSelect.open();
 
-        if (filterText != null && !filterText.trim().isEmpty())
+        if (StringUtils.isNotBlank(filterText))
         {
             lookupSelect.enterValueInTextbox(filterText);
         }
@@ -587,10 +608,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return selection;
     }
 
+    /**
+     * Selects all cells in the table, then deletes their content
+     */
+    public void clearAllCells() throws IOException, UnsupportedFlavorException
+    {
+        selectAllCells();
+        new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
+    }
+
     public String copyCurrentSelection() throws IOException, UnsupportedFlavorException
     {
         // now copy the contents of the current selection to the clipboard
-        Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+        Keys cmdKey = MODIFIER_KEY;
         Actions actions = new Actions(getDriver());
         actions.keyDown(cmdKey)
                 .sendKeys( "c")
@@ -602,19 +632,36 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 .getData(DataFlavor.stringFlavor);
     }
 
-    private EditableGrid selectCellRange(WebElement startCell, WebElement endCell)
+    public void dragFill(WebElement startCell, WebElement endCell)
     {
-        selectCell(startCell);
-        getWrapper().scrollIntoView(endCell);
-        // now drag mouse from start to end cell
-        Actions selectRange = new Actions(getDriver());
-        selectRange.dragAndDrop(startCell, endCell)
-                .build()
-                .perform();
+        Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
+        WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
+        dragToCell(selectionHandle, endCell);
+        selectionHandleLoc.waitForElement(endCell, 5_000);
+    }
+
+    public void selectCellRange(WebElement startCell, WebElement endCell)
+    {
+        dragToCell(startCell, endCell);
 
         WebDriverWrapper.waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
                 "Cell range did not become selected", 2000);
-        return this;
+    }
+
+    private void dragToCell(WebElement elementToDrag, WebElement destinationCell)
+    {
+        var size = destinationCell.getSize();
+
+        new Actions(getDriver())
+                // WebDriver doesn't calculate correct location to click the cell selection handle
+                .moveToElement(elementToDrag, 0, 7)
+                .clickAndHold()
+                .moveToElement(destinationCell)
+                // Extra wiggle to get it to stick
+                .moveByOffset(0, -size.getHeight())
+                .moveByOffset(0, size.getHeight())
+                .release()
+                .perform();
     }
 
     private void selectAllCells()
@@ -625,11 +672,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
                                                                 // this resets the grid state to a known base condition
             // use 'ctrl-a' to select the entire grid
-            Keys cmdKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
+            Keys cmdKey = MODIFIER_KEY;
             new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
             WebDriverWrapper.waitFor(this::areAllInSelection,
                     "the expected cells did not become selected", 3000);
         }
+    }
+
+    private WebElement selectCell(int row, String columnName)
+    {
+        // Get a reference to the cell.
+        WebElement gridCell = getCell(row, columnName);
+
+        // Select the cell.
+        selectCell(gridCell);
+        return gridCell;
     }
 
     /**
@@ -637,6 +694,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     private void selectCell(WebElement cell)
     {
+        getWrapper().scrollIntoView(cell);
+
         if (!isCellSelected(cell))
         {
             cell.click();
@@ -752,16 +811,26 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
-    public void doAndWaitForUpdate(Runnable func)
+    public void setAddRows(int count)
     {
-        func.run();
-        waitForUpdate();
+        elementCache().addCountInput.set(String.valueOf(count));
     }
 
-    private void waitForUpdate()
+    public void addRows(int count)
     {
-        waitForLoaded();
-        clearElementCache();
+        setAddRows(count);
+        doAndWaitForUpdate(() -> {
+            elementCache().addRowsButton.click();
+        });
+    }
+
+    private void doAndWaitForUpdate(Runnable func)
+    {
+        int initialCount = getRowCount();
+
+        func.run();
+
+        waitFor(() -> getRowCount() != initialCount, "Failed to add/remove rows", 5_000);
     }
 
     @Override
@@ -772,22 +841,73 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(getComponentElement());
-        public WebElement inputCell()
+        final WebElement topControls = Locator.byClass("editable-grid-buttons__action-buttons").findWhenNeeded(this);
+
+        final WebElement bulkInsertBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
+        final WebElement bulkUpdateBtn = Locator.byClass("bulk-update-button").findWhenNeeded(topControls);
+        final WebElement deleteRowsBtn =  Locator.byClass("bulk-remove-button").findWhenNeeded(topControls);
+        final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
+
+        final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
+
+        private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
+
+        private final List<String> columnNames = new ArrayList<>();
+
+        public List<String> getColumnNames()
         {
-            return Locators.inputCell.findElement(getComponentElement());
+            if (columnNames.isEmpty())
+            {
+                List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
+
+                for (WebElement el : headerCells)
+                {
+                    columnNames.add(el.getText().trim());
+                }
+
+                int rowNumberColumn;
+
+                if (hasSelectColumn())
+                {
+                    columnNames.set(0, SELECT_COLUMN_HEADER);
+                    rowNumberColumn = 1;
+                }
+                else
+                {
+                    rowNumberColumn = 0;
+                }
+
+                if (columnNames.get(rowNumberColumn).trim().isEmpty())
+                {
+                    columnNames.set(rowNumberColumn, ROW_NUMBER_COLUMN_HEADER);
+                }
+            }
+
+            return columnNames;
         }
 
-        public ReactSelect lookupSelect()
+
+        public WebElement inputCell()
         {
-            return ReactSelect.finder(getDriver()).find(getComponentElement());
+            return Locators.inputCell.findElement(table);
+        }
+
+        public ReactSelect lookupSelect(WebElement cell)
+        {
+            Locator.byClass("cell-menu-selector").findOptionalElement(cell).ifPresent(WebElement::click);
+            ReactSelect lookupSelect = ReactSelect.finder(getDriver()).timeout(2_000).find(table);
+            waitFor(()->lookupSelect.isInteractive() && !lookupSelect.isLoading(), "Select control is not ready.", 1_000);
+            return lookupSelect;
         }
 
         public ReactDatePicker datePicker()
         {
-            return new ReactDatePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(getComponentElement());
+            return new ReactDatePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(table);
         }
 
+        final WebElement addRowsPanel = Locator.byClass("editable-grid__controls").findWhenNeeded(this);
+        final Input addCountInput = Input.Input(Locator.name("addCount"), getDriver()).findWhenNeeded(addRowsPanel);
+        final WebElement addRowsButton = Locator.byClass("btn-primary").findWhenNeeded(addRowsPanel);
     }
 
     protected abstract static class Locators
@@ -797,28 +917,18 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // Do nothing constructor to prevent instantiation.
         }
 
-        public static Locator.XPathLocator editableGrid()
-        {
-            return Locator.byClass("table-cellular");
-        }
-
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
-        static final Locator spinner = Locator.css("span i.fa-spinner");
+        static final Locator spinner = Locator.css(".fa-spinner");
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
-        static final Locator headerCells = Locator.xpath("//thead/tr/th");
+        static final Locator headerCells = Locator.css("thead tr th");
         static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
-
-        static Locator.XPathLocator itemElement(String text)
-        {
-            return Locator.tagContainingText("span", text).withClass("btn-primary");
-        }
 
     }
 
     public static class EditableGridFinder extends WebDriverComponent.WebDriverComponentFinder<EditableGrid, EditableGridFinder>
     {
-        private final Locator _locator = Locators.editableGrid();
+        private final Locator _locator = Locator.byClass("editable-grid__container").parent();
 
         public EditableGridFinder(WebDriver driver)
         {

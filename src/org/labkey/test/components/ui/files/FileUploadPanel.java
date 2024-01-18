@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.Input;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
@@ -12,8 +13,6 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.labkey.test.components.html.Input.Input;
 
 public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementCache>
 {
@@ -42,11 +41,11 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
     {
         try
         {
-            elementCache().input().set(file.getAbsolutePath());
+            elementCache().fileUploadInput().set(file);
         }catch(ElementNotInteractableException nie)
         {
             WebDriverWrapper.sleep(1000);
-            elementCache().input().set(file.getAbsolutePath());   // retry
+            elementCache().fileUploadInput().set(file);   // retry
         }
         WebDriverWrapper.waitFor(()-> hasFile(file.getName()),
                 "the file ["+ file.getName() +"] was not added", 2000);
@@ -87,9 +86,9 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        Input input()
+        FileInput fileUploadInput()
         {
-            return Input(Locator.id("fileUpload"), getDriver()).waitFor(this);
+            return Input.FileInput(Locator.id("fileUpload"), getDriver()).waitFor(this);
         }
 
         Locator.XPathLocator attachedFileContainer = Locator.tagWithClass("div", "attached-file--container")

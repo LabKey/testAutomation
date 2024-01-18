@@ -22,18 +22,22 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DataClassHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -142,21 +146,23 @@ public class DataClassTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields("created");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'created' is a reserved name."),
+                "'created' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("rowid");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'rowid' is a reserved name."),
+                "'rowid' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("name");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'name' is a reserved name."),
+                "'name' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
-        domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
     }
@@ -221,6 +227,85 @@ public class DataClassTest extends BaseWebDriverTest
         domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
+    }
+
+    @Test // Issue 48705
+    public void testLongFieldNames()
+    {
+        goToProjectHome();
+
+        String name = "Long Field Names Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(name);
+
+        log("Add a field name > 49 characters");
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields("This_field_name_is_longer_than_50_characters_for_testing");
+        createPage.clickSave();
+
+        DataClassHelper sourceHelper = DataClassHelper.beginAtDataClassesList(this, getProjectName());
+        assertEquals("Data class grid should have zero rows", 0, sourceHelper.goToDataClass(name).getDataCount());
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        goToProjectHome();
+
+        String dataClassName = "Unique Constraint Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(dataClassName);
+
+        log("Add a field with a unique constraint");
+        String fieldName1 = "field Name1";
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields(fieldName1)
+                .setType(FieldDefinition.ColumnType.Integer)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field with a unique constraint");
+        String fieldName2 = "fieldName_2";
+        domainFormPanel.addField(fieldName2)
+                .setType(FieldDefinition.ColumnType.DateAndTime)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field which does not have a unique constraint");
+        String fieldName3 = "FieldName@3";
+        domainFormPanel.addField(fieldName3)
+                .setType(FieldDefinition.ColumnType.Boolean);
+        createPage.clickSave();
+
+        viewRawTableMetadata(dataClassName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+
+        log("Remove a field unique constraint and add a new one");
+        goToProjectHome();
+        CreateDataClassPage updatePage = goToDataClass(dataClassName);
+        domainFormPanel = updatePage.getDomainEditor();
+        domainFormPanel.getField(fieldName2)
+                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        domainFormPanel.getField(fieldName3)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        updatePage.clickSave();
+        viewRawTableMetadata(dataClassName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_test_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String dataClassName)
+    {
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "exp.data", "query.queryName", dataClassName)));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("lsid");
+        suffixes.add("name_classid");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     private CreateDataClassPage goToCreateNewDataClass()

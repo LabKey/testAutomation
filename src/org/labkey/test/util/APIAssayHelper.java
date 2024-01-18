@@ -39,6 +39,8 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.params.assay.AssayDesign;
+import org.openqa.selenium.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +67,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -75,7 +77,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setRunFilePath(runFilePath);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -87,7 +89,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.setProperties(runProperties);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @LogMethod(quiet = true)
@@ -124,7 +126,7 @@ public class APIAssayHelper extends AbstractAssayHelper
             irc.setBatchProperties(batchProperties);
 
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
     @Override
@@ -201,7 +203,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         AssayListResponse alr = null;
         try
         {
-            alr = alc.execute(_test.createDefaultConnection(), "/" + projectPath);
+            alr = alc.execute(_test.createDefaultConnection(), projectPath);
         }
         catch (CommandException | IOException e)
         {
@@ -221,7 +223,7 @@ public class APIAssayHelper extends AbstractAssayHelper
                 fail("Assay not found: " + assayName);
             return 0;
         }
-        return ((Long) alr.getDefinition(assayName).get("id")).intValue();
+        return (int)alr.getDefinition(assayName).get("id");
     }
 
     /**
@@ -238,13 +240,9 @@ public class APIAssayHelper extends AbstractAssayHelper
         SelectRowsCommand cmd = new SelectRowsCommand("assay", "AssayList");
         cmd.setColumns(Arrays.asList("Name", "Description", "Type"));
 
-        String formattedContainerPath = containerPath;
-        if(!formattedContainerPath.startsWith("/"))
-            formattedContainerPath = "/" + formattedContainerPath;
-
         List<String> resultData = new ArrayList<>();
 
-        SelectRowsResponse response = cmd.execute(connection, formattedContainerPath);
+        SelectRowsResponse response = cmd.execute(connection, containerPath);
         for(Row row : response.getRowset())
         {
             resultData.add(row.getValue("Name").toString());
@@ -274,20 +272,13 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         SaveAssayBatchCommand cmd = new SaveAssayBatchCommand(assayId, batch);
         cmd.setTimeout(180000); // Wait 3 minutes for assay import
-        cmd.execute(_test.createDefaultConnection(), "/" + projectPath);
+        cmd.execute(_test.createDefaultConnection(), projectPath);
     }
 
     public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws IOException, CommandException
     {
-        Connection connection = _test.createDefaultConnection();
-        GetProtocolCommand getProtocolCommand = new GetProtocolCommand(providerName);
-        ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
-
-        Protocol newAssayProtocol = getProtocolResponse.getProtocol();
-        newAssayProtocol.setName(assayName);
-        SaveProtocolCommand saveProtocolCommand = new SaveProtocolCommand(newAssayProtocol);
-        ProtocolResponse saveProtocolResponse = saveProtocolCommand.execute(connection, containerPath);
-        return saveProtocolResponse.getProtocol();
+        return AssayDesign.of(providerName, assayName)
+                .createAssay(containerPath, _test.createDefaultConnection());
     }
 
     /**
@@ -321,12 +312,34 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     public String getPlateTemplateLsid(String folderPath) throws Exception
     {
-        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
-        selectRowsCmd.setColumns(List.of("Lsid"));
-
-        SelectRowsResponse resp = selectRowsCmd.execute(_test.createDefaultConnection(), folderPath);
+        SelectRowsResponse resp = getPlateTemplates(folderPath);
 
         return String.valueOf(resp.getRows().get(0).get("Lsid"));
+    }
+
+    public String getPlateTemplateLsid(String folderPath, String name) throws Exception
+    {
+        SelectRowsResponse resp = getPlateTemplates(folderPath);
+        List<String> names = new ArrayList<>();
+        for (Map<String, Object> row : resp.getRows())
+        {
+            String rowName = (String) row.get("name");
+            if (rowName.equals(name))
+            {
+                return (String) row.get("Lsid");
+            }
+            names.add(rowName);
+        }
+
+        throw new NotFoundException("No plate template '%s'. Found: %s".formatted(name, names.toString()));
+    }
+
+    private SelectRowsResponse getPlateTemplates(String folderPath) throws IOException, CommandException
+    {
+        SelectRowsCommand selectRowsCmd = new SelectRowsCommand("assay.General", "PlateTemplate");
+        selectRowsCmd.setColumns(List.of("Name", "Lsid"));
+
+        return selectRowsCmd.execute(_test.createDefaultConnection(), folderPath);
     }
 
     public List<PropertyDescriptor> inferFieldsFromFile(File file, String containerPath) throws IOException, CommandException

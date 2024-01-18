@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.ComboBox;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -138,6 +139,85 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return doAndWaitForDownload(()->elementCache().getDownloadTemplateButton().click());
     }
 
+    public void setFileInsertOption(boolean isUpdate)
+    {
+        setInsertOption(true, isUpdate);
+    }
+
+    public void setFileMerge(boolean isMerge)
+    {
+        setFileMerge(isMerge, isMerge);
+    }
+
+    public void setFileMerge(boolean isMerge, boolean isUpdate)
+    {
+        setFileInsertOption(isUpdate || isMerge);
+
+        if (isMerge && !isFileMergeChecked())
+            elementCache().mergeFile.check();
+        else if (!isMerge && isFileMergeChecked())
+            elementCache().mergeFile.uncheck();
+
+    }
+
+    public boolean isFileMergeChecked()
+    {
+        return elementCache().mergeFile.isChecked();
+    }
+
+    public boolean isFileMergeOptionPresent()
+    {
+        return elementCache().mergeFileOptional != null;
+    }
+
+    public void setCopyPasteInsertOption(boolean isUpdate)
+    {
+        setInsertOption(false, isUpdate);
+    }
+
+    public void setCopyPasteMerge(boolean isMerge)
+    {
+        setCopyPasteMerge(isMerge, isMerge);
+    }
+
+    public void setCopyPasteMerge(boolean isMerge, boolean isUpdate)
+    {
+        setCopyPasteInsertOption(isUpdate || isMerge);
+
+        if (isMerge && !isCopyPasteMergeChecked())
+            elementCache().mergePaste.check();
+        else if (!isMerge && isCopyPasteMergeChecked())
+            elementCache().mergePaste.uncheck();
+    }
+
+    public boolean isCopyPasteMergeChecked()
+    {
+        return elementCache().mergePaste.isChecked();
+    }
+
+    public void setInsertOption(boolean isFile, boolean isUpdate)
+    {
+        if (isFile)
+        {
+            if (isUpdate)
+                elementCache().updateRowsFile.set(true);
+            else
+                elementCache().addRowsFile.set(true);
+        }
+        else
+        {
+            if (isUpdate)
+                elementCache().updateRowsPaste.set(true);
+            else
+                elementCache().addRowsPaste.set(true);
+        }
+    }
+
+    public boolean isPasteMergeOptionPresent()
+    {
+        return elementCache().mergePasteOptional != null;
+    }
+
     public enum Format
     {
         TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
@@ -173,6 +253,10 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         WebElement uploadFileDiv = Locator.byClass("panel-body").findWhenNeeded(uploadPanel);
         WebElement uploadExpando = Locator.byClass("lk-import-expando").findWhenNeeded(uploadPanel);
         WebElement uploadFileFilePath = Locator.input("file").findWhenNeeded(uploadFileDiv);
+        RadioButton addRowsFile = RadioButton.RadioButton().withLabelContaining("Add").findWhenNeeded(uploadPanel);
+        RadioButton updateRowsFile = RadioButton.RadioButton().withLabelContaining("Update").findWhenNeeded(uploadPanel);
+        Checkbox mergeFile = Ext4Checkbox().withLabelContaining("Allow new").findWhenNeeded(uploadPanel);
+        Checkbox mergeFileOptional = Ext4Checkbox().withLabelContaining("Allow new").findOrNull(uploadPanel);
 
         // Paste data
         WebElement copyPastePanel = Locator.tagWithAttribute("div", "data-panel-name", "copyPastePanel").findWhenNeeded(this);
@@ -180,6 +264,10 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         WebElement copyPasteExpando = Locator.byClass("lk-import-expando").findWhenNeeded(copyPastePanel);
         WebElement pasteDataTextArea = Locator.tag("textarea").findWhenNeeded(copyPasteDiv);
         ComboBox formatCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel("Format:").findWhenNeeded(copyPastePanel);
+        RadioButton addRowsPaste = RadioButton.RadioButton().withLabelContaining("Add").findWhenNeeded(copyPastePanel);
+        RadioButton updateRowsPaste = RadioButton.RadioButton().withLabelContaining("Update").findWhenNeeded(copyPastePanel);
+        Checkbox mergePaste = Ext4Checkbox().withLabelContaining("Allow new").findWhenNeeded(copyPastePanel);
+        Checkbox mergePasteOptional = Ext4Checkbox().withLabelContaining("Allow new").findOrNull(copyPastePanel);
 
         WebElement getExpandedPanel()
         {

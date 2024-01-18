@@ -2,7 +2,6 @@ package org.labkey.test.components.ui.grids;
 
 
 import org.labkey.test.Locator;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 
@@ -16,21 +15,9 @@ public class LineageGridRow extends GridRow
     private static final Locator secondParentLoc = Locator.tagWithClass("span", "label-primary").withText("2nd parent");
     private String _lineageName;
 
-    protected LineageGridRow(ResponsiveGrid<?> grid, WebElement el, WebDriver driver)
+    protected LineageGridRow(ResponsiveGrid<?> grid, WebElement el)
     {
-        super(grid, el, driver);
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _el;
-    }
-
-    @Override
-    public WebDriver getDriver()
-    {
-        return _driver;
+        super(grid, el);
     }
 
     public String getLineageName()

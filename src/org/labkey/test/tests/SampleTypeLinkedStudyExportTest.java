@@ -95,12 +95,20 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
                 "Date", now,
                 "ParticipantID", "P1"));
 
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.clickImportBulkData();
+        String header = "AliquotedFrom\n";
+        String aliquotRow =  "Blood\n";
+        setFormElement(Locator.name("text"), header + aliquotRow);
+        clickButton("Submit");
+
         log("Export the Sample type folder");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         goToFolderManagement()
                 .goToExportTab();
         File exportArchive = new ExportFolderPage(getDriver())
-                .includeSampleTypeAndDataClasses(true)
+                .includeSampleTypeData(true)
+                .includeDataClassData(true)
                 .exportToBrowserAsZipFile();
 
         log("Navigate into the destination folder and import there");
@@ -114,7 +122,7 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
         goToProjectHome(IMPORT_PROJECT);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE));
         DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        checker().verifyEquals("Incorrect Columns in imported sample type", Arrays.asList("Name", "Flag", "Visit ID", "Date", "Participant ID",
+        checker().verifyEquals("Incorrect Columns in imported sample type", Arrays.asList("Name", "Expiration Date", "Flag", "Visit ID", "Date", "Participant ID", "Amount", "Units",
                 "Linked to " + LINKED_STUDY + " Study"), table.getColumnLabels());
 
         clickAndWait(Locator.linkWithText("linked"));

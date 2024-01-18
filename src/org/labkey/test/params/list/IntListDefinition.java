@@ -1,6 +1,7 @@
 package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -17,9 +18,9 @@ public class IntListDefinition extends ListDefinition
     }
 
     @Override
-    public List<FieldDefinition> getFields()
+    public List<PropertyDescriptor> getFields()
     {
-        List<FieldDefinition> fields = super.getFields();
+        List<PropertyDescriptor> fields = super.getFields();
         fields.add(0, new FieldDefinition(getKeyName(), FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
         return fields;
     }

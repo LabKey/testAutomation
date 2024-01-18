@@ -9,11 +9,14 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -94,7 +97,21 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
-        validateSingleColumnData();
+        assertNoLabKeyErrors();
+
+        DataRegionTable dataRegion = new DataRegionTable("Data", this);
+
+        Map<String, List<String>> singleExpectedData = new HashMap<>();
+        singleExpectedData.put("Participant ID", List.of("Ted", "Alice", "Bob"));
+        singleExpectedData.put("Age", List.of("N", "17", "Q"));
+        singleExpectedData.put("Sex", List.of("male", "female", "N"));
+
+        Map<String, List<Integer>> singleExpectedMVIndicators = new HashMap<>();
+        singleExpectedMVIndicators.put("Age", List.of(0, 2));
+        singleExpectedMVIndicators.put("Sex", List.of(2));
+
+        checkDataregionData(dataRegion, singleExpectedData);
+        checkMvIndicatorPresent(dataRegion, singleExpectedMVIndicators);
 
         log("Import two column MV data");
         clickProject(getProjectName());
@@ -113,7 +130,23 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_RUN_TWO_COLUMN));
-        validateTwoColumnData("Data", "ParticipantID");
+        assertNoLabKeyErrors();
+
+        dataRegion = new DataRegionTable("Data", this);
+
+        Map<String, List<String>> multiExpectedData = new HashMap<>();
+        multiExpectedData.put("Participant ID", List.of("Franny", "Zoe", "J.D."));
+        multiExpectedData.put("Age", List.of("N", "Q", "50"));
+        multiExpectedData.put("Sex", List.of("male", "female", "Q"));
+
+        Map<String, List<Integer>> multiExpectedMVIndicators = new HashMap<>();
+        multiExpectedMVIndicators.put("Age", List.of(0, 1));
+        multiExpectedMVIndicators.put("Sex", List.of(2));
+
+        checkDataregionData(dataRegion, multiExpectedData);
+        checkMvIndicatorPresent(dataRegion, multiExpectedMVIndicators);
+        checkOriginalValuePopup(dataRegion, "Age", 0, " ");
+
         testMvFiltering(List.of("age", "sex"));
 
         log("Import from Excel in single-column format");
@@ -133,7 +166,13 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN));
-        validateSingleColumnData();
+        assertNoLabKeyErrors();
+
+        dataRegion = new DataRegionTable("Data", this);
+
+        // Expected data is the same as before.
+        checkDataregionData(dataRegion, singleExpectedData);
+        checkMvIndicatorPresent(dataRegion, singleExpectedMVIndicators);
 
         log("Import from Excel in two-column format");
         clickProject(getProjectName());
@@ -151,7 +190,14 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
-        validateTwoColumnData("Data", "ParticipantID");
+        assertNoLabKeyErrors();
+
+        dataRegion = new DataRegionTable("Data", this);
+
+        // Expected data is the same as before.
+        checkDataregionData(dataRegion, multiExpectedData);
+        checkMvIndicatorPresent(dataRegion, multiExpectedMVIndicators);
+        checkOriginalValuePopup(dataRegion, "Age", 0, " ");
 
         log("Export folder");
         File folderAsZip = ExportFolderPage.beginAt(this).includeExperimentsAndRuns(true).exportToBrowserAsZipFile();
@@ -164,7 +210,10 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickProject(IMPORT_PROJECT);
         waitAndClickAndWait(Locator.linkWithText("MVAssay"));
         clickAndWait(Locator.linkWithText("view results"));
-        assertMvIndicatorPresent();
+        multiExpectedMVIndicators = new HashMap<>();
+        multiExpectedMVIndicators.put("Age", List.of(0, 2, 3, 4, 6, 8, 9, 10));
+        multiExpectedMVIndicators.put("Sex", List.of(2, 5, 8, 11));
+        checkMvIndicatorPresent(dataRegion, multiExpectedMVIndicators);
         testMvFiltering(List.of("age", "sex"));
     }
 

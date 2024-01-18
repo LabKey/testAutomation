@@ -95,7 +95,7 @@ public class FlowImportTest extends BaseFlowTest
         {
             assertTrue("expect each field in FileDate column to have a value, is [" + date + "]", !date.isEmpty());
             // make sure the resulting value parses to a date
-            new SimpleDateFormat("YYYY-MM-DD HH:mm").parse(date);
+            new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date);
         }
         // UNDONE: Check '118795.fcs' FCSAnalysis well has a fake FCSFile that has an original FCSFile data input.
         // UNDONE: Check FCSFiles.Original column
@@ -114,7 +114,7 @@ public class FlowImportTest extends BaseFlowTest
         assertOptionEquals(Locator.name("selectedSamples.rows[295].matchedFile"), "118795.fcs (microFCS)");
         assertChecked(Locator.name("selectedSamples.rows[296].selected"));
         assertOptionEquals(Locator.name("selectedSamples.rows[296].matchedFile"), "118797.fcs (microFCS)");
-        importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("All Samples"), null);
+        importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("labkey-demo-comps"), null);
         assertElementPresent(Locator.css(".labkey-error").withText("All selected rows must be matched to a previously imported FCS file."));
         importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("labkey-demo-samples"), null);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders
@@ -125,6 +125,5 @@ public class FlowImportTest extends BaseFlowTest
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this);
         assertEquals("Expected four runs", table.getDataRowCount(), 4);
-
     }
 }

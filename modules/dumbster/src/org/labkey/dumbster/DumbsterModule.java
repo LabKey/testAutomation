@@ -68,10 +68,4 @@ public class DumbsterModule extends CodeOnlyModule
         if (AppProps.getInstance().isMailRecorderEnabled())
             DumbsterManager.get().start();
     }
-
-    @Override
-    public boolean isAutoUninstall()
-    {
-        return true;
-    }
 }

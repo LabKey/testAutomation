@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
@@ -22,7 +24,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({})
+@Category({Daily.class})
 public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
 {
     private static final String TEST_LOOKUP_SAMPLETYPE = "lookupsampletype";
@@ -57,13 +59,12 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
         // create a sampleType with a lookup column to the issue tracker
         List<FieldDefinition> testColumns = Arrays.asList(
                 new FieldDefinition("comment", FieldDefinition.ColumnType.String),
-                new FieldDefinition("amount", FieldDefinition.ColumnType.Decimal),
-                new FieldDefinition("ingredient", new FieldDefinition.LookupInfo(init.getProjectName(), "lists", TEST_INGREDIENT_LIST)
+                new FieldDefinition("ingredient", new FieldDefinition.LookupInfo(init.getProjectName(), "lists", init.TEST_INGREDIENT_LIST)
                         .setTableType(FieldDefinition.ColumnType.Integer)));
         SampleTypeDefinition sampleTypeDef = new SampleTypeDefinition(TEST_LOOKUP_SAMPLETYPE)
                 .setFields(testColumns)
                 .setNameExpression("S-${genId}");
-        var dataGenerator = SampleTypeAPIHelper.createEmptySampleType(init.getProjectName(), sampleTypeDef);
+        SampleTypeAPIHelper.createEmptySampleType(init.getProjectName(), sampleTypeDef);
 
         new PortalHelper(init.getDriver()).addBodyWebPart("Sample Types");
     }
@@ -129,7 +130,7 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
         if (name != null)   // for update, name field is disabled
             insertPage.setField("Name", name);
         insertPage.setField("comment", comment);
-        insertPage.setField("amount", amount);
+        insertPage.setField("StoredAmount", amount);
         insertPage.setField("ingredient", ingredient);
         insertPage.submit();
     }

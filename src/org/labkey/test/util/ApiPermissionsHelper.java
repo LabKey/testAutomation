@@ -17,16 +17,17 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.security.AddAssignmentCommand;
 import org.labkey.remoteapi.security.AddGroupMembersCommand;
 import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
 import org.labkey.remoteapi.security.CreateGroupCommand;
 import org.labkey.remoteapi.security.DeleteGroupCommand;
 import org.labkey.remoteapi.security.DeletePolicyCommand;
+import org.labkey.remoteapi.security.GetContainersCommand;
 import org.labkey.remoteapi.security.GetGroupPermsCommand;
 import org.labkey.remoteapi.security.GetGroupPermsResponse;
 import org.labkey.remoteapi.security.RemoveAssignmentCommand;
@@ -37,7 +38,6 @@ import org.labkey.test.WebTestHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,23 +45,54 @@ import java.util.function.Supplier;
 
 public class ApiPermissionsHelper extends PermissionsHelper
 {
-    private final Supplier<Connection> connectionFactory;
+    private final Supplier<Connection> _connectionSupplier;
+    private final Supplier<String> _containerPathSupplier;
 
-    public ApiPermissionsHelper(WebDriverWrapper driver, Supplier<Connection> connectionFactory)
+    private ApiPermissionsHelper(Supplier<Connection> connectionSupplier, Supplier<String> containerPathSupplier)
     {
-        super(driver);
-        this.connectionFactory = connectionFactory;
+        _connectionSupplier = connectionSupplier;
+        _containerPathSupplier = containerPathSupplier;
+    }
+
+    public ApiPermissionsHelper(WebDriverWrapper driver, Supplier<Connection> connectionSupplier)
+    {
+        this(connectionSupplier, driver::getCurrentContainerPath);
     }
 
     public ApiPermissionsHelper(WebDriverWrapper test)
     {
-        this(test, () -> WebTestHelper.getRemoteApiConnection());
+        this(test, WebTestHelper::getRemoteApiConnection);
+    }
+
+    /**
+     * For API-only operations against a specific container.
+     */
+    public ApiPermissionsHelper(String containerPath)
+    {
+        this(WebTestHelper::getRemoteApiConnection, () -> containerPath);
+    }
+
+    @Override
+    protected Connection getConnection()
+    {
+        return _connectionSupplier.get();
+    }
+
+    private String getContainerPath()
+    {
+        return _containerPathSupplier.get();
+    }
+
+    private String getProject()
+    {
+        String project = StringUtils.stripStart(getContainerPath(), "/").split("/", 2)[0];
+        return project.isBlank() ? "/" : project;
     }
 
     @Override
     public void assertNoPermission(String userOrGroupName, String permissionSetting)
     {
-        String container = _driver.getCurrentContainerPath();
+        String container = getContainerPath();
         List<String> roles = new ArrayList<>();
         if (userOrGroupName.contains("@"))
             roles.addAll(getUserRoles(container, userOrGroupName));
@@ -75,7 +106,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void assertPermissionSetting(String userOrGroupName, String permissionSetting)
     {
-        String container = _driver.getCurrentContainerPath();
+        String container = getContainerPath();
         String expectedRole = toRole(permissionSetting);
         List<String> roles = new ArrayList<>();
         if (userOrGroupName.contains("@"))
@@ -176,15 +207,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         if (project.isEmpty() || project.equals("/"))
             return groups;
 
-        Iterator<Map<String, Object>> iter = groups.iterator();
-        while (iter.hasNext())
-        {
-            Map<String, Object> group = iter.next();
-            if (!(Boolean)group.get("isProjectGroup"))
-            {
-                iter.remove();
-            }
-        }
+        groups.removeIf(group -> !(Boolean) group.get("isProjectGroup"));
         return groups;
     }
 
@@ -199,7 +222,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             if (groupName.equals(group.get("name")))
             {
-                return Math.toIntExact((long)group.get("id"));
+                return (int)group.get("id");
             }
         }
         return null;
@@ -214,7 +237,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             if (groupName.equals(group.get("name")))
             {
-                return Math.toIntExact((long)group.get("id"));
+                return (int)group.get("id");
             }
         }
         return null;
@@ -224,7 +247,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     {
         Integer id = getSiteGroupId(groupName);
         if (id == null)
-            id = getProjectGroupId(groupName, _driver.getCurrentProject());
+            id = getProjectGroupId(groupName, getProject());
         return id;
     }
 
@@ -249,14 +272,14 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             if (groupName.equals(group.get("name")))
             {
-                groupId = Math.toIntExact((long)group.get("id"));
+                groupId = (int)group.get("id");
                 break;
             }
         }
 
         Connection connection = getConnection();
-        Command command = new Command("security", "getGroupMembers");
-        command.setParameters(new HashMap<String, Object>(Maps.of("groupId", groupId)));
+        SimpleGetCommand command = new SimpleGetCommand("security", "getGroupMembers");
+        command.setParameters(Maps.of("groupId", groupId));
 
         CommandResponse response;
         try
@@ -273,14 +296,14 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private List<Map<String, Object>> getUserGroups(String container, String user) throws CommandException
     {
-        return (List)getUserPerms(container, user).getProperty("container.groups");
+        return getUserPerms(container, user).getProperty("container.groups");
     }
 
-    private List<String> getUserRoles(String container, String user)
+    public List<String> getUserRoles(String container, String user)
     {
         try
         {
-            return (List<String>)getUserPerms(container, user).getProperty("container.roles");
+            return getUserPerms(container, user).getProperty("container.roles");
         }
         catch (CommandException e)
         {
@@ -291,8 +314,8 @@ public class ApiPermissionsHelper extends PermissionsHelper
     private CommandResponse getUserPerms(String container, String user) throws CommandException
     {
         Connection connection = getConnection();
-        Command command = new Command("security", "getUserPerms");
-        command.setParameters(new HashMap<String, Object>(Maps.of("userEmail", user)));
+        SimpleGetCommand command = new SimpleGetCommand("security", "getUserPerms");
+        command.setParameters(Maps.of("userEmail", user));
 
         CommandResponse response;
         try
@@ -310,23 +333,27 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void uncheckInheritedPermissions()
     {
-        new UIPermissionsHelper((BaseWebDriverTest) _driver).uncheckInheritedPermissions();
+        new UIPermissionsHelper(BaseWebDriverTest.getCurrentTest()).uncheckInheritedPermissions();
     }
 
     @Override
     public void checkInheritedPermissions()
     {
-        inheritPermissions(_driver.getContainerId());
+        inheritPermissions(getContainerPath());
     }
 
-    public void inheritPermissions(String containerId)
+    public void inheritPermissions(String containerPath)
     {
-        DeletePolicyCommand  command = new DeletePolicyCommand(containerId);
-        Connection connection = getConnection();
-
         try
         {
-            command.execute(connection, "/");
+            Connection connection = getConnection();
+
+            String containerId = new GetContainersCommand()
+                    .execute(connection, containerPath)
+                    .getContainerId();
+
+            new DeletePolicyCommand(containerId)
+                    .execute(connection, "/");
         }
         catch (IOException | CommandException e)
         {
@@ -337,7 +364,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public boolean isPermissionsInherited()
     {
-        return isPermissionsInherited(_driver.getCurrentContainerPath());
+        return isPermissionsInherited(getContainerPath());
     }
 
     public boolean isPermissionsInherited(String container)
@@ -360,7 +387,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     protected void removeRoleAssignment(String userOrGroupName, String permissionString, MemberType memberType)
     {
-        String container = _driver.getCurrentContainerPath();
+        String container = getContainerPath();
         if (memberType == MemberType.user)
             removeUserRoleAssignment(userOrGroupName, permissionString, container);
         else
@@ -416,7 +443,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
     {
-        addMemberToRole(userOrGroupName, permissionString, memberType, _driver.getCurrentContainerPath());
+        addMemberToRole(userOrGroupName, permissionString, memberType, getContainerPath());
     }
 
     public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType, String container)
@@ -454,7 +481,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
             case siteGroup:
                 return getSiteGroupId(userOrGroupName);
             default:
-                throw new IllegalArgumentException("Unknown principal type: " + principalType.toString());
+                throw new IllegalArgumentException("Unknown principal type: " + principalType);
         }
     }
 
@@ -538,11 +565,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    private Connection getConnection()
-    {
-        return connectionFactory.get();
-    }
-
     @Override
     public Integer createGlobalPermissionsGroup(String groupName, String... users)
     {
@@ -552,13 +574,13 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public Integer createPermissionsGroup(String groupName)
     {
-        return  createProjectGroup(groupName, _driver.getCurrentProject());
+        return  createProjectGroup(groupName, getProject());
     }
 
     @Override
     public Integer createPermissionsGroup(String groupName, String... users)
     {
-        return _createPermissionsGroup(groupName, _driver.getCurrentProject(), users);
+        return _createPermissionsGroup(groupName, getProject(), users);
     }
 
     private void addMembersToGroup(String project, Integer groupId, String... members)
@@ -674,22 +696,20 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    private static final String APP_ADMIN = "Application Admin";
-
     public void addUserAsAppAdmin(String userEmail)
     {
         if(!isUserAppAdmin(userEmail))
-            addMemberToRole(userEmail, APP_ADMIN, PermissionsHelper.MemberType.user, "/");
+            addMemberToRole(userEmail, APP_ADMIN_ROLE, PermissionsHelper.MemberType.user, "/");
     }
 
     public void removeUserFromAppAdmin(String userEmail)
     {
         if (isUserAppAdmin(userEmail))
-            removeUserRoleAssignment(userEmail, APP_ADMIN, "/");
+            removeUserRoleAssignment(userEmail, APP_ADMIN_ROLE, "/");
     }
 
     private boolean isUserAppAdmin(String userEmail)
     {
-        return doesUserHaveRole(userEmail, APP_ADMIN, "/");
+        return doesUserHaveRole(userEmail, APP_ADMIN_ROLE, "/");
     }
 }

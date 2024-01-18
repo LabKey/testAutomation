@@ -71,7 +71,6 @@ public class JUnitHeader extends JUnitTest.BaseJUnitTestWrapper
     @AfterClass
     public static void logStart()
     {
-        startTime = System.currentTimeMillis();
         logToServer("=== Starting Server-side JUnit Tests ===");
     }
 }

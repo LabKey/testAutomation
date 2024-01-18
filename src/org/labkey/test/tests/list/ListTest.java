@@ -70,6 +70,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -647,7 +648,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        _listHelper.deleteList("Custom view '" + TEST_VIEW + "'");
+        _listHelper.deleteList();
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
@@ -662,7 +663,7 @@ public class ListTest extends BaseWebDriverTest
         String exportUrl = "/" + EscapeUtil.encode(PROJECT_VERIFY) + "/query-exportRowsTsv.view?schemaName=lists&query.queryName=" + EscapeUtil.encode(LIST_NAME_COLORS);
         beginAt(exportUrl);
         assertEquals("Incorrect response code", 404, getResponseCode());
-        assertTextPresent("The specified query does not exist in schema 'lists'");
+        assertTextPresent("The specified query '%s' does not exist in schema '%s'".formatted(LIST_NAME_COLORS, "lists"));
 
         clickButton("Back");
         // after the 13.2 audit log migration, we are no longer going to co-mingle domain and list events in the same table
@@ -703,10 +704,10 @@ public class ListTest extends BaseWebDriverTest
         createList(mergeListName, BatchListColumns, BatchListData);
         _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
 
-        _listHelper.clickImportData();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", _listHelper.isMergeOptionPresent());
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", importDataPage.isPasteMergeOptionPresent());
         _listHelper.chooseFileUpload();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", _listHelper.isMergeOptionPresent());
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", importDataPage.isFileMergeOptionPresent());
         _listHelper.chooseCopyPasteText();
 
         log("Try to upload the same data without choosing to merge.  Errors are expected.");
@@ -718,14 +719,14 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Upload the same data using the merge operation. No errors should result.");
-        _listHelper.clickImportData();
-        _listHelper.chooseMerge(false);
+        importDataPage = _listHelper.clickImportData();
+        importDataPage.setCopyPasteMerge(true);
         setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData));
         _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Now upload some new data and modify existing data");
-        _listHelper.clickImportData();
-        _listHelper.chooseMerge(false);
+        importDataPage = _listHelper.clickImportData();
+        importDataPage.setCopyPasteMerge(true);
         setListImportAsTestDataField(toTSV(BatchListMergeColumns, BatchListMergeData));
         _listHelper.verifyListData(BatchListColumns, BatchListAfterMergeData, checker());
     }
@@ -737,8 +738,8 @@ public class ListTest extends BaseWebDriverTest
 
         _listHelper.createList(PROJECT_VERIFY, mergeListName, ListColumnType.AutoInteger, "Key", col("Name", ColumnType.String));
 
-        _listHelper.clickImportData();
-        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", _listHelper.isMergeOptionPresent());
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", importDataPage.isPasteMergeOptionPresent());
     }
 
     @Test
@@ -1242,7 +1243,7 @@ public class ListTest extends BaseWebDriverTest
                 .openAdvancedListSettings()
                 .indexEntireListAsASingleDocument(true, "",
                         AdvancedListSettingsDialog.SearchIncludeOptions.MetadataAndData,
-                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText)
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText, null)
                 .setIndexFileAttachments(true)
                 .clickApply()
                 .clickSave();
@@ -1258,6 +1259,30 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
         new PortalHelper(this).addWebPart("Search");
         searchFor(getProjectName(), "hypertrophimadeupword", 1, null);
+    }
+
+    @Test
+    public void testAttachmentFieldWithSpace()
+    {
+        final String listName = "Attachment Field with Space List";
+        final String attachmentFileName = "searchData.tsv";
+        final String path = TestFileUtils.getSampleData("lists/" + attachmentFileName).getAbsolutePath();
+        final String attachmentCol = "Attachment Field With Space";
+
+        Map<String, String> row = new HashMap<>();
+        row.put(attachmentCol, path);
+
+        goToProjectHome();
+
+        log("create list with an attachment column '" + attachmentCol + "'");
+        _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
+                col(attachmentCol, ColumnType.Attachment));
+
+        log("Insert data, upload attachment for col '" + attachmentCol + "'");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.insertNewRow(row, false);
+        assertTextPresent(attachmentFileName);
     }
 
     @Test
@@ -1299,6 +1324,67 @@ public class ListTest extends BaseWebDriverTest
             .clickRemoveField(true);
         listDefinitionPage.clickSave();
         AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        String listName = "Unique Constraint List";
+        String fieldName1 = "field Name1";
+        String fieldName2 = "fieldName_2";
+        String fieldName3 = "FieldName@3";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
+                new FieldDefinition(fieldName1, ColumnType.Integer),
+                new FieldDefinition(fieldName2, ColumnType.DateAndTime),
+                new FieldDefinition(fieldName3, ColumnType.Boolean)
+        );
+
+        // verify initial set of indices
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", Collections.emptyList());
+
+        // set two fields to have unique constraints
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName1).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.clickSave();
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
+        assertTextNotPresent("unique_constraint_list_fieldname_3");
+
+        // remove a field unique constraint and add a new one
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName3).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.clickSave();
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_list_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String listName)
+    {
+        goToSchemaBrowser();
+        selectQuery("lists", listName);
+        waitAndClickAndWait(Locator.linkWithText("view raw table metadata"));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("pk");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     //
@@ -1495,7 +1581,7 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
+            assertTrue(getCurrentRelativeURL(false).contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
     }

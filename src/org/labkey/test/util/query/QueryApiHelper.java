@@ -4,9 +4,9 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.DomainResponse;
+import org.labkey.remoteapi.domain.DomainDetailsResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
-import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -118,9 +118,9 @@ public class QueryApiHelper
         return truncateCommand.execute(_connection, _containerPath);
     }
 
-    public DomainResponse getDomain() throws IOException, CommandException
+    public DomainDetailsResponse getDomainDetails() throws IOException, CommandException
     {
-        GetDomainCommand cmd = new GetDomainCommand(_schema, _query);
+        GetDomainDetailsCommand cmd = new GetDomainDetailsCommand(_schema, _query);
         return cmd.execute(_connection, _containerPath);
     }
 

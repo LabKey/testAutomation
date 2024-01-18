@@ -31,6 +31,11 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         super(element, driver);
     }
 
+    public ReactSelect(ReactSelect wrapped)
+    {
+        this(wrapped.getComponentElement(), wrapped.getDriver());
+    }
+
     public static ReactSelectFinder finder(WebDriver driver)
     {
         return new ReactSelectFinder(driver);
@@ -50,7 +55,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void select(String option)
     {
-        waitForLoaded();
+        waitForReady();
         scrollIntoView();
         open();
         clickOption(option);
@@ -59,11 +64,11 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
 
     public void typeOptionThenSelect(String option)
     {
-        waitForLoaded();
+        waitForReady();
         scrollIntoView();
         open();
         enterValueInTextbox(option);
-        waitForLoaded();
+        waitForReady();
 
         waitFor(()->getOptions().contains(option), String.format("Option '%s' is not in the list of options.", option), 1_000);
 

@@ -217,7 +217,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     public void testAcceptTermsThenLogin()
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
-        signIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        signIn(PasswordUtil.getUsername());
         String title = getDriver().getTitle();
         assertFalse("Unexpected title " + title, title.contains("Sign In") || title.contains("Terms of Use"));
         assertTextNotPresent("To use this site, you must check the box to approve the terms of use.", SITE_WIDE_TERMS_TEXT);
@@ -273,7 +273,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     public String getServerErrors()
     {
         String serverErrors = super.getServerErrors();
-        if (serverErrors.contains("agreeToTerms.view?")) // Site terms not accepted. Let postamble do error checking
+        if (serverErrors.contains("agreeToTerms.view")) // Site terms not accepted. Let postamble do error checking
             return "";
         return serverErrors;
     }

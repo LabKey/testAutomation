@@ -148,6 +148,12 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new ReorderFoldersPage(getDriver());
     }
 
+    public RenameFolderPage clickFolderRename()
+    {
+        beginAt(WebTestHelper.buildRelativeUrl("admin", getCurrentContainerPath(), "renameFolder"));
+        return new RenameFolderPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

@@ -52,6 +52,16 @@ public class ColumnChartRegion extends WebDriverComponent<Component<?>.ElementCa
         return _el;
     }
 
+    public List<WebElement> getPlots(int expectedPlotCount)
+    {
+        return getWrapper().shortWait().withMessage("Didn't find %s plots".formatted(expectedPlotCount)).until(wd -> {
+            List<WebElement> plots = getPlots();
+            if (plots.size() == expectedPlotCount)
+                return plots;
+            return null;
+        });
+    }
+
     public List<WebElement> getPlots()
     {
         return Locator.tagWithClass("div", "labkey-dataregion-msg-plot-analytic").waitForElements(this, 10_000);

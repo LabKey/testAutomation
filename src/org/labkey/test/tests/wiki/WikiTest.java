@@ -16,7 +16,7 @@
 
 package org.labkey.test.tests.wiki;
 
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -39,7 +40,6 @@ import java.util.List;
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
-
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
@@ -112,9 +112,6 @@ public class WikiTest extends BaseWebDriverTest
         assertTextPresent(file.getName(), "Some HTML content");
         final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
         assertElementPresent(wikiTitleLink);
-        impersonateRole("Reader");
-        assertElementNotPresent(wikiTitleLink);
-        stopImpersonating();
 
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", numberOfWikiCreated, WIKI_PAGE_TITLE);
@@ -138,7 +135,7 @@ public class WikiTest extends BaseWebDriverTest
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
-        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()),WIKI_PAGE_ALTTITLE);
+        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()), WIKI_PAGE_ALTTITLE);
         clickButton("Submit");
         verifyWikiPagePresent();
 
@@ -153,6 +150,31 @@ public class WikiTest extends BaseWebDriverTest
         log("verify second wiki part pointing to first handled delete well");
         clickFolder(getSubfolderName());
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
+    }
+
+    @Test
+    public void testEmbeddedVideoInWiki()
+    {
+        String wikiName = "Wiki with video";
+        String wikiTitle = "Sample finder video";
+        String wikiContent = """
+                Some random content start : Have fun watching video below
+                {video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}
+                Hope you had fun watching the video..!
+                """;
+
+        goToProjectHome();
+        log("Creating the wiki with video");
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("RADEOX");
+        numberOfWikiCreated++;
+        setFormElement(Locator.name("name"), wikiName);
+        setFormElement(Locator.name("title"), wikiTitle);
+        wikiHelper.setWikiBody(wikiContent);
+        wikiHelper.saveWikiPage();
+
+        Assert.assertEquals("Video is missing", "https://www.youtube.com/embed/JEE4807UHN4",
+                getAttribute(Locator.tag("iframe"), "src"));
     }
 
     @Test
@@ -175,6 +197,32 @@ public class WikiTest extends BaseWebDriverTest
         assertElementPresent(Locator.id("wiki-toc-tree").append(Locator.linkContainingText(WIKI_PAGE_TITLE + " (" + WIKI_PAGE_NAME + ")")));
     }
 
+    /*
+        Regression coverage for
+        https://www.labkey.org/home/Developer/issues/Secure/issues-details.view?issueId=48019
+
+     */
+    @Test
+    public void testWikiWithComma()
+    {
+        String wikiName = "Wiki with comma's";
+        String wikiTitle = "Comma in the content";
+        String wikiContent = "This is my HTML, with commas";
+
+        goToProjectHome();
+        log("Creating the wiki " + wikiTitle);
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        setFormElement(Locator.name("name"), wikiName);
+        setFormElement(Locator.name("title"), wikiTitle);
+        wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
+        wikiHelper.saveWikiPage();
+        numberOfWikiCreated++;
+
+        searchFor(PROJECT_NAME, "commas", 1, null);
+        Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
+    }
+
     protected void verifyWikiPagePresent()
     {
         waitForText(WIKI_CHECK_CONTENT);
@@ -183,7 +231,8 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void doTestInlineEditor()
     {
-        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']");
+        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']")
+                .withDescendant(Locator.tagWithClassContaining("div", "tox-edit-area"));
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
@@ -230,10 +279,13 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
-        executeScript("if (!tinyMCE) {throw 'tinyMCE API is not available'}" +
-                "editor = tinyMCE.getInstanceById(arguments[0]);" +
-                "if (!editor) {throw 'No tinyMCE instance: ' + arguments[0];}" +
-                "editor.setContent(arguments[1]);", editorId, content);
+        executeScript("if (!tinymce) {throw 'tinymce API is not available'}" +
+                "editor = tinymce.get(arguments[0]);" +
+                "if (!editor) {throw 'No tinymce instance: ' + arguments[0];}" +
+                "editor.setContent(arguments[1]);" +
+                "editor.setDirty(true);"         // Explicitly setDirty as the setContent doesn't by default
+                , editorId, content);
+        log(String.format("Content [%1$s] set on editor: %2$s", content,  editorId));
     }
 
     @Override

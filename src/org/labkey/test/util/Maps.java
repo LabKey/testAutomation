@@ -69,4 +69,9 @@ public class Maps
         map.put(k5, v5);
         return Collections.unmodifiableMap(map);
     }
+
+    public static boolean isBlank(Map<?, ?> map)
+    {
+        return map == null || map.isEmpty();
+    }
 }

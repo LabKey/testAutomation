@@ -77,7 +77,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
     public void testFacetCutoff()
     {
         Locator advancedFilteringLoc = Locator.name("value_1");
-        Locator.XPathLocator factedFilterLoc = Locator.linkContainingText("[All]");
+        Locator.XPathLocator factedFilterLoc = Locator.tagContainingText("span", "[All]");
         DataRegionTable listDataRegion = new DataRegionTable("query", this);
 
         listDataRegion.openFilterDialog(AT_CUTOFF);
@@ -97,7 +97,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
     public void testPreFilteredFacetCutoff()
     {
         Locator advancedFilteringLoc = Locator.name("value_1");
-        Locator.XPathLocator factedFilterLoc = Locator.linkContainingText("[All]");
+        Locator.XPathLocator factedFilterLoc = Locator.tagContainingText("span", "[All]");
         DataRegionTable listDataRegion = new DataRegionTable("query", this);
 
         listDataRegion.setFilter(AT_CUTOFF, "Does Not Equal", "2");

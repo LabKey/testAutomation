@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.search;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -8,6 +9,7 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,6 +49,15 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     }
 
     /**
+     * Check single facet value by label to see if it is checked or not.
+     * @param value desired value
+     */
+    public boolean isChecked(String value)
+    {
+        return elementCache().findCheckbox(value).isChecked();
+    }
+
+    /**
      * Check all the specified options. Should retain any existing selections.
      * @param values values to select
      */
@@ -80,6 +91,16 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         return elementCache().getSelectedValues();
     }
 
+    public FilterFacetedPanel filterValues(String filterStr)
+    {
+        if (StringUtils.isEmpty(filterStr))
+            elementCache().filterInput.set("");
+        else
+            elementCache().filterInput.setWithPaste(filterStr);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().checkboxLabelLoc.waitForElement(this, 5_000)));
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -89,9 +110,9 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     protected class ElementCache extends Component<?>.ElementCache
     {
         protected final Input filterInput =
-                Input(Locator.id("find-filter-typeahead-input"), getDriver()).findWhenNeeded(this);
+                Input(Locator.id("filter-faceted__typeahead-input"), getDriver()).findWhenNeeded(this);
         protected final WebElement checkboxSection =
-                Locator.byClass("labkey-wizard-pills").index(0).findWhenNeeded(this);
+                Locator.byClass("labkey-wizard-pills").index(0).refindWhenNeeded(this);
         protected final Locator.XPathLocator checkboxLabelLoc
                 = Locator.byClass("filter-faceted__value");
 

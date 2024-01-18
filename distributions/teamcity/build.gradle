@@ -1,9 +1,9 @@
+import org.labkey.gradle.plugin.Distribution
+import org.labkey.gradle.plugin.FileModule
 import org.labkey.gradle.task.ModuleDistribution
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.ModuleFinder
-import org.labkey.gradle.plugin.Distribution
-import org.labkey.gradle.plugin.FileModule
 
 plugins {
     id 'org.labkey.build.distribution'
@@ -14,19 +14,17 @@ if (!BuildUtils.isOpenSource(project))
 
 dist.description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
 
-project.task(
-        "distribution",
-        group: GroupNames.DISTRIBUTION,
-        description: "Make a LabKey modules distribution for 'test'",
-        type: ModuleDistribution,
-        {ModuleDistribution dist ->
-            dist.subDirName = "test"
-            dist.includeTarGZArchive=true
-            dist.embeddedArchiveType="tar.gz"
-            dist.extraFileIdentifier='-test'
-            dist.versionPrefix='Test'
-        }
-)
+project.tasks.register("distribution", ModuleDistribution) {
+    ModuleDistribution dist ->
+        dist.group = GroupNames.DISTRIBUTION
+        dist.description = "Make a LabKey modules distribution for 'test'"
+
+        dist.subDirName = "test"
+        dist.includeTarGZArchive = true
+        dist.embeddedArchiveType = "tar.gz"
+        dist.extraFileIdentifier = '-test'
+        dist.versionPrefix = 'Test'
+}
 
 
 if (project.hasProperty('inheritedDistPath'))
@@ -51,8 +49,10 @@ if (project.hasProperty('inheritedDistPath'))
 
     def split = inheritedDistPath.split(":")
     String inheritedDistName = split[split.length - 1]
-    tasks.distribution.subDirName = "test/" + inheritedDistName
-    tasks.distribution.versionPrefix = "Test_" + inheritedDistName
+    tasks.named('distribution').configure { task ->
+        task.subDirName = "test/" + inheritedDistName
+        task.versionPrefix = "Test_" + inheritedDistName
+    }
 }
 else
 {
@@ -62,9 +62,9 @@ else
             if (otherProject != project && ModuleFinder.isPotentialModule(otherProject) && FileModule.shouldDoBuild(otherProject, false))
             {
                 project.evaluationDependsOn(otherProject.path)
-                if (otherProject.plugins.hasPlugin('org.labkey.module') ||
-                    otherProject.plugins.hasPlugin('org.labkey.fileModule') ||
-                    otherProject.plugins.hasPlugin('org.labkey.javaModule'))
+                if (otherProject.plugins.hasPlugin('org.labkey.build.module') ||
+                    otherProject.plugins.hasPlugin('org.labkey.build.fileModule') ||
+                    otherProject.plugins.hasPlugin('org.labkey.build.javaModule'))
                     pathList += otherProject.path
             }
     }

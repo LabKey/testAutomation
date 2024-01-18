@@ -18,7 +18,10 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -113,7 +116,22 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         importDataPage.setText(TEST_DATA_SINGLE_COLUMN_DATASET)
                 .submit();
 
-        validateSingleColumnData();
+        assertNoLabKeyErrors();
+
+        DataRegionTable dataRegion = new DataRegionTable("Dataset", this);
+
+        Map<String, List<String>> expectedData = new HashMap<>();
+        expectedData.put("Participant ID", List.of("Alice", "Bob", "Ted"));
+        expectedData.put("Age with space", List.of("17", "Q", "N"));
+        expectedData.put("Sex", List.of("female", "N", "male"));
+
+        Map<String, List<Integer>> expectedMVIndicators = new HashMap<>();
+        expectedMVIndicators.put("Age with space", List.of(1, 2));
+        expectedMVIndicators.put("Sex", List.of(1));
+
+        checkDataregionData(dataRegion, expectedData);
+        checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
+
         testMvFiltering(List.of("Age with space", "Sex"));
 
         deleteDatasetData(3);
@@ -138,8 +156,23 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
 
         importDataPage.setText(TEST_DATA_TWO_COLUMN_DATASET);
         importDataPage.submit();
+        assertNoLabKeyErrors();
 
-        validateTwoColumnData("Dataset", "ParticipantId");
+        dataRegion = new DataRegionTable("Dataset", this);
+
+        expectedData = new HashMap<>();
+        expectedData.put("Participant ID", List.of("Franny", "J.D.", "Zoe"));
+        expectedData.put("Age with space", List.of("N", "50", "Q"));
+        expectedData.put("Sex", List.of("male", "Q", "female"));
+
+        expectedMVIndicators = new HashMap<>();
+        expectedMVIndicators.put("Age with space", List.of(0, 2));
+        expectedMVIndicators.put("Sex", List.of(1));
+
+        checkDataregionData(dataRegion, expectedData);
+        checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
+        checkOriginalValuePopup(dataRegion, "Age with space", 2, "25");
+
         testMvFiltering(List.of("Age with space", "Sex"));
 
         log("19874: Regression test for reshow of missing value indicators when submitting default forms with errors");
@@ -188,7 +221,23 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Next");
 
         clickButton("Link to Study");
-        validateSingleColumnData();
+        assertNoLabKeyErrors();
+
+        DataRegionTable dataRegion = new DataRegionTable("Dataset", this);
+
+        Map<String, List<String>> expectedData = new HashMap<>();
+        expectedData.put("Participant ID", List.of("Alice", "Bob", "Ted"));
+        expectedData.put("Age", List.of("17", "Q", "N"));
+        expectedData.put("Sex", List.of("female", "N", "male"));
+        expectedData.put("Assay ID", Collections.nCopies(3, ASSAY_RUN_SINGLE_COLUMN));
+
+        Map<String, List<Integer>> expectedMVIndicators = new HashMap<>();
+        expectedMVIndicators.put("Age", List.of(1, 2));
+        expectedMVIndicators.put("Sex", List.of(1));
+
+        checkDataregionData(dataRegion, expectedData);
+        checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
+
     }
 
     private void deleteDatasetData(int rowCount)

@@ -38,7 +38,6 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class ListArchiveImportTest extends BaseWebDriverTest
 {
-
     @Override
     protected @Nullable String getProjectName()
     {
@@ -78,6 +77,7 @@ public class ListArchiveImportTest extends BaseWebDriverTest
         checker().verifyEquals("Wrong error message after attempting to import bad list archive.", expectedError, actualError);
 
         ManageListsGrid listsGrid = goToManageLists().getGrid();
+        listsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_FOLDER);
         if (checker().verifyEquals("Found list after import error.",
             List.of(listName), listsGrid.getListNames()))
         {

@@ -6,6 +6,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfNestedElementLocatedBy;
+
 
 public class UpdateQCStatePage extends LabKeyPage<UpdateQCStatePage.ElementCache>
 {
@@ -22,7 +24,8 @@ public class UpdateQCStatePage extends LabKeyPage<UpdateQCStatePage.ElementCache
 
     public UpdateQCStatePage selectState(String state)
     {
-        setFormElement(elementCache().stateInput, state);
+        shortWait().until(presenceOfNestedElementLocatedBy(elementCache().stateSelect, Locator.tagWithAttribute("option", "value")));
+        selectOptionByText(elementCache().stateSelect, state);
         return this;
     }
 
@@ -52,8 +55,7 @@ public class UpdateQCStatePage extends LabKeyPage<UpdateQCStatePage.ElementCache
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-
-        WebElement stateInput = Locator.id("stateInput").findWhenNeeded(this);
+        WebElement stateSelect = Locator.id("stateInput").findWhenNeeded(this);
         WebElement commentInput = Locator.textarea("comment").findWhenNeeded(this);
     }
 }

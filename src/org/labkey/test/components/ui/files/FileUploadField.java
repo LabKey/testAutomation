@@ -27,7 +27,7 @@ public class FileUploadField extends WebDriverComponent<FileUploadField.ElementC
     {
         removeFile();
         elementCache().fileInput.sendKeys(file.getAbsolutePath());
-        getWrapper().shortWait().until(ExpectedConditions.textToBe(elementCache().tempFileLoc, file.getName()));
+        getWrapper().shortWait().until(ExpectedConditions.textToBePresentInElement(elementCache().tempFileLoc, file.getName()));
         return this;
     }
 
@@ -82,7 +82,8 @@ public class FileUploadField extends WebDriverComponent<FileUploadField.ElementC
                 .refindWhenNeeded(this);
 
         // Elements for new attachment
-        Locator tempFileLoc = Locator.tagWithClass("div", "attached-file--inline-container");
+        WebElement tempFileLoc = Locator.tagWithClass("div", "attached-file--inline-container")
+                .refindWhenNeeded(this);
         WebElement removeBtn = Locator.tagWithClass("span", "file-upload__remove--icon")
                 .refindWhenNeeded(this);
 

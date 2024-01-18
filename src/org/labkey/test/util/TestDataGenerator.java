@@ -25,9 +25,13 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
+import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
@@ -176,6 +180,18 @@ public class TestDataGenerator
             row.put(columns.get(i), values.get(i));
         }
         addCustomRow(row);
+        return this;
+    }
+
+    public TestDataGenerator addRowsFromFile(File tsv)
+    {
+        try (TabLoader loader = new TabLoader(tsv, true))
+        {
+            for (Map<String, Object> row : loader.load())
+            {
+                addCustomRow(row);
+            }
+        }
         return this;
     }
 
@@ -404,6 +420,15 @@ public class TestDataGenerator
     {
 
         return createDomain(cn, "IntList", Map.of("keyName", keyName));
+    }
+
+    /**
+     * @deprecated Use {@link QueryApiHelper}
+     */
+    @Deprecated(since = "22.4")
+    public CommandResponse deleteDomain(Connection cn) throws IOException, CommandException
+    {
+        return getQueryHelper(cn).deleteDomain();
     }
 
     public SaveRowsResponse insertRows() throws IOException, CommandException

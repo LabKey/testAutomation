@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SampleTypeAPIHelper
 {
@@ -75,7 +74,7 @@ public class SampleTypeAPIHelper
      * @return A map of containing sample names and their corresponding row ids.
      * @throws Exception Because this uses the Select Rows Command it can throw a few different type of exceptions.
      */
-    public static Map<String, Long> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
+    public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
@@ -85,19 +84,18 @@ public class SampleTypeAPIHelper
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
-        Map<String, Long> rowIds = new HashMap<>();
+        Map<String, Integer> rowIds = new HashMap<>();
 
         for(Map<String, Object> row : response.getRows())
         {
             Object name = row.get("Name");
             Object value = row.get("RowId");
-            rowIds.put(name.toString(), Long.parseLong(value.toString()));
+            rowIds.put(name.toString(), Integer.parseInt(value.toString()));
         }
 
         // Check that the names returned from the query match the names sent in.
-        Set<String> names = new HashSet<>(sampleNames);
-        Assert.assertTrue("The sample names returned from the query do not match the sample names sent in.",
-                names.containsAll(rowIds.keySet()));
+        Assert.assertEquals("The sample names returned from the query do not match the sample names sent in.",
+                new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
     }

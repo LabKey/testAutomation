@@ -38,6 +38,6 @@ public class FileInput extends Input
     {
         super.assertElementType(el);
         String type = el.getAttribute("type");
-        Assert.assertEquals("Not a file input: " + el.toString(), "file", type);
+        Assert.assertEquals("Not a file input: " + el, "file", type);
     }
 }

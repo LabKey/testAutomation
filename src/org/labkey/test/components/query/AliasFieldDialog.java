@@ -1,13 +1,13 @@
 package org.labkey.test.components.query;
 
-import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 
 
 public class AliasFieldDialog extends ModalDialog
 {
-    private QueryMetadataEditorPage _page;
+    private final QueryMetadataEditorPage _page;
 
     public AliasFieldDialog(QueryMetadataEditorPage page)
     {

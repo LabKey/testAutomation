@@ -73,6 +73,10 @@ public class FolderExportTest extends BaseWebDriverTest
     private static final String folderFromTemplate = "4 Folder From Template";
     private static final String folderWithPermissions = "5 Folder From Zip With Permissions";
     private static final String folderInheritingPermissions = "6 Inheriting";
+
+    private static final String exportImportSourceProject = "Source_Folder~,!@#$%%++_)(&+=[{";
+    private static final String exportImportTargetProject = "Target_Folder~!@#$%%++_)(&+=]},";
+
     private static final String folderArchive = "SampleWithSubfolders.folder";
     private static final String folderZip = folderArchive + ".zip";
     private static final String projectPermsZip = "ProjectWithPerms.folder.zip";
@@ -156,6 +160,48 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testExportImportWithSpecialCharactersInFileName()
+    {
+        String dir = "test~!@#$%(%)+-_=+_[]{}";
+        String uploadFileName = "pdf_sample_with+%$@+%%+#-+=.pdf";
+
+        goToHome();
+
+        log("Creating " + exportImportSourceProject);
+        _containerHelper.createProject(exportImportSourceProject, "Collaboration");
+
+        log("Creating dir " + dir + " in Files webpart");
+        goToProjectHome(exportImportSourceProject);
+        goToModule("FileContent");
+        _fileBrowserHelper.createFolder(dir);
+
+        log("Uploading file '" + uploadFileName + "' in " + dir);
+        _fileBrowserHelper.selectFileBrowserItem("/" + dir + "/");
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("fileTypes/" + uploadFileName));
+
+        goToProjectHome(exportImportSourceProject);
+
+        log("Exporting " + exportImportSourceProject);
+        File sourceZip = exportFolderAsZip(exportImportSourceProject, false, false, false, true);
+
+        log("Creating " + exportImportTargetProject);
+        _containerHelper.createProject(exportImportTargetProject, "Collaboration");
+
+        log("Importing " + sourceZip.getName() + " to " + exportImportTargetProject);
+        goToProjectHome(exportImportTargetProject);
+        importFolderFromZip(sourceZip, false, 1);
+
+        log("Verify presence of " + uploadFileName);
+        goToModule("FileContent");
+        _fileBrowserHelper.selectFileBrowserItem(dir + "/" + uploadFileName);
+        File downloadedFile = _fileBrowserHelper.downloadSelectedFiles();
+        assertEquals("Expected file '" + uploadFileName + "' did not get downloaded", uploadFileName, downloadedFile.getName());
+
+        log("Test Drag and Drop zip folder '" + sourceZip.getName() + "'");
+        _fileBrowserHelper.dragDropUpload(sourceZip);
+    }
+
+    @Test
     public void testImportProjectWithoutUsers()
     {
         //test project import with users that do not exist
@@ -229,7 +275,8 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(importProjects[5], "Inherited Imported Subfolder");
         importFolder("Inherited Imported Subfolder", inheritedPermsZip);
         clickFolder("Inherited Imported Subfolder");
-        _permissionsHelper.assertPermissionsInherited();
+        assertTrue("Permissions not inherited for folder: " + getCurrentContainerPath(),
+                _permissionsHelper.isPermissionsInherited());
     }
 
     private void importFolder(String folderName, String zipFileName)
@@ -587,10 +634,12 @@ public class FolderExportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Notifications"));
         waitForText("Default settings");
 
-        String messagesDefault = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO).find(getDriver()).getValue();
+        ComboBox messagesCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO).find(getDriver());
+        String messagesDefault = shortWait().until(wd -> StringUtils.trimToNull(messagesCombo.getValue()));
         assertEquals("Wrong default value for message notification emails.", "All conversations", messagesDefault);
 
-        String fileDefault = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.FILES_DEFAULT_COMBO).find(getDriver()).getValue();
+        ComboBox filesCombo = new ComboBox.ComboBoxFinder(getDriver()).withLabel(MessagesLongTest.FILES_DEFAULT_COMBO).find(getDriver());
+        String fileDefault = shortWait().until(wd -> StringUtils.trimToNull(filesCombo.getValue()));
         assertEquals("Wrong default value for file notification emails.", "Daily digest", fileDefault);
 
         verifySubfolderImport(importedFolderName, false);
@@ -634,6 +683,8 @@ public class FolderExportTest extends BaseWebDriverTest
         {
             _containerHelper.deleteProject(importProject, false);
         }
+        _containerHelper.deleteProject(exportImportSourceProject, false);
+        _containerHelper.deleteProject(exportImportTargetProject, false);
         _userHelper.deleteUsers(false, testUsers);
     }
 

@@ -6,7 +6,7 @@
                 df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
                 fields <- labkey.domain.inferFields(baseUrl=labkey.url.base, folderPath="%projectName%", df)
                 dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
-                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryId = -1))
+                print(labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryId = -1)))
             ]]>
         </url>
         <response>
@@ -22,7 +22,7 @@
                 df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
                 fields <- labkey.domain.inferFields(baseUrl=labkey.url.base, folderPath="%projectName%", df)
                 dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
-                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryId = -1, categoryName = "Control Group A"))
+                print(labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryId = -1, categoryName = "Control Group A")))
             ]]>
         </url>
         <response>
@@ -38,7 +38,7 @@
                 df <- data.frame(customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
                 fields <- labkey.domain.inferFields(baseUrl=labkey.url.base, folderPath="%projectName%", df)
                 dd <- labkey.domain.createDesign(name="test dataset one", fields=fields)
-                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryName = "Control Group A"))
+                print(labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="StudyDatasetVisit", domainDesign=dd, options=list(categoryName = "Control Group A")))
             ]]>
         </url>
         <response>

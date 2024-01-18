@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="AllTypesCategories" tableDbType="TABLE">
+    <columns>
+      <column columnName="TextKey">
+        <datatype>varchar</datatype>
+        <columnTitle>Text Key</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="Category">
+        <datatype>varchar</datatype>
+        <columnTitle>Category</columnTitle>
+      </column>
+      <column columnName="CategorySort">
+        <datatype>double</datatype>
+        <columnTitle>Sort Ordinal</columnTitle>
+      </column>
+      <column columnName="Group">
+        <datatype>varchar</datatype>
+        <columnTitle>Category Group</columnTitle>
+        <fk>
+          <fkDbSchema>lists</fkDbSchema>
+          <fkTable>AllTypesCategoryGroups</fkTable>
+          <fkColumnName>GroupName</fkColumnName>
+        </fk>
+      </column>
+    </columns>
+    <pkColumnName>TextKey</pkColumnName>
+  </table>
+  <table tableName="AllTypesComments" tableDbType="TABLE">
+    <columns>
+      <column columnName="AllTypesRowId">
+        <datatype>integer</datatype>
+        <columnTitle>All Types Row Id</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+      <column columnName="Title">
+        <datatype>varchar</datatype>
+        <columnTitle>Title</columnTitle>
+      </column>
+      <column columnName="Comment">
+        <datatype>varchar</datatype>
+        <inputType>textarea</inputType>
+        <columnTitle>Comment</columnTitle>
+      </column>
+    </columns>
+    <pkColumnName>AllTypesRowId</pkColumnName>
+  </table>
+  <table tableName="AllTypes" tableDbType="TABLE">
+    <columns>
+      <column columnName="RowId">
+        <datatype>integer</datatype>
+        <columnTitle>Row Id</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+      <column columnName="DisplayFld">
+        <datatype>varchar</datatype>
+        <columnTitle>DisplayName</columnTitle>
+      </column>
+      <column columnName="TextFld">
+        <datatype>varchar</datatype>
+        <columnTitle>Text Field</columnTitle>
+      </column>
+      <column columnName="IntFld">
+        <datatype>integer</datatype>
+        <columnTitle>Integer Field</columnTitle>
+      </column>
+      <column columnName="DoubleFld">
+        <datatype>double</datatype>
+        <columnTitle>Double Field</columnTitle>
+      </column>
+      <column columnName="DateTimeFld">
+        <datatype>timestamp</datatype>
+        <columnTitle>DateTime Field</columnTitle>
+      </column>
+      <column columnName="BooleanFld">
+        <datatype>boolean</datatype>
+        <columnTitle>Boolean Field</columnTitle>
+      </column>
+      <column columnName="LongTextFld">
+        <datatype>varchar</datatype>
+        <inputType>textarea</inputType>
+        <columnTitle>Long Text Field</columnTitle>
+      </column>
+      <column columnName="AttachmentFld">
+        <datatype>Attachment</datatype>
+        <columnTitle>Attachment</columnTitle>
+      </column>
+      <column columnName="RequiredText">
+        <datatype>varchar</datatype>
+        <columnTitle>Required Text</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="RequiredInt">
+        <datatype>integer</datatype>
+        <columnTitle>Required Integer</columnTitle>
+        <nullable>false</nullable>
+      </column>
+      <column columnName="Category">
+        <datatype>varchar</datatype>
+        <columnTitle>Category Lookup</columnTitle>
+        <fk>
+          <fkDbSchema>lists</fkDbSchema>
+          <fkTable>AllTypesCategories</fkTable>
+          <fkColumnName>TextKey</fkColumnName>
+        </fk>
+      </column>
+    </columns>
+    <pkColumnName>RowId</pkColumnName>
+  </table>
+  <table tableName="AllTypesCategoryGroups" tableDbType="TABLE">
+    <columns>
+      <column columnName="GroupName">
+        <datatype>varchar</datatype>
+        <columnTitle>Group Name</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+      </column>
+    </columns>
+    <pkColumnName>GroupName</pkColumnName>
+  </table>
+</tables>

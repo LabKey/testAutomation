@@ -24,7 +24,7 @@
     <tr>
       <td>&nbsp;</td>
       <td>
-        <a class='labkey-button' href='#' onclick='startAnalysis(); return false;'>
+        <a id="duplicateFiles" class='labkey-button' href='#'>
           <span>Duplicate File(s)</span>
         </a>
       </td>
@@ -34,7 +34,10 @@
 </form>
 
 
-<script>
+<script type="text/javascript" nonce="<%=scriptNonce%>">
+
+document.getElementById('duplicateFiles')['onclick'] = startAnalysis;
+
 var path = null;
 var files = [];
 
@@ -79,13 +82,13 @@ function startAnalysis()
   var protocolName = document.getElementById("protocolNameInput").value;
   if (!protocolName) {
     alert("Protocol name is required");
-    return;
+    return false;
   }
 
   var skipLines = document.getElementById("skipLinesInput").value;
   if (skipLines < 0) {
     alert("Skip lines >= 0 required");
-    return;
+    return false;
   }
 
   LABKEY.Pipeline.startAnalysis({
@@ -103,6 +106,7 @@ function startAnalysis()
       window.location = LABKEY.ActionURL.buildURL("pipeline-status", "showList.view")
     }
   });
+  return false;
 }
 
 </script>

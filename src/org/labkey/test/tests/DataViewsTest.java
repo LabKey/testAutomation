@@ -413,12 +413,12 @@ public class DataViewsTest extends ParticipantListTest
         // now parse the categories out of the response object
         org.labkey.remoteapi.reports.Category subCategory1 = response.getCategory("Subcategory1-"+CATEGORIES[2]);
         org.labkey.remoteapi.reports.Category subCategory2 = response.getCategory("Subcategory2-"+CATEGORIES[2]);
-        Assert.assertFalse("missing " + "Subcategory1-"+CATEGORIES[2], null == subCategory1);
-        Assert.assertFalse("missing " + "Subcategory2-"+CATEGORIES[2], null == subCategory2);
+        Assert.assertNotNull("missing " + "Subcategory1-" + CATEGORIES[2], subCategory1);
+        Assert.assertNotNull("missing " + "Subcategory2-" + CATEGORIES[2], subCategory2);
 
         // prepare args to switch display order (as the UI will)
-        Long subCat1Ordinal = subCategory1.getDisplayOrder();
-        Long subCat2Ordinal = subCategory2.getDisplayOrder();
+        Integer subCat1Ordinal = subCategory1.getDisplayOrder();
+        Integer subCat2Ordinal = subCategory2.getDisplayOrder();
         subCategory1.setDisplayOrder(subCat2Ordinal);
         subCategory2.setDisplayOrder(subCat1Ordinal);
 

@@ -25,6 +25,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         public String label;
         public String description;
         public SampleTypeHelper.StatusType statusType;
+        public boolean isLocked;
     }
 
     public ManageSampleStatusesPanel(WebElement element, WebDriver driver)
@@ -76,10 +77,33 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public SampleStatus selectStatus(String name, SampleTypeHelper.StatusType statusType)
     {
-        elementCache().statusItem(name, statusType).click();
+        WebElement groupItem = elementCache().statusItem(name, statusType);
+        groupItem.click();
         SampleStatus status = new SampleStatus();
 
-        waitForEditReady();
+        status.isLocked = isLocked();
+
+        if(!status.isLocked)
+        {
+            waitForEditReady();
+        }
+        else
+        {
+            WebDriverWrapper.waitFor(()->
+                    {
+                        try
+                        {
+                            return groupItem.getText().trim().toLowerCase()
+                                    .contains(getWrapper().getFormElement(elementCache().labelField.getComponentElement()).trim().toLowerCase());
+                        }
+                        catch (NoSuchElementException | StaleElementReferenceException exp)
+                        {
+                            return false;
+                        }
+                    },
+                    "Edit part of the panel for a locked status did not render in time.", 1_000);
+
+        }
 
         status.statusType = getStatusType();
         status.label = getLabel();
@@ -103,6 +127,13 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return SampleTypeHelper.StatusType.valueOf(elementCache().statusTypeSelect.getValue());
     }
 
+    public boolean isLocked()
+    {
+        return Locator.tagWithClass("span", "domain-field-lock-icon")
+                .findWhenNeeded(elementCache().selectedStatusItem)
+                .isDisplayed();
+    }
+
     public List<String> getStatusNames()
     {
         return elementCache().statusItems
@@ -116,6 +147,11 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     {
         elementCache().addStatusButton.click();
         return this;
+    }
+
+    public boolean isAddStatusPresent()
+    {
+        return elementCache().addStatusButton.isDisplayed();
     }
 
     public ManageSampleStatusesPanel setLabel(String label)
@@ -162,6 +198,11 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         setLabel(label).setDescription(description).setStatusType(statusType);
 
         elementCache().saveButton.click();
+
+        // Don't know why but on MSSQL/Windows in TC this is taking a long time to complete.
+        WebDriverWrapper.waitFor(()->elementCache().deleteButton.isDisplayed(),
+                "Delete button did not become visible after adding a status.", 5_000);
+
         return this;
     }
 
@@ -188,13 +229,15 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
         final Locator statusItems = Locator.tagWithClass("button", "list-group-item");
 
+        final WebElement selectedStatusItem = Locator.tagWithClass("button", "list-group-item").withClass("active")
+                .refindWhenNeeded(this);
         final WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
                 .findWhenNeeded(getComponentElement());
         final Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).findWhenNeeded(this);
         final WebElement descriptionField = Locator.textarea("description").findWhenNeeded(this);
         final ReactSelect statusTypeSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
         final WebElement saveButton = Locator.tagWithText("button", "Save").findWhenNeeded(this);
-        final WebElement deleteButton = Locator.tagContainingText("button", "Delete").findWhenNeeded(this);
+        final WebElement deleteButton = Locator.tag("button").withChild(Locator.tagContainingText("span", "Delete")).refindWhenNeeded(this);
     }
 
     public static class ManageSampleStatusesPanelFinder extends WebDriverComponentFinder<ManageSampleStatusesPanel, ManageSampleStatusesPanelFinder>

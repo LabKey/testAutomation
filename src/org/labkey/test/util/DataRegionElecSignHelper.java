@@ -20,20 +20,19 @@ import org.labkey.test.Locator;
 
 public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelper
 {
-    private String _userName, _userPassword;
+    private final String _userName;
+    private final String _userPassword;
 
     public DataRegionElecSignHelper(DataRegionTable drt)
     {
-        super(drt);
-        _userName = PasswordUtil.getUsername();
-        _userPassword = PasswordUtil.getPassword();
+        this(PasswordUtil.getUsername(), drt);
     }
 
-    public DataRegionElecSignHelper(String userName, String userPassword, DataRegionTable drt)
+    public DataRegionElecSignHelper(String userName, DataRegionTable drt)
     {
         super(drt);
         _userName = userName;
-        _userPassword = userPassword;
+        _userPassword = PasswordUtil.getPassword();
     }
 
     public void signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)

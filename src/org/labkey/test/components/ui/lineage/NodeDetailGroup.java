@@ -5,6 +5,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,25 +31,41 @@ public class NodeDetailGroup extends WebDriverComponent<NodeDetailGroup.ElementC
             return elementCache().summary.getText();
     }
 
+    private void showAllItems()
+    {
+        Locator.tag("li").child(Locator.tagWithClass("a", "lineage-link"))
+                .findOptionalElement(this)
+                .ifPresent(moreLink ->
+                {
+                    if (moreLink.getText().contains("more"))
+                    {
+                        moreLink.click();
+                        getWrapper().shortWait().until(ExpectedConditions.textToBePresentInElement(moreLink, "less"));
+                    }
+                });
+    }
+
     public NodeDetail getItem(String itemName)
     {
-        return  elementCache().items().stream().filter(a-> a.getName().equals(itemName))
-                .findFirst().orElseThrow();
+        showAllItems();
+        return elementCache().itemNamed(itemName);
     }
 
     public NodeDetail getItemByTitle(String title)
     {
-        return elementCache().item(title);
+        showAllItems();
+        return elementCache().itemWithTitle(title);
     }
 
     public List<NodeDetail> getItems()
     {
+        showAllItems();
         return elementCache().items();
     }
 
     public List<String> getItemNames()
     {
-        return elementCache().items().stream().map(NodeDetail::getName).collect(Collectors.toList());
+        return getItems().stream().map(NodeDetail::getName).collect(Collectors.toList());
     }
 
     @Override
@@ -80,7 +97,12 @@ public class NodeDetailGroup extends WebDriverComponent<NodeDetailGroup.ElementC
             return new NodeDetail.NodeDetailItemFinder(getDriver()).findAll(this);
         }
 
-        NodeDetail item(String title)
+        NodeDetail itemNamed(String name)
+        {
+            return new NodeDetail.NodeDetailItemFinder(getDriver()).withName(name).find(this);
+        }
+
+        NodeDetail itemWithTitle(String title)
         {
             return new NodeDetail.NodeDetailItemFinder(getDriver()).withTitle(title).find(this);
         }

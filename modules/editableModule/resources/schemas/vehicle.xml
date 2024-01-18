@@ -240,7 +240,7 @@
       </column>
       <column columnName="Created">
         <isUserEditable>false</isUserEditable>
-        <datatype>timestamp</datatype>
+        <datatype>DATETIME</datatype>
         <isReadOnly>true</isReadOnly>
         <isHidden>true</isHidden>
       </column>
@@ -257,7 +257,7 @@
       </column>
       <column columnName="Modified">
         <isUserEditable>false</isUserEditable>
-        <datatype>timestamp</datatype>
+        <datatype>DATETIME</datatype>
         <isReadOnly>true</isReadOnly>
         <isHidden>true</isHidden>
       </column>
@@ -288,7 +288,7 @@
         <datatype>int</datatype>
       </column>
       <column columnName="LastService">
-        <datatype>timestamp</datatype>
+        <datatype>DATETIME</datatype>
       </column>
     </columns>
   </table>

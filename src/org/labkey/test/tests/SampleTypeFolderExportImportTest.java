@@ -60,14 +60,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
@@ -287,12 +284,10 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         log("Create the sample type named '" + SAMPLE_TYPE_NAME + "' and add the fields.");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         List<FieldDefinition> fields = new ArrayList<>();
-        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
-                .setType(FieldDefinition.ColumnType.String)
+        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME, FieldDefinition.ColumnType.String)
                 .setMvEnabled(false)
                 .setRequired(true));
-        fields.add(new FieldDefinition(MISSING_FIELD_NAME)
-                .setType(FieldDefinition.ColumnType.String)
+        fields.add(new FieldDefinition(MISSING_FIELD_NAME, FieldDefinition.ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
         SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE_NAME).setFields(fields);
@@ -595,7 +590,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         Protocol serverProtocol = saveProtocolCommand.execute(createDefaultConnection(), subfolderPath).getProtocol();
 
         // now save a couple of runs
-        Integer protocolId = Integer.parseInt(serverProtocol.getProtocolId().toString());
+        Integer protocolId = serverProtocol.getProtocolId();
         List<Map<String, Object>> runRecords1 = new ArrayList<>();
         runRecords1.add(Map.of("sampleId", "sample1", "resultData", "this thing"));
         runRecords1.add(Map.of("sampleId", "sample2", "resultData", "that thing"));

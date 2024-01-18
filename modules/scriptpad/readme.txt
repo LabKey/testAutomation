@@ -34,7 +34,7 @@ script_rhtml.rhtml, script_rmd.rmd, kable.rmd test Knitr and client dependencies
 errOnly.r and consoleOnly.r test error and console output
 
 script_rserve.r tests that a function ('helloWorld') can be invoked using 'Execute Function' if it is published in a report
-session and that report session is used.  The metadata file script_rserve.report.xml adds the function to the whitelist.
+session and that report session is used. The metadata file script_rserve.report.xml adds the function to the allow list.
 
 To test execute function, you must:
 - enable Rserve

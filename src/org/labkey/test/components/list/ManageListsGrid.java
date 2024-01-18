@@ -17,6 +17,7 @@ package org.labkey.test.components.list;
 
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.pages.list.ConfirmDeletePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.ImportListArchivePage;
 import org.labkey.test.util.DataRegionTable;
@@ -52,8 +53,9 @@ public class ManageListsGrid extends DataRegionTable
 
     public BeginPage deleteSelectedLists()
     {
-        deleteSelectedRows();
-        return new BeginPage(getDriver());
+        clickHeaderButtonAndWait("Delete");
+        ConfirmDeletePage confirmPage = new ConfirmDeletePage(getDriver());
+        return confirmPage.confirmDelete();
     }
 
     public List<String> getListNames()

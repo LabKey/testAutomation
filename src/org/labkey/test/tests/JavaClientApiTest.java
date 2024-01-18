@@ -23,9 +23,10 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainDetailsResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
-import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -75,7 +76,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -83,7 +83,7 @@ import static org.junit.Assert.fail;
 /**
  * Test for the Java Client API library. This test is written in
  * Selenium because we don't yet have a way to create a list via
- * the API, so this test will setup a list and then use the Java
+ * the API, so this test will set up a list and then use the Java
  * client API library to insert, read, update, and delete from that list
  */
 @Category({Daily.class})
@@ -188,7 +188,6 @@ public class JavaClientApiTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));
         doCRUDtTest();
-        doCommandFromResponseTest();
         doExtendedFormatTest();
 
         // NOTE: This test deletes all rows in the table so it should be done last.
@@ -288,38 +287,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         TruncateTableCommand truncCmd = new TruncateTableCommand("lists", LIST_NAME);
         TruncateTableResponse resp = truncCmd.execute(cn, PROJECT_NAME);
 
-        assertEquals(2L, resp.getDeletedRowCount());
+        assertEquals((Integer)2, resp.getDeletedRowCount());
 
         log("Completed TruncateTable test...");
-    }
-
-    protected void doCommandFromResponseTest() throws Exception
-    {
-        log("Testing the copy command to response functionality...");
-        SelectRowsCommand selCmd = new SelectRowsCommand("lists", LIST_NAME);
-        selCmd.setRequiredVersion(9.1);
-        selCmd.setMaxRows(2);
-        selCmd.addFilter(new Filter("FirstName", "Fred", Filter.Operator.STARTS_WITH));
-
-        Connection cn = new Connection(WebTestHelper.getBaseURL());
-        SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
-
-        //verify that the command we get back from the response object is a copy
-        //yet has the same settings
-        SelectRowsCommand cmdFromResp = (SelectRowsCommand) resp.getSourceCommand();
-        assertNotSame(selCmd, cmdFromResp);
-        assertEquals(2, cmdFromResp.getMaxRows());
-        assertEquals(9.1, cmdFromResp.getRequiredVersion(), 0.001);
-        assertNotNull(cmdFromResp.getFilters());
-        assertEquals(1, cmdFromResp.getFilters().size());
-
-        Filter filter = cmdFromResp.getFilters().get(0);
-        assertNotSame(selCmd.getFilters().get(0), filter);
-        assertEquals("FirstName", filter.getColumnName());
-        assertEquals("Fred", filter.getValue());
-        assertEquals(Filter.Operator.STARTS_WITH, filter.getOperator());
-
-        log("Completed testing the copy command to response functionality.");
     }
 
     protected void doExtendedFormatTest() throws Exception
@@ -388,9 +358,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Set<String> expected = new HashSet<>(Arrays.asList("key", "foo", "bar", "baz"));
         verifyDomain(response.getDomain(), expected);
 
-        GetDomainCommand getCmd = new GetDomainCommand("lists", LIST_NAME);
-        response = getCmd.execute(cn, PROJECT_NAME);
-        verifyDomain(response.getDomain(), expected);
+        GetDomainDetailsCommand getCmd = new GetDomainDetailsCommand("lists", LIST_NAME);
+        DomainDetailsResponse detailsResponse = getCmd.execute(cn, PROJECT_NAME);
+        verifyDomain(detailsResponse.getDomain(), expected);
 
         log("modify the existing domain");
         SaveDomainCommand saveCmd = new SaveDomainCommand("lists", LIST_NAME);
@@ -599,7 +569,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals(USER2_NAME, who.getEmail());
         assertTrue(who.isImpersonated());
 
-        cn.stopImpersonate();
+        cn.stopImpersonating();
     }
 
     @Override

@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.getdata;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 

@@ -16,7 +16,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                lsFolders(getSession(baseUrl=labkey.url.base, "/%projectName%"))
+                print(lsFolders(getSession(baseUrl=labkey.url.base, "/%projectName%")))
             ]]>
         </url>
         <response>
@@ -30,7 +30,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.getFolders(labkey.url.base, "/%projectName%", includeEffectivePermissions=FALSE)
+                print(labkey.getFolders(labkey.url.base, "/%projectName%", includeEffectivePermissions=FALSE))
             ]]>
         </url>
         <response>

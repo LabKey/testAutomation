@@ -422,11 +422,11 @@ public class FilterTest extends BaseWebDriverTest
         assertEquals("ModifiedBy: Contains '~me~'",
                 List.of(name0, name0), list.getColumnDataAsText(userColumn));
 
-        list.setFilter("ModifiedBy", "Does Not Equal Any Of (example usage: a;b;c)", "~me~");
+        list.setFilter("ModifiedBy", "Does Not Equal Any Of", "~me~");
         assertEquals("ModifiedBy: Does Not Equal Any Of (~me~)",
                 List.of(name1, name2), list.getColumnDataAsText(userColumn));
 
-        list.setFilter("ModifiedBy", "Equals One Of (example usage: a;b;c)", "~me~;" + name1);
+        list.setFilter("ModifiedBy", "Equals One Of", "~me~;" + name1);
         assertEquals("ModifiedBy: Equals One Of (~me~;editor1)",
                 List.of(name0, name1, name0), list.getColumnDataAsText(userColumn));
     }
@@ -540,13 +540,13 @@ public class FilterTest extends BaseWebDriverTest
             return Arrays.asList(
                     //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
                     //Issue 12197
-                    createFilterArgs(_listCol4, "Equals One Of (example usage: a;b;c)", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}),
+                    createFilterArgs(_listCol4, "Equals One Of", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}),
                     createFilterArgs(_listCol1, "Equals", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}),
                     createFilterArgs(_listCol1, "Starts With", "Z", null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}),
                     createFilterArgs(_listCol1, "Does Not Start With", "Z", null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]}),
                     //can't check for the absence of thing you're excluding, since it will be present in the filter text
                     createFilterArgs(_listCol1, "Does Not Equal", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0]}),
-                    createFilterArgs(_listCol1, "Does Not Equal Any Of (example usage: a;b;c)", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0], TEST_DATA[5][1]}),
+                    createFilterArgs(_listCol1, "Does Not Equal Any Of", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0], TEST_DATA[5][1]}),
                     createFilterArgs(_listCol3, "Equals", "true", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
                     createFilterArgs(_listCol3, "Does Not Equal", "false", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
                     //filter is case insensitive
@@ -555,8 +555,8 @@ public class FilterTest extends BaseWebDriverTest
                     createFilterArgs(_listCol4, "Is Greater Than", "9", null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1]}),
                     createFilterArgs(_listCol4, "Is Blank", null, null, null, new String[]{}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1], TEST_DATA[1][0]}),
                     //new filters for faceted filtering
-                    createFilterArgs(_listCol6, "Contains One Of (example usage: a;b;c)", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[]{TEST_DATA[5][1]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}),
-                    createFilterArgs(_listCol1, "Does Not Contain Any Of (example usage: a;b;c)", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[0][1], TEST_DATA[0][3]}),
+                    createFilterArgs(_listCol6, "Contains One Of", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[]{TEST_DATA[5][1]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}),
+                    createFilterArgs(_listCol1, "Does Not Contain Any Of", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[0][1], TEST_DATA[0][3]}),
                     createFilterArgs(_listCol6, "Is Blank", null, null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}),
                     createFilterArgs(_listCol6, "Is Not Blank", null, null, null, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]})
             );
@@ -606,7 +606,8 @@ public class FilterTest extends BaseWebDriverTest
             region = new DataRegionTable(TABLE_NAME, this);
             region.openFilterDialog(fieldKey);
             _extHelper.clickExtTab("Choose Filters");
-            shortWait().until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(getDriver())));
+            String id = (filter1Type.matches("Contains One Of|Does Not Contain Any Of|Equals One Of|Does Not Equal Any Of")) ? "value_1-1" : "value_1";
+            shortWait().until(ExpectedConditions.visibilityOf(Locator.id(id).findElement(getDriver())));
 
             if (filter1 != null)
             {
@@ -624,12 +625,12 @@ public class FilterTest extends BaseWebDriverTest
                     // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
                     waitForFormElementToEqual(Locator.name("value_1"), "Light");
                 }
-                else if (filter1Type.equals("Does Not Equal Any Of (example usage: a;b;c)") && "Light;Mellow".equals(filter1))
+                else if (filter1Type.equals("Does Not Equal Any Of") && "Light;Mellow".equals(filter1))
                 {
                     // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
                     // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
                     // When switching tabs, nothing changes.
-                    waitForFormElementToEqual(Locator.name("value_1"), "Light;Mellow");
+                    waitForFormElementToEqual(Locator.name("value_1-1"), "Light\nMellow");
                 }
                 else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
                 {
@@ -643,7 +644,7 @@ public class FilterTest extends BaseWebDriverTest
                 }
                 else
                 {
-                    assertEquals(filter1, getFormElement(Locator.id("value_1")));
+                    assertEquals(filter1.replaceAll(";", "\n"), getFormElement(Locator.id(id)));
                 }
             }
 

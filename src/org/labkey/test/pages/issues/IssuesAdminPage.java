@@ -153,8 +153,8 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         OldestFirst("ASC", "Oldest first"),
         NewestFirst("DESC", "Newest first");
 
-        private String _value;
-        private String _text;
+        private final String _value;
+        private final String _text;
 
         SortDirection(String value, String text)
         {
@@ -175,7 +175,7 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         }
     }
 
-    protected class ElementCache extends DomainDesigner.ElementCache
+    protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
         Input singularNameInput = new Input(Locator.inputById("singularItemName").findWhenNeeded(propertiesPanel), getDriver());
         Input pluralNameInput = new Input(Locator.inputById("pluralItemName").findWhenNeeded(propertiesPanel), getDriver());

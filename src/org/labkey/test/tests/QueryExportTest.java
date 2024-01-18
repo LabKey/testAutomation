@@ -55,6 +55,18 @@ public class QueryExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return null;
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 0;
+    }
+
+    @Override
     protected int getTestColumnIndex()
     {
         return 1;

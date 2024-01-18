@@ -3,16 +3,16 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getPipelineContainer(
+                print(labkey.pipeline.getPipelineContainer(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%"
-                )
+                ))
             ]]>
         </url>
         <response>
             <![CDATA[
                 $webDavURL
-                [1] "/labkey/_webdav/RlabkeyTest%20Project/%40files/"
+                [1] "%contextPath%/_webdav/RlabkeyTest%20Project/%40files/"
                 $containerPath
                 [1] "/RlabkeyTest Project"
             ]]>
@@ -23,7 +23,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -34,7 +34,7 @@
                     pipelineDescription = "test pipe desc",
                     jsonParameters = list(x = 1, y = 2),
                     saveProtocol = TRUE
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -50,7 +50,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -61,7 +61,7 @@
                     pipelineDescription = "test pipe desc",
                     jsonParameters = list(x = 1, y = 2),
                     saveProtocol = FALSE
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -77,14 +77,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     protocolName = "Rlabkey RCopy Test 3", #using a new protocol name
                     path="/",
                     files=list("sample.txt")
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -98,14 +98,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
                     path="/",
                     files=list("BOGUS.txt")
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -119,7 +119,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -127,7 +127,7 @@
                     path="/",
                     files=list("sample.txt"),
                     xmlParameters = list(x = 1)
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -141,7 +141,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -149,7 +149,7 @@
                     path="/",
                     files=list("sample.txt"),
                     jsonParameters = 123
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -163,7 +163,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -171,7 +171,7 @@
                     path="/",
                     files=list("sample.txt"),
                     jsonParameters = list(x = 1)
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -185,7 +185,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -194,7 +194,7 @@
                     files=list("sample.txt"),
                     xmlParameters = "{\"x\": 1}",
                     jsonParameters = list(x = 1)
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -208,7 +208,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
@@ -216,7 +216,7 @@
                     path="/",
                     files=list("sample.txt"),
                     saveProtocol = TRUE
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -230,14 +230,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.startAnalysis(
+                print(labkey.pipeline.startAnalysis(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     protocolName = "Rlabkey RCopy Test 1", #using the previously saved protocol
                     path="/",
                     files=list("sample.txt"),
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -253,10 +253,10 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getProtocols(
+                print(labkey.pipeline.getProtocols(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%"
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -270,12 +270,12 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getProtocols(
+                print(labkey.pipeline.getProtocols(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:BOGUS",
                     path = "/"
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -289,12 +289,12 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getProtocols(
+                print(labkey.pipeline.getProtocols(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "BOGUS"
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -308,12 +308,12 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getProtocols(
+                print(labkey.pipeline.getProtocols(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "/"
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -350,13 +350,13 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getFileStatus(
+                print(labkey.pipeline.getFileStatus(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "/",
                     protocolName = "Rlabkey RCopy Test 1"
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -370,14 +370,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getFileStatus(
+                print(labkey.pipeline.getFileStatus(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "/",
                     protocolName = "Rlabkey RCopy Test 1",
                     files = "BOGUS.txt"
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -391,14 +391,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getFileStatus(
+                print(labkey.pipeline.getFileStatus(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "/",
                     protocolName = "BOGUS",
                     files = list("sample.txt")
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -419,14 +419,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getFileStatus(
+                print(labkey.pipeline.getFileStatus(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "/",
                     protocolName = "Rlabkey RCopy Test 1",
                     files = list("BOGUS.txt")
-                )
+                ))
             ]]>
         </url>
         <response>
@@ -447,14 +447,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.pipeline.getFileStatus(
+                print(labkey.pipeline.getFileStatus(
                     baseUrl=labkey.url.base,
                     folderPath="%projectName%",
                     taskId = "pipelinetest:pipeline:r-copy",
                     path = "/",
                     protocolName = "Rlabkey RCopy Test 1",
                     files = list("sample.txt")
-                )
+                ))
             ]]>
         </url>
         <response>

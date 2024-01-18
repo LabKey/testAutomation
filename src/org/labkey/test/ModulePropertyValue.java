@@ -81,14 +81,30 @@ public class ModulePropertyValue extends ModuleProperty
         _inputType = inputType;
     }
 
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String propertyLabel, Object value, InputType inputType)
+    {
+        super(moduleName, containerPath, propertyName, propertyLabel, value);
+        _inputType = inputType;
+    }
+
     public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String value)
     {
         this(moduleName, containerPath, propertyName, value, InputType.text);
     }
 
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String propertyLabel, String value)
+    {
+        this(moduleName, containerPath, propertyName, propertyLabel, value, InputType.text);
+    }
+
     public ModulePropertyValue(String moduleName, String containerPath, String propertyName, boolean value)
     {
         this(moduleName, containerPath, propertyName, value, InputType.checkbox);
+    }
+
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String propertyLabel, boolean value)
+    {
+        this(moduleName, containerPath, propertyName, propertyLabel, value, InputType.checkbox);
     }
 
     public InputType getInputType()

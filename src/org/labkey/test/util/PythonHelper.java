@@ -18,8 +18,8 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
@@ -125,7 +125,7 @@ public class PythonHelper
     private String assertPythonVersion(File pythonExecutable)
     {
         String pythonVersion = getPythonVersion(pythonExecutable);
-        Assert.assertThat("Unwanted Python version: " + pythonExecutable.getAbsolutePath() + "\nSet '" + getPythonExeEnv() + "' environment variable to the appropriate python executable",
+        MatcherAssert.assertThat("Unwanted Python version: " + pythonExecutable.getAbsolutePath() + "\nSet '" + getPythonExeEnv() + "' environment variable to the appropriate python executable",
                 pythonVersion, CoreMatchers.startsWith(getVersionPrefix()));
         return pythonVersion;
     }

@@ -161,7 +161,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement heading = Locator.tagWithClass("div", "detail__edit--heading").findWhenNeeded(this);
+        final WebElement heading = Locator.tagWithClass("span", "detail__edit--heading").parent().findWhenNeeded(this);
 
         public Optional<WebElement> editButton()
         {
@@ -190,7 +190,9 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "panel")
                 .withDescendant(Locator.tagWithClass("table", "detail-component--table__fixed"));
+        private final Locator.XPathLocator _baseLocatorAsTooltip = Locator.tagWithClass("div", "header-details-hover");
         private String _title = null;
+        private boolean _asTooltip = false;
 
         public DetailDataPanelFinder(WebDriver driver)
         {
@@ -203,6 +205,12 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             return this;
         }
 
+        public DetailDataPanelFinder asTooltip()
+        {
+            _asTooltip = true;
+            return this;
+        }
+
         @Override
         protected DetailDataPanel construct(WebElement el, WebDriver driver)
         {
@@ -212,7 +220,9 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         @Override
         protected Locator locator()
         {
-            if (_title != null)
+            if (_asTooltip)
+                return _baseLocatorAsTooltip;
+            else if (_title != null)
                 return _baseLocator.withChild(Locator.tagWithClass("div", "panel-heading")
                         .withText(_title));
             else

@@ -17,7 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -42,7 +42,7 @@ public abstract class Log4jUtils
             return;
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        PostCommand<?> command = new PostCommand<>("logger", "update");
+        SimplePostCommand command = new SimplePostCommand("logger", "update");
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("level", level.name());
@@ -73,7 +73,7 @@ public abstract class Log4jUtils
             return;
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        PostCommand<?> command = new PostCommand<>("logger", "reset");
+        SimplePostCommand command = new SimplePostCommand("logger", "reset");
         try
         {
             command.execute(connection, "/");
@@ -97,7 +97,7 @@ public abstract class Log4jUtils
     public static void resetLogMark() throws IOException, CommandException
     {
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        PostCommand<?> command = new PostCommand<>("admin", "resetPrimaryLogMark");
+        SimplePostCommand command = new SimplePostCommand("admin", "resetPrimaryLogMark");
         command.execute(connection, "/");
     }
 

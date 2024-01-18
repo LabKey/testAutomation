@@ -59,7 +59,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.*;
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.ABSOLUTE;
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.FOLDER_RELATIVE;
+import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidOutputType.PARTIAL_FOLDER_RELATIVE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -135,7 +137,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private Long createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
+    private Integer createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
     {
         final String PERL_SCRIPT = "modifyColumnInAssayRun.pl";
 
@@ -610,7 +612,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         final String instrumentSetting = "456";
         final String commentPrefix = "This is a comment for run to be exported via XAR. This is for run: ";
 
-        int assayId = createSimpleProjectAndAssay(exportProject, assayName).intValue();
+        int assayId = createSimpleProjectAndAssay(exportProject, assayName);
 
         Connection cn = createDefaultConnection();
 
@@ -657,11 +659,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         exportPanel.exportXarToPipeline(FOLDER_RELATIVE, toPipelineXarName)
                 .waitForComplete();
 
-        log("Delete runs.");
-        AssayRunsPage assayRunsPage = goToManageAssays().clickAssay(assayName);
-        DataRegionTable runsGrid = assayRunsPage.getTable();
-        runsGrid.checkAllOnPage();
-        runsGrid.deleteSelectedRows();
+        deleteAllAssayRuns(assayName);
 
         log("Reimport runs into same project.");
         goToModule("FileContent");
@@ -677,9 +675,16 @@ public class AssayExportImportTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(partialRelativeXarFile);
         _fileBrowserHelper.importFile(partialRelativeXarFile.getName(), "Import Experiment");
+        goToDataPipeline();
+        waitForPipelineJobsToComplete(1, false);
+
+        compareRunColumnsWithExpected(importProject, assayName, RUN01_NAME, run01ColumnData);
+        compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
+
+        deleteAllAssayRuns(assayName);
+
+        log("Delete jobs.");
         PipelineStatusTable pipelineStatusTable = goToDataPipeline();
-        waitForPipelineJobsToComplete(1, true);
-        checkExpectedErrors(2);
         pipelineStatusTable.deleteAllPipelineJobs();
 
         log("Import runs (folder relative LSID) into a new project");
@@ -694,6 +699,15 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         compareRunColumnsWithExpected(importProject, assayName, RUN01_NAME, run01ColumnData);
         compareRunColumnsWithExpected(importProject, assayName, RUN04_NAME, run04ColumnData);
+    }
+
+    private void deleteAllAssayRuns(String assayName)
+    {
+        log("Delete runs.");
+        AssayRunsPage assayRunsPage = goToManageAssays().clickAssay(assayName);
+        DataRegionTable runsGrid = assayRunsPage.getTable();
+        runsGrid.checkAllOnPage();
+        runsGrid.deleteSelectedRows();
     }
 
 }

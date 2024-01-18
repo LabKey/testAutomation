@@ -60,7 +60,9 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     public WebElement selectTab(String tabText)
     {
-        elementCache().findTab(tabText).click();
+        WebElement tab = elementCache().findTab(tabText);
+        getWrapper().scrollIntoView(tab);
+        tab.click();
         WebElement panel = findPanelForTab(tabText);
         getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
         return panel;

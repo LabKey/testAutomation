@@ -41,11 +41,6 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
         return getComponentElement().getAttribute("class").contains("is-active");
     }
 
-    public boolean isFilter()
-    {
-        return elementCache().icon.getAttribute("class").contains("fa-filter");
-    }
-
     private boolean isClose()
     {
         return elementCache().icon.getAttribute("class").contains("fa-close");
@@ -67,6 +62,16 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
                 return ExpectedConditions.stalenessOf(getComponentElement()).apply(getDriver())
                         || !getText().equals(originalText);
         }, "the value item ["+originalText+"] did not disappear", 1000);
+    }
+
+    /**
+     * A filter will be locked if it was applied by a view.
+     *
+     * @return True if the locked icon is present, false otherwise.
+     */
+    public boolean isLocked()
+    {
+        return Locator.tagWithClass("i", "fa-lock").findWhenNeeded(this).isDisplayed();
     }
 
     @Override

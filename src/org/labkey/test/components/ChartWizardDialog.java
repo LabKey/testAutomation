@@ -40,7 +40,7 @@ public abstract class ChartWizardDialog<EC extends ChartWizardDialog.ElementCach
         clickButton("Cancel", true);
     }
 
-    class ElementCache extends Window.ElementCache
+    class ElementCache extends Window<?>.ElementCache
     {
         public ElementCache()
         {

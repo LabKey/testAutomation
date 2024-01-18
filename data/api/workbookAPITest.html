@@ -2,6 +2,7 @@
 <div id='testButtonDiv'></div><br>
 <div id='createWorkbookDiv'></div><br>
 <div id='deleteWorkbookDiv'></div><br>
+<button id="runButton">RunAPITest</button>
 
 <script type="text/javascript">
 
@@ -53,5 +54,5 @@
         createContainer(true);    // Create then delete
     }
 
+    document.getElementById("runButton")['onclick'] = run;
 </script>
-<button onclick="run();">RunAPITest</button>

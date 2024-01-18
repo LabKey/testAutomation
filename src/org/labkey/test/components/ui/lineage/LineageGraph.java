@@ -7,7 +7,10 @@ import org.labkey.test.components.ui.grids.DetailTable;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +28,22 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
     {
         _el = element;
         _driver = driver;
+    }
+
+    /**
+     * Switch from old 'graphviz' run graph to the "Beta" run graph
+     * "Beta" run graph might be the default if 'graphviz' isn't installed
+     * Assumes the caller has already navigated to 'experiment-showRunGraph.view' somehow
+     */
+    public static LineageGraph showLineageGraph(WebDriver driver)
+    {
+        LineageGraph lineageGraph = new LineageGraph.LineageGraphFinder(driver).findWhenNeeded();
+        if (!lineageGraph.getComponentElement().isDisplayed())
+        {
+            Locator.linkWithSpan("Toggle Beta Graph (new!)").findElement(driver).click();
+        }
+        new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(lineageGraph.getComponentElement()));
+        return lineageGraph;
     }
 
     public Map<String, String> getCurrentNodeData()

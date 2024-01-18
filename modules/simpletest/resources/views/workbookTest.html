@@ -7,7 +7,12 @@ target folder, that should be respected.  The same is true for both updateRows a
 <div id='testResultsDiv'></div><br>
 <div id='containerPathDiv'></div><br>
 
-<script type='text/javascript'>
+<button id='pushme'>RunContainerPathTest</button>
+
+<script type="text/javascript" nonce="<%=scriptNonce%>">
+    LABKEY.Utils.onReady(function() {
+        document.getElementById('pushme')['onclick'] = testContainerPath;
+    })
 
     function testContainerPath() {
         var container = LABKEY.container;
@@ -440,4 +445,3 @@ target folder, that should be respected.  The same is true for both updateRows a
         });
     }
 </script>
-<button onclick='testContainerPath();'>RunContainerPathTest</button>

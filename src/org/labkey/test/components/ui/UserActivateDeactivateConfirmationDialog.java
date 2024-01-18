@@ -23,7 +23,7 @@ public class UserActivateDeactivateConfirmationDialog<SourcePage extends WebDriv
 
     protected UserActivateDeactivateConfirmationDialog(String partialTitle, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), sourcePage, confirmPageSupplier);
     }
 
     protected UserActivateDeactivateConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)

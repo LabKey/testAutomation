@@ -100,11 +100,13 @@ public class LoggedOutDialog extends ModalDialog
         }
     }
 
+    @Override
     protected ElementCache elementCache()
     {
         return (ElementCache) super.elementCache();
     }
 
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();

@@ -3,20 +3,14 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
-import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.Pager;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.labkey.test.components.html.Input.Input;
 
 /**
  * Wraps the component described in ui-components internal\components\lineage\grid\LineageGridDisplay.tsx
@@ -98,7 +92,7 @@ public class LineageGrid extends WebDriverComponent<LineageGrid.ElementCache>
     public List<LineageGridRow> getRows()
     {
         return new GridRow.GridRowFinder(elementCache().table)
-                .findAll().stream().map(a-> new LineageGridRow(elementCache().table, a.getComponentElement(), getDriver()))
+                .findAll().stream().map(a-> new LineageGridRow(elementCache().table, a.getComponentElement()))
                 .collect(Collectors.toList());
     }
 

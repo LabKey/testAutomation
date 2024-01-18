@@ -29,8 +29,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -534,7 +534,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
 
         beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-begin.view?schemaName=CommonData&queryName=Demographics");
-        final WebElement error = Locator.tagWithClass("div", "lk-qd-error").waitForElement(shortWait());
+        final WebElement error = Locator.tagWithClass("div", "lk-vq-warn-message").waitForElement(shortWait());
         MatcherAssert.assertThat("Schema browser error.", error.getText(),
                 CoreMatchers.containsString("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map."));
 
@@ -574,8 +574,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         navigateToMetadataQuery(schema, query);
         QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
-        queryMetadataEditorPage.aliasField().selectAliasField(fieldToWrap).clickApply();
-        queryMetadataEditorPage.getFieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickAliasField().selectAliasField(fieldToWrap).clickApply();
+        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
         queryMetadataEditorPage.clickSave();
     }
 
@@ -846,7 +846,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
-        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 38, table.getDataRowCount());
+        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 33, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)

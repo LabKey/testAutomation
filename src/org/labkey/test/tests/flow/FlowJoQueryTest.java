@@ -33,12 +33,10 @@ import org.labkey.test.util.LogMethod;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * This test tests uploading a FlowJo workspace that has results calculated in it, but no associated FCS files.
@@ -92,29 +90,20 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(getProjectName(), "Comparison", TestFileUtils.getFileContents(new File(sampledataDir, "Comparison.sql")), TestFileUtils.getFileContents(new File(sampledataDir, "Comparison.xml")), true);
 
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("1 run"));
+        clickAndWait(Locator.linkContainingText("1 run"));
         new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "PassFail");
 
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
 
         goToFlowDashboard();
-        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false);
+        importAnalysis(new ImportAnalysisOptions(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false, true));
 
-        int runId = -1;
+        int runId;
         String currentURL = getCurrentRelativeURL();
-        Pattern p = Pattern.compile(".*runId=([0-9]+).*$");
-        Matcher m = p.matcher(currentURL);
-        if (m.matches())
-        {
-            String runIdStr = m.group(1);
-            runId = Integer.parseInt(runIdStr);
-            log("mini-fcs.xml runId = " + runId);
-        }
-        else
-        {
-            fail("Failed to match runId pattern for url: " + currentURL);
-        }
+        runId = Integer.parseInt(Objects.requireNonNull(getUrlParam("runId"),
+                "Failed to match runId pattern for url: " + currentURL));
+        log("mini-fcs.xml runId = " + runId);
         assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
 
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
@@ -149,8 +138,9 @@ public class FlowJoQueryTest extends BaseFlowTest
         new DataRegionTable("query", getDriver()).clickHeaderMenu("Analysis Folder", "All Analysis Folders");
         assertTextNotPresent("No data to show");
         DataRegionTable region = new DataRegionTable("query", this);
-        region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
-        region.setFilter("PercentDifference", "Is Greater Than or Equal To", "2.5", longWaitForPage);
+        region.setUpdateTimeout(longWaitForPage);
+        region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2");
+        region.setFilter("PercentDifference", "Is Greater Than or Equal To", "2.5");
 
         // NOTE: see https://github.com/LabKey/commonAssays/pull/476
         // As part of this PR there were various places we removed range constraints on data values to improve plot consistency.
@@ -185,7 +175,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
     private void verifyWSPImport()
     {
-        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("/advanced"), "Windows File", false, true);
+        importAnalysis(new ImportAnalysisOptions(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("/advanced"), "Windows File", false, true, true));
         assertTextPresent("931115-B02- Sample 01.fcs");
     }
 
@@ -203,9 +193,8 @@ public class FlowJoQueryTest extends BaseFlowTest
     private void verifyFilterOnImport()
     {
         setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
-        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "FilterAnalysis", false, true);
+        importAnalysis(new ImportAnalysisOptions(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "FilterAnalysis", false, true, true));
         DataRegionTable queryTable = new DataRegionTable("query", this);
         assertEquals(1, queryTable.getDataRowCount());
     }
-
 }

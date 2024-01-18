@@ -49,7 +49,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     public FilteringReactSelect typeAheadSelect(String value, String optionText, String selectedOptionLabel)
     {
-        waitForLoaded();
+        waitForReady();
         scrollIntoView();
         open();
 
@@ -85,7 +85,6 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
         try
         {
-            getWrapper().scrollIntoView(optionToClick);
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(optionToClick));
             optionToClick.click();
         }
@@ -95,8 +94,11 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             throw sere;
         }
 
-        if (!WebDriverWrapper.waitFor(()-> !isExpanded(), 1500))   // give it a moment to close, blur if it hasn't
+        if (Boolean.FALSE.equals(WebDriverWrapper.waitFor(()-> !isExpanded(), 1500)))   // give it a moment to close, blur if it hasn't
         {
+            // Adding for debugging. Trying to see if there is any correlation between this and failures where a "Save"
+            // button is not enabled because it did not see the change event in the select control.
+            log("Firing the blur event on the input control for the react select.");
             getWrapper().fireEvent(elementCache().input, WebDriverWrapper.SeleniumEvent.blur);
         }
 
@@ -117,7 +119,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
        unless type-ahead filter information is keyed in first */
     public FilteringReactSelect filterSelect(String value, Locator elementToWaitFor)
     {
-        waitForLoaded();
+        waitForReady();
         scrollIntoView();
         WebElement success = null;
         int tryCount = 0;
@@ -163,6 +165,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     private List<WebElement> setFilter(String value)
     {
+        open();
         elementCache().input.sendKeys(value);
         long filterStart = System.currentTimeMillis();
         WebDriverWrapper.waitFor(()-> {

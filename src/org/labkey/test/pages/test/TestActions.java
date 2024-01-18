@@ -15,7 +15,7 @@
  */
 package org.labkey.test.pages.test;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;

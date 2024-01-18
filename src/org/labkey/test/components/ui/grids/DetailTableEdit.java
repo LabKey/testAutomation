@@ -15,6 +15,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebElement _formElement;
     private final WebDriver _driver;
     private String _title;
+    private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -53,6 +55,12 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         if (_title == null)
             _title = elementCache().header.getText();
         return _title;
+    }
+
+    public DetailTableEdit setReadyTimeout(int readyTimeout)
+    {
+        _readyTimeout = readyTimeout;
+        return this;
     }
 
     /**
@@ -143,6 +151,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         Locator inputloc = Locator.tagWithClass("input", "form-control")
             .withAttribute("name",  fieldName);
+        Input input = Input.Input(inputloc,
+                getDriver()).waitFor();
+        input.set(value);
+        return this;
+    }
+
+    public DetailTableEdit setTextareaByFieldName(String fieldName, String value)
+    {
+        Locator inputloc = Locator.tagWithClass("textarea", "form-control")
+                .withAttribute("name",  fieldName);
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
@@ -242,26 +260,24 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     }
 
     /**
-     * Get the value of an select field. This could be one or many values, because of this the result is returned as a list.
+     * Get the value of a select field.
      *
      * @param fieldCaption The caption/label of the field to get.
-     * @return A (String) list of the values selected.
+     * @return The selected value.
      **/
-    public List<String> getSelectValue(String fieldCaption)
+    public String getSelectedValue(String fieldCaption)
     {
-        return ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find().getSelections();
+        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
+        return reactSelect.getValue();
     }
 
-    /**
-     * clears the selections from the specified reactSelect
-     * @param fieldCaption The label text for the select box
-     * @return A reference to the current object
+    /*
+        This allows you to query a given select in the edit panel to see what options it offers
      */
-    public DetailTableEdit clearSelectionValues(String fieldCaption)
+    public List<String> getSelectOptions(String fieldCaption)
     {
-        ReactSelect reactSelect =  ReactSelect.finder(_driver).followingLabelWithSpan(fieldCaption).find();
-        reactSelect.clearSelection();
-        return this;
+        FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
+        return reactSelect.getOptions();
     }
 
     /**
@@ -277,6 +293,15 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return setSelectValue(fieldCaption, selection);
     }
 
+    public DetailTableEdit createSelectValue(String fieldCaption, String value)
+    {
+        WebElement container = Locator.tag("td").withAttribute("data-caption", fieldCaption).findElement(this);
+        var select = ReactSelect.finder(getDriver()).waitFor(container);
+        select.createValue(value);
+        return this;
+    }
+
+
     /**
      * Select multiple values from a select list.
      *
@@ -287,7 +312,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setSelectValue(String fieldCaption, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
-        selectValues.forEach(s -> {reactSelect.typeAheadSelect(s);});
+        selectValues.forEach(reactSelect::typeAheadSelect);
         return this;
     }
 
@@ -299,7 +324,30 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit clearSelectValue(String fieldCaption)
     {
-        elementCache().findSelect(fieldCaption).clearSelection();
+        return clearSelectValue(fieldCaption, true, true);
+    }
+
+    /**
+     * Clear a given select field
+     * @param fieldCaption The caption/label of the field to clear.
+     * @param waitForSelection If true, wait for the select to have a selection before clearing it
+     * @param assertSelection  If true, assert if no selection appears (note: does nothing if waitForSelection is not true)
+     * @return
+     */
+    public DetailTableEdit clearSelectValue(String fieldCaption, boolean waitForSelection, boolean assertSelection)
+    {
+        var select = elementCache().findSelect(fieldCaption);
+        if (waitForSelection)
+        {
+            if (assertSelection) {
+                WebDriverWrapper.waitFor(() -> select.hasSelection(),
+                        String.format("The %s select did not have any selection in time", fieldCaption), _readyTimeout);
+            }
+            else {
+                WebDriverWrapper.waitFor(() -> select.hasSelection(), 1000);
+            }
+        }
+        select.clearSelection();
         return this;
     }
 
@@ -340,11 +388,12 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailDataPanel clickSave()
     {
         String title = getSourceTitle();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
         elementCache().saveButton.click();
 
         // If save causes some update, wait until it is completed.
         WebDriverWrapper.waitFor(()->!BootstrapLocators.loadingSpinner.existsIn(getDriver()),
-                "Save has taken too long to complete.", 5_000);
+                "Save has taken too long to complete.", 15_000);
 
         return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
     }
@@ -354,7 +403,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         elementCache().saveButton.click();
         WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
         WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
-                "No error message was shown.", 750);
+                "No error message was shown.", 1_000);
         return errorBanner.getText();
     }
 
@@ -370,7 +419,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         elementCache().cancelButton.click();
         WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
         WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
-                "No error message was shown.", 750);
+                "No error message was shown.", 1_000);
         return errorBanner.getText();
     }
 
@@ -383,7 +432,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement header = Locator.tagWithClass("div", "detail__edit--heading")
+        public WebElement header = Locator.tagWithClass("div", "panel-heading")
                 .findWhenNeeded(this);
         public WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
                 .findWhenNeeded(this);
@@ -426,8 +475,8 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public DetailTableEditFinder withTitle(String title)
         {
-            _locator = _baseLocator.withDescendant(Locator.tagWithClass("div", "detail__edit--heading")
-                    .withText(title));
+            _locator = _baseLocator.withDescendant(Locator.tagWithClass("span", "detail__edit--heading")
+                .parent().withText(title));
             return this;
         }
 

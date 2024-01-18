@@ -15,14 +15,12 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class Diff
 {
 
     public static String diff(String a, String b)
     {
-        return _diff(StringUtils.split(a), StringUtils.split(b));
+        return _diff(a.split("\n"), b.split("\n"));
     }
 
 
@@ -42,7 +40,7 @@ public class Diff
         {
             for (int j = N - 1; j >= 0; j--)
             {
-                if (equals(x[i], y[j]))
+                if (equals(x[i].strip(), y[j].strip()))
                     opt[i][j] = opt[i + 1][j + 1] + 1;
                 else
                     opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
@@ -53,7 +51,7 @@ public class Diff
         int i, j;
         for (i=0, j=0 ; i < M && j < N ; )
         {
-            if (x[i].equals(y[j]))
+            if (x[i].strip().equals(y[j].strip()))
             {
                 sb.append("        ").append(x[i]).append("\n");
                 i++;

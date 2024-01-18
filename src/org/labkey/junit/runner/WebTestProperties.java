@@ -119,7 +119,7 @@ public abstract class WebTestProperties
 
     private static List<String> getInstalledModules()
     {
-        File modulesDir = new File(TestFileUtils.getDefaultDeployDir(), "modules");
+        File modulesDir = TestFileUtils.getModulesDir();
 
         if (!modulesDir.exists())
             return Collections.emptyList();

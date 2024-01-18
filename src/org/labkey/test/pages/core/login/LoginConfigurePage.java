@@ -3,6 +3,7 @@ package org.labkey.test.pages.core.login;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
@@ -68,6 +69,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     {
         toggleSecondaryConfiguration();
         return elementCache().secondaryMenuFinder.findOptional(getDriver()).isPresent();
+    }
+
+    public boolean isSecondaryConfOptionEnabled(String option)
+    {
+        toggleSecondaryConfiguration();
+        return !elementCache().addSecondaryMenu.isMenuItemDisabled(option);
     }
 
     private boolean isPrimarySelected()
@@ -183,13 +190,9 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        SvgCheckbox selfSignupCheckBox = new SvgCheckbox(checkBoxLoc("Allow self sign up").findWhenNeeded(globalSettingsPanel())
-                .withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
-        SvgCheckbox allowUserEmailEditCheckbox = new SvgCheckbox(checkBoxLoc("Allow users to edit their own email addresses")
-                .findWhenNeeded(globalSettingsPanel()).withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
-        SvgCheckbox autoCreateCheckBox = new SvgCheckbox(checkBoxLoc("Auto-create authenticated users")
-                .findWhenNeeded(globalSettingsPanel())
-                .withTimeout(WAIT_FOR_JAVASCRIPT), getDriver());
+        Checkbox selfSignupCheckBox = new Checkbox(this, "Allow self sign up");
+        Checkbox allowUserEmailEditCheckbox = new Checkbox(this, "Allow users to edit their own email addresses");
+        Checkbox autoCreateCheckBox = new Checkbox(this,"Auto-create authenticated users");
         WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
@@ -200,7 +203,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         BootstrapMenu addPrimaryMenu = primaryMenuFinder.findWhenNeeded(this);
         MultiMenu.MultiMenuFinder secondaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
                 .withText("Add New Secondary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
-        BootstrapMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
+        MultiMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
 
         WebElement globalSettingsPanel()
         {
@@ -208,12 +211,6 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                     .withChild(Locator.tagWithClass("div", "panel-heading")
                             .withChild(Locator.tag("span").withText("Global Settings")))
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
-        }
-
-        Locator checkBoxLoc(String label)
-        {
-            return Locator.tagWithClass("div", "global-settings__text-row").containing(label)
-                    .child(Locator.tagWithClass("span", "clickable"));
         }
 
         WebElement configurationsPanel()

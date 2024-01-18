@@ -34,7 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,7 +105,6 @@ public abstract class ExcelHelper
 
     /**
      * Helper to safely convert cell values to a string equivalent
-     *
      */
     public static String getCellStringValue(Cell cell)
     {
@@ -208,13 +207,15 @@ public abstract class ExcelHelper
     public static List<String> getRowData(Sheet sheet, int rowIdx)
     {
         List<String> rowData = new ArrayList<>();
-        Iterator<Cell> row = sheet.getRow(rowIdx).cellIterator();
-        Cell cell;
-        while (row.hasNext())
+        sheet.getRow(rowIdx).cellIterator().forEachRemaining(cell ->
         {
-            cell = row.next();
-            rowData.add(getCellStringValue(cell));
-        }
+            final int columnIndex = cell.getColumnIndex();
+            while (columnIndex > rowData.size())
+            {
+                rowData.add(""); // fill in empty cells
+            }
+            rowData.add(columnIndex, getCellStringValue(cell));
+        });
         return rowData;
     }
 
@@ -225,6 +226,58 @@ public abstract class ExcelHelper
         {
             rows.add(getRowData(sheet, i));
         }
+        final int colCount = rows.get(0).size(); // Assume first row is column headers
+        for (int j = 1; j < rows.size(); j++)
+        {
+            List<String> dataRow = rows.get(j);
+            // Pad out empty columns
+            while (dataRow.size() < colCount)
+            {
+                dataRow.add("");
+            }
+        }
         return rows;
+    }
+
+    public static List<List<String>> getAllRows(Sheet sheet)
+    {
+        return getFirstNRows(sheet, sheet.getLastRowNum() + 1);
+    }
+
+    public static Map<String, List<Map<String, String>>> loadData(File file)
+    {
+        try (Workbook workbook = ExcelHelper.create(file))
+        {
+            Map<String, List<Map<String, String>>> allData = new LinkedHashMap<>();
+
+            for (int s = 0; s < workbook.getNumberOfSheets(); s++)
+            {
+                Sheet sheet = workbook.getSheetAt(s);
+
+                List<List<String>> rawRows = getAllRows(sheet);
+                List<String> rawHeaders = rawRows.get(0);
+                List<List<String>> rawData = rawRows.subList(1, rawRows.size());
+
+                List<Map<String, String>> rowMaps = new ArrayList<>();
+
+                for (List<String> rawRow : rawData)
+                {
+                    Map<String, String> rowMap = new LinkedHashMap<>();
+                    for (int col = 0; col < rawRow.size(); col++)
+                    {
+                        rowMap.put(rawHeaders.get(col), rawRow.get(col));
+                    }
+                    rowMaps.add(rowMap);
+                }
+
+                allData.put(sheet.getSheetName(), rowMaps);
+            }
+
+            return allData;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

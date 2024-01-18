@@ -20,14 +20,13 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.GetRolesCommand;
 import org.labkey.remoteapi.security.GetRolesResponse;
-import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -35,39 +34,35 @@ import static org.junit.Assert.fail;
  */
 public abstract class PermissionsHelper
 {
-    private static final String permissionClassPkg = "org.labkey.api.security.roles.";
-    protected WebDriverWrapper _driver;
+    public static final String SITE_ADMIN_ROLE = "Site Administrator";
+    public static final String APP_ADMIN_ROLE = "Application Admin";
+    public static final String DEVELOPER_ROLE = "Platform Developer";
+    public static final String IMP_TROUBLESHOOTER_ROLE = "Impersonating Troubleshooter";
 
-    public PermissionsHelper(WebDriverWrapper driver)
+    public static String toRole(final String name)
     {
-        _driver = driver;
+        if (name.contains("."))
+            return name;
+
+        String roleClassName = name.replaceAll("[- ]", "").replace("Administrator", "Admin") + "Role";
+
+        String role = ObjectUtils.firstNonNull(
+                getRoles().get(name),
+                getRoles().get(roleClassName));
+        if (role == null)
+            throw new RuntimeException("No role found matching '" + name + "'");
+
+        return role;
     }
 
-    public String toRole(final String perm)
-    {
-        if (perm.contains("."))
-            return perm;
-
-        Map<String, String> specialRoleClasses = new HashMap<>();
-        specialRoleClasses.put("See Audit Log Events", permissionClassPkg + "CanSeeAuditLogRole");
-
-        String roleClassName = perm.replaceAll("[- ]", "").replace("Administrator", "Admin") + "Role";
-
-        return ObjectUtils.firstNonNull(
-                specialRoleClasses.get(perm),
-                getRoles().get(perm),
-                getRoles().get(roleClassName),
-                permissionClassPkg + roleClassName);
-    }
-
-    private Map<String, String> _roles;
-    private Map<String, String> getRoles()
+    private static Map<String, String> _roles;
+    private static Map<String, String> getRoles()
     {
         if (_roles == null)
         {
             _roles = new HashMap<>();
             GetRolesCommand command = new GetRolesCommand();
-            Connection connection = _driver.createDefaultConnection();
+            Connection connection = WebTestHelper.getRemoteApiConnection();
 
             try
             {
@@ -75,10 +70,13 @@ public abstract class PermissionsHelper
                 List<GetRolesResponse.Role> roles = response.getRoles();
                 for (GetRolesResponse.Role role : roles)
                 {
-                    String[] roleParts = role.getUniqueName().split("\\.");
-                    _roles.put(roleParts[roleParts.length - 1], role.getUniqueName());
-                    _roles.put(role.getName(), role.getUniqueName());
+                    String uniqueName = role.getUniqueName();
+                    String simpleRoleClassName = uniqueName.substring(uniqueName.lastIndexOf(".") + 1);
+                    _roles.put(simpleRoleClassName, uniqueName);
+                    _roles.put(role.getName(), uniqueName);
                 }
+                _roles.putIfAbsent("NoPermissionsRole", "org.labkey.api.security.roles.NoPermissionsRole");
+                _roles.putIfAbsent("No Permissions", "org.labkey.api.security.roles.NoPermissionsRole");
             }
             catch (IOException | CommandException e)
             {
@@ -96,11 +94,7 @@ public abstract class PermissionsHelper
     public abstract void checkInheritedPermissions();
     public abstract void uncheckInheritedPermissions();
     public abstract boolean isPermissionsInherited();
-
-    public void assertPermissionsInherited()
-    {
-        assertTrue("Permissions not inherited for folder: " + _driver.getCurrentContainerPath(), isPermissionsInherited());
-    }
+    protected abstract Connection getConnection();
 
     public enum MemberType
     {user, group, siteGroup}
@@ -168,14 +162,14 @@ public abstract class PermissionsHelper
 
     public void assertGroupExists(String groupName, String projectName)
     {
-        _driver.log("asserting that group " + groupName + " exists in project " + projectName + "...");
+        TestLogger.log("asserting that group " + groupName + " exists in project " + projectName + "...");
         if (!doesGroupExist(groupName, projectName))
             fail("group " + groupName + " does not exist in project " + projectName);
     }
 
     public void assertGroupDoesNotExist(String groupName, String projectName)
     {
-        _driver.log("asserting that group " + groupName + " does not exist in project " + projectName + "...");
+        TestLogger.log("asserting that group " + groupName + " does not exist in project " + projectName + "...");
         if (doesGroupExist(groupName, projectName))
             fail("group " + groupName + " exists in project " + projectName);
     }
@@ -184,14 +178,14 @@ public abstract class PermissionsHelper
 
     public void assertUserInGroup(String member, String groupName, String projectName, PrincipalType principalType)
     {
-        _driver.log("asserting that member " + member + " is in group " + projectName + "/" + groupName + "...");
+        TestLogger.log("asserting that member " + member + " is in group " + projectName + "/" + groupName + "...");
         if (!isUserInGroup(member, groupName, projectName, principalType))
             fail("member " + member + " was not in group " + projectName + "/" + groupName);
     }
 
     public void assertUserNotInGroup(String member, String groupName, String projectName, PrincipalType principalType)
     {
-        _driver.log("asserting that member " + member + " is not in group " + projectName + "/" + groupName + "...");
+        TestLogger.log("asserting that member " + member + " is not in group " + projectName + "/" + groupName + "...");
         if (isUserInGroup(member, groupName, projectName, principalType))
             fail("member " + member + " was found in group " + projectName + "/" + groupName);
     }

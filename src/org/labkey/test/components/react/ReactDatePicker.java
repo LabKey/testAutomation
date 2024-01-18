@@ -10,13 +10,13 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementCache>
 {
     private final WebDriver _driver;
     private final WebElement _el;
-
-    private static final String YMD = "\\d{4}-\\d{2}-\\d{2}";
-    private static final String YMDHS = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}";
 
     protected ReactDatePicker(WebElement element, WebDriver driver)
     {
@@ -45,7 +45,14 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
     {
         elementCache().input.set(value);
         if (close)
-            elementCache().input.getComponentElement().sendKeys(Keys.ENTER); // Dismiss date picker
+            dismiss();
+    }
+
+    private void dismiss()
+    {
+        elementCache().input.getComponentElement().sendKeys(Keys.ENTER); // Dismiss date picker
+
+        WebDriverWrapper.waitFor(()-> !isExpanded(), "Date picker didn't close", 1000);
     }
 
     public void set(String value)
@@ -53,41 +60,64 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         set(value, true);
     }
 
-
     /**
-     * use keyboard input to set year, month. then use picker to select day and time
-     * @param value date or datetime string
-     * @return false if date string is not one of "yyyy-MM-dddd" or "yyyy-MM-dddd hh:ss" format
+     * Use keyboard input to set year, month. then use picker to select day and time
+     * Midnight time values will be ignored
+     * @param value date or datetime value
      */
-    public boolean select(String value)
+    public void select(LocalDateTime value)
     {
-        if (value.matches(YMD) || value.matches(YMDHS))
-        {
-            set("", false);
-            String[] dateParts = getParsedDateParts(value);
-            set(dateParts[0], false); // use keyboard input to set year and month
-            elementCache().datePickerDateCell(dateParts[1]).click(); // use calendar ui to select day
-            if (!StringUtils.isEmpty(dateParts[2])) // use timepicker to select time
-                clickTime(dateParts[2]);
-
-            return true;
-        }
-
-        return false;
+        set("", false);
+        set(value.getYear() + "-" + value.getMonthValue(), false); // use keyboard input to set year and month
+        elementCache().datePickerDateCell(value.getDayOfMonth()).click(); // use calendar ui to select day
+        if (!value.toLocalTime().equals(LocalTime.MIDNIGHT)) // use timepicker to select time
+            clickTime(value.toLocalTime());
+        else
+            dismiss();
     }
 
     public void clear()
     {
         set("");
+    }
+
+    private void clickTime(LocalTime time)
+    {
+        String timeStr;
+
+        // If the time value "13:00" is available, then presume this ReactDatePicker is configured for 24-hour time.
+        if (elementCache().datePickerTime("13:00").isDisplayed())
+        {
+            // Expected format is "HH:mm"
+            timeStr = "%s:%s".formatted(withLeadingZero(time.getHour()), withLeadingZero(time.getMinute()));
+        }
+        else
+        {
+            int hour = time.getHour();
+            String amPm = "AM";
+
+            if (hour == 0)
+                hour = 12;
+            else if (hour == 12)
+                amPm = "PM";
+            else if (hour > 12)
+            {
+                hour -= 12;
+                amPm = "PM";
+            }
+
+            // Expected format is "h:mm a"
+            timeStr = "%d:%s %s".formatted(hour, withLeadingZero(time.getMinute()), amPm);
+        }
+
+        WebElement timeElement = elementCache().datePickerTime(timeStr);
+        getWrapper().fireEvent(timeElement, WebDriverWrapper.SeleniumEvent.click);
         WebDriverWrapper.waitFor(()-> !isExpanded(), "Date picker didn't close", 1000);
     }
 
-    public ReactDatePicker clickTime(String time)
+    private String withLeadingZero(int i)
     {
-        expand();
-        elementCache().timeListItem(time).click();
-        WebDriverWrapper.waitFor(()-> !isExpanded(), "Date picker didn't close", 1000);
-        return this;
+        return StringUtils.leftPad(String.valueOf(i), 2, "0");
     }
 
     private boolean isExpanded()
@@ -102,34 +132,6 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
             getComponentElement().click();
             WebDriverWrapper.waitFor(this::isExpanded, "Date picker didn't open", 1500);
         }
-    }
-
-    /**
-     * Parse "2022-07-11 08:30" to ["2022-07", "11", "8:30 AM"]
-     * @param fullDateStr
-     * @return
-     */
-    private String[] getParsedDateParts(String fullDateStr)
-    {
-        String[] parts = fullDateStr.split(" ") ;
-        String[] dayParts = parts[0].split("-");
-        String yearMon = dayParts[0] + "-" + dayParts[1];
-        String dayPart = dayParts[2];
-        String timePart = parts.length > 1 ? parts[1] : "";
-        if (!StringUtils.isEmpty(timePart))
-        {
-            String[] timeParts = timePart.split(":");
-            String amPM = "AM";
-            int hour = Integer.parseInt(timeParts[0]);
-            if (hour > 12)
-            {
-                amPM = "PM";
-                hour -= 12;
-            }
-            timePart = hour + ":" + timeParts[1] + " " + amPM;
-        }
-
-        return new String[]{yearMon, dayPart, timePart};
     }
 
     @Override
@@ -147,30 +149,28 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         WebElement popup = Locator.xpath(".").followingSibling("div").withClass("react-datepicker__tab-loop")
                 .refindWhenNeeded(this);
 
-        WebElement timeList = Locator.tagWithClass("div", "react-datepicker__time-box")
-                    .child(Locator.tagWithClass("ul", "react-datepicker__time-list"))
-                    .refindWhenNeeded(popup);
-
-        WebElement timeListItem(String text)
-        {
-            return Locator.tagWithClass("li", "react-datepicker__time-list-item").withText(text)
-                    .findElement(timeList);
-        }
-
         /**
          * Return the date cell div of react datepicker
          * @param day '01', '02', ... '31'
-         * @return
          */
-        WebElement datePickerDateCell(String day)
+        WebElement datePickerDateCell(int day)
         {
-            return datePickerDateLoc(day).findElement(popup);
+            return datePickerDateLoc(withLeadingZero(day)).findElement(popup);
+        }
+
+        WebElement datePickerTime(String timeStr)
+        {
+            return Locator.tagWithClass("li", "react-datepicker__time-list-item")
+                    .withText(timeStr)
+                    .findWhenNeeded(elementCache().popup);
         }
     }
 
     static Locator.XPathLocator datePickerDateLoc(String datePart)
     {
-        return Locator.tagWithClass("div", "react-datepicker__day--0" + datePart);
+        return Locator.tagWithClass("div", "react-datepicker__day--0" + datePart)
+                // Don't get day from previous month
+                .withoutClass("react-datepicker__day--outside-month");
     }
 
     public static class ReactDateInputFinder extends WebDriverComponentFinder<ReactDatePicker, ReactDateInputFinder>

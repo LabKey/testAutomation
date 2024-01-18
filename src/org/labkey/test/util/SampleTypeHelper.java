@@ -50,8 +50,9 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGI
  */
 public class SampleTypeHelper extends WebDriverWrapper
 {
-    public static final String IMPORT_DATA_LABEL = "Insert";
-    public static final String MERGE_DATA_LABEL = "Insert and Replace";
+    public static final String IMPORT_OPTION = "IMPORT";
+    public static final String MERGE_OPTION = "MERGE";
+    public static final String UPDATE_OPTION = "UPDATE";
     private final WebDriver _driver;
 
     public enum StatusType {
@@ -154,15 +155,6 @@ public class SampleTypeHelper extends WebDriverWrapper
         return new CreateSampleTypePage(getDriver());
     }
 
-    public void selectImportOption(String label, int index)
-    {
-        waitForText("Import Lookups by Alternate Key");
-        boolean merge = MERGE_DATA_LABEL.equals(label);
-        String componentId = "insertOption" + index;
-        String script = "Ext4.ComponentManager.get('" + componentId + "').setValue(" + (merge ? "1" : "0") + ")";
-        executeScript(script);
-    }
-
     public SampleTypeHelper goToSampleType(String name)
     {
         TestLogger.log("Go to the sample type '" + name + "'");
@@ -183,6 +175,9 @@ public class SampleTypeHelper extends WebDriverWrapper
         Set<String> actualNames = new HashSet<>(getSampleTypeFields());
         Set<String> expectedNames = _fields.stream().map(FieldDefinition::getName).collect(Collectors.toSet());
         expectedNames.add("Name");
+        expectedNames.add("MaterialExpDate");
+        expectedNames.add("StoredAmount");
+        expectedNames.add("Units");
         expectedNames.add("Flag");
         assertEquals("Fields in sample type.", expectedNames, actualNames);
     }
@@ -220,12 +215,12 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void bulkImport(File dataFile)
     {
-        fileImport(dataFile, IMPORT_DATA_LABEL);
+        fileImport(dataFile, IMPORT_OPTION);
     }
 
     public void mergeImport(File dataFile)
     {
-        fileImport(dataFile, MERGE_DATA_LABEL);
+        fileImport(dataFile, MERGE_OPTION);
     }
 
     private void fileImport(File dataFile, String importOption)
@@ -234,25 +229,28 @@ public class SampleTypeHelper extends WebDriverWrapper
         TestLogger.log("Adding data from file");
         ImportDataPage importDataPage = drt.clickImportBulkData();
         importDataPage.setFile(dataFile);
-        selectImportOption(importOption, 0);
+        if (MERGE_OPTION.equals(importOption))
+            importDataPage.setFileMerge(true);
+        else if (UPDATE_OPTION.equals(importOption))
+            importDataPage.setFileInsertOption(true);
         importDataPage.submit();
     }
 
     public void bulkImport(String tsvData)
     {
-        startTsvImport(tsvData, IMPORT_DATA_LABEL)
+        startTsvImport(tsvData, IMPORT_OPTION)
                 .submit();
     }
 
     public void mergeImport(String tsvData)
     {
-        startTsvImport(tsvData, SampleTypeHelper.MERGE_DATA_LABEL)
+        startTsvImport(tsvData, SampleTypeHelper.MERGE_OPTION)
                 .submit();
     }
 
     public void bulkImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, IMPORT_DATA_LABEL)
+        startTsvImport(data, IMPORT_OPTION)
                 .submit();
     }
 
@@ -264,13 +262,13 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public void mergeImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
+        startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
                 .submit();
     }
 
     public void mergeImportExpectingError(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleTypeHelper.MERGE_DATA_LABEL)
+        startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
                 .submitExpectingError();
     }
 
@@ -278,7 +276,10 @@ public class SampleTypeHelper extends WebDriverWrapper
     {
         DataRegionTable drt = getSamplesDataRegionTable();
         ImportDataPage importDataPage = drt.clickImportBulkData();
-        selectImportOption(importOption, 1);
+        if (MERGE_OPTION.equals(importOption))
+            importDataPage.setCopyPasteMerge(true);
+        else if (UPDATE_OPTION.equals(importOption))
+            importDataPage.setCopyPasteInsertOption(true);
         importDataPage.setText(tsv);
         return importDataPage;
     }
@@ -309,7 +310,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
         for (Map.Entry<String, String> field : expectedData.entrySet())
         {
-            assertEquals(field.getKey() + " not as expected at index " + index, field.getValue(), actualData.get(field.getKey()));
+            assertEquals(field.getKey() + " not as expected at index " + index, field.getValue().trim(), actualData.get(field.getKey()));
         }
     }
 
@@ -318,7 +319,7 @@ public class SampleTypeHelper extends WebDriverWrapper
         DataRegionTable drt = getSamplesDataRegionTable();
         for (Map<String, String> expectedRow : data)
         {
-            int index = drt.getRowIndex("Name", expectedRow.get("Name"));
+            int index = drt.getRowIndex("Name", expectedRow.get("Name").trim());
             verifyDataRow(expectedRow, index, drt);
         }
     }

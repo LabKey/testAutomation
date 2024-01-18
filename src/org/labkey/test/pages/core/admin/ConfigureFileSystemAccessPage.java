@@ -37,6 +37,12 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return new ConfigureFileSystemAccessPage(driver.getDriver());
     }
 
+    @Override
+    protected void waitForPage()
+    {
+        Locator.tagWithClass("span", "x4-tree-node-text").waitForElement(elementCache().fileTreePanel, 10_000);
+    }
+
     public ShowAdminPage save()
     {
         clickAndWait(elementCache().saveButton);
@@ -85,10 +91,11 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return new MapNetworkDrivePage(getDriver());
     }
 
-    public ConfigureFileSystemAccessPage selectFolder(String folderName)
+    public void selectFolder(String folderName)
     {
-        click(Locator.tagWithText("span", folderName).withClass("x4-tree-node-text"));
-        return this;
+        Locator.tagWithText("span", folderName).withClass("x4-tree-node-text")
+                .findElement(elementCache().fileTreePanel)
+                .click();
     }
 
     @Override
@@ -97,7 +104,7 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         protected final WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
@@ -109,6 +116,8 @@ public class ConfigureFileSystemAccessPage extends LabKeyPage<ConfigureFileSyste
         public WebElement enableWebFilesCheckbox = Locator.input("webfilesEnabled")
                 .findWhenNeeded(this).withTimeout(4000);
         // TODO need to add an element and support methods for the summary grid.
+
+        final WebElement fileTreePanel = Locator.id("viewsGrid").findWhenNeeded(this);
     }
 
 }

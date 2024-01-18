@@ -4,7 +4,7 @@
                 library(Rlabkey)
                 s<-getSession(baseUrl=labkey.url.base, folderPath="/%projectName%")
                 scobj <- getSchema(s, "lists")
-                scobj   # shows available queries
+                print(scobj)   # shows available queries
             ]]>
     </url>
     <response>
@@ -21,7 +21,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.getQueries(labkey.url.base, "/%projectName%", "lists")
+                print(labkey.getQueries(labkey.url.base, "/%projectName%", "lists"))
             ]]>
         </url>
         <response>
@@ -38,7 +38,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                lsSchemas(getSession(baseUrl=labkey.url.base, "/%projectName%"))
+                print(lsSchemas(getSession(baseUrl=labkey.url.base, "/%projectName%")))
             ]]>
         </url>
         <response>
@@ -61,7 +61,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.getSchemas(labkey.url.base, "/%projectName%")
+                print(labkey.getSchemas(labkey.url.base, "/%projectName%"))
             ]]>
         </url>
         <response>
@@ -87,7 +87,7 @@
                 s<-getSession(baseUrl=labkey.url.base, folderPath="/%projectName%")
                 scobj <- getSchema(s, "lists")
                 lkdata<- getRows(s, scobj$AllTypes)  # shorthand for labkey.selectRows, all the same args apply
-                lkdata
+                print(lkdata)
             ]]>
         </url>
         <response>
@@ -109,7 +109,7 @@
                 s<-getSession(baseUrl=labkey.url.base, folderPath="/%projectName%")
                 scobj <- getSchema(s, "lists")
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
-                lucols
+                print(lucols)
             ]]>
         </url>
         <response>
@@ -128,7 +128,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.getLookupDetails(labkey.url.base, "/%projectName%", "lists", "AllTypes", "Category")
+                print(labkey.getLookupDetails(labkey.url.base, "/%projectName%", "lists", "AllTypes", "Category"))
             ]]>
         </url>
         <response>
@@ -152,7 +152,7 @@
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
                 cols <- c(names(scobj$AllTypes)[10:14], names(lucols)[9:11])
                 simpledf <- getRows(s, scobj$AllTypes, colSelect=paste(cols, sep=","), colNameOpt="caption")
-                simpledf
+                print(simpledf)
             ]]>
         </url>
         <response>
@@ -176,7 +176,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.getQueryDetails(labkey.url.base, "/%projectName%", "lists", "AllTypesCategories")
+                print(labkey.getQueryDetails(labkey.url.base, "/%projectName%", "lists", "AllTypesCategories"))
             ]]>
         </url>
         <response>
@@ -195,7 +195,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.getDefaultViewDetails(labkey.url.base, "/%projectName%", "lists", "AllTypesCategories")
+                print(labkey.getDefaultViewDetails(labkey.url.base, "/%projectName%", "lists", "AllTypesCategories"))
             ]]>
         </url>
         <response>
@@ -226,7 +226,7 @@
                     , RequiredText = "I"
                     , Category = "LOOKUP2")
 
-                labkey.insertRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+                print(labkey.insertRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow))
             ]]>
         </url>
         <response>
@@ -253,7 +253,7 @@
                     , RequiredInt = 0
                     , Category = "LOOKUP2")
 
-                labkey.insertRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+                print(labkey.insertRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow))
             ]]>
         </url>
         <response>
@@ -283,7 +283,7 @@
                 insertedRow <- labkey.insertRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toInsert=newrow)
                 selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
                         , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted via Rlabkey")))
-                selectedRow
+                print(selectedRow)
             ]]>
         </url>
         <response>
@@ -313,7 +313,7 @@
                 updatedRow <- labkey.updateRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes", toUpdate=updaterow)
                 selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
                         , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
-                selectedRow
+                print(selectedRow)
             ]]>
         </url>
         <response>
@@ -329,7 +329,7 @@
 
                 selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
                         , colFilter=makeFilter(c("DisplayFld", "equals", "Updated via Rlabkey")))
-                selectedRow
+                print(selectedRow)
             ]]>
         </url>
         <response>
@@ -349,7 +349,7 @@
                     , queryName="AllTypes"
                     , colFilter=makeFilter(c("*", "Q", "empty"))
                 )
-                selectedRow
+                print(selectedRow)
             ]]>
         </url>
         <response>
@@ -373,13 +373,13 @@
                 deleterow <- data.frame(RowId=selectedRow[1, "Row Id"])
                 labkey.deleteRows(baseUrl=labkey.url.base, folderPath="/%projectName%", schemaName="lists", queryName="AllTypes",  toDelete=deleterow)
 
-                selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
-                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
+                print(selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
+                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey"))))
             ]]>
         </url>
         <response>
             <![CDATA[
-                Empty data frame was returned. Query may be too restrictive.
+                <0 rows>
             ]]>
         </response>
     </test>
@@ -400,7 +400,7 @@
                 ## reselect inserted row
                 selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"
                     , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted with plus (+) sign")))
-                selectedRow
+                print(selectedRow)
             ]]>
         </url>
         <response>
@@ -421,7 +421,7 @@
 
                 selectedRow<-labkey.executeSql(labkey.url.base, folderPath="/%projectName%",schemaName="lists",
                     sql="select DisplayFld, TextFld from AllTypes where DisplayFld = 'Row 1'")
-                selectedRow
+                print(selectedRow)
             ]]>
         </url>
         <response>
@@ -439,7 +439,7 @@
                 selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",
                     schemaName="issues", queryName="rlabkeyissues", containerFilter="Current",
                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
-                selectedRow
+                print(selectedRow)
                 ]]>
         </url>
         <response>
@@ -456,7 +456,7 @@
                  selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",
                      schemaName="issues", queryName="rlabkeyissues", containerFilter="CurrentAndSubfolders", colSort="+IssueId",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
-                 selectedRow
+                 print(selectedRow)
                  ]]>
         </url>
         <response>
@@ -475,7 +475,7 @@
                 selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%/RlabkeyTest",
                     schemaName="issues", queryName="rlabkeyissues", containerFilter="Current",
                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
-                selectedRow
+                print(selectedRow)
                 ]]>
         </url>
         <response>
@@ -492,7 +492,7 @@
                  selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%/RlabkeyTest",
                      schemaName="issues", queryName="rlabkeyissues", containerFilter="CurrentAndParents", colSort="+IssueId",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
-                 selectedRow
+                 print(selectedRow)
                  ]]>
         </url>
         <response>
@@ -510,7 +510,7 @@
                  selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%/RlabkeyTest",
                      schemaName="issues", queryName="rlabkeyissues", containerFilter="CurrentPlusProject", colSort="+IssueId",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
-                 selectedRow
+                 print(selectedRow)
                  ]]>
         </url>
         <response>
@@ -531,7 +531,7 @@
                      colSort="Title",
                      containerFilter="AllFolders",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
-                 selectedRow
+                 print(selectedRow)
                  ]]>
         </url>
         <response>
@@ -574,7 +574,7 @@
                  selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",
                      schemaName="core", queryName="SiteUsers",
                      colSelect=c("UserId", "Groups"))
-                 selectedRow
+                 print(selectedRow)
             ]]>
         </url>
         <response>
@@ -590,8 +590,8 @@
                  selectedRow<-labkey.selectRows(labkey.url.base, folderPath="/%projectName%",
                      schemaName="lists", queryName="AllTypes", colSelect="DisplayFld",
                      maxRows=2, rowOffset=1, method="GET") # TODO: issue 31833: maxRows not respected in selectRows POST
-                 selectedRow
-                 paste("rows: ", dim(selectedRow)[1], ", cols:", dim(selectedRow)[2], sep="")
+                 print(selectedRow)
+                 print(paste("rows: ", dim(selectedRow)[1], ", cols:", dim(selectedRow)[2], sep=""))
             ]]>
         </url>
         <response>
@@ -608,7 +608,7 @@
             <![CDATA[
                 library(Rlabkey)
 
-                labkey.truncateTable(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes")
+                print(labkey.truncateTable(labkey.url.base, folderPath="/%projectName%",schemaName="lists", queryName="AllTypes"))
 
             ]]>
         </url>

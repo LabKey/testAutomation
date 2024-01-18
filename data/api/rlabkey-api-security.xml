@@ -3,9 +3,9 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.security.createContainer(baseUrl=labkey.url.base, parentPath="%projectName%", name = "FromAPI1", title = "From API 1", folderType = "Collaboration")
-                labkey.security.createContainer(baseUrl=labkey.url.base, parentPath="%projectName%", name = "FromAPI2", title = "From API 2", folderType = "Collaboration")
-                labkey.security.createContainer(baseUrl=labkey.url.base, parentPath="%projectName%", name = "FromAPI3", title = "From API 3", folderType = "Collaboration")
+                print(labkey.security.createContainer(baseUrl=labkey.url.base, parentPath="%projectName%", name = "FromAPI1", title = "From API 1", folderType = "Collaboration"))
+                print(labkey.security.createContainer(baseUrl=labkey.url.base, parentPath="%projectName%", name = "FromAPI2", title = "From API 2", folderType = "Collaboration"))
+                print(labkey.security.createContainer(baseUrl=labkey.url.base, parentPath="%projectName%", name = "FromAPI3", title = "From API 3", folderType = "Collaboration"))
             ]]>
         </url>
         <response>
@@ -37,7 +37,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.security.moveContainer(baseUrl=labkey.url.base, folderPath = paste("%projectName%", "FromAPI2", sep="/"), destinationParent = paste("%projectName%", "FromAPI1", sep="/"))
+                print(labkey.security.moveContainer(baseUrl=labkey.url.base, folderPath = paste("%projectName%", "FromAPI2", sep="/"), destinationParent = paste("%projectName%", "FromAPI1", sep="/")))
             ]]>
         </url>
         <response>
@@ -53,7 +53,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.security.deleteContainer(baseUrl=labkey.url.base, folderPath = paste("%projectName%", "FromAPI3", sep="/"))
+                print(labkey.security.deleteContainer(baseUrl=labkey.url.base, folderPath = paste("%projectName%", "FromAPI3", sep="/")))
             ]]>
         </url>
         <response>

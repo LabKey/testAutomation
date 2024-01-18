@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -158,10 +159,11 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
      * </p>
      * <p>
      *     This may cause a navigation to occur. For example if the import failed this will take you to the error
-     *     report, if a success it will go someplace else depending upon the app.
+     *     report, if a success it will go someplace else depending upon the app, or the app may already be on the page.
      * </p>
      * <p>
-     *     This will wait until the url changes. It is up to the consuming code to know which page the navigation went to.
+     *     This function will wait until the current url matches the url in the link. It is up to the calling code to
+     *     know which page the navigation is going to.
      * </p>
      */
     public void clickViewLink()
@@ -169,12 +171,15 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
         String currentUrl = getDriver().getCurrentUrl().toLowerCase();
         String targetUrl = elementCache().link.getAttribute("href").toLowerCase();
 
+        TestLogger.log(String.format("ServerNotificationItem.clickViewLink: currentUrl: %s", currentUrl));
+        TestLogger.log(String.format("ServerNotificationItem.clickViewLink: targetUrl: %s", targetUrl));
+
         elementCache().link.click();
 
-        // Check if currently on the target page.
-        if(!currentUrl.contains(targetUrl))
+        // If the url before clicking the link is the same as the target then don't wait for a navigation.
+        if(!targetUrl.equalsIgnoreCase(currentUrl))
         {
-            WebDriverWrapper.waitFor(()->!getDriver().getCurrentUrl().toLowerCase().contains(currentUrl),
+            WebDriverWrapper.waitFor(()->!getDriver().getCurrentUrl().equalsIgnoreCase(currentUrl),
                     "Clicking the 'View' link in the notification did not navigate in time.", 5_000);
         }
 

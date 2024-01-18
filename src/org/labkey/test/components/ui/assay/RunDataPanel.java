@@ -61,35 +61,6 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
         }, "The insert panel did not become loaded", WAIT_FOR_JAVASCRIPT);
     }
 
-    // copy-paste data mode
-
-    public RunDataPanel pasteTabbedText(String pasteText)
-    {
-        if (!isPasteDataInputVisible())
-            selectMode(PanelMode.CopyAndPasteData);
-
-        getWrapper().setFormElement(Locator.textarea("rundata"), pasteText);
-
-        return this;
-    }
-
-    public boolean isPasteDataInputVisible()
-    {
-        var textArea = elementCache().runDataTextArea.findOptionalElement(this);
-        if (textArea.isPresent())
-                return textArea.get().isDisplayed();
-        else
-            return false;
-    }
-
-    public String getRunDataText()
-    {
-        if (!isPasteDataInputVisible())
-            selectMode(PanelMode.CopyAndPasteData);
-
-        return elementCache().runDataTextArea.findElement(this).getText();
-    }
-
     // grid mode
 
     public RunDataPanel showGrid()
@@ -131,7 +102,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     public boolean isBulkInsertVisible()
     {
-        return mode().equals("Enter Data Into Grid") &&
+        return mode().equals(PanelMode.EnterDataIntoGrid.getText()) &&
                 elementCache().bulkInsertBtnLoc.existsIn(this) &&
                 isElementVisible(elementCache().bulkInsertBtn);
     }
@@ -164,7 +135,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     public boolean isFileUploadVisible()
     {
-        return mode().equals("Upload Files") &&
+        return mode().equals(PanelMode.UploadFiles.getText()) &&
                 optionalFileUploadPanel().isPresent() &&
                 isElementVisible(fileUploadPanel().getComponentElement());
     }
@@ -290,9 +261,8 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     public enum PanelMode
     {
-        UploadFiles("Upload Files"),
-        CopyAndPasteData("Copy-and-Paste Data"),
-        EnterDataIntoGrid("Enter Data Into Grid");
+        UploadFiles("Import Data from File"),
+        EnterDataIntoGrid("Enter Data into Grid");
 
         private final String _text;
         PanelMode(String text)
