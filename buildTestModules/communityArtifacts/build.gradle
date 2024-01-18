@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'org.labkey.module'
+apply plugin: 'org.labkey.build.module'
 
 dependencies { 
     // add dependencies on community modules, not including those that come through from transitive dependencies:

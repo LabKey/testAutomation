@@ -265,7 +265,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         return ReactSelect.finder(getDriver())
                 .withNamedInput(String.format("entityType%d", index))
-                .find(this);
+                .waitFor(this);
     }
 
     public ReactSelect getEntityType(String entityName)

@@ -23,9 +23,10 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainDetailsResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
-import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -357,9 +358,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Set<String> expected = new HashSet<>(Arrays.asList("key", "foo", "bar", "baz"));
         verifyDomain(response.getDomain(), expected);
 
-        GetDomainCommand getCmd = new GetDomainCommand("lists", LIST_NAME);
-        response = getCmd.execute(cn, PROJECT_NAME);
-        verifyDomain(response.getDomain(), expected);
+        GetDomainDetailsCommand getCmd = new GetDomainDetailsCommand("lists", LIST_NAME);
+        DomainDetailsResponse detailsResponse = getCmd.execute(cn, PROJECT_NAME);
+        verifyDomain(detailsResponse.getDomain(), expected);
 
         log("modify the existing domain");
         SaveDomainCommand saveCmd = new SaveDomainCommand("lists", LIST_NAME);
