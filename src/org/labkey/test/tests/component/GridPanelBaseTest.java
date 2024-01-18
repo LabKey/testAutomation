@@ -21,7 +21,7 @@ public class GridPanelBaseTest extends BaseWebDriverTest
 
     // View menu options.
     protected static final String VIEW_DEFAULT = "Default";
-    protected static final String VIEW_DEFAULT_MODIFIED = "My Default"; // If the default view is changed and not shared this will be the menu option.
+    protected static final String VIEW_DEFAULT_MODIFIED = "Your Default"; // If the default view is changed and not shared this will be the menu option.
     protected static final String VIEW_CUSTOMIZE = "Customize Grid View";
     protected static final String VIEW_MANAGE = "Manage Saved Views";
     protected static final String VIEW_SAVE = "Save Grid View";

@@ -123,7 +123,7 @@ function toggleRecorder(checkbox)
 }
 </script>
 <!--Fake data region for ease of testing.-->
-<table id=<%=q(emailRegion.getDomId())%> lk-region-name=<%=q(emailRegion.getName())%> class="labkey-data-region-legacy labkey-show-borders">
+<table id="<%=h(emailRegion.getDomId())%>" lk-region-name="<%=h(emailRegion.getName())%>" class="labkey-data-region-legacy labkey-show-borders">
     <colgroup><col width="120"/><col width="120"/><col width="125"/><col width="400"></colgroup>
     <!-- hidden TRs where the header region and message box would normally be in a real data region -->
     <tr style="display:none"><td colspan="5">&nbsp;</td></tr>
@@ -209,7 +209,7 @@ function toggleRecorder(checkbox)
         }
     }
 %>
-    <tr id=<%=q(renderId)%> style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
+    <tr id="<%=h(renderId)%>" style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
 </table>
 <%
     if (getUser().hasRootAdminPermission())

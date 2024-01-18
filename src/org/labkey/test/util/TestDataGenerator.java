@@ -34,6 +34,7 @@ import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
@@ -421,15 +422,6 @@ public class TestDataGenerator
     public DomainResponse createList(Connection cn, String keyName) throws IOException, CommandException
     {
         return createDomain(cn, "IntList", Map.of("keyName", keyName));
-    }
-
-    /**
-     * @deprecated Use {@link QueryApiHelper}
-     */
-    @Deprecated(since = "22.4")
-    public DomainResponse getDomain(Connection cn) throws IOException, CommandException
-    {
-        return getQueryHelper(cn).getDomain();
     }
 
     /**

@@ -113,8 +113,8 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getNameExpressionPreview()
     {
         getWrapper().mouseOver(elementCache().helpTarget("Naming "));
-        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
-        return elementCache().toolTip.getText();
+        waitFor(()->elementCache().popover.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
+        return elementCache().popover.getText();
     }
 
     public T dismissToolTip()
@@ -125,7 +125,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         // Of course this may not be true in the future.
         getWrapper().mouseOver(elementCache().learnMoreLink);
 
-        waitFor(()->!elementCache().toolTip.isDisplayed(), "The tool tip did not go away.", 1_000);
+        waitFor(()->!elementCache().popover.isDisplayed(), "The tool tip did not go away.", 1_000);
 
         return getThis();
     }
@@ -390,7 +390,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         }
 
         // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.
-        public final WebElement toolTip = Locator.tagWithId("div", "tooltip").refindWhenNeeded(getDriver());
+        public final WebElement popover = Locator.byClass("popover").refindWhenNeeded(getDriver());
 
         protected final WebElement genIdAlert = Locator.tagWithClass("div", "genid-alert").refindWhenNeeded(this);
 
