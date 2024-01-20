@@ -214,7 +214,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
         if (depth != null)
             config.put("depth", depth);
         if (container != null)
-            config.put("container", container);
+            config.put("container", "/" + container);
 
         String script = "var config = arguments[0];\n" +
                 "config.success = callback;\n" +
