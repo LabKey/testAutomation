@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 @Category({Daily.class})
 public class GetReadableContainersAPITest extends BaseWebDriverTest
 {
-    private static final String PROJECT_PREFIX = "/GetReadableContainersAPITest";
+    private static final String PROJECT_PREFIX = "GetReadableContainersAPITest";
     private static final String READABLE_PROJECT = PROJECT_PREFIX + " Readable";
     private static final String UNREADABLE_PROJECT = PROJECT_PREFIX + " Unreadable";
     private static final String USER = "reader@containersapi.test";
@@ -190,7 +190,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     private Set<String> getReadableContainers(Boolean includeSubfolders, Integer depth, Object container)
     {
         List<String> response = executeGetReadableContainers(includeSubfolders, depth, container, List.class);
-        return response.stream().filter(path -> path.startsWith(PROJECT_PREFIX)).collect(Collectors.toSet());
+        return response.stream().filter(path -> path.startsWith("/" + PROJECT_PREFIX)).collect(Collectors.toSet());
     }
 
     private List<Map<String, String>> getReadableContainersErrors(Boolean includeSubfolders, Integer depth, Object container)
