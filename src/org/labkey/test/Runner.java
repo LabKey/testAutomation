@@ -31,6 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -39,9 +43,6 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.manipulation.Orderable;
-import org.junit.runner.manipulation.Sortable;
-import org.junit.runner.manipulation.Sorter;
 import org.labkey.junit.runner.WebTestProperties;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.serverapi.writer.PrintWriters;
@@ -56,9 +57,9 @@ import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ExportDiagnosticsPseudoTest;
 import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
-import org.labkey.test.util.Order;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.Timer;
 import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.BufferedReader;
@@ -404,8 +405,10 @@ public class Runner extends TestSuite
         return suite;
     }
 
-    private static void addTests(TestSuite suite, Set<Class<?>> testClasses)
+    private static void addTests(TestSuite suite, Set<Class<?>> testClasses) throws IOException
     {
+        waitForTomcat();
+
         boolean foundServerSideTest = false;
         for (Class<?> testClass : testClasses)
         {
@@ -556,6 +559,7 @@ public class Runner extends TestSuite
     }
 
     // for error reporting
+    @SuppressWarnings("JUnitMalformedDeclaration")
     public static class ErrorTest extends TestCase
     {
         Throwable t;
@@ -1112,6 +1116,36 @@ public class Runner extends TestSuite
             return ((JUnit4TestAdapter) test).getTestClass();
         else
             return test.getClass();
+    }
+
+    private static void waitForTomcat() throws IOException
+    {
+        Duration timeout = Duration.ofSeconds(TestProperties.getServerStartupTimeout());
+        LOG.info("Waiting for server to respond");
+        Timer timer = new Timer(timeout);
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        do {
+            try (CloseableHttpClient client = WebTestHelper.getHttpClient())
+            {
+                HttpGet method = new HttpGet(WebTestHelper.getBaseURL());
+                client.execute(method, context, response -> {
+                    EntityUtils.consumeQuietly(response.getEntity());
+                    return response.getCode();
+                });
+                // Any response is ok.
+                LOG.info("Server started after: " + formatDuration(timer.elapsed().toMillis()));
+                return;
+            }
+            catch (IOException e)
+            {
+                if (timer.isTimedOut())
+                {
+                    LOG.info("Server failed to start after: " + formatDuration(timeout.toMillis()));
+                    throw e;
+                }
+                WebDriverWrapper.sleep(1000);
+            }
+        } while(true);
     }
 }
 

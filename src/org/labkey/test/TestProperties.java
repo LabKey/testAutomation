@@ -284,7 +284,7 @@ public abstract class TestProperties
         }
         catch (NumberFormatException nfe)
         {
-            return 60;
+            return 120;
         }
     }
 
