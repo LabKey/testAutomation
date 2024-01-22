@@ -209,7 +209,7 @@ public class MultiMenu extends BootstrapMenu
     {
         static public Locator.XPathLocator menuContainer()
         {
-            return Locator.tagWithClass("*", "dropdown");
+            return Locator.XPathLocator.union(Locator.byClass("dropdown"), Locator.byClass("dropup"));
         }
 
         static public Locator.XPathLocator menuContainer(String text)
