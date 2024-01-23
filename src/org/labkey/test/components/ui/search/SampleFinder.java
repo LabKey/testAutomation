@@ -138,7 +138,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
     public SavedSearchesMenu getSaveSearchMenu()
     {
-        return new SavedSearchesMenu(elementCache().savedSearchesContainer, getDriver(), elementCache().saveViewsDropdown());
+        return new SavedSearchesMenu(elementCache().savedSearchesContainer, getDriver(), elementCache().savedSearchesButton);
     }
 
     public MultiMenu getSaveSearchDropdownBtn()
@@ -238,13 +238,10 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         final MultiMenu saveDropdown = new MultiMenu.MultiMenuFinder(getDriver()).findWhenNeeded(splitButton);
 
         final Locator.XPathLocator savedSearchesButtonLoc = Locator.byClass("search-selector");
-        final WebElement savedSearchesContainer = Locator.byClass("dropdown").withChild(savedSearchesButtonLoc).findWhenNeeded(this);
 
-        final WebElement saveViewsDropdown()
-        {
-            return savedSearchesButtonLoc.findElement(this);
-        }
+        final WebElement savedSearchesButton = savedSearchesButtonLoc.findWhenNeeded(this);
 
+        final WebElement savedSearchesContainer = Locator.byClass("dropdown").withChild(savedSearchesButtonLoc).refindWhenNeeded(this);
     }
 
     public class SavedSearchesMenu  extends BootstrapMenu
