@@ -354,6 +354,7 @@ public class JUnitTest extends TestSuite
         }
     }
 
+    @SuppressWarnings("JUnitMalformedDeclaration")
     public static class RemoteTest extends TestCase
     {
         String _remoteClass;

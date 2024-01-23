@@ -1,6 +1,6 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
     <test name="recorded test case" type="get">
-    <url>visualization/TimeChartTest%20Project%E2%98%83~%21%40%24%26%28%29_%2B%7B%7D-%3D%5B%5D%2C.%23%C3%A4%C3%B6%C3%BC%C3%85/Demo%20Study/getVisualizationTypes.view?</url>
+    <url>TimeChartTest%20Project%E2%98%83~%21%40%24%26%28%29_%2B%7B%7D-%3D%5B%5D%2C.%23%C3%A4%C3%B6%C3%BC%C3%85/Demo%20Study/visualization-getVisualizationTypes.view?</url>
     <response>{
         "types": [
             {
@@ -34,7 +34,7 @@
     }</response>
       </test>
     <test name="recorded test case" type="get">
-        <url>visualization/TimeChartTest%20Project%E2%98%83~%21%40%24%26%28%29_%2B%7B%7D-%3D%5B%5D%2C.%23%C3%A4%C3%B6%C3%BC%C3%85/Demo%20Visit%20Study/getVisualizationTypes.view?</url>
+        <url>TimeChartTest%20Project%E2%98%83~%21%40%24%26%28%29_%2B%7B%7D-%3D%5B%5D%2C.%23%C3%A4%C3%B6%C3%BC%C3%85/Demo%20Visit%20Study/visualization-getVisualizationTypes.view?</url>
         <response>{
         "types": [
             {
