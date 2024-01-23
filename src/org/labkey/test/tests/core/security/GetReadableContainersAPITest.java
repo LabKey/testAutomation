@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 @Category({Daily.class})
 public class GetReadableContainersAPITest extends BaseWebDriverTest
 {
-    private static final String PROJECT_PREFIX = "GetReadableContainersAPITest";
+    private static final String PROJECT_PREFIX = "/GetReadableContainersAPITest";
     private static final String READABLE_PROJECT = PROJECT_PREFIX + " Readable";
     private static final String UNREADABLE_PROJECT = PROJECT_PREFIX + " Unreadable";
     private static final String USER = "reader@containersapi.test";
@@ -95,8 +95,8 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     public void testUnlimitedDepth()
     {
         impersonate(USER);
-        Set<String> expectedFolders = getExpectedFolders("", 10, false);
-        Set<String> readableContainers = getReadableContainers(true, -1, "");
+        Set<String> expectedFolders = getExpectedFolders("/", 10, false);
+        Set<String> readableContainers = getReadableContainers(true, -1, "/");
 
         assertEquals("Depth '-1' should be treated as unlimited'", expectedFolders, readableContainers);
     }
@@ -105,8 +105,8 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     public void testCustomDepth()
     {
         impersonate(USER);
-        Set<String> expectedFolders = getExpectedFolders("", 2, false);
-        Set<String> readableContainers = getReadableContainers(true, 2, "");
+        Set<String> expectedFolders = getExpectedFolders("/", 2, false);
+        Set<String> readableContainers = getReadableContainers(true, 2, "/");
 
         assertEquals("Custom listing depth should be respected", expectedFolders, readableContainers);
     }
@@ -138,8 +138,8 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     @Test
     public void testSiteAdminSeesAll()
     {
-        Set<String> expectedFolders = getExpectedFolders("", 10, true);
-        Set<String> readableContainers = getReadableContainers(true, -1, "");
+        Set<String> expectedFolders = getExpectedFolders("/", 10, true);
+        Set<String> readableContainers = getReadableContainers(true, -1, "/");
 
         assertEquals("Site admin should see all containers", expectedFolders, readableContainers);
     }
@@ -151,7 +151,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
                         (info.isReadable() || includeUnreadable) &&
                         info.getAbsoluteDepth() <= absoluteDepth &&
                         info.getPath().startsWith(container))
-                .map(containerInfo -> "/" + containerInfo.getPath())
+                .map(ContainerInfo::getPath)
                 .collect(Collectors.toSet());
     }
 
@@ -190,7 +190,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     private Set<String> getReadableContainers(Boolean includeSubfolders, Integer depth, Object container)
     {
         List<String> response = executeGetReadableContainers(includeSubfolders, depth, container, List.class);
-        return response.stream().filter(path -> path.startsWith("/" + PROJECT_PREFIX)).collect(Collectors.toSet());
+        return response.stream().filter(path -> path.startsWith(PROJECT_PREFIX)).collect(Collectors.toSet());
     }
 
     private List<Map<String, String>> getReadableContainersErrors(Boolean includeSubfolders, Integer depth, Object container)
@@ -214,7 +214,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
         if (depth != null)
             config.put("depth", depth);
         if (container != null)
-            config.put("container", "/" + container);
+            config.put("container", container);
 
         String script = "var config = arguments[0];\n" +
                 "config.success = callback;\n" +
