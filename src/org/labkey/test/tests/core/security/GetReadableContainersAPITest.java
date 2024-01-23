@@ -95,8 +95,8 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     public void testUnlimitedDepth()
     {
         impersonate(USER);
-        Set<String> expectedFolders = getExpectedFolders("/", 10, false);
-        Set<String> readableContainers = getReadableContainers(true, -1, "/");
+        Set<String> expectedFolders = getExpectedFolders("", 10, false);
+        Set<String> readableContainers = getReadableContainers(true, -1, "");
 
         assertEquals("Depth '-1' should be treated as unlimited'", expectedFolders, readableContainers);
     }
@@ -105,8 +105,8 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     public void testCustomDepth()
     {
         impersonate(USER);
-        Set<String> expectedFolders = getExpectedFolders("/", 2, false);
-        Set<String> readableContainers = getReadableContainers(true, 2, "/");
+        Set<String> expectedFolders = getExpectedFolders("", 2, false);
+        Set<String> readableContainers = getReadableContainers(true, 2, "");
 
         assertEquals("Custom listing depth should be respected", expectedFolders, readableContainers);
     }
@@ -138,8 +138,8 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     @Test
     public void testSiteAdminSeesAll()
     {
-        Set<String> expectedFolders = getExpectedFolders("/", 10, true);
-        Set<String> readableContainers = getReadableContainers(true, -1, "/");
+        Set<String> expectedFolders = getExpectedFolders("", 10, true);
+        Set<String> readableContainers = getReadableContainers(true, -1, "");
 
         assertEquals("Site admin should see all containers", expectedFolders, readableContainers);
     }
@@ -151,7 +151,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
                         (info.isReadable() || includeUnreadable) &&
                         info.getAbsoluteDepth() <= absoluteDepth &&
                         info.getPath().startsWith(container))
-                .map(ContainerInfo::getPath)
+                .map(containerInfo -> "/" + containerInfo.getPath())
                 .collect(Collectors.toSet());
     }
 
