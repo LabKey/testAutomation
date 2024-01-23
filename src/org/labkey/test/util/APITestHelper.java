@@ -145,7 +145,8 @@ public class APITestHelper
 
         String response = element.getResponse();
         if (response != null)
-            testCase.setResponse(StringUtils.trim(response));
+            testCase.setResponse(StringUtils.trim(response)
+                    .replaceAll("%contextPath%", WebTestHelper.getContextPath()));
 
         String formData = element.getFormData();
         if (formData != null)

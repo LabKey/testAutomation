@@ -11,6 +11,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.MultiMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Wrapper for UI component defined in 'packages/components/src/internal/components/gridbar/PageSizeSelector.tsx'
@@ -113,6 +114,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         _pagedComponent.doAndWaitForUpdate(() ->
         {
             getWrapper().scrollIntoView(button);
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(button));
             button.click();
         });
         return this;
@@ -130,6 +132,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         _pagedComponent.doAndWaitForUpdate(() ->
         {
             getWrapper().scrollIntoView(button);
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(button));
             button.click();
         });
         return this;
