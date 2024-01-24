@@ -63,6 +63,11 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
         return _confirmPageSupplier.get();
     }
 
+    public Boolean isDeleteEnabled()
+    {
+        return isDismissEnabled("Yes, Delete");
+    }
+
     public ConfirmPage confirmPermanentlyDelete()
     {
         return confirmPermanentlyDelete(10);
