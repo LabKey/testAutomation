@@ -234,8 +234,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
         final TabbedGridPanel resultsGrid = new TabbedGridPanel.TabbedGridPanelFinder(getDriver()).findWhenNeeded(this);
 
-        final WebElement splitButton = Locator.byClass("split-button-menu").findWhenNeeded(this);
-        final MultiMenu saveDropdown = new MultiMenu.MultiMenuFinder(getDriver()).findWhenNeeded(splitButton);
+        final MultiMenu saveDropdown = new MultiMenu.MultiMenuFinder(getDriver()).withClass("split-button-dropdown").findWhenNeeded(this);
 
         final Locator.XPathLocator savedSearchesButtonLoc = Locator.byClass("search-selector");
 
