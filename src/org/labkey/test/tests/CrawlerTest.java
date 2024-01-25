@@ -164,7 +164,7 @@ public class CrawlerTest extends BaseWebDriverTest
     }
 
     @Override
-    public void checkLinks() { /* Will try to crawl 'crawlerTest' actions without special handling */ }
+    public void checkLinks() { /* Nothing interesting to crawl */ }
 
     @Override
     protected BrowserType bestBrowser()
