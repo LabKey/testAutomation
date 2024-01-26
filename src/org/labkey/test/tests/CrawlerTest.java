@@ -164,6 +164,9 @@ public class CrawlerTest extends BaseWebDriverTest
     }
 
     @Override
+    public void checkLinks() { /* Nothing interesting to crawl */ }
+
+    @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
