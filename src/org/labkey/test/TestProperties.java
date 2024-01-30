@@ -231,7 +231,7 @@ public abstract class TestProperties
 
     public static boolean isEmbeddedTomcat()
     {
-        return System.getProperties().containsKey("useEmbeddedTomcat") || new File(TestFileUtils.getDefaultDeployDir(), "embedded").isDirectory();
+        return !System.getProperty("useEmbeddedTomcat", "false").equals("false") || new File(TestFileUtils.getDefaultDeployDir(), "embedded").isDirectory();
     }
 
     public static boolean isCheckerFatal()
