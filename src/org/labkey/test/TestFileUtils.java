@@ -199,10 +199,10 @@ public abstract class TestFileUtils
     }
 
     /**
-     * Private because deployment structure varies between Non-embedded, locally built embedded, and deployed embedded
-     * distribution.
+     * Access is restricted because deployment structure varies between Non-embedded, locally built embedded, and
+     * deployed embedded distribution.
      */
-    private static File getDefaultDeployDir()
+    static File getDefaultDeployDir()
     {
         return new File(getLabKeyRoot(), "build/deploy");
     }

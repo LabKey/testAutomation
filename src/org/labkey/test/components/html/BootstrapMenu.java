@@ -169,7 +169,7 @@ public class BootstrapMenu extends BaseBootstrapMenu
 
         protected WebElement findDisabledMenuItemOrNull(String text)
         {
-            Locator.XPathLocator loc=  Locator.xpath("./li/a").withText(text).parent().withClass("disabled");
+            Locator.XPathLocator loc = Locator.xpath("./li/a").withText(text).parent().withClass("disabled");
             return loc.findElementOrNull(findVisibleMenuPanel());
         }
     }

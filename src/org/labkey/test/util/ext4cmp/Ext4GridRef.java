@@ -330,4 +330,23 @@ public class Ext4GridRef extends Ext4CmpRef
 
         return new Ext4FieldRef(fieldId, _test);
     }
+
+    private boolean isCollapsed()
+    {
+        return Locator.xpath("//*[@id='" + this._id + "']//img[contains(@class, 'x4-tool-expand-bottom')]").isDisplayed(_test.getDriver());
+    }
+
+    // Handle collapsible grids
+    public void expand()
+    {
+        // If collapsed indicator is not present then the grid is either not collapsible or already expanded
+        if (isCollapsed())
+        {
+            Locator.xpath("//*[@id='" + this._id + "']//img[contains(@class, 'x4-tool-expand-bottom')]").
+                    findElement(_test.getDriver()).click();
+
+            WebDriverWrapper.waitFor(() -> !isCollapsed(),
+                    "Grid could not be expanded", 100000);
+        }
+    }
 }

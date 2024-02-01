@@ -417,8 +417,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return menus.get(buttonText);
         }
 
-        protected final BootstrapMenu aliquotView = BootstrapMenu.finder(getDriver()).locatedBy(
-                Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
+        protected final MultiMenu aliquotView = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("aliquot-view-selector").findWhenNeeded(this);
 
         protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
         protected final WebElement clearSearchButton = Locator.byClass("fa-remove").findWhenNeeded(this);

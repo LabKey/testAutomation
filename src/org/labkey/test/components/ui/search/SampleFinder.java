@@ -7,6 +7,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.grids.TabbedGridPanel;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -137,12 +138,12 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
     public SavedSearchesMenu getSaveSearchMenu()
     {
-        return new SavedSearchesMenu(elementCache().savedViewsMenu().getComponentElement(), getDriver(), elementCache().saveViewsDropdown());
+        return new SavedSearchesMenu(elementCache().savedSearchesContainer, getDriver(), elementCache().savedSearchesButton);
     }
 
-    public BootstrapMenu getSaveSearchDropdownBtn()
+    public MultiMenu getSaveSearchDropdownBtn()
     {
-        return elementCache().saveViewDropdownBtn;
+        return elementCache().saveDropdown;
     }
 
     /**
@@ -233,21 +234,13 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 
         final TabbedGridPanel resultsGrid = new TabbedGridPanel.TabbedGridPanelFinder(getDriver()).findWhenNeeded(this);
 
-        final BootstrapMenu savedViewsMenu()
-        {
-            return BootstrapMenu.finder(getDriver())
-                    .locatedBy(Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").parent())
-                    .waitFor(this);
-        }
+        final MultiMenu saveDropdown = new MultiMenu.MultiMenuFinder(getDriver()).withClass("split-button-dropdown").findWhenNeeded(this);
 
-        final BootstrapMenu saveViewDropdownBtn = BootstrapMenu.finder(getDriver()).locatedBy(
-                Locator.tagWithAttributeContaining("button", "id", "save-finderview-dropdown").parent()).findWhenNeeded(this);
+        final Locator.XPathLocator savedSearchesButtonLoc = Locator.byClass("search-selector");
 
-        final WebElement saveViewsDropdown()
-        {
-            return Locator.tagWithAttributeContaining("button", "id", "samplefinder-savedsearch-menu").findElement(this);
-        }
+        final WebElement savedSearchesButton = savedSearchesButtonLoc.findWhenNeeded(this);
 
+        final WebElement savedSearchesContainer = Locator.byClass("dropdown").withChild(savedSearchesButtonLoc).refindWhenNeeded(this);
     }
 
     public class SavedSearchesMenu  extends BootstrapMenu
