@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.core.login;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -38,7 +39,6 @@ import org.labkey.test.util.core.login.DbLoginUtils.DbLoginProperties;
 import org.labkey.test.util.core.login.DbLoginUtils.PasswordExpiration;
 import org.labkey.test.util.core.login.DbLoginUtils.PasswordStrength;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -241,7 +241,7 @@ public class PasswordTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            if (HttpServletResponse.SC_BAD_REQUEST == e.getStatusCode())
+            if (HttpStatus.SC_BAD_REQUEST == e.getStatusCode())
                 rejectedProperly = true;
         }
         catch (IOException e)

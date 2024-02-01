@@ -43,7 +43,6 @@ project.dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
     implementation("net.sf.opencsv:opencsv:${opencsvVersion}")
-    implementation("javax.servlet:javax.servlet-api:${servletApiVersion}")
     aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
     implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
     implementation "org.apache.logging.log4j:log4j-iostreams:${log4j2Version}"

@@ -121,6 +121,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         waitForClose(waitSeconds);
     }
 
+    public boolean isDismissEnabled(String buttonText)
+    {
+        return Locators.dismissButton(buttonText).findElement(getComponentElement()).isEnabled();
+    }
+
     protected void waitForClose()
     {
         waitForClose(10);

@@ -1,7 +1,7 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
 
     <test name="get group permissions" type="get">
-        <url>security/Security%20API%20Test%20Project/getGroupPerms.view?</url>
+        <url>Security%20API%20Test%20Project/security-getGroupPerms.view?</url>
         <response>
             {"container":
                 {
@@ -135,7 +135,7 @@
     </test>
 
     <test name="groups for current user" type="get">
-        <url>security/Security%20Api%20Test%20Project/getGroupsForCurrentUser.view?</url>
+        <url>Security%20Api%20Test%20Project/security-getGroupsForCurrentUser.view?</url>
         <response>
             {"groups": [
                     {
@@ -162,7 +162,7 @@
     </test>
 
     <test name="ensure login" type="get">
-        <url>security/Security%20Api%20Test%20Project/ensureLogin.view?</url>
+        <url>Security%20Api%20Test%20Project/security-ensureLogin.view?</url>
         <response>
             {"currentUser":
                 {

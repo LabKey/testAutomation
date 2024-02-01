@@ -108,6 +108,8 @@ public class WebTestHelper
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
     private static final Map<String, String> savedSessionKeys = new HashMap<>();
 
+    static { TestProperties.load(); }
+
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
         USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
@@ -226,7 +228,7 @@ public class WebTestHelper
             if (_webPort == null)
             {
                 String webPortStr = System.getProperty("labkey.port");
-                if (webPortStr == null || webPortStr.trim().length() == 0)
+                if (webPortStr == null || StringUtils.isBlank(webPortStr))
                 {
                     LOG.info("Using default labkey port (" + DEFAULT_WEB_PORT +
                                         ").\nThis can be changed by setting the property 'labkey.port=[yourport]'.");
@@ -246,10 +248,10 @@ public class WebTestHelper
     {
         synchronized (SERVER_LOCK)
         {
-            if (_targetServer == null || !_targetServer.equals(System.getProperty("labkey.server")))
+            if (_targetServer == null)
             {
                 _targetServer = System.getProperty("labkey.server");
-                if (_targetServer == null || _targetServer.length() == 0)
+                if (_targetServer == null || _targetServer.isEmpty())
                 {
                     LOG.info("Using default target server (" + DEFAULT_TARGET_SERVER +
                                         ").\nThis can be changed by setting the property 'labkey.server=[yourserver]'.");
@@ -537,7 +539,7 @@ public class WebTestHelper
             String [] splitMessage = message.split("\n");
             for (String thisMessage: splitMessage)
             {
-                if (thisMessage.length() > 0)
+                if (!thisMessage.isEmpty())
                     logToServer(thisMessage, connection);
             }
             return;
