@@ -2,6 +2,7 @@ package org.labkey.test.components.ui.grids;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -21,7 +22,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
