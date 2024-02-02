@@ -69,6 +69,7 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.core.login.DbLoginUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
@@ -439,7 +440,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         assertTextPresent(username,
                 "has been verified! Create an account password below.",
-                "Your password must be at least six characters and cannot contain spaces or match your email address."
+                DbLoginUtils.PasswordStrength.Good.getGuidance()
         );
 
         new SetPasswordForm(getDriver())

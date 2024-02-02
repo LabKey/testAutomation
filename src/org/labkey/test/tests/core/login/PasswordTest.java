@@ -100,14 +100,14 @@ public class PasswordTest extends BaseWebDriverTest
         assertEquals("Login config", new DbLoginProperties(PasswordStrength.Good, PasswordExpiration.OneYear),
                 DbLoginUtils.getDbLoginConfig(connection));
 
-        DbLoginUtils.setDbLoginConfig(connection, PasswordStrength.Weak, PasswordExpiration.SixMonths);
+        DbLoginUtils.setDbLoginConfig(connection, PasswordStrength.Strong, PasswordExpiration.SixMonths);
         DatabaseAuthConfigureDialog configDialog = configurePage
                 .getPrimaryConfigurationRow(dbAuth.getProviderDescription())
                 .clickEdit(dbAuth);
 
         DbLoginProperties dbLoginConfig = configDialog.getDbLoginConfig();
         assertEquals("Login config",
-                new DbLoginProperties(PasswordStrength.Weak, PasswordExpiration.SixMonths),
+                new DbLoginProperties(PasswordStrength.Strong, PasswordExpiration.SixMonths),
                 dbLoginConfig);
     }
 
@@ -195,7 +195,7 @@ public class PasswordTest extends BaseWebDriverTest
     public void testPasswordReset()
     {
         DbLoginUtils.setDbLoginConfig(createDefaultConnection(),
-                PasswordStrength.Weak,
+                PasswordStrength.Good,
                 PasswordExpiration.Never);
 
         //get user a password
@@ -210,7 +210,7 @@ public class PasswordTest extends BaseWebDriverTest
 
         beginAt(resetUrl);
 
-        attemptSetInvalidPassword("fooba", "fooba", "Your password must be at least six characters and cannot contain spaces.");
+        attemptSetInvalidPassword("fooba", "fooba", "Your password must be at least eight characters and cannot contain spaces.");
         attemptSetInvalidPassword("foobar", "foobar2", "Your password entries didn't match.");
 
         resetPassword(resetUrl, USER, VERY_STRONG_PASSWORD);
@@ -221,7 +221,7 @@ public class PasswordTest extends BaseWebDriverTest
     @Test
     public void testPasswordParameter()
     {
-        setInitialPassword(USER, VERY_WEAK_PASSWORD);
+        setInitialPassword(USER, WEAK_PASSWORD);
 
         // 31000: fail login actions if parameters present on URL
         SimplePostCommand command = new SimplePostCommand("login", "loginAPI");

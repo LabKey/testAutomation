@@ -153,10 +153,10 @@ public class APIUserHelper extends AbstractUserHelper
         return getUsers(false);
     }
 
-    public GetUsersResponse getUsers(boolean includeDeactivated)
+    public GetUsersResponse getUsers(boolean includeInactive)
     {
         GetUsersCommand command = new GetUsersCommand();
-        command.setIncludeDeactivated(includeDeactivated);
+        command.setIncludeInactive(includeInactive);
         Connection connection = getWrapper().createDefaultConnection();
         if (getWrapper().isImpersonating())
         {
@@ -179,10 +179,10 @@ public class APIUserHelper extends AbstractUserHelper
         return getUserIds(userEmails, true);
     }
 
-    public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeDeactivated)
+    public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeInactive)
     {
         Map<String, Integer> userIds = new HashMap<>();
-        List<UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
+        List<UserInfo> usersInfo = getUsers(includeInactive).getUsersInfo();
         for (UserInfo userInfo : usersInfo)
         {
             if (userEmails.contains(userInfo.getEmail()))
