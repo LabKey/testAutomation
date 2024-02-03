@@ -81,12 +81,26 @@ public class DbLoginUtils
 
     public enum PasswordStrength implements OptionSelect.SelectOption
     {
-        Weak, Good, Strong;
+        Good("Your password must be at least eight non-whitespace characters, include a mix of lowercase letters, uppercase letters, digits, and symbols, and cannot include portions of your personal information."),
+        Strong("Secure passwords are long and use multiple character types. The password strength gauge will turn green when your new password meets the complexity requirements.");
+
+        private final String _guidance;
+
+        PasswordStrength(String guidance)
+        {
+            _guidance = guidance;
+        }
 
         @Override
         public String getValue()
         {
             return name();
+        }
+
+        // General password guidance displayed on the set/change password page for this rule
+        public String getGuidance()
+        {
+            return _guidance;
         }
     }
 
