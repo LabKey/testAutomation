@@ -154,11 +154,13 @@ public class MultiMenu extends BootstrapMenu
         for (WebElement menuItem : menuItems)
         {
             menuItem = Locator.xpath("..").findElement(menuItem); // Up a level
-            Optional<WebElement> expando = Locator.xpath("./i").withClass("fa-chevron-down").findOptionalElement(menuItem);
+            Optional<WebElement> expando = Locator.byClass("fa-chevron-down").findOptionalElement(menuItem);
             if (expando.isPresent())
             {
                 expando.get().click();
-                Locator.tagWithClass("ul", "well").waitForElement(menuItem, 1_000);
+                // Note: if we really do need to wait for the items to appear we can probably wait for elements with
+                // class "dropdown-section__menu-item", we'll want to track how many we already have and check that the
+                // number has increased, since nothing is nested, everything is siblings.
             }
         }
     }
