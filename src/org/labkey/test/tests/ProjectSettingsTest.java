@@ -26,6 +26,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.openqa.selenium.WebElement;
@@ -54,9 +56,10 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         return "Copycat Project";
     }
 
-    protected void goToSiteLookAndFeel()
+    protected LookAndFeelSettingsPage goToSiteLookAndFeel()
     {
         goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
+        return new LookAndFeelSettingsPage(getDriver());
     }
 
     //this project's properties will be altered and so should not copy site properties
@@ -94,36 +97,35 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         goToProjectSettings(getProjectAlteredName());
         setFormElement(Locator.name("reportAProblemPath"), "");
         clickButton("Save");
-        assertElementNotPresent(Locators.labkeyError);
+        assertElementNotVisible(Locators.labkeyError);
 
         checkHelpLinks(getProjectAlteredName(), false, true);
 //        assertElementNotPresent("Support link still present after removing link from settings", supportLink);
     }
 
     @Test
-    public void testSteps()
+    public void testHelpMenuOption()
     {
         //assert both locators are present in clone project
         goToProjectHome();
         checkHelpLinks(null, true, true);
 
         //change global settings to exclude help link
-        goToSiteLookAndFeel();
-        click(Locator.checkboxByName("helpMenuEnabled"));
-        clickButtonContainingText("Save");
-
+        LookAndFeelSettingsPage settingsPage = goToSiteLookAndFeel();
+        settingsPage.enableHelp(false);
+        settingsPage.save();
 
         //assert help link missing in proj 1, present in proj 2
         checkHelpLinks(getProjectName(), true, false);
         checkHelpLinks(getProjectAlteredName(), false, true);
 
         //change proj 2 to exclude both help and support
-        goToProjectSettings(getProjectAlteredName());
-        uncheckCheckbox(Locator.checkboxByName("helpMenuEnabled"));
-        clickButtonContainingText("Save");
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectAlteredName());
+        projectSettingsPage.enableHelp(false);
+        projectSettingsPage.save();
 
         //assert help link itself gone
-        assertElementNotPresent(helpMenuLink);
+        checkHelpLinks(null, false, false);
     }
 
     @Test
@@ -144,6 +146,12 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         DataRegionTable list = new DataRegionTable("query", getDriver());
         String attemptedInjection = list.getDataAsText(0, 0);
         assertEquals("Wrong list data from injection attempt", testDate + INJECT_CHARS, attemptedInjection);
+    }
+
+    @Test
+    public void testTimeAndDateFields()
+    {
+
     }
 
     @Override

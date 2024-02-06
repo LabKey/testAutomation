@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -17,6 +18,7 @@ import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +51,21 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("dateCol", FieldDefinition.ColumnType.DateAndTime)));
+                        new FieldDefinition("dateTimeCol", FieldDefinition.ColumnType.DateAndTime),
+                        new FieldDefinition("dateCol", FieldDefinition.ColumnType.Date),
+                        new FieldDefinition("timeCol", FieldDefinition.ColumnType.Time)));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
-        dgen.addCustomRow(Map.of("name", "First", "dateCol", "05/10/2020"));
+        dgen.addCustomRow(Map.of("name", "First", "dateTimeCol", "05/10/2020", "date", "02/05/2024", "time", "16:43:32"));
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
+    }
+
+    @AfterClass
+    public static void resetLookAndFeel()
+    {
+        ParsingPatternForDateTest init = (ParsingPatternForDateTest) getCurrentTest();
+        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(init);
+        settingsPage.reset();
     }
 
     @Override
@@ -65,7 +77,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return null;
+        return new ArrayList<>();
     }
 
     @Test
@@ -80,19 +92,23 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(dateList));
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
         listTable.clickEditRow(0);
-        setFormElement(Locator.name("quf_dateCol"), "25Nov2020:24:23:00");
+        setFormElement(Locator.name("quf_dateTimeCol"), "25Nov2020:24:23:00");
+        setFormElement(Locator.name("quf_dateCol"), "25Nov2020");
+        setFormElement(Locator.name("quf_timeCol"), "24:23:00");
         clickButton("Submit");
 
-        checker().verifyEquals("Incorrect date parsed while editing the row", "2020-11-26 00:23", listTable.getDataAsText(0, "dateCol"));
+        checker().verifyEquals("Incorrect date parsed while editing the row", "2020-11-26 00:23", listTable.getDataAsText(0, "dateTimeCol"));
 
         log("Insert a row with a date in a non-standard format");
         listTable.clickInsertNewRow();
         setFormElement(Locator.name("quf_name"), "Second");
-        setFormElement(Locator.name("quf_dateCol"), "23Nov2020:12:23:34");
+        setFormElement(Locator.name("quf_dateTimeCol"), "23Nov2020:12:23:34");
+        setFormElement(Locator.name("quf_dateCol"), "23Nov2020");
+        setFormElement(Locator.name("quf_timeCol"), "12:23:34");
         clickButton("Submit");
 
         listTable.setFilter("name", "Equals", "Second");
-        checker().verifyEquals("Incorrect date parsed while inserting row", "2020-11-23 12:23", listTable.getDataAsText(0, "dateCol"));
+        checker().verifyEquals("Incorrect date parsed while inserting row", "2020-11-23 12:23", listTable.getDataAsText(0, "dateTimeCol"));
 
         log("Bulk import with some dates in non-standard format");
         listTable.clearAllFilters();
@@ -123,8 +139,8 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("Dataset1")); // dataset with non standard date format.
 
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
-        checker().verifyEquals("Incorrect date parsed while importing", Arrays.asList("2020-11-29 00:23", "2020-11-28 00:23")
-                , table.getColumnDataAsText("dateCol"));
+        checker().verifyEquals("Incorrect date parsed while importing", Arrays.asList("2020-11-29 00:23", "2020-11-28 00:23", "2024-02-05 16:36")
+                , table.getColumnDataAsText("dateTimeCol"));
     }
 
     private void setUpDataParsing(String pattern)

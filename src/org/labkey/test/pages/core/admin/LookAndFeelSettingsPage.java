@@ -18,8 +18,10 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -236,7 +238,8 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
 
     public void reset()
     {
-        click(elementCache().resetBtn);
+        elementCache().resetBtn.click();
+        acceptAlert();
     }
 
     @Override

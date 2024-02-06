@@ -25,9 +25,12 @@ import org.openqa.selenium.WebElement;
 
 public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementCache>
 {
+    private  LookAndFeelSettingsPage lookAndFeelPage;
+
     public ProjectSettingsPage(WebDriver driver)
     {
         super(driver);
+        lookAndFeelPage = new LookAndFeelSettingsPage(driver);
     }
 
     public static ProjectSettingsPage beginAt(WebDriverWrapper driver)
@@ -50,6 +53,12 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
     {
         return elementCache().discussionEnabled;
     }
+
+    public void enableHelp(boolean enable)
+    {
+        lookAndFeelPage.enableHelp(enable);
+    }
+
 
     @Override
     protected ElementCache newElementCache()

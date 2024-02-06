@@ -474,6 +474,8 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType String = new ColumnTypeImpl("Text", "string");
         ColumnType Subject = new ColumnTypeImpl("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null);
         ColumnType DateAndTime = new ColumnTypeImpl("Date Time", "dateTime");
+        ColumnType Date = new ColumnTypeImpl("Date", "date");
+        ColumnType Time = new ColumnTypeImpl("Time", "time");
         ColumnType Boolean = new ColumnTypeImpl("Boolean", "boolean");
         ColumnType Double = new ColumnTypeImpl("Number (Double)", "float");
         ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double");
