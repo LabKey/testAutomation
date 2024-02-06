@@ -61,8 +61,6 @@ public class MultiMenu extends BootstrapMenu
     {
         expand();
 
-        WebElement menuList = getMenuList();
-
         for (int i = 0; i < pathToAction.size(); i++)
         {
             Assert.assertFalse("Menu item not enabled.", isMenuItemDisabled(pathToAction.get(i)));
@@ -72,8 +70,8 @@ public class MultiMenu extends BootstrapMenu
             if (i < pathToAction.size() - 1)
             {
                 // Everything in the pathToAction should contain a sub menu except possibly the last item.
-                Assert.assertTrue("Item in menu path '" + pathToAction.get(i) + "' does not contain a sub-menu.", menuItem.getAttribute("class").contains("dropdown-submenu"));
-                if(!Locator.xpath("./i").findElement(menuItem).getAttribute("class").contains("fa-chevron-up"))
+                Assert.assertTrue("Item in menu path '" + pathToAction.get(i) + "' does not contain a sub-menu.", menuItem.getAttribute("class").contains("dropdown-section-toggle"));
+                if(!Locator.byClass("fa").findElement(menuItem).getAttribute("class").contains("fa-chevron-up"))
                 {
                     // This is a sub-menu item, but click it only if the sub-menu is not expanded.
                     menuItem.click();
