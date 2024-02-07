@@ -189,15 +189,31 @@ public class MultiMenu extends BootstrapMenu
     public List<String> getItemsUnderHeading(String heading)
     {
         expandAll();
+        boolean headingFound = false;
+        List<String> items = new ArrayList<>();
+        List<WebElement> listItems = Locator.tag("li").findElements(this);
 
-        WebElement submenu = Locator.byClass("dropdown-header").withText(heading)
-                .followingSibling("li").withClass("dropdown-submenu").findElement(this);
-        List<WebElement> menuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(submenu);
-        List<String> menuText = getWrapper().getTexts(menuList);
+        for (WebElement item : listItems)
+        {
+            String className = item.getAttribute("class");
+            String text = item.getText().trim();
+
+            if (className.contains("dropdown-header") && text.equalsIgnoreCase(heading))
+                headingFound = true;
+
+            // Once we've found our header we know that all dropdown-section__menu-item elements belong to the heading
+            // we are interested in
+            if (headingFound && className.contains("dropdown-section__menu-item"))
+                items.add(text);
+
+            // Once we hit a divider we're done looking at menu items related to the heading, so we can stop iterating
+            if (headingFound && className.contains("divider"))
+                break;
+        }
 
         collapse();
 
-        return menuText;
+        return items;
     }
 
     public String getButtonText()
