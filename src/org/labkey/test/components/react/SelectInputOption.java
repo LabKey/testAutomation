@@ -1,5 +1,6 @@
 package org.labkey.test.components.react;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.api.collections.CaseInsensitiveMapWrapper;
 import org.labkey.api.util.Pair;
@@ -78,7 +79,7 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
             {
                 WebElement keyEl = Locator.tag("strong").findElement(el);
                 WebElement valEl = Locator.tag("span").findElement(el);
-                data.put(keyEl.getText(), valEl.getAttribute("title"));
+                data.put(StringUtils.stripEnd(keyEl.getText(), ":"), valEl.getAttribute("title"));
             }
             return data;
         }
