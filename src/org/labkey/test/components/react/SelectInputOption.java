@@ -79,7 +79,7 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
             {
                 WebElement keyEl = Locator.tag("strong").findElement(el);
                 WebElement valEl = Locator.tag("span").findElement(el);
-                data.put(StringUtils.stripEnd(keyEl.getText(), ":"), valEl.getAttribute("title"));
+                data.put(StringUtils.stripEnd(keyEl.getText(), ":"), valEl.getText());
             }
             return data;
         }
