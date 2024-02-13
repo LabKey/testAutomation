@@ -89,12 +89,9 @@ public class AppsMenu extends WebDriverComponent<AppsMenu.ElementCache>
                 .clickItem(node);
     }
 
-    public void navigateToLabKey(String project)
-    {
-        showProductsPanel()
-                .clickLabkey()
-                .clickProject(project);
-    }
+    public static Locator rootLocator = Locator.XPathLocator.union(
+        Locator.byClass("product-navigation-menu"), // Bio/FM/SM
+        Locator.id("headerProductDropdown")); // LKS
 
     @Override
     protected AppsMenu.ElementCache newElementCache()
@@ -104,8 +101,13 @@ public class AppsMenu extends WebDriverComponent<AppsMenu.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public final WebElement rootElement = Locator.byClass("product-navigation-menu").findWhenNeeded(getDriver());
-        public final WebElement toggle = Locator.byClass("navbar-menu-button").findWhenNeeded(rootElement);
+        public final WebElement rootElement = rootLocator.findWhenNeeded(getDriver());
+
+        private final Locator _toggleLocator = Locator.XPathLocator.union(
+                Locator.byClass("navbar-menu-button"), // Bio/FM/SM
+                Locator.byClass("dropdown-toggle") // LKS
+        );
+        public final WebElement toggle = _toggleLocator.findWhenNeeded(rootElement);
 
         public Optional<WebElement> getList()
         {
@@ -113,10 +115,12 @@ public class AppsMenu extends WebDriverComponent<AppsMenu.ElementCache>
         }
     }
 
-
     public static class AppsMenuFinder extends WebDriverComponent.WebDriverComponentFinder<AppsMenu, AppsMenuFinder>
     {
-        private Locator _locator = Locator.byClass("product-navigation-menu");
+        private final Locator _locator = Locator.XPathLocator.union(
+                Locator.byClass("product-navigation-menu"), // Bio/FM/SM
+                Locator.id("headerProductDropdown") // LKS
+        );
 
         public AppsMenuFinder(WebDriver driver)
         {
@@ -126,7 +130,7 @@ public class AppsMenu extends WebDriverComponent<AppsMenu.ElementCache>
         @Override
         protected Locator locator()
         {
-            return _locator;
+            return AppsMenu.rootLocator;
         }
 
         @Override
