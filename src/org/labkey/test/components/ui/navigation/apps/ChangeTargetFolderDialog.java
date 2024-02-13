@@ -1,15 +1,14 @@
 package org.labkey.test.components.ui.navigation.apps;
 
-import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.WebDriver;
 
 
 
-public class ChangeProjectsAndResetFormModalDialog extends ModalDialog
+public class ChangeTargetFolderDialog extends ModalDialog
 {
-    private final UpdatingComponent _updatingComponent;
-    public ChangeProjectsAndResetFormModalDialog(WebDriver driver, UpdatingComponent updatingComponent)
+    private final UpdatesTargetFolder _updatingComponent;
+    public ChangeTargetFolderDialog(WebDriver driver, UpdatesTargetFolder updatingComponent)
     {
         super(new ModalDialogFinder(driver).withTitle("Change projects and reset form?"));
         this._updatingComponent = updatingComponent;
@@ -23,8 +22,15 @@ public class ChangeProjectsAndResetFormModalDialog extends ModalDialog
 
     public void clickChangeProjects()
     {
-        _updatingComponent.doAndWaitForUpdate(()->
+        _updatingComponent.doAndWaitForFolderUpdate(()->
                 dismiss("Change Projects"));
 
+    }
+
+
+
+    static public interface UpdatesTargetFolder
+    {
+        void doAndWaitForFolderUpdate(Runnable func);
     }
 }
