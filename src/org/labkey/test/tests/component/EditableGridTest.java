@@ -242,6 +242,61 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testShiftClick()
+    {
+        EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        testGrid.addRows(15);
+        testGrid.shiftSelectRange(2, 7);
+
+        // select a range
+        checker().verifyFalse(String.format("row %d should not be checked", 1), testGrid.isRowSelected(1));
+        for (int i=2; i<7; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be checked", i), testGrid.isRowSelected(i));
+        }
+        checker().verifyFalse(String.format("row %d should not be checked", 8), testGrid.isRowSelected(8));
+        checker().screenShotIfNewError("unexpected selection range");
+
+        // select a non-adjacent range
+        testGrid.shiftSelectRange(10, 13);
+        checker().verifyFalse(String.format("row %d should not be checked", 9), testGrid.isRowSelected(9));
+        for (int i=10; i<13; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be checked", i), testGrid.isRowSelected(i));
+        }
+        checker().verifyFalse(String.format("row %d should not be checked", 14), testGrid.isRowSelected(14));
+        // ensure the first range is still selected
+        for (int i=2; i<7; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be checked", i), testGrid.isRowSelected(i));
+        }
+        checker().screenShotIfNewError("unexpected selections1");
+
+        // now de-select cells 6 to 3
+        testGrid.shiftSelectRange(6, 3);
+        // ensure they are deselected
+        for (int i=3; i<6; i++)
+        {
+            checker().verifyFalse(String.format("row %d should not be checked", i), testGrid.isRowSelected(i));
+        }
+        // make sure 2 and 7 are still selected
+        checker().verifyTrue(String.format("row %d should be checked", 2), testGrid.isRowSelected(2));
+        checker().verifyTrue(String.format("row %d should be checked", 7), testGrid.isRowSelected(7));
+        // make sure 10-13 are still selected
+        for (int i=10; i<13; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be checked", i), testGrid.isRowSelected(i));
+        }
+        checker().screenShotIfNewError("unexpected selections2");
+
+        // now select 0-14
+        testGrid.shiftSelectRange(0, 14);
+        checker().withScreenshot("all_rows_not_selected")
+                .verifyTrue("not all rows are selected",
+                testGrid.areAllRowsSelected());
+    }
+
+    @Test
     public void testExpandedPaste() throws Exception
     {
         final List<List<String>> clipRows = List.of(

@@ -13,8 +13,10 @@ import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.util.selenium.WebDriverUtils;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
@@ -340,6 +342,25 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
+    /**
+     * Selects a range of rows in the current view.
+     * If the range is within a range of already-selected rows, will deselect the specified range
+     * @param start the starting index (0-based), of non-header rows with checkboxes
+     * @param end the ending index
+     * @return  the current instance
+     */
+    public QueryGrid shiftSelectRange(int start, int end)
+    {
+        var checkBoxes = Locator.tagWithClass("input", "grid-panel__row-checkbox").findElements(this);
+        getWrapper().scrollIntoView(checkBoxes.get(0), true); // scroll the top row to the top
+        new Actions(getDriver())
+                .click(checkBoxes.get(start))
+                .keyDown(Keys.SHIFT)
+                .click(checkBoxes.get(end))
+                .keyUp(Keys.SHIFT)
+                .perform();
+        return this;
+    }
 
     /**
      * Select a view from the 'Views' menu.

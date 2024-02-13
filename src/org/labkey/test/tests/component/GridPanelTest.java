@@ -300,6 +300,53 @@ public class GridPanelTest extends GridPanelBaseTest
 
     }
 
+    @Test
+    public void testShiftClick()
+    {
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+        log("foo");
+
+
+        // select a range of rows
+        grid.shiftSelectRange(2, 11);
+
+        // verify rows 2-11 are selected, 1 and 12 are not
+        checker().verifyFalse("row1 should remain unchecked", grid.isRowSelected(1));
+        for (int i=2; i<12; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be selected", i), grid.isRowSelected(i));
+        }
+        checker().verifyFalse("row12 should remain unchecked", grid.isRowSelected(12));
+        checker().verifyEquals("expect selection status to equal",
+                "10 of 300 selected" ,grid.getSelectionStatusCount());
+        checker().screenShotIfNewError("unexpected range select");
+
+
+        // negatively select from within a selected range - uncheck 7, shift down, uncheck 4
+        grid.shiftSelectRange(7, 4);
+
+        // verify 4567 are unchecked, 3 and 8 remain checked
+        checker().verifyTrue("row3 should remain checked", grid.isRowSelected(3));
+        for (int i=4; i<8; i++)
+        {
+            checker().verifyFalse(String.format("row %d should be unchecked", i), grid.isRowSelected(i));
+        }
+        checker().verifyTrue("row8 should remain checked", grid.isRowSelected(8));
+        checker().verifyEquals("expect selection status to equal",
+                "6 of 300 selected" ,grid.getSelectionStatusCount());
+        checker().screenShotIfNewError("unexpected range select");
+
+        // select a non-adjacent range, verify
+        grid.shiftSelectRange(13, 17);
+        for (int i=13; i<17; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be checked", i), grid.isRowSelected(i));
+        }
+        checker().verifyEquals("expect selection status to equal",
+                "11 of 300 selected" ,grid.getSelectionStatusCount());
+        checker().screenShotIfNewError("unexpected range select");
+    }
+
     /**
      * Validate that using the 'First Page' and 'Last Page' navigation works as expected.
      */
