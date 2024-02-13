@@ -304,8 +304,6 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testShiftClick()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
-        log("foo");
-
 
         // select a range of rows
         grid.shiftSelectRange(2, 11);
