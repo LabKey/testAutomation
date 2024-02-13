@@ -4,7 +4,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
