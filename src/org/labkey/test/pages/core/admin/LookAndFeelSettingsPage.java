@@ -18,17 +18,11 @@ package org.labkey.test.pages.core.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.pages.LabKeyPage;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-/**
- * Created by RyanS on 5/19/2017.
- */
-public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.ElementCache>
+public class LookAndFeelSettingsPage extends BaseSettingsPage
 {
     public LookAndFeelSettingsPage(WebDriver driver)
     {
@@ -42,183 +36,31 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         return new LookAndFeelSettingsPage(wrapper.getDriver());
     }
 
-    public static LookAndFeelSettingsPage beginAt(WebDriverWrapper wrapper, String containerPath)
+    public boolean isUsDateParsingModeChecked()
     {
-        wrapper.beginAt(WebTestHelper.buildURL("admin", containerPath, "projectSettings"));
-        return new LookAndFeelSettingsPage(wrapper.getDriver());
+        return new RadioButton(elementCache().usDateParsingRadio).isChecked();
     }
 
-    @Override
-    protected void waitForPage()
+    public boolean isNonUsDateParsingModeChecked()
     {
-        Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span","Save"), Locator.tagWithText("span","Done"));
+        return new RadioButton(elementCache().nonUSDateParsingRadio).isChecked();
     }
 
-    public String getHeaderShortName()
-    {
-        return (elementCache().headerShortName.getAttribute("value"));
-    }
-
-    public void setTheme(String theme)
-    {
-        selectOptionByText(elementCache().theme, theme);
-    }
-
-    public void setShowNavAlways()
-    {
-        new RadioButton(elementCache().showNavAlways).check();
-    }
-
-    public void setShowNavAdmin()
-    {
-        new RadioButton(elementCache().showNavForAdmin).check();
-    }
-
-    public void setShowAppNavAlways()
-    {
-        new RadioButton(elementCache().showAppNavAlways).check();
-    }
-
-    public void setShowAppNavAdmin()
-    {
-        new RadioButton(elementCache().showAppNavForAdmin).check();
-    }
-
-
-    public void enableHelp(boolean enable)
-    {
-        if (enable)
-            checkCheckbox(elementCache().helpMenuEnabledChk);
-        else
-            uncheckCheckbox(elementCache().helpMenuEnabledChk);
-    }
-
-    public void enableObjectLevelDiscussions(boolean enable)
-    {
-        if (enable)
-            checkCheckbox(elementCache().discussionEnabledChk);
-        else
-            uncheckCheckbox(elementCache().discussionEnabledChk);
-    }
-
-    public void setLogoLink(String link)
-    {
-        setFormElement(elementCache().logoLinkTxt,link);
-    }
-
-    public String getLogoLink()
-    {
-        return (elementCache().logoLinkTxt).getText();
-    }
-
-    public void setSupportLink(String link)
-    {
-        setFormElement(elementCache().supportLinkTxt, link);
-    }
-
-    public String getSupportLink()
-    {
-        return (elementCache().supportLinkTxt).getText();
-    }
-
-    public void setSupportEmail(String email)
-    {
-        setFormElement(elementCache().supportEmailTxt,email);
-    }
-
-    public String getSupportEmail()
-    {
-        return (elementCache().supportEmailTxt).getText();
-    }
-
-    public void setSystemEmail(String email)
-    {
-        setFormElement(elementCache().systemEmailTxt,email);
-    }
-
-    public String getSystemEmail()
-    {
-        return (elementCache().systemEmailTxt).getText();
-    }
-
-    public void setOrgName(String name)
-    {
-        setFormElement(elementCache().organizationNameTxt, name);
-    }
-
-    public String getOrgName()
-    {
-        return (elementCache().organizationNameTxt).getText();
-    }
-
-    public void setDateParsingMode(boolean isUSDateFormat)
+    public void setDateParsingMode(boolean useUSDateFormat)
     {
         RadioButton button;
 
-        if (isUSDateFormat)
-            button = new RadioButton(elementCache().USDateParsingRdio);
+        if (useUSDateFormat)
+            button = new RadioButton(elementCache().usDateParsingRadio);
         else
-            button = new RadioButton(elementCache().NonUSDateParsingRdio);
+            button = new RadioButton(elementCache().nonUSDateParsingRadio);
 
         button.check();
     }
 
-    public void setDefaultDateDisplay(String displayFormat)
+    public String getAltLoginPage()
     {
-        setFormElement(elementCache().defaultDateFormatTxt,displayFormat);
-    }
-
-    public String getDefaultDateDisplay()
-    {
-        return (elementCache().defaultDateFormatTxt).getText();
-    }
-
-    public String getAdditionalParsingPatternDates()
-    {
-        return elementCache().additionalParsingPatternDates.getText();
-    }
-
-    public void setAdditionalParsingPatternDates(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternDates, pattern);
-    }
-
-    public String getAdditionalParsingPatternDateAndTime()
-    {
-        return elementCache().additionalParsingPatternDateAndTime.getText();
-    }
-
-    public void setAdditionalParsingPatternDateAndTime(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternDateAndTime, pattern);
-    }
-
-    public void setDefaultDateTimeDisplay(String displayFormat)
-    {
-        setFormElement(elementCache().defaultDateTimeFormatTxt,displayFormat);
-    }
-
-    public String getDefaultDateTimeDisplay()
-    {
-        return (elementCache().defaultDateTimeFormatTxt).getText();
-    }
-
-    public void setDefaultNumberDisplay(String numberFormat)
-    {
-        setFormElement(elementCache().defaultNumberFormatTxt, numberFormat);
-    }
-
-    public String getDefaultNumberDisplay()
-    {
-        return (elementCache().defaultNumberFormatTxt).getText();
-    }
-
-    public void restrictChartingCols(boolean restrict)
-    {
-        if (restrict)
-            checkCheckbox(elementCache().restrictChartingColsChk);
-        else
-            uncheckCheckbox(elementCache().restrictChartingColsChk);
+        return getFormElement(elementCache().altLoginPageTxt);
     }
 
     public void setAltLoginPage(String loginPage)
@@ -226,20 +68,10 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         setFormElement(elementCache().altLoginPageTxt,loginPage);
     }
 
-    public String getAltLoginPage()
+    @Override
+    protected ElementCache elementCache()
     {
-        return (elementCache().altLoginPageTxt).getText();
-    }
-
-    public void save()
-    {
-        clickAndWait(elementCache().saveBtn);
-    }
-
-    public void reset()
-    {
-        elementCache().resetBtn.click();
-        acceptAlert();
+        return (ElementCache) super.elementCache();
     }
 
     @Override
@@ -248,32 +80,11 @@ public class LookAndFeelSettingsPage extends LabKeyPage<LookAndFeelSettingsPage.
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends BaseSettingsPage.ElementCache
     {
-        WebElement systemDescription = Locator.name("systemDescription").findWhenNeeded(this);
-        WebElement headerShortName = Locator.name("systemShortName").findWhenNeeded(this);
-        WebElement theme = Locator.name("themeName").findWhenNeeded(this);
-        WebElement showNavAlways = Locator.xpath("//input[@name='folderDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
-        WebElement showNavForAdmin = Locator.xpath("//input[@name='folderDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
-        WebElement showAppNavAlways = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
-        WebElement showAppNavForAdmin = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
-        WebElement helpMenuEnabledChk = Locator.name("helpMenuEnabled").findWhenNeeded(this);
-        WebElement discussionEnabledChk = Locator.name("discussionEnabled").findWhenNeeded(this);
-        WebElement logoLinkTxt = Locator.inputByNameContaining("logoHref").findWhenNeeded(this);
-        WebElement supportLinkTxt = Locator.inputByNameContaining("reportAProblemPath").findWhenNeeded(this);
-        WebElement supportEmailTxt = Locator.inputByNameContaining("supportEmail").findWhenNeeded(this);
-        WebElement systemEmailTxt = Locator.inputByNameContaining("systemEmailAddress").findWhenNeeded(this);
-        WebElement organizationNameTxt = Locator.inputByNameContaining("companyName").findWhenNeeded(this);
-        WebElement USDateParsingRdio = Locator.xpath("//input[@name='dateParsingMode' and @value='US']").findWhenNeeded(this);
-        WebElement NonUSDateParsingRdio = Locator.xpath("//input[@name='dateParsingMode' and @value='NON_US']").findWhenNeeded(this);
-        WebElement defaultDateFormatTxt = Locator.inputByNameContaining("defaultDateFormat").findWhenNeeded(this);
-        WebElement defaultDateTimeFormatTxt = Locator.inputByNameContaining("defaultDateTimeFormat").findWhenNeeded(this);
-        WebElement defaultNumberFormatTxt = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
-        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElement(this);
-        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
-        WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
+        WebElement usDateParsingRadio = Locator.xpath("//input[@name='dateParsingMode' and @value='US']").findWhenNeeded(this);
+        WebElement nonUSDateParsingRadio = Locator.xpath("//input[@name='dateParsingMode' and @value='NON_US']").findWhenNeeded(this);
         WebElement altLoginPageTxt = Locator.inputByNameContaining("customLogin").findWhenNeeded(this);
-        WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
-        WebElement resetBtn = Locator.lkButton("Reset").findWhenNeeded(this);
     }
+
 }

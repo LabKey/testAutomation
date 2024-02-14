@@ -20,8 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.BootstrapMenu;
@@ -43,29 +41,20 @@ import static org.junit.Assert.assertEquals;
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
-    private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
-    private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";
     private static final String DATE_TIME_FORMAT_INJECTION = "yyyy-MM-dd HH:mm'" + INJECT_CHARS + "'";
-    private static final Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
 
     @Override
     //this project will remain unaltered and copy every property from the site.
     protected String getProjectName()
     {
-        return "Copycat Project";
+        return "Site Settings Test";
     }
 
     protected LookAndFeelSettingsPage goToSiteLookAndFeel()
     {
         goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
         return new LookAndFeelSettingsPage(getDriver());
-    }
-
-    //this project's properties will be altered and so should not copy site properties
-    protected String getProjectAlteredName()
-    {
-        return "Independent Project";
     }
 
     protected void checkHelpLinks(String projectName, boolean supportLinkPresent, boolean helpLinkPresent)
@@ -76,8 +65,24 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         BootstrapMenu menu = new SiteNavBar(getDriver()).userMenu();
         menu.expand();    // the support and help links are now on the user menu
         List<WebElement> visibleLinks = menu.findVisibleMenuItems();
-        assertEquals("Support link state unexpected.", supportLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("Support")));
-        assertEquals("Help link state unexpected.", helpLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("LabKey Documentation")));
+        checker().verifyEquals("Support link state unexpected.",
+                supportLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("Support")));
+        checker().verifyEquals("Help link state unexpected.",
+                helpLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("LabKey Documentation")));
+
+        checker().screenShotIfNewError("Menu_Error");
+    }
+
+    private void resetSiteSettings()
+    {
+        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(this);
+        settingsPage.reset();
+    }
+
+    private void resetProjectSettings()
+    {
+        ProjectSettingsPage settingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
+        settingsPage.reset();
     }
 
     @BeforeClass
@@ -89,43 +94,53 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
     protected void setUpTest()
     {
+
+        // Make sure the site settings are reset.
+        resetSiteSettings();
+
         _containerHelper.createProject(getProjectName(), null);
         checkHelpLinks(null, true, true);
-        _containerHelper.createProject(getProjectAlteredName(), null);
-        checkHelpLinks(null, true, true);
+        checkHelpLinks(getProjectName(), true, true);
 
-        goToProjectSettings(getProjectAlteredName());
-        setFormElement(Locator.name("reportAProblemPath"), "");
-        clickButton("Save");
-        assertElementNotVisible(Locators.labkeyError);
-
-        checkHelpLinks(getProjectAlteredName(), false, true);
-//        assertElementNotPresent("Support link still present after removing link from settings", supportLink);
     }
 
     @Test
-    public void testHelpMenuOption()
+    public void testSiteSettingOverride()
     {
-        //assert both locators are present in clone project
         goToProjectHome();
-        checkHelpLinks(null, true, true);
 
-        //change global settings to exclude help link
+        log("Assert both locators are present in the project.");
+        checkHelpLinks(getProjectName(), true, true);
+
+        log("Change global settings to exclude help and report a problem link.");
         LookAndFeelSettingsPage settingsPage = goToSiteLookAndFeel();
-        settingsPage.enableHelp(false);
+        settingsPage.setHelpMenu(false);
+        settingsPage.setSupportLink("");
         settingsPage.save();
 
-        //assert help link missing in proj 1, present in proj 2
-        checkHelpLinks(getProjectName(), true, false);
-        checkHelpLinks(getProjectAlteredName(), false, true);
+        log("Go to the project settings page and validate that various settings match the site settings.");
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
 
-        //change proj 2 to exclude both help and support
-        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectAlteredName());
-        projectSettingsPage.enableHelp(false);
+        checker().verifyFalse("Help menu should not be checked.",
+                projectSettingsPage.getHelpMenu());
+
+        checker().verifyTrue("Support link should be empty.",
+                projectSettingsPage.getSupportLink().isEmpty());
+
+        log("Validate help and report links are missing from the menu.");
+        checkHelpLinks(getProjectName(), false, false);
+
+        log("Change settings in folder/project re-enable help and report options.");
+        projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
+        projectSettingsPage.setHelpMenu(true);
+        projectSettingsPage.setSupportLink("${contextPath}/home/support/project-begin.view");
         projectSettingsPage.save();
 
-        //assert help link itself gone
-        checkHelpLinks(null, false, false);
+        log("Assert help link and report link are present in the menu in the project.");
+        checkHelpLinks(null, true, true);
+
+        resetSiteSettings();
+        resetProjectSettings();
     }
 
     @Test
@@ -151,7 +166,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     @Test
     public void testTimeAndDateFields()
     {
-
+        goToProjectHome();
+        goToProjectSettings();
     }
 
     @Override
@@ -162,7 +178,6 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         clickButtonContainingText("Save");
 
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        _containerHelper.deleteProject(getProjectAlteredName(), afterTest);
     }
 
     @Override

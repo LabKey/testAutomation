@@ -23,14 +23,11 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementCache>
+public class ProjectSettingsPage extends BaseSettingsPage
 {
-    private  LookAndFeelSettingsPage lookAndFeelPage;
-
     public ProjectSettingsPage(WebDriver driver)
     {
         super(driver);
-        lookAndFeelPage = new LookAndFeelSettingsPage(driver);
     }
 
     public static ProjectSettingsPage beginAt(WebDriverWrapper driver)
@@ -44,21 +41,28 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         return new ProjectSettingsPage(driver.getDriver());
     }
 
-    public void save()
+    public boolean getShouldInherit()
     {
-        elementCache().saveButton.click();
+        return elementCache().shouldInherit.isChecked();
     }
 
-    public Checkbox getDiscussionEnabledCheckbox()
+    public void setShouldInherit(boolean value)
     {
-        return elementCache().discussionEnabled;
+        if(value)
+        {
+            elementCache().shouldInherit.check();
+        }
+        else
+        {
+            elementCache().shouldInherit.uncheck();
+        }
     }
 
-    public void enableHelp(boolean enable)
+    @Override
+    protected ElementCache elementCache()
     {
-        lookAndFeelPage.enableHelp(enable);
+        return (ElementCache) super.elementCache();
     }
-
 
     @Override
     protected ElementCache newElementCache()
@@ -66,9 +70,8 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends BaseSettingsPage.ElementCache
     {
-        protected final Checkbox discussionEnabled = Checkbox.Checkbox(Locator.name("discussionEnabled")).findWhenNeeded(this);
-        protected final WebElement saveButton = findButton("Save");
+        protected final Checkbox shouldInherit = Checkbox.Checkbox(Locator.name("shouldInherit")).findWhenNeeded(this);
     }
 }

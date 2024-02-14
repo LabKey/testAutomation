@@ -84,8 +84,10 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     public void testAdditionalParsingPatternDateAndTime()
     {
         log("Setting the parsing pattern");
-        String pattern = "ddMMMyyyy:HH:mm:ss";
-        setUpDataParsing(pattern);
+        String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
+        String datePattern = "mm/dd/yy";
+        String timePattern = "hh:mm a";
+        setAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
 
         log("Update a row with a date in a non-standard format");
         goToProjectHome();
@@ -93,8 +95,8 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
         listTable.clickEditRow(0);
         setFormElement(Locator.name("quf_dateTimeCol"), "25Nov2020:24:23:00");
-        setFormElement(Locator.name("quf_dateCol"), "25Nov2020");
-        setFormElement(Locator.name("quf_timeCol"), "24:23:00");
+        setFormElement(Locator.name("quf_dateCol"), "11/25/20");
+        setFormElement(Locator.name("quf_timeCol"), "12:23 am");
         clickButton("Submit");
 
         checker().verifyEquals("Incorrect date parsed while editing the row", "2020-11-26 00:23", listTable.getDataAsText(0, "dateTimeCol"));
@@ -103,8 +105,8 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         listTable.clickInsertNewRow();
         setFormElement(Locator.name("quf_name"), "Second");
         setFormElement(Locator.name("quf_dateTimeCol"), "23Nov2020:12:23:34");
-        setFormElement(Locator.name("quf_dateCol"), "23Nov2020");
-        setFormElement(Locator.name("quf_timeCol"), "12:23:34");
+        setFormElement(Locator.name("quf_dateCol"), "11/23/20");
+        setFormElement(Locator.name("quf_timeCol"), "12:23 pm");
         clickButton("Submit");
 
         listTable.setFilter("name", "Equals", "Second");
@@ -127,8 +129,10 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     public void testAdditionalParsingPatternForPipelineJobs()
     {
         log("Setting the parsing pattern");
-        String pattern = "ddMMMyyyy:HH:mm:ss";
-        setUpDataParsing(pattern);
+        String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
+        String datePattern = "dd/mm/yy";
+        String timePattern = "hh:mm a";
+        setAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
 
         log("Importing a study where a dataset has some dates in the non-standard format");
         goToProjectHome();
@@ -143,12 +147,48 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
                 , table.getColumnDataAsText("dateTimeCol"));
     }
 
-    private void setUpDataParsing(String pattern)
+    private void setAdditionalParsingPatterns(String dateTimePattern, String datePattern, String timePattern)
     {
-        goToAdminConsole().clickLookAndFeelSettings();
-        LookAndFeelSettingsPage lookAndFeelSettingsPage = new LookAndFeelSettingsPage(getDriver());
-        lookAndFeelSettingsPage.setAdditionalParsingPatternDates(pattern);
-        lookAndFeelSettingsPage.setAdditionalParsingPatternDateAndTime(pattern);
+        LookAndFeelSettingsPage lookAndFeelSettingsPage = goToAdminConsole().clickLookAndFeelSettings();
+
+        if(null != dateTimePattern && !dateTimePattern.isEmpty())
+        {
+            lookAndFeelSettingsPage.setAdditionalParsingPatternDates(datePattern);
+        }
+
+        if(null != datePattern && !datePattern.isEmpty())
+        {
+            lookAndFeelSettingsPage.setAdditionalParsingPatternDateAndTime(dateTimePattern);
+        }
+
+        if(null != timePattern && !timePattern.isEmpty())
+        {
+            lookAndFeelSettingsPage.setAdditionalParsingPatternTimes(timePattern);
+        }
+
         lookAndFeelSettingsPage.save();
     }
+
+    private void setDisplayFormats(String dateTimeFormat, String dateFormat, String timeFormat)
+    {
+        LookAndFeelSettingsPage lookAndFeelSettingsPage = goToAdminConsole().clickLookAndFeelSettings();
+
+        if(null != dateTimeFormat && !dateTimeFormat.isEmpty())
+        {
+            lookAndFeelSettingsPage.setDefaultDateTimeDisplay(dateTimeFormat);
+        }
+
+        if(null != dateFormat && !dateFormat.isEmpty())
+        {
+            lookAndFeelSettingsPage.setDefaultDateDisplay(dateFormat);
+        }
+
+        if(null != timeFormat && !timeFormat.isEmpty())
+        {
+            lookAndFeelSettingsPage.setDefaultTimeDisplay(timeFormat);
+        }
+
+        lookAndFeelSettingsPage.save();
+    }
+
 }
