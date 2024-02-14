@@ -63,6 +63,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
     protected void waitForPage()
     {
         waitForElement(SIGNAL_LOC, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.tag("table").withAttributeContaining("id", "labkey-principalcombo-"));
     }
 
     public void clickSaveAndFinish()
