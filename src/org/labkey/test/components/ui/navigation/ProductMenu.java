@@ -6,8 +6,9 @@ package org.labkey.test.components.ui.navigation;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.components.react.BaseBootstrapMenu;
-import org.labkey.test.components.react.MultiMenu;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,29 +20,60 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ProductMenu extends BaseBootstrapMenu
+public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
 {
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
 
     protected ProductMenu(WebElement element, WebDriver driver)
     {
-        super(element, driver);
+        _componentElement = element;
+        _driver = driver;
     }
 
     public static SimpleWebDriverComponentFinder<ProductMenu> finder(WebDriver driver)
     {
-        return new MultiMenu.MultiMenuFinder(driver).withButtonId("product-menu").wrap(ProductMenu::new);
+        return new SimpleWebDriverComponentFinder<>(driver, rootLocator, ProductMenu::new);
     }
 
     @Override
+    protected WebDriver getDriver()
+    {
+        return _driver;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _componentElement;
+    }
+
     protected boolean isExpanded()
     {
-        boolean ariaExpanded = super.isExpanded();
+        boolean ariaExpanded = "true".equals(elementCache().toggle.getAttribute("aria-expanded"));
         boolean menuContentDisplayed = elementCache().menuContent.isDisplayed();
         TestLogger.debug(String.format("Product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b.",
                 ariaExpanded, menuContentDisplayed));
 
         return  ariaExpanded && menuContentDisplayed &&
                 ExpectedConditions.invisibilityOfAllElements(BootstrapLocators.loadingSpinner.findElements(this)).apply(getDriver());
+    }
+
+    public void expand()
+    {
+        if (!isExpanded())
+        {
+            elementCache().toggle.click();
+            WebDriverWrapper.waitFor(this::isExpanded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
+    public void collapse()
+    {
+        if (isExpanded())
+        {
+            elementCache().toggle.click();
+        }
     }
 
     public List<String> getMenuSectionHeaders()
@@ -138,28 +170,14 @@ public class ProductMenu extends BaseBootstrapMenu
 
     public String getButtonTitle()
     {
-        WebElement buttonTitle = Locator.tagWithId("button", "product-menu")
-                .child(Locator.tagWithClass("div", "title")).findElement(this);
+        WebElement buttonTitle = elementCache().toggle.findElement(Locator.byClass("title"));
         return buttonTitle.getText();
     }
 
     public String getButtonSubtitle()
     {
-        WebElement buttonSubtitle = Locator.tagWithId("button", "product-menu")
-                .child(Locator.tagWithClass("div", "subtitle")).findElement(this);
+        WebElement buttonSubtitle = elementCache().toggle.findElement(Locator.byClass("subtitle"));
         return buttonSubtitle.getText();
-    }
-
-    @Override
-    protected Locator getToggleLocator()
-    {
-        return Locator.tagWithId("button", "product-menu");
-    }
-
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
     }
 
     @Override
@@ -168,8 +186,12 @@ public class ProductMenu extends BaseBootstrapMenu
         return new ElementCache();
     }
 
-    protected class ElementCache extends BaseBootstrapMenu.ElementCache
+    static Locator rootLocator = Locator.byClass("product-menu");
+
+    protected class ElementCache extends Component<?>.ElementCache
     {
+        private final WebElement rootElement = rootLocator.findElement(getDriver());
+        private final WebElement toggle = Locator.byClass("product-menu-button").findElement(rootElement);
         private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").refindWhenNeeded(this);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").refindWhenNeeded(menuContent);
 

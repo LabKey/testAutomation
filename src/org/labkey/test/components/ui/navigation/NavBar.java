@@ -86,7 +86,7 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
      */
     public ServerNotificationMenu getNotificationMenu()
     {
-        return ServerNotificationMenu.finder(getDriver()).find(this);
+        return elementCache().notificationsMenu;
     }
 
     public ProductMenu getProductMenu()
@@ -121,5 +121,6 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
         public Input searchBox = Input.Input(Locator.tagWithClass("input", "navbar__search-input"), getDriver()).findWhenNeeded(this);
         public MultiMenu searchMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("navbar__find-and-search-button").findWhenNeeded(this);
         public final ProductMenu productMenu = ProductMenu.finder(getDriver()).timeout(1000).findWhenNeeded(this);
+        public final ServerNotificationMenu notificationsMenu = ServerNotificationMenu.finder(getDriver()).timeout(1000).findWhenNeeded(this);
     }
 }

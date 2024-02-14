@@ -461,7 +461,8 @@ public class FieldDefinition extends PropertyDescriptor
 
     // Temporary, for 'ColumnType.values()'
     private static final List<ColumnType> COLUMN_TYPES = List.of(
-            ColumnType.MultiLine, ColumnType.Integer, ColumnType.String, ColumnType.Subject, ColumnType.DateAndTime,
+            ColumnType.MultiLine, ColumnType.Integer, ColumnType.String, ColumnType.Subject,
+            ColumnType.DateAndTime, ColumnType.Date, ColumnType.Time,
             ColumnType.Boolean, ColumnType.Double, ColumnType.Decimal, ColumnType.File, ColumnType.Flag,
             ColumnType.Attachment, ColumnType.User, ColumnType.Lookup, ColumnType.OntologyLookup, ColumnType.VisitId,
             ColumnType.VisitDate, ColumnType.Sample, ColumnType.Barcode, ColumnType.TextChoice, ColumnType.SMILES
@@ -475,7 +476,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType Subject = new ColumnTypeImpl("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null);
         ColumnType DateAndTime = new ColumnTypeImpl("Date Time", "dateTime");
         ColumnType Date = new ColumnTypeImpl("Date", "date");
-        ColumnType Time = new ColumnTypeImpl("Time", "time");
+        ColumnType Time = new ColumnTypeImpl("Time", "time", "http://www.w3.org/2001/XMLSchema#time", null);
         ColumnType Boolean = new ColumnTypeImpl("Boolean", "boolean");
         ColumnType Double = new ColumnTypeImpl("Number (Double)", "float");
         ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double");
