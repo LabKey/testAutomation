@@ -30,7 +30,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
-import org.labkey.test.pages.PermissionsEditor;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -591,7 +591,7 @@ public class SecurityTest extends BaseWebDriverTest
         // 17037 Regression
         impersonate(PROJECT_ADMIN_USER);
         clickProject(PROJECT_NAME);
-        PermissionsEditor.enterPermissionsUI(this);
+        PermissionsPage.enterPermissionsUI(this);
         _ext4Helper.clickTabContainingText("Project Groups");
         assertTextPresent("Total Users");
         stopImpersonating();
