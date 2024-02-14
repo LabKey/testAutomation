@@ -61,8 +61,6 @@ public class MultiMenu extends BootstrapMenu
     {
         expand();
 
-        WebElement menuList = getMenuList();
-
         for (int i = 0; i < pathToAction.size(); i++)
         {
             Assert.assertFalse("Menu item not enabled.", isMenuItemDisabled(pathToAction.get(i)));
@@ -72,8 +70,8 @@ public class MultiMenu extends BootstrapMenu
             if (i < pathToAction.size() - 1)
             {
                 // Everything in the pathToAction should contain a sub menu except possibly the last item.
-                Assert.assertTrue("Item in menu path '" + pathToAction.get(i) + "' does not contain a sub-menu.", menuItem.getAttribute("class").contains("dropdown-submenu"));
-                if(!Locator.xpath("./i").findElement(menuItem).getAttribute("class").contains("fa-chevron-up"))
+                Assert.assertTrue("Item in menu path '" + pathToAction.get(i) + "' does not contain a sub-menu.", menuItem.getAttribute("class").contains("dropdown-section-toggle"));
+                if(!Locator.byClass("fa").findElement(menuItem).getAttribute("class").contains("fa-chevron-up"))
                 {
                     // This is a sub-menu item, but click it only if the sub-menu is not expanded.
                     menuItem.click();
@@ -156,11 +154,13 @@ public class MultiMenu extends BootstrapMenu
         for (WebElement menuItem : menuItems)
         {
             menuItem = Locator.xpath("..").findElement(menuItem); // Up a level
-            Optional<WebElement> expando = Locator.xpath("./i").withClass("fa-chevron-down").findOptionalElement(menuItem);
+            Optional<WebElement> expando = Locator.byClass("fa-chevron-down").findOptionalElement(menuItem);
             if (expando.isPresent())
             {
                 expando.get().click();
-                Locator.tagWithClass("ul", "well").waitForElement(menuItem, 1_000);
+                // Note: if we really do need to wait for the items to appear we can probably wait for elements with
+                // class "dropdown-section__menu-item", we'll want to track how many we already have and check that the
+                // number has increased, since nothing is nested, everything is siblings.
             }
         }
     }
@@ -189,15 +189,31 @@ public class MultiMenu extends BootstrapMenu
     public List<String> getItemsUnderHeading(String heading)
     {
         expandAll();
+        boolean headingFound = false;
+        List<String> items = new ArrayList<>();
+        List<WebElement> listItems = Locator.tag("li").findElements(this);
 
-        WebElement submenu = Locator.byClass("dropdown-header").withText(heading)
-                .followingSibling("li").withClass("dropdown-submenu").findElement(this);
-        List<WebElement> menuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(submenu);
-        List<String> menuText = getWrapper().getTexts(menuList);
+        for (WebElement item : listItems)
+        {
+            String className = item.getAttribute("class");
+            String text = item.getText().trim();
+
+            if (className.contains("dropdown-header") && text.equalsIgnoreCase(heading))
+                headingFound = true;
+
+            // Once we've found our header we know that all dropdown-section__menu-item elements belong to the heading
+            // we are interested in
+            if (headingFound && className.contains("dropdown-section__menu-item"))
+                items.add(text);
+
+            // Once we hit a divider we're done looking at menu items related to the heading, so we can stop iterating
+            if (headingFound && className.contains("divider"))
+                break;
+        }
 
         collapse();
 
-        return menuText;
+        return items;
     }
 
     public String getButtonText()
