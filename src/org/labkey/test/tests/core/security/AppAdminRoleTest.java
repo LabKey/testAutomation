@@ -24,7 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.PermissionsEditor;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
@@ -169,10 +169,10 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     public void testPermissionsUi()
     {
         impersonate(APP_ADMIN);
-        PermissionsEditor permissionsEditor;
+        PermissionsPage permissionsEditor;
 
         log("Test adding roles");
-        permissionsEditor = PermissionsEditor.beginAt(this, "/");
+        permissionsEditor = PermissionsPage.beginAt(this, "/");
         for (String role : List.of(SITE_ADMIN_ROLE, DEVELOPER_ROLE, IMP_TROUBLESHOOTER_ROLE))
         {
             checker().verifyFalse("App admin user shouldn't be able to modify " + role + " role", permissionsEditor.isRoleEditable(role));

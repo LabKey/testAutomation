@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages.admin;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -61,12 +62,22 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
     @Override
     protected void waitForPage()
     {
+        waitForElement(SIGNAL_LOC, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.tag("table").withAttributeContaining("id", "labkey-principalcombo-"));
     }
 
     public void clickSaveAndFinish()
     {
         clickAndWait(elementCache().saveAndFinishButton);
+    }
+
+    public static PermissionsPage enterPermissionsUI(WebDriverWrapper test)
+    {
+        if (!test.isElementPresent(SIGNAL_LOC))
+        {
+            test.clickAdminMenuItem("Folder", "Permissions");
+        }
+        return new PermissionsPage(test.getDriver());
     }
 
     public PermissionsPage selectFolder(String folderName)
@@ -98,6 +109,12 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         else if (!perm.contains("."))
             return R + perm + "Role";
         return perm;
+    }
+
+    @NotNull
+    private static Locator.XPathLocator rolePanelLoc(String permissionString)
+    {
+        return Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
     }
 
     public PermissionsPage checkInheritedPermissions()
@@ -174,14 +191,13 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         }
     }
 
-    private PermissionsPage _selectPermission(String userOrGroupName, String group, String permissionString)
+    private void _selectPermission(String userOrGroupName, String group, String permissionString)
     {
-        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+        Locator.XPathLocator roleCombo = rolePanelLoc(permissionString);
         waitForElement(roleCombo);
         scrollIntoView(roleCombo);
         _ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-        return this;
     }
 
     public PermissionsPage removeSiteGroupPermission(String groupName, String permissionString)
@@ -204,6 +220,24 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
             savePermissions();
         }
         return this;
+    }
+
+    public boolean isRoleEditable(String roleName)
+    {
+        WebElement rolePanel = rolePanelLoc(roleName).findElement(getDriver());
+        boolean canAddMembers = Locator.tag("input").findElement(rolePanel).isEnabled();
+        List<WebElement> memberButton = Locator.tagWithClass("a", "x4-btn").findElements(rolePanel);
+        for (WebElement button : memberButton)
+        {
+            // Ensure consistency between adding and removing members
+            if (button.getAttribute("class").contains("disabled") == canAddMembers)
+            {
+                String able = canAddMembers ? "add" : "remove";
+                String unable = canAddMembers ? "remove" : "add";
+                throw new IllegalStateException("Able to %s members to role '%s' but can't %s them".formatted(able, roleName, unable));
+            }
+        }
+        return canAddMembers;
     }
 
     /**
@@ -419,7 +453,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
 
     private PermissionsPage waitForReady()
     {
-        waitForElement(Locators.pageSignal(READY_SIGNAL), WAIT_FOR_JAVASCRIPT);
+        waitForElement(SIGNAL_LOC, WAIT_FOR_JAVASCRIPT);
         return this;
     }
 
@@ -501,7 +535,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
 
         WebElement saveAndFinishButton = Locator.tagWithText("span", "Save and Finish")
