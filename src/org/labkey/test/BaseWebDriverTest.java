@@ -1230,7 +1230,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             TestLogger.log(pendingRequestCount.getValue() + " requests still pending after " + msWait + "ms");
         if (pendingRequestCount.getValue() < 0)
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
-        SearchAdminAPIHelper.waitForIndexerBackground();
+
+        if (_containerHelper.getAllModules().contains("Search"))
+            SearchAdminAPIHelper.waitForIndexerBackground();
     }
 
     private int getPendingRequestCount(Connection connection)
