@@ -19,7 +19,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.PermissionsEditor;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -267,9 +267,9 @@ public class UIPermissionsHelper extends PermissionsHelper
     } //addUserToProjGroup()
 
     @Deprecated
-    public void enterPermissionsUI()
+    public PermissionsPage enterPermissionsUI()
     {
-        PermissionsEditor.enterPermissionsUI(_driver);
+        return PermissionsPage.enterPermissionsUI(_driver);
     }
 
     public void exitPermissionsUI()

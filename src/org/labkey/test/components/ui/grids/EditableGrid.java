@@ -7,6 +7,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactDatePicker;
 import org.labkey.test.components.react.ReactSelect;
@@ -145,6 +146,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return this;
     }
 
+    public boolean isRowSelected(int index)
+    {
+        if (hasSelectColumn())
+        {
+            WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
+            return checkBox.isSelected();
+        }
+        else
+        {
+            throw new NoSuchElementException("There is no select checkbox for row " + index);
+        }
+    }
+
     public EditableGrid selectAll(boolean checked)
     {
         if (hasSelectColumn())
@@ -155,6 +169,39 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             throw new NoSuchElementException("There is no select checkbox for all rows.");
         }
+        return this;
+    }
+
+    public boolean areAllRowsSelected()
+    {
+        if (hasSelectColumn())
+            return new Checkbox(elementCache().selectColumn).isSelected();
+        else
+            throw new NoSuchElementException("There is no select checkbox for all rows.");
+    }
+
+    /**
+     * Selects a range of rows in the current view.
+     * If the range is within a range of already-selected rows, will deselect the specified range
+     * @param start the starting index (0-based), of non-header rows with checkboxes
+     * @param end the ending index
+     * @return  the current instance
+     */
+    public EditableGrid shiftSelectRange(int start, int end)
+    {
+        if (!hasSelectColumn())
+            throw new NoSuchElementException("there is no select checkbox for all rows");
+
+        var checkBoxes = Locator.tag("tr").child("td")
+                .child(Locator.tagWithAttribute("input", "type", "checkbox"))
+                .findElements(elementCache().table);
+        getWrapper().scrollIntoView(checkBoxes.get(0), true); // bring as much of the grid into view as possible
+        new Actions(getDriver())
+                .click(checkBoxes.get(start))
+                .keyDown(Keys.SHIFT)
+                .click(checkBoxes.get(end))
+                .keyUp(Keys.SHIFT)
+                .perform();
         return this;
     }
 
