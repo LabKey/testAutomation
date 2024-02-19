@@ -33,7 +33,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
     public String getText()
     {
-        return elementCache().textSpan().getText();
+        return elementCache().textSpan.getText();
     }
 
     private boolean isActive()
@@ -59,7 +59,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
         // be swapped out with the one to its right.  So, we check to see that either the text has changed or
         // the item became stale. ExpectedConditions.textToBePresentInElement returns false if element is stale.
         WebDriverWrapper.waitFor(()-> ExpectedConditions.not(
-                ExpectedConditions.textToBePresentInElement(elementCache().textSpan(), originalText))
+                ExpectedConditions.textToBePresentInElement(elementCache().textSpan, originalText))
                         .apply(getDriver())
                 , "The value item ["+originalText+"] did not disappear.", 1000);
     }
@@ -82,10 +82,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement textSpan()
-        {
-            return Locator.tag("span").findElement(getComponentElement());
-        }
+        public final WebElement textSpan = Locator.tag("span").refindWhenNeeded(getComponentElement());
 
         public final WebElement icon = Locator.tag("i").findWhenNeeded(getComponentElement());
     }
