@@ -100,7 +100,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void createList()
     {
-        beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/begin.view");
         clickTab("Portal");
 
         ListHelper listHelper = new ListHelper(getDriver());
@@ -130,7 +130,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void createSampleType()
     {
-        beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/project-begin.view");
         clickTab("Portal");
 
         PortalHelper portalHelper = new PortalHelper(getDriver());
@@ -160,7 +160,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/project-begin.view");
     }
 
     @Override

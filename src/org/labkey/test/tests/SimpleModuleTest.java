@@ -590,7 +590,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
-        beginAt("/query/" + getProjectName() + "/begin.view?");
+        beginAt(getProjectName() + "/query-begin.view");
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
@@ -1397,7 +1397,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
-    private final String subfolderPath = "/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?";
+    private final String subfolderPath = getProjectName() + "/" + FOLDER_NAME + "/project-begin.view";
 
     private final static String GET_MODULEP_PROPS_SCRIPT = "library('Rlabkey')\n" +
             "baseUrl = labkey.url.base\n" +

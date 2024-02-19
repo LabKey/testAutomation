@@ -153,7 +153,6 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
 
     protected void goToProjectBegin(String projectName)
     {
-        beginAt("project/" + projectName + "/begin.view?");
+        beginAt(projectName + "/project-begin.view");
     }
-
 }

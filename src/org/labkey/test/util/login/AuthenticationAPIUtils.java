@@ -31,7 +31,7 @@ public class AuthenticationAPIUtils
       "primaryProviders": {
         "TestSSO": {
           "helpLink": "https://www.labkey.org/Documentation/20.0/wiki-page.view?name=authenticationModule",
-          "saveLink": "/labkey/testsso-testSsoSaveConfiguration.view?",
+          "saveLink": "/labkey/testsso-testSsoSaveConfiguration.view",
           "settingsFields": [],
           "description": "A trivial, insecure SSO authentication provider (for test purposes only)",
           "sso": true
@@ -70,7 +70,7 @@ public class AuthenticationAPIUtils
       "secondaryProviders": {
         "TestSecondary": {
           "helpLink": "https://www.labkey.org/Documentation/20.0/wiki-page.view?name=authenticationModule",
-          "saveLink": "/labkey/testsecondary-testSecondarySaveConfiguration.view?",
+          "saveLink": "/labkey/testsecondary-testSecondarySaveConfiguration.view",
           "settingsFields": [],
           "description": "Adds a trivial, insecure secondary authentication requirement (for test purposes only)"
         }
