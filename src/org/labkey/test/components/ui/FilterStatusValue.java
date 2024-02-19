@@ -4,9 +4,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.ElementCache>
 {
@@ -57,17 +57,10 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
         // If the item you're dismissing is not the rightmost, it won't become stale; instead, its text will
         // be swapped out with the one to its right.  So, we check to see that either the text has changed or
-        // the item became stale.
-        WebDriverWrapper.waitFor(()-> {
-                    try
-                    {
-                        return !getText().equals(originalText);
-                    }
-                    catch (StaleElementReferenceException s)
-                    {
-                        return true;
-                    }
-                }
+        // the item became stale. ExpectedConditions.textToBePresentInElement returns false if element is stale.
+        WebDriverWrapper.waitFor(()-> ExpectedConditions.not(
+                ExpectedConditions.textToBePresentInElement(elementCache().textSpan(), originalText))
+                        .apply(getDriver())
                 , "The value item ["+originalText+"] did not disappear.", 1000);
     }
 
