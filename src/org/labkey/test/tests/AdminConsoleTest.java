@@ -84,7 +84,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         Locator ribbonLink = Locator.tagWithClassContaining("div", "alert").append(Locator.linkContainingText("and also click this..."));
         assertElementPresent(ribbonLink);
         String href = ribbonLink.findElement(getDriver()).getAttribute("href");
-        String expected = WebTestHelper.getBaseURL() + "/project/home/begin.view";
+        String expected = WebTestHelper.getBaseURL() + "/home/project-begin.view";
         assertEquals("Incorrect URL", expected, href);
 
         goToHome();
