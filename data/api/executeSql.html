@@ -5,7 +5,8 @@
 <div><input type="button" value="Execute SQL" id="button_loadqwp"/></div>
 <div id="qwp-div">Query Web Part DIV</div>
 
-<script type="text/javascript" nonce="<%=scriptNonce%>">
+<!-- Used as HTML wiki source, so nonce is NOT required -->
+<script type="text/javascript">
     LABKEY.Utils.onReady(function() {
         document.getElementById('button_loadqwp')['onclick'] = loadQWP;
     });
