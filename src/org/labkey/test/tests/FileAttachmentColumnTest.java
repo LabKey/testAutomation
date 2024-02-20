@@ -100,7 +100,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void createList()
     {
-        beginAt(getProjectName() + "/" + FOLDER_NAME + "/begin.view");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/project-begin.view");
         clickTab("Portal");
 
         ListHelper listHelper = new ListHelper(getDriver());
