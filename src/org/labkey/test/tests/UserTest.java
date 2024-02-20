@@ -307,7 +307,7 @@ public class UserTest extends BaseWebDriverTest
     private String getEmailChangeMsgBody(String subjectRegex)
     {
         EmailRecordTable ert = new EmailRecordTable(getDriver());
-        beginAt("/dumbster/begin.view?");
+        beginAt("/dumbster-begin.view");
         EmailRecordTable.EmailMessage eMsg = ert.getMessageRegEx(subjectRegex);
         ert.clickMessage(eMsg);
         eMsg = ert.getMessageRegEx(subjectRegex);

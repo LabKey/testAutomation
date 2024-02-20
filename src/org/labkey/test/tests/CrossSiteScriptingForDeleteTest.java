@@ -19,7 +19,7 @@ public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "CrossSiteScriptingForDeleteTest";
     protected static final String REPORT_NAME = BaseWebDriverTest.INJECT_CHARS_1;
-    private static final String LINK_REPORT_URL = "/project/home/begin.view";
+    private static final String LINK_REPORT_URL = "/home/project-begin.view";
 
     @BeforeClass
     public static void initTest()

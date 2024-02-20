@@ -167,23 +167,23 @@ public class SecurityTest extends BaseWebDriverTest
     protected void cantReachAdminToolFromUserAccount()
     {
         final String historyTabTitle = "History:";
-        final Set<String> unreachableUrls = new HashSet<>(Arrays.asList("/admin/showAdmin.view?", "/user/showUsers.view?",
-                "/security/group.view?group=Administrators", "/security/group.view?group=Developers",
-                "/user/showUsers.view?", "/security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F", "/admin/createFolder.view?",
-                "/analytics/begin.view?", "/login/configure.view?", "/admin/customizeEmail.view?", "/admin/filesSiteSettings.view?",
-                "/admin/projectSettings.view?", "/flow/flowAdmin.view?", "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
-                "/core/configureReportsAndScripts.view?", "/audit/showAuditLog.view?", "/search/admin.view?",
-                "/ms2/showMS2Admin.view?", "/experiment-types/begin.view?", "/pipeline-status/showList.view?",
-                "/pipeline/setup.view?", "/ms2/showProteinAdmin.view?", "/admin/actions.view?", "/admin/caches.view?",
-                "/admin/dbChecker.view?", "/query/dataSourceAdmin.view?", "/admin/dumpHeap.view?", "/admin/environmentVariables.view?",
-                "/admin/memTracker.view?", "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
-                "/admin-sql/scripts.view?", "/admin/systemProperties.view?", "/admin/emailTest.view?", "/admin/showAllErrors.view?",
-                "/admin/showErrorsSinceMark.view?", "/admin/showPrimaryLog.view?",
+        final Set<String> unreachableUrls = new HashSet<>(Arrays.asList("/admin-showAdmin.view", "/user-showUsers.view",
+            "/security-group.view?group=Administrators", "/security-group.view?group=Developers",
+            "/user-showUsers.view", "/security-project.view?returnUrl=%2Fuser%2FshowUsers.view%3F", "/admin-createFolder.view",
+            "/analytics-begin.view", "/login-configure.view", "/admin-customizeEmail.view", "/admin-filesSiteSettings.view",
+            "/admin-projectSettings.view", "/flow-flowAdmin.view", "/admin-reorderFolders.view", "/admin-customizeSite.view",
+            "/core-configureReportsAndScripts.view", "/audit-showAuditLog.view", "/search-admin.view",
+            "/ms2-showMS2Admin.view", "/experiment-types-begin.view", "/pipeline-status-showList.view",
+            "/pipeline-setup.view", "/ms2-showProteinAdmin.view", "/admin-actions.view", "/admin-caches.view",
+            "/admin-dbChecker.view", "/query-dataSourceAdmin.view", "/admin-dumpHeap.view", "/admin-environmentVariables.view",
+            "/admin-memTracker.view", "/admin-queries.view", "/admin-resetErrorMark.view", "/admin-showThreads.view",
+            "/admin-sql-scripts.view", "/admin-systemProperties.view", "/admin-emailTest.view", "/admin-showAllErrors.view",
+            "/admin-showErrorsSinceMark.view", "/admin-showPrimaryLog.view",
 
         /* Management actions shouldn't be reachable by non-admins */
-                "/admin-missingValues.view", "/admin-manageFolders.view", "/admin-moduleProperties.view", "/admin-concepts.view",
-                "/search-searchSettings.view", "/admin-notifications.view", "/admin-exportFolder.view", "/admin-importFolder.view",
-                "/admin-fileRoots.view", "/admin-folderInformation.view"
+            "/admin-missingValues.view", "/admin-manageFolders.view", "/admin-moduleProperties.view", "/admin-concepts.view",
+            "/search-searchSettings.view", "/admin-notifications.view", "/admin-exportFolder.view", "/admin-importFolder.view",
+            "/admin-fileRoots.view", "/admin-folderInformation.view"
         ));
 
 
@@ -430,7 +430,7 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void tokenAuthenticationTest() throws IOException
     {
-        beginAt("/project/SecurityVerifyProject/begin.view?");
+        beginAt("/SecurityVerifyProject/project-begin.view");
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
         String relUrl = getCurrentRelativeURL();
         boolean newSchool = relUrl.contains("project-");

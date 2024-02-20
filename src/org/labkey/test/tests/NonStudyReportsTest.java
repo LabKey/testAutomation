@@ -56,7 +56,7 @@ public class NonStudyReportsTest extends ReportTest
     private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
     private static final String LINK_REPORT1_NAME = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT1_DESCRIPTION = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
-    private static final String LINK_REPORT1_URL = "/project/home/begin.view";
+    private static final String LINK_REPORT1_URL = "/home/project-begin.view";
     private static final String LINK_REPORT2_NAME = "Link report 2" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT2_DESCRIPTION = "This link report points links to an external page.";
     protected final PortalHelper portalHelper = new PortalHelper(this);
