@@ -263,7 +263,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         insertJobIntoSubFolder(SUB_FOLDER_B);
 
         log("** Viewing pipeline status from project container. Sort by Description (report name) and include sub-folders");
-        beginAt("/pipeline-status/" + getProjectName() + "/showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
+        beginAt("/" + getProjectName() + "/pipeline-status-showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(0), "href");

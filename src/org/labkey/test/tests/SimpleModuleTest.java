@@ -590,7 +590,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
-        beginAt("/query/" + getProjectName() + "/begin.view?");
+        beginAt(getProjectName() + "/query-begin.view");
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
@@ -1397,75 +1397,66 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
-    private final String subfolderPath = "/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?";
+    private final String subfolderPath = getProjectName() + "/" + FOLDER_NAME + "/project-begin.view";
 
-    private final static String GET_MODULEP_PROPS_SCRIPT = "library('Rlabkey')\n" +
-            "baseUrl = labkey.url.base\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
-            "moduleName = \"simpletest\"\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp1\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp2\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCheckbox\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestSelect\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCombo\")";
+    private static final String SET_MODULE_PROPS_SCRIPT = """
+            library('Rlabkey')
+            baseUrl = labkey.url.base
+            moduleName = "simpletest"
 
-    private static final String SET_MODULE_PROPS_SCRIPT = "library('Rlabkey')\n" +
-            "baseUrl = labkey.url.base\n" +
-            "moduleName = \"simpletest\"\n" +
-            "\n" +
-            "## set site wide properties\n" +
-            "folderPath = \"/\"\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp1\", propValue = \"Prop1apiValue\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCheckbox\", propValue = \"false\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestSelect\", propValue = \"value2\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCombo\", propValue = \"comboValue2\")\n" +
-            "\n" +
-            "## set folder level properties\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp2\", propValue = \"Prop2apiValue\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\", propValue = \"$$folder1value$$\")\n" +
-            "\n" +
-            "## set folder level property for another folder\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder2\"\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\", propValue = \"$$folder2value$$\")";
+            ## set site wide properties
+            folderPath = "/"
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp1", propValue = "Prop1apiValue")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCheckbox", propValue = "false")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestSelect", propValue = "value2")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCombo", propValue = "comboValue2")
+
+            ## set folder level properties
+            folderPath = "SimpleModuleTest Project/subfolder"
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp2", propValue = "Prop2apiValue")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea", propValue = "$$folder1value$$")
+
+            ## set folder level property for another folder
+            folderPath = "SimpleModuleTest Project/subfolder2"
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea", propValue = "$$folder2value$$")""";
 
 
-    private static final String ENSURE_RLIBPATHS_SOURCE = "library('Rlabkey')\n" +
-            "baseUrl = labkey.url.base\n" +
-            "moduleName = \"simpletest\"\n" +
-            "propName = \"TestTextArea\"\n" +
-            "\n" +
-            "labkey.ensureRLibPath <- function(append=FALSE)\n" +
-            "{\n" +
-            "  propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)\n" +
-            "  \n" +
-            "  splits <- strsplit(propValue, '\\r\\n|\\n|\\r')\n" +
-            "  paths <- splits[[1]]\n" +
-            "  \n" +
-            "  if (append == TRUE)\n" +
-            "  \t.libPaths(c(paths, .libPaths()))\n" +
-            "  else\n" +
-            "  \t.libPaths(c(paths[1], paths[2]))\n" +
-            "  \n" +
-            "  .libPaths()\n" +
-            "}\n" +
-            "     \n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
-            "print(\"BEGIN-FIRST-CALL\")\n" +
-            "labkey.ensureRLibPath()  \n" +
-            "print(\"END-FIRST-CALL\")\n" +
-            "     \n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder2\"  \n" +
-            "print(\"BEGIN-SECOND-CALL\")\n" +
-            "labkey.ensureRLibPath()\n" +
-            "print(\"END-SECOND-CALL\")     \n" +
-            "\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"  \n" +
-            "print(\"BEGIN-THIRD-CALL\")\n" +
-            "labkey.ensureRLibPath(append=TRUE)\n" +
-            "print(\"END-THIRD-CALL\")\n" +
-            "  ";
+    private static final String ENSURE_RLIBPATHS_SOURCE = """
+            library('Rlabkey')
+            baseUrl = labkey.url.base
+            moduleName = "simpletest"
+            propName = "TestTextArea"
+
+            labkey.ensureRLibPath <- function(append=FALSE)
+            {
+              propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)
+             \s
+              splits <- strsplit(propValue, '\\r\\n|\\n|\\r')
+              paths <- splits[[1]]
+             \s
+              if (append == TRUE)
+              \t.libPaths(c(paths, .libPaths()))
+              else
+              \t.libPaths(c(paths[1], paths[2]))
+             \s
+              .libPaths()
+            }
+                \s
+            folderPath = "SimpleModuleTest Project/subfolder"
+            print("BEGIN-FIRST-CALL")
+            labkey.ensureRLibPath() \s
+            print("END-FIRST-CALL")
+                \s
+            folderPath = "SimpleModuleTest Project/subfolder2" \s
+            print("BEGIN-SECOND-CALL")
+            labkey.ensureRLibPath()
+            print("END-SECOND-CALL")    \s
+
+            folderPath = "SimpleModuleTest Project/subfolder" \s
+            print("BEGIN-THIRD-CALL")
+            labkey.ensureRLibPath(append=TRUE)
+            print("END-THIRD-CALL")
+             \s""";
 
     @LogMethod
     @Test
@@ -1500,7 +1491,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         validateValues(propList);
 
         log("Verify get module properties using Rlabkey api");
-        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", GET_MODULEP_PROPS_SCRIPT, false);
+        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", SET_MODULE_PROPS_SCRIPT, false);
         List<String> expectedProps = Arrays.asList("[1] \"Prop1Value\"\n",
                 "[1] \"FolderValue\"\n",
                 "[1] \"updated1\\nupdated2\"\n",
@@ -1696,29 +1687,30 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Finish");
     }
 
-    private static final String vehicleMetadataJsQuery = "function onFailure(errorInfo, options, responseObj)\n" +
-            "{\n" +
-            "    if (errorInfo && errorInfo.exception)\n" +
-            "        callback(\"Failure: \" + errorInfo.exception);\n" +
-            "    else\n" +
-            "        callback(\"Failure: \" + responseObj.statusText);\n" +
-            "}\n" +
-            "\n" +
-            "function onSuccess(data)\n" +
-            "{\n" +
-            "    if(data)\n" +
-            "        callback(data);\n" +
-            "    else\n" +
-            "        callback(\"No data returned!\");\n" +
-            "}\n" +
-            "\n" +
-            "LABKEY.Query.selectRows({\n" +
-            "            schemaName: 'vehicle',\n" +
-            "            queryName: 'Vehicles',\n" +
-            "            columns: ['Color'],\n" +
-            "            success: onSuccess,\n" +
-            "            failure: onFailure\n" +
-            "        });";
+    private static final String vehicleMetadataJsQuery = """
+            function onFailure(errorInfo, options, responseObj)
+            {
+                if (errorInfo && errorInfo.exception)
+                    callback("Failure: " + errorInfo.exception);
+                else
+                    callback("Failure: " + responseObj.statusText);
+            }
+
+            function onSuccess(data)
+            {
+                if(data)
+                    callback(data);
+                else
+                    callback("No data returned!");
+            }
+
+            LABKEY.Query.selectRows({
+                        schemaName: 'vehicle',
+                        queryName: 'Vehicles',
+                        columns: ['Color'],
+                        success: onSuccess,
+                        failure: onFailure
+                    });""";
 
     @LogMethod
     private void doTestFkLookupFilter()
