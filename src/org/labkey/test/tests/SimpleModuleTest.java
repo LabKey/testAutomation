@@ -98,11 +98,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String CORE_SCHEMA = "core";
     public static final String LIST_NAME = "People";
-    public static final String LIST_DATA = "Name\tAge\tCrazy\n" +
-            "Dave\t39\tTrue\n" +
-            "Adam\t65\tTrue\n" +
-            "Britt\t30\tFalse\n" +
-            "Josh\t30\tTrue";
+    public static final String LIST_DATA = """
+            Name\tAge\tCrazy
+            Dave\t39\tTrue
+            Adam\t65\tTrue
+            Britt\t30\tFalse
+            Josh\t30\tTrue""";
 
     public static final String STUDY_FOLDER_TAB_NAME = "Study Container Tab";
     public static final String ASSAY_FOLDER_TAB_NAME = "Assay Container Tab 2";
@@ -132,57 +133,62 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/camry.jpg");
     private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("thumbnails/focusPopup.jpg");
 
-    private static final String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
-            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"Image\">\n" +
-            "        <datatype>varchar</datatype>\n" +
-            "        <displayColumnFactory>\n" +
-            "          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>\n" +
-            "          <properties>\n" +
-            "            <property name=\"thumbnailImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>\n" +
-            "            <property name=\"popupImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>\n" +
-            "            <property name=\"popupImageWidth\">150px</property>\n" +
-            "          </properties>\n" +
-            "        </displayColumnFactory>\n" +
-            "        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>\n";
+    private static final String XML_METADATA = """
+            <tables xmlns="http://labkey.org/data/xml">
+              <table tableName="Models" tableDbType="TABLE">
+                <columns>
+                  <column columnName="Image">
+                    <datatype>varchar</datatype>
+                    <displayColumnFactory>
+                      <className>org.labkey.api.data.URLDisplayColumn$Factory</className>
+                      <properties>
+                        <property name="thumbnailImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>
+                        <property name="popupImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>
+                        <property name="popupImageWidth">150px</property>
+                      </properties>
+                    </displayColumnFactory>
+                    <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>
+                  </column>
+                </columns>
+              </table>
+            </tables>
+            """;
 
-    private static final String XML_METADATA_NO_POPUP = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
-            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"Image\">\n" +
-            "        <datatype>varchar</datatype>\n" +
-            "        <displayColumnFactory>\n" +
-            "          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>\n" +
-            "          <properties>\n" +
-            "            <property name=\"thumbnailImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>\n" +
-            "            <property name=\"popupImageUrl\"></property>\n" +
-            "          </properties>\n" +
-            "        </displayColumnFactory>\n" +
-            "        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>\n";
+    private static final String XML_METADATA_NO_POPUP = """
+            <tables xmlns="http://labkey.org/data/xml">
+              <table tableName="Models" tableDbType="TABLE">
+                <columns>
+                  <column columnName="Image">
+                    <datatype>varchar</datatype>
+                    <displayColumnFactory>
+                      <className>org.labkey.api.data.URLDisplayColumn$Factory</className>
+                      <properties>
+                        <property name="thumbnailImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>
+                        <property name="popupImageUrl"></property>
+                      </properties>
+                    </displayColumnFactory>
+                    <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>
+                  </column>
+                </columns>
+              </table>
+            </tables>
+            """;
 
-    private static final String XML_METADATA_CUSTOM_QUERY = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "  <table tableName=\"SelectOnColors\" tableDbType=\"NOT_IN_DB\">\n" +
-            "    <pkColumnName>Name</pkColumnName>\n" +
-            "     <insertUrl>/query/insertQueryRow.view?schemaName=vehicle&amp;queryName=Colors</insertUrl> \n" +
-            "     <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;queryName=Colors&amp;Name=${Name}</updateUrl> \n" +
-            "     <importUrl>/query/import.view?schemaName=vehicle&amp;queryName=Colors</importUrl> \n" +
-            "     <deleteUrl>/query/deleteQueryRows.view?schemaName=vehicle&amp;queryName=Colors</deleteUrl> \n" +
-            "    <columns>\n" +
-            "      \t<column columnName=\"Name\">\n" +
-            "        \t<isKeyField>true</isKeyField>\n" +
-            "        </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>";
+    private static final String XML_METADATA_CUSTOM_QUERY = """
+            <tables xmlns="http://labkey.org/data/xml">
+              <table tableName="SelectOnColors" tableDbType="NOT_IN_DB">
+                <pkColumnName>Name</pkColumnName>
+                 <insertUrl>/query/insertQueryRow.view?schemaName=vehicle&amp;queryName=Colors</insertUrl>\s
+                 <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;queryName=Colors&amp;Name=${Name}</updateUrl>\s
+                 <importUrl>/query/import.view?schemaName=vehicle&amp;queryName=Colors</importUrl>\s
+                 <deleteUrl>/query/deleteQueryRows.view?schemaName=vehicle&amp;queryName=Colors</deleteUrl>\s
+                <columns>
+                  <column columnName="Name">
+                    <isKeyField>true</isKeyField>
+                  </column>
+                </columns>
+              </table>
+            </tables>""";
 
     private final PortalHelper portalHelper = new PortalHelper(this);
 
@@ -855,7 +861,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestViewEditing()
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
+        beginAt("/" + getProjectName() + "/query-executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
 
         DataRegionTable dr = new DataRegionTable("query", this);
 
@@ -1181,7 +1187,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestReportIcon()
     {
-
         log("Verify custom module report icon image");
         setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), KNITR_PEOPLE);
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
@@ -1394,10 +1399,21 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
         assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
         assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
-
     }
 
     private final String subfolderPath = getProjectName() + "/" + FOLDER_NAME + "/project-begin.view";
+
+    private final static String GET_MODULE_PROPS_SCRIPT = """
+            library('Rlabkey')
+            baseUrl = labkey.url.base
+            folderPath = "SimpleModuleTest Project/subfolder"
+            moduleName = "simpletest"
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp1")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp2")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCheckbox")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestSelect")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCombo")""";
 
     private static final String SET_MODULE_PROPS_SCRIPT = """
             library('Rlabkey')
@@ -1419,7 +1435,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
             ## set folder level property for another folder
             folderPath = "SimpleModuleTest Project/subfolder2"
             labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea", propValue = "$$folder2value$$")""";
-
 
     private static final String ENSURE_RLIBPATHS_SOURCE = """
             library('Rlabkey')
@@ -1491,7 +1506,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         validateValues(propList);
 
         log("Verify get module properties using Rlabkey api");
-        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", SET_MODULE_PROPS_SCRIPT, false);
+        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", GET_MODULE_PROPS_SCRIPT, false);
         List<String> expectedProps = Arrays.asList("[1] \"Prop1Value\"\n",
                 "[1] \"FolderValue\"\n",
                 "[1] \"updated1\\nupdated2\"\n",
@@ -1548,7 +1563,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         goToProjectHome();
         assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
-
     }
 
     private String getContainerRoot(String containerPath)
