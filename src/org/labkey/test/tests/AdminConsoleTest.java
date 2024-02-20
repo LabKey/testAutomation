@@ -68,7 +68,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message without providing a message to show')]"));
 
         String linkText = "and also click this...";
-        String html = "READ ME!!!  <a href='<%=contextPath%>/project/home/begin.view'>" + linkText + "</a>";
+        String html = "READ ME!!!  <a href='<%=contextPath%>" + "/home/project-begin.view'>" + linkText + "</a>";
 
         //only check if not already checked
         checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
