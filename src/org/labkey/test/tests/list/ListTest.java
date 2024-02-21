@@ -24,11 +24,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -45,6 +48,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.ImportDataPage;
+import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
@@ -60,6 +64,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
@@ -68,10 +73,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,42 +103,55 @@ public class ListTest extends BaseWebDriverTest
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
     protected final static String LIST_DESCRIPTION = "A list of colors and what they are like";
-    protected final static String FAKE_COL1_NAME = "FakeName";
+    protected final static String FAKE_COL_NAME = "FakeName";
     protected final static String ALIASED_KEY_NAME = "Material";
     protected final static String HIDDEN_TEXT = "CantSeeMe";
 
-    protected final FieldDefinition _listCol1Fake = new FieldDefinition(FAKE_COL1_NAME, ColumnType.String).setDescription("What the color is like");
-    protected final FieldDefinition _listCol1 = new FieldDefinition("Desc", ColumnType.String).setLabel("Description").setDescription("What the color is like");
-    protected final FieldDefinition _listCol2 = new FieldDefinition("Month", ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
-    protected final FieldDefinition _listCol3 = new FieldDefinition("JewelTone", ColumnType.Boolean).setLabel("Jewel Tone").setDescription("Am I a jewel tone?");
-    protected final FieldDefinition _listCol4 = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
-    protected final FieldDefinition _listCol5 = new FieldDefinition("HiddenColumn", ColumnType.String).setLabel(HIDDEN_TEXT).setDescription("I should be hidden!");
-    protected final FieldDefinition _listCol6 = new FieldDefinition("Aliased,Column", ColumnType.String).setLabel("Element").setDescription("I show aliased data.");
+    protected final FieldDefinition _listColFake = new FieldDefinition(FAKE_COL_NAME, ColumnType.String).setDescription("What the color is like");
+    protected final FieldDefinition _listColDesc = new FieldDefinition("Desc", ColumnType.String).setLabel("Description").setDescription("What the color is like");
+
+    protected final FieldDefinition _listColMonth = new FieldDefinition("Month", FieldDefinition.ColumnType.TextChoice)
+        .setTextChoiceValues(List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+        .setLabel("Month to Wear").setDescription("When to wear the color");
+
+
+    protected final FieldDefinition _listColTone = new FieldDefinition("JewelTone", ColumnType.Boolean).setLabel("Jewel Tone").setDescription("Am I a jewel tone?");
+    protected final FieldDefinition _listColGood = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
+    protected final FieldDefinition _listColHidden = new FieldDefinition("HiddenColumn", ColumnType.String).setLabel(HIDDEN_TEXT).setDescription("I should be hidden!");
+    protected final FieldDefinition _listColAliased = new FieldDefinition("Aliased,Column", ColumnType.String).setLabel("Element").setDescription("I show aliased data.");
+
+    private static final int TD_COLOR = 0;
+    private static final int TD_DESC = 1;
+    private static final int TD_TONE = 2;
+    private static final int TD_MONTH = 3;
+    private static final int TD_GOOD = 4;
+    private static final int TD_ALIAS = 5;
+
+    protected final static String[] VALID_MONTHS = { "Jan", "Apr", "Mar", "Feb" };
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
             { "true", "false", "true", "false"},
-            { "1", "4", "3", "2" },
+            VALID_MONTHS,
             { "10", "9", "8", "7"},
             { "Water", "Earth", "Fire", "Air"}};
-    protected final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
-    private final static String LIST_ROW1 = TEST_DATA[0][0] + "\t" + TEST_DATA[1][0] + "\t" + TEST_DATA[2][0] + "\t" + CONVERTED_MONTHS[0];
-    private final static String LIST_ROW2 = TEST_DATA[0][1] + "\t" + TEST_DATA[1][1] + "\t" + TEST_DATA[2][1] + "\t" + CONVERTED_MONTHS[1];
-    private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + TEST_DATA[2][2] + "\t" + CONVERTED_MONTHS[2];
+    private final static String LIST_ROW1 = TEST_DATA[TD_COLOR][0] + "\t" + TEST_DATA[TD_DESC][0] + "\t" + TEST_DATA[TD_TONE][0] + "\t" + VALID_MONTHS[0];
+    private final static String LIST_ROW2 = TEST_DATA[TD_COLOR][1] + "\t" + TEST_DATA[TD_DESC][1] + "\t" + TEST_DATA[TD_TONE][1] + "\t" + VALID_MONTHS[1];
+    private final static String LIST_ROW3 = TEST_DATA[TD_COLOR][2] + "\t" + TEST_DATA[TD_DESC][2] + "\t" + TEST_DATA[TD_TONE][2] + "\t" + VALID_MONTHS[2];
     private final String LIST_DATA =
-            LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" +
+            LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\n" +
             LIST_ROW1 + "\n" +
             LIST_ROW2 + "\n" +
             LIST_ROW3;
     private final String LIST_DATA2 =
-            LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\t" + _listCol4.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listCol5.getName() + "\n" +
-            LIST_ROW1 + "\t" + TEST_DATA[4][0] + "\t" + TEST_DATA[5][0] + "\t" + HIDDEN_TEXT + "\n" +
-            LIST_ROW2 + "\t" + TEST_DATA[4][1] + "\t" + TEST_DATA[5][1] + "\t" + HIDDEN_TEXT + "\n" +
-            LIST_ROW3 + "\t" + TEST_DATA[4][2] + "\t" + TEST_DATA[5][2] + "\t" + HIDDEN_TEXT;
+            LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\t" + _listColGood.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listColHidden.getName() + "\n" +
+            LIST_ROW1 + "\t" + TEST_DATA[TD_GOOD][0] + "\t" + TEST_DATA[TD_ALIAS][0] + "\t" + HIDDEN_TEXT + "\n" +
+            LIST_ROW2 + "\t" + TEST_DATA[TD_GOOD][1] + "\t" + TEST_DATA[TD_ALIAS][1] + "\t" + HIDDEN_TEXT + "\n" +
+            LIST_ROW3 + "\t" + TEST_DATA[TD_GOOD][2] + "\t" + TEST_DATA[TD_ALIAS][2] + "\t" + HIDDEN_TEXT;
     private final static String TEST_FAIL = "testfail";
     private final static String TEST_FAIL2 = "testfail\n2\n";
-    private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
-            LIST_ROW1 + "\t" + "String";
+    private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColMonth.getName() + "\n" +
+            LIST_ROW1;
     private final static String TEST_VIEW = "list_view";
     private final static String LIST2_NAME_CARS = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
     protected final static ListColumnType LIST2_KEY_TYPE = ListColumnType.String;
@@ -244,7 +265,8 @@ public class ListTest extends BaseWebDriverTest
         // Previously it was called from the @BeforeClass method, even though none of the other test cases use this list.
 
         log("Add list -- " + LIST_NAME_COLORS);
-        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1Fake, _listCol2, _listCol3);
+        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listColFake,
+        _listColMonth, _listColTone);
 
         log("Add description and test edit");
         _listHelper.goToEditDesign(LIST_NAME_COLORS)
@@ -262,68 +284,68 @@ public class ListTest extends BaseWebDriverTest
         importDataPage.submitExpectingErrorContaining("Data does not contain required field: Color");
 
         importDataPage.setText(TEST_FAIL3);
-        importDataPage.submitExpectingErrorContaining("Could not convert");
+        importDataPage.submitExpectingErrorContaining(String.format("Value 'true' for field '%s' is invalid.", _listColMonth.getLabel()));
 
         importDataPage.setText(LIST_DATA);
         importDataPage.submit();
 
         log("Check upload worked correctly");
         assertTextPresent(
-                _listCol2.getLabel(),
-                TEST_DATA[0][0],
-                TEST_DATA[1][1],
-                TEST_DATA[3][2]);
+                _listColMonth.getLabel(),
+                TEST_DATA[TD_COLOR][0],
+                TEST_DATA[TD_DESC][1],
+                TEST_DATA[TD_MONTH][2]);
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
-        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][2], table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][0], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][0]), _listColTone.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][1], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][1]), _listColTone.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][2], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][2]), _listColTone.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
-        assertEquals(1, table.getRowIndex(TEST_DATA[0][1]));
+        assertEquals(1, table.getRowIndex(TEST_DATA[TD_COLOR][1]));
         clickAndWait(table.updateLink(1));
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
+        setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
         clickButton("Submit");
         // Third row (Red)
-        assertEquals(2, table.getRowIndex(TEST_DATA[0][2]));
+        assertEquals(2, table.getRowIndex(TEST_DATA[TD_COLOR][2]));
         clickAndWait(table.updateLink(2));
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
+        setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         clickButton("Submit");
 
         table = new DataRegionTable("query", getDriver());
-        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
-        assertEquals("true", table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals("false", table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][0], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][0]), _listColTone.getLabel()));
+        assertEquals("true", table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][1]), _listColTone.getLabel()));
+        assertEquals("false", table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][2]), _listColTone.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
         _listHelper.goToList(LIST_NAME_COLORS);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(1)
-            .setName(_listCol1.getName())
-            .setLabel(_listCol1.getLabel());
-        fieldsPanel.addField(_listCol4);
+        fieldsPanel.getField(_listColFake.getName())
+            .setName(_listColDesc.getName())
+            .setLabel(_listColDesc.getLabel());
+        fieldsPanel.addField(_listColGood);
 
         // Create "Hidden Field" and remove from all views.
-        fieldsPanel.addField(_listCol5);
-        fieldsPanel.getField(_listCol5.getName())
+        fieldsPanel.addField(_listColHidden);
+        fieldsPanel.getField(_listColHidden.getName())
             .showFieldOnDefaultView(false)
             .showFieldOnInsertView(false)
             .showFieldOnUpdateView(false)
             .showFieldOnDetailsView(false);
 
-        fieldsPanel.addField(_listCol6);
-        fieldsPanel.getField(_listCol6.getName())
+        fieldsPanel.addField(_listColAliased);
+        fieldsPanel.getField(_listColAliased.getName())
             .setImportAliases(ALIASED_KEY_NAME);
 
         listDefinitionPage.clickSave();
 
         log("Check new field was added correctly");
-        assertTextPresent(_listCol4.getName());
+        assertTextPresent(_listColGood.getName());
 
         log("Set title field of 'Colors' to 'Desc'");
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
@@ -331,9 +353,9 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         assertTextPresent(
-                TEST_DATA[0][0],
-                TEST_DATA[1][1],
-                TEST_DATA[3][2]);
+                TEST_DATA[TD_COLOR][0],
+                TEST_DATA[TD_DESC][1],
+                TEST_DATA[TD_MONTH][2]);
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
 
@@ -341,15 +363,15 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that data was added correctly");
         assertTextPresent(
-                TEST_DATA[0][0],
-                TEST_DATA[1][1],
-                TEST_DATA[3][2],
-                TEST_DATA[4][0],
-                TEST_DATA[4][1],
-                TEST_DATA[4][2],
-                TEST_DATA[5][0],
-                TEST_DATA[5][1],
-                TEST_DATA[5][2]);
+                TEST_DATA[TD_COLOR][0],
+                TEST_DATA[TD_DESC][1],
+                TEST_DATA[TD_MONTH][2],
+                TEST_DATA[TD_GOOD][0],
+                TEST_DATA[TD_GOOD][1],
+                TEST_DATA[TD_GOOD][2],
+                TEST_DATA[TD_ALIAS][0],
+                TEST_DATA[TD_ALIAS][1],
+                TEST_DATA[TD_ALIAS][2]);
 
         log("Check that hidden column is hidden.");
         DataRegionTable regionTable = new DataRegionTable("query", getDriver());
@@ -364,35 +386,30 @@ public class ListTest extends BaseWebDriverTest
         regionTable.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         String html = getHtmlSource();
-        assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
-        assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
-        setFormElement(Locator.name("quf_" + _listCol1.getName()), TEST_DATA[1][3]);
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), "wrong type");
+        assertTrue("Description \"" + _listColDesc.getDescription() + "\" not present.", html.contains(_listColDesc.getDescription()));
+        assertTrue("Description \"" + _listColTone.getDescription() + "\" not present.", html.contains(_listColTone.getDescription()));
+        setFormElement(Locator.name("quf_" + _listColDesc.getName()), TEST_DATA[TD_DESC][3]);
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
-        setFormElement(Locator.name("quf_" + _listCol4.getName()), TEST_DATA[4][3]);
+        setFormElement(Locator.name("quf_" + _listColGood.getName()), TEST_DATA[TD_GOOD][3]);
         clickButton("Submit");
         assertTextPresent("This field is required");
-        setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[0][3]);
-        clickButton("Submit");
-        assertTextPresent("Could not convert");
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[3]);
+        setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[TD_COLOR][3]);
         clickButton("Submit");
 
         log("Check new row was added");
         assertTextPresent(
-                TEST_DATA[0][3],
-                TEST_DATA[1][3],
-                TEST_DATA[2][3],
-                TEST_DATA[3][3]);
+                TEST_DATA[TD_COLOR][3],
+                TEST_DATA[TD_DESC][3],
+                TEST_DATA[TD_TONE][3]);
         table = new DataRegionTable("query", getDriver());
-        assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
-        assertEquals(3, table.getRowIndex(TEST_DATA[0][3]));
-        assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][2], table.getDataAsText(2, _listColTone.getLabel()));
+        assertEquals(3, table.getRowIndex(TEST_DATA[TD_COLOR][3]));
+        assertEquals(TEST_DATA[TD_TONE][3], table.getDataAsText(3, _listColTone.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnDefaultView(true);
         listDefinitionPage.clickSave();
 
@@ -401,19 +418,19 @@ public class ListTest extends BaseWebDriverTest
         table = new DataRegionTable("query", getDriver());
         clickAndWait(table.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
-        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        assertTextBefore(_listColMonth.getLabel(), _listColTone.getLabel());
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
-        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        assertTextBefore(_listColMonth.getLabel(), _listColTone.getLabel());
         clickButton("Cancel");
         table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
-        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        assertTextBefore(_listColMonth.getLabel(), _listColTone.getLabel());
         clickButton("Cancel");
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnDefaultView(false)
             .showFieldOnInsertView(true);
         listDefinitionPage.clickSave();
@@ -431,7 +448,7 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnInsertView(false)
             .showFieldOnUpdateView(true);
         listDefinitionPage.clickSave();
@@ -449,7 +466,7 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnUpdateView(false)
             .showFieldOnDetailsView(true);
         listDefinitionPage.clickSave();
@@ -477,36 +494,36 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test Sort and Filter in Data View");
         DataRegionTable region = new DataRegionTable("query", getDriver());
-        region.setSort(_listCol1.getName(), SortDirection.ASC);
-        assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
+        region.setSort(_listColDesc.getName(), SortDirection.ASC);
+        assertTextBefore(TEST_DATA[TD_COLOR][0], TEST_DATA[TD_COLOR][1]);
 
         clearSortTest();
 
-        region.setFilter(_listCol4.getName(), "Is Greater Than", "7");
-        assertTextNotPresent(TEST_DATA[0][3]);
+        region.setFilter(_listColGood.getName(), "Is Greater Than", "7");
+        assertTextNotPresent(TEST_DATA[TD_COLOR][3]);
 
         log("Test Customize View");
         // Re-navigate to the list to clear filters and sorts
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeColumn(_listCol4.getName());
-        _customizeViewsHelper.addFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(_listCol2.getName(), _listCol2.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.removeColumn(_listColGood.getName());
+        _customizeViewsHelper.addFilter(_listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_listColMonth.getName(), _listColMonth.getLabel(), SortDirection.ASC);
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check Customize View worked");
-        assertTextPresent(TEST_DATA[0][3]);
-        assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(TEST_DATA[0][0], _listCol4.getLabel());
+        assertTextPresent(TEST_DATA[TD_COLOR][3]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        assertTextNotPresent(TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeColumn(LIST_KEY_NAME2);
-        _customizeViewsHelper.removeColumn(_listCol1.getName());
-        _customizeViewsHelper.removeColumn(_listCol2.getName());
-        _customizeViewsHelper.removeColumn(_listCol3.getName());
-        _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
+        _customizeViewsHelper.removeColumn(_listColDesc.getName());
+        _customizeViewsHelper.removeColumn(_listColMonth.getName());
+        _customizeViewsHelper.removeColumn(_listColTone.getName());
+        _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listColAliased.getName()));
         _customizeViewsHelper.clickViewGrid();
         assertExt4MsgBox("You must select at least one field to display in the grid.", "OK");
         _customizeViewsHelper.closePanel();
@@ -516,8 +533,8 @@ public class ListTest extends BaseWebDriverTest
         File tableFile = new DataRegionExportHelper(new DataRegionTable("query", getDriver())).exportText();
         TextSearcher tsvSearcher = new TextSearcher(tableFile);
 
-        assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(tsvSearcher, TEST_DATA[0][0], _listCol4.getLabel());
+        assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        assertTextNotPresent(tsvSearcher, TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
         filterTest();
 
         clickProject(getProjectName());
@@ -525,31 +542,31 @@ public class ListTest extends BaseWebDriverTest
         log("Test that sort only affects one web part");
         DataRegionTable firstList = DataRegionTable.DataRegion(getDriver()).find();
         DataRegionTable secondList = DataRegionTable.DataRegion(getDriver()).index(1).find();
-        firstList.setSort(_listCol4.getName(), SortDirection.ASC);
-        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[4]));
-        List<String> firstListColumn = secondList.getColumnDataAsText(_listCol4.getName());
+        firstList.setSort(_listColGood.getName(), SortDirection.ASC);
+        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[TD_GOOD]));
+        List<String> firstListColumn = secondList.getColumnDataAsText(_listColGood.getName());
         assertEquals("Second query webpart shouldn't have been sorted", expectedColumn, firstListColumn);
         expectedColumn.sort(Comparator.comparingInt(Integer::parseInt)); // Parse to check sorting of 10 vs 7, 8, 9
-        List<String> secondListColumn = firstList.getColumnDataAsText(_listCol4.getName());
+        List<String> secondListColumn = firstList.getColumnDataAsText(_listColGood.getName());
         assertEquals("First query webpart should have been sorted", expectedColumn, secondListColumn);
 
         log("Test list history");
         clickAndWait(Locator.linkWithText("manage lists"));
         clickAndWait(Locator.linkWithText("view history"));
-        assertTextPresent(":History");
-        assertTextPresent("record was modified", 2);    // An existing list record was modified
-        assertTextPresent("were modified", 6);          // The column(s) of domain ></% 1äöüColors were modified
-        assertTextPresent("Bulk inserted", 2);
-        assertTextPresent("A new list record was inserted", 1);
-        assertTextPresent("was created", 2);                // Once for the list, once for the domain
+        checker().wrapAssertion(()->assertTextPresent(":History"));
+        checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
+        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of domain ></% 1äöüColors were modified
+        checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
+        checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
+        checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
-        assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size());
-        assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size());
-        assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size());
+        checker().wrapAssertion(()->assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
-        assertTextPresent("List Item Details");
-        assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event");
+        checker().wrapAssertion(()->assertTextPresent("List Item Details"));
+        checker().wrapAssertion(()->assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event"));
 
         clickButton("Done");
         clickAndWait(Locator.linkWithText(PROJECT_VERIFY).index(3));
@@ -590,21 +607,21 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol1.getName(), _list2Col1.getLabel() + " " + _listCol1.getLabel());
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol2.getName(), _list2Col1.getLabel() + " " + _listCol2.getLabel());
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
-        _customizeViewsHelper.addFilter(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColDesc.getName(), _list2Col1.getLabel() + " " + _listColDesc.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColMonth.getName(), _list2Col1.getLabel() + " " + _listColMonth.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColGood.getName(), _list2Col1.getLabel() + " " + _listColGood.getLabel());
+        _customizeViewsHelper.addFilter(_list2Col1.getName() + "/" + _listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_list2Col1.getName() + "/" + _listColGood.getName(), _listColGood.getLabel(), SortDirection.ASC);
         _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
         _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
-        waitForText(WAIT_FOR_JAVASCRIPT, _listCol1.getLabel());
+        waitForText(WAIT_FOR_JAVASCRIPT, _listColDesc.getLabel());
         assertTextPresent(
-                _listCol1.getLabel(),
-                _listCol2.getLabel(),
-                _listCol4.getLabel(),
+                _listColDesc.getLabel(),
+                _listColMonth.getLabel(),
+                _listColGood.getLabel(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(LIST2_KEY);
@@ -618,9 +635,9 @@ public class ListTest extends BaseWebDriverTest
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
         TextSearcher srch = new TextSearcher(expFile);
-        assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listCol1.getName(),
-                LIST_KEY_NAME2 + '/' + _listCol2.getName(),
-                LIST_KEY_NAME2 + '/' + _listCol4.getName(),
+        assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listColDesc.getName(),
+                LIST_KEY_NAME2 + '/' + _listColMonth.getName(),
+                LIST_KEY_NAME2 + '/' + _listColGood.getName(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
@@ -628,12 +645,12 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test edit row");
         list.updateRow(LIST2_KEY3, Maps.of(
-                "Color", TEST_DATA[1][1],
+                "Color", TEST_DATA[TD_DESC][1],
                 "Owner", LIST2_FOREIGN_KEY_OUTSIDE));
 
         final DataRegionTable dt = DataRegion(getDriver()).withName("query").find();
         dt.goToView("Default");
-        assertTextPresent(TEST_DATA[1][1], 2);
+        assertTextPresent(TEST_DATA[TD_DESC][1], 2);
 
         log("Test deleting rows");
         dataRegionTable.checkAll();
@@ -918,19 +935,19 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test that the right filters are present for each type");
         DataRegionTable region = new DataRegionTable("qwp3", getDriver());
-        region.openFilterDialog(_listCol4.getName());
+        region.openFilterDialog(_listColGood.getName());
         _extHelper.clickExtTab("Choose Filters");
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 
         assertElementNotPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
         assertElementPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
-        _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "Cancel", 0);
+        _extHelper.clickExtButton("Show Rows Where " + _listColGood.getLabel(), "Cancel", 0);
 
         log("Test that filters don't affect multiple web parts");
-        assertTextPresent(TEST_DATA[1][0], 2);
-        region.setFilter(_listCol4.getName(), "Is Less Than", "10");
-        assertTextPresent(TEST_DATA[1][0], 1);
+        assertTextPresent(TEST_DATA[TD_DESC][0], 2);
+        region.setFilter(_listColGood.getName(), "Is Less Than", "10");
+        assertTextPresent(TEST_DATA[TD_DESC][0], 1);
 
         clickAndWait(Locator.linkContainingText(LIST_NAME_COLORS));
     }
@@ -938,7 +955,7 @@ public class ListTest extends BaseWebDriverTest
     /*  Issue 11825: Create test for "Clear Sort"
         Issue 15567: Can't sort DataRegion by column name that has comma
 
-        sort by a parameter, than clear sort.
+        sort by a parameter, then clear sort.
         Verify that reverts to original sort and the dropdown menu disappears
 
         preconditions:  table already sorted by description
@@ -947,19 +964,19 @@ public class ListTest extends BaseWebDriverTest
     private void clearSortTest()
     {
         //make sure elements are ordered the way they should be
-        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_ALIAS][0], TEST_DATA[TD_ALIAS][1],TEST_DATA[TD_ALIAS][2]);
 
-        String encodedName = EscapeUtil.fieldKeyEncodePart(_listCol6.getName());
+        String encodedName = EscapeUtil.fieldKeyEncodePart(_listColAliased.getName());
 
         DataRegionTable query = new DataRegionTable("query", getDriver());
 
         //sort  by element and verify it worked
         query.setSort(encodedName, SortDirection.DESC);
-        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][2], TEST_DATA[5][1]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_ALIAS][0], TEST_DATA[TD_ALIAS][2], TEST_DATA[TD_ALIAS][1]);
 
         //remove sort and verify we return to initial state
         query.clearSort(encodedName);
-        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_ALIAS][0], TEST_DATA[TD_ALIAS][1],TEST_DATA[TD_ALIAS][2]);
     }
 
     @Test
@@ -1572,6 +1589,450 @@ public class ListTest extends BaseWebDriverTest
             assertTrue(getCurrentRelativeURL(false).contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
+    }
+
+    private static SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+    private static SimpleDateFormat DEFAULT_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+    private void prepForDatAndTimeOnlyTest(String listName) throws IOException, CommandException
+    {
+        log("Reset site setting to have default formats for date and time values.");
+        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(this);
+        settingsPage.reset();
+
+        // Use java's Date object and SimpleDateFormatter (not strings) to enter the data.
+        DEFAULT_DATE_FORMAT = new SimpleDateFormat(settingsPage.getDefaultDateDisplay());
+        DEFAULT_TIME_FORMAT = new SimpleDateFormat(settingsPage.getDefaultTimeDisplay());
+        DEFAULT_DATE_TIME_FORMAT = new SimpleDateFormat(settingsPage.getDefaultDateTimeDisplay());
+
+        deleteListIfPresent(getProjectName(), listName);
+
+    }
+
+    private void deleteListIfPresent(String projectName, String listName) throws IOException, CommandException
+    {
+
+        Connection cn = createDefaultConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
+        cmd.setColumns(Arrays.asList("Name", "Container"));
+        cmd.addFilter("Container/DisplayName", projectName, Filter.Operator.getOperator("EQUAL"));
+        cmd.addFilter("Name", listName, Filter.Operator.getOperator("EQUAL"));
+        SelectRowsResponse response = cmd.execute(cn, projectName);
+
+        if(response.getRowCount().intValue() != 0)
+        {
+            _listHelper.beginAtList(projectName, listName);
+            _listHelper.deleteList();
+        }
+
+    }
+
+    private void validateListDataInUI(DataRegionTable table, List<Map<String, String>> expectedData, String desc)
+    {
+        checker().verifyEquals("Number of rows in the UI list not equal to number of expected rows.",
+                expectedData.size(), table.getDataRowCount());
+
+        int rowIndex = 0;
+        for(Map<String, String> expectedRow : expectedData)
+        {
+            checker().verifyEquals(String.format("For %s list row %d not as expected.", desc, rowIndex),
+                    expectedRow, table.getRowDataAsMap(rowIndex));
+            rowIndex++;
+        }
+    }
+
+    /**
+     * <p>
+     *     Primarily testing the import of values into a date-only and time-only field in a list.
+     * </p>
+     * <p>
+     *     Test covers:
+     *     <ul>
+     *         <li>Import date-only, time-only and dateTime values by bulk.</li>
+     *         <li>Import date-only, time-only and dateTime values by xlsx. The xlsx file has columns formatted for date and time.</li>
+     *         <li>Add a row through the UI.</li>
+     *         <li>Import a time value into a date-only field and a date value into a time-only field.</li>
+     *         <li>The test also uses different formats and validates the list displays in default site formats.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testDateAndTimeColumnsInsert() throws IOException, CommandException
+    {
+
+        SimpleDateFormat variantDateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+        SimpleDateFormat variantTimeFormat = new SimpleDateFormat("hh:mm:ss aa");
+        SimpleDateFormat variantDateTimeFormat = new SimpleDateFormat("MMMM dd, yyyy hh:mm aa");
+
+        String listName = "Date and Time Insert List";
+        String dateCol = "Date";
+        String timeCol = "Time";
+        String dateTimeCol = "DateTime";
+
+        prepForDatAndTimeOnlyTest(listName);
+
+        log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
+
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
+                new FieldDefinition(dateCol, ColumnType.Date),
+                new FieldDefinition(timeCol, ColumnType.Time),
+                new FieldDefinition(dateTimeCol, ColumnType.DateAndTime).setLabel(dateTimeCol)
+        );
+
+        log("Validate adding entries in bulk. Use a different format for the date and time values in the second row.");
+
+        List<Map<String, String>> expectedData = new ArrayList<>();
+
+        Date testDate01 = new Calendar.Builder()
+                .setDate(2023, 1, 17)
+                .setTimeOfDay(11, 12, 03)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        // Use a separate variable for this date. It will be formatted differently from the default when entered.
+        Date testDate02 = new Calendar.Builder()
+                .setDate(2022, 6, 10)
+                .setTimeOfDay(20, 45, 15)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate02),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate02),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate02)));
+
+        testDate01 = new Calendar.Builder()
+                .setDate(1994, 11, 21)
+                .setTimeOfDay(3, 23, 00)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        String bulkImportText = String.format("%s\t%s\t%s\n", dateCol, timeCol, dateTimeCol) +
+                String.format("%s\t%s\t%s\n",
+                        expectedData.get(0).get(dateCol), expectedData.get(0).get(timeCol), expectedData.get(0).get(dateTimeCol)) +
+                String.format("%s\t%s\t%s\n",
+                        variantDateFormat.format(testDate02), variantTimeFormat.format(testDate02), DEFAULT_DATE_TIME_FORMAT.format(testDate02)) +
+                String.format("%s\t%s\t%s\n",
+                        expectedData.get(2).get(dateCol), expectedData.get(2).get(timeCol), expectedData.get(2).get(dateTimeCol));
+
+        _listHelper.bulkImportData(bulkImportText);
+
+        log("Validate adding entries by xlsx import. Note the xlsx file has columns formatted as time and date specific.");
+        File excelDateTimeFile = TestFileUtils.getSampleData("lists/Date_And_Time_Format.xlsx");
+
+        _listHelper.importDataFromFile(excelDateTimeFile);
+
+        // Note, the month is zero based. The value of the month here is one less than what is seen in the file.
+        // Also of note the xlsx used has a column formatted as time and another as date. Excel does not have a DateTime specific format.
+        testDate01 = new Calendar.Builder()
+                .setDate(2024, 1, 29)
+                .setTimeOfDay(11, 28, 54)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        testDate01 = new Calendar.Builder()
+                .setDate(1998, 2, 10)
+                .setTimeOfDay(18, 12, 00)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        testDate01 = new Calendar.Builder()
+                .setDate(2002, 9, 31)
+                .setTimeOfDay(22, 20, 00)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        log("Validate adding an entry through the UI. Use a different format for the date and dateTime field.");
+
+        testDate01 = new Calendar.Builder()
+                .setDate(2024, 2, 14)
+                .setTimeOfDay(12, 00, 45)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        Map<String, String> uiDateFormat = Map.of(
+                dateCol, variantDateFormat.format(testDate01),
+                timeCol, DEFAULT_TIME_FORMAT.format(testDate01),
+                dateTimeCol, variantDateTimeFormat.format(testDate01));
+
+        _listHelper.insertNewRow(uiDateFormat, false);
+
+        log("Bulk import a time for the date field and a date for the time field.");
+
+        testDate01 = new Calendar.Builder()
+                .setDate(1992, 8, 4)
+                .setTimeOfDay(19, 30, 32)
+                .build().getTime();
+
+        // If a time is given for a date-only field the date will default to 1-1-1970
+        // If a date is given for a time-only field the time will default to 9:00:00
+        Date dateMissing = new Calendar.Builder()
+                .setDate(1970, 0, 1)
+                .setTimeOfDay(9, 00, 00)
+                .build().getTime();
+
+        expectedData.add(Map.of(dateCol, DEFAULT_DATE_FORMAT.format(dateMissing),
+                timeCol, DEFAULT_TIME_FORMAT.format(dateMissing),
+                dateTimeCol, DEFAULT_DATE_TIME_FORMAT.format(testDate01)));
+
+        // Making sure the time format and date formats are in the wrong column.
+        bulkImportText = String.format("%s\t%s\t%s\n", dateCol, timeCol, dateTimeCol) +
+                String.format("%s\t%s\t%s\n",
+                        DEFAULT_TIME_FORMAT.format(testDate01), DEFAULT_DATE_FORMAT.format(testDate01), DEFAULT_DATE_TIME_FORMAT.format(testDate01));
+
+        _listHelper.bulkImportData(bulkImportText);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+
+        validateListDataInUI(table, expectedData, "InsertTest");
+
+    }
+
+    private List<Map<String, String>> buildExpectedSorted(List<Date> dates, Date useDateOnly, Date useTimeOnly,
+                                                          String dateCol, String timeCol)
+    {
+        List<Map<String, String>> expectedData = new ArrayList<>();
+
+        for(Date date : dates)
+        {
+            Map<String, String> expectedRow = new HashMap<>();
+
+            if(date.equals(useDateOnly))
+            {
+                expectedRow.put(dateCol, DEFAULT_DATE_FORMAT.format(date));
+                expectedRow.put(timeCol, " ");
+            }
+            else if(date.equals(useTimeOnly))
+            {
+                expectedRow.put(dateCol, " ");
+                expectedRow.put(timeCol, DEFAULT_TIME_FORMAT.format(date));
+            }
+            else
+            {
+                expectedRow.put(dateCol, DEFAULT_DATE_FORMAT.format(date));
+                expectedRow.put(timeCol, DEFAULT_TIME_FORMAT.format(date));
+            }
+
+            expectedData.add(expectedRow);
+        }
+
+        return expectedData;
+    }
+
+    @Test
+    public void testDateAndTimeColumnsFilterAndSort() throws IOException, CommandException
+    {
+
+        String listName = "Date and Time Sort and Filter List";
+        String dateCol = "Date";
+        String timeCol = "Time";
+
+        prepForDatAndTimeOnlyTest(listName);
+
+        log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
+
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
+                new FieldDefinition(dateCol, ColumnType.Date),
+                new FieldDefinition(timeCol, ColumnType.Time)
+        );
+
+        List<Date> dates = new ArrayList<>();
+
+        Date date01 = new Calendar.Builder()
+                .setDate(1950, 9, 12)
+                .setTimeOfDay(8, 00, 01)
+                .build().getTime();
+
+        dates.add(date01);
+
+        // Add a date in the future.
+        Calendar calToday = Calendar.getInstance();
+        calToday.setTime(TestDateUtils.getTodaysDate());
+        calToday.add(Calendar.MONTH, 2);
+        calToday.set(Calendar.HOUR, 14);
+        calToday.set(Calendar.MINUTE, 23);
+        calToday.set(Calendar.SECOND, 54);
+        Date dateFuture = calToday.getTime();
+
+        dates.add(dateFuture);
+
+        Date date03 = new Calendar.Builder()
+                .setDate(2024, 0, 1)
+                .setTimeOfDay(0, 00, 00)
+                .build().getTime();
+
+        dates.add(date03);
+
+        Date dateDuplicate = new Calendar.Builder()
+                .setDate(1992, 2, 3)
+                .setTimeOfDay(10, 10, 10)
+                .build().getTime();
+
+        dates.add(dateDuplicate);
+
+        // Have two entries with the same values.
+        dates.add(dateDuplicate);
+
+        Date date05 = new Calendar.Builder()
+                .setDate(1992, 2, 3)
+                .setTimeOfDay(10, 11, 34)
+                .build().getTime();
+
+        dates.add(date05);
+
+        Date date06 = new Calendar.Builder()
+                .setDate(1995, 2, 3)
+                .setTimeOfDay(9, 10, 10)
+                .build().getTime();
+
+        dates.add(date06);
+
+        // Add leap day to the mix
+        Date date07 = new Calendar.Builder()
+                .setDate(2024, 1, 29)
+                .setTimeOfDay(18, 32, 00)
+                .build().getTime();
+
+        dates.add(date07);
+
+        Date date08 = new Calendar.Builder()
+                .setDate(2002, 8, 15)
+                .setTimeOfDay(17, 45, 20)
+                .build().getTime();
+
+        dates.add(date08);
+
+        StringBuilder bulkInsertText = new StringBuilder();
+        bulkInsertText.append(String.format("%s\t%s\n", dateCol, timeCol));
+
+        for(Date date : dates)
+        {
+            bulkInsertText.append(String.format("%s\t%s\n",
+                    DEFAULT_DATE_FORMAT.format(date), DEFAULT_TIME_FORMAT.format(date)));
+        }
+
+        Date dateUseDateOnly = new Calendar.Builder()
+                .setDate(1989, 7, 12)
+                .setTimeOfDay(0, 0, 0)
+                .build().getTime();
+
+        // Add a line with only a date.
+        bulkInsertText.append(String.format("%s\t\n", DEFAULT_DATE_FORMAT.format(dateUseDateOnly)));
+
+        Date dateUseTimeOnly = new Calendar.Builder()
+                .setDate(1970, 0, 1)
+                .setTimeOfDay(14, 59, 25)
+                .build().getTime();
+
+        // Add a line with only a time.
+        bulkInsertText.append(String.format("\t%s\n", DEFAULT_TIME_FORMAT.format(dateUseTimeOnly)));
+
+        log("Populate the list with values to sort.");
+        _listHelper.bulkImportData(bulkInsertText.toString());
+
+        // List sorted by date in ascending order.
+        // Ascending order should be:
+        // 1950-10-12
+        // 1989-08-12
+        // 1992-03-03 (10:10:10)
+        // 1992-03-03 (10:10:10)
+        // 1992-03-03 (10:11:34)
+        // 1995-03-03
+        // 2002-09-15
+        // 2024-01-01
+        // 2024-02-29
+        // 2024-04-21
+        // (empty)
+        List<Date> dateSorted = new ArrayList<>();
+        dateSorted.add(date01);
+        dateSorted.add(dateUseDateOnly);
+        dateSorted.add(dateDuplicate);
+        dateSorted.add(dateDuplicate);
+        dateSorted.add(date05);
+        dateSorted.add(date06);
+        dateSorted.add(date08);
+        dateSorted.add(date03);
+        dateSorted.add(date07);
+        dateSorted.add(dateFuture);
+        dateSorted.add(dateUseTimeOnly);
+
+        // List sorted by time in ascending order.
+        // Ascending order for time should be:
+        // 00:00:00
+        // 02:23:54
+        // 08:00:01
+        // 09:10:10
+        // 10:10:10
+        // 10:10:10
+        // 10:11:34
+        // 14:59:25
+        // 17:45:20
+        // 18:32:00
+        // (empty)
+        List<Date> timeSorted = new ArrayList<>();
+        timeSorted.add(date03);
+        timeSorted.add(dateFuture);
+        timeSorted.add(date01);
+        timeSorted.add(date06);
+        timeSorted.add(dateDuplicate);
+        timeSorted.add(dateDuplicate);
+        timeSorted.add(date05);
+        timeSorted.add(dateUseTimeOnly);
+        timeSorted.add(date08);
+        timeSorted.add(date07);
+        timeSorted.add(dateUseDateOnly);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+
+        log("Sort the date-only field in ascending order.");
+        List<Map<String, String>> expectedData = buildExpectedSorted(dateSorted, dateUseDateOnly, dateUseTimeOnly, dateCol, timeCol);
+        table.setSort(dateCol, SortDirection.ASC);
+        validateListDataInUI(table, expectedData, "date ASC");
+        checker().screenShotIfNewError("Error_Sort_Date_ASC");
+
+        log("Sort the date-only field in descending order.");
+        Collections.reverse(dateSorted);
+        expectedData = buildExpectedSorted(dateSorted, dateUseDateOnly, dateUseTimeOnly, dateCol, timeCol);
+        table.setSort(dateCol, SortDirection.DESC);
+        validateListDataInUI(table, expectedData, "date DESC");
+        checker().screenShotIfNewError("Error_Sort_Date_DESC");
+
+        log("Clear the sort from the date-only column.");
+        table.clearSort(dateCol);
+
+        log("Sort the time-only field in ascending order.");
+        expectedData = buildExpectedSorted(timeSorted, dateUseDateOnly, dateUseTimeOnly, dateCol, timeCol);
+        table.setSort(timeCol, SortDirection.ASC);
+        validateListDataInUI(table, expectedData, "time ASC");
+        checker().screenShotIfNewError("Error_Sort_Time_ASC");
+
+        log("Sort the time-only field in descending order.");
+        Collections.reverse(timeSorted);
+        expectedData = buildExpectedSorted(timeSorted, dateUseDateOnly, dateUseTimeOnly, dateCol, timeCol);
+        table.setSort(timeCol, SortDirection.DESC);
+        validateListDataInUI(table, expectedData, "time DESC");
+        checker().screenShotIfNewError("Error_Sort_Time_DESC");
+
+        log("Clear the sort from the time-only column.");
+        table.clearSort(timeCol);
+
     }
 
     @Override
