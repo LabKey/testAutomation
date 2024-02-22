@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
@@ -574,15 +575,22 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return lookupSelect.getOptions();
     }
 
+
+    public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
+    {
+        return pasteFromCell(row, columnName, pasteText, true);
+    }
+
     /**
      * Pastes delimited text to the grid, from a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
      * @param columnName    column of the target cell
      * @param pasteText     tab-delimited or csv or excel data
+     * @param validate      whether to await/confirm the presence of pasted text before resuming
      * @return A Reference to this editableGrid object.
      */
-    public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
+    public EditableGrid pasteFromCell(int row, String columnName, String pasteText, boolean validate)
     {
         int initialRowCount = getRowCount();
         WebElement gridCell = getCell(row, columnName);
@@ -595,7 +603,26 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // ... or for a second and a half
         WebDriverWrapper.waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
                         isInSelection(gridCell), 1500);
+        if (validate)
+            waitForPasteContent(pasteText);
+
         return this;
+    }
+
+    public void waitForPasteContent(String pasteContent)
+    {
+        var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        await().atMost(Duration.ofSeconds(2))
+                .untilAsserted(()-> Assertions.assertThat(getSelectionCellTexts())
+                        .contains(contentParts));
+    }
+
+    // captures the texts of any cells currently in selection
+    public List<String> getSelectionCellTexts()
+    {
+        var cells = Locator.tagWithClass("div", "cellular-display")
+                .withAttributeContaining("class","cell-selection").findElements(this);
+        return getWrapper().getTexts(cells);
     }
 
     /**
