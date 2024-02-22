@@ -19,37 +19,38 @@ import java.util.List;
 public class PermissionsTestForJavascriptExecution extends BaseWebDriverTest
 {
     private static final String USER = "javascripttestuser@permissionstestforjavascriptexecution.test";
-    private static final String XML_METADATA_2 = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
-            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"editCol\">\n" +
-            "            <columnTitle></columnTitle> \n" +
-            "            <displayColumnFactory>\n" +
-            "                <className>org.labkey.api.data.JavaScriptDisplayColumnFactory</className>\n" +
-            "                <properties>\n" +
-            "                    <property name=\"dependency\">ehr/window/ManageRecordWindow.js</property>\n" +
-            "                    <property name=\"javaScriptEvents\">onclick=\"EHR.window.ManageRecordWindow.buttonHandler(${Id:jsString}, " +
-            "                     ${objectid:jsString}, ${queryName:jsString}, '${dataRegionName}');\"</property>\n" +
-            "                </properties>\n" +
-            "            </displayColumnFactory>\n" +
-            "        </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>\n";
-    private static final String XML_METADATA_1 = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "    <table tableName=\"Models\" tableDbType=\"TABLE\">                \n" +
-            "        <buttonBarOptions includeStandardButtons=\"true\">\n" +
-            "            <item text=\"Custom Dropdown\" insertPosition=\"end\"> \n" +
-            "                <item text=\"Say Hello\"> \n" +
-            "                     <onClick>alert('Hello');</onClick> \n" +
-            "                </item> \n" +
-            "                <item text=\"LabKey.com\"> \n" +
-            "                     <target>http://www.labkey.com</target> \n" +
-            "                </item> \n" +
-            "            </item> \n" +
-            "        </buttonBarOptions>\n" +
-            "    </table>\n" +
-            "</tables>\n";
+    private static final String XML_METADATA_1 = """
+                <tables xmlns="http://labkey.org/data/xml">
+                <table tableName="Models" tableDbType="TABLE">                
+                    <buttonBarOptions includeStandardButtons="true">
+                        <item text="Custom Dropdown" insertPosition="end"> 
+                            <item text="Say Hello"> 
+                                 <onClick>alert('Hello');</onClick> 
+                            </item> 
+                            <item text="LabKey.com"> 
+                                 <target>http://www.labkey.com</target> 
+                            </item> 
+                        </item> 
+                    </buttonBarOptions>
+                </table>
+            </tables> """;
+    private static final String XML_METADATA_2 = """
+            <tables xmlns="http://labkey.org/data/xml">\s
+              <table tableName="Models" tableDbType="TABLE">
+                <columns>
+                  <column columnName="editCol">
+                        <columnTitle></columnTitle>\s
+                        <displayColumnFactory>
+                            <className>org.labkey.api.data.JavaScriptDisplayColumnFactory</className>
+                            <properties>
+                                <property name="dependency">ehr/window/ManageRecordWindow.js</property>
+                                <property name="javaScriptEvents">onclick="EHR.window.ManageRecordWindow.buttonHandler(${Id:jsString},                      ${objectid:jsString}, ${queryName:jsString}, '${dataRegionName}');"</property>
+                            </properties>
+                        </displayColumnFactory>
+                    </column>
+                </columns>
+              </table>
+            </tables>""";
     ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
