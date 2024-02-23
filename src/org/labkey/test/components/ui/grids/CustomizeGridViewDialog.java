@@ -7,6 +7,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.biologics.plates.PlateDetailPage;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,6 +36,13 @@ public class CustomizeGridViewDialog extends ModalDialog
         super(new ModalDialogFinder(driver));
         this.linkedComponent = linkedComponent;
         waitForReady();
+    }
+
+    protected CustomizeGridViewDialog(PlateDetailPage plateDetailPage)
+    {
+        super(new ModalDialogFinder(plateDetailPage.getDriver()));
+        waitForReady();
+        this.linkedComponent = null;
     }
 
     @Override
