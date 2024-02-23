@@ -38,9 +38,9 @@ public class CustomizeGridViewDialog extends ModalDialog
         waitForReady();
     }
 
-    protected CustomizeGridViewDialog(PlateDetailPage plateDetailPage)
+    protected CustomizeGridViewDialog(WebDriver driver)
     {
-        super(new ModalDialogFinder(plateDetailPage.getDriver()));
+        super(new ModalDialogFinder(driver));
         waitForReady();
         this.linkedComponent = null;
     }
