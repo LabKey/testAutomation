@@ -611,10 +611,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void waitForPasteContent(String pasteContent)
     {
+        // split pasteContent into its parts
         var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        // filter out empty and space-only values
+        var filteredParts = Arrays.stream(contentParts).filter(a-> !a.isEmpty() && !a.equals(" ")).collect(Collectors.toList());
         await().atMost(Duration.ofSeconds(2))
                 .untilAsserted(()-> Assertions.assertThat(getSelectionCellTexts())
-                        .contains(contentParts));
+                        .containsAll(filteredParts));
     }
 
     // captures the texts of any cells currently in selection
