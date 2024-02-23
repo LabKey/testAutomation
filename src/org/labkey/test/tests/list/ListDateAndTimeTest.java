@@ -19,6 +19,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
@@ -1026,6 +1027,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 .setTimeOfDay(8, 12, 35, 102)
                 .build().getTime());
 
+        // Milliseconds should default to 0 if not given.
         dates.add(new Calendar.Builder()
                 .setDate(2024, 1, 29)
                 .setTimeOfDay(11, 11, 11)
@@ -1098,6 +1100,189 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         validateListDataInUI(table, expectedData);
         checker().screenShotIfNewError("Format02_Error");
+    }
+
+    /**
+     * <p>
+     *     Test converting a DateTime filed to a date-only and time-only field. Test also validates that a date-only
+     *     field can be converted to a DateTime field, but a time-only field can not.
+     * </p>
+     * @throws IOException Can be thrown by helper that checks if the list already exists.
+     * @throws CommandException Can be thrown by helper that checks if the list already exists.
+     */
+    @Test
+    public void testConvertDateTimeField() throws IOException, CommandException
+    {
+
+        String listName = "Convert DateTime Field List";
+        String dateTimeToTimeCol = "DT_To_Time";
+        String dateTimeToDateCol = "DT_To_Date";
+
+        prepForDatAndTimeOnlyTest(listName);
+
+        log(String.format("Create a list named '%s' with two DateTime fields that will be converted to date-only and time-only fields.", listName));
+
+        String dtFormatDate = "yyyy-MM-dd HH:mm";
+        String dtFormatTime = "yyyy-MM-dd HH:mm:ss";
+
+        SimpleDateFormat formatterFormatTime = new SimpleDateFormat(dtFormatTime);
+
+        log(String.format("Set the format for one DateTime field to '%s'.", dtFormatDate));
+        log(String.format("Set the format for the other DateTime field to '%s'. This field will be converted to a tine-only field.", dtFormatTime));
+
+        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "Key",
+                new FieldDefinition(dateTimeToDateCol, FieldDefinition.ColumnType.DateAndTime).setFormat(dtFormatDate).setLabel(dateTimeToDateCol),
+                new FieldDefinition(dateTimeToTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(dtFormatTime).setLabel(dateTimeToTimeCol)
+        );
+
+        List<Date> dates = new ArrayList<>();
+
+        dates.add(new Calendar.Builder()
+                .setDate(1962, 0, 1)
+                .setTimeOfDay(0, 0, 0)
+                .build().getTime());
+
+        dates.add(new Calendar.Builder()
+                .setDate(2023, 11, 31)
+                .setTimeOfDay(23, 59, 59)
+                .build().getTime());
+
+        dates.add(new Calendar.Builder()
+                .setDate(2024, 1, 29)
+                .setTimeOfDay(11, 11, 11)
+                .build().getTime());
+
+        dates.add(new Calendar.Builder()
+                .setDate(2022, 5, 6)
+                .setTimeOfDay(13, 12, 11)
+                .build().getTime());
+
+        dates.add(new Calendar.Builder()
+                .setDate(1999, 7, 18)
+                .setTimeOfDay(15, 0, 12)
+                .build().getTime());
+
+        dates.add(new Calendar.Builder()
+                .setDate(2005, 3, 20)
+                .setTimeOfDay(4, 54, 33)
+                .build().getTime());
+
+        StringBuilder bulkImportText = new StringBuilder();
+
+        bulkImportText.append(String.format("%s\t%s\n", dateTimeToDateCol, dateTimeToTimeCol));
+
+        for(Date date : dates)
+        {
+            bulkImportText.append(String.format("%s\t%s\n",
+                    _defaultDateTimeFormat.format(date), formatterFormatTime.format(date)
+            ));
+        }
+
+        _listHelper.bulkImportData(bulkImportText.toString());
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+
+        clickAndWait(table.getHeaderButton("Design"));
+        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
+
+        log(String.format("Change field '%s' to be a date-only field.", dateTimeToDateCol));
+
+        DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
+        ModalDialog confirmDialog = domainEditor.getField(dateTimeToDateCol).setTypeWithDialog(FieldDefinition.ColumnType.Date);
+
+        String expectedMsg = "This change will convert the values in the field from DateTime to Date. This will cause the Time portion of the value to be removed.";
+        String actualMsg = confirmDialog.getBodyText();
+
+        checker().withScreenshot("Convert_To_Date_Msg_Error")
+                .verifyTrue("Confirmation dialog for converting DateTime to Date does not have expected message.",
+                        actualMsg.contains(expectedMsg));
+
+        confirmDialog.dismiss("Yes, Change Data Type");
+
+        log(String.format("Change field '%s' to be a time-only field.", dateTimeToTimeCol));
+
+        confirmDialog = domainEditor.getField(dateTimeToTimeCol).setTypeWithDialog(FieldDefinition.ColumnType.Time);
+        expectedMsg = "This change will convert the values in the field from DateTime to Time. This will cause the Date portion of the value to be removed. Once you save your changes, you will not be able to change it back to DateTime.";
+        actualMsg = confirmDialog.getBodyText();
+
+        checker().withScreenshot("Convert_To_Time_Msg_Error")
+                .verifyTrue("Confirmation dialog for converting DateTime to Time does not have expected message.",
+                        actualMsg.contains(expectedMsg));
+
+        confirmDialog.dismiss("Yes, Change Data Type");
+
+        listDefinitionPage.clickSave();
+
+        String dateFormat = "yyyy-MM-dd";
+        String timeFormat = "HH:mm:ss";
+
+        SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat);
+
+        List<Map<String, String>> expectedData = new ArrayList<>();
+
+        for(Date date : dates)
+        {
+            expectedData.add(
+                    Map.of(
+                            dateTimeToDateCol, formatterDate.format(date),
+                            dateTimeToTimeCol, formatterTime.format(date)
+                    ));
+        }
+
+        log("Validate the data in the list.");
+
+        validateListDataInUI(table, expectedData);
+        checker().screenShotIfNewError("Convert_From_DateTime_Error");
+
+        table = new DataRegionTable("query", getDriver());
+
+        clickAndWait(table.getHeaderButton("Design"));
+        listDefinitionPage = new EditListDefinitionPage(getDriver());
+
+        domainEditor = listDefinitionPage.getFieldsPanel();
+
+        log(String.format("Validate that field '%s' cannot be converted back to a DateTime field.", dateTimeToTimeCol));
+
+        List<String> expectedList = List.of(FieldDefinition.ColumnType.MultiLine.getLabel(),
+                FieldDefinition.ColumnType.String.getLabel(),
+                FieldDefinition.ColumnType.Time.getLabel());
+        List<String> actualList = domainEditor.getField(dateTimeToTimeCol).getTypeOptions();
+
+        checker().verifyEquals("Listed types Time field can convert to are not as expected.",
+                expectedList, actualList);
+
+        expectedList = List.of(FieldDefinition.ColumnType.Date.getLabel(),
+                FieldDefinition.ColumnType.DateAndTime.getLabel(),
+                FieldDefinition.ColumnType.MultiLine.getLabel(),
+                FieldDefinition.ColumnType.String.getLabel());
+        actualList = domainEditor.getField(dateTimeToDateCol).getTypeOptions();
+
+        checker().verifyEquals("Listed types Date field can convert to are not as expected.",
+                expectedList, actualList);
+
+        log(String.format("Change field '%s' back to a DateTime field.", dateTimeToDateCol));
+
+        domainEditor.getField(dateTimeToDateCol).setType(FieldDefinition.ColumnType.DateAndTime, true);
+
+        listDefinitionPage.clickSave();
+
+        expectedData = new ArrayList<>();
+
+        for(Date date : dates)
+        {
+            expectedData.add(
+                    Map.of(
+                            dateTimeToDateCol, String.format("%s 00:00", formatterDate.format(date)),
+                            dateTimeToTimeCol, formatterTime.format(date)
+                    ));
+        }
+
+        log("Again validate the data in the list.");
+
+        validateListDataInUI(table, expectedData);
+        checker().screenShotIfNewError("Convert_To_DateTime_Error");
+
     }
 
 }

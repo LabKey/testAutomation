@@ -136,6 +136,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    /**
+     * Selects the field data type and returns the 'are you sure' dialog.
+     */
+    public ModalDialog setTypeWithDialog(FieldDefinition.ColumnType columnType)
+    {
+        elementCache().fieldTypeSelectInput.selectByVisibleText(columnType.getLabel());
+
+        ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Data Type Change").timeout(1000).waitFor();
+
+        return confirmDialog;
+
+    }
+
     public boolean getRequiredField()
     {
         return elementCache().fieldRequiredCheckbox.get();
