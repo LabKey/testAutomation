@@ -300,10 +300,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 .build().getTime();
 
         // If a time is given for a date-only field the date will default to 1-1-1970
-        // If a date is given for a time-only field the time will default to 9:00:00
+        // If a date is given for a time-only field the time will default to 0:00:00
         Date dateMissing = new Calendar.Builder()
                 .setDate(1970, 0, 1)
-                .setTimeOfDay(9, 0, 0)
+                .setTimeOfDay(0, 0, 0)
                 .build().getTime();
 
         expectedData.add(Map.of(dateCol, _defaultDateFormat.format(dateMissing),
