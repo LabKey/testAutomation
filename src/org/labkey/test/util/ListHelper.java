@@ -105,7 +105,7 @@ public class ListHelper extends LabKeySiteWrapper
     /**
      * From the list data grid, insert a new entry into the current list
      *
-     * @param data key = the the name of the field, value = the value to enter in that field
+     * @param data key = the name of the field, value = the value to enter in that field
      */
 
     public void insertNewRow(Map<String, ?> data)
