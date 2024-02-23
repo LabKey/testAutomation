@@ -624,7 +624,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      *         <li>Is Greater Than or Equal To</li>
      *         <li>Is Greater Than or Equal To and Is Less Than</li>
      *         <li>Is blank</li>
-     *         <li>Filtering time-only column also validates value given has only hh:mm (no seconds)</li>
+     *         <li>Filtering time-only column also validates when the value given as the filter has only hh:mm (no seconds)</li>
      *     </ul>
      * </p>
      * @throws IOException Can be thrown by helper that checks if the list already exists.
@@ -971,6 +971,13 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
     }
 
+    /**
+     * <p>
+     *     Test setting the format property on a date-only, time-only and DateTime field.
+     * </p>
+     * @throws IOException Can be thrown by helper that checks if the list already exists.
+     * @throws CommandException Can be thrown by helper that checks if the list already exists.
+     */
     @Test
     public void testDateAndTimeFormat() throws IOException, CommandException
     {
@@ -1028,6 +1035,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         bulkImportText.append(String.format("%s\t%s\t%s\n", dateCol, timeCol, dateTimeCol));
 
+        // Use a different format when writing the data for bulk import.
         SimpleDateFormat inputDateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat inputTimeFormatter = new SimpleDateFormat("hh:mm:ss.SSS aa");
         SimpleDateFormat inputDateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
