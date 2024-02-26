@@ -101,6 +101,12 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
         return new ExecuteQueryPage(getDriver());
     }
 
+    public String clickSaveExpectingError()
+    {
+        Ext4Helper.Locators.ext4Button("Save").findElement(getDriver()).click();
+        return waitForElement(Locator.tagWithId("div","status")).getText();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
