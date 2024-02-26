@@ -612,12 +612,32 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         WebDriverWrapper.waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
                         isInSelection(gridCell), 1500);
         if (validate)
-            waitForPasteContent(pasteText);
+            waitForAnyPasteContent(pasteText);
 
         return this;
     }
 
-    protected void waitForPasteContent(String pasteContent)
+    /**
+     * Awaits any elements (except for empty, or space-only) of the pasted content to be present in the grid
+     * @param pasteContent  tab-separated text
+     */
+    protected void waitForAnyPasteContent(String pasteContent)
+    {
+        // split pasteContent into its parts
+        var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        // filter out empty and space-only values
+        var filteredParts = Arrays.stream(contentParts).filter(a-> !a.isEmpty() && !a.equals(" ")).collect(Collectors.toList());
+        await().atMost(Duration.ofSeconds(2))
+                .untilAsserted(()-> Assertions.assertThat(getSelectionCellTexts())
+                        .containsAnyElementsOf(filteredParts));
+    }
+
+    /**
+     * Awaits all elements (except empty or space-only) of the pasted content to be present in the grid.
+     * Use this to validate all expected content appears after pasting to the grid
+     * @param pasteContent  tab-separated text of the sort usually pasted into the edit grid
+     */
+    public void waitForPasteContent(String pasteContent)
     {
         // split pasteContent into its parts
         var contentParts = pasteContent.replace("\n", "\t").split("\t");
