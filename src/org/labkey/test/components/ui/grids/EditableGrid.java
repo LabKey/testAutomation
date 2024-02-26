@@ -576,13 +576,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
 
+    /**
+     * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
+     * text into cells based on text delimiters; thus we can paste a square of data into the grid.
+     * @param row           index of the target cell
+     * @param columnName    column of the target cell
+     * @param pasteText     tab-delimited or csv or excel data
+     * @return A Reference to this editableGrid object.
+     */
     public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
     {
-        return pasteFromCell(row, columnName, pasteText, true);
+        return pasteFromCell(row, columnName, pasteText, false);
     }
 
     /**
-     * Pastes delimited text to the grid, from a single target.  The component is clever enough to target
+     * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
      * @param columnName    column of the target cell
@@ -609,7 +617,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return this;
     }
 
-    public void waitForPasteContent(String pasteContent)
+    protected void waitForPasteContent(String pasteContent)
     {
         // split pasteContent into its parts
         var contentParts = pasteContent.replace("\n", "\t").split("\t");
