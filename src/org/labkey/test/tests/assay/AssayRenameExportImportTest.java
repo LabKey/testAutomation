@@ -200,13 +200,11 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
         new WebDavUploadHelper(projectName).uploadFile(runFile);
         beginAt(WebTestHelper.buildURL("pipeline", projectName, "browse"));
         _fileBrowserHelper.importFile(runFile.getName(), "Create New Standard Assay Design");
-        waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
 
-        Locator assayNameTxtBox = Locator.tagWithId("input", "AssayDesignerName");
-        setFormElement(assayNameTxtBox, assayName);
-        fireEvent(assayNameTxtBox, SeleniumEvent.blur);
+        ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+        assayDesignerPage.setName(assayName);
+        assayDesignerPage.clickFinish();
 
-        clickButton("Begin import");
         waitAndClick(Locator.lkButton("Next"));
         waitAndClick(Locator.lkButton("Save and Finish"));
         waitAndClick(Locator.linkWithText(runFile.getName()));
