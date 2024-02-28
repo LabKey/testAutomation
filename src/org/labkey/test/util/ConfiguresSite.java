@@ -23,4 +23,5 @@ public interface ConfiguresSite
     void configureSite();
     void configureProject(String project);
     void configureFolder(String containerPath);
+    default void cleanupSite() {}
 }
