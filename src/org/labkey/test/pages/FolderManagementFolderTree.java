@@ -15,11 +15,10 @@
  */
 package org.labkey.test.pages;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
-import org.openqa.selenium.Keys;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -106,9 +105,8 @@ public class FolderManagementFolderTree
 
     public void deselectFolder(String folder)
     {
-        Keys multiSelectKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
         Actions builder = new Actions(_test.getDriver());
-        builder.keyDown(multiSelectKey).click(Locator.xpath("//span[text()='"+ folder +"']").findElement(_test.getDriver())).keyUp(multiSelectKey).build().perform();
+        builder.keyDown(WebDriverUtils.MODIFIER_KEY).click(Locator.xpath("//span[text()='"+ folder +"']").findElement(_test.getDriver())).keyUp(WebDriverUtils.MODIFIER_KEY).build().perform();
     }
 
     public void expandFolderNode(String... folders)
