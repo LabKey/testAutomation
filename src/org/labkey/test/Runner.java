@@ -28,6 +28,7 @@ import junit.runner.BaseTestRunner;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -431,7 +432,6 @@ public class Runner extends TestSuite
             {
                 List<Class<?>> interfaces = ClassUtils.getAllInterfaces(testClass);
                 WebTestHelper.DatabaseType databaseType = WebTestHelper.getDatabaseType();
-                String osName = System.getProperty("os.name", "<unknown>");
                 if (interfaces.contains(PostgresOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.PostgreSQL)
                 {
                     LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
@@ -448,14 +448,14 @@ public class Runner extends TestSuite
                     LOG.warn("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
                     continue;
                 }
-                else if(interfaces.contains(WindowsOnlyTest.class) && !osName.toLowerCase().contains("windows"))
+                else if(interfaces.contains(WindowsOnlyTest.class) && !SystemUtils.IS_OS_WINDOWS)
                 {
-                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + SystemUtils.OS_NAME);
                     continue;
                 }
-                else if(interfaces.contains(NonWindowsTest.class) && osName.toLowerCase().contains("windows"))
+                else if(interfaces.contains(NonWindowsTest.class) && SystemUtils.IS_OS_WINDOWS)
                 {
-                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + SystemUtils.OS_NAME);
                     continue;
                 }
                 test = new JUnit4TestAdapter(testClass);

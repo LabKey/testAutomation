@@ -16,6 +16,7 @@
 package org.labkey.test.tests.announcements;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -62,7 +63,7 @@ public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWind
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        assertFalse("Do not run this test on Windows. It uses files with illegal characters", System.getProperty("os.name").toLowerCase().contains("windows"));
+        assertFalse("Do not run this test on Windows. It uses files with illegal characters", SystemUtils.IS_OS_WINDOWS);
 
         MessagesAttachmentTest init = (MessagesAttachmentTest) getCurrentTest();
         init.doSetup();
