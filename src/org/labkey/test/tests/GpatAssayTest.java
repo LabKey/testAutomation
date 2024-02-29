@@ -99,7 +99,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     public void testSteps()
     {
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLS, ASSAY_NAME_XLS);
-        DomainFormPanel results = setAssayResultsProperties(assayDesignerPage);
+        DomainFormPanel results = setAssayResultsProperties(assayDesignerPage, 9);
         results.removeField("Role");
         assayDesignerPage.clickFinish();
         clickButton("Next", defaultWaitForPage);
@@ -128,7 +128,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Import XLSX GPAT assay");
         assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLSX, ASSAY_NAME_XLSX);
-        setAssayResultsProperties(assayDesignerPage);
+        setAssayResultsProperties(assayDesignerPage, 9);
         assayDesignerPage.clickFinish();
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
@@ -166,9 +166,11 @@ public class GpatAssayTest extends BaseWebDriverTest
                 "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
     }
 
-    private DomainFormPanel setAssayResultsProperties(ReactAssayDesignerPage assayDesignerPage)
+    private DomainFormPanel setAssayResultsProperties(ReactAssayDesignerPage assayDesignerPage, int fieldCount)
     {
         DomainFormPanel results = assayDesignerPage.expandFieldsPanel("Results");
+        checker().fatal().verifyEquals("Results fields count not as expected", fieldCount + " Fields Defined",
+                results.getFieldCountMessage());
         results.getField("Score").setRequiredField(true);
         results.getField("Primary").setMissingValuesEnabled(true);
         return results;
@@ -192,6 +194,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         _fileBrowserHelper.importFile(dataFile.getName(), "Create New Standard Assay Design");
 
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
+
         if (assayName != null)
             assayDesignerPage.setName(assayName);
         return assayDesignerPage;
@@ -268,7 +271,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         String originalAssayName = "A Assay Name";
         log(String.format("Create an assay named '%s'.", originalAssayName));
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, originalAssayName);
-        setAssayResultsProperties(assayDesignerPage);
+        setAssayResultsProperties(assayDesignerPage, 10);
         assayDesignerPage.clickFinish();
 
         clickButton("Next", defaultWaitForPage);

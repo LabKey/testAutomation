@@ -203,6 +203,8 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
 
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
         assayDesignerPage.setName(assayName);
+        checker().fatal().verifyEquals("Results fields count not as expected", "8 Fields Defined",
+                assayDesignerPage.expandFieldsPanel("Results Fields").getFieldCountMessage());
         assayDesignerPage.clickFinish();
 
         waitAndClick(Locator.lkButton("Next"));
