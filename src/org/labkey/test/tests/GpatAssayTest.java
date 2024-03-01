@@ -99,7 +99,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     public void testSteps()
     {
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLS, ASSAY_NAME_XLS);
-        DomainFormPanel results = setAssayResultsProperties(assayDesignerPage, 9);
+        DomainFormPanel results = setAssayResultsProperties(assayDesignerPage, 10);
         results.removeField("Role");
         assayDesignerPage.clickFinish();
         clickButton("Next", defaultWaitForPage);
@@ -206,9 +206,9 @@ public class GpatAssayTest extends BaseWebDriverTest
         File file1 = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
         File file2 = TestFileUtils.getSampleData("GPAT/trial01b.xlsx");
         File file3 = TestFileUtils.getSampleData("GPAT/trial01c.xlsx");
-        String fileName = "trial01a";
+        String fileName = "trial01b";
 
-        importFastaGpatAssay(GPAT_ASSAY_FNA_2, ASSAY_NAME_FNA_MULTIPLE);
+        importFastaGpatAssay(file1, ASSAY_NAME_FNA_MULTIPLE);
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME_FNA_MULTIPLE));
         clickButton("Import Data");
@@ -217,18 +217,16 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Check radio button for multiple upload");
         checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
 
-        uploadAssayFile(file1, 0);
+        uploadAssayFile(file2, 0);
         addNewFile();
-        uploadAssayFile(file2, 1);
-        addNewFile();
-        uploadAssayFile(file3, 2);
+        uploadAssayFile(file3, 1);
 
         clickButton("Save and Finish");
 
         log("Verifying the upload");
         clickAndWait(Locator.linkContainingText(fileName));
         DataRegionTable table = new DataRegionTable("Data", getDriver());
-        table.assertPaginationText(1, 100, 603);
+        table.assertPaginationText(1, 100, 402);
 
     }
 
@@ -236,14 +234,16 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testMultipleFileUploadSingleRowInAssayRun()
     {
+        File file1 = TestFileUtils.getSampleData("GPAT/trial01b.xlsx");
+        File file2 = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
+        File file3 = TestFileUtils.getSampleData("GPAT/trial01c.xlsx");
         List<File> files = new ArrayList<>();
-        files.add(TestFileUtils.getSampleData("GPAT/trial01b.xlsx"));
-        files.add(TestFileUtils.getSampleData("GPAT/trial01a.xlsx"));
-        files.add(TestFileUtils.getSampleData("GPAT/trial01c.xlsx"));
+        files.add(file2);
+        files.add(file3);
 
-        String fileName = "trial01b";
+        String fileName = "trial01a";
 
-        importFastaGpatAssay(GPAT_ASSAY_FNA_3, ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT);
+        importFastaGpatAssay(file1, ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT);
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT));
         clickButton("Import Data");
@@ -259,7 +259,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Verifying the upload");
         clickAndWait(Locator.linkContainingText(fileName));
         DataRegionTable table = new DataRegionTable("Data", getDriver());
-        table.assertPaginationText(1, 100, 603);
+        table.assertPaginationText(1, 100, 402);
 
     }
 
