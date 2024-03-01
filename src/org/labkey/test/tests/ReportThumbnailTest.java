@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -377,8 +378,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         goToDataViews();
 
         // Trying to work around flaky test failures on Windows.
-        String osName = System.getProperty("os.name").toLowerCase();
-        if(osName.contains("windows"))
+        if(SystemUtils.IS_OS_WINDOWS)
         {
             refresh();
         }
@@ -388,7 +388,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         if (null == expected)
         {
             // If the thumbnail isn't different, refresh/revisit the page and try again. (Issue 47143)
-            if(THUMBNAIL_DATA.equals(thumbnailData) && osName.contains("windows"))
+            if(THUMBNAIL_DATA.equals(thumbnailData) && SystemUtils.IS_OS_WINDOWS)
             {
                 log("The thumbnail was not updated as expecting. Trying a 'refresh' to get the updated image.");
                 sleep(1_500);
