@@ -2,6 +2,7 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,8 +11,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
@@ -25,19 +29,25 @@ import java.util.List;
 import java.util.Map;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class ParsingPatternForDateTest extends BaseWebDriverTest
 {
-    private String dateList = "Sample List with Date column";
+    private static final String TEST_LIST = "Input Format List";
+
+    private static final String COL_NAME = "name";
+    private static final String COL_DATETIME = "dateTimeCol";
+    private static final String COL_DATE = "dateCol";
+    private static final String COL_TIME = "timeCol";
+
+    private static int completedPipelineJobs = 0;
 
     @BeforeClass
-    public static void setupProject() throws IOException, CommandException
+    public static void setupProject()
     {
         ParsingPatternForDateTest init = (ParsingPatternForDateTest) getCurrentTest();
         init.doSetup();
     }
 
-    private void doSetup() throws IOException, CommandException
+    private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
         _studyHelper.startCreateStudy()
@@ -47,26 +57,33 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
-
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", dateList);
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("dateTimeCol", FieldDefinition.ColumnType.DateAndTime),
-                        new FieldDefinition("dateCol", FieldDefinition.ColumnType.Date),
-                        new FieldDefinition("timeCol", FieldDefinition.ColumnType.Time)));
-        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
-
-        dgen.addCustomRow(Map.of("name", "First", "dateTimeCol", "05/10/2020", "date", "02/05/2024", "time", "16:43:32"));
-        dgen.insertRows(createDefaultConnection(), dgen.getRows());
     }
 
     @AfterClass
-    public static void resetLookAndFeel()
+    public static void resetAfterClass()
     {
         ParsingPatternForDateTest init = (ParsingPatternForDateTest) getCurrentTest();
-        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(init);
-        settingsPage.reset();
+        init.resetSiteSettings();
+    }
+
+    @Before
+    public void resetForTest()
+    {
+        resetSiteSettings();
+        resetProjectSettings();
+    }
+
+    public void resetSiteSettings()
+    {
+        log("Reset site settings.");
+        LookAndFeelSettingsPage.beginAt(this).reset();
+    }
+
+    private void resetProjectSettings()
+    {
+        log("Reset project / folder settings.");
+        goToProjectHome();
+        ProjectSettingsPage.beginAt(this).reset();
     }
 
     @Override
@@ -82,26 +99,73 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAdditionalParsingPatternDateAndTime()
+    public void testSiteAdditionalParsingPatternDateAndTime() throws IOException, CommandException
     {
-        log("Setting the additional parsing patterns.");
+        createList();
+        log("Setting the additional parsing patterns for the site.");
+        testParsingPatternsList(true);
+    }
+
+    @Test
+    public void testProjectAdditionalParsingPatternDateAndTime() throws IOException, CommandException
+    {
+        createList();
+        log("Set the additional parsing patterns for the project.");
+        testParsingPatternsList(false);
+    }
+
+    private void createList() throws IOException, CommandException
+    {
+        // Delete the list if it already exists.
+        goToProjectHome();
+        if(goToManageLists().getGrid().getListNames().contains(TEST_LIST))
+        {
+            _listHelper.goToList(TEST_LIST);
+            _listHelper.deleteList();
+        }
+
+        TestDataGenerator dgen = new IntListDefinition(TEST_LIST, "id")
+                .setFields(List.of(
+                        new FieldDefinition(COL_NAME, FieldDefinition.ColumnType.String),
+                        new FieldDefinition(COL_DATETIME, FieldDefinition.ColumnType.DateAndTime),
+                        new FieldDefinition(COL_DATE, FieldDefinition.ColumnType.Date),
+                        new FieldDefinition(COL_TIME, FieldDefinition.ColumnType.Time)))
+                .create(createDefaultConnection(), getProjectName());
+
+        // Prepopulate the list with one item.
+        dgen.addCustomRow(Map.of(COL_NAME, "First", COL_DATETIME, "05/10/2020", "date", "02/05/2024", "time", "16:43:32"));
+        dgen.insertRows(createDefaultConnection(), dgen.getRows());
+    }
+
+    private void testParsingPatternsList(boolean changeSiteSettings)
+    {
+
         String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
         String datePattern = "mm/dd/yy";
         String timePattern = "hh:mm a";
-        setAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+
+        if(changeSiteSettings)
+        {
+            setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+        }
+        else
+        {
+            goToProjectHome();
+            setProjectAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+        }
 
         List<Map<String, String>> expectedTableValues = new ArrayList<>();
 
         log("Update a row with values in the additional parsing format.");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(dateList));
+        clickAndWait(Locator.linkWithText(TEST_LIST));
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
         listTable.clickEditRow(0);
 
         Map<String, String> setValuesMap = new HashMap<>();
-        setValuesMap.put("dateTimeCol", "2020-11-26 00:23");
-        setValuesMap.put("dateCol", "2020-11-25");
-        setValuesMap.put("timeCol", "00:23:00");
+        setValuesMap.put(COL_DATETIME, "2020-11-26 00:23");
+        setValuesMap.put(COL_DATE, "2020-11-25");
+        setValuesMap.put(COL_TIME, "00:23:00");
 
         for(var entry : setValuesMap.entrySet())
         {
@@ -110,7 +174,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         clickButton("Submit");
 
         // Add the name to the values expected in the grid.
-        setValuesMap.put("name", "First");
+        setValuesMap.put(COL_NAME, "First");
 
         expectedTableValues.add(setValuesMap);
 
@@ -119,10 +183,10 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         listTable.clickInsertNewRow();
 
         setValuesMap = Map.of(
-                "name", "Second",
-                "dateTimeCol", "2020-11-23 12:23",
-                "dateCol", "2020-11-23",
-                "timeCol", "12:23:00"
+                COL_NAME, "Second",
+                COL_DATETIME, "2020-11-23 12:23",
+                COL_DATE, "2020-11-23",
+                COL_TIME, "12:23:00"
         );
 
         expectedTableValues.add(setValuesMap);
@@ -138,47 +202,54 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         listTable.clickImportBulkData();
         click(Locator.tagContainingText("h3", "Upload file"));
 
-        // Note: the date and time columns in this xlsx are formatted as date and time types. Excel does not have a date-time format, that is a string.
+        log("Import a xlsx file where date & time values are numbers.");
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("DateParsing/BulkImportDateParsing.xlsx"));
         clickButton("Submit");
 
+        listTable.clickImportBulkData();
+        click(Locator.tagContainingText("h3", "Upload file"));
+
+        log("Import a xlsx file where date & time values are text.");
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("DateParsing/BulkImportDateParsing_Text.xlsx"));
+        clickButton("Submit");
+
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(dateList));
+        clickAndWait(Locator.linkWithText(TEST_LIST));
         listTable = new DataRegionTable("query", getDriver());
 
         expectedTableValues.add(Map.of(
-                "name", "Third",
-                "dateTimeCol", "2020-12-23 12:20",
-                "dateCol", "2020-12-23",
-                "timeCol", "12:20:34")
+                COL_NAME, "Third",
+                COL_DATETIME, "2020-12-23 12:20",
+                COL_DATE, "2020-12-23",
+                COL_TIME, "12:20:34")
         );
 
         expectedTableValues.add(Map.of(
-                "name", "Fourth",
-                "dateTimeCol", "2020-01-23 12:24",
-                "dateCol", "2020-01-23",
-                "timeCol", "00:24:35")
+                COL_NAME, "Fourth",
+                COL_DATETIME, "2020-01-23 12:24",
+                COL_DATE, "2020-01-23",
+                COL_TIME, "00:24:35")
         );
 
         expectedTableValues.add(Map.of(
-                "name", "Fifth",
-                "dateTimeCol", "2020-03-23 12:23",
-                "dateCol", "2020-03-23",
-                "timeCol", "12:23:36")
+                COL_NAME, "Fifth",
+                COL_DATETIME, "2020-03-23 12:23",
+                COL_DATE, "2020-03-23",
+                COL_TIME, "12:23:36")
         );
 
         expectedTableValues.add(Map.of(
-                "name", "Sixth",
-                "dateTimeCol", "2020-06-23 12:29",
-                "dateCol", "2020-06-23",
-                "timeCol", "11:29:37")
+                COL_NAME, "Sixth",
+                COL_DATETIME, "2020-06-23 12:29",
+                COL_DATE, "2020-06-23",
+                COL_TIME, "11:29:37")
         );
 
         int i = 0;
         for(Map<String, String> expectedRowMap : expectedTableValues)
         {
             Map<String, String> actualRowMap = listTable.getRowDataAsMap(i);
-            checker().verifyEquals(String.format("Incorrect parsed data for row %d '%s'.", i, expectedRowMap.get("name")),
+            checker().verifyEquals(String.format("Incorrect parsed data for row %d '%s'.", i, expectedRowMap.get(COL_NAME)),
                     expectedRowMap, actualRowMap);
             i++;
         }
@@ -186,17 +257,38 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAdditionalParsingPatternForPipelineJobs()
+    public void testSiteAdditionalParsingPatternForPipelineJobs()
+    {
+        testParsingPatternsPipelineJobs(true);
+    }
+
+    @Test
+    public void testProjectAdditionalParsingPatternForPipelineJobs()
+    {
+        testParsingPatternsPipelineJobs(false);
+    }
+
+    private void testParsingPatternsPipelineJobs(boolean changeSiteSettings)
     {
         log("Setting the parsing pattern");
         String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
         String datePattern = "dd/mm/yy";
         String timePattern = "hh:mm a";
-        setAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+
+        if(changeSiteSettings)
+        {
+            setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+        }
+        else
+        {
+            goToProjectHome();
+            setProjectAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+        }
 
         log("Importing a study where a dataset has some dates in the non-standard format");
         goToProjectHome();
-        importFolderFromZip(TestFileUtils.getSampleData("DateParsing/StudyForDateParsing.zip"), false, 1);
+        completedPipelineJobs = completedPipelineJobs + 1;
+        importFolderFromZip(TestFileUtils.getSampleData("DateParsing/StudyForDateParsing.zip"), false, completedPipelineJobs);
 
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("dataset"));
@@ -204,35 +296,45 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
         checker().verifyEquals("Incorrect date-time parsed while importing", Arrays.asList("2020-11-29 00:23", "2020-11-28 00:23", "2024-02-05 16:36")
-                , table.getColumnDataAsText("dateTimeCol"));
+                , table.getColumnDataAsText(COL_DATETIME));
 
         checker().verifyEquals("Incorrect date parsed while importing", Arrays.asList("2020-11-29", "2020-11-28", "2024-02-05")
-                , table.getColumnDataAsText("dateCol"));
+                , table.getColumnDataAsText(COL_DATE));
 
         checker().verifyEquals("Incorrect time parsed while importing", Arrays.asList("00:23:00", "00:23:00", "16:36:00")
-                , table.getColumnDataAsText("timeCol"));
+                , table.getColumnDataAsText(COL_TIME));
     }
 
-    private void setAdditionalParsingPatterns(String dateTimePattern, String datePattern, String timePattern)
+    private void setSiteAdditionalParsingPatterns(String dateTimePattern, String datePattern, String timePattern)
     {
         LookAndFeelSettingsPage lookAndFeelSettingsPage = LookAndFeelSettingsPage.beginAt(this);
+        setAdditionalParsingPatterns(lookAndFeelSettingsPage, dateTimePattern, datePattern, timePattern);
+    }
 
+    private void setProjectAdditionalParsingPatterns(String dateTimePattern, String datePattern, String timePattern)
+    {
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this);
+        setAdditionalParsingPatterns(projectSettingsPage, dateTimePattern, datePattern, timePattern);
+    }
+
+    private void setAdditionalParsingPatterns(BaseSettingsPage settingsPage, String dateTimePattern, String datePattern, String timePattern)
+    {
         if(null != dateTimePattern && !dateTimePattern.isEmpty())
         {
-            lookAndFeelSettingsPage.setAdditionalParsingPatternDateAndTime(dateTimePattern);
+            settingsPage.setAdditionalParsingPatternDateAndTime(dateTimePattern);
         }
 
         if(null != datePattern && !datePattern.isEmpty())
         {
-            lookAndFeelSettingsPage.setAdditionalParsingPatternDates(datePattern);
+            settingsPage.setAdditionalParsingPatternDates(datePattern);
         }
 
         if(null != timePattern && !timePattern.isEmpty())
         {
-            lookAndFeelSettingsPage.setAdditionalParsingPatternTimes(timePattern);
+            settingsPage.setAdditionalParsingPatternTimes(timePattern);
         }
 
-        lookAndFeelSettingsPage.save();
+        settingsPage.save();
     }
 
 }
