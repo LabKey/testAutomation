@@ -494,6 +494,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             actionRadioButton.check();
             assertTrue("Failed to select action: " + actionName, actionRadioButton.isSelected());
         }
+
         importWindow.clickButton("Import");
     }
 
