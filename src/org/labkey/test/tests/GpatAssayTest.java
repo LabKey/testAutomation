@@ -130,6 +130,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLSX, ASSAY_NAME_XLSX);
         setAssayResultsProperties(assayDesignerPage, 9);
         assayDesignerPage.clickFinish();
+        if (isElementPresent(Locator.tagContainingText("p", "The files listed below have been created by another run")))
+            clickButton("OK", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX.getName()));
