@@ -32,6 +32,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -54,8 +55,6 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final File GPAT_ASSAY_XLSX = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
     private static final File GPAT_ASSAY_TSV = TestFileUtils.getSampleData("GPAT/trial02.tsv");
     private static final File GPAT_ASSAY_FNA_1 = TestFileUtils.getSampleData("GPAT/trial03.fna");
-    private static final File GPAT_ASSAY_FNA_2 = TestFileUtils.getSampleData("GPAT/trial04.fna");
-    private static final File GPAT_ASSAY_FNA_3 = TestFileUtils.getSampleData("GPAT/trial05.fna");
     private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
@@ -99,7 +98,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     public void testSteps()
     {
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLS, ASSAY_NAME_XLS);
-        DomainFormPanel results = setAssayResultsProperties(assayDesignerPage, 10);
+        DomainFormPanel results = setAssayResultsProperties(assayDesignerPage, 12);
         results.removeField("Role");
         assayDesignerPage.clickFinish();
         clickButton("Next", defaultWaitForPage);
@@ -128,7 +127,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Import XLSX GPAT assay");
         assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLSX, ASSAY_NAME_XLSX);
-        setAssayResultsProperties(assayDesignerPage, 9);
+        setAssayResultsProperties(assayDesignerPage, 11);
         assayDesignerPage.clickFinish();
         if (isElementPresent(Locator.tagContainingText("p", "The files listed below have been created by another run")))
             clickButton("OK", defaultWaitForPage);
@@ -150,6 +149,16 @@ public class GpatAssayTest extends BaseWebDriverTest
                 .setLabel("Result")
                 .setImportAliases("Score")
                 .setRequiredField(true);
+
+        // Set the date-only field type.
+        results.getField("DateOnly")
+                .setType(FieldDefinition.ColumnType.Date, false);
+
+        // Using a tsv abd the data-pipeline to define the results fields sets the time-only field to a type of Text.
+        // A field of type Text cannot be converted to a Time type. The only way around this is to remove the field and
+        // add it back as a time-only type.
+        results.removeField("TimeOnly", false);
+        results.addField(new FieldDefinition("TimeOnly", FieldDefinition.ColumnType.Time));
         assayDesignerPage.clickFinish();
 
         clickButton("Next", defaultWaitForPage);
@@ -175,6 +184,14 @@ public class GpatAssayTest extends BaseWebDriverTest
                 results.getFieldCountMessage());
         results.getField("Score").setRequiredField(true);
         results.getField("Primary").setMissingValuesEnabled(true);
+
+        // Set the date-only and time-only result fields to the proper type.
+        if(results.fieldNames().contains("DateOnly") && results.fieldNames().contains("TimeOnly"))
+        {
+            results.getField("DateOnly").setType(FieldDefinition.ColumnType.Date, false);
+            results.getField("TimeOnly").setType(FieldDefinition.ColumnType.Time, false);
+        }
+
         return results;
     }
 

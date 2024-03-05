@@ -543,12 +543,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         log("Sort the time-only field in ascending order.");
         expectedKeyColOrder = new ArrayList<>();
         expectedKeyColOrder.add("3"); // 2024-01-01 00:00:00
-        expectedKeyColOrder.add("2"); // (some future date) 14:23:54
         expectedKeyColOrder.add("1"); // 1950-10-12 08:00:01
         expectedKeyColOrder.add("7"); // 1995-03-03 09:10:10
         expectedKeyColOrder.add("4"); // 1992-03-03 10:10:10
         expectedKeyColOrder.add("5"); // 1992-03-03 10:10:10
         expectedKeyColOrder.add("6"); // 1992-03-03 10:11:34
+        expectedKeyColOrder.add("2"); // (some future date) 14:23:54
         expectedKeyColOrder.add("11"); // (empty) 14:59:25
         expectedKeyColOrder.add("9"); // 2002-09-15 17:45:20
         expectedKeyColOrder.add("8"); // 2024-02-29 18:32:00
@@ -567,12 +567,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         expectedKeyColOrder.add("8");
         expectedKeyColOrder.add("9");
         expectedKeyColOrder.add("11");
+        expectedKeyColOrder.add("2");
         expectedKeyColOrder.add("6");
         expectedKeyColOrder.add("4");
         expectedKeyColOrder.add("5");
         expectedKeyColOrder.add("7");
         expectedKeyColOrder.add("1");
-        expectedKeyColOrder.add("2");
         expectedKeyColOrder.add("3");
 
         table.setSort(timeCol, SortDirection.DESC);
@@ -823,6 +823,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         log(String.format("Filter the time-only field greater than '%s'.", filterValue01));
 
         expectedKeyCol = new ArrayList<>();
+        expectedKeyCol.add("2"); // (some future date) 14:23:54
         expectedKeyCol.add("8"); // 2024-02-29 18:32:00
         expectedKeyCol.add("9"); // 2002-09-15 17:45:20
         expectedKeyCol.add("11"); // (empty) 14:59:25
@@ -848,6 +849,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 filterValue01, filterValue02));
 
         expectedKeyCol = new ArrayList<>();
+        expectedKeyCol.add("2"); // (some future date) 14:23:54
         expectedKeyCol.add("4"); // 1992-03-03 10:10:10
         expectedKeyCol.add("5"); // 1992-03-03 10:10:10
         expectedKeyCol.add("6"); // 1992-03-03 10:11:34
