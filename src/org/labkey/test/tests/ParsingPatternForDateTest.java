@@ -21,13 +21,9 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +42,10 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     private static final String COL_TIME = "timeCol";
 
     private static int completedPipelineJobs = 0;
+
+    private static final String DATE_TIME_PATTERN = "ddMMMyyyy:HH:mm:ss";
+    private static final String DATE_PATTERN = "dd/mm/yy";
+    private static final String TIME_PATTERN = "hh:mm a";
 
     @BeforeClass
     public static void setupProject()
@@ -78,6 +78,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     {
         resetSiteSettings();
         resetProjectSettings();
+
+        log("Verify no patters are set for the project.");
+        verifyNoPatternsSet(ProjectSettingsPage.beginAt(this, getProjectName()));
+
+        log("Verify no patters are set for the site.");
+        verifyNoPatternsSet(LookAndFeelSettingsPage.beginAt(this));
+
     }
 
     public void resetSiteSettings()
@@ -108,9 +115,23 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     @Test
     public void testSiteAdditionalParsingPatternDateAndTime() throws IOException, CommandException
     {
+
         createList(TEST_PARSING);
         log("Setting the additional parsing patterns for the site.");
         testParsingPatternsList(true);
+
+        log("Validate that parsing patterns for the site are shown in the project config.");
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
+
+        checker().verifyEquals("Parsing pattern for the DateTime field should show site level value.",
+                DATE_TIME_PATTERN, projectSettingsPage.getAdditionalParsingPatternDateAndTime());
+
+        checker().verifyEquals("Parsing pattern for the Date field should show site level value.",
+                DATE_PATTERN, projectSettingsPage.getAdditionalParsingPatternDates());
+
+        checker().verifyEquals("Parsing pattern for the Time field should show site level value.",
+                TIME_PATTERN, projectSettingsPage.getAdditionalParsingPatternTimes());
+
     }
 
     @Test
@@ -126,21 +147,15 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     {
         createList(TEST_MODE);
 
-        String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
-        String datePattern = "mm/dd/yy";
-        String timePattern = "hh:mm a";
-
         log("Use 'Non-U.S. date parsing (DMY)'.");
-        setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern, false);
-//        setProjectAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+        setSiteAdditionalParsingPatterns(null, null, null, false);
 
-        String bulkData;
-        bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
+        String bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
                 + "A\t23/12/24 14:45\t23/12/24\t14:45\n"
                 + "B\t19/11/99 9:32:06.001\t19/11/99\t9:32:06.001\n"
                 + "C\t2/3/1972 10:45 pm\t2/3/1972\t10:45 pm\n"
                 + "D\t3-2-05 00:00\t3-2-05\t00:00\n"
-                + "E\t19July1999 19:32:06\t19/7/99\t19:32:06\n";
+                + "E\t19July1999 19:32:06\t19/07/99\t19:32:06\n";
 
         List<String> expectedDateTimeCol = List.of("2024-12-23 14:45", "1999-11-19 09:32", "1972-03-02 22:45", "2005-02-03 00:00", "1999-07-19 19:32");
         List<String> expectedDateCol = List.of("2024-12-23", "1999-11-19", "1972-03-02", "2005-02-03", "1999-07-19");
@@ -149,6 +164,47 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_MODE));
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
+        listTable.clickImportBulkData()
+                .setText(bulkData);
+        clickButton("Submit");
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(TEST_MODE));
+        listTable = new DataRegionTable("query", getDriver());
+
+        checker().verifyEquals("Values in " + COL_DATETIME + " are not as expected.",
+                expectedDateTimeCol, listTable.getColumnDataAsText(COL_DATETIME));
+
+        checker().verifyEquals("Values in " + COL_DATE + " are not as expected.",
+                expectedDateCol, listTable.getColumnDataAsText(COL_DATE));
+
+        checker().verifyEquals("Values in " + COL_TIME + " are not as expected.",
+                expectedTimeCol, listTable.getColumnDataAsText(COL_TIME));
+
+        checker().screenShotIfNewError("Non_US_Mode_Error");
+
+        listTable.checkAllOnPage();
+        listTable.clickDeleteAllButton();
+
+        log("Set an additional parsing patterns that is US format (MM/dd).");
+        String dateTimePattern = "MM/dd/yy HH:mm";
+        String datePattern = "MM/dd/yy";
+        String timePattern = "HH:mm";
+        setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern, false);
+        goToProjectHome();
+
+        // Additional parsing format should be applied first before non-US mode (?)
+        // Send in dates that are MM/dd format.
+
+        bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
+                + "A\t12/23/24 14:45\t12/23/24\t14:45\n"
+                + "B\t11/19/99 9:32:06.001\t11/19/99\t9:32:06.001\n"
+                + "C\t3/2/1972 10:45 pm\t3/2/1972\t10:45 pm\n"
+                + "D\t2-3-05 00:00\t2-3-05\t00:00\n"
+                + "E\t19July1999 19:32:06\t07/19/99\t19:32:06\n";
+
+        clickAndWait(Locator.linkWithText(TEST_MODE));
+        listTable = new DataRegionTable("query", getDriver());
         listTable.clickImportBulkData()
                 .setText(bulkData);
         clickButton("Submit");
@@ -188,6 +244,22 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
     }
 
+    private void verifyNoPatternsSet(BaseSettingsPage settingsPage)
+    {
+        checker().fatal()
+                .verifyTrue("No additional parsing pattern should be set for the DateTime field.",
+                        settingsPage.getAdditionalParsingPatternDateAndTime().isEmpty());
+
+        checker().fatal()
+                .verifyTrue("No additional parsing pattern should be set for the Date field.",
+                        settingsPage.getAdditionalParsingPatternDates().isEmpty());
+
+        checker().fatal()
+                .verifyTrue("No additional parsing pattern should be set for the Time field.",
+                        settingsPage.getAdditionalParsingPatternTimes().isEmpty());
+
+    }
+
     private void testParsingPatternsList(boolean changeSiteSettings) throws IOException, CommandException
     {
 
@@ -196,17 +268,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         dataGenerator.addCustomRow(Map.of(COL_NAME, "First", COL_DATETIME, "05/10/2020", COL_DATE, "02/05/2024", COL_TIME, "16:43:32"));
         dataGenerator.insertRows(createDefaultConnection(), dataGenerator.getRows());
 
-        String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
-        String datePattern = "mm/dd/yy";
-        String timePattern = "hh:mm a";
-
         if(changeSiteSettings)
         {
-            setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern, true);
+            setSiteAdditionalParsingPatterns(DATE_TIME_PATTERN, DATE_PATTERN, TIME_PATTERN, true);
         }
         else
         {
-            setProjectAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+            setProjectAdditionalParsingPatterns(DATE_TIME_PATTERN, DATE_PATTERN, TIME_PATTERN);
         }
 
         List<Map<String, String>> expectedTableValues = new ArrayList<>();
@@ -322,17 +390,14 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     private void testParsingPatternsPipelineJobs(boolean changeSiteSettings)
     {
         log("Setting the parsing pattern");
-        String dateTimePattern = "ddMMMyyyy:HH:mm:ss";
-        String datePattern = "dd/mm/yy";
-        String timePattern = "hh:mm a";
 
         if(changeSiteSettings)
         {
-            setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern, true);
+            setSiteAdditionalParsingPatterns(DATE_TIME_PATTERN, DATE_PATTERN, TIME_PATTERN, true);
         }
         else
         {
-            setProjectAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern);
+            setProjectAdditionalParsingPatterns(DATE_TIME_PATTERN, DATE_PATTERN, TIME_PATTERN);
         }
 
         log("Importing a study where a dataset has some dates in the non-standard format");

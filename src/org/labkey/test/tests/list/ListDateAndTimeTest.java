@@ -1,6 +1,7 @@
 package org.labkey.test.tests.list;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.tests.ParsingPatternForDateTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -75,6 +77,19 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+    }
+
+    @AfterClass
+    public static void resetAfterClass()
+    {
+        ListDateAndTimeTest init = (ListDateAndTimeTest) getCurrentTest();
+        init.resetSiteSettings();
+    }
+
+    public void resetSiteSettings()
+    {
+        log("Reset site settings.");
+        LookAndFeelSettingsPage.beginAt(this).reset();
     }
 
     @Before
