@@ -170,6 +170,25 @@ public class EntityBulkUpdateDialog extends ModalDialog
                 "Wrong editable fields", waitMilliseconds);
         return this;
     }
+
+    public boolean isCommentInputPresent()
+    {
+        return elementCache().commentInputLocator.findOptionalElement(getDriver()).isPresent();
+    }
+
+    public EntityBulkUpdateDialog setActionComment(String comment)
+    {
+        elementCache().commentInput.sendKeys(comment);
+        return this;
+    }
+
+    public EntityBulkUpdateDialog clearActionComment()
+    {
+        elementCache().commentInput.clear();
+        return this;
+    }
+
+
     // dismiss the dialog
 
     public void clickEditWithGrid()
@@ -256,6 +275,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
         final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
+        final Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
+        final WebElement commentInput = commentInputLocator.refindWhenNeeded(getDriver());
 
         final WebElement updateButton = Locator.tagWithClass("button", "btn-success").findWhenNeeded(this);
     }
