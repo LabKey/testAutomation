@@ -109,9 +109,11 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
         // navigation tabs
         WebElement tabListContainer = Locator.tagWithClass("ul", "nav-tabs")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement overviewTab = Locator.tag("li").withChild(Locator.id("concept-information-tabs-tab-overview"))
+        WebElement overviewTab = Locator.tagWithAttributeContaining("a", "role", "tab")
+                .withText("Overview")
                 .findWhenNeeded(tabListContainer);
-        WebElement pathInformationTab = Locator.tag("li").withChild(Locator.id("concept-information-tabs-tab-pathinfo"))
+        WebElement pathInformationTab = Locator.tagWithAttributeContaining("a", "role", "tab")
+                .withText("Path Information")
                 .findWhenNeeded(tabListContainer);
 
         // panes
@@ -119,7 +121,7 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         // overview pane
-        WebElement overviewPane = Locator.id("concept-information-tabs-pane-overview")
+        WebElement overviewPane = Locator.byClass("ontology-concept-overview-container")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement title = Locator.tagWithClass("div", "title").findWhenNeeded(overviewPane);
         WebElement codeBox = Locator.tagWithClass("span", "code").findWhenNeeded(overviewPane);
@@ -136,7 +138,7 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
         }
 
         // path info pane
-        WebElement pathInformationPane = Locator.id("concept-information-tabs-pane-pathinfo")
+        WebElement pathInformationPane = Locator.byClass("ontology-concept-pathinfo-container")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement conceptPathContainer()
         {
@@ -164,7 +166,7 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
 
     public static class ConceptInfoTabsFinder extends WebDriverComponentFinder<ConceptInfoTabs, ConceptInfoTabsFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.id("concept-information-tabs");
+        private final Locator.XPathLocator _baseLocator = Locator.byClass("concept-information-tabs");
 
         public ConceptInfoTabsFinder(WebDriver driver)
         {

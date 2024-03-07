@@ -159,7 +159,7 @@ public class ConceptPickerDialog extends ModalDialog
                 .findWhenNeeded(this);
 
         final ConceptInfoTabs infoTabs = new ConceptInfoTabs.ConceptInfoTabsFinder(getDriver())
-                .findWhenNeeded(this);
+                .refindWhenNeeded(this);
 
         final ReactSelect ontologySelect = ReactSelect.finder(getDriver()).withId("ontology-select")
                 .findWhenNeeded(this);

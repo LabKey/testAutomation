@@ -132,13 +132,13 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public LoginConfigRow getPrimaryConfigurationRow(String description)
     {
         return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description)
-                .waitFor(elementCache().tabPane1);
+                .waitFor(elementCache().activeTabPane);
     }
 
     public List<LoginConfigRow> getPrimaryConfigurations()
     {
         togglePrimaryConfiguration();
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().tabPane1);
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().activeTabPane);
     }
 
     public LoginConfigurePage toggleSecondaryConfiguration()
@@ -152,14 +152,14 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     public List<LoginConfigRow> getSecondaryConfigurations()
     {
         toggleSecondaryConfiguration();
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().tabPane2);
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().activeTabPane);
     }
 
     public LoginConfigRow getSecondaryConfigurationRow(String description)
     {
         toggleSecondaryConfiguration();
         return new LoginConfigRow.LoginConfigRowFinder(getDriver())
-                .withDescription(description).waitFor(elementCache().tabPane2);
+                .withDescription(description).waitFor(elementCache().activeTabPane);
     }
 
     public LoginConfigurePage removeConfiguration(String description)      // assumes for now we're doing primary only
@@ -193,11 +193,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         Checkbox selfSignupCheckBox = new Checkbox(this, "Allow self sign up");
         Checkbox allowUserEmailEditCheckbox = new Checkbox(this, "Allow users to edit their own email addresses");
         Checkbox autoCreateCheckBox = new Checkbox(this,"Auto-create authenticated users");
-        WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab1 = Locator.id("tabs3-tab-primary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement tabPane1 = Locator.id("tabs3-pane-primary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab2 = Locator.id("tabs3-tab-secondary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement tabPane2 = Locator.id("tabs3-pane-secondary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab1 = Locator.tagWithAttributeContaining("a", "data-event-key", "primary")
+                .refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab2 = Locator.tagWithAttributeContaining("a", "data-event-key", "secondary")
+                .refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement activeTabPane = Locator.tag("div").withClasses("tab-pane", "active")
+                .refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         MultiMenu.MultiMenuFinder primaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
                 .withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
         BootstrapMenu addPrimaryMenu = primaryMenuFinder.findWhenNeeded(this);
