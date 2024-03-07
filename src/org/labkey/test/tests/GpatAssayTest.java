@@ -137,6 +137,20 @@ public class GpatAssayTest extends BaseWebDriverTest
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementPresent(Locator.css(".labkey-column-header").containing("Role"));
 
+        // Filter the date-only and time-only columns as a way to validate that data for those columns was part of the assay run.
+        DataRegionTable dataTable = new DataRegionTable("Data", getDriver());
+        dataTable.setFilter("TimeOnly", "Is Greater Than", "14:45");
+        checker().withScreenshot("Filter_TimeOnly_Column")
+                .verifyEquals("Filtering the 'TimeOnly' column to Greater Than 14:45 did not return the expected number of records.",
+                        74, dataTable.getDataRowCount());
+        dataTable.clearFilter("TimeOnly");
+
+        dataTable.setFilter("DateOnly", "Is Less Than", "2009-01-01");
+        checker().withScreenshot("Filter_DateOnly_Column")
+                .verifyEquals("Filtering the 'DateOnly' column to Less Than 2009-01-01 did not return the expected number of records.",
+                        52, dataTable.getDataRowCount());
+        dataTable.clearFilter("DateOnly");
+
         log("Import TSV GPAT assay");
         clickProject(getProjectName());
         assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_TSV, ASSAY_NAME_TSV);
@@ -154,7 +168,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         results.getField("DateOnly")
                 .setType(FieldDefinition.ColumnType.Date, false);
 
-        // Using a tsv abd the data-pipeline to define the results fields sets the time-only field to a type of Text.
+        // Using a tsv and the data-pipeline to define the results fields sets the time-only field to a type of Text.
         // A field of type Text cannot be converted to a Time type. The only way around this is to remove the field and
         // add it back as a time-only type.
         results.removeField("TimeOnly", false);
@@ -167,6 +181,20 @@ public class GpatAssayTest extends BaseWebDriverTest
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementPresent(Locator.css(".labkey-column-header").containing("Blank"));
         assertElementPresent(Locator.css(".labkey-column-header").containing("Result"));
+
+        // Again, filter the date-only and time-only columns as a way to validate that data for those columns was part of the assay run.
+        dataTable = new DataRegionTable("Data", getDriver());
+        dataTable.setFilter("TimeOnly", "Is Greater Than", "14:45");
+        checker().withScreenshot("Filter_TimeOnly_Column")
+                .verifyEquals("Filtering the 'TimeOnly' column to Greater Than 14:45 did not return the expected number of records.",
+                        80, dataTable.getDataRowCount());
+        dataTable.clearFilter("TimeOnly");
+
+        dataTable.setFilter("DateOnly", "Is Less Than", "2009-01-01");
+        checker().withScreenshot("Filter_DateOnly_Column")
+                .verifyEquals("Filtering the 'DateOnly' column to Less Than 2009-01-01 did not return the expected number of records.",
+                        52, dataTable.getDataRowCount());
+        dataTable.clearFilter("DateOnly");
 
         importFastaGpatAssay(GPAT_ASSAY_FNA_1, ASSAY_NAME_FNA);
         log("Verify data after the GPAT assay upload");

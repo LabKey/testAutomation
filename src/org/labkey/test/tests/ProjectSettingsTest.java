@@ -374,13 +374,6 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         assertEquals("Wrong list data from injection attempt", testDate + INJECT_CHARS, attemptedInjection);
     }
 
-    @Test
-    public void testTimeAndDateFields()
-    {
-        goToProjectHome();
-        goToProjectSettings();
-    }
-
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
