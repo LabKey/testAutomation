@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controls 'Tabs' and 'Tab' components from 'react-bootstrap'
+ * Controls 'Tabs' and 'Tab' components from 'react-bootstrap' or 'packages/components/src/internal/Tabs.tsx'
  *
  * Corresponding application code looks something like:
  * <pre>{@code
- * <Tabs id="panel-tabs" >
+ * <Tabs className="panel-tabs" >
  *     <Tab title="First Tab">
  *         <PanelComponent1/>
  *     </Tab>
