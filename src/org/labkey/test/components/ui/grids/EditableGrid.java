@@ -658,7 +658,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * Selects all cells in the table, then deletes their content
      */
-    public void clearAllCells() throws IOException, UnsupportedFlavorException
+    public void clearAllCells()
     {
         selectAllCells();
         new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
@@ -726,7 +726,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
-    private WebElement selectCell(int row, String columnName)
+    public WebElement selectCell(int row, String columnName)
     {
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
@@ -754,12 +754,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void activateCell(WebElement cell)
     {
         // If it is a selector, and it already has focus (is active), it will not have a div.cellular-display
-        if(Locator.tagWithClass("div", "select-input__control--is-focused")
-                .findElements(cell).isEmpty())
-        {
-            var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(cell);
-            cellContent.sendKeys(Keys.ENTER);
-        }
+        if (Locator.tagWithClass("div", "select-input__control--is-focused").findElements(cell).isEmpty())
+            sendKeysToCell(cell, Keys.ENTER);
+    }
+
+    public void sendKeysToCell(WebElement cell, CharSequence... keysToSend)
+    {
+        var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(cell);
+        cellContent.sendKeys(keysToSend);
     }
 
     /**
@@ -767,7 +769,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param cell A WebElement that is the grid cell (a  td).
      * @return True if the edit is present
      */
-    private boolean isCellSelected(WebElement cell)
+    public boolean isCellSelected(WebElement cell)
     {
         try
         {
@@ -777,7 +779,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                     .findElement(cell)
                     .getAttribute("class").contains("cell-selected");
         }
-        catch(NoSuchElementException nse)
+        catch (NoSuchElementException nse)
         {
             // If the cell is an open/active reactSelect the class attribute is different.
             return Locator.tagWithClass("div", "select-input__control")
