@@ -194,10 +194,10 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         Checkbox allowUserEmailEditCheckbox = new Checkbox(this, "Allow users to edit their own email addresses");
         Checkbox autoCreateCheckBox = new Checkbox(this,"Auto-create authenticated users");
         WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab2 = Locator.id("tab-panel-tab-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement tabPane2 = Locator.id("tab-panel-pane-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab1 = Locator.id("tabs3-tab-primary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement tabPane1 = Locator.id("tabs3-pane-primary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement panelTab2 = Locator.id("tabs3-tab-secondary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement tabPane2 = Locator.id("tabs3-pane-secondary").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         MultiMenu.MultiMenuFinder primaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
                 .withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
         BootstrapMenu addPrimaryMenu = primaryMenuFinder.findWhenNeeded(this);
