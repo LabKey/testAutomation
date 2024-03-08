@@ -35,7 +35,7 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
     private final WebElement _el;
     private final WebDriver _driver;
 
-    protected Tabs(WebElement element, WebDriver driver)
+    public Tabs(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
