@@ -1,5 +1,7 @@
 package org.labkey.test.tests.list;
 
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -26,7 +28,9 @@ import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDateUtils;
@@ -109,7 +113,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    private void prepForDatAndTimeOnlyTest(String listName) throws IOException, CommandException
+    private void prepForDateAndTimeOnlyTest(String listName) throws IOException, CommandException
     {
         log("Reset site setting to have default formats for date and time values.");
         LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(this);
@@ -202,7 +206,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
 
-        prepForDatAndTimeOnlyTest(listName);
+        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
@@ -337,6 +341,134 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
     }
 
+    @Test
+    public void testExcelImportExport() throws IOException, CommandException
+    {
+
+        String listName = "Date and Time Export List";
+        String dateCol = "Date";
+        String timeCol = "Time";
+        String dateTimeCol = "DateTime";
+
+        prepForDateAndTimeOnlyTest(listName);
+
+        log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
+
+        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "key",
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setLabel(dateTimeCol)
+        );
+
+        File excelDateTimeFile = TestFileUtils.getSampleData("lists/Date_And_Time_Format.xlsx");
+
+        _listHelper.importDataFromFile(excelDateTimeFile);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+
+        List<Map<String, String>> expectedUIData = new ArrayList<>();
+
+        // Note, the month is zero based. The value of the month here is one less than what is seen in the file.
+        // Also of note the xlsx used has a column formatted as time and another as date. Excel does not have a DateTime specific format.
+        Date testDate01 = new Calendar.Builder()
+                .setDate(2024, 1, 29)
+                .setTimeOfDay(11, 28, 54)
+                .build().getTime();
+
+        expectedUIData.add(Map.of(dateCol, _defaultDateFormat.format(testDate01),
+                timeCol, _defaultTimeFormat.format(testDate01),
+                dateTimeCol, _defaultDateTimeFormat.format(testDate01)));
+
+        // The expected data in the exported Excel sheet.
+        List<List<Date>> expectedExportedData = new ArrayList<>();
+
+        // In Excel:
+        // The date-only column will have a time of 0:00
+        // The time-only column will have a date of 1/1/70
+        // The date-time column should be the same as the date object.
+        expectedExportedData.add(List.of(
+                new Calendar.Builder()
+                        .setDate(2024, 1, 29)
+                        .setTimeOfDay(0, 0, 0)
+                        .build().getTime(),
+                new Calendar.Builder()
+                        .setDate(1970, 0, 1)
+                        .setTimeOfDay(11, 28, 54)
+                        .build().getTime(),
+                testDate01
+        ));
+
+        testDate01 = new Calendar.Builder()
+                .setDate(1998, 2, 10)
+                .setTimeOfDay(18, 12, 0)
+                .build().getTime();
+
+        expectedUIData.add(Map.of(dateCol, _defaultDateFormat.format(testDate01),
+                timeCol, _defaultTimeFormat.format(testDate01),
+                dateTimeCol, _defaultDateTimeFormat.format(testDate01)));
+
+        expectedExportedData.add(List.of(
+                new Calendar.Builder()
+                        .setDate(1998, 2, 10)
+                        .setTimeOfDay(0, 0, 0)
+                        .build().getTime(),
+                new Calendar.Builder()
+                        .setDate(1970, 0, 1)
+                        .setTimeOfDay(18, 12, 0)
+                        .build().getTime(),
+                testDate01
+        ));
+
+        testDate01 = new Calendar.Builder()
+                .setDate(2002, 9, 31)
+                .setTimeOfDay(22, 20, 0)
+                .build().getTime();
+
+        expectedUIData.add(Map.of(dateCol, _defaultDateFormat.format(testDate01),
+                timeCol, _defaultTimeFormat.format(testDate01),
+                dateTimeCol, _defaultDateTimeFormat.format(testDate01)));
+
+        expectedExportedData.add(List.of(
+                new Calendar.Builder()
+                        .setDate(2002, 9, 31)
+                        .setTimeOfDay(0, 0, 0)
+                        .build().getTime(),
+                new Calendar.Builder()
+                        .setDate(1970, 0, 1)
+                        .setTimeOfDay(22, 20, 0)
+                        .build().getTime(),
+                testDate01
+        ));
+
+        validateListDataInUI(table, expectedUIData);
+
+        log("Now export the list to excel and validate.");
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(table);
+
+        table.checkAllOnPage();
+
+        File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
+
+        try(Workbook workbook = ExcelHelper.create(exportedFile))
+        {
+            Sheet sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
+
+            int row = 1;
+            for(List<Date> expectedDate : expectedExportedData)
+            {
+
+                for (int column = 0; column < 3; column++)
+                {
+                    checker().verifyEquals(String.format("For row %d column %d the exported value is not as expected.", row, column),
+                            expectedDate.get(column), sheet.getRow(row).getCell(column).getDateCellValue());
+                }
+
+                row++;
+            }
+        }
+
+    }
+
     // The order of the list returned is important. The data will be added to the list in the same order as the list.
     // If changes are made to this data cooresponding changes will need to be made to the sorting and filtering tests.
     private List<Date> createDateAndTimeTestData()
@@ -445,7 +577,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String keyCol = "Key";
 
-        prepForDatAndTimeOnlyTest(listName);
+        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
 
@@ -654,7 +786,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String keyCol = "Key";
 
-        prepForDatAndTimeOnlyTest(listName);
+        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
 
@@ -906,7 +1038,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
 
-        prepForDatAndTimeOnlyTest(listName);
+        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
@@ -1011,7 +1143,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
 
-        prepForDatAndTimeOnlyTest(listName);
+        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
@@ -1134,7 +1266,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String dateTimeToTimeCol = "DT_To_Time";
         String dateTimeToDateCol = "DT_To_Date";
 
-        prepForDatAndTimeOnlyTest(listName);
+        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with two DateTime fields that will be converted to date-only and time-only fields.", listName));
 

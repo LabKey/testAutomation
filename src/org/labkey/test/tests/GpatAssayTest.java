@@ -128,10 +128,29 @@ public class GpatAssayTest extends BaseWebDriverTest
         log("Import XLSX GPAT assay");
         assayDesignerPage = startCreateGpatAssay(GPAT_ASSAY_XLSX, ASSAY_NAME_XLSX);
         setAssayResultsProperties(assayDesignerPage, 11);
+
+        DomainFormPanel domainFormPanel = assayDesignerPage.expandFieldsPanel("Run Fields");
+        domainFormPanel.addField(new FieldDefinition("Date", FieldDefinition.ColumnType.Date));
+        domainFormPanel.addField(new FieldDefinition("Time", FieldDefinition.ColumnType.Time));
+        domainFormPanel.addField(new FieldDefinition("DateTime", FieldDefinition.ColumnType.DateAndTime));
+
         assayDesignerPage.clickFinish();
         if (isElementPresent(Locator.tagContainingText("p", "The files listed below have been created by another run")))
             clickButton("OK", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
+
+        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "lk-region-form", "Runs")
+                .findElement(getDriver());
+
+        setFormElement(Locator.name("date").findElement(runPropertiesPanel),
+                "11/22/24");
+
+        setFormElement(Locator.name("time").findElement(runPropertiesPanel),
+                "10:38 am");
+
+        setFormElement(Locator.name("dateTime").findElement(runPropertiesPanel),
+                "11/22/24 10:38 am");
+
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX.getName()));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
