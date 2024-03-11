@@ -122,60 +122,20 @@ public class ProjectSettingsTest extends BaseWebDriverTest
                                         String dateFormat, String dateTimeFormat, String timeFormat)
     {
 
-        if(helpMenu)
-        {
-            checker().verifyTrue("Help menu should be checked.",
-                    settingsPage.getHelpMenu());
-        }
-        else
-        {
-            checker().verifyFalse("Help menu should not be checked.",
-                    settingsPage.getHelpMenu());
-        }
+        checker().verifyEquals("Help menu should be " + (helpMenu ? "checked." : "unchecked."),
+                helpMenu, settingsPage.getHelpMenu());
 
-        if(supportLink.isEmpty())
-        {
-            checker().verifyTrue("Support link should be empty.",
-                    settingsPage.getSupportLink().isEmpty());
-        }
-        else
-        {
-            checker().verifyEquals("Support link value not as expected.",
-                    supportLink, settingsPage.getSupportLink());
-        }
+        checker().verifyEquals("Support link value not as expected.",
+                supportLink, settingsPage.getSupportLink());
 
-        if(dateFormat.isEmpty())
-        {
-            checker().verifyTrue("'Default Date Display' should be empty.",
-                    settingsPage.getDefaultDateDisplay().isEmpty());
-        }
-        else
-        {
-            checker().verifyEquals("'Default Date Display'  not as expected.",
-                    dateFormat, settingsPage.getDefaultDateDisplay());
-        }
+        checker().verifyEquals("'Default Date Display'  not as expected.",
+                dateFormat, settingsPage.getDefaultDateDisplay());
 
-        if(dateTimeFormat.isEmpty())
-        {
-            checker().verifyTrue("'Default Time Display' should be empty.",
-                    settingsPage.getDefaultDateTimeDisplay().isEmpty());
-        }
-        else
-        {
-            checker().verifyEquals("'Default Date Display'  not as expected.",
-                    dateTimeFormat, settingsPage.getDefaultDateTimeDisplay());
-        }
+        checker().verifyEquals("'Default Date Display'  not as expected.",
+                dateTimeFormat, settingsPage.getDefaultDateTimeDisplay());
 
-        if(timeFormat.isEmpty())
-        {
-            checker().verifyTrue("'Default Time Display' should be empty.",
-                    settingsPage.getDefaultTimeDisplay().isEmpty());
-        }
-        else
-        {
-            checker().verifyEquals("'Default Time Display'  not as expected.",
-                    timeFormat, settingsPage.getDefaultTimeDisplay());
-        }
+        checker().verifyEquals("'Default Time Display'  not as expected.",
+                timeFormat, settingsPage.getDefaultTimeDisplay());
 
     }
 

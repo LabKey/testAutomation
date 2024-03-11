@@ -46,14 +46,7 @@ public class ProjectSettingsPage extends BaseSettingsPage
 
     public void setShouldInherit(boolean value)
     {
-        if(value)
-        {
-            elementCache().shouldInherit.check();
-        }
-        else
-        {
-            elementCache().shouldInherit.uncheck();
-        }
+        elementCache().shouldInherit.set(value);
     }
 
     @Override
