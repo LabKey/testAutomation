@@ -433,6 +433,17 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return this;
     }
 
+    public void setActionComment(String comment)
+    {
+        elementCache().commentInput.sendKeys(comment);
+    }
+
+    public void clearActionComment()
+    {
+        elementCache().commentInput.clear();
+    }
+
+
     /**
      * Simple finder for this panel.
      */
@@ -495,6 +506,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         final WebElement addButton = Locator
                 .tagContainingText("span", "Add")
                 .findWhenNeeded(this);
+
+        public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
 
         // This is the remove button that is used to remove a lineage entity.
         WebElement removeButton(int index)

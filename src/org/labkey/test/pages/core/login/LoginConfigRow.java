@@ -1,6 +1,7 @@
 package org.labkey.test.pages.core.login;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.login.AuthenticationProvider;
@@ -44,7 +45,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         return new LoginConfigurePage(getDriver());
     }
 
-    public <P extends AuthDialogBase> P clickEdit(AuthenticationProvider<P> authenticationProvider)
+    public <P extends AuthDialogBase<?>> P clickEdit(AuthenticationProvider<P> authenticationProvider)
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editButton));
         elementCache().editButton.click();
@@ -75,7 +76,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     }
 
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement baseFieldsElement = Locator.tagWithClass("div", "domain-row-base-fields").findWhenNeeded(this);
         final WebElement description = Locator.tagWithClass("div", "description").findWhenNeeded(baseFieldsElement);

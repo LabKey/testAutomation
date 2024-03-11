@@ -423,6 +423,15 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return errorBanner.getText();
     }
 
+    public void setActionComment(String comment)
+    {
+        elementCache().commentInput.sendKeys(comment);
+    }
+
+    public void clearActionComment()
+    {
+        elementCache().commentInput.clear();
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -453,6 +462,8 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 .findWhenNeeded(this);
         public WebElement cancelButton = Locator.tagWithAttribute("button", "type", "button")
                 .findWhenNeeded(this);
+
+        public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
 
         public FilteringReactSelect findSelect(String fieldCaption)
         {
