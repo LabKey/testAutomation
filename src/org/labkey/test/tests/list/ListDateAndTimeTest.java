@@ -484,13 +484,11 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         // Add a date in the future.
         Calendar calToday = Calendar.getInstance();
-        calToday.setTime(TestDateUtils.getTodaysDate());
-        calToday.add(Calendar.MONTH, 2);
-        calToday.set(Calendar.HOUR, 14);
+        calToday.set(Calendar.HOUR_OF_DAY, 14);
         calToday.set(Calendar.MINUTE, 23);
         calToday.set(Calendar.SECOND, 54);
+        calToday.add(Calendar.MONTH, 2);
         date = calToday.getTime();
-
         dates.add(date);
 
         date = new Calendar.Builder()
