@@ -386,6 +386,7 @@ public class DataClassTest extends BaseWebDriverTest
         checker().verifyEquals("Values in date-only column not as expected.",
                 expectedDateCol, listTable.getColumnDataAsText(dateField));
 
+        // It looks like Dataclasses do not support milliseconds.
         checker().verifyEquals("Values in time-only column not as expected.",
                 expectedTimeCol, listTable.getColumnDataAsText(timeField));
 

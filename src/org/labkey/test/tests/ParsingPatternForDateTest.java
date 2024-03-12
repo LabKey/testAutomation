@@ -186,7 +186,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         listTable.checkAllOnPage();
         listTable.clickDeleteAllButton();
 
-        log("Set an additional parsing patterns that is US format (MM/dd).");
+        log("Set an additional parsing patterns that is US format (MM/dd) but site setting is still Non-US.");
         String dateTimePattern = "MM/dd/yy HH:mm";
         String datePattern = "MM/dd/yy";
         String timePattern = "HH:mm";
@@ -196,6 +196,8 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         // Additional parsing format should be applied first before non-US mode (?)
         // Send in dates that are MM/dd format.
 
+        // This data fails to import because the date-only field is not parsed. The dateTime field with the same date
+        // format has no problems.
         bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
                 + "A\t12/23/24 14:45\t12/23/24\t14:45\n"
                 + "B\t11/19/99 9:32:06.001\t11/19/99\t9:32:06.001\n"
