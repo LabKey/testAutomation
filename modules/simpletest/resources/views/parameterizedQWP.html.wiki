@@ -1,4 +1,5 @@
 <div id='queryTestDiv1'></div>
+<!-- Used as HTML wiki source, so nonce is NOT required -->
 <script type="text/javascript">
     LABKEY.requiresExt3ClientAPI(function() {
         Ext.onReady(function() {

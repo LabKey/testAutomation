@@ -9,7 +9,7 @@
         <label for="email">Email</label>
         <input id="email" name="email" type="text" class="input-block" tabindex="1" >
         <label for="password">
-            Password <a href="login-resetPassword.view?">(forgot password)</a>
+            Password <a href="login-resetPassword.view">(forgot password)</a>
         </label>
         <input id="password" name="password" type="password" class="input-block" tabindex="2" autofocus>
         <input type=checkbox name="remember" id="remember"  checked>
@@ -18,12 +18,12 @@
             <div class="auth-header auth-item">Terms of Use</div>
             <div class="toucontent auth-item termsOfUseContent"></div>
             <div class="auth-item">
-                <input type="checkbox" name="approvedTermsOfUse" id="approvedTermsOfUse" class="auth-item" unchecked>
+                <input type="checkbox" name="approvedTermsOfUse" id="approvedTermsOfUse" class="auth-item">
                 <label for="approvedTermsOfUse">I agree to these terms</label>
             </div>
         </div>
         <input type="hidden" name="termsOfUseType" id="termsOfUseType">
-        <input type="hidden" id="returnUrl" name="returnUrl" value="<%=contextPath%>/project/Shared/start.view">
+        <input type="hidden" id="returnUrl" name="returnUrl" value="<%=contextPath%>/Shared/project-start.view">
         <div class="auth-item auth-credentials-submit">
             <input type="submit" tab-index="-1" style="position: absolute; left: -9999px; width: 1px; height: 1px;" class="loginSubmitButton"/>
             <a class="labkey-button primary signin-btn"><span>Sign In</span></a>

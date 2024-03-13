@@ -7,6 +7,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactDatePicker;
 import org.labkey.test.components.react.ReactSelect;
@@ -41,6 +42,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
@@ -145,6 +147,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return this;
     }
 
+    public boolean isRowSelected(int index)
+    {
+        if (hasSelectColumn())
+        {
+            WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
+            return checkBox.isSelected();
+        }
+        else
+        {
+            throw new NoSuchElementException("There is no select checkbox for row " + index);
+        }
+    }
+
     public EditableGrid selectAll(boolean checked)
     {
         if (hasSelectColumn())
@@ -155,6 +170,39 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             throw new NoSuchElementException("There is no select checkbox for all rows.");
         }
+        return this;
+    }
+
+    public boolean areAllRowsSelected()
+    {
+        if (hasSelectColumn())
+            return new Checkbox(elementCache().selectColumn).isSelected();
+        else
+            throw new NoSuchElementException("There is no select checkbox for all rows.");
+    }
+
+    /**
+     * Selects a range of rows in the current view.
+     * If the range is within a range of already-selected rows, will deselect the specified range
+     * @param start the starting index (0-based), of non-header rows with checkboxes
+     * @param end the ending index
+     * @return  the current instance
+     */
+    public EditableGrid shiftSelectRange(int start, int end)
+    {
+        if (!hasSelectColumn())
+            throw new NoSuchElementException("there is no select checkbox for all rows");
+
+        var checkBoxes = Locator.tag("tr").child("td")
+                .child(Locator.tagWithAttribute("input", "type", "checkbox"))
+                .findElements(elementCache().table);
+        getWrapper().scrollIntoView(checkBoxes.get(0), true); // bring as much of the grid into view as possible
+        new Actions(getDriver())
+                .click(checkBoxes.get(start))
+                .keyDown(Keys.SHIFT)
+                .click(checkBoxes.get(end))
+                .keyUp(Keys.SHIFT)
+                .perform();
         return this;
     }
 
@@ -527,8 +575,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return lookupSelect.getOptions();
     }
 
+
     /**
-     * Pastes delimited text to the grid, from a single target.  The component is clever enough to target
+     * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
      * @param columnName    column of the target cell
@@ -536,6 +585,20 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @return A Reference to this editableGrid object.
      */
     public EditableGrid pasteFromCell(int row, String columnName, String pasteText)
+    {
+        return pasteFromCell(row, columnName, pasteText, false);
+    }
+
+    /**
+     * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
+     * text into cells based on text delimiters; thus we can paste a square of data into the grid.
+     * @param row           index of the target cell
+     * @param columnName    column of the target cell
+     * @param pasteText     tab-delimited or csv or excel data
+     * @param validate      whether to await/confirm the presence of pasted text before resuming
+     * @return A Reference to this editableGrid object.
+     */
+    public EditableGrid pasteFromCell(int row, String columnName, String pasteText, boolean validate)
     {
         int initialRowCount = getRowCount();
         WebElement gridCell = getCell(row, columnName);
@@ -548,7 +611,49 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // ... or for a second and a half
         WebDriverWrapper.waitFor(()-> (getRowCount() > initialRowCount || !indexValue.equals(gridCell.getText())) &&
                         isInSelection(gridCell), 1500);
+        if (validate)
+            waitForAnyPasteContent(pasteText);
+
         return this;
+    }
+
+    /**
+     * Awaits any elements (except for empty, or space-only) of the pasted content to be present in the grid
+     * @param pasteContent  tab-separated text
+     */
+    protected void waitForAnyPasteContent(String pasteContent)
+    {
+        // split pasteContent into its parts
+        var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        // filter out empty and space-only values
+        var filteredParts = Arrays.stream(contentParts).filter(a-> !a.isEmpty() && !a.equals(" ")).collect(Collectors.toList());
+        await().atMost(Duration.ofSeconds(2))
+                .untilAsserted(()-> Assertions.assertThat(getSelectionCellTexts())
+                        .containsAnyElementsOf(filteredParts));
+    }
+
+    /**
+     * Awaits all elements (except empty or space-only) of the pasted content to be present in the grid.
+     * Use this to validate all expected content appears after pasting to the grid
+     * @param pasteContent  tab-separated text of the sort usually pasted into the edit grid
+     */
+    public void waitForPasteContent(String pasteContent)
+    {
+        // split pasteContent into its parts
+        var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        // filter out empty and space-only values
+        var filteredParts = Arrays.stream(contentParts).filter(a-> !a.isEmpty() && !a.equals(" ")).collect(Collectors.toList());
+        await().atMost(Duration.ofSeconds(2))
+                .untilAsserted(()-> Assertions.assertThat(getSelectionCellTexts())
+                        .containsAll(filteredParts));
+    }
+
+    // captures the texts of any cells currently in selection
+    public List<String> getSelectionCellTexts()
+    {
+        var cells = Locator.tagWithClass("div", "cellular-display")
+                .withAttributeContaining("class","cell-selection").findElements(this);
+        return getWrapper().getTexts(cells);
     }
 
     /**
@@ -611,7 +716,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * Selects all cells in the table, then deletes their content
      */
-    public void clearAllCells() throws IOException, UnsupportedFlavorException
+    public void clearAllCells()
     {
         selectAllCells();
         new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
@@ -679,7 +784,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
-    private WebElement selectCell(int row, String columnName)
+    public WebElement selectCell(int row, String columnName)
     {
         // Get a reference to the cell.
         WebElement gridCell = getCell(row, columnName);
@@ -707,12 +812,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void activateCell(WebElement cell)
     {
         // If it is a selector, and it already has focus (is active), it will not have a div.cellular-display
-        if(Locator.tagWithClass("div", "select-input__control--is-focused")
-                .findElements(cell).isEmpty())
-        {
-            var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(cell);
-            cellContent.sendKeys(Keys.ENTER);
-        }
+        if (Locator.tagWithClass("div", "select-input__control--is-focused").findElements(cell).isEmpty())
+            sendKeysToCell(cell, Keys.ENTER);
+    }
+
+    public void sendKeysToCell(WebElement cell, CharSequence... keysToSend)
+    {
+        var cellContent = Locator.tagWithClass("div", "cellular-display").findElement(cell);
+        cellContent.sendKeys(keysToSend);
     }
 
     /**
@@ -720,7 +827,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * @param cell A WebElement that is the grid cell (a  td).
      * @return True if the edit is present
      */
-    private boolean isCellSelected(WebElement cell)
+    public boolean isCellSelected(WebElement cell)
     {
         try
         {
@@ -730,7 +837,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                     .findElement(cell)
                     .getAttribute("class").contains("cell-selected");
         }
-        catch(NoSuchElementException nse)
+        catch (NoSuchElementException nse)
         {
             // If the cell is an open/active reactSelect the class attribute is different.
             return Locator.tagWithClass("div", "select-input__control")

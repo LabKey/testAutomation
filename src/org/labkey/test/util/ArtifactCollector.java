@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -225,7 +226,7 @@ public class ArtifactCollector
         File screenFile = new File(dir, baseName + "Fullscreen.png");
 
         // Windows doesn't support OS level screenshots for headless environment
-        if (!isTestRunningOnTeamCity() || !System.getProperty("os.name").toLowerCase().contains("win"))
+        if (!isTestRunningOnTeamCity() || !SystemUtils.IS_OS_WINDOWS)
         {
             try
             {

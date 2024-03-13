@@ -191,7 +191,7 @@ public class JUnitTest extends TestSuite
         CloseableHttpResponse response = null;
         try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
-            final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view?";
+            final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view";
             HttpGet method = new HttpGet(url);
             try
             {

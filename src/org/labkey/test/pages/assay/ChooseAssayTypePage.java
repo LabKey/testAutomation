@@ -105,7 +105,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         // selectButton's text changes depending upon which assay is selected- it can be 'Choose Standard Assay' or 'Choose x Assay'
         public final WebElement selectButton = Locator.tagWithClass("button", "pull-right").findWhenNeeded(getDriver());
 
-        public final WebElement specialtyPanel = Locator.tagWithId("div", "assay-picker-tabs-pane-specialty").findWhenNeeded(this);
+        public final WebElement specialtyPanel = Locator.byClass("tab-pane").index(1).findWhenNeeded(this);
 
         public final WebElement stdAssayTab = stdAssayTabLocator().findWhenNeeded(this);
         public final WebElement specialtyAssayTab = specialtyAssayTabLocator().findWhenNeeded(this);
@@ -122,19 +122,19 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         }
         public Locator.XPathLocator stdAssayTabLocator()
         {
-            return Locator.id("assay-picker-tabs-tab-standard");
+            return Locator.tagWithText("a", "Standard Assay");
         }
         public Locator.XPathLocator stdAssayPaneLocator()
         {
-            return Locator.id("assay-picker-tabs-pane-standard");
+            return Locator.byClass("tab-pane").index(0);
         }
         public Locator.XPathLocator specialtyAssayTabLocator()
         {
-            return Locator.id("assay-picker-tabs-tab-specialty");
+            return Locator.tagWithText("a", "Specialty Assays");
         }
         public Locator.XPathLocator specialtyAssayPaneLocator()
         {
-            return Locator.id("assay-picker-tabs-pane-specialty");
+            return Locator.byClass("tab-pane").index(1);
         }
     }
 }

@@ -37,6 +37,13 @@ public class CustomizeGridViewDialog extends ModalDialog
         waitForReady();
     }
 
+    protected CustomizeGridViewDialog(WebDriver driver)
+    {
+        super(new ModalDialogFinder(driver));
+        waitForReady();
+        this.linkedComponent = null;
+    }
+
     @Override
     protected void waitForReady()
     {
@@ -186,8 +193,8 @@ public class CustomizeGridViewDialog extends ModalDialog
         Assert.assertTrue(String.format("Field with data-fieldkey attribute '%s' is not visible in the 'Available Fields' panel.", fieldKey),
                 listItem.isDisplayed());
 
-        String iconClass = expand ? "fa-plus-square" : "fa-minus-square";
-        String oppositeIconClass = !expand ? "fa-plus-square" : "fa-minus-square";
+        String iconClass = expand ? "fa-chevron-right" : "fa-chevron-down";
+        String oppositeIconClass = !expand ? "fa-chevron-right" : "fa-chevron-down";
 
         WebElement expandIcon = Locator.tagWithClass("div", "field-expand-icon")
                 .withChild(Locator.tagWithClass("i", iconClass))
@@ -215,9 +222,9 @@ public class CustomizeGridViewDialog extends ModalDialog
      */
     private boolean isFieldKeyExpanded(WebElement listItem)
     {
-        // As long as there is no plus/expand icon then this field is expanded.
+        // As long as there is no expand icon then this field is expanded.
         return   !Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", "fa-plus-square"))
+                .withChild(Locator.tagWithClass("i", "fa-chevron-right"))
                 .findWhenNeeded(listItem).isDisplayed();
     }
 

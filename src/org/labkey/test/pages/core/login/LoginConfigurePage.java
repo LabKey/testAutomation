@@ -6,6 +6,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.Tabs;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.params.login.AuthenticationProvider;
@@ -35,7 +36,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         Locator.waitForAnyElement(shortWait(), Locator.button("Done"), Locator.button("Cancel"));
     }
 
-    public <D extends AuthDialogBase> D addConfiguration(AuthenticationProvider<D> authenticationProvider)
+    public <D extends AuthDialogBase<?>> D addConfiguration(AuthenticationProvider<D> authenticationProvider)
     {
         togglePrimaryConfiguration();
         elementCache().addPrimaryMenu.
@@ -44,18 +45,13 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return authenticationProvider.getNewDialog(getDriver());
     }
 
-    public <D extends AuthDialogBase> D editConfiguration(AuthenticationProvider<D> authenticationProvider, String description)
-    {
-        return clickEditConfiguration(description, authenticationProvider);
-    }
-
     public boolean canAddConfiguration()
     {
         togglePrimaryConfiguration();
         return elementCache().primaryMenuFinder.findOptional(getDriver()).isPresent();
     }
 
-    public <D extends AuthDialogBase> D addSecondaryConfiguration(AuthenticationProvider<D> authenticationProvider)
+    public <D extends AuthDialogBase<?>> D addSecondaryConfiguration(AuthenticationProvider<D> authenticationProvider)
     {
         toggleSecondaryConfiguration();
         WebDriverWrapper.waitFor(() -> elementCache().addSecondaryMenu.getComponentElement().isDisplayed(), 2000);
@@ -75,16 +71,6 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
     {
         toggleSecondaryConfiguration();
         return !elementCache().addSecondaryMenu.isMenuItemDisabled(option);
-    }
-
-    private boolean isPrimarySelected()
-    {
-        return elementCache().panelTab1.getAttribute("aria-selected").equals("true");
-    }
-
-    private boolean isSecondarySelected()
-    {
-        return elementCache().panelTab2.getAttribute("aria-selected").equals("true");
     }
 
     // global settings
@@ -121,58 +107,37 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return elementCache().autoCreateCheckBox.get();
     }
 
-    public LoginConfigurePage togglePrimaryConfiguration()
+    private WebElement togglePrimaryConfiguration()
     {
-        if (!isPrimarySelected())
-            elementCache().panelTab1.click();
-        waitFor(() -> isPrimarySelected(), 1000);
-        return this;
+        return elementCache().authTabs.selectTab("Primary");
     }
 
     public LoginConfigRow getPrimaryConfigurationRow(String description)
     {
         return new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description)
-                .waitFor(elementCache().tabPane1);
+                .waitFor(togglePrimaryConfiguration());
     }
 
     public List<LoginConfigRow> getPrimaryConfigurations()
     {
-        togglePrimaryConfiguration();
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().tabPane1);
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver())
+                .findAll(togglePrimaryConfiguration());
     }
 
-    public LoginConfigurePage toggleSecondaryConfiguration()
+    private WebElement toggleSecondaryConfiguration()
     {
-        if (!isSecondarySelected())
-            elementCache().panelTab2.click();
-        waitFor(() -> isSecondarySelected(), 1000);
-        return this;
+        return elementCache().authTabs.selectTab("Secondary");
     }
 
     public List<LoginConfigRow> getSecondaryConfigurations()
     {
-        toggleSecondaryConfiguration();
-        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(elementCache().tabPane2);
+        return new LoginConfigRow.LoginConfigRowFinder(getDriver()).findAll(toggleSecondaryConfiguration());
     }
 
     public LoginConfigRow getSecondaryConfigurationRow(String description)
     {
-        toggleSecondaryConfiguration();
         return new LoginConfigRow.LoginConfigRowFinder(getDriver())
-                .withDescription(description).waitFor(elementCache().tabPane2);
-    }
-
-    public LoginConfigurePage removeConfiguration(String description)      // assumes for now we're doing primary only
-    {
-        new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor()
-                .clickDelete();
-        return this;
-    }
-
-    public <D extends AuthDialogBase> D clickEditConfiguration(String description, AuthenticationProvider<D> authenticationProvider)
-    {
-        LoginConfigRow row = new LoginConfigRow.LoginConfigRowFinder(getDriver()).withDescription(description).waitFor(getDriver());
-        return row.clickEdit(authenticationProvider);
+                .withDescription(description).waitFor(toggleSecondaryConfiguration());
     }
 
     public ShowAdminPage clickSaveAndFinish()
@@ -188,16 +153,12 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         Checkbox selfSignupCheckBox = new Checkbox(this, "Allow self sign up");
         Checkbox allowUserEmailEditCheckbox = new Checkbox(this, "Allow users to edit their own email addresses");
         Checkbox autoCreateCheckBox = new Checkbox(this,"Auto-create authenticated users");
-        WebElement tabPanel = Locator.id("tab-panel").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab1 = Locator.id("tab-panel-tab-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement tabPane1 = Locator.id("tab-panel-pane-1").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement panelTab2 = Locator.id("tab-panel-tab-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement tabPane2 = Locator.id("tab-panel-pane-2").refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final Tabs authTabs = new Tabs.TabsFinder(getDriver()).locatedBy(Locator.byClass("lk-tabs")).findWhenNeeded(this);
         MultiMenu.MultiMenuFinder primaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
                 .withText("Add New Primary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
         BootstrapMenu addPrimaryMenu = primaryMenuFinder.findWhenNeeded(this);

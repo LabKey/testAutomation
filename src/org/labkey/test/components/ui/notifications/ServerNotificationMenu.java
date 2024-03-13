@@ -2,8 +2,8 @@ package org.labkey.test.components.ui.notifications;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.react.BaseBootstrapMenu;
-import org.labkey.test.components.react.MultiMenu;
+import org.labkey.test.components.Component;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ui.pipeline.ImportsPage;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -13,17 +13,32 @@ import org.openqa.selenium.WebElement;
 /**
  * This covers a couple of components under component/notifications. Mostly ServerNotifications.tsx and ServerActivityList.tsx
  */
-public class ServerNotificationMenu extends BaseBootstrapMenu
+public class ServerNotificationMenu extends WebDriverComponent<ServerNotificationMenu.ElementCache>
 {
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
 
     protected ServerNotificationMenu(WebElement element, WebDriver driver)
     {
-        super(element, driver);
+        _componentElement = element;
+        _driver = driver;
+    }
+
+    @Override
+    protected WebDriver getDriver()
+    {
+        return _driver;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _componentElement;
     }
 
     public static SimpleWebDriverComponentFinder<ServerNotificationMenu> finder(WebDriver driver)
     {
-        return new MultiMenu.MultiMenuFinder(driver).withButtonId("server-notifications-button").wrap(ServerNotificationMenu::new);
+        return  new SimpleWebDriverComponentFinder<>(driver, rootLocator, ServerNotificationMenu::new);
     }
 
     /**
@@ -105,6 +120,31 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
         return elementCache().markAll().isDisplayed();
     }
 
+    protected boolean isExpanded()
+    {
+        boolean ariaExpanded = "true".equals(elementCache().toggle.getAttribute("aria-expanded"));
+        boolean menuContentDisplayed = elementCache().menuContent.isDisplayed();
+
+        return ariaExpanded && menuContentDisplayed;
+    }
+
+    public void expand()
+    {
+        if (!isExpanded())
+        {
+            elementCache().toggle.click();
+            WebDriverWrapper.waitFor(this::isExpanded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
+    public void collapse()
+    {
+        if (isExpanded())
+        {
+            elementCache().toggle.click();
+        }
+    }
+
     /**
      * Click the 'Mark all as read' link. This will cause the list to refresh, any references you have to a
      * {@link ServerNotificationItem} will need to be reacquired.
@@ -136,11 +176,11 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         // Wait for the listing container to show up. The listing container is in the open menu, scope the search to that.
         Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
-        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(elementCache().findOpenMenu()).isDisplayed(),
+        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(elementCache().menuContent).isDisplayed(),
                 "List container did not render.", 500);
 
         // Find again (lambda requires a final reference to the component).
-        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().findOpenMenu());
+        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().menuContent);
 
         // It may be a moment before any notifications show up.
         WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing")
@@ -158,7 +198,7 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
         // update with the most recent notification the old reference will be stale.
-        return notificationsContainerLocator.waitForElement(elementCache().findOpenMenu(), 1_000);
+        return notificationsContainerLocator.waitForElement(elementCache().menuContent, 1_000);
     }
 
     /**
@@ -208,26 +248,18 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
     }
 
     @Override
-    protected Locator getToggleLocator()
-    {
-        return Locator.tagWithId("button", "server-notifications-button");
-    }
-
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
-    @Override
-    protected ElementCache newElementCache()
+    protected ServerNotificationMenu.ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends BaseBootstrapMenu.ElementCache
+    public static final Locator rootLocator = Locator.byClass("server-notifications");
+
+    protected class ElementCache extends Component<?>.ElementCache
     {
-        public final Locator notificationList = Locator.tagWithClass("ul", "server-notifications-listing");
+        public final WebElement menuContent = Locator.byClass("navbar-menu__content").refindWhenNeeded(this);
+
+        public final WebElement toggle = Locator.byClass("navbar-menu-button").findWhenNeeded(this);
 
         public final WebElement statusIcon()
         {
@@ -236,14 +268,14 @@ public class ServerNotificationMenu extends BaseBootstrapMenu
 
         public final WebElement noNotificationsElement()
         {
-            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(elementCache().findOpenMenu());
+            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(elementCache().menuContent);
         }
 
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
                     .child(Locator.tagWithClass("div", "server-notifications-link"))
-                    .refindWhenNeeded(elementCache().findOpenMenu());
+                    .refindWhenNeeded(elementCache().menuContent);
         }
 
         public final WebElement viewAllLink = Locator.tagWithText("div", "View all activity").refindWhenNeeded(this);
