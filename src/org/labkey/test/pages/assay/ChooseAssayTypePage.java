@@ -34,13 +34,13 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     @Override
     protected void waitForPage()
     {
-        waitFor(() -> elementCache().authTabs.getTabText().size() > 1, WAIT_FOR_PAGE);
+        waitFor(() -> elementCache().assayTypeTabs.getTabText().size() > 1, WAIT_FOR_PAGE);
     }
 
 
     public ReactAssayDesignerPage selectStandardAssay()
     {
-        elementCache().authTabs.selectTab("Standard Assay");
+        elementCache().assayTypeTabs.selectTab("Standard Assay");
 
         clickSelectButton();
         return new ReactAssayDesignerPage(getDriver());
@@ -52,7 +52,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
             return selectStandardAssay();
         }
 
-        WebElement activeTab = elementCache().authTabs.selectTab("Specialty Assays");
+        WebElement activeTab = elementCache().assayTypeTabs.selectTab("Specialty Assays");
 
         WebElement specialtySelect = Locator.id("specialty-assay-type-select").findWhenNeeded(activeTab);
         shortWait().until(ExpectedConditions.visibilityOf(specialtySelect));
@@ -68,7 +68,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
 
     public ChooseAssayTypePage goToImportAssayDesignTab()
     {
-        elementCache().authTabs.selectTab("Import Assay Design");
+        elementCache().assayTypeTabs.selectTab("Import Assay Design");
         return this;
     }
 
@@ -97,7 +97,9 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         // selectButton's text changes depending upon which assay is selected- it can be 'Choose Standard Assay' or 'Choose x Assay'
         public final WebElement selectButton = Locator.tagWithClass("button", "pull-right").findWhenNeeded(getDriver());
 
-        public final Tabs authTabs = new Tabs.TabsFinder(getDriver()).locatedBy(Locator.byClass("lk-tabs")).findWhenNeeded(this);
+        public final Tabs assayTypeTabs = new Tabs.TabsFinder(getDriver())
+                .locatedBy(Locator.XPathLocator.union(Locator.id("assay-picker-tabs"), Locator.byClass("lk-tabs")))
+                .findWhenNeeded(this);
 
     }
 }

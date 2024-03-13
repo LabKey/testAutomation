@@ -88,11 +88,11 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement tabList = Locator.xpath("./ul").withClass("nav-tabs").findWhenNeeded(this);
+        final WebElement tabList = Locator.xpath("(ul|div/ul)").withClass("nav-tabs").findWhenNeeded(this);
         final Map<String, WebElement> tabMap = new HashMap<>();
         final List<WebElement> tabs = new ArrayList<>();
         private final Locator.XPathLocator tabLoc = Locator.tag("a").withAttribute("role", "tab");
-        final WebElement tabContent = Locator.xpath("./div").withClass("tab-content").findWhenNeeded(this);
+        final WebElement tabContent = Locator.xpath("(div|div/div)").withClass("tab-content").findWhenNeeded(this);
 
         public ElementCache()
         {
