@@ -215,7 +215,7 @@ public abstract class TestFileUtils
             if (TestProperties.isEmbeddedTomcat() && !_modulesDir.isDirectory())
             {
                 // Module root when deploying from embedded distribution
-                _modulesDir = new File(getDefaultDeployDir(), "embedded/server/modules");
+                _modulesDir = new File(getDefaultDeployDir(), "embedded/modules");
             }
         }
         return _modulesDir;
