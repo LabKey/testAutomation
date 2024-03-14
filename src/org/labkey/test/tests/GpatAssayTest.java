@@ -34,6 +34,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayBeginPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -336,8 +337,11 @@ public class GpatAssayTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testUpdateAssayDesign()
+    public void testUpdateAssayDesign() throws IOException, CommandException
     {
+
+        BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
+
         File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
 
         String originalAssayName = "A Assay Name";

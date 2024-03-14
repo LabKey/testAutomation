@@ -3,12 +3,12 @@ package org.labkey.test.tests.list;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -20,6 +20,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ImportDataPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -43,9 +44,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 {
 
     private static final String PROJECT_NAME = "List Date And Time Test";
-    private SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
-    private SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static SimpleDateFormat _defaultDateFormat = null;
+    private static SimpleDateFormat _defaultTimeFormat = null;
+    private static SimpleDateFormat _defaultDateTimeFormat = null;
 
     @Override
     public List<String> getAssociatedModules()
@@ -79,11 +80,16 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         _defaultDateTimeFormat = new SimpleDateFormat(settingsPage.getDefaultDateTimeDisplay());
     }
 
+    @AfterClass
+    public static void afterClass() throws IOException, CommandException
+    {
+        ((ListDateAndTimeTest) getCurrentTest()).resetSiteSettings();
+    }
+
     private void resetSiteSettings() throws IOException, CommandException
     {
         log("Reset site settings.");
-        new SimplePostCommand("admin", "resetProperties")
-                .execute(createDefaultConnection(), "/");
+        BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
     }
 
     @Before
@@ -106,7 +112,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         int rowIndex = 0;
         for(Map<String, String> expectedRowMap : expectedData)
         {
-            // Protect against expecting more rows than are present in the grid.
+            // Protect against the table having fewer rows than expected (index out of bounds error).
             if(rowIndex < table.getDataRowCount())
             {
                 Map<String, String> tableRowMap = table.getRowDataAsMap(rowIndex);

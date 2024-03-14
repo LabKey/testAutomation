@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -28,10 +30,15 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,26 +146,24 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
     }
 
-    private void resetSiteSettings()
+    private void resetSiteSettings() throws IOException, CommandException
     {
-        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(this);
-        settingsPage.reset();
+        BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
     }
 
-    private void resetProjectSettings()
+    private void resetProjectSettings() throws IOException, CommandException
     {
-        ProjectSettingsPage settingsPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
-        settingsPage.reset();
+        BaseSettingsPage.resetSettings(createDefaultConnection(), PROJ_CHANGE);
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws IOException, CommandException
     {
         ProjectSettingsTest init = (ProjectSettingsTest)getCurrentTest();
         init.setUpTest();
     }
 
-    protected void setUpTest()
+    protected void setUpTest() throws IOException, CommandException
     {
         _containerHelper.deleteProject(PROJ_CHANGE, false);
         _containerHelper.deleteProject(PROJ_BASE, false);
@@ -169,39 +174,43 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJ_BASE, null);
     }
 
+    @AfterClass
+    public static void cleanUpAfter() throws IOException, CommandException
+    {
+        ((ProjectSettingsTest) getCurrentTest()).resetSiteSettings();
+    }
+
     private static final String DT_LIST_NAME = "Date_And_Time";
     private static final String DT_LIST_ID_COL = "id";
     private static final String DT_LIST_DATE_COL = "Date";
     private static final String DT_LIST_TIME_COL = "Time";
     private static final String DT_LIST_DATETIME_COL = "DateTime";
 
-    private void createDateAndTimeList(String project, List<Map<String, String>> listData)
+    private void createDateAndTimeList(String project, List<Map<String, String>> listData) throws IOException, CommandException
     {
-        _listHelper.createList(project, DT_LIST_NAME, ListHelper.ListColumnType.AutoInteger, DT_LIST_ID_COL,
-                new FieldDefinition(DT_LIST_DATE_COL, FieldDefinition.ColumnType.Date),
+
+        ListDefinition listDef = new IntListDefinition(DT_LIST_NAME, DT_LIST_ID_COL);
+        listDef.setFields(List.of(new FieldDefinition(DT_LIST_DATE_COL, FieldDefinition.ColumnType.Date),
                 new FieldDefinition(DT_LIST_TIME_COL, FieldDefinition.ColumnType.Time),
-                new FieldDefinition(DT_LIST_DATETIME_COL, FieldDefinition.ColumnType.DateAndTime));
+                new FieldDefinition(DT_LIST_DATETIME_COL, FieldDefinition.ColumnType.DateAndTime)));
 
-
-        // Use the default format to initially populate the lists.
-        StringBuilder bulkImportData = new StringBuilder();
-        bulkImportData.append(String.format("%s\t%s\t%s\n", DT_LIST_DATE_COL, DT_LIST_TIME_COL, DT_LIST_DATETIME_COL));
+        TestDataGenerator tdg = listDef.create(createDefaultConnection(), project);
 
         for(Map<String, String> listRow : listData)
         {
-            bulkImportData.append(String.format("%s\t%s\t%s\n",
-                    listRow.get(DT_LIST_DATE_COL),
-                    listRow.get(DT_LIST_TIME_COL),
-                    listRow.get(DT_LIST_DATETIME_COL))
-            );
+            Map<String, Object> tmap = new HashMap<>(listRow);
+            tdg.addCustomRow(tmap);
         }
 
-        _listHelper.bulkImportData(bulkImportData.toString());
+        tdg.insertRows();
+
+        goToProjectHome(project);
+        new PortalHelper(getDriver()).addWebPart("Lists");
 
     }
 
     @Test
-    public void testSiteSettingOverride()
+    public void testSiteSettingOverride() throws IOException, CommandException
     {
 
         String siteDateDisplay = "MMMM dd, yyyy";
@@ -312,7 +321,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testInjection()
+    public void testInjection() throws IOException, CommandException
     {
         resetSiteSettings();
         resetProjectSettings();
@@ -337,7 +346,6 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        resetSiteSettings();
         _containerHelper.deleteProject(PROJ_CHANGE, false);
         _containerHelper.deleteProject(PROJ_BASE, false);
     }

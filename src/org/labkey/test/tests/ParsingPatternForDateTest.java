@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -67,11 +69,39 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         portalHelper.addWebPart("Lists");
     }
 
+    @AfterClass
+    public static void afterClass()
+    {
+        try
+        {
+        ((ParsingPatternForDateTest) getCurrentTest()).resetSiteSettings();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to reset site look and settings after class: " + e);
+        }
+    }
+
     @Before
     public void resetForTest()
     {
-        resetSiteSettings();
-        resetProjectSettings();
+        try
+        {
+            resetSiteSettings();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to reset site look and settings: " + e);
+        }
+
+        try
+        {
+            resetProjectSettings();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to reset project settings: " + e);
+        }
 
         log("Verify no patters are set for the project.");
         verifyNoPatternsSet(ProjectSettingsPage.beginAt(this, getProjectName()));
@@ -81,36 +111,21 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
     }
 
-    private void resetSiteSettings()
+    private void resetSiteSettings() throws IOException, CommandException
     {
         log("Reset site settings.");
-        try
-        {
-            resetSettings("/");
-        }
-        catch (IOException | CommandException e)
-        {
-            TestLogger.error("Failed to reset site look and settings.", e);
-        }
+        resetSettings("/");
     }
 
-    private void resetProjectSettings()
+    private void resetProjectSettings() throws IOException, CommandException
     {
         log("Reset project settings.");
-        try
-        {
-            resetSettings(getProjectName());
-        }
-        catch (IOException | CommandException e)
-        {
-            TestLogger.error("Failed to reset project settings.", e);
-        }
+        resetSettings(getProjectName());
     }
 
     private void resetSettings(String path) throws IOException, CommandException
     {
-        new SimplePostCommand("admin", "resetProperties")
-                .execute(createDefaultConnection(), path);
+        BaseSettingsPage.resetSettings(createDefaultConnection(), path);
     }
 
     @Override
@@ -242,13 +257,12 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     private void createList(String listName) throws IOException, CommandException
     {
         // Delete the list if it already exists.
-        goToProjectHome();
-        if(goToManageLists().getGrid().getListNames().contains(listName))
+        if(DomainUtils.doesDomainExist(getProjectName(), LIST_SCHEMA, listName))
         {
-            _listHelper.goToList(listName);
-            _listHelper.deleteList();
+            DomainUtils.deleteDomain(getProjectName(), LIST_SCHEMA, listName);
         }
 
+        goToProjectHome();
         new IntListDefinition(listName, "id")
                 .setFields(List.of(
                         new FieldDefinition(COL_NAME, FieldDefinition.ColumnType.String),

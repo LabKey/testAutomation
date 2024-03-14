@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
 import org.labkey.test.util.LogMethod;
@@ -142,8 +143,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            new SimplePostCommand("admin", "resetProperties")
-                    .execute(createDefaultConnection(), "/");
+            BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
         }
         catch (IOException | CommandException e)
         {

@@ -1,12 +1,17 @@
 package org.labkey.test.pages.core.admin;
 
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class BaseSettingsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
+import java.io.IOException;
+
+public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 {
 
     public BaseSettingsPage(WebDriver driver)
@@ -262,12 +267,6 @@ public class BaseSettingsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
     }
 
     @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
-    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -300,4 +299,16 @@ public class BaseSettingsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement resetBtn = Locator.lkButton("Reset").findWhenNeeded(this);
     }
+
+    /**
+     * Reset the settings for the site or a project/folder using the API (SimplePostCommand).
+     * @param cn API Connection
+     * @param path Project name/path or a '/' for the site setting.
+     */
+    public static void resetSettings(Connection cn, String path) throws IOException, CommandException
+    {
+        new SimplePostCommand("admin", "resetProperties")
+                .execute(cn, path);
+    }
+
 }
