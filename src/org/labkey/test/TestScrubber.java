@@ -140,6 +140,16 @@ public class TestScrubber extends ExtraSiteWrapper
             TestLogger.error("Failed to reset active user limit after test", e);
         }
 
+        try
+        {
+            new SimplePostCommand("admin", "resetProperties")
+                    .execute(createDefaultConnection(), "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.error("Failed to reset site look and feel properties after test.", e);
+        }
+
     }
 
     @LogMethod(quiet = true)

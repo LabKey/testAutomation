@@ -1,12 +1,12 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -20,6 +20,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,13 +67,6 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         portalHelper.addWebPart("Lists");
     }
 
-    @AfterClass
-    public static void resetAfterClass()
-    {
-        ParsingPatternForDateTest init = (ParsingPatternForDateTest) getCurrentTest();
-        init.resetSiteSettings();
-    }
-
     @Before
     public void resetForTest()
     {
@@ -87,17 +81,36 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
     }
 
-    public void resetSiteSettings()
+    private void resetSiteSettings()
     {
         log("Reset site settings.");
-        LookAndFeelSettingsPage.beginAt(this).reset();
+        try
+        {
+            resetSettings("/");
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.error("Failed to reset site look and settings.", e);
+        }
     }
 
     private void resetProjectSettings()
     {
-        log("Reset project / folder settings.");
-        goToProjectHome();
-        ProjectSettingsPage.beginAt(this).reset();
+        log("Reset project settings.");
+        try
+        {
+            resetSettings(getProjectName());
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.error("Failed to reset project settings.", e);
+        }
+    }
+
+    private void resetSettings(String path) throws IOException, CommandException
+    {
+        new SimplePostCommand("admin", "resetProperties")
+                .execute(createDefaultConnection(), path);
     }
 
     @Override

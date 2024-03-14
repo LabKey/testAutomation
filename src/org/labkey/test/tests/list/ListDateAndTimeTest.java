@@ -3,21 +3,16 @@ package org.labkey.test.tests.list;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
@@ -32,8 +27,6 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.TestDateUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +43,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 {
 
     private static final String PROJECT_NAME = "List Date And Time Test";
+    private SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -63,90 +60,42 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws IOException, CommandException
     {
         ListDateAndTimeTest init = (ListDateAndTimeTest)getCurrentTest();
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws IOException, CommandException
     {
-        log("Setup project and list module");
+        resetSiteSettings();
         _containerHelper.createProject(PROJECT_NAME, null);
         goToProjectHome();
+        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(this);
+
+        // Use java's Date object and SimpleDateFormatter (not strings) to enter the data.
+        _defaultDateFormat = new SimpleDateFormat(settingsPage.getDefaultDateDisplay());
+        _defaultTimeFormat = new SimpleDateFormat(settingsPage.getDefaultTimeDisplay());
+        _defaultDateTimeFormat = new SimpleDateFormat(settingsPage.getDefaultDateTimeDisplay());
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-    }
-
-    @AfterClass
-    public static void resetAfterClass()
-    {
-        ListDateAndTimeTest init = (ListDateAndTimeTest) getCurrentTest();
-        init.resetSiteSettings();
-    }
-
-    public void resetSiteSettings()
+    private void resetSiteSettings() throws IOException, CommandException
     {
         log("Reset site settings.");
-        LookAndFeelSettingsPage.beginAt(this).reset();
+        new SimplePostCommand("admin", "resetProperties")
+                .execute(createDefaultConnection(), "/");
     }
 
     @Before
     public void preTest()
     {
         goToProjectHome();
-        if (isElementPresent(PortalHelper.Locators.webPartTitle("Search")))
-            new PortalHelper(this).removeWebPart("Search");
     }
 
     @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    private SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
-    private SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
-    private void prepForDateAndTimeOnlyTest(String listName) throws IOException, CommandException
-    {
-        log("Reset site setting to have default formats for date and time values.");
-        LookAndFeelSettingsPage settingsPage = LookAndFeelSettingsPage.beginAt(this);
-        settingsPage.reset();
-
-        // Reset doesn't wait for page (page may or may not refresh).
-        sleep(500);
-
-        // Use java's Date object and SimpleDateFormatter (not strings) to enter the data.
-        _defaultDateFormat = new SimpleDateFormat(settingsPage.getDefaultDateDisplay());
-        _defaultTimeFormat = new SimpleDateFormat(settingsPage.getDefaultTimeDisplay());
-        _defaultDateTimeFormat = new SimpleDateFormat(settingsPage.getDefaultDateTimeDisplay());
-
-        deleteListIfPresent(getProjectName(), listName);
-
-    }
-
-    private void deleteListIfPresent(String projectName, String listName) throws IOException, CommandException
-    {
-
-        Connection cn = createDefaultConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
-        cmd.setColumns(Arrays.asList("Name", "Container"));
-        cmd.addFilter("Container/DisplayName", projectName, Filter.Operator.getOperator("EQUAL"));
-        cmd.addFilter("Name", listName, Filter.Operator.getOperator("EQUAL"));
-        SelectRowsResponse response = cmd.execute(cn, projectName);
-
-        if(response.getRowCount().intValue() != 0)
-        {
-            _listHelper.beginAtList(projectName, listName);
-            _listHelper.deleteList();
-        }
-
     }
 
     private void validateListDataInUI(DataRegionTable table, List<Map<String, String>> expectedData)
@@ -173,7 +122,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 }
 
             }
-
             rowIndex++;
         }
     }
@@ -205,8 +153,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String dateCol = "Date";
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
-
-        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
@@ -350,8 +296,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
 
-        prepForDateAndTimeOnlyTest(listName);
-
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
         _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "key",
@@ -470,7 +414,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     }
 
     // The order of the list returned is important. The data will be added to the list in the same order as the list.
-    // If changes are made to this data cooresponding changes will need to be made to the sorting and filtering tests.
+    // If changes are made to this data corresponding changes will need to be made to the sorting and filtering tests.
     private List<Date> createDateAndTimeTestData()
     {
         List<Date> dates = new ArrayList<>();
@@ -574,8 +518,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String dateCol = "Date";
         String timeCol = "Time";
         String keyCol = "Key";
-
-        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
 
@@ -783,8 +725,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String dateCol = "Date";
         String timeCol = "Time";
         String keyCol = "Key";
-
-        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
 
@@ -1036,8 +976,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
 
-        prepForDateAndTimeOnlyTest(listName);
-
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
         _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "Key",
@@ -1140,8 +1078,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String dateCol = "Date";
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
-
-        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
@@ -1263,8 +1199,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String listName = "Convert DateTime Field List";
         String dateTimeToTimeCol = "DT_To_Time";
         String dateTimeToDateCol = "DT_To_Date";
-
-        prepForDateAndTimeOnlyTest(listName);
 
         log(String.format("Create a list named '%s' with two DateTime fields that will be converted to date-only and time-only fields.", listName));
 
