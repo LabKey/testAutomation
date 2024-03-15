@@ -1,33 +1,38 @@
 package org.labkey.test.util;
 
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.GuestCredentialsProvider;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.LabKeySiteWrapper;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.login.SetPasswordForm;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.labkey.test.WebTestHelper.getBaseURL;
 
 /**
  * Bootstrap a server without the initial user validation done by {@link LabKeySiteWrapper#signIn()}
- * Requires that we are able to create the initial user via API.
  */
-public class ApiBootstrapHelper extends ExtraSiteWrapper
+public class ApiBootstrapHelper
 {
-    public ApiBootstrapHelper(WebDriver driver)
-    {
-        super(driver);
-    }
+    public ApiBootstrapHelper() { }
 
-    @Override
     public void signIn()
     {
         waitForStartup();
@@ -35,7 +40,7 @@ public class ApiBootstrapHelper extends ExtraSiteWrapper
         {
             createInitialUser();
             waitForBootstrap();
-            new APIUserHelper(this).setInjectionDisplayName(PasswordUtil.getUsername());
+            new APIUserHelper(this::createDefaultConnection).setInjectionDisplayName(PasswordUtil.getUsername());
         }
         else
         {
@@ -46,7 +51,7 @@ public class ApiBootstrapHelper extends ExtraSiteWrapper
     @LogMethod
     private void waitForStartup()
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
+        Connection cn = new Connection(getBaseURL(), new GuestCredentialsProvider());
         SimpleGetCommand command = new SimpleGetCommand("admin", "healthCheck");
         Exception lastException = null;
 
@@ -76,7 +81,7 @@ public class ApiBootstrapHelper extends ExtraSiteWrapper
             {
                 lastException = e;
             }
-            sleep(500);
+            WebDriverWrapper.sleep(500);
         } while (!timer.isTimedOut());
 
         throw new RuntimeException("Server not done starting up.", lastException);
@@ -85,7 +90,7 @@ public class ApiBootstrapHelper extends ExtraSiteWrapper
     @LogMethod
     private boolean isInitialUserCreated()
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new GuestCredentialsProvider());
+        Connection cn = new Connection(getBaseURL(), new GuestCredentialsProvider());
         SimplePostCommand command = new SimplePostCommand("admin", "configurationSummary");
 
         try
@@ -106,29 +111,11 @@ public class ApiBootstrapHelper extends ExtraSiteWrapper
         }
     }
 
+    @LogMethod
     private void createInitialUser()
     {
-        beginAt(WebTestHelper.buildURL("login", "initialUser"));
-        new SetPasswordForm(getDriver())
-                .setEmail(PasswordUtil.getUsername())
-                .setNewPassword(PasswordUtil.getPassword())
-                .clickSubmit(90_000);
-    }
-
-    /**
-     * TODO: Make this work so that we don't have to open a browser.
-     * The POST just ends up redirecting to the normal initial user view.
-     */
-    @LogMethod
-    private void createInitialUser_API()
-    {
-        Connection cn = createDefaultConnection();
-        SimplePostCommand initialUserCommand = new SimplePostCommand("login", "initialUser");
-        JSONObject params = new JSONObject();
-        params.put("email", PasswordUtil.getUsername());
-        params.put("password", PasswordUtil.getPassword());
-        params.put("password2", PasswordUtil.getPassword());
-        initialUserCommand.setJsonObject(params);
+        Connection cn = new Connection(getBaseURL(), new GuestCredentialsProvider());
+        CreateInitialUserCommand initialUserCommand = new CreateInitialUserCommand();
 
         try
         {
@@ -167,4 +154,35 @@ public class ApiBootstrapHelper extends ExtraSiteWrapper
         throw new RuntimeException("Server didn't finish starting.", lastException);
     }
 
+    public Connection createDefaultConnection()
+    {
+        return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+}
+
+class CreateInitialUserCommand extends PostCommand<CommandResponse>
+{
+    public CreateInitialUserCommand()
+    {
+        super("login", "initialUser");
+    }
+
+    protected List<BasicNameValuePair> getPostData()
+    {
+        List<BasicNameValuePair> postData = new ArrayList<>();
+        postData.add(new BasicNameValuePair("email", PasswordUtil.getUsername()));
+        postData.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
+        postData.add(new BasicNameValuePair("password2", PasswordUtil.getPassword()));
+
+        return postData;
+    }
+
+    @Override
+    protected HttpPost createRequest(URI uri)
+    {
+        // InitialUserAction is not a real API action, so we POST form data instead of JSON
+        HttpPost request = new HttpPost(uri);
+        request.setEntity(new UrlEncodedFormEntity(getPostData()));
+        return request;
+    }
 }

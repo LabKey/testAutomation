@@ -44,6 +44,7 @@ import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Runner;
 import org.labkey.test.SuiteFactory;
 import org.labkey.test.TestProperties;
@@ -115,12 +116,14 @@ public class JUnitTest extends TestSuite
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
 
-        ExtraSiteWrapper bootstrapBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX,
-                ArtifactCollector.ensureDumpDir(JUnitTest.class.getSimpleName()));
         if (skipInitialUserChecks)
         {
-            bootstrapBrowser = new ApiBootstrapHelper(bootstrapBrowser.getDriver());
+            new ApiBootstrapHelper().signIn();
+            return;
         }
+
+        ExtraSiteWrapper bootstrapBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX,
+                ArtifactCollector.ensureDumpDir(JUnitTest.class.getSimpleName()));
 
         try
         {
