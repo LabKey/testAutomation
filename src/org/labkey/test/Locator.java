@@ -1364,17 +1364,18 @@ public abstract class Locator extends By
 
         public XPathLocator withPredicate(@Language("XPath") String predicate)
         {
-            return this.append("[" + getRelativeXPath(predicate) + "]");
+            // Make compatible with Chrome "/../self::*[predicate]" instead of "/..[predicate]"
+            return this.append((getLoc().endsWith("/..") ? "/self::*" : "") + "[" + getRelativeXPath(predicate) + "]");
         }
 
         public XPathLocator withoutPredicate(@Language("XPath") String predicate)
         {
-            return this.append("[not(" + getRelativeXPath(predicate) + ")]");
+            return this.withPredicate("not(" + getRelativeXPath(predicate) + ")");
         }
 
         public XPathLocator withoutPredicate(XPathLocator predicate)
         {
-            return this.append("[not(" + getRelativeXPath(predicate.toXpath()) + ")]");
+            return this.withoutPredicate(getRelativeXPath(predicate.toXpath()));
         }
 
         public XPathLocator attributeStartsWith(String attribute, String text)
