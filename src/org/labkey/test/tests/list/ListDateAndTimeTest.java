@@ -13,6 +13,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
@@ -589,6 +590,13 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Sort the date-only field in ascending order.");
         List<String> expectedKeyColOrder = new ArrayList<>();
+
+        // In MSSQL the "empty" value is at the top.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            expectedKeyColOrder.add("11"); // (empty) 14:59:25
+        }
+
         expectedKeyColOrder.add("1"); // 1950-10-12 08:00:01
         expectedKeyColOrder.add("10"); // 1989-08-12 (empty)
         expectedKeyColOrder.add("4"); // 1992-03-03 10:10:10
@@ -599,7 +607,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         expectedKeyColOrder.add("3"); // 2024-01-01 00:00:00
         expectedKeyColOrder.add("8"); // 2024-02-29 18:32:00
         expectedKeyColOrder.add("2"); // (some future date) 14:23:54
-        expectedKeyColOrder.add("11"); // (empty) 14:59:25
+
+        // In postgres the "empty" value is at the bottom.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            expectedKeyColOrder.add("11"); // (empty) 14:59:25
+        }
 
         table.setSort(dateCol, SortDirection.ASC);
         List<String> actualKeyColOrder = table.getColumnDataAsText(keyCol);
@@ -610,7 +623,13 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Sort the date-only field in descending order.");
         expectedKeyColOrder = new ArrayList<>();
-        expectedKeyColOrder.add("11");
+
+        // Empty is sorted differently between postgres and MSSQL.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            expectedKeyColOrder.add("11"); // (empty) 14:59:25
+        }
+
         expectedKeyColOrder.add("2");
         expectedKeyColOrder.add("8");
         expectedKeyColOrder.add("3");
@@ -621,6 +640,11 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         expectedKeyColOrder.add("6");
         expectedKeyColOrder.add("10");
         expectedKeyColOrder.add("1");
+
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            expectedKeyColOrder.add("11"); // (empty) 14:59:25
+        }
 
         table.setSort(dateCol, SortDirection.DESC);
         actualKeyColOrder = table.getColumnDataAsText(keyCol);
@@ -634,6 +658,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Sort the time-only field in ascending order.");
         expectedKeyColOrder = new ArrayList<>();
+
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            expectedKeyColOrder.add("10"); // 1989-08-12 (empty)
+        }
+
         expectedKeyColOrder.add("3"); // 2024-01-01 00:00:00
         expectedKeyColOrder.add("1"); // 1950-10-12 08:00:01
         expectedKeyColOrder.add("7"); // 1995-03-03 09:10:10
@@ -644,7 +674,11 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         expectedKeyColOrder.add("11"); // (empty) 14:59:25
         expectedKeyColOrder.add("9"); // 2002-09-15 17:45:20
         expectedKeyColOrder.add("8"); // 2024-02-29 18:32:00
-        expectedKeyColOrder.add("10"); // 1989-08-12 (empty)
+
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            expectedKeyColOrder.add("10"); // 1989-08-12 (empty)
+        }
 
         table.setSort(timeCol, SortDirection.ASC);
         actualKeyColOrder = table.getColumnDataAsText(keyCol);
@@ -655,7 +689,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Sort the time-only field in descending order.");
         expectedKeyColOrder = new ArrayList<>();
-        expectedKeyColOrder.add("10");
+
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            expectedKeyColOrder.add("10"); // 1989-08-12 (empty)
+        }
+
         expectedKeyColOrder.add("8");
         expectedKeyColOrder.add("9");
         expectedKeyColOrder.add("11");
@@ -666,6 +705,11 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         expectedKeyColOrder.add("7");
         expectedKeyColOrder.add("1");
         expectedKeyColOrder.add("3");
+
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            expectedKeyColOrder.add("10"); // 1989-08-12 (empty)
+        }
 
         table.setSort(timeCol, SortDirection.DESC);
         actualKeyColOrder = table.getColumnDataAsText(keyCol);

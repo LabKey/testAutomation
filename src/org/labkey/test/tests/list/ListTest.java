@@ -506,7 +506,17 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check Customize View worked");
         assertTextPresent(TEST_DATA[TD_COLOR][3]);
-        assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+
+        // Sorting is different between MSSQL and postgres if one of the values is empty / blank.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][3], TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2]);
+        }
+        else
+        {
+            assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        }
+
         assertTextNotPresent(TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
@@ -525,7 +535,15 @@ public class ListTest extends BaseWebDriverTest
         File tableFile = new DataRegionExportHelper(new DataRegionTable("query", getDriver())).exportText();
         TextSearcher tsvSearcher = new TextSearcher(tableFile);
 
-        assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][3], TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2]);
+        }
+        else
+        {
+            assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        }
+
         assertTextNotPresent(tsvSearcher, TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
         filterTest();
 
