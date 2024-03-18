@@ -341,6 +341,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     {
 
         BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
+        BaseSettingsPage.resetSettings(createDefaultConnection(), getProjectName());
 
         File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
 
