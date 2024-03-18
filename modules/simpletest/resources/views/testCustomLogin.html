@@ -1,6 +1,6 @@
 <!-- this is a test html file for exercising the custom login feature -->
 <!-- this test can be activated by setting the Look and Feel Settings property of Custom Login to the value 'simpletest-testCustomLogin'. -->
-<form class="auth-form" name="login" action="javascript:void(0)">
+<form class="auth-form" name="login">
     <div class="auth-header">Sign In</div>
     <p>SimpleTest Module Custom Sign In</p>
     <div class="labkey-error" id="errors"></div>
@@ -11,7 +11,7 @@
             Password <a href="login-resetPassword.view">(forgot password)</a>
         </label>
         <input id="password" name="password" type="password" class="input-block" tabindex="2" autofocus>
-        <input type=checkbox name="remember" id="remember"  checked>
+        <input type=checkbox name="remember" id="remember" checked>
         <label for="remember">Remember my email address</label>
         <div class="termsOfUseSection">
             <div class="auth-header auth-item">Terms of Use</div>
@@ -23,6 +23,7 @@
         </div>
         <input type="hidden" name="termsOfUseType" id="termsOfUseType">
         <div class="auth-item auth-credentials-submit">
+            <!-- Note: login.js attaches an authenticateUser() click event to elements with class "loginSubmitButton" -->
             <input type="submit" tab-index="-1" style="position: absolute; left: -9999px; width: 1px; height: 1px;" class="loginSubmitButton"/>
             <a class="labkey-button primary signin-btn"><span>Sign In</span></a>
         </div>
