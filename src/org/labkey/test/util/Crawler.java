@@ -1110,7 +1110,7 @@ public class Crawler
                 {
                     originBrowser.simpleSignIn();
                     originBrowser.beginAt(origin.toString());
-                    ArtifactCollector collector = new ArtifactCollector(BaseWebDriverTest.getCurrentTest(), originBrowser);
+                    ArtifactCollector collector = new ArtifactCollector(originBrowser, _test.getArtifactCollector());
                     collector.dumpPageSnapshot("crawler", "crawlOrigin");
                 }
             }

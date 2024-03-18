@@ -113,7 +113,7 @@ public class ConceptInfoTabs extends WebDriverComponent<ConceptInfoTabs.ElementC
 
     public static class ConceptInfoTabsFinder extends WebDriverComponentFinder<ConceptInfoTabs, ConceptInfoTabsFinder>
     {
-        private final XPathLocator _baseLocator = Locator.id("concept-information-tabs");
+        private final XPathLocator _baseLocator = Locator.byClass("concept-information-tabs");
 
         public ConceptInfoTabsFinder(WebDriver driver)
         {
