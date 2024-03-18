@@ -625,6 +625,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
         private DomainFieldRow findFieldRow(String name)
         {
+            WebDriverWrapper.waitFor(() -> !findFieldRows().isEmpty(), 1_000);
             List<DomainFieldRow> fieldRows = findFieldRows();
             for (int i = 0; i < fieldRows.size(); i++)
             {

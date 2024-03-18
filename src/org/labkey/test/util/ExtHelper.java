@@ -463,22 +463,6 @@ public class ExtHelper
         _test.waitAndClick(l);
     }
 
-    public void clickSideTab(String tab)
-    {
-        if (_test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]")))
-            // Tab hasn't rendered yet
-            _test.click(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]"));
-        else
-            // Tab has rendered
-            _test.click(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab + "')]]"));
-    }
-
-    public void clickExtTabContainingText(String tabText)
-    {
-        _test.log("Selecting Ext tab " + tabText);
-        _test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and contains( text(), '" + tabText + "')]"));
-    }
-
     public void clickExtButton(String caption)
     {
         clickExtButton(caption, WAIT_FOR_PAGE);

@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -45,9 +46,17 @@ import static org.junit.Assert.assertTrue;
 
 public class APIUserHelper extends AbstractUserHelper
 {
+    private final Supplier<Connection> connectionSupplier;
+    public APIUserHelper(Supplier<Connection> connectionSupplier)
+    {
+        super(null);
+        this.connectionSupplier = connectionSupplier;
+    }
+
     public APIUserHelper(WebDriverWrapper driver)
     {
         super(driver);
+        connectionSupplier = driver::createDefaultConnection;
     }
 
     @Override
@@ -82,7 +91,7 @@ public class APIUserHelper extends AbstractUserHelper
 
         try
         {
-            new QueryApiHelper(getWrapper().createDefaultConnection(), "/", "core", "siteusers")
+            new QueryApiHelper(connectionSupplier.get(), "/", "core", "siteusers")
                     .updateRows(List.of(Maps.of("userId", userId, "DisplayName", newDisplayName)));
         }
         catch (IOException | CommandException e)
@@ -122,7 +131,7 @@ public class APIUserHelper extends AbstractUserHelper
             }
         };
         command.setSendEmail(sendEmail);
-        Connection connection = getWrapper().createDefaultConnection();
+        Connection connection = connectionSupplier.get();
         try
         {
             CreateUserResponse response = command.execute(connection, "");
@@ -157,8 +166,8 @@ public class APIUserHelper extends AbstractUserHelper
     {
         GetUsersCommand command = new GetUsersCommand();
         command.setIncludeInactive(includeInactive);
-        Connection connection = getWrapper().createDefaultConnection();
-        if (getWrapper().isImpersonating())
+        Connection connection = connectionSupplier.get();
+        if (getWrapper() != null && getWrapper().isImpersonating())
         {
             // Don't use browser session. Tests often call 'getDisplayNameForEmail' while impersonating non-admins.
             connection = WebTestHelper.getRemoteApiConnection(false);
@@ -205,11 +214,10 @@ public class APIUserHelper extends AbstractUserHelper
 
     private void deleteUser(@NotNull Integer userId)
     {
-        Connection connection = getWrapper().createDefaultConnection();
         DeleteUserCommand command = new DeleteUserCommand(userId);
         try
         {
-            command.execute(connection, "/");
+            command.execute(connectionSupplier.get(), "/");
         }
         catch (IOException|CommandException e)
         {
