@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -55,6 +57,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
@@ -91,7 +94,8 @@ import static org.junit.Assert.fail;
 public class JavaClientApiTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
-    public static final String LIST_NAME = "People";
+    public static final String LIST_NAME = "People" + FieldDefinition.TRICKY_CHARACTERS;
+    public static final String LAST_NAME = "LastName" + FieldDefinition.TRICKY_CHARACTERS;
     public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String USER2_NAME = "user2@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
@@ -121,7 +125,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Domain domain = createCmd.getDomainDesign();
         domain.setFields(List.of(
                 new PropertyDescriptor("FirstName", "First Name", "string"),
-                new PropertyDescriptor("LastName", "Last Name", "string"),
+                new PropertyDescriptor(LAST_NAME, "Last Name " + FieldDefinition.TRICKY_CHARACTERS, "string"),
                 new PropertyDescriptor("Birthdate", "Birthdate", "dateTime"),
                 new PropertyDescriptor("GooAmount", "Goo Amount", "double").setDescription("Amount of Goo"),
                 new PropertyDescriptor("Crazy", "Crazy", "boolean").setDescription("Crazy?"),
@@ -207,7 +211,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         InsertRowsCommand insertCmd = new InsertRowsCommand("lists", LIST_NAME);
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("FirstName", "first to be inserted");
-        rowMap.put("LastName", "last to be inserted");
+        rowMap.put(LAST_NAME, "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS);
         rowMap.put("Birthdate", now);
         rowMap.put("GooAmount", 4.2);
         rowMap.put("Crazy", true);
@@ -226,7 +230,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals("Wrong number of rows returned", 1, selResp.getRowCount().intValue());
         Map<String, Object> responseRow = selResp.getRows().get(0);
         assertEquals("Wrong FirstName in response", "first to be inserted", responseRow.get("FirstName"));
-        assertEquals("Wrong LastName in response", "last to be inserted", responseRow.get("LastName"));
+        assertEquals("Wrong LastName in response", "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS, responseRow.get(LAST_NAME));
         assertEquals("Wrong type for Birthdate in response", Date.class, responseRow.get("Birthdate").getClass());
         assertEquals("Wrong GooAmount in response", 4.2, (Double)responseRow.get("GooAmount"), 0.001);
         assertEquals("Wrong type for 'Crazy' in response", Boolean.class, responseRow.get("Crazy").getClass());
@@ -234,7 +238,25 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         //refresh the list in the browser and make sure it appears there too
         refresh();
-        assertTextPresent("first to be inserted", "last to be inserted");
+        assertTextPresent("first to be inserted", "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS);
+
+        try
+        {
+            // Issue 49959: UpdateRowsAction can't handle fields with quotes in their name
+            // TODO: Add 'LAST_NAME' to successful row update below once issue is fixed
+            UpdateRowsCommand updateCmd = new UpdateRowsCommand("lists", LIST_NAME);
+            rowMap = new HashMap<>();
+            rowMap.put("Key", key);
+            rowMap.put(LAST_NAME.toLowerCase(), "UPDATED last name");
+            rowMap.put("gooamount", 5.5);
+            updateCmd.addRow(rowMap);
+            updateCmd.execute(cn, PROJECT_NAME);
+            Assert.fail("Update UpdateRows is known to fail with tricky characters in column name. Update test if behavior has improved");
+        }
+        catch (CommandException expected)
+        {
+            assertEquals("Known Issue: Update rows with quotes", "SQLFragment.append(String) does not allow semicolons or unmatched quotes", expected.getMessage());
+        }
 
         //update the record
         log("Updating the record...");
@@ -299,29 +321,39 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         InsertRowsCommand insCmd = new InsertRowsCommand("lists", LIST_NAME);
 
-        Map<String,Object> row = new HashMap<>();
-        row.put("FirstName", "Barney");
-        row.put("LastName", "Rubble");
-        insCmd.addRow(row);
-
-        row.put("FirstName", "Fred");
-        row.put("LastName", "Flintstone");
-        insCmd.addRow(row);
+        insCmd.addRow(Map.of(
+                "FirstName", "Barney",
+                LAST_NAME, "Rubble"));
+        insCmd.addRow(Map.of(
+                "FirstName", "Fred",
+                LAST_NAME, "Flintstone"));
 
         insCmd.execute(cn, PROJECT_NAME);
         
         SelectRowsCommand selCmd = new SelectRowsCommand("lists", LIST_NAME);
         selCmd.setRequiredVersion(9.1);
-        selCmd.addSort("LastName", Sort.Direction.ASCENDING);
         SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
 
         assertNotNull("null rows array", resp.getRows());
         assertNotEquals("empty rows array", 0, resp.getRows().size());
-        assertTrue("FirstName column value was not a map: " + resp.getRows().get(0).get("FirstName").getClass().getName(), resp.getRows().get(0).get("FirstName") instanceof Map);
+        Assertions.assertThat(resp.getRows().get(0).get("FirstName")).as("FirstName column").isInstanceOf(Map.class);
         Map<?, ?> firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
-        assertEquals("FirstName.value is incorrect", "Fred", firstNameField.get("value"));
+        assertEquals("FirstName.value is incorrect", "Barney", firstNameField.get("value"));
 
         log("Completed test of the new extended select results format.");
+
+        // Issue 49960: Java API Sort/Colum/Filter do not handle special characters
+        // TODO: expect a single row, sorted correctly
+        selCmd.setFilters(List.of(new Filter(LAST_NAME, "Rubble")));
+        selCmd.setSorts(List.of(new Sort(LAST_NAME, Sort.Direction.ASCENDING)));
+        selCmd.setColumns(List.of("FirstName", LAST_NAME));
+        resp = selCmd.execute(cn, PROJECT_NAME);
+        firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        assertEquals("Known issue. Sort with tricky characters is ignored", "Barney" /*"Fred"*/, firstNameField.get("value"));
+        assertEquals("Known issue. Filter with tricky characters is ignored", 2 /*1*/, resp.getRowCount());
+        assertEquals("Known issue. Column list with tricky characters is ignored",
+                List.of("FirstName") /*List.of("FirstName", LAST_NAME)*/,
+                resp.getColumnModel().stream().map(m -> m.get("dataIndex")).toList());
 
         //also test maxrows = 0
         log("Testing maxrows=0...");
