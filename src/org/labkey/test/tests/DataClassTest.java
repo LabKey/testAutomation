@@ -27,10 +27,10 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataClassHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -290,6 +290,106 @@ public class DataClassTest extends BaseWebDriverTest
         viewRawTableMetadata(dataClassName);
         verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
         assertTextNotPresent("unique_constraint_test_fieldname_2");
+    }
+
+    @Test
+    public void testDateAndTimeFields()
+    {
+
+        goToProjectHome();
+
+        String dataClassName = "Date and Time Fields Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(dataClassName);
+
+        log("Add a date-time field.");
+
+        String dateTimeField = "DateTime";
+        String dateTimeFormat = "MMM dd, yyyy hh:mm:ss.SSS a";
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields(dateTimeField)
+                .setType(FieldDefinition.ColumnType.DateAndTime)
+                .setDateFormat(dateTimeFormat);
+
+        log("Add a date-only field.");
+
+        String dateField = "Date";
+        String dateFormat = "MMM dd, yyyy";
+        domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.addField(dateField)
+                .setType(FieldDefinition.ColumnType.Date)
+                .setDateFormat(dateFormat);
+
+        log("Add a time-only field.");
+
+        String timeField = "Time";
+        String timeFormat = "hh:mm:ss.SSS a";
+        domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.addField(timeField)
+                .setType(FieldDefinition.ColumnType.Time)
+                .setDateFormat(timeFormat);
+
+        createPage.clickSave();
+
+        Locator.linkWithText(dataClassName).waitForElement(getDriver(), 1_000);
+
+        clickAndWait(Locator.linkWithText(dataClassName));
+
+        String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeField, dateField, timeField)
+                + "A\t12/23/24 14:45\t12/23/24\t14:45\n"
+                + "B\t11/19/99 9:32:06.001\t11/19/99\t9:32:06.001\n"
+                + "C\t3/2/1972 10:45 pm\t3/2/1972\t10:45 pm\n"
+                + "D\t2-3-05 00:00\t2-3-05\t00:00\n";
+
+        DataRegionTable listTable = new DataRegionTable("query", getDriver());
+        listTable.clickImportBulkData()
+                .setText(bulkData);
+        clickButton("Submit");
+
+        listTable = new DataRegionTable("query", getDriver());
+        UpdateQueryRowPage insertRowPage = listTable.clickInsertNewRow();
+        insertRowPage.setField("Name", "E");
+        insertRowPage.setField(dateTimeField, "2/29/24 13:13:13.013");
+        insertRowPage.setField(dateField, "2/29/24");
+        insertRowPage.setField(timeField, "13:13:13.013");
+        insertRowPage.submit();
+
+        List<String> expectedDateTimeCol = List.of(
+                "Feb 29, 2024 01:13:13.013 PM",
+                "Feb 03, 2005 12:00:00.000 AM",
+                "Mar 02, 1972 10:45:00.000 PM",
+                "Nov 19, 1999 09:32:06.001 AM",
+                "Dec 23, 2024 02:45:00.000 PM");
+
+        List<String> expectedDateCol = List.of(
+                "Feb 29, 2024",
+                "Feb 03, 2005",
+                "Mar 02, 1972",
+                "Nov 19, 1999",
+                "Dec 23, 2024");
+
+        List<String> expectedTimeCol = List.of(
+                "01:13:13.013 PM",
+                "12:00:00.000 AM",
+                "10:45:00.000 PM",
+                "09:32:06.001 AM",
+                "02:45:00.000 PM");
+
+        listTable = new DataRegionTable("query", getDriver());
+
+        // Just going to validate that the values were inserted correctly.
+        // Testing of filtering and sorting of date-time, date-only and time-only fields is done in ListDateAndTimeTest.
+
+        checker().verifyEquals("Values in date-time column not as expected.",
+                expectedDateTimeCol, listTable.getColumnDataAsText("Date Time"));
+
+        checker().verifyEquals("Values in date-only column not as expected.",
+                expectedDateCol, listTable.getColumnDataAsText(dateField));
+
+        // It looks like Dataclasses do not support milliseconds.
+        checker().verifyEquals("Values in time-only column not as expected.",
+                expectedTimeCol, listTable.getColumnDataAsText(timeField));
+
     }
 
     private void viewRawTableMetadata(String dataClassName)
