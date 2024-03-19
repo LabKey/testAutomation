@@ -44,7 +44,9 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.core.login.DbLoginUtils;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -80,6 +82,8 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
     protected static final String NOT_FOUND_ERROR = "notFound";
+
+    protected static final String SIGN_IN_TEXT = "Sign In";
 
     @Override
     public List<String> getAssociatedModules()
@@ -134,6 +138,7 @@ public class SecurityTest extends BaseWebDriverTest
         tokenAuthenticationTest();
         if (!isQuickTest())
         {
+            useReturnDuringSignIn();
             impersonationTest();
             guestTest();
             disableGuestAccountTest();
@@ -555,6 +560,26 @@ public class SecurityTest extends BaseWebDriverTest
         return url.substring(0, index);
     }
 
+    @LogMethod
+    protected void useReturnDuringSignIn()
+    {
+        signOut();
+        clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
+
+        waitForText("Remember my email address");
+
+        WebElement signInButton = Locator.lkButton(SIGN_IN_TEXT).findElement(getDriver());
+
+        assertElementPresent(Locator.tagWithName("form", "login"));
+        setFormElement(Locator.id("email"), PasswordUtil.getUsername());
+
+        String password = PasswordUtil.getPassword() + Keys.ENTER;
+        setFormElement(Locator.id("password"), password);
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
+        shortWait().until(ExpectedConditions.or(
+                ExpectedConditions.stalenessOf(signInButton), // Successful login
+                ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
+    }
 
     @LogMethod
     protected void impersonationTest()
@@ -610,11 +635,11 @@ public class SecurityTest extends BaseWebDriverTest
         signOut();
 
         // test: attempt login, check if register button appears, click register
-        if (!getDriver().getTitle().equals("Sign In"))
+        if (!getDriver().getTitle().equals(SIGN_IN_TEXT))
         {
-            clickAndWait(Locator.linkWithText("Sign In"));
+            clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
         }
-        assertTitleContains("Sign In");
+        assertTitleContains(SIGN_IN_TEXT);
         assertElementPresent(Locator.tagWithName("form", "login"));
         clickAndWait(Locator.lkButton("Register"));
 
@@ -639,11 +664,11 @@ public class SecurityTest extends BaseWebDriverTest
         signOut();
 
         // test: attempt login and confirm self register link is not on login screen
-        if (!getDriver().getTitle().equals("Sign In"))
+        if (!getDriver().getTitle().equals(SIGN_IN_TEXT))
         {
-            clickAndWait(Locator.linkWithText("Sign In"));
+            clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
         }
-        assertTitleContains("Sign In");
+        assertTitleContains(SIGN_IN_TEXT);
         WebElement link = Locator.button("Register").findElementOrNull(getDriver());
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
