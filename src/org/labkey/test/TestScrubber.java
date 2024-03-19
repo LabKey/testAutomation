@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
 import org.labkey.test.util.LogMethod;
@@ -138,6 +139,15 @@ public class TestScrubber extends ExtraSiteWrapper
         catch (IOException | CommandException e)
         {
             TestLogger.error("Failed to reset active user limit after test", e);
+        }
+
+        try
+        {
+            BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            TestLogger.error("Failed to reset site look and feel properties after test.", e);
         }
 
     }
