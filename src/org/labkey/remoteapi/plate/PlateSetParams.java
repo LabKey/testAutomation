@@ -27,16 +27,11 @@ public class PlateSetParams
     public JSONObject toJSON()
     {
         JSONObject json = new JSONObject();
-        if (_name != null)
-            json.put("name", _name);
-        if (_description != null)
-            json.put("description", _description);
-        if (_type != null)
-            json.put("type", _type);
-        if (_id != null)
-            json.put("rowId", _id);
-        if (_parentPlateSetId != null)
-            json.put("parentPlateSetId", _parentPlateSetId);
+        json.put("name", _name);
+        json.put("description", _description);
+        json.put("type", _type);
+        json.put("rowId", _id);
+        json.put("parentPlateSetId", _parentPlateSetId);
         return json;
     }
 
