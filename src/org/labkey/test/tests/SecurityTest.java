@@ -134,11 +134,11 @@ public class SecurityTest extends BaseWebDriverTest
             enableEmailRecorder();
         }
 
+        useReturnDuringSignInTest();
         clonePermissionsTest();
         tokenAuthenticationTest();
         if (!isQuickTest())
         {
-            useReturnDuringSignIn();
             impersonationTest();
             guestTest();
             disableGuestAccountTest();
@@ -561,24 +561,24 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void useReturnDuringSignIn()
+    protected void useReturnDuringSignInTest()
     {
         signOut();
         clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
 
         waitForText("Remember my email address");
 
-        WebElement signInButton = Locator.lkButton(SIGN_IN_TEXT).findElement(getDriver());
-
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), PasswordUtil.getUsername());
 
-        String password = PasswordUtil.getPassword() + Keys.ENTER;
-        setFormElement(Locator.id("password"), password);
+        String password = PasswordUtil.getPassword();
+        WebElement input = Locator.id("password").findElement(getDriver());
+        input.clear();
+        input.sendKeys(password);
+        input.sendKeys(Keys.ENTER);
         shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
-        shortWait().until(ExpectedConditions.or(
-                ExpectedConditions.stalenessOf(signInButton), // Successful login
-                ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
+        shortWait().until(ExpectedConditions.urlContains("/home/project-begin.view"));
+
     }
 
     @LogMethod
