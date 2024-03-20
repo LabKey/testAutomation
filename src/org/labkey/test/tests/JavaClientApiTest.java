@@ -263,7 +263,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         UpdateRowsCommand updateCmd = new UpdateRowsCommand("lists", LIST_NAME);
         rowMap = new HashMap<>();
         rowMap.put("Key", key);
-        rowMap.put("firstname", "UPDATED first name"); //testing for case-insensitivity
+        rowMap.put("firstname", "UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS); //testing for case-insensitivity
         rowMap.put("gooamount", 5.5);
         updateCmd.addRow(rowMap);
         saveResp = updateCmd.execute(cn, PROJECT_NAME);
@@ -273,12 +273,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selectCmd.addFilter("Key", key, Filter.Operator.EQUAL);
         selResp = selectCmd.execute(cn, PROJECT_NAME);
         responseRow = selResp.getRows().get(0);
-        assertEquals("UPDATED first name", responseRow.get("FirstName"));
+        assertEquals("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS, responseRow.get("FirstName"));
         assertEquals(5.5, (Double)responseRow.get("GooAmount"), 0.001);
 
         //verify that it's updated in the browser as well
         refresh();
-        assertTextPresent("UPDATED first name");
+        assertTextPresent("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS);
 
         //delete the record
         log("Deleting the record...");
