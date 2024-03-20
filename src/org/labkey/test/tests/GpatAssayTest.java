@@ -470,7 +470,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         // Converting a date, time or dateTime field to String will be different between MSSQL and postgres.
         if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
         {
-            expectedText = "Jan 1 1970 " + new SimpleDateFormat("hh:mma").format(date);
+            expectedText = "Jan 1 1970 " + new SimpleDateFormat("h:mma").format(date);
         }
         else
         {
