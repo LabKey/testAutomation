@@ -7,7 +7,7 @@ public class PlateSetParams
 {
     private String _name = null;
     private String _description = null;
-    private String _type = null;
+    private PlateSetType _type = null;
     private Integer _id = null;
     private Integer _parentPlateSetId = null;
 
@@ -19,7 +19,7 @@ public class PlateSetParams
     {
         _name = json.getString("name");
         _description = json.optString("description", null);
-        _type = json.optString("type", null);
+        _type = PlateSetType.fromName(json.optString("type", null));
         _id = json.getInt("rowId");
         _parentPlateSetId = json.optIntegerObject("parentPlateSetId", null);
     }
@@ -29,7 +29,8 @@ public class PlateSetParams
         JSONObject json = new JSONObject();
         json.put("name", _name);
         json.put("description", _description);
-        json.put("type", _type);
+        if (_type != null)
+            json.put("type", _type.getType());
         json.put("rowId", _id);
         json.put("parentPlateSetId", _parentPlateSetId);
         return json;
@@ -57,13 +58,13 @@ public class PlateSetParams
         return _description;
     }
 
-    public PlateSetParams setType(String type)
+    public PlateSetParams setType(PlateSetType type)
     {
         _type = type;
         return this;
     }
 
-    public String getType()
+    public PlateSetType getType()
     {
         return _type;
     }
@@ -84,4 +85,32 @@ public class PlateSetParams
         return _parentPlateSetId;
     }
 
+
+    public enum PlateSetType
+    {
+        Primary("primary"),
+        Assay("assay");
+
+        PlateSetType(String type)
+                {
+                    this._type = type;
+                }
+        private final String _type;
+        public String getType()
+        {
+            return _type;
+        }
+        public static PlateSetType fromName(String type)
+        {
+            if (type != null)
+            {
+                for (PlateSetType plateSetType : PlateSetType.values())
+                {
+                    if (type.equalsIgnoreCase(plateSetType.getType()))
+                        return plateSetType;
+                }
+            }
+            return null;
+        }
+    }
 }
