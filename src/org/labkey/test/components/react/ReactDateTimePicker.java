@@ -173,7 +173,7 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
                 .withoutClass("react-datepicker__day--outside-month");
     }
 
-    public static class ReactDateInputFinder extends WebDriverComponentFinder<ReactDateTimePicker, ReactDateInputFinder>
+    public static class ReactDateTimeInputFinder extends WebDriverComponentFinder<ReactDateTimePicker, ReactDateTimeInputFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "react-datepicker-wrapper")
             .withDescendant(Locator.tag("input"));
@@ -183,30 +183,30 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
 
         private String _className = null;
 
-        public ReactDateInputFinder(WebDriver driver)
+        public ReactDateTimeInputFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public ReactDateInputFinder withInputId(String id)
+        public ReactDateTimeInputFinder withInputId(String id)
         {
             _inputId = id;
             return this;
         }
 
-        public ReactDateInputFinder withName(String name)
+        public ReactDateTimeInputFinder withName(String name)
         {
             _name = name;
             return this;
         }
 
-        public ReactDateInputFinder withPlaceholder(String placeholder)
+        public ReactDateTimeInputFinder withPlaceholder(String placeholder)
         {
             _placeholder = placeholder;
             return this;
         }
 
-        public ReactDateInputFinder withClassName(String className)
+        public ReactDateTimeInputFinder withClassName(String className)
         {
             _className = className;
             return this;

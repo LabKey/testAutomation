@@ -374,7 +374,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
         public ReactDateTimePicker dateInput(String fieldKey)
         {
-            return new ReactDateTimePicker.ReactDateInputFinder(getDriver())
+            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
                     .withInputId(fieldKey).find(formRow(fieldKey));
         }
 

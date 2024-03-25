@@ -1009,7 +1009,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public ReactDateTimePicker datePicker()
         {
-            return new ReactDateTimePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(table);
+            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).withClassName("date-input-cell").find(table);
         }
 
         final WebElement addRowsPanel = Locator.byClass("editable-grid__controls").findWhenNeeded(this);
