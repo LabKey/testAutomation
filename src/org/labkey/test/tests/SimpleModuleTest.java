@@ -80,7 +80,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.TestFileUtils.getLabKeyRoot;
+import static org.labkey.test.TestFileUtils.getDefaultFileRoot;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -1455,6 +1455,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
               \t.libPaths(c(paths[1], paths[2]))
              \s
               .libPaths()
+              print(propValue)
             }
                 \s
             folderPath = "SimpleModuleTest Project/subfolder"
@@ -1517,9 +1518,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
             assertTrue("R api labkey.getModuleProperty is not returning module properties as expected", apiModulePropResults.contains(expected));
 
         log("Set site and folder level module properties using Rlabkey api");
-        String fileRootPath1 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME);
-        String fileRootPath2 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_2);
-        String fileRootPath3 = getContainerRoot(getProjectName() + "/" + FOLDER_NAME_3);
+        String fileRootPath1 = getDefaultFileRoot(getProjectName() + "/" + FOLDER_NAME).getAbsolutePath();
+        String fileRootPath2 = getDefaultFileRoot(getProjectName() + "/" + FOLDER_NAME_2).getAbsolutePath();
+        String fileRootPath3 = getDefaultFileRoot(getProjectName() + "/" + FOLDER_NAME_3).getAbsolutePath();
         String fileRootFolder1 = getRStr(fileRootPath1);
         String fileRootFolder2 = getRStr(fileRootPath2);
         String fileRootFolder3 = getRStr(fileRootPath3);
@@ -1563,12 +1564,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         goToProjectHome();
         assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
-    }
-
-    private String getContainerRoot(String containerPath)
-    {
-        File containerRoot = new File(getLabKeyRoot(), "build/deploy/files/" + containerPath);
-        return containerRoot.getPath();
     }
 
     private String getRStr(String rawString)

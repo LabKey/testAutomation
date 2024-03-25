@@ -150,7 +150,7 @@ public class ArtifactCollector
         if (!isLocalServer())
             return;
 
-        File threadDumpRequest = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
+        File threadDumpRequest = new File(TestFileUtils.getModulesDir().getParentFile(), "threadDumpRequest");
         threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
         TestLogger.log("Threads dumped to standard labkey log file");
     }
