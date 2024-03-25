@@ -80,7 +80,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.TestFileUtils.getLabKeyRoot;
+import static org.labkey.test.TestFileUtils.getDefaultFileRoot;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -1455,6 +1455,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
               \t.libPaths(c(paths[1], paths[2]))
              \s
               .libPaths()
+              print(propValue)
             }
                 \s
             folderPath = "SimpleModuleTest Project/subfolder"
@@ -1567,7 +1568,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private String getContainerRoot(String containerPath)
     {
-        File containerRoot = new File(getLabKeyRoot(), "build/deploy/files/" + containerPath);
+        File containerRoot = getDefaultFileRoot(containerPath).getParentFile();
         return containerRoot.getPath();
     }
 
