@@ -26,7 +26,6 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.protocol.HttpContext;
@@ -266,7 +265,7 @@ public class Crawler
         return controllers;
     }
 
-    public List<Function<UrlToCheck, Boolean>> getSpecialCrawlExclusions()
+    private List<Function<UrlToCheck, Boolean>> getSpecialCrawlExclusions()
     {
         final List<Function<UrlToCheck, Boolean>> urlVisitableChecks = new ArrayList<>();
 
@@ -484,14 +483,14 @@ public class Crawler
                 {
                     int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
                     final String relativeURL = urlText.substring(relativeURLStart);
-                    if (!relativeURL.isBlank())
+                    if (!relativeURL.isBlank() && "/".equals(relativeURL))
                     {
                         _relativeURL = relativeURL;
 
                         ControllerActionId tempActionId = null;
                         try
                         {
-                            tempActionId = new ControllerActionId(_relativeURL);;
+                            tempActionId = new ControllerActionId(_relativeURL);
                         }
                         catch (IllegalArgumentException ignore) { } // Probably a resource, not an action.
                         _actionId = tempActionId;
@@ -528,6 +527,16 @@ public class Crawler
             if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getFolder(),"/")))
                 p += (_prioritizeAdminPages ? -1 : 1);
             priority = p + random.nextFloat();
+
+            try
+            {
+                isVisitableURL();
+            }
+            catch (RuntimeException ex)
+            {
+                // Get a more useful exception if we hit a URL that we REALLY don't understand
+                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()));
+            }
         }
 
         private boolean isLabKeyShortUrl(String urlText)
@@ -868,7 +877,7 @@ public class Crawler
         try
         {
             String messagePrefix = "Navigating to ";
-            if (relativeUrl.length() == 0)
+            if (relativeUrl.isEmpty())
             {
                 logMessage = messagePrefix + "root";
             }
@@ -893,7 +902,6 @@ public class Crawler
                 ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
                 // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
                 _test.executeScript("document.location = arguments[0]", fullURL);
-                //noinspection ResultOfMethodCallIgnored
                 if (!WebDriverWrapper.waitFor(() -> {
                     boolean stale;
                     try
@@ -1191,12 +1199,11 @@ public class Crawler
         {
             // LabKey actions don't support HEAD requests. Only a non-existent action will 404
             var method = new HttpHead(url);
-            try (CloseableHttpResponse response = httpClient.execute(method, context))
-            {
+            return httpClient.execute(method, context, response -> {
                 EntityUtils.consumeQuietly(response.getEntity());
                 // If url 404s, then the action doesn't exist
                 return response.getCode() != HttpStatus.SC_NOT_FOUND;
-            }
+            });
         }
         catch (IOException | IllegalArgumentException e)
         {
@@ -1358,7 +1365,7 @@ public class Crawler
 
         // Attempt injection against random parameters from the list of those found so far
         // Don't include 'start' or 'begin' actions unless they already have some parameters
-        if (!"start".equalsIgnoreCase(actionId.getAction()) || !"begin".equalsIgnoreCase(actionId.getAction()) || params.size() > 0)
+        if (!"start".equalsIgnoreCase(actionId.getAction()) || !"begin".equalsIgnoreCase(actionId.getAction()) || !params.isEmpty())
         {
             params = addRandomParams(params, actionId);
         }
@@ -1447,7 +1454,7 @@ public class Crawler
         StringBuilder sb = new StringBuilder();
         list.forEach(e ->
         {
-            if (sb.length()!=0)
+            if (!sb.isEmpty())
                 sb.append('&');
             sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8));
             sb.append('=');
