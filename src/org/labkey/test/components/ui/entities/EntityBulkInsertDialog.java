@@ -8,7 +8,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.components.react.ReactDatePicker;
+import org.labkey.test.components.react.ReactDateTimePicker;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -218,7 +218,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog setDateField(String fieldKey, String dateString)
     {
-        ReactDatePicker input = elementCache().dateInput(fieldKey);
+        ReactDateTimePicker input = elementCache().dateInput(fieldKey);
         input.set(dateString);
         return this;
     }
@@ -372,9 +372,9 @@ public class EntityBulkInsertDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDatePicker dateInput(String fieldKey)
+        public ReactDateTimePicker dateInput(String fieldKey)
         {
-            return new ReactDatePicker.ReactDateInputFinder(getDriver())
+            return new ReactDateTimePicker.ReactDateInputFinder(getDriver())
                     .withInputId(fieldKey).find(formRow(fieldKey));
         }
 

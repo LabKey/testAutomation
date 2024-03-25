@@ -13,12 +13,12 @@ import org.openqa.selenium.WebElement;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementCache>
+public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.ElementCache>
 {
     private final WebDriver _driver;
     private final WebElement _el;
 
-    protected ReactDatePicker(WebElement element, WebDriver driver)
+    protected ReactDateTimePicker(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -85,7 +85,7 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
     {
         String timeStr;
 
-        // If the time value "13:00" is available, then presume this ReactDatePicker is configured for 24-hour time.
+        // If the time value "13:00" is available, then presume this ReactDateTimePicker is configured for 24-hour time.
         if (elementCache().datePickerTime("13:00").isDisplayed())
         {
             // Expected format is "HH:mm"
@@ -173,7 +173,7 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
                 .withoutClass("react-datepicker__day--outside-month");
     }
 
-    public static class ReactDateInputFinder extends WebDriverComponentFinder<ReactDatePicker, ReactDateInputFinder>
+    public static class ReactDateInputFinder extends WebDriverComponentFinder<ReactDateTimePicker, ReactDateInputFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "react-datepicker-wrapper")
             .withDescendant(Locator.tag("input"));
@@ -213,9 +213,9 @@ public class ReactDatePicker extends WebDriverComponent<ReactDatePicker.ElementC
         }
 
         @Override
-        protected ReactDatePicker construct(WebElement el, WebDriver driver)
+        protected ReactDateTimePicker construct(WebElement el, WebDriver driver)
         {
-            return new ReactDatePicker(el, driver);
+            return new ReactDateTimePicker(el, driver);
         }
 
 

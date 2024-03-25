@@ -9,7 +9,7 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.components.react.ReactDatePicker;
+import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -266,9 +266,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDatePicker dateInput(String fieldKey)
+        public ReactDateTimePicker dateInput(String fieldKey)
         {
-            return new ReactDatePicker.ReactDateInputFinder(getDriver())
+            return new ReactDateTimePicker.ReactDateInputFinder(getDriver())
                     .withInputId(fieldKey).waitFor(formRow(fieldKey));
         }
 

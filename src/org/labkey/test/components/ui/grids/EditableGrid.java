@@ -9,7 +9,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.ReactDatePicker;
+import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
@@ -442,7 +442,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // Activate the cell.
             activateCell(gridCell);
 
-            ReactDatePicker datePicker = elementCache().datePicker();
+            ReactDateTimePicker datePicker = elementCache().datePicker();
             datePicker.select(localDateTime);
         }
         else
@@ -1007,9 +1007,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return lookupSelect;
         }
 
-        public ReactDatePicker datePicker()
+        public ReactDateTimePicker datePicker()
         {
-            return new ReactDatePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(table);
+            return new ReactDateTimePicker.ReactDateInputFinder(getDriver()).withClassName("date-input-cell").find(table);
         }
 
         final WebElement addRowsPanel = Locator.byClass("editable-grid__controls").findWhenNeeded(this);
