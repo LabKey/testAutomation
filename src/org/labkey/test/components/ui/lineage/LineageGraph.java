@@ -191,8 +191,8 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
         WebElement detailsTab = Locator.css("a[role=\"tab\"]").withText("Details").findWhenNeeded(this);
         WebElement runPropertiesTab = Locator.css("a[role=\"tab\"]").withText("Run Properties").findWhenNeeded(this);
-        WebElement runStepDetailsTab = Locator.tagWithId("a", "lineage-run-step-tabs-tab-1").findWhenNeeded(this);
-        WebElement provenanceMapTab = Locator.tagWithId("a", "lineage-run-step-tabs-tab-2").findWhenNeeded(this);
+        WebElement runStepDetailsTab = Locator.css("a[role=\"tab\"]").withText("Step Details").findWhenNeeded(this);
+        WebElement provenanceMapTab = Locator.css("a[role=\"tab\"]").withText("Provenance Map").findWhenNeeded(this);
 
         NodeDetailGroup summaryList(String nodeLabel)
         {
