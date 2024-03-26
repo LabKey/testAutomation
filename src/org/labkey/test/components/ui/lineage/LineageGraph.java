@@ -188,8 +188,9 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         WebElement nodeDetailsName = Locator.tagWithClass("div", "lineage-name-data")
                 .findWhenNeeded(nodeDetails);
 
-        WebElement detailsTab = Locator.tagWithId("a", "lineage-run-tabs-tab-1").findWhenNeeded(this);
-        WebElement runPropertiesTab = Locator.tagWithId("a", "lineage-run-tabs-tab-2").findWhenNeeded(this);
+
+        WebElement detailsTab = Locator.css("a[role=\"tab\"]").withText("Details").findWhenNeeded(this);
+        WebElement runPropertiesTab = Locator.css("a[role=\"tab\"]").withText("Run Properties").findWhenNeeded(this);
         WebElement runStepDetailsTab = Locator.tagWithId("a", "lineage-run-step-tabs-tab-1").findWhenNeeded(this);
         WebElement provenanceMapTab = Locator.tagWithId("a", "lineage-run-step-tabs-tab-2").findWhenNeeded(this);
 
