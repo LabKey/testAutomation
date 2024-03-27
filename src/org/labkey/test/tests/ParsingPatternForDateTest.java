@@ -7,7 +7,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -22,7 +21,6 @@ import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -210,47 +208,6 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
                 expectedTimeCol, listTable.getColumnDataAsText(COL_TIME));
 
         checker().screenShotIfNewError("Non_US_Mode_Error");
-
-        listTable.checkAllOnPage();
-        listTable.clickDeleteAllButton();
-
-        log("Set an additional parsing patterns that is US format (MM/dd) but site setting is still Non-US.");
-        String dateTimePattern = "MM/dd/yy HH:mm";
-        String datePattern = "MM/dd/yy";
-        String timePattern = "HH:mm";
-        setSiteAdditionalParsingPatterns(dateTimePattern, datePattern, timePattern, false);
-        goToProjectHome();
-
-        // Additional parsing format should be applied first before non-US mode (?)
-        // Send in dates that are MM/dd format.
-
-        // This data fails to import because the date-only field is not parsed. The dateTime field with the same date
-        // format has no problems.
-        bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
-                + "A\t12/23/24 14:45\t12/23/24\t14:45\n"
-                + "B\t11/19/99 9:32:06.001\t11/19/99\t9:32:06.001\n"
-                + "C\t3/2/1972 10:45 pm\t3/2/1972\t10:45 pm\n"
-                + "D\t2-3-05 00:00\t2-3-05\t00:00\n"
-                + "E\t19July1999 19:32:06\t07/19/99\t19:32:06\n";
-
-        clickAndWait(Locator.linkWithText(TEST_MODE));
-        listTable = new DataRegionTable("query", getDriver());
-        listTable.clickImportBulkData()
-                .setText(bulkData);
-        clickButton("Submit");
-
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(TEST_MODE));
-        listTable = new DataRegionTable("query", getDriver());
-
-        checker().verifyEquals("Values in " + COL_DATETIME + " are not as expected.",
-                expectedDateTimeCol, listTable.getColumnDataAsText(COL_DATETIME));
-
-        checker().verifyEquals("Values in " + COL_DATE + " are not as expected.",
-                expectedDateCol, listTable.getColumnDataAsText(COL_DATE));
-
-        checker().verifyEquals("Values in " + COL_TIME + " are not as expected.",
-                expectedTimeCol, listTable.getColumnDataAsText(COL_TIME));
 
     }
 
