@@ -507,8 +507,8 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
     class ElementCache extends ChartWizardDialog.ElementCache
     {
         public final String XAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
-        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis Categories')]";
-        public final String XSUBCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Split Categories By')]";
+        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
+        public final String XSUBCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Group By')]";
         public final String YAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]";
         public final String CATEGORIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Categories')]";
         public final String MEASURE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Measure')]";
