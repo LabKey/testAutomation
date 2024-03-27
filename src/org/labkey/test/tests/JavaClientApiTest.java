@@ -15,8 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -93,7 +93,7 @@ import static org.junit.Assert.fail;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class JavaClientApiTest extends BaseWebDriverTest
 {
-    public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
+    public static final String PROJECT_NAME = JavaClientApiTest.class.getSimpleName() + " Project " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     public static final String LIST_NAME = "People" + FieldDefinition.TRICKY_CHARACTERS;
     public static final String LAST_NAME = "LastName" + FieldDefinition.TRICKY_CHARACTERS;
     public static final String USER_NAME = "user1@javaclientapi.test";
@@ -293,7 +293,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         TruncateTableCommand truncCmd = new TruncateTableCommand("lists", LIST_NAME);
         TruncateTableResponse resp = truncCmd.execute(cn, PROJECT_NAME);
 
-        assertEquals((Integer)2, resp.getDeletedRowCount());
+        assertEquals((Integer)3, resp.getDeletedRowCount());
 
         log("Completed TruncateTable test...");
     }
@@ -311,6 +311,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         insCmd.addRow(Map.of(
                 "FirstName", "Fred",
                 LAST_NAME, "Flintstone"));
+        insCmd.addRow(Map.of(
+                "FirstName", "Betty",
+                LAST_NAME, "Rabble"));
 
         insCmd.execute(cn, PROJECT_NAME);
         
@@ -327,16 +330,27 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("Completed test of the new extended select results format.");
 
         // Issue 49960: Java API Sort/Colum/Filter do not handle special characters
-        // TODO: expect a single row, sorted correctly
-        selCmd.setFilters(List.of(new Filter(LAST_NAME, "Rubble")));
+        selCmd.setFilters(List.of(new Filter(LAST_NAME, "R", Filter.Operator.STARTS_WITH)));
         selCmd.setSorts(List.of(new Sort(LAST_NAME, Sort.Direction.ASCENDING)));
         selCmd.setColumns(List.of("FirstName", LAST_NAME));
         resp = selCmd.execute(cn, PROJECT_NAME);
         firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
-        assertEquals("Known issue. Sort with tricky characters is ignored", "Barney" /*"Fred"*/, firstNameField.get("value"));
-        assertEquals("Known issue. Filter with tricky characters is ignored", 2 /*1*/, resp.getRowCount());
+        assertEquals("Known issue. Sort with tricky characters is ignored", "Barney" /*"Betty"*/, firstNameField.get("value"));
+        assertEquals("Known issue. Filter with tricky characters is ignored", 3 /*2*/, resp.getRowCount());
         assertEquals("Known issue. Column list with tricky characters is ignored",
                 List.of("FirstName") /*List.of("FirstName", LAST_NAME)*/,
+                resp.getColumnModel().stream().map(m -> m.get("dataIndex")).toList());
+
+        // Column references work if you use our special escape characters like org.labkey.api.query.QueryKey
+        selCmd.setFilters(List.of(new Filter(encodeColumnName(LAST_NAME), "R", Filter.Operator.STARTS_WITH)));
+        selCmd.setSorts(List.of(new Sort(encodeColumnName(LAST_NAME), Sort.Direction.ASCENDING)));
+        selCmd.setColumns(List.of("FirstName", encodeColumnName(LAST_NAME)));
+        resp = selCmd.execute(cn, PROJECT_NAME);
+        firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        assertEquals("Known issue. Sort with tricky characters is ignored", "Betty", firstNameField.get("value"));
+        assertEquals("Filter with tricky characters", 2, resp.getRowCount());
+        assertEquals("Known issue. Column list with tricky characters is ignored",
+                List.of("FirstName", LAST_NAME),
                 resp.getColumnModel().stream().map(m -> m.get("dataIndex")).toList());
 
         //also test maxrows = 0
@@ -606,5 +620,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
+    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
+    private static String encodeColumnName(String columnName)
+    {
+        return StringUtils.replaceEach(columnName, ILLEGAL, REPLACEMENT);
     }
 }
