@@ -193,12 +193,6 @@ public class GpatAssayTest extends BaseWebDriverTest
         // Set the date-only field type.
         results.getField("DateOnly")
                 .setType(FieldDefinition.ColumnType.Date, false);
-
-        // Using a tsv and the data-pipeline to define the results fields sets the time-only field to a type of Text.
-        // A field of type Text cannot be converted to a Time type. The only way around this is to remove the field and
-        // add it back as a time-only type.
-        results.removeField("TimeOnly", false);
-        results.addField(new FieldDefinition("TimeOnly", FieldDefinition.ColumnType.Time));
         assayDesignerPage.clickFinish();
 
         clickButton("Next", defaultWaitForPage);
