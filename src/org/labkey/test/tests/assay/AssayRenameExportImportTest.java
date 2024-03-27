@@ -15,7 +15,6 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
-
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -62,7 +61,7 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
             .build().getTime();
 
     private SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm");
+    private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @BeforeClass
