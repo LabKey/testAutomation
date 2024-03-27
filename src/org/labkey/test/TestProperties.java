@@ -38,8 +38,11 @@ public abstract class TestProperties
 
     static
     {
-        //TODO: DO NOT MERGE! FORCING FIREFOX VERSION FOR VALIDATION
-        System.setProperty("selenium.firefox.binary", System.getenv("FIREFOX115"));
+        if (System.getenv("FIREFOX115") != null)
+        {
+            //TODO: DO NOT MERGE! FORCING FIREFOX VERSION FOR VALIDATION
+            System.setProperty("selenium.firefox.binary", System.getenv("FIREFOX115"));
+        }
 
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
