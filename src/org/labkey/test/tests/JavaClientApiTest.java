@@ -240,30 +240,13 @@ public class JavaClientApiTest extends BaseWebDriverTest
         refresh();
         assertTextPresent("first to be inserted", "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS);
 
-        try
-        {
-            // Issue 49959: UpdateRowsAction can't handle fields with quotes in their name
-            // TODO: Add 'LAST_NAME' to successful row update below once issue is fixed
-            UpdateRowsCommand updateCmd = new UpdateRowsCommand("lists", LIST_NAME);
-            rowMap = new HashMap<>();
-            rowMap.put("Key", key);
-            rowMap.put(LAST_NAME.toLowerCase(), "UPDATED last name");
-            rowMap.put("gooamount", 5.5);
-            updateCmd.addRow(rowMap);
-            updateCmd.execute(cn, PROJECT_NAME);
-            Assert.fail("Update UpdateRows is known to fail with tricky characters in column name. Update test if behavior has improved");
-        }
-        catch (CommandException expected)
-        {
-            assertEquals("Known Issue: Update rows with quotes", "SQLFragment.append(String) does not allow semicolons or unmatched quotes", expected.getMessage());
-        }
-
         //update the record
         log("Updating the record...");
         UpdateRowsCommand updateCmd = new UpdateRowsCommand("lists", LIST_NAME);
         rowMap = new HashMap<>();
         rowMap.put("Key", key);
         rowMap.put("firstname", "UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS); //testing for case-insensitivity
+        rowMap.put(LAST_NAME, "UPDATED last name"); // Issue 49959: UpdateRowsAction can't handle fields with quotes in their name
         rowMap.put("gooamount", 5.5);
         updateCmd.addRow(rowMap);
         saveResp = updateCmd.execute(cn, PROJECT_NAME);
@@ -274,11 +257,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selResp = selectCmd.execute(cn, PROJECT_NAME);
         responseRow = selResp.getRows().get(0);
         assertEquals("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS, responseRow.get("FirstName"));
+        assertEquals("UPDATED last name", responseRow.get(LAST_NAME));
         assertEquals(5.5, (Double)responseRow.get("GooAmount"), 0.001);
 
         //verify that it's updated in the browser as well
         refresh();
-        assertTextPresent("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS);
+        assertTextPresent("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS, "UPDATED last name");
 
         //delete the record
         log("Deleting the record...");
