@@ -1278,17 +1278,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return whoAmI().getDisplayName();
     }
 
-    public String getCurrentDateTimeFormatString()
+    public String getContainerDateTimeFormatString()
     {
         return (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
     }
 
-    public String getCurrentTimeFormatString()
+    public String getContainerTimeFormatString()
     {
         return (String)executeScript("return LABKEY.container.formats.timeFormat");
     }
 
-    public String getCurrentDateFormatString()
+    public String getContainerDateFormatString()
     {
         return (String)executeScript("return LABKEY.container.formats.dateFormat");
     }
