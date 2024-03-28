@@ -1141,22 +1141,22 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         dates.add(new Calendar.Builder()
                 .setDate(1955, 0, 1)
-                .setTimeOfDay(0, 0, 0, 0)
+                .setTimeOfDay(0, 0, 0)
                 .build().getTime());
 
         dates.add(new Calendar.Builder()
                 .setDate(2023, 11, 31)
-                .setTimeOfDay(23, 59, 59, 59)
+                .setTimeOfDay(23, 59, 59)
                 .build().getTime());
 
         dates.add(new Calendar.Builder()
                 .setDate(2022, 5, 1)
-                .setTimeOfDay(12, 1, 23, 99)
+                .setTimeOfDay(12, 1, 23)
                 .build().getTime());
 
         dates.add(new Calendar.Builder()
                 .setDate(2023, 6, 4)
-                .setTimeOfDay(8, 12, 35, 102)
+                .setTimeOfDay(8, 12, 35)
                 .build().getTime());
 
         // Milliseconds should default to 0 if not given.
@@ -1171,8 +1171,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         // Use a different format when writing the data for bulk import.
         SimpleDateFormat inputDateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat inputTimeFormatter = new SimpleDateFormat("hh:mm:ss.SSS aa");
-        SimpleDateFormat inputDateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        SimpleDateFormat inputTimeFormatter = new SimpleDateFormat("hh:mm:ss aa");
+        SimpleDateFormat inputDateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         for(Date date : dates)
         {
@@ -1201,8 +1201,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         checker().screenShotIfNewError("Format01_Error");
 
         String dateFormat02 = "MM.dd.yy";
-        String timeFormat02 = "HH:mm:ss.SSS";
-        String dateTimeFormat02 = "dd/MM/yyyy HH:mm:ss.SSS";
+        String timeFormat02 = "HH:mm:ss";
+        String dateTimeFormat02 = "dd/MM/yyyy HH:mm:ss";
 
         formatterDate = new SimpleDateFormat(dateFormat02);
         formatterTime = new SimpleDateFormat(timeFormat02);

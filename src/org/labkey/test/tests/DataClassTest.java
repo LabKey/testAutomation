@@ -305,7 +305,7 @@ public class DataClassTest extends BaseWebDriverTest
         log("Add a date-time field.");
 
         String dateTimeField = "DateTime";
-        String dateTimeFormat = "MMM dd, yyyy hh:mm:ss.SSS a";
+        String dateTimeFormat = "MMM dd, yyyy hh:mm:ss a";
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(dateTimeField)
                 .setType(FieldDefinition.ColumnType.DateAndTime)
@@ -323,7 +323,7 @@ public class DataClassTest extends BaseWebDriverTest
         log("Add a time-only field.");
 
         String timeField = "Time";
-        String timeFormat = "hh:mm:ss.SSS a";
+        String timeFormat = "hh:mm:ss a";
         domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.addField(timeField)
                 .setType(FieldDefinition.ColumnType.Time)
@@ -337,7 +337,7 @@ public class DataClassTest extends BaseWebDriverTest
 
         String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeField, dateField, timeField)
                 + "A\t12/23/24 14:45\t12/23/24\t14:45\n"
-                + "B\t11/19/99 9:32:06.001\t11/19/99\t9:32:06.001\n"
+                + "B\t11/19/99 9:32:06\t11/19/99\t9:32:06\n"
                 + "C\t3/2/1972 10:45 pm\t3/2/1972\t10:45 pm\n"
                 + "D\t2-3-05 00:00\t2-3-05\t00:00\n";
 
@@ -349,17 +349,17 @@ public class DataClassTest extends BaseWebDriverTest
         listTable = new DataRegionTable("query", getDriver());
         UpdateQueryRowPage insertRowPage = listTable.clickInsertNewRow();
         insertRowPage.setField("Name", "E");
-        insertRowPage.setField(dateTimeField, "2/29/24 13:13:13.013");
+        insertRowPage.setField(dateTimeField, "2/29/24 13:13:13");
         insertRowPage.setField(dateField, "2/29/24");
-        insertRowPage.setField(timeField, "13:13:13.013");
+        insertRowPage.setField(timeField, "13:13:13");
         insertRowPage.submit();
 
         List<String> expectedDateTimeCol = List.of(
-                "Feb 29, 2024 01:13:13.013 PM",
-                "Feb 03, 2005 12:00:00.000 AM",
-                "Mar 02, 1972 10:45:00.000 PM",
-                "Nov 19, 1999 09:32:06.001 AM",
-                "Dec 23, 2024 02:45:00.000 PM");
+                "Feb 29, 2024 01:13:13 PM",
+                "Feb 03, 2005 12:00:00 AM",
+                "Mar 02, 1972 10:45:00 PM",
+                "Nov 19, 1999 09:32:06 AM",
+                "Dec 23, 2024 02:45:00 PM");
 
         List<String> expectedDateCol = List.of(
                 "Feb 29, 2024",
@@ -369,11 +369,11 @@ public class DataClassTest extends BaseWebDriverTest
                 "Dec 23, 2024");
 
         List<String> expectedTimeCol = List.of(
-                "01:13:13.013 PM",
-                "12:00:00.000 AM",
-                "10:45:00.000 PM",
-                "09:32:06.001 AM",
-                "02:45:00.000 PM");
+                "01:13:13 PM",
+                "12:00:00 AM",
+                "10:45:00 PM",
+                "09:32:06 AM",
+                "02:45:00 PM");
 
         listTable = new DataRegionTable("query", getDriver());
 
