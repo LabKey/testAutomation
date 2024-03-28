@@ -137,7 +137,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     public ResponsiveGrid getProvenanceMapGrid()
     {
-        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).inParentWithId("lineage-run-step-tabs-pane-2").find();
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).find(elementCache().nodeDetails);
     }
 
     @Override
