@@ -141,7 +141,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         return elementCache().nodeDetailsTabs().selectTab("Provenance Map");
     }
 
-    public ResponsiveGrid getProvenanceMapGrid()
+    public ResponsiveGrid<?> getProvenanceMapGrid()
     {
         return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).find(clickProvenanceMapTab());
     }
