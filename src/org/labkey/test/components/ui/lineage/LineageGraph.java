@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.lineage;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.Tabs;
 import org.labkey.test.components.ui.grids.DetailTable;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.WebDriver;
@@ -13,8 +14,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-
-import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * Automates the Labkey UI component implemented in /components/lineage/LineageGraph.tsx
@@ -37,12 +36,15 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
      */
     public static LineageGraph showLineageGraph(WebDriver driver)
     {
+        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(2));
         LineageGraph lineageGraph = new LineageGraph.LineageGraphFinder(driver).findWhenNeeded();
+        WebElement betaToggleLink = Locator.linkWithSpan("Toggle Beta Graph (new!)").findWhenNeeded(driver);
+        webDriverWait.until(ExpectedConditions.or(ExpectedConditions.visibilityOf(betaToggleLink), ExpectedConditions.visibilityOf(lineageGraph.getComponentElement())));
         if (!lineageGraph.getComponentElement().isDisplayed())
         {
-            Locator.linkWithSpan("Toggle Beta Graph (new!)").findElement(driver).click();
+            betaToggleLink.click();
+            webDriverWait.until(ExpectedConditions.visibilityOf(lineageGraph.getComponentElement()));
         }
-        new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions.visibilityOf(lineageGraph.getComponentElement()));
         return lineageGraph;
     }
 
@@ -111,33 +113,37 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
             elementCache().nodeLineageLink.click();
     }
 
-    public void clickDetailsTab()
+    public void clickRunStepDetails(String runStep)
     {
-        elementCache().detailsTab.click();
-        sleep(1000); // bootstrap tab animation
+        WebElement stepEl = elementCache().lineageItem(runStep, clickRunPropertiesTab());
+        getWrapper().scrollIntoView(stepEl);
+        Locator.linkWithText("Details").findElement(stepEl).click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(stepEl));
     }
 
-    public void clickRunPropertiesTab()
+    public WebElement clickDetailsTab()
     {
-        elementCache().runPropertiesTab.click();
-        sleep(1000); // bootstrap tab animation
+        return elementCache().nodeDetailsTabs().selectTab("Details");
     }
 
-    public void clickRunStepDetailsTab()
+    public WebElement clickRunPropertiesTab()
     {
-        elementCache().runStepDetailsTab.click();
-        sleep(1000); // bootstrap tab animation
+        return elementCache().nodeDetailsTabs().selectTab("Run Properties");
     }
 
-    public void clickProvenanceMapTab()
+    public WebElement clickRunStepDetailsTab()
     {
-        elementCache().provenanceMapTab.click();
-        sleep(1000); // bootstrap tab animation
+        return elementCache().nodeDetailsTabs().selectTab("Step Details");
+    }
+
+    public WebElement clickProvenanceMapTab()
+    {
+        return elementCache().nodeDetailsTabs().selectTab("Provenance Map");
     }
 
     public ResponsiveGrid getProvenanceMapGrid()
     {
-        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).find(elementCache().nodeDetails);
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).find(clickProvenanceMapTab());
     }
 
     @Override
@@ -161,6 +167,11 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
+        final WebElement lineageItem(String name, WebElement tabPanel)
+        {
+            return Locator.byClass("lineage-name").withChild(Locator.tag("span").withText(name)).waitForElement(tabPanel, Duration.ofSeconds(2));
+        }
+
         // container for the graph
         final WebElement visGraphContainer = Locator.tagWithClass("div", "lineage-visgraph-ct")
                 .findWhenNeeded(this);
@@ -177,6 +188,10 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
                 .findWhenNeeded(nodeDetailLinksContainer);
         Locator lineageLinkLoc = Locator.linkWithSpan("Lineage").withClass("lineage-data-link--text");
         WebElement nodeLineageLink = lineageLinkLoc.findWhenNeeded(nodeDetailLinksContainer);
+        Tabs nodeDetailsTabs()
+        {
+            return new Tabs.TabsFinder(getDriver()).findWhenNeeded(nodeDetailContainer);
+        }
 
         DetailTable detailTable()
         {
@@ -187,12 +202,6 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
                 .findWhenNeeded(nodeDetailContainer).withTimeout(3000);
         WebElement nodeDetailsName = Locator.tagWithClass("div", "lineage-name-data")
                 .findWhenNeeded(nodeDetails);
-
-
-        WebElement detailsTab = Locator.css("a[role=\"tab\"]").withText("Details").findWhenNeeded(this);
-        WebElement runPropertiesTab = Locator.css("a[role=\"tab\"]").withText("Run Properties").findWhenNeeded(this);
-        WebElement runStepDetailsTab = Locator.css("a[role=\"tab\"]").withText("Step Details").findWhenNeeded(this);
-        WebElement provenanceMapTab = Locator.css("a[role=\"tab\"]").withText("Provenance Map").findWhenNeeded(this);
 
         NodeDetailGroup summaryList(String nodeLabel)
         {
