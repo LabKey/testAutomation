@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -411,11 +412,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public WebElement setCellValue(int row, String columnName, Object value)
     {
         // Normalize date values
-        if (value instanceof LocalDate ld)
-        {
-            value = ld.atStartOfDay();
-        }
-        else if (value instanceof Date date)
+        if (value instanceof Date date)
         {
             value = LocalDateTime.ofInstant(date.toInstant(), TimeZone.getDefault().toZoneId());
         }
@@ -442,11 +439,35 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // Activate the cell.
             activateCell(gridCell);
 
+            ReactDateTimePicker dateTimePicker = elementCache().datePicker();
+            dateTimePicker.select(localDateTime);
+        }
+        else if(value instanceof LocalDate localDate)
+        {
+
+            // For a date the format shouldn't really matter but to be safe format the value using the date format for the container.
+            String date = localDate.format(DateTimeFormatter.ofPattern(getWrapper().getContainerDateFormatString()));
+
+            activateCell(gridCell);
+
             ReactDateTimePicker datePicker = elementCache().datePicker();
-            datePicker.select(localDateTime);
+            datePicker.set(date, true);
+        }
+        else if(value instanceof LocalTime localTime)
+        {
+
+            // Time values in the list will be formatted by the current container forlmat.
+            String date = localTime.format(DateTimeFormatter.ofPattern(getWrapper().getContainerTimeFormatString()));
+
+            activateCell(gridCell);
+
+            ReactDateTimePicker datePicker = elementCache().datePicker();
+            datePicker.set(date, true);
         }
         else
         {
+            String beforeText = gridCell.getText();
+
             new Actions(getDriver()).sendKeys(" ").perform(); // Type into no particular element to activate input
 
             String str = value.toString();
@@ -455,11 +476,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
-            // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
-            // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
-            // of the existing value so the new value should exist somewhere in the cell text value not necessarily
-            // at the end of it.
-            WebDriverWrapper.waitFor(() -> gridCell.getText().contains(str),
+            // Wait until the grid cell has been updated.
+            WebDriverWrapper.waitFor(() -> !gridCell.getText().equals(beforeText),
                     "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
         }
         return gridCell;
