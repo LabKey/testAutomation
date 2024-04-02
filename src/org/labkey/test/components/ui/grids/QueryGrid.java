@@ -9,6 +9,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.QueryChartPanel;
+import org.labkey.test.components.react.QueryChartDialog;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
@@ -702,10 +704,24 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return this;
     }
 
-    public WebElement showChart(String chartName)
+    public QueryChartPanel showChart(String chartName)
     {
         elementCache().chartsMenu.clickSubMenu(false, chartName);
-        return elementCache().svgChart();
+        return getChartPanel();
+    }
+
+    public QueryChartDialog createChart()
+    {
+        elementCache().chartsMenu.clickSubMenu(false, "Create Chart");
+        return new QueryChartDialog("Create Chart", getDriver(), this);
+    }
+
+    /*
+        gets a chart panel that is already being shown
+     */
+    public QueryChartPanel getChartPanel()
+    {
+        return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this).waitFor(this);
     }
 
     public WebElement showRReport(String reportName)
@@ -716,7 +732,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public void closeChart()
     {
-        elementCache().closeButton.click();
+        getChartPanel().clickClose();
     }
 
     @Override
