@@ -66,6 +66,13 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         return new ReactAssayDesignerPage(getDriver());
     }
 
+    public ChooseAssayTypePage selectAssayLocation(String value)
+    {
+        selectStandardAssay();
+        selectOptionByText(elementCache().containerSelect, value);
+        return this;
+    }
+
     public ChooseAssayTypePage goToImportAssayDesignTab()
     {
         elementCache().assayTypeTabs.selectTab("Import Assay Design");
@@ -101,5 +108,6 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
                 .locatedBy(Locator.XPathLocator.union(Locator.id("assay-picker-tabs"), Locator.byClass("lk-tabs")))
                 .findWhenNeeded(this);
 
+        public final WebElement containerSelect = Locator.tagWithId("select", "assay-type-select-container").findWhenNeeded(this);
     }
 }
