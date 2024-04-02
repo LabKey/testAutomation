@@ -60,7 +60,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectXAxis(String field)
     {
-        elementCache().reactSelectByLabel("X Axis *").select(field);
+        elementCache().reactSelectByLabel("X Axis").select(field);
         return this;
     }
 
@@ -146,8 +146,8 @@ public class QueryChartDialog extends ModalDialog
 
     public WebElement waitForPreview()
     {
-        WebDriverWrapper.waitFor(()-> elementCache().isPreviewRendered(),
-                "the preview was not rendered in time", 2000);
+        WebDriverWrapper.waitFor(()-> elementCache().isPreviewPresent(),
+                "the preview was not present in time", 2000);
         return elementCache().svg();
     }
 
@@ -278,14 +278,15 @@ public class QueryChartDialog extends ModalDialog
         }
 
         private Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
-        public boolean isPreviewRendered()
+        private Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart");
+        public boolean isPreviewPresent()
         {
-            return previewBodyLoc.existsIn(previewContainer());
+            return previewBodyLoc.existsIn(previewContainer()) && svgLoc.existsIn(previewContainer());
         }
 
         public WebElement svg()
         {
-            return Locator.tagWithClass("div", "svg-chart__chart").waitForElement(previewContainer(), 1500);
+            return svgLoc.waitForElement(previewContainer(), 1500);
         }
 
     }
