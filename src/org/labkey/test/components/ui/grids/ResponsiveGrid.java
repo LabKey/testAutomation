@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -432,21 +431,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T selectAllOnPage(boolean checked, @Nullable ReactCheckBox.CheckboxState expectedState)
     {
         selectAllBox().set(checked, expectedState);
-        Locator selectedText = Locator.XPathLocator.union(
-                Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]"),
-                Locator.tagWithClass("span", "selection-status__count").containing("selected"));
-
-        // If checked is false, so un-selecting a value, don't wait for a confirmation message.
-        if(checked)
-            WebDriverWrapper.waitFor(()->
-                    selectedText.findOptionalElement(getComponentElement()).isPresent(), WAIT_FOR_JAVASCRIPT);
 
         if (expectedState == null)  // we didn't verify expected state of the select-all box,
         {                           // ensure intended state of rows here
             if (!checked)
                 assertThat("more than 0 rows in the current page were selected", getSelectedRows().size(), is(0));
             else
-                assertTrue("not all rows in the current page were selected", getSelectedRows().stream().allMatch(GridRow::isSelected));
+                assertEquals("not all rows in the current page were selected", getRows().size(), getSelectedRows().size());
         }
 
         return getThis();
@@ -745,7 +736,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return hasSelectColumn;
         }
 
-        ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this));
+        ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this))
+        {
+            @Override
+            public void toggle()
+            {
+                doAndWaitForUpdate(super::toggle);
+            }
+        };
 
         private final Map<String, WebElement> headerCells = new HashMap<>();
         protected final WebElement getColumnHeaderCell(String headerText)
