@@ -411,6 +411,27 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public WebElement setCellValue(int row, String columnName, Object value)
     {
+        return setCellValue(row, columnName, value, true);
+    }
+
+    /**
+     * <p>
+     * For the identified row set the value in the identified column.
+     * </p>
+     * <p>
+     * If the column to be updated is a look-up, the value passed in must be a list, even if it is just one value.
+     * This is needed so the function knows how to set the value.
+     * </p>
+     *
+     * @param row        Index of the row (0 based).
+     * @param columnName Name of the column to update.
+     * @param value      If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
+     * @param checkContains Check to see if the value passed in is contained in the value shown in the grid after the edit.
+     *                   Will be true most of the time but can be false if the field has formatting that may alter the value passed in like date values.
+     * @return cell WebElement
+     */
+    public WebElement setCellValue(int row, String columnName, Object value, boolean checkContains)
+    {
         // Normalize date values
         if (value instanceof Date date)
         {
@@ -476,9 +497,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
-            // Wait until the grid cell has been updated.
-            WebDriverWrapper.waitFor(() -> !gridCell.getText().equals(beforeText),
-                    "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
+            if(checkContains)
+            {
+                // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
+                // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
+                // of the existing value so the new value should exist somewhere in the cell text value not necessarily
+                // at the end of it.
+                WebDriverWrapper.waitFor(() -> gridCell.getText().contains(str),
+                        "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
+            }
+            else
+            {
+                // Wait until the grid cell is not the same as before.
+                WebDriverWrapper.waitFor(() -> !gridCell.getText().equals(beforeText),
+                        "Value entered into inputCell '" + value + "' did not appear in grid cell.", WAIT_FOR_JAVASCRIPT);
+            }
         }
         return gridCell;
     }
