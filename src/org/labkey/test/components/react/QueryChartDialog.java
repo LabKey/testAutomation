@@ -151,6 +151,12 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().svg();
     }
 
+    public WebElement svg()
+    {
+        waitForPreview();
+        return elementCache().svg();
+    }
+
     public void clickCancel()
     {
         dismiss("Cancel");
