@@ -50,16 +50,27 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
         clickHiddenLink(elementCache().lineageGraphLink, wait);
     }
 
+    public void clickDetailsLink()
+    {
+        clickHiddenLink(elementCache().detailsLink, false);
+    }
+
     private void clickHiddenLink(WebElement link, boolean wait)
     {
-        new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(wd -> {
+        WebDriverWait webDriverWait = new WebDriverWait(getDriver(), Duration.ofSeconds(2));
+        webDriverWait.until(wd -> {
             getWrapper().mouseOver(getComponentElement());
             return ExpectedConditions.elementToBeClickable(link).apply(wd);
         });
         if (wait)
+        {
             getWrapper().clickAndWait(link);
+        }
         else
+        {
             link.click();
+            webDriverWait.until(ExpectedConditions.stalenessOf(link));
+        }
     }
 
     public WebElement getIcon()
@@ -95,6 +106,8 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
                 .withText("Overview").findWhenNeeded(this).withTimeout(2000);
         final WebElement lineageGraphLink = Locator.tagWithClass("a", "lineage-data-link--text")
                 .withText("Lineage").findWhenNeeded(this).withTimeout(2000);
+        final WebElement detailsLink = Locator.tagWithClass("a", "lineage-data-link--text")
+                .withText("Details").findWhenNeeded(this).withTimeout(2000);
         final WebElement nameElement = NAME_LOC.findElement(this);
     }
 
