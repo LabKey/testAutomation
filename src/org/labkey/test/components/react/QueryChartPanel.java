@@ -36,10 +36,10 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
 
     public String getTitle()
     {
-        return elementCache().getTitle();
+        return elementCache().titleElement.getText();
     }
 
-    public WebElement svgChart()
+    public WebElement getSvgChart()
     {
         return Locator.byClass("svg-chart").waitForElement(this, WAIT_FOR_JAVASCRIPT);
     }
@@ -79,17 +79,14 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement headingEl = Locator.tagWithClass("div", "chart-panel__heading")
+        public final WebElement headingEl = Locator.tagWithClass("div", "chart-panel__heading")
                 .findWhenNeeded(this).withTimeout(2000);
-        public WebElement editButton = Locator.tagWithAttribute("button", "title", "Edit chart")
+        public final WebElement editButton = Locator.tagWithAttribute("button", "title", "Edit chart")
                 .findWhenNeeded(headingEl);
-        public WebElement closeButton = Locator.tagWithAttribute("button", "title", "Hide chart")
+        public final WebElement closeButton = Locator.tagWithAttribute("button", "title", "Hide chart")
                 .findWhenNeeded(headingEl);
-        public String getTitle()
-        {
-            return Locator.tagWithClass("div", "chart-panel__heading-title").findElement(headingEl).getText();
-        }
-
+        public final WebElement titleElement= Locator.tagWithClass("div", "chart-panel__heading-title")
+                .findWhenNeeded(headingEl);
     }
 
 

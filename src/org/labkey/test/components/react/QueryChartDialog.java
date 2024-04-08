@@ -11,6 +11,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.components.html.Input.Input;
@@ -69,6 +70,11 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().reactSelectByLabel("X Axis").getValue();
     }
 
+    public List<String> getXAxisSelectionOptions()
+    {
+        return elementCache().reactSelectByLabel("X Axis").getOptions();
+    }
+
     /*
         Y Axis is an option for bar, box, line, scatter charts
      */
@@ -83,6 +89,11 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().reactSelectByLabel("Y Axis").getValue();
     }
 
+    public List<String> getYAxisSelectionOptions()
+    {
+        return elementCache().reactSelectByLabel("Y Axis").getOptions();
+    }
+
     /*
         groupBy is an option for bar charts only
      */
@@ -90,6 +101,16 @@ public class QueryChartDialog extends ModalDialog
     {
         elementCache().reactSelectByLabel("Group By").select(field);
         return this;
+    }
+
+    public String getGroupBySelection()
+    {
+        return elementCache().reactSelectByLabel("Group By").getValue();
+    }
+
+    public List<String> getGroupBySelectionOptions()
+    {
+        return elementCache().reactSelectByLabel("Group By").getOptions();
     }
 
     /*
@@ -101,6 +122,11 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public String getSelectedColor()
+    {
+        return elementCache().reactSelectByLabel("Color").getValue();
+    }
+
     /*
         shape is an option for Scatter, Box charts
      */
@@ -108,6 +134,11 @@ public class QueryChartDialog extends ModalDialog
     {
         elementCache().reactSelectByLabel("Shape").select(field);
         return this;
+    }
+
+    public String getSelectedShape()
+    {
+        return elementCache().reactSelectByLabel("Shape").getValue();
     }
 
     /*
@@ -119,6 +150,11 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public String getSelectedSeries()
+    {
+        return elementCache().reactSelectByLabel("Series").getValue();
+    }
+
     /*
         categories is an option for pie charts
      */
@@ -128,32 +164,55 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public String getSelectedCategory()
+    {
+        return elementCache().reactSelectByLabel("Categories").getValue();
+    }
+
+    public List<String> getCategorySelectOptions()
+    {
+        return elementCache().reactSelectByLabel("Categories").getOptions();
+    }
+
     // chart type selection
     /*
         Note: Chart Type is not settable when opened for edit/ it is only settable
         when creating the chart
+        Also, when updating the chart type, expect field selects to be re-drawn or made stale
      */
     public QueryChartDialog setChartType(CHART_TYPE chartType)
     {
-        elementCache().selectChartType(chartType);
+        if (getSelectedChartType().equals(chartType))
+            return this;
+
+        var el = elementCache().chartBuilderType.withAttribute("data-name", chartType.getChartType())
+                .waitForElement(this, 1500);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(el));
+        el.click();
+        WebDriverWrapper.waitFor(()-> getSelectedChartType().equals(chartType),
+                "The requested chart type did not become selected", 2000);
+
         return this;
     }
 
     public CHART_TYPE getSelectedChartType()
     {
-        return elementCache().getSelectedChartType();
+        var selectedEl = elementCache().chartBuilderType.withAttributeContaining("class", "selected")
+                .waitForElement(this, 1500);
+        String dataName = selectedEl.getAttribute("data-name");
+        return CHART_TYPE.fromChartType(dataName);
     }
 
-    public WebElement waitForPreview()
+    public boolean isPreviewPresent()
     {
-        WebDriverWrapper.waitFor(()-> elementCache().isPreviewPresent(),
+        return elementCache().previewBodyLoc.existsIn(elementCache().previewContainer()) &&
+                elementCache().svgLoc.existsIn(elementCache().previewContainer());
+    }
+
+    public WebElement getSvgChart()
+    {
+        WebDriverWrapper.waitFor(()-> isPreviewPresent(),
                 "the preview was not present in time", 2000);
-        return elementCache().svg();
-    }
-
-    public WebElement svg()
-    {
-        waitForPreview();
         return elementCache().svg();
     }
 
@@ -244,27 +303,6 @@ public class QueryChartDialog extends ModalDialog
         final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(this);
 
         Locator.XPathLocator chartBuilderType = Locator.tagWithClass("div", "chart-builder-type");
-        public CHART_TYPE getSelectedChartType()
-        {
-            var selectedEl = chartBuilderType.withAttributeContaining("class", "selected")
-                    .waitForElement(this, 1500);
-            String dataName = selectedEl.getAttribute("data-name");
-            return CHART_TYPE.fromChartType(dataName);
-        }
-
-        // note: selecting a chart type will cause most select fields to go stale
-        public void selectChartType(CHART_TYPE chartType)
-        {
-            if (getSelectedChartType().equals(chartType))
-                return;
-
-            var el = chartBuilderType.withAttribute("data-name", chartType.getChartType())
-                    .waitForElement(this, 1500);
-            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(el));
-            el.click();
-            WebDriverWrapper.waitFor(()-> getSelectedChartType().equals(chartType),
-                    "The requested chart type did not become selected", 2000);
-        }
 
         public ReactSelect reactSelectByLabel(String label)
         {
@@ -285,10 +323,6 @@ public class QueryChartDialog extends ModalDialog
 
         private Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
         private Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart");
-        public boolean isPreviewPresent()
-        {
-            return previewBodyLoc.existsIn(previewContainer()) && svgLoc.existsIn(previewContainer());
-        }
 
         public WebElement svg()
         {
@@ -316,7 +350,7 @@ public class QueryChartDialog extends ModalDialog
             }
             CHART_TYPE_MAP = map;
         }
-        private String _chartType;
+        private final String _chartType;
         private static final Map<String,CHART_TYPE> CHART_TYPE_MAP;
         public String getChartType()
         {
