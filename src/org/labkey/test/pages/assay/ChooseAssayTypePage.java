@@ -7,6 +7,7 @@ import org.labkey.test.components.react.Tabs;
 import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -34,7 +35,16 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     @Override
     protected void waitForPage()
     {
-        waitFor(() -> elementCache().assayTypeTabs.getTabText().size() > 1, WAIT_FOR_PAGE);
+        waitFor(() -> {
+                    try
+                    {
+                        return elementCache().assayTypeTabs.getTabText().size() > 1;
+                    }
+                    catch (NoSuchElementException retry)
+                    {
+                        return false;
+                    }
+                }, WAIT_FOR_PAGE);
     }
 
 
