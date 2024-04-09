@@ -472,8 +472,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         assertTrue("Script is missing labkey library", pythonScript.contains("from labkey.api_wrapper import APIWrapper"));
         assertTrue("Script is missing labkey.query.select_rows call", pythonScript.contains("api.query.select_rows("));
-        assertTrue("Script is missing schema_name property", pythonScript.contains("schema_name='" + getDataRegionSchemaName() + "'"));
-        assertTrue("Script is missing query_name property", pythonScript.contains("query_name='" + getDataRegionQueryName() + "'"));
+        assertTrue("Script is missing schema_name property", pythonScript.contains("schema_name=\"" + getDataRegionSchemaName() + "\""));
+        assertTrue("Script is missing query_name property", pythonScript.contains("query_name=\"" + getDataRegionQueryName() + "\""));
         if (null != filterColumn)
             assertTrue("Script is missing filter for column '" + filterColumn + "'", pythonScript.contains(filterColumn));
     }
@@ -527,7 +527,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         assertTrue("Script is missing schemaName property", perlScript.contains("-schemaName => '" + getDataRegionSchemaName() + "'"));
         assertTrue("Script is missing queryName property", perlScript.contains("-queryName => '" + getDataRegionQueryName() + "'"));
         if (null != filterColumn)
-            assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', eq, ''foo'']"));
+            assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', 'eq', 'foo']"));
     }
 
     protected boolean expectSortedExport()
