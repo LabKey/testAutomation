@@ -13,6 +13,7 @@ import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,12 +90,21 @@ public class SampleTypeAPIHelper
         if(response.getRowCount().intValue() == 0)
         {
             cmd = new SelectRowsCommand("samples", sampleTypeName);
-            cmd.setColumns(Arrays.asList("RowId"));
+            cmd.setColumns(Arrays.asList("Name"));
 
             SelectRowsResponse responseCount = cmd.execute(connection, containerPath);
 
-            errorMsg = errorMsg + "\n" + String.format(" Now rows were returned with filter, but sample type '%s' has %d rows.",
+            errorMsg = errorMsg + "\n" + String.format(" Now rows were returned with filter. The sample type '%s' has %d rows.",
                     sampleTypeName, responseCount.getRowCount().intValue());
+
+            List<String> names = new ArrayList<>();
+            for(Map<String, Object> row : response.getRows())
+            {
+                Object tempName = row.get("Name");
+                names.add(tempName.toString());
+            }
+
+            errorMsg = errorMsg + "\n Sample Names: " + names.toString();
         }
 
         Map<String, Integer> rowIds = new HashMap<>();
