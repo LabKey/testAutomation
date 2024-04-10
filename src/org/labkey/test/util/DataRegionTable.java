@@ -1192,6 +1192,12 @@ public class DataRegionTable extends DataRegion
         doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : getUpdateTimeout()));
     }
 
+    public void clearVariables()
+    {
+        TestLogger.log("Clear variable in" + getDataRegionName());
+        doAndWaitForUpdate(()-> getWrapper().click(Locator.tagWithClass("span", "labkey-button ctx-clear-var")));
+    }
+
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
     {
         final WebElement menu = elementCache().getColumnHeader(columnName);
