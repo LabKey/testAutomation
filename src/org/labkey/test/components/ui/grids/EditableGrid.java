@@ -465,25 +465,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
         else if(value instanceof LocalDate localDate)
         {
-
-            // For a date the format shouldn't really matter but to be safe format the value using the date format for the container.
-            String date = localDate.format(DateTimeFormatter.ofPattern(getWrapper().getContainerDateFormatString()));
-
             activateCell(gridCell);
-
             ReactDateTimePicker datePicker = elementCache().datePicker();
-            datePicker.set(date, true);
+            datePicker.selectDate(localDate);
         }
         else if(value instanceof LocalTime localTime)
         {
-
-            // Time values in the list will be formatted by the current container forlmat.
-            String date = localTime.format(DateTimeFormatter.ofPattern(getWrapper().getContainerTimeFormatString()));
-
             activateCell(gridCell);
-
             ReactDateTimePicker datePicker = elementCache().datePicker();
-            datePicker.set(date, true);
+            datePicker.selectTime(localTime);
         }
         else
         {
