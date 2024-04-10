@@ -84,6 +84,19 @@ public class SampleTypeAPIHelper
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
+        String errorMsg = "The sample names returned from the query do not match the sample names sent in.";
+
+        if(response.getRowCount().intValue() == 0)
+        {
+            cmd = new SelectRowsCommand("samples", sampleTypeName);
+            cmd.setColumns(Arrays.asList("RowId"));
+
+            SelectRowsResponse responseCount = cmd.execute(connection, containerPath);
+
+            errorMsg = errorMsg + "\n" + String.format(" Now rows were returned with filter, but sample type '%s' has %d rows.",
+                    sampleTypeName, responseCount.getRowCount().intValue());
+        }
+
         Map<String, Integer> rowIds = new HashMap<>();
 
         for(Map<String, Object> row : response.getRows())
@@ -94,7 +107,7 @@ public class SampleTypeAPIHelper
         }
 
         // Check that the names returned from the query match the names sent in.
-        Assert.assertEquals("The sample names returned from the query do not match the sample names sent in.",
+        Assert.assertEquals(errorMsg,
                 new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
