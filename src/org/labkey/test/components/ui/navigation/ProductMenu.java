@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
 {
@@ -79,8 +78,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public List<String> getMenuSectionHeaders()
     {
         expand();
-        return elementCache().menuSectionHeaderElements().stream().map(el -> el.getText().trim())
-                .collect(Collectors.toList());
+        return elementCache().menuSectionHeaderElements().stream().map(el -> el.getText().trim()).toList();
     }
 
     public Map<String, String> getMenuSectionHeaderLinks()
@@ -114,7 +112,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         return Locator.tag("li").childTag("a").findElements(elementCache().menuSectionBody(headerText))
                 .stream()
                 .map(element -> element.getAttribute("href"))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void clickMenuItem(String headerText, String menuText)
@@ -136,7 +134,8 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         // Use .collect(Collectors.toList()) to allow the returned list to be manipulated if needed.
         return elementCache().folderMenuItems()
                 .stream()
-                .map(WebElement::getText).collect(Collectors.toList());
+                .map(WebElement::getText)
+                .toList();
     }
 
     public ProductMenu clickFolderItem(String folderName)
@@ -223,7 +222,12 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
 
         WebElement menuSectionBody(String headerText)
         {
-            return menuSectionHeaderLoc(headerText).parent("ul").findElement(sectionContent);
+            return menuSectionHeaderLoc(headerText)
+                    .parent("ul")
+                    .parent("div") // .product-menu-section-header
+                    .followingSibling("div") // .product-menu-section-body
+                    .childTag("ul")
+                    .findElement(sectionContent);
         }
 
         WebElement menuSectionLink(String headerText, String linkText)
