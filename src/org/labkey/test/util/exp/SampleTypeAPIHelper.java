@@ -87,6 +87,8 @@ public class SampleTypeAPIHelper
 
         String errorMsg = "The sample names returned from the query do not match the sample names sent in.";
 
+        // There have been some TC failures where selectRows is not returning anything when it should. Adding this
+        // logging to help get more logging when/if it happens again.
         if(response.getRowCount().intValue() == 0)
         {
             cmd = new SelectRowsCommand("samples", sampleTypeName);
