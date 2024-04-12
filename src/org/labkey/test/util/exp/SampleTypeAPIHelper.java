@@ -96,7 +96,7 @@ public class SampleTypeAPIHelper
 
             SelectRowsResponse responseCount = cmd.execute(connection, containerPath);
 
-            errorMsg = errorMsg + "\n" + String.format(" Now rows were returned with filter. The sample type '%s' has %d rows.",
+            errorMsg = errorMsg + "\n" + String.format("No rows were returned with filter. The sample type '%s' has %d rows.",
                     sampleTypeName, responseCount.getRowCount().intValue());
 
             List<String> names = new ArrayList<>();
