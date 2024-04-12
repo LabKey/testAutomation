@@ -9,6 +9,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
+import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.By;
@@ -18,6 +19,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -349,6 +353,96 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         }
         select.clearSelection();
         return this;
+    }
+
+    public DetailTableEdit setDateTimeField(String fieldCaption, Object dateTime)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        if(dateTime instanceof LocalDateTime localDateTime)
+        {
+            dateTimePicker.select(localDateTime);
+        }
+        else
+        {
+            dateTimePicker.set(dateTime.toString(), true);
+        }
+        return this;
+    }
+
+    public String getDateTimeField(String fieldCaption)
+    {
+        return getDateTimePickerValue(fieldCaption);
+    }
+
+    public void clearDateTimeField(String fieldCaption)
+    {
+        clearDateTimePicker(fieldCaption);
+    }
+
+    public DetailTableEdit setDateField(String fieldCaption, Object date)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        if(date instanceof LocalDate localDate)
+        {
+            dateTimePicker.selectDate(localDate);
+        }
+        else
+        {
+            dateTimePicker.set(date.toString(), true);
+        }
+        return this;
+    }
+
+    public String getDateField(String fieldCaption)
+    {
+        return getDateTimePickerValue(fieldCaption);
+    }
+
+    public void clearDateField(String fieldCaption)
+    {
+        clearDateTimePicker(fieldCaption);
+    }
+
+    public DetailTableEdit setTimeField(String fieldCaption, Object time)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        if(time instanceof LocalTime localTime)
+        {
+            dateTimePicker.selectTime(localTime);
+        }
+        else
+        {
+            dateTimePicker.set(time.toString(), true);
+        }
+        return this;
+    }
+
+    public String getTimeField(String fieldCaption)
+    {
+        return getDateTimePickerValue(fieldCaption);
+    }
+
+    public void clearTimeField(String fieldCaption)
+    {
+        clearDateTimePicker(fieldCaption);
+    }
+
+    private ReactDateTimePicker getDateTimePicker(String fieldCaption)
+    {
+        return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
+                .withInputId(fieldCaption).find(this);
+    }
+
+    private String getDateTimePickerValue(String fieldCaption)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        return dateTimePicker.get();
+    }
+
+    private void clearDateTimePicker(String fieldCaption)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        dateTimePicker.clear();
     }
 
     /**

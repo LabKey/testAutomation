@@ -91,7 +91,15 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
 
     public void clear()
     {
-        set("");
+
+        if(elementCache().clearButton.isDisplayed())
+        {
+            elementCache().clearButton.click();
+        }
+        else
+        {
+            set("");
+        }
     }
 
     /**
@@ -168,6 +176,9 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
             return datePickerTimeListItemLocator.withText(timeStr)
                     .findWhenNeeded(elementCache().popup);
         }
+
+        WebElement clearButton = Locator.tagWithClass("button", "react-datepicker__close-icon")
+                .refindWhenNeeded(inputContainer);
     }
 
     static Locator.XPathLocator datePickerDateLoc(String datePart)
