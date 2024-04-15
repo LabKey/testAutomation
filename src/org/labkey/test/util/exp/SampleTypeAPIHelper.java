@@ -100,13 +100,13 @@ public class SampleTypeAPIHelper
                     sampleTypeName, responseCount.getRowCount().intValue());
 
             List<String> names = new ArrayList<>();
-            for(Map<String, Object> row : response.getRows())
+            for(Map<String, Object> row : responseCount.getRows())
             {
                 Object tempName = row.get("Name");
                 names.add(tempName.toString());
             }
 
-            errorMsg = errorMsg + "\n Sample Names: " + names.toString();
+            errorMsg = errorMsg + "\n Sample Names: " + names;
         }
 
         Map<String, Integer> rowIds = new HashMap<>();
