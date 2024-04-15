@@ -355,6 +355,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
+    /**
+     * Set a DateTime, Date or Time field.
+     * @param fieldCaption The caption of the field to set.
+     * @param dateTime Will be used to determine what kind of field is being set and how to set it. If the parameter
+     *                 is a LocalDateTime object then it is assumed that field is a DateTime field. If the parameter is
+     *                 a LocalDate object then it is assumed to be a date-only field. And I think you can guess what
+     *                 happens with a LocalTime object type. If the type is a string it is used as a literal value that
+     *                 is typed into the field (no picker is used).
+     * @return A reference to this DetailTableEdit object.
+     */
     public DetailTableEdit setDateTimeField(String fieldCaption, Object dateTime)
     {
         ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
@@ -362,87 +372,45 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         {
             dateTimePicker.select(localDateTime);
         }
+        else if(dateTime instanceof LocalDate localDate)
+        {
+            dateTimePicker.selectDate(localDate);
+        }
+        else if(dateTime instanceof LocalTime localTime)
+        {
+            dateTimePicker.selectTime(localTime);
+        }
+        else if(dateTime instanceof String setValue)
+        {
+            dateTimePicker.set(setValue, true);
+            // When setting DateTime, Date-only or Time-only fields by text there is a slight delay as any formatting is applied.
+            getWrapper().sleep(500);
+        }
         else
         {
-            dateTimePicker.set(dateTime.toString(), true);
+            throw new IllegalArgumentException(
+                    String.format("Unable to use type %s to set a DateTime, Date or Time field.", dateTime.getClass()));
         }
+
         return this;
     }
 
     public String getDateTimeField(String fieldCaption)
     {
-        return getDateTimePickerValue(fieldCaption);
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        return dateTimePicker.get();
     }
 
     public void clearDateTimeField(String fieldCaption)
     {
-        clearDateTimePicker(fieldCaption);
-    }
-
-    public DetailTableEdit setDateField(String fieldCaption, Object date)
-    {
         ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
-        if(date instanceof LocalDate localDate)
-        {
-            dateTimePicker.selectDate(localDate);
-        }
-        else
-        {
-            dateTimePicker.set(date.toString(), true);
-        }
-        return this;
-    }
-
-    public String getDateField(String fieldCaption)
-    {
-        return getDateTimePickerValue(fieldCaption);
-    }
-
-    public void clearDateField(String fieldCaption)
-    {
-        clearDateTimePicker(fieldCaption);
-    }
-
-    public DetailTableEdit setTimeField(String fieldCaption, Object time)
-    {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
-        if(time instanceof LocalTime localTime)
-        {
-            dateTimePicker.selectTime(localTime);
-        }
-        else
-        {
-            dateTimePicker.set(time.toString(), true);
-        }
-        return this;
-    }
-
-    public String getTimeField(String fieldCaption)
-    {
-        return getDateTimePickerValue(fieldCaption);
-    }
-
-    public void clearTimeField(String fieldCaption)
-    {
-        clearDateTimePicker(fieldCaption);
+        dateTimePicker.clear();
     }
 
     private ReactDateTimePicker getDateTimePicker(String fieldCaption)
     {
         return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
                 .withInputId(fieldCaption).find(this);
-    }
-
-    private String getDateTimePickerValue(String fieldCaption)
-    {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
-        return dateTimePicker.get();
-    }
-
-    private void clearDateTimePicker(String fieldCaption)
-    {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
-        dateTimePicker.clear();
     }
 
     /**
