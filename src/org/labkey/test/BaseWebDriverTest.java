@@ -920,7 +920,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (isTestRunningOnTeamCity())
                 {
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
+                    getArtifactCollector().addArtifactLocation(TestFileUtils.getBaseFileRoot());
                     getArtifactCollector().dumpPipelineFiles();
                 }
             }
