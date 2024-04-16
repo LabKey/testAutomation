@@ -13,6 +13,7 @@ import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,6 +85,30 @@ public class SampleTypeAPIHelper
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
+        String errorMsg = "The sample names returned from the query do not match the sample names sent in.";
+
+        // There have been some TC failures where selectRows is not returning anything when it should. Adding this
+        // logging to help get more logging when/if it happens again.
+        if(response.getRowCount().intValue() == 0)
+        {
+            cmd = new SelectRowsCommand("samples", sampleTypeName);
+            cmd.setColumns(Arrays.asList("Name"));
+
+            SelectRowsResponse responseCount = cmd.execute(connection, containerPath);
+
+            errorMsg = errorMsg + "\n" + String.format("No rows were returned with filter. The sample type '%s' has %d rows.",
+                    sampleTypeName, responseCount.getRowCount().intValue());
+
+            List<String> names = new ArrayList<>();
+            for(Map<String, Object> row : responseCount.getRows())
+            {
+                Object tempName = row.get("Name");
+                names.add(tempName.toString());
+            }
+
+            errorMsg = errorMsg + "\n Sample Names: " + names;
+        }
+
         Map<String, Integer> rowIds = new HashMap<>();
 
         for(Map<String, Object> row : response.getRows())
@@ -94,7 +119,7 @@ public class SampleTypeAPIHelper
         }
 
         // Check that the names returned from the query match the names sent in.
-        Assert.assertEquals("The sample names returned from the query do not match the sample names sent in.",
+        Assert.assertEquals(errorMsg,
                 new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
