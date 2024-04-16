@@ -187,7 +187,7 @@ public abstract class TestFileUtils
         return _buildDir;
     }
 
-    private static File getBaseFileRoot()
+    public static File getBaseFileRoot()
     {
         // Files are a sibling of the modules directory
         return new File(getModulesDir().getParentFile(), "files");
