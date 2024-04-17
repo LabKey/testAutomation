@@ -256,10 +256,10 @@ public class SurveyTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(EDITOR, "Reader");
         clickButton("Save and Finish");
-//        clickFolder(FOLDER_NAME);
-//        _permissionsHelper.enterPermissionsUI();
-//        _permissionsHelper.setUserPermissions(EDITOR, "Editor");
-//        clickButton("Save and Finish");
+        clickFolder(FOLDER_NAME);
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(EDITOR, "Editor");
+        clickButton("Save and Finish");
     }
 
     protected void createSurveyDesign(String project, @Nullable String folder, @Nullable String tabName, String designName, @Nullable String description,
