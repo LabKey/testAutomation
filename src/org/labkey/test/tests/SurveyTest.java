@@ -154,7 +154,13 @@ public class SurveyTest extends BaseWebDriverTest
 
         var dateTimeFieldTimeValue = "12:45";
         final WebElement timeInput = Locator.name(DATETIME_TIME_FIELD_NAME).findElement(getDriver());
-        timeInput.clear();
+        int attempt = 0;
+        while (attempt++ < 5 && !"".equals(getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME))))
+        {
+            timeInput.clear();
+            shortWait();
+        }
+        assertEquals("'Date Time Field (time)' not cleared.", "", getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME)));
         timeInput.sendKeys(dateTimeFieldTimeValue);
         assertEquals("'Date Time Field (time)' not set.", dateTimeFieldTimeValue, getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME)));
 
@@ -250,10 +256,10 @@ public class SurveyTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(EDITOR, "Reader");
         clickButton("Save and Finish");
-        clickFolder(FOLDER_NAME);
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(EDITOR, "Editor");
-        clickButton("Save and Finish");
+//        clickFolder(FOLDER_NAME);
+//        _permissionsHelper.enterPermissionsUI();
+//        _permissionsHelper.setUserPermissions(EDITOR, "Editor");
+//        clickButton("Save and Finish");
     }
 
     protected void createSurveyDesign(String project, @Nullable String folder, @Nullable String tabName, String designName, @Nullable String description,
