@@ -1455,7 +1455,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
               \t.libPaths(c(paths[1], paths[2]))
              \s
               .libPaths()
-              print(propValue)
             }
                 \s
             folderPath = "SimpleModuleTest Project/subfolder"
