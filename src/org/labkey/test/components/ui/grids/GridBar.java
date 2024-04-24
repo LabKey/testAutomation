@@ -60,6 +60,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return elementCache().exportMenu.exportData(exportType);
     }
 
+    public File exportData(ExportType exportType, int index)
+    {
+        return elementCache().exportMenu.exportData(exportType, index);
+    }
+
     public TabSelectionExportDialog openExcelTabsModal()
     {
         return elementCache().exportMenu.openExcelTabsModal();
