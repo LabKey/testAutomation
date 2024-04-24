@@ -216,14 +216,23 @@ public class EntityBulkInsertDialog extends ModalDialog
         return getWrapper().getFormElement(Locator.tagWithId("input", id));
     }
 
-    public EntityBulkInsertDialog setDateField(String fieldKey, String dateString)
+    /**
+     * Can be used to set a DateTime, Date-only or Time-only field. Pass in a LocalDateTime, LocalDate or LocalTime
+     * object to use the picker to set the field. If a text value is passed in it is used as a literal and jut typed
+     * into the textbox.
+     *
+     * @param fieldKey Field to update.
+     * @param dateTime A LocalDateTime, LocalDate, LocalTime or String.
+     * @return A reference to this page.
+     */
+    public EntityBulkInsertDialog setDateTimeField(String fieldKey, Object dateTime)
     {
-        ReactDateTimePicker input = elementCache().dateInput(fieldKey);
-        input.set(dateString);
+        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldKey);
+        dateTimePicker.select(dateTime);
         return this;
     }
 
-    public String getDateField(String fieldKey)
+    public String getDateTimeField(String fieldKey)
     {
         return elementCache().dateInput(fieldKey).get();
     }

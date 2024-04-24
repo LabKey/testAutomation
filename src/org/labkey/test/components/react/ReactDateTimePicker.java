@@ -45,7 +45,21 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
 
     public void set(String value, boolean close)
     {
+        String beforeValue = elementCache().input.get();
+
         elementCache().input.set(value);
+
+        // When setting a value by text there is a slight delay as formatting, if present, is applied.
+        if(!value.equals(beforeValue))
+        {
+            WebDriverWrapper.waitFor(()->!elementCache().input.get().equals(beforeValue),
+                    "Updating ReactDateTimePicker with text failed.", 1_000);
+        }
+        else
+        {
+            WebDriverWrapper.sleep(500);
+        }
+
         if (close)
             dismiss();
     }
@@ -63,19 +77,44 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
     }
 
     /**
-     * Use keyboard input to set year, month. then use picker to select day and time
-     * Midnight time values will be ignored
-     * @param value date or datetime value
+     * Can be used to set a DateTime, Date-only or Time-only field. Pass in a LocalDateTime, LocalDate or LocalTime
+     * object to use the picker to set the field. If a text value is passed in it is used as a literal and jut typed
+     * into the textbox.
+     * If a LocalDateTime or LocalDate object is passed in the keyboard is used to input the year and month then use
+     * picker to select day and time (for LocateDateTime).
+     *
+     * @param dateTime A LocalDateTime, LocalDate, LocalTime or String.
      */
-    public void select(LocalDateTime value)
+    public void select(Object dateTime)
     {
-        set("", false);
-        set(value.getYear() + "-" + value.getMonthValue(), false); // use keyboard input to set year and month
-        elementCache().datePickerDateCell(value.getDayOfMonth()).click(); // use calendar ui to select day
-        if (!value.toLocalTime().equals(LocalTime.MIDNIGHT)) // use timepicker to select time
-            selectTime(value.toLocalTime());
+        if(dateTime instanceof LocalDateTime localDateTime)
+        {
+            set("", false);
+            set(localDateTime.getYear() + "-" + localDateTime.getMonthValue(), false); // use keyboard input to set year and month
+            elementCache().datePickerDateCell(localDateTime.getDayOfMonth()).click(); // use calendar ui to select day
+            if (!localDateTime.toLocalTime().equals(LocalTime.MIDNIGHT)) // use timepicker to select time
+                selectTime(localDateTime.toLocalTime());
+            else
+                dismiss();
+        }
+        else if(dateTime instanceof LocalDate localDate)
+        {
+            selectDate(localDate);
+        }
+        else if(dateTime instanceof LocalTime localTime)
+        {
+            selectTime(localTime);
+        }
+        else if(dateTime instanceof String setValue)
+        {
+            set(setValue, true);
+        }
         else
-            dismiss();
+        {
+            throw new IllegalArgumentException(
+                    String.format("Unable to use type %s to set a DateTime, Date or Time field.", dateTime.getClass()));
+        }
+
     }
 
     /**

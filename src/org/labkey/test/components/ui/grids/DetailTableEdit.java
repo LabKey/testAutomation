@@ -383,8 +383,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         else if(dateTime instanceof String setValue)
         {
             dateTimePicker.set(setValue, true);
-            // When setting DateTime, Date-only or Time-only fields by text there is a slight delay as any formatting is applied.
-            getWrapper().sleep(500);
         }
         else
         {
