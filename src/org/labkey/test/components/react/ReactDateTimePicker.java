@@ -45,20 +45,11 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
 
     public void set(String value, boolean close)
     {
-        String beforeValue = elementCache().input.get();
 
         elementCache().input.set(value);
 
         // When setting a value by text there is a slight delay as formatting, if present, is applied.
-        if(!value.equals(beforeValue))
-        {
-            WebDriverWrapper.waitFor(()->!elementCache().input.get().equals(beforeValue),
-                    "Updating ReactDateTimePicker with text failed.", 1_000);
-        }
-        else
-        {
-            WebDriverWrapper.sleep(500);
-        }
+        WebDriverWrapper.sleep(750);
 
         if (close)
             dismiss();
