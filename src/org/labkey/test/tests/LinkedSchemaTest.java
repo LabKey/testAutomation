@@ -15,8 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -39,7 +37,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -524,22 +521,19 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         updatedMetaData = updatedMetaData.replace("StudyB", "StudyC");
         checkLinkedSchema(updatedMetaData, "StudyC", 0);
 
-        log("Now validate that a wrapped field gives the expected error.");
+        log("Now validate wrapped field filter doesn't filter unwrapped field.");
         goToProjectHome();
         navigateToFolder(getProjectName(), STUDY_FOLDER);
         wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
-        log("Update the filter to use the wrapped field. Because the field is only wrapped and there is no foreign key it should error.");
-        updatedMetaData = updatedMetaData.replace("ParticipantId/Study", "Pid2Consent/Study");
-        _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
+        updatedMetaData = STUDY_FILTER_METADATA
+                .replace("<!-- ", "").replace(" -->", "")
+                .replace("ParticipantId/Study", "Pid2Consent/Study");
+        checkLinkedSchema(updatedMetaData, null, 0);
 
-        beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-begin.view?schemaName=CommonData&queryName=Demographics");
-        final WebElement error = Locator.tagWithClass("div", "lk-vq-warn-message").waitForElement(shortWait());
-        MatcherAssert.assertThat("Schema browser error.", error.getText(),
-                CoreMatchers.containsString("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map."));
-
-        beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-executeQuery.view?schemaName=CommonData&queryName=Demographics");
-        assertTextPresent("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map.");
+        log("Add FK to the wrapped field.");
+        updatedMetaData = updatedMetaData.replace("ParticipantId", "Pid2Consent");
+        checkLinkedSchema(updatedMetaData, null, 2);
 
         log("Looks good, going home.");
         goToProjectHome();
@@ -548,7 +542,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private void checkLinkedSchema(String updatedMetaData, String studyName, int expectedUsersCount)
     {
         String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
-        _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
+        _schemaHelper.updateLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
 
         navigateToQuery("CommonData", "Demographics");
         DataRegionTable table = new DataRegionTable("query", this);
