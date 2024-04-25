@@ -9,6 +9,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
+import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.By;
@@ -18,6 +19,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -349,6 +353,62 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         }
         select.clearSelection();
         return this;
+    }
+
+    /**
+     * Set a DateTime, Date or Time field.
+     * @param fieldCaption The caption of the field to set.
+     * @param dateTime Will be used to determine what kind of field is being set and how to set it. If the parameter
+     *                 is a LocalDateTime object then it is assumed that field is a DateTime field. If the parameter is
+     *                 a LocalDate object then it is assumed to be a date-only field. And I think you can guess what
+     *                 happens with a LocalTime object type. If the type is a string it is used as a literal value that
+     *                 is typed into the field (no picker is used).
+     * @return A reference to this DetailTableEdit object.
+     */
+    public DetailTableEdit setDateTimeField(String fieldCaption, Object dateTime)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        if(dateTime instanceof LocalDateTime localDateTime)
+        {
+            dateTimePicker.select(localDateTime);
+        }
+        else if(dateTime instanceof LocalDate localDate)
+        {
+            dateTimePicker.selectDate(localDate);
+        }
+        else if(dateTime instanceof LocalTime localTime)
+        {
+            dateTimePicker.selectTime(localTime);
+        }
+        else if(dateTime instanceof String setValue)
+        {
+            dateTimePicker.set(setValue, true);
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                    String.format("Unable to use type %s to set a DateTime, Date or Time field.", dateTime.getClass()));
+        }
+
+        return this;
+    }
+
+    public String getDateTimeField(String fieldCaption)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        return dateTimePicker.get();
+    }
+
+    public void clearDateTimeField(String fieldCaption)
+    {
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        dateTimePicker.clear();
+    }
+
+    private ReactDateTimePicker getDateTimePicker(String fieldCaption)
+    {
+        return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
+                .withInputId(fieldCaption).find(this);
     }
 
     /**

@@ -262,8 +262,12 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void reset()
     {
-        elementCache().resetBtn.click();
-        acceptAlert();
+        doAndWaitForPageToLoad(()->
+        {
+            elementCache().resetBtn.click();
+            acceptAlert();
+        });
+
     }
 
     @Override
