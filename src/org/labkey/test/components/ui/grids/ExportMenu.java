@@ -48,6 +48,13 @@ public class ExportMenu extends WebDriverComponent<Component.ElementCache>
         return getWrapper().doAndWaitForDownload(exportButton::click);
     }
 
+
+    public File exportData(GridBar.ExportType exportType, int index)
+    {
+        WebElement exportButton = getExportMenuItem(exportType, index);
+        return getWrapper().doAndWaitForDownload(exportButton::click);
+    }
+
     public TabSelectionExportDialog openExcelTabsModal()
     {
         WebElement exportButton = getExportMenuItem(GridBar.ExportType.EXCEL);
@@ -60,5 +67,11 @@ public class ExportMenu extends WebDriverComponent<Component.ElementCache>
     {
         _menu.expand();
         return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
+    }
+
+    private WebElement getExportMenuItem(GridBar.ExportType exportType, int index)
+    {
+        _menu.expand();
+        return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElements(this).get(index);
     }
 }
