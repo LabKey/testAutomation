@@ -29,7 +29,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -152,15 +151,11 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name(DATETIME_DATE_FIELD_NAME), dateTimeFieldDateValue);
         assertEquals("'Date Time Field (date)' not set.", dateTimeFieldDateValue, getFormElement(Locator.name(DATETIME_DATE_FIELD_NAME)));
 
-        var dateTimeFieldTimeValue = "12:45";
         final WebElement timeInput = Locator.name(DATETIME_TIME_FIELD_NAME).findElement(getDriver());
-        int attempt = 0;
-        while (attempt++ < 5 && !"".equals(getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME))))
-        {
-            timeInput.clear();
-            shortWait();
-        }
-        assertEquals("'Date Time Field (time)' not cleared.", "", getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME)));
+        timeInput.click();
+        timeInput.clear();
+        waitFor(()->timeInput.getText().isEmpty(), "'Date Time Field (time)' not cleared.",1_000);
+        var dateTimeFieldTimeValue = "12:45";
         timeInput.sendKeys(dateTimeFieldTimeValue);
         assertEquals("'Date Time Field (time)' not set.", dateTimeFieldTimeValue, getFormElement(Locator.name(DATETIME_TIME_FIELD_NAME)));
 
