@@ -88,7 +88,7 @@ public class SignedSnapshotDetailsPage extends LabKeyPage<SignedSnapshotDetailsP
         WebElement showGridBtn = new RefindingWebElement(Locators.showGridBtn, this);
     }
 
-    protected static class Locators extends org.labkey.test.Locators
+    protected static class Locators
     {
         public static final Locator.XPathLocator sourceSchema = Locator.tagWithClass("td","lk-form-label").withText("Source Schema:").notHidden().append("/following-sibling::td");
         public static final Locator.XPathLocator sourceQuery = Locator.tagWithClass("td","lk-form-label").withText("Source Query:").notHidden().append("/following-sibling::td");
