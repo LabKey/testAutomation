@@ -130,7 +130,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             return;
         }
 
-        if (!getDriver().getTitle().startsWith("Sign In"))
+        if (!Locator.tagWithName("form", "login").existsIn(getDriver()))
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
