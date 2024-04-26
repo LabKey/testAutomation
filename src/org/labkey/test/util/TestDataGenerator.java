@@ -34,7 +34,6 @@ import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
