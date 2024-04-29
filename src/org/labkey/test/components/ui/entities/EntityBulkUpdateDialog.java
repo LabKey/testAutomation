@@ -41,14 +41,14 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     // enable/disable field editable state
 
-    public boolean isFieldEnabled(String columnTitle)
+    public boolean isFieldEnabled(String fieldKey)
     {
-        return elementCache().getToggle(columnTitle).isOn();
+        return elementCache().getToggle(fieldKey).isOn();
     }
 
-    public EntityBulkUpdateDialog setEditableState(String columnTitle, boolean enable)
+    public EntityBulkUpdateDialog setEditableState(String fieldKey, boolean enable)
     {
-        elementCache().getToggle(columnTitle).set(enable);
+        elementCache().getToggle(fieldKey).set(enable);
         return this;
     }
 
@@ -59,12 +59,12 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     // interact with selection fields
 
-    public EntityBulkUpdateDialog setSelectionField(String columnTitle, List<String> selectValues)
+    public EntityBulkUpdateDialog setSelectionField(String fieldKey, List<String> selectValues)
     {
-        setEditableState(columnTitle, true);
-        FilteringReactSelect reactSelect = elementCache().getSelect(columnTitle);
+        setEditableState(fieldKey, true);
+        FilteringReactSelect reactSelect = elementCache().getSelect(fieldKey);
         WebDriverWrapper.waitFor(reactSelect::isEnabled,
-                "the ["+columnTitle+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
+                "the ["+fieldKey+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
         selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
