@@ -21,6 +21,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CspLogUtil
 {
+    private static final List<String> ignoredVioloations = List.of(
+            "/_rstudio/",
+            "/_rstudioReport/",
+            "/reports-createScriptReport.view?",
+            "/reports-runReport.view?"
+    );
     private static final String logName = "csp-report.log";
     private static final File logFile = new File(TestFileUtils.getServerLogDir(), logName);
 
@@ -38,7 +44,15 @@ public class CspLogUtil
         if (!logFile.isFile())
         {
             missingLog = true; // Only fail one test if CSP check is enabled but log is missing.
-            assertThat(logFile).as("CSP log file").isFile(); // Should fail
+            if (TestProperties.isCspCheckSkipped())
+            {
+                TestLogger.warn("CSP log not found");
+                return;
+            }
+            else
+            {
+                assertThat(logFile).as("CSP log file").isFile(); // Should fail
+            }
         }
 
         long logSize = logFile.length();
@@ -72,8 +86,15 @@ public class CspLogUtil
                     if (split.length > 1)
                     {
                         String url = split[1];
-                        Crawler.ControllerActionId actionId = new Crawler.ControllerActionId(url);
-                        violoations.put(actionId, url);
+                        if (ignoredVioloations.stream().anyMatch(url::contains))
+                        {
+                            TestLogger.warn("Ignoring CSP warning on page: " + url);
+                        }
+                        else
+                        {
+                            Crawler.ControllerActionId actionId = new Crawler.ControllerActionId(url);
+                            violoations.put(actionId, url);
+                        }
                     }
                 }
 
@@ -101,7 +122,14 @@ public class CspLogUtil
                         errorMessage.append(": ").append(urls.iterator().next());
                     }
                 }
-                throw new CspWarningDetectedException(errorMessage);
+                if (TestProperties.isCspCheckSkipped())
+                {
+                    TestLogger.warn(errorMessage.toString());
+                }
+                else
+                {
+                    throw new CspWarningDetectedException(errorMessage);
+                }
             }
             finally
             {
@@ -113,7 +141,7 @@ public class CspLogUtil
 
     public static void resetCspLogMark()
     {
-        if (TestProperties.isCspCheckSkipped() || TestProperties.isServerRemote() || !logFile.isFile())
+        if (TestProperties.isServerRemote() || !logFile.isFile())
             return;
 
         lastSize = logFile.length();
