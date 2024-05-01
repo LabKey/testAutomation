@@ -226,8 +226,8 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
             return loc;
         }
 
-        static final Locator.XPathLocator windowLoc = Locator.tagWithClass("div", Ext4Helper.getCssPrefix() + "window").withoutClass(Ext4Helper.getCssPrefix() + "window-ghost").notHidden();
-        static final Locator.XPathLocator titleLoc = Locator.tagWithClass("span", Ext4Helper.getCssPrefix() + "window-header-text");
+        static final Locator.XPathLocator windowLoc = Locators.window();
+        static final Locator.XPathLocator titleLoc = Locators.title();
     }
 
     /**
@@ -238,11 +238,11 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
     {
         public static Locator.XPathLocator window()
         {
-            return WindowFinder.windowLoc;
+            return Locator.tagWithClass("div", Ext4Helper.getCssPrefix() + "window").withoutClass(Ext4Helper.getCssPrefix() + "window-ghost").notHidden();
         }
         public static Locator.XPathLocator title()
         {
-            return WindowFinder.titleLoc;
+            return Locator.tagWithClass("span", Ext4Helper.getCssPrefix() + "window-header-text");
         }
     }
 }
