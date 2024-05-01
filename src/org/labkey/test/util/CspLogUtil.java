@@ -79,12 +79,14 @@ public class CspLogUtil
                     throw new RuntimeException("Failed to read recent CSP violations.", e);
                 }
 
+                boolean foundVioloation = false;
                 MultiValuedMap<Crawler.ControllerActionId, String> violoations = new HashSetValuedHashMap<>();
                 for (String line : warningLines)
                 {
                     String[] split = line.split("ContentSecurityPolicy warning on page: ");
                     if (split.length > 1)
                     {
+                        foundVioloation = true;
                         String url = split[1];
                         if (ignoredVioloations.stream().anyMatch(url::contains))
                         {
@@ -98,7 +100,7 @@ public class CspLogUtil
                     }
                 }
 
-                if (violoations.isEmpty())
+                if (!foundVioloation)
                 {
                     throw new AssertionError("Detected CSP violations but unable to parse log file: " + recentWarningsFile.getAbsolutePath());
                 }
