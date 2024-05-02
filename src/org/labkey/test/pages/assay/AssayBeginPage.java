@@ -49,9 +49,9 @@ public class AssayBeginPage extends LabKeyPage<AssayBeginPage.ElementCache>
         return new ChooseAssayTypePage(getDriver());
     }
 
-    public PlateTemplateListPage clickConfigurePlateTemplates()
+    public PlateTemplateListPage clickConfigurePlates()
     {
-        elementCache().assaysList.clickHeaderButtonAndWait("Configure Plate Templates");
+        elementCache().assaysList.clickHeaderButtonAndWait("Configure Plates");
 
         return new PlateTemplateListPage(getDriver());
     }

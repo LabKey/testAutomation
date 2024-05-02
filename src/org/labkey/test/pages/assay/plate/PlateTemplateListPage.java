@@ -27,7 +27,7 @@ public class PlateTemplateListPage extends LabKeyPage<PlateTemplateListPage.Elem
 
     public static PlateTemplateListPage beginAt(WebDriverWrapper webDriverWrapper, String containerPath)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("plate", containerPath, "plateTemplateList"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("plate", containerPath, "plateList"));
         return new PlateTemplateListPage(webDriverWrapper.getDriver());
     }
 
