@@ -28,13 +28,14 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
 
@@ -490,27 +491,29 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @Test
-    public void verifyLinkedSchemaWithLookup()
+    public void verifyLinkedSchemaWithLookup() throws Exception
     {
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+
         // This test validates the fixes for issues 32454 & 32456
         log("Create a list in the study folder.");
-        _listHelper.createList(getProjectName() + "/" + STUDY_FOLDER, STUDY_LIST_NAME,
-                ListHelper.ListColumnType.String, "GlobalPid",
-                new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
-        _listHelper.goToList(STUDY_LIST_NAME);
-        _listHelper.clickImportData()
+        new VarListDefinition(STUDY_LIST_NAME).setFields(List.of(
+                new FieldDefinition("GlobalPid", FieldDefinition.ColumnType.String),
+                new FieldDefinition("Study", FieldDefinition.ColumnType.String).setDescription("Study"))
+        ).create(createDefaultConnection(), sourceContainerPath);
+
+        GridPage.beginAt(this, sourceContainerPath, STUDY_LIST_NAME).getGrid()
+                .clickImportBulkData()
                 .setText(STUDY_LIST_DATA)
                 .submit();
 
         log("Create the linked schema to the study.");
-        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
         _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
 
         log("Validate that with no filter all of the participants are visible in the linked schema.");
         checkLinkedSchema(STUDY_FILTER_METADATA, null, 6);
 
         log("Apply the filter. This should limit the user to those in 'StudyA'.");
-        String updatedMetaData = STUDY_FILTER_METADATA.replace("<!-- ", "").replace(" -->", "");
         checkLinkedSchema(buildStudyFilterMetadata("StudyA"), "StudyA", 2);
 
         log("Replace the study name with a different value (should limit the number of participants returned).");
