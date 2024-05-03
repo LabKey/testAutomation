@@ -175,6 +175,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         log(String.format("Create the '%s' view for the '%s' sample type.", VIEW_EXTRA_COLUMNS, SMALL_SAMPLE_TYPE));
         CustomizeView cv = drtSamples.openCustomizeGrid();
+        cv.showHiddenItems();
         for(String columnName : extraColumnsNames)
         {
             cv.addColumn(columnName);
