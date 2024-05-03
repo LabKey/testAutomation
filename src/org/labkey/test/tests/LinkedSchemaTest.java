@@ -527,7 +527,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), STUDY_FOLDER);
         wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
-        log("Filter on wrapped field without fkoverride");
+        log("Filter on wrapped field without fk override");
         checkLinkedSchema(buildStudyFilterMetadata("Demo Study", "Pid2Consent/Study/Label"), null, 6);
 
         log("Add FK to the wrapped field and filter on it.");
