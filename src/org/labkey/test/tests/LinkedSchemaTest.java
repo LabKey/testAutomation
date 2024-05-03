@@ -527,8 +527,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), STUDY_FOLDER);
         wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
-        log("Add FK to the wrapped field.");
-        checkLinkedSchema(buildStudyFilterMetadata("StudyA", "Pid2Consent"), null, 2);
+        log("Filter on wrapped field without fkoverride");
+        checkLinkedSchema(buildStudyFilterMetadata("Demo Study", "Pid2Consent/Study/Label"), null, 6);
+
+        log("Add FK to the wrapped field and filter on it.");
+        checkLinkedSchema(buildStudyFilterMetadata("StudyA").replace("ParticipantId", "Pid2Consent"), null, 2);
 
         log("Looks good, going home.");
         goToProjectHome();
@@ -536,7 +539,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     private String buildStudyFilterMetadata(String study, String lookupColumn)
     {
-        return buildStudyFilterMetadata(study).replace("ParticipantId", lookupColumn);
+        return buildStudyFilterMetadata(study).replace("ParticipantId/Study", lookupColumn);
     }
 
     private String buildStudyFilterMetadata(String study)
