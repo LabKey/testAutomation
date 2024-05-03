@@ -511,32 +511,36 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         log("Apply the filter. This should limit the user to those in 'StudyA'.");
         String updatedMetaData = STUDY_FILTER_METADATA.replace("<!-- ", "").replace(" -->", "");
-        checkLinkedSchema(updatedMetaData, "StudyA", 2);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyA"), "StudyA", 2);
 
         log("Replace the study name with a different value (should limit the number of participants returned).");
-        updatedMetaData = updatedMetaData.replace("StudyA", "StudyB");
-        checkLinkedSchema(updatedMetaData, "StudyB", 1);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyB"), "StudyB", 1);
 
         log("Replace the study name with one that is not there, no participants should be returned.");
-        updatedMetaData = updatedMetaData.replace("StudyB", "StudyC");
-        checkLinkedSchema(updatedMetaData, "StudyC", 0);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyC"), "StudyC", 0);
 
-        log("Now validate wrapped field filter doesn't filter unwrapped field.");
+        log("Now validate wrapped field filter unwrapped field.");
         goToProjectHome();
         navigateToFolder(getProjectName(), STUDY_FOLDER);
         wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
-        updatedMetaData = STUDY_FILTER_METADATA
-                .replace("<!-- ", "").replace(" -->", "")
-                .replace("ParticipantId/Study", "Pid2Consent/Study");
-        checkLinkedSchema(updatedMetaData, null, 0);
-
         log("Add FK to the wrapped field.");
-        updatedMetaData = updatedMetaData.replace("ParticipantId", "Pid2Consent");
-        checkLinkedSchema(updatedMetaData, null, 2);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyA", "Pid2Consent"), null, 2);
 
         log("Looks good, going home.");
         goToProjectHome();
+    }
+
+    private String buildStudyFilterMetadata(String study, String lookupColumn)
+    {
+        return buildStudyFilterMetadata(study).replace("ParticipantId", lookupColumn);
+    }
+
+    private String buildStudyFilterMetadata(String study)
+    {
+        return STUDY_FILTER_METADATA
+                .replace("<!-- ", "").replace(" -->", "")
+                .replace("StudyA", study);
     }
 
     private void checkLinkedSchema(String updatedMetaData, String studyName, int expectedUsersCount)
