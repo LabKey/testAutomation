@@ -79,12 +79,14 @@ public class CspLogUtil
                     throw new RuntimeException("Failed to read recent CSP violations.", e);
                 }
 
+                boolean foundVioloation = false;
                 MultiValuedMap<Crawler.ControllerActionId, String> violoations = new HashSetValuedHashMap<>();
                 for (String line : warningLines)
                 {
                     String[] split = line.split("ContentSecurityPolicy warning on page: ");
                     if (split.length > 1)
                     {
+                        foundVioloation = true;
                         String url = split[1];
                         if (ignoredVioloations.stream().anyMatch(url::contains))
                         {
@@ -98,37 +100,40 @@ public class CspLogUtil
                     }
                 }
 
-                if (violoations.isEmpty())
+                if (!foundVioloation)
                 {
                     throw new AssertionError("Detected CSP violations but unable to parse log file: " + recentWarningsFile.getAbsolutePath());
                 }
 
-                StringBuilder errorMessage = new StringBuilder()
-                        .append("Detected CSP violations on the following actions (See log for more detail: ")
-                        .append(recentWarningsFile.getAbsolutePath())
-                        .append("):");
-                for (Crawler.ControllerActionId actionId : violoations.keySet())
+                if (!violoations.isEmpty())
                 {
-                    errorMessage.append("\n\t");
-                    Collection<String> urls = violoations.get(actionId);
-                    errorMessage.append(actionId);
-                    if (urls.size() > 1)
+                    StringBuilder errorMessage = new StringBuilder()
+                            .append("Detected CSP violations on the following actions (See log for more detail: ")
+                            .append(recentWarningsFile.getAbsolutePath())
+                            .append("):");
+                    for (Crawler.ControllerActionId actionId : violoations.keySet())
                     {
-                        errorMessage.append("\n\t\t");
-                        errorMessage.append(String.join("\n\t\t", urls));
+                        errorMessage.append("\n\t");
+                        Collection<String> urls = violoations.get(actionId);
+                        errorMessage.append(actionId);
+                        if (urls.size() > 1)
+                        {
+                            errorMessage.append("\n\t\t");
+                            errorMessage.append(String.join("\n\t\t", urls));
+                        }
+                        else
+                        {
+                            errorMessage.append(": ").append(urls.iterator().next());
+                        }
+                    }
+                    if (TestProperties.isCspCheckSkipped())
+                    {
+                        TestLogger.warn(errorMessage.toString());
                     }
                     else
                     {
-                        errorMessage.append(": ").append(urls.iterator().next());
+                        throw new CspWarningDetectedException(errorMessage);
                     }
-                }
-                if (TestProperties.isCspCheckSkipped())
-                {
-                    TestLogger.warn(errorMessage.toString());
-                }
-                else
-                {
-                    throw new CspWarningDetectedException(errorMessage);
                 }
             }
             finally
