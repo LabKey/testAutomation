@@ -106,7 +106,8 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         if (!password.isEmpty() && elementCache().strengthGuidance.getText().equals(expectedGuidance))
             assertPasswordGuidance("", GUIDANCE_PLACEHOLDER); // Clear out previous guidance
 
-        setPassword1(password);
+        // Paste password to avoid triggering 'oninput' multiple times
+        pastePassword(password);
         assertGuidanceMessage(expectedGuidance);
     }
 
@@ -130,21 +131,26 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         return this;
     }
 
-    public SetPasswordForm setPassword1(String password1)
+    private void pastePassword(String password1)
     {
         if (password1.isEmpty())
         {
             // `WebElement.clear()` doesn't trigger `oninput`
             // Need to use this method to update strength guidance
-            getWrapper().actionClear(elementCache().password);
+            getWrapper().actionClear(elementCache().password.getComponentElement());
         }
         else
         {
             // Won't trigger 'oninput'
-            elementCache().password.clear();
+            elementCache().password.getComponentElement().clear();
             // Paste to avoid triggering 'oninput' twice
-            getWrapper().actionPaste(elementCache().password, password1);
+            getWrapper().actionPaste(elementCache().password.getComponentElement(), password1);
         }
+    }
+
+    public SetPasswordForm setPassword1(String password1)
+    {
+        elementCache().password.set(password1);
 
         return this;
     }
@@ -194,7 +200,7 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
         // For ChangePasswordAction
         final Input oldPassword = Input(Locator.id("oldPassword"), getDriver()).findWhenNeeded(this);
 
-        final WebElement password = Locator.id("password").findWhenNeeded(this);
+        final Input password = Input(Locator.id("password"), getDriver()).findWhenNeeded(this);
         final Input password2 = Input(Locator.id("password2"), getDriver()).findWhenNeeded(this);
         final WebElement strengthGuidance = Locator.id("strengthGuidance").findWhenNeeded(this);
         final WebElement submitButton = Locator.name("set").findWhenNeeded(this);
