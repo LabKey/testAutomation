@@ -241,6 +241,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
 
+        if (!TestProperties.isCspCheckSkipped())
+        {
+            addPageLoadListener(new PageLoadListener()
+            {
+                @Override
+                public void beforePageLoad()
+                {
+                    try
+                    {
+                        CspLogUtil.checkNewCspWarnings(_artifactCollector);
+                    }
+                    catch (CspLogUtil.CspWarningDetectedException ex)
+                    {
+                        checker().withScreenshot("csp_violation").recordError(ex);
+                    }
+                }
+            });
+        }
+
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
         {
