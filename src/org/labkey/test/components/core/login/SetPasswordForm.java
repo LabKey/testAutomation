@@ -46,6 +46,12 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
 
         if (getWrapper().getCurrentRelativeURL().contains("changePassword.view") && PasswordUtil.getUsername().equals(getWrapper().getCurrentUser()))
             throw new IllegalArgumentException("Don't change the primary site admin user's password");
+
+        if (elementCache().strengthGuidance.isDisplayed())
+        {
+            // Not all password strength requirements display password guidance meter
+            assertGuidanceMessage(GUIDANCE_PLACEHOLDER);
+        }
     }
 
     // Don't use this unless you're actually testing authentication functionality
@@ -101,6 +107,11 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
             assertPasswordGuidance("", GUIDANCE_PLACEHOLDER); // Clear out previous guidance
 
         setPassword1(password);
+        assertGuidanceMessage(expectedGuidance);
+    }
+
+    private void assertGuidanceMessage(String expectedGuidance)
+    {
         Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted(() ->
                 assertEquals("Strength guidance for password", expectedGuidance, elementCache().strengthGuidance.getText()));
     }
