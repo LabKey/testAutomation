@@ -78,7 +78,7 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
 
     public ChooseAssayTypePage selectAssayLocation(String value)
     {
-        selectStandardAssay();
+        elementCache().assayTypeTabs.selectTab("Standard Assay");
         selectOptionByText(elementCache().containerSelect, value);
         return this;
     }
