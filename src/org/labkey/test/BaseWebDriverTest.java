@@ -197,6 +197,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static boolean _dumpedHeap = false;
     private final ArtifactCollector _artifactCollector;
     private final DeferredErrorCollector _errorCollector;
+    private final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -241,6 +242,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
+        _cspCheckPageLoadListener = new CspCheckPageLoadListener(this);
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
@@ -324,7 +326,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (!TestProperties.isCspCheckSkipped())
         {
-            addPageLoadListener(new CspCheckPageLoadListener(this));
+            addPageLoadListener(_cspCheckPageLoadListener);
         }
     }
 
