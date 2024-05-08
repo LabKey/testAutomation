@@ -408,7 +408,7 @@ public class WebTestHelper
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
-                    LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+                    LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextpath'.");
 
                 _contextPath = StringUtils.strip(_contextPath, "/ ");
                 if (!_contextPath.isEmpty())

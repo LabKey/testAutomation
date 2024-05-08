@@ -41,10 +41,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
-import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.TestUser;
 import org.labkey.test.util.URLBuilder;
 import org.openqa.selenium.WebElement;
@@ -93,7 +90,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
 
         EDITOR_USER.create(this)
-                .setPassword(PasswordUtil.getPassword())
+                .setInitialPassword()
                 .addPermission("Editor", getProjectName());
     }
 
