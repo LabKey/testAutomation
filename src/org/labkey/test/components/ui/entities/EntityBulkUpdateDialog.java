@@ -155,6 +155,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return BootstrapLocators.errorBanner.waitForElement(this, getWrapper().defaultWaitForPage).getText();
     }
 
+    public String getWarningAlertText()
+    {
+        return BootstrapLocators.warningBanner.waitForElement(this, getWrapper().defaultWaitForPage).getText();
+    }
+
     public List<String> getColumns()
     {
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
