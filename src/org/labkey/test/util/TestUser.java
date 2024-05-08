@@ -59,12 +59,28 @@ public class TestUser
     }
 
     /**
+     * Set the initial password for a newly created user. Uses the reset link emailed to the user.
+     * Stores the password in the bean for later use.
+     *  Note: this can only be done once for a given user account
+     * @return The current instance
+     * @see #getPassword()
+     */
+    public TestUser setInitialPassword()
+    {
+        return setPassword(PasswordUtil.getPassword());
+    }
+
+    /**
      * Uses the UI to reset the randomly-generated password a user gets when created, by following the reset link they'll
      * receive in mail. Also stores the provided password in the bean for later use.
      *  Note: this can only be done once for a given user account
      * @param password  The password
      * @return  The current instance
+     * @deprecated There is no need to specify a particular password for most test scenarios.
+     *  Such scenarios should not use this class.
+     * @see #setInitialPassword()
      */
+    @Deprecated (since = "24.6")
     public TestUser setPassword(String password)
     {
         if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
@@ -83,6 +99,10 @@ public class TestUser
 
     public String getPassword()
     {
+        if (_password == null)
+        {
+            throw new IllegalStateException("Password has not been set for user: " + _email);
+        }
         return _password;
     }
 

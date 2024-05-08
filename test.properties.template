@@ -105,7 +105,7 @@ selenium.debug.port=5005
 #==============================================================================
 labkey.port=8080
 labkey.server=http://localhost
-labkey.contextpath=/labkey
+labkey.contextpath=
 
 
 #==============================================================================
