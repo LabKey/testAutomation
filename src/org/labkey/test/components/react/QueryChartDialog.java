@@ -56,6 +56,12 @@ public class QueryChartDialog extends ModalDialog
 
     // field selects
 
+    public QueryChartDialog clearFieldValue(String fieldLabel)
+    {
+        elementCache().reactSelectByLabel(fieldLabel).clearSelection();
+        return this;
+    }
+
     /*
         X axis is an option for bar, box, line, scatter charts
      */
@@ -92,6 +98,20 @@ public class QueryChartDialog extends ModalDialog
     public List<String> getYAxisSelectionOptions()
     {
         return elementCache().reactSelectByLabel("Y Axis").getOptions();
+    }
+
+    /*
+        Y Axis Aggregate Method is an option for bar chart
+     */
+    public QueryChartDialog selectYAxisAggregateMethod(String option)
+    {
+        elementCache().reactSelectByLabel("Y Axis Aggregate Method").select(option);
+        return this;
+    }
+
+    public String getYAxisAggregateMethod()
+    {
+        return elementCache().reactSelectByLabel("Y Axis Aggregate Method").getValue();
     }
 
     /*

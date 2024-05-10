@@ -3,10 +3,12 @@ package org.labkey.test.components.react;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import java.io.File;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -32,6 +34,15 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(editButton));
         editButton.click();
         return new QueryChartDialog("Edit Chart", getDriver(), _queryGrid);
+    }
+
+    public File clickExport(String subMenuText)
+    {
+        elementCache().exportMenu.expand();
+        return getWrapper().doAndWaitForDownload(() ->
+                Locator.tagWithClass("li", "lk-menu-item")
+                    .descendant(Locator.tagContainingText("a", subMenuText))
+                    .findElement(elementCache().headingEl).click());
     }
 
     public String getTitle()
@@ -83,6 +94,7 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
                 .findWhenNeeded(this).withTimeout(2000);
         public final WebElement editButton = Locator.tagWithAttribute("button", "title", "Edit chart")
                 .findWhenNeeded(headingEl);
+        public final BootstrapMenu exportMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("chart-panel-export-btn").findWhenNeeded(headingEl);
         public final WebElement closeButton = Locator.tagWithAttribute("button", "title", "Hide chart")
                 .findWhenNeeded(headingEl);
         public final WebElement titleElement= Locator.tagWithClass("div", "chart-panel__heading-title")
