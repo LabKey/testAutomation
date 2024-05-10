@@ -141,7 +141,18 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public ProductMenu clickFolderItem(String folderName)
     {
         expand();
+
+        // clicking the folder item link should replace its containing li with an active one
         elementCache().folderItemLink(folderName).click();
+
+        // await it becoming active
+        WebDriverWrapper.waitFor(()-> elementCache().activeFolderMenuItemLocator.withText(folderName)
+                .existsIn(elementCache().folderColumn()),
+                "the folder item did not become active in time", 2000);
+
+        // setting the folder item active (if it wasn't) may update contents if the user's permissions differ there
+        clearElementCache();
+
         return this;
     }
 
@@ -240,7 +251,8 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
             return Locator.tagWithClass("div", "col-folders").refindWhenNeeded(menuContent);
         }
 
-        private final Locator folderMenuItemLocator = Locator.tagWithClass("a", "menu-folder-item");
+        private final Locator.XPathLocator folderMenuItemLocator = Locator.tagWithClass("a", "menu-folder-item");
+        private final Locator activeFolderMenuItemLocator = Locator.tagWithClass("li", "active").descendant(folderMenuItemLocator);
 
         List<WebElement> folderMenuItems()
         {
