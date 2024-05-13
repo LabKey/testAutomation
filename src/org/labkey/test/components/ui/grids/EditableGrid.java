@@ -182,7 +182,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public boolean areAllRowsSelected()
     {
-        if (hasSelectColumn())
+        if (hasSelectAllCheckbox())
             return new Checkbox(elementCache().selectAllCheckboxEl).isSelected();
         else
             throw new NoSuchElementException("There is no select checkbox for all rows.");
