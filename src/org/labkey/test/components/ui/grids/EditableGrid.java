@@ -131,7 +131,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private boolean hasSelectColumn()
     {
-        return elementCache().selectColumn.isDisplayed();
+        return elementCache().selectAllHeaderCellLoc.existsIn(elementCache().table);
+    }
+
+    // sometimes edit grids will have a select column but no select-all checkbox
+    private boolean hasSelectAllCheckbox()
+    {
+        return elementCache().selectAllCheckboxEl.isDisplayed();
     }
 
     public EditableGrid selectRow(int index, boolean checked)
@@ -163,9 +169,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public EditableGrid selectAll(boolean checked)
     {
-        if (hasSelectColumn())
+        if (hasSelectAllCheckbox())
         {
-            getWrapper().setCheckbox(elementCache().selectColumn, checked);
+            getWrapper().setCheckbox(elementCache().selectAllCheckboxEl, checked);
         }
         else
         {
@@ -177,7 +183,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public boolean areAllRowsSelected()
     {
         if (hasSelectColumn())
-            return new Checkbox(elementCache().selectColumn).isSelected();
+            return new Checkbox(elementCache().selectAllCheckboxEl).isSelected();
         else
             throw new NoSuchElementException("There is no select checkbox for all rows.");
     }
@@ -998,7 +1004,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
 
-        private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
+        private final Locator selectAllHeaderCellLoc = Locator.tagWithClass("th", "grid-header-cell")
+            .withAttribute("id", "__selection__");
+        private final WebElement selectAllCheckboxEl = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
 
         private final List<String> columnNames = new ArrayList<>();
 
