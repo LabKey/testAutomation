@@ -129,12 +129,20 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         throw new NotFoundException("Column not found in grid: " + columnHeader + ". Found: " + columnTexts);
     }
 
+    /**
+     * Returns true if the header-cell of a select-column is present (this cell, if present, optionally contains the
+     * select-all checkbox)
+     * @return true if the header cell of a select-column is present on the table
+     */
     private boolean hasSelectColumn()
     {
         return elementCache().selectAllHeaderCellLoc.existsIn(elementCache().table);
     }
 
-    // sometimes edit grids will have a select column but no select-all checkbox
+    /**
+     * sometimes edit grids will have a select column but no select-all checkbox; this checks for the box
+     * separately from checking for its containing cell
+    */
     private boolean hasSelectAllCheckbox()
     {
         return elementCache().selectAllCheckboxEl.isDisplayed();
@@ -1004,8 +1012,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
 
+        // this is the header cell that optionally contains the select-all checkbox
         private final Locator selectAllHeaderCellLoc = Locator.tagWithClass("th", "grid-header-cell")
             .withAttribute("id", "__selection__");
+        // some grids have a placeholder cell without a select-all checkbox
         private final WebElement selectAllCheckboxEl = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
 
         private final List<String> columnNames = new ArrayList<>();
