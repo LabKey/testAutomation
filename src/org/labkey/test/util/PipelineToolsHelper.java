@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 
 import java.io.File;
@@ -27,14 +28,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static java.io.File.pathSeparator;
-import static org.labkey.test.TestFileUtils.getLabKeyRoot;
 
 public class PipelineToolsHelper
 {
     private LabKeySiteWrapper _test;
     private static Set<String> _originalToolsDirs = null;
     private static Set<String> _currentToolsDirs = null;
-    private static final String _defaultToolsDirectory = new File(getLabKeyRoot(), "build/deploy/bin").getAbsoluteFile().toString();
+    private static final String _defaultToolsDirectory = new File(TestFileUtils.getModulesDir().getParentFile(), "bin").getAbsoluteFile().toString();
     private static final String _extraPipelineTools = TestProperties.getAdditionalPipelineTools();
 
     public PipelineToolsHelper(LabKeySiteWrapper test)
