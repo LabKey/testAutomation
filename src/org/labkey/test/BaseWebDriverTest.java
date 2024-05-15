@@ -134,6 +134,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -196,6 +197,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static boolean _dumpedHeap = false;
     private final ArtifactCollector _artifactCollector;
     private final DeferredErrorCollector _errorCollector;
+    private final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -240,6 +242,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
+        _cspCheckPageLoadListener = new CspCheckPageLoadListener(this);
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
@@ -320,6 +323,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 throw ex;
         }
         closeExtraWindows();
+
+        if (!TestProperties.isCspCheckSkipped())
+        {
+            addPageLoadListener(_cspCheckPageLoadListener);
+        }
     }
 
     public ArtifactCollector getArtifactCollector()
@@ -2781,6 +2789,52 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 getDriverService().stop();
             // Don't clear _downloadDir. Cleanup steps might still need it after tearDown
             _driverAndService = new ImmutablePair<>(null, null);
+        }
+    }
+
+    private static class CspCheckPageLoadListener implements PageLoadListener
+    {
+        private final ArtifactCollector _artifactCollector;
+        private final DeferredErrorCollector _checker;
+
+        public CspCheckPageLoadListener(BaseWebDriverTest baseWebDriverTest)
+        {
+            _artifactCollector = baseWebDriverTest.getArtifactCollector();
+            _checker = baseWebDriverTest.checker();
+        }
+
+        @Override
+        public void beforePageLoad()
+        {
+            try
+            {
+                CspLogUtil.checkNewCspWarnings(_artifactCollector);
+            }
+            catch (CspLogUtil.CspWarningDetectedException ex)
+            {
+                _checker.withScreenshot("csp_violation").recordError(ex);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CspCheckPageLoadListener that = (CspCheckPageLoadListener) o;
+            return Objects.equals(_artifactCollector, that._artifactCollector);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(_artifactCollector);
+        }
+
+        @Override
+        public String toString()
+        {
+            return getClass().getSimpleName() + "-" + _artifactCollector.getDumpDirName();
         }
     }
 }
