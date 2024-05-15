@@ -76,7 +76,7 @@ public class DeferredErrorCollector
      *
      * @param errorType Additional error type to be recorded.
      */
-    public void addRecordableErrorType(Class<? extends Exception> errorType)
+    public void addRecordableErrorType(Class<? extends Throwable> errorType)
     {
         errorTypes.add(errorType);
     }
@@ -486,7 +486,7 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     }
 
     @Override
-    public void addRecordableErrorType(Class<? extends Exception> errorType)
+    public void addRecordableErrorType(Class<? extends Throwable> errorType)
     {
         wrappedCollector.addRecordableErrorType(errorType);
     }

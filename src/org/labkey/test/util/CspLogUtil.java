@@ -38,7 +38,7 @@ public class CspLogUtil
 
     public static void checkNewCspWarnings(ArtifactCollector artifactCollector)
     {
-        if (TestProperties.isCspCheckSkipped() || TestProperties.isServerRemote() || missingLog)
+        if (TestProperties.isServerRemote() || missingLog)
             return;
 
         if (!logFile.isFile())

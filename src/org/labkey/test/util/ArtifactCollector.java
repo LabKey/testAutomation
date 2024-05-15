@@ -90,6 +90,11 @@ public class ArtifactCollector
         _testStart = System.currentTimeMillis();
     }
 
+    public String getDumpDirName()
+    {
+        return _dumpDirName;
+    }
+
     public File ensureDumpDir()
     {
         return ensureDumpDir(_dumpDirName);
