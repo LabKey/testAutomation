@@ -157,6 +157,12 @@ public class CrawlerTest extends BaseWebDriverTest
         return WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "injectJsp", Map.of("inject", injectionParam));
     }
 
+    @Override
+    protected boolean cspFailFast()
+    {
+        return false;
+    }
+
     @After
     public void postTest()
     {
