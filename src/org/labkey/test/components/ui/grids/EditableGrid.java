@@ -901,13 +901,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
 
-        private final List<String> columnNames = new ArrayList<>();
+        private List<String> columnNames = new ArrayList<>();
 
         public List<String> getColumnNames()
         {
+
+            // If the number of header cells is not equal to the list of columnName the columns have been modified since
+            // the last call to getColumnNames so get the column names again.
+            List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
+            if(columnNames.size() != headerCells.size())
+            {
+                columnNames = new ArrayList<>();
+            }
+
             if (columnNames.isEmpty())
             {
-                List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
 
                 for (WebElement el : headerCells)
                 {
