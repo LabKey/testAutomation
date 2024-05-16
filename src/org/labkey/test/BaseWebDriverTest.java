@@ -324,12 +324,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         closeExtraWindows();
 
-        if (!TestProperties.isCspCheckSkipped())
+        if (!TestProperties.isCspCheckSkipped() && cspFailFast())
         {
             addPageLoadListener(_cspCheckPageLoadListener);
         }
     }
 
+    /**
+     * Specifies whether the CSP log should be checked before each page load.
+     * Tests that only want the CSP log to be checked at the end should override this method.
+     * @return true to check for CSP violations before each navigation
+     */
+    protected boolean cspFailFast()
+    {
+        return true;
+    }
+    
     public ArtifactCollector getArtifactCollector()
     {
         return _artifactCollector;
