@@ -845,8 +845,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         if (!isCellSelected(cell))
         {
             cell.click();
-            WebDriverWrapper.waitFor(()->  isCellSelected(cell),
-                    "the target cell did not become selected", 4000);
+
+            // The initial click may work but the selection style may go away in some scenarios, like click happening
+            // before some required cells are populated. This is a retry to protect against those scenarios.
+            if(Boolean.FALSE.equals(WebDriverWrapper.waitFor(()->  isCellSelected(cell), 1_000)))
+            {
+                cell.click();
+                WebDriverWrapper.waitFor(()->  isCellSelected(cell),
+                        "The target cell did not become selected.", 1_000);
+            }
         }
     }
 
