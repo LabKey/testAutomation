@@ -11,12 +11,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AdvancedSettingsDialog extends ModalDialog
 {
-    private DomainFieldRow _row;
+    private final DomainFieldRow _row;
 
     private AdvancedSettingsDialog(DomainFieldRow row, ModalDialogFinder finder)
     {
@@ -27,15 +26,6 @@ public class AdvancedSettingsDialog extends ModalDialog
     public AdvancedSettingsDialog(DomainFieldRow row)
     {
         this(row, new ModalDialogFinder(row.getDriver()).withTitle("Advanced Settings and Properties"));
-    }
-
-    public AdvancedSettingsDialog setAdvancedFieldSettings(Map<AdvancedFieldSetting, Object> advancedSettings)
-    {
-        for (Map.Entry<AdvancedFieldSetting, Object> setting : advancedSettings.entrySet())
-        {
-            setting.getKey().setValue(this, setting.getValue());
-        }
-        return this;
     }
 
     public boolean isShownInDefaultView()
@@ -175,6 +165,19 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
+    public boolean isUniqueConstraint()
+    {
+        return elementCache().uniqueConstraint.get();
+    }
+
+    public AdvancedSettingsDialog setUniqueConstraint(boolean checked)
+    {
+        elementCache().uniqueConstraint.set(checked);
+        getWrapper().waitFor(()-> elementCache().uniqueConstraint.get().equals(checked),
+                "uniqueConstraint checkbox was not set as expected", 1000);
+        return this;
+    }
+
     public boolean missingValuesEnabled()
     {
         return elementCache().enableMissingValues.get();
@@ -243,6 +246,8 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-recommendedVariable").findWhenNeeded(this));
         public Checkbox enableMissingValues = new Checkbox(
                 Locator.input("domainpropertiesrow-mvEnabled").findWhenNeeded(this));
+        public Checkbox uniqueConstraint = new Checkbox(
+                Locator.input("domainpropertiesrow-uniqueConstraint").findWhenNeeded(this));
     }
 
 }

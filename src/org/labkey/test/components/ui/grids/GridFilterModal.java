@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.grids;
 import org.labkey.test.Locator;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.Tabs;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
@@ -44,6 +45,19 @@ public class GridFilterModal extends ModalDialog
         Locator.byClass("field-modal__col-sub-title").withText("Find values for " + fieldLabel)
                 .waitForElement(elementCache().filterPanel, 10_000);
 
+        return this;
+    }
+
+    /**
+     * Sets the 'Find Samples without [selected assay] results
+     * @param checked whether or not to check the box
+     * @return this component
+     */
+    public GridFilterModal checkNoDataCheckbox(boolean checked)
+    {
+        Checkbox noDataBox = Checkbox.Checkbox(Locator.input("field-value-nodata-check"))
+                .waitFor(elementCache().fieldsSelectionPanel);
+        noDataBox.set(checked);
         return this;
     }
 

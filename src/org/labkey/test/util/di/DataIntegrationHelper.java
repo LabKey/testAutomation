@@ -160,7 +160,7 @@ public class DataIntegrationHelper
     {
         // TODO: Proper handling of null transformId
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
         if (response.getRows().isEmpty())
             return null;
         else
@@ -170,14 +170,14 @@ public class DataIntegrationHelper
     public String getTransformRunFieldByJobId(@NotNull String jobId, String fieldName) throws CommandException, IOException
     {
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
         return response.getRows().get(0).get(fieldName).toString();
     }
 
     public String getTransformState(@NotNull String transformId) throws CommandException, IOException
     {
         String query = "SELECT TransformState FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
         return response.getRows().get(0).get("TransformState").toString();
     }
 
@@ -203,14 +203,14 @@ public class DataIntegrationHelper
     public boolean getTransformEnabled(@NotNull String transformId) throws CommandException, IOException
     {
         String query = "SELECT Enabled FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
         return Boolean.parseBoolean(response.getRows().get(0).get("Enabled").toString());
     }
 
     private String getContainerForFolder(String folderName) throws CommandException, IOException
     {
         String query = "select EntityID from Containers where Name = '" + folderName + "'";
-        SelectRowsResponse response = executeQuery("/" + folderName, "core", query);
+        SelectRowsResponse response = executeQuery(folderName, "core", query);
         return response.getRows().get(0).get("EntityID").toString();
     }
 
@@ -222,7 +222,7 @@ public class DataIntegrationHelper
     public String getEtlLogFile(String jobId) throws CommandException, IOException
     {
         String query = "SELECT FilePath FROM pipeline.job WHERE RowId = '" + jobId + "'";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
         String filePath = response.getRows().get(0).get("FilePath").toString();
         if (filePath == null)
             return null;

@@ -15,12 +15,12 @@
  */
 package org.labkey.test.util;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
@@ -126,7 +126,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     @Override
     protected void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
-        deleteContainer("/" + projectName, failIfNotFound, wait);
+        deleteContainer(projectName, failIfNotFound, wait);
     }
 
     @Override
@@ -242,20 +242,16 @@ public class APIContainerHelper extends AbstractContainerHelper
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
         final String containerPath = projectName + "/" + folderName;
-        PostCommand command = new PostCommand("core", "moveContainer")
+        SimplePostCommand command = new SimplePostCommand("core", "moveContainer")
         {
             @Override
             public JSONObject getJsonObject()
             {
-                JSONObject result = super.getJsonObject();
-                if (result == null)
-                {
-                    result = new JSONObject();
-                }
+                JSONObject result = new JSONObject();
                 result.put("container", containerPath);
                 result.put("parent", newParent);
                 result.put("addAlias", createAlias);
-                setJsonObject(result);
+
                 return result;
             }
         };

@@ -17,7 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,7 +59,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -287,7 +286,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         boolean foundEvent = rows.stream().anyMatch(a-> a.get("_labkeyurl_container").toString().contains(containerPath) && a.get("comment").toString().equals(matchingComment));
         if (!foundEvent)
         {
-            ShowAuditLogPage.beginAt(this, containerPath, "ContainerAuditEvent");
+            ShowAuditLogPage.beginAt(this, "ContainerAuditEvent");
             Assert.fail("Event not found: " + matchingComment);
         }
     }
@@ -374,7 +373,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(403, ex.getStatusCode());
+            assertEquals(400, ex.getStatusCode());
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
 //            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }

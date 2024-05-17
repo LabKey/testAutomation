@@ -18,12 +18,14 @@ project.configurations {
 
 project.dependencies {
 
-    implementation "org.xerial:sqlite-jdbc:3.7.2" // declaring SQLite here to be used in targettedMS test
+    implementation "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}" // declaring SQLite here to be used in TargetedMS test
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
+    api("org.assertj:assertj-core:${assertjVersion}")
+    implementation("org.awaitility:awaitility:${awaitilityVersion}")
     implementation("commons-io:commons-io:${commonsIoVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
-    implementation("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")
+    implementation("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
 
     //api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}")
@@ -31,26 +33,22 @@ project.dependencies {
     implementation("org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}")
     implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
-    implementation("org.seleniumhq.selenium:jetty-repacked:${jettyRepackagedVersion}")
+    implementation("org.eclipse.jetty:jetty-util:${jettyVersion}")
 
-    api("org.apache.httpcomponents:httpcore:${httpcoreVersion}")
     implementation("com.google.guava:guava:${guavaVersion}")
-    api("org.apache.httpcomponents:httpclient:${httpclientVersion}")
-    api("org.hamcrest:hamcrest-core:${hamcrestCoreVersion}")
+    api("org.apache.httpcomponents.core5:httpcore5:${httpcore5Version}")
+    api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
+    api("org.hamcrest:hamcrest:${hamcrestVersion}")
     implementation("org.apache.commons:commons-text:${commonsTextVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    implementation("org.apache.httpcomponents:httpmime:${httpmimeVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
     implementation("org.apache.commons:commons-collections4:${commonsCollections4Version}")
     implementation("net.sf.opencsv:opencsv:${opencsvVersion}")
-    implementation("javax.servlet:javax.servlet-api:${servletApiVersion}") // originally 3.1.0
     aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
     implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
     implementation "org.apache.logging.log4j:log4j-iostreams:${log4j2Version}"
     api "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
-    api "com.googlecode.json-simple:json-simple:${jsonSimpleVersion}"
-    //implementation "javax.xml.bind:jaxb-api:${jaxbVersion}"
-    implementation "com.sun.xml.bind:jaxb-impl:${jaxbVersion}"
-    implementation "com.sun.xml.bind:jaxb-core:${jaxbVersion}"
+    implementation "javax.xml.bind:jaxb-api:${jaxbApiOldVersion}"
+    implementation "org.glassfish.jaxb:jaxb-runtime:${jaxbOldVersion}"
     api "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
     implementation "org.apache.tika:tika-core:${tikaVersion}"
     implementation "org.apache.commons:commons-compress:${commonsCompressVersion}"
@@ -60,7 +58,7 @@ project.dependencies {
     api "org.apache.poi:poi:${poiVersion}"
     implementation "org.apache.poi:poi-ooxml:${poiVersion}"
     implementation "org.apache.xmlbeans:xmlbeans:${xmlbeansVersion}"
-    implementation "org.bouncycastle:bcpg-jdk15on:${bouncycastleVersion}"
+    implementation "org.bouncycastle:bcpg-jdk18on:${bouncycastlePgpVersion}"
     implementation "org.jetbrains:annotations:${annotationsVersion}"
     implementation "org.mock-server:mockserver-netty:${mockserverNettyVersion}" // used by test classes in accounts
     runtimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
@@ -68,7 +66,7 @@ project.dependencies {
     implementation "org.reflections:reflections:${reflectionsVersion}"
     uiTestRuntimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
 
-    if (!project.hasProperty('testWithLocalApi') && // Use this property temporarily when upgrading XMLBeans
+    if (!project.hasProperty('testWithLocalApi') && // Use this property temporarily when upgrading XMLBeans or changing dependencies provided by API
             (project.hasProperty("teamcity") || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)) {
         // LabKey XML schemas are used to decode exported folder XMLs and test case XMLs
         // Don't include local version so that running tests doesn't require building API module
@@ -84,7 +82,6 @@ project.dependencies {
                 transitive: false
         )
     }
-
 }
 
 BuildUtils.addLabKeyDependency(
@@ -101,10 +98,10 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
 
 if (project.hasProperty("teamcity"))
 {
-    apply plugin: 'org.labkey.teamCity'
+    apply plugin: 'org.labkey.build.teamCity'
 }
 
-// If this configuration for the default jar file is included when synching with IntelliJ
+// If this configuration for the default jar file is included when syncing with IntelliJ
 // the classes in other modules that reference classes here will not resolve properly.
 if (!BuildUtils.isIntellij())  {
     // the jar file that contains just the classes from this project, not all other
@@ -120,7 +117,7 @@ if (!BuildUtils.isIntellij())  {
             }
         }
     }
-    project.tasks.jar {
+    project.tasks.named('jar').configure {
         Jar jar ->
             jar.archiveBaseName.set(apiArtifactName)
             jar.setGroup('org.labkey.api')

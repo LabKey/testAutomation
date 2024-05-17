@@ -3,14 +3,23 @@ package org.labkey.test.components.ui.lineage;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 /**
  * Automates the labkey UI for node details (implemented in /components/lineage/LineageNodeList.tsx)
  */
 public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 {
+    private static final Locator.XPathLocator NAME_LOC = Locator.XPathLocator.union(
+            Locator.tagWithClass("a", "lineage-link"),
+            Locator.tag("span"));
+
     final WebElement _el;
     final WebDriver _driver;
 
@@ -20,34 +29,48 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
         _driver = driver;
     }
 
+    @Override
+    protected void waitForReady()
+    {
+        getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(getComponentElement()));
+    }
+
     public String getName()
     {
        return elementCache().nameElement.getText();
     }
 
-    private boolean isNameLinked()
-    {
-        return elementCache().nameSpan.existsIn(this);
-    }
-
     public void clickOverViewLink(boolean wait)
     {
-        getWrapper().mouseOver(getComponentElement());
-        getWrapper().waitFor(()-> elementCache().overviewLink.isEnabled(), 1000);
-        if (wait)
-            getWrapper().clickAndWait(elementCache().overviewLink);
-        else
-            elementCache().overviewLink.click();
+        clickHiddenLink(elementCache().overviewLink, wait);
     }
 
     public void clickLineageGraphLink(boolean wait)
     {
-        getWrapper().mouseOver(getComponentElement());
-        getWrapper().waitFor(()-> elementCache().lineageGraphLink.isEnabled(), 1000);
+        clickHiddenLink(elementCache().lineageGraphLink, wait);
+    }
+
+    public void clickDetailsLink()
+    {
+        clickHiddenLink(elementCache().detailsLink, false);
+    }
+
+    private void clickHiddenLink(WebElement link, boolean wait)
+    {
+        WebDriverWait webDriverWait = new WebDriverWait(getDriver(), Duration.ofSeconds(2));
+        webDriverWait.until(wd -> {
+            getWrapper().mouseOver(getComponentElement());
+            return ExpectedConditions.elementToBeClickable(link).apply(wd);
+        });
         if (wait)
-            getWrapper().clickAndWait(elementCache().lineageGraphLink);
+        {
+            getWrapper().clickAndWait(link);
+        }
         else
-            elementCache().lineageGraphLink.click();
+        {
+            link.click();
+            webDriverWait.until(ExpectedConditions.stalenessOf(link));
+        }
     }
 
     public WebElement getIcon()
@@ -83,15 +106,15 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
                 .withText("Overview").findWhenNeeded(this).withTimeout(2000);
         final WebElement lineageGraphLink = Locator.tagWithClass("a", "lineage-data-link--text")
                 .withText("Lineage").findWhenNeeded(this).withTimeout(2000);
-        final Locator.XPathLocator nameLink = Locator.tagWithClass("a", "lineage-link");
-        final Locator.XPathLocator nameSpan = Locator.tag("span");
-        final WebElement nameElement = Locator.XPathLocator.union(nameLink, nameSpan).findElement(this);
+        final WebElement detailsLink = Locator.tagWithClass("a", "lineage-data-link--text")
+                .withText("Details").findWhenNeeded(this).withTimeout(2000);
+        final WebElement nameElement = NAME_LOC.findElement(this);
     }
 
     public static class NodeDetailItemFinder extends WebDriverComponentFinder<NodeDetail, NodeDetailItemFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "lineage-item-test");
-        private String _title = null;
+        private final Locator.XPathLocator _baseLocator = Locator.tag("li").child(Locator.tagWithClass("div", "lineage-name"));
+        private Locator _locator = _baseLocator;
 
         public NodeDetailItemFinder(WebDriver driver)
         {
@@ -100,7 +123,13 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 
         public NodeDetailItemFinder withTitle(String title)
         {
-            _title = title;
+            _locator = _baseLocator.withAttribute("title", title);
+            return this;
+        }
+
+        public NodeDetailItemFinder withName(String name)
+        {
+            _locator = _baseLocator.withChild(NAME_LOC.withText(name));
             return this;
         }
 
@@ -114,10 +143,7 @@ public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
         @Override
         protected Locator locator()
         {
-           if (_title != null)
-                return _baseLocator.withAttribute("title", _title);
-            else
-                return _baseLocator;
+           return _locator;
         }
     }
 }

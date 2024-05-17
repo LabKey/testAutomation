@@ -8,7 +8,7 @@
                 indices = labkey.domain.createIndices(list("intKey", "customInt"), TRUE)
                 indices = labkey.domain.createIndices(list("customInt"), FALSE, indices)
                 dd <- labkey.domain.createDesign(name="test list", fields=fields, indices=indices)
-                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="IntList", domainDesign=dd, options=list(keyName = "intKey"))
+                print(labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainKind="IntList", domainDesign=dd, options=list(keyName = "intKey")))
             ]]>
         </url>
         <response>
@@ -28,7 +28,7 @@
                     customInt=1
                     , customString="custom string value")
 
-                labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
+                print(labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow))
             ]]>
         </url>
         <response>
@@ -53,7 +53,7 @@
 
                 domain$fields[3,]$rangeURI = "xsd:string"
                 domain$fields[3,]$name = "changed to string"
-                labkey.domain.save(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=domain)
+                print(labkey.domain.save(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=domain))
             ]]>
         </url>
         <response>
@@ -81,12 +81,12 @@
                 newDesign$fields[2,]$propertyId = oldDesign$fields[2,]$propertyId
                 newDesign$fields[2,]$propertyURI = oldDesign$fields[2,]$propertyURI
 
-                labkey.domain.save(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=newDesign)
+                print(labkey.domain.save(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", domainDesign=newDesign))
                 newrow <- data.frame(
                     customInt=2
                     , customString="custom string value")
 
-                labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow)
+                print(labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow))
             ]]>
         </url>
         <response>
@@ -100,7 +100,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.domain.drop(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list")
+                print(labkey.domain.drop(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list"))
             ]]>
         </url>
         <response>
@@ -115,7 +115,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainTemplate="Priority", module="simpletest", domainGroup="todolist")
+                print(labkey.domain.create(baseUrl=labkey.url.base, folderPath="%projectName%", domainTemplate="Priority", module="simpletest", domainGroup="todolist"))
             ]]>
         </url>
         <response>

@@ -19,13 +19,14 @@ package org.labkey.test;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableLong;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -39,11 +40,11 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.junit.rules.TestWatcher;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -62,18 +63,45 @@ import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.teamcity.TeamCityUtils;
-import org.labkey.test.util.*;
+import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.AbstractAssayHelper;
+import org.labkey.test.util.AbstractContainerHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.ArtifactCollector;
+import org.labkey.test.util.ComponentQuery;
+import org.labkey.test.util.Crawler;
+import org.labkey.test.util.CspLogUtil;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DebugUtils;
+import org.labkey.test.util.DeferredErrorCollector;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.Log4jUtils;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.ReadOnlyTest;
+import org.labkey.test.util.SecurityHelper;
+import org.labkey.test.util.SimpleHttpResponse;
+import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.query.QueryUtils;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -106,14 +134,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
 import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
@@ -126,9 +157,11 @@ import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.teamcity.TeamCityUtils.publishArtifact;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -161,8 +194,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private String _lastPageText = null;
     protected static boolean _testFailed = false;
     protected static boolean _anyTestFailed = false;
+    private static boolean _dumpedHeap = false;
     private final ArtifactCollector _artifactCollector;
     private final DeferredErrorCollector _errorCollector;
+    private final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -190,6 +225,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
+    public static final String DISMISSED_STORAGE_PREFIX = "__release_notes_dismissed__";
+
     static final Set<String> urlsSeen = new HashSet<>();
 
     static
@@ -199,10 +236,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public BaseWebDriverTest()
     {
+        Awaitility.pollInSameThread(); // We don't do cross thread selenium testing.
+
         _artifactCollector = new ArtifactCollector(this);
         _errorCollector = new DeferredErrorCollector(_artifactCollector);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeView(this);
+        _cspCheckPageLoadListener = new CspCheckPageLoadListener(this);
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
@@ -241,7 +281,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return currentTest;
     }
 
-    public static Class<? extends BaseWebDriverTest> getCurrentTestClass()
+    private static Class<? extends BaseWebDriverTest> getCurrentTestClass()
     {
         return getCurrentTest() != null ? getCurrentTest().getClass() : null;
     }
@@ -283,8 +323,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 throw ex;
         }
         closeExtraWindows();
+
+        if (!TestProperties.isCspCheckSkipped() && cspFailFast())
+        {
+            addPageLoadListener(_cspCheckPageLoadListener);
+        }
     }
 
+    /**
+     * Specifies whether the CSP log should be checked before each page load.
+     * Tests that only want the CSP log to be checked at the end should override this method.
+     * @return true to check for CSP violations before each navigation
+     */
+    protected boolean cspFailFast()
+    {
+        return true;
+    }
+    
     public ArtifactCollector getArtifactCollector()
     {
         return _artifactCollector;
@@ -363,7 +418,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
     private static boolean reenableMiniProfiler = false;
-    private static long testClassStartTime;
+    private static long previousLeakCheck = 0;
     private static long testCount;
     private static int currentTestNumber;
 
@@ -375,7 +430,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             public void starting(Description description)
             {
-                testClassStartTime = System.currentTimeMillis();
                 SingletonWebDriver.getInstance().clear();
                 testCount = description.getChildren().stream().filter(child -> child.getAnnotation(Ignore.class) == null).count();
                 currentTestNumber = 0;
@@ -590,9 +644,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         // step in the test, there's no reason to bother doing it again at the beginning of the next test
         if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
         {
+            if (!TestProperties.isTestRunningOnTeamCity())
+            {
+                // Running locally, pre-test errors are unlikely to be interesting. Clear them out.
+                resetErrors();
+                CspLogUtil.resetCspLogMark();
+            }
             checker().addRecordableErrorType(WebDriverException.class);
             checker().withScreenshot("startupErrors").wrapAssertion(this::checkErrors);
-            checker().withScreenshot("startupLeaks").wrapAssertion(() -> checkLeaks(null));
+            checker().withScreenshot("startupLeaks").wrapAssertion(this::checkLeaks);
+            checker().wrapAssertion(() -> CspLogUtil.checkNewCspWarnings(getArtifactCollector()));
+            checker().setErrorMark(); // Nothing to screenshot from CSP check
             checker().resetErrorTypes();
             _checkedLeaksAndErrors = true;
         }
@@ -632,7 +694,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return; // app admin can't enable stack traces
         }
         Connection cn = createDefaultConnection();
-        PostCommand<?> command = new PostCommand<>("mini-profiler", "enableTroubleshootingStacktraces");
+        SimplePostCommand command = new SimplePostCommand("mini-profiler", "enableTroubleshootingStacktraces");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", true);
         command.setJsonObject(jsonObject);
@@ -695,6 +757,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 };
             }
 
+            private void clearLocalStorage()
+            {
+                // Clears browser localStorage. Needed in order to reset some state such as grid filters/sorts/etc.
+                // which are sticky, but can interfere with what tests expect.
+                WebDriver driver = getDriver();
+
+                if (driver instanceof WebStorage webStorage)
+                {
+                    webStorage.getLocalStorage().clear();
+                }
+            }
+
             @Override
             protected void starting(Description description)
             {
@@ -706,6 +780,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 setUp(); // Instantiate new WebDriver if needed
                 ensureSignedInAsPrimaryTestUser();
+                clearLocalStorage();
+
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
@@ -848,9 +924,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             try
             {
+                if (TestProperties.isDumpBrowserConsole())
+                {
+                    dumpBrowserConsole();
+                }
+            }
+            catch (WebDriverException e)
+            {
+                log("Unable to dump console log");
+                TestLogger.error(e.getMessage(), e);
+            }
+            try
+            {
                 if (isTestRunningOnTeamCity())
                 {
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
+                    getArtifactCollector().addArtifactLocation(TestFileUtils.getBaseFileRoot());
                     getArtifactCollector().dumpPipelineFiles();
                 }
             }
@@ -996,10 +1084,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 try
                 {
                     Path path = Paths.get(notEmpty.getFile());
-                    List<String> subdirs = Files.walk(path).map(p -> path.relativize(p).toString())
-                            .filter(s -> !s.isEmpty()).collect(Collectors.toList());
-                    TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
-                    getArtifactCollector().dumpHeap();
+                    try (Stream<Path> paths = Files.walk(path))
+                    {
+                        List<String> subdirs = paths.map(p -> path.relativize(p).toString())
+                            .filter(s -> !s.isEmpty()).toList();
+                        TestLogger.error("Remaining files after attempting to delete: " + path + "\n\t" + String.join("\t\n", subdirs), notEmpty);
+                    }
+                    dumpHeap();
                 }
                 catch (IOException e)
                 {
@@ -1046,6 +1137,78 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return null;
     }
 
+    public void dumpHeap()
+    {
+        if (_dumpedHeap || // Only one heap dump per suite (don't want to overload TeamCity)
+                !isLocalServer() ||
+                isGuestModeTest() ||
+                !isHeapDumpCollectionEnabled()
+        )
+        {
+            return;
+        }
+
+        pushLocation();
+
+        // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
+        beginAt(WebTestHelper.buildURL("admin", "dumpHeap"));
+        String dumpMsg = Locators.bodyPanel().childTag("div").findElement(getDriver()).getText();
+        String filePrefix = "Heap dumped to ";
+        int prefixIndex = dumpMsg.indexOf(filePrefix);
+        if (prefixIndex < 0)
+        {
+            checker().error("Unable to extract heap dump filename from page body.\n" + dumpMsg);
+            return;
+        }
+        String filename = dumpMsg.substring(prefixIndex + filePrefix.length());
+        File heapDump = new File(filename);
+        File destFile = new File(getArtifactCollector().ensureDumpDir(), heapDump.getName());
+        try
+        {
+            Files.move(heapDump.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            publishArtifact(destFile, null);
+            _dumpedHeap = true;
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to move HeapDump file to test logs directory.");
+            e.printStackTrace();
+        }
+
+        popLocation(); // go back to get screenshot if needed.
+    }
+
+    private void dumpBrowserConsole()
+    {
+        List<?> logEntries = executeScript("return console.everything;", List.class);
+        if (logEntries != null)
+        {
+            if (logEntries.isEmpty())
+            {
+                log("No JavaScript console logs to dump");
+            }
+            else
+            {
+                StringBuilder logStr = new StringBuilder();
+                logStr.append("Dumping JavaScript console log\n");
+                for (Object logEntry : logEntries)
+                {
+                    Map entry = (Map) logEntry;
+
+                    logStr.append("    console.")
+                            .append(StringUtils.rightPad((String) entry.get("type"), 6))
+                            .append(entry.get("datetime")).append("  ")
+                            .append(entry.get("value")).append("\n");
+                }
+                log(logStr.toString());
+            }
+        }
+        else
+        {
+            log("Unable to dump JavaScript console");
+        }
+    }
+
     protected void disablePageUnloadEvents()
     {
         executeScript(
@@ -1074,6 +1237,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isTestRunningOnTeamCity())
             checkActionCoverage();
 
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+
         checkLinks();
 
         if (!isTestCleanupSkipped())
@@ -1099,7 +1264,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
         {
             checkErrors();
-            checkLeaks(null);
+            checkLeaks();
         }
 
         if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
@@ -1111,7 +1276,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void waitForPendingRequests(int msWait)
     {
         Connection connection = createDefaultConnection();
-        MutableLong pendingRequestCount = new MutableLong(-1);
+        MutableInt pendingRequestCount = new MutableInt(-1);
         waitFor(() -> {
             pendingRequestCount.setValue(getPendingRequestCount(connection));
             if (pendingRequestCount.getValue() == 0)
@@ -1128,11 +1293,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             TestLogger.log(pendingRequestCount.getValue() + " requests still pending after " + msWait + "ms");
         if (pendingRequestCount.getValue() < 0)
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
+
+        if (_containerHelper.getAllModules().contains("Search"))
+            SearchAdminAPIHelper.waitForIndexerBackground();
     }
 
-    private long getPendingRequestCount(Connection connection)
+    private int getPendingRequestCount(Connection connection)
     {
-        Command<?> getPendingRequestCount = new Command<>("admin", "getPendingRequestCount");
+        SimpleGetCommand getPendingRequestCount = new SimpleGetCommand("admin", "getPendingRequestCount");
         try
         {
             CommandResponse response = getPendingRequestCount.execute(connection, null);
@@ -1196,17 +1364,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
-    protected void checkLeaks(Long leakCutoffTime)
+    protected void checkLeaks()
     {
         if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
             return;
-
-        if (leakCutoffTime == null)
-        {
-            leakCutoffTime = testClassStartTime;
-        }
 
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
@@ -1226,12 +1389,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     sleep(10000);
                 }
             }
-            msSinceTestStart = System.currentTimeMillis() - leakCutoffTime;
+            msSinceTestStart = System.currentTimeMillis() - previousLeakCheck;
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
+
+        previousLeakCheck = System.currentTimeMillis();
 
         if (leakCount > MAX_LEAK_LIMIT)
         {
@@ -1251,7 +1416,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             if (newLeak != null)
             {
-                getArtifactCollector().dumpHeap();
+                dumpHeap();
                 ArtifactCollector.dumpThreads();
                 fail(String.format("Found memory leak: %s [1 of %d, MAX:%d]\nSee test artifacts for more information.", newLeak, leakCount, MAX_LEAK_LIMIT));
             }
@@ -1314,7 +1479,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     /**
      * TODO: 7695: Custom views are not deleted when list is deleted
-     * @return List of view names which are no longer valid
+     * @return Set of view names which are no longer valid
      */
     protected Set<String> getOrphanedViews()
     {
@@ -1467,6 +1632,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 throw new AssertionError("Crawler triggered some server-side errors.");
             }
             goToHome(); // Make sure crawler doesn't leave browser on a bad page
+
+            CspLogUtil.checkNewCspWarnings(getArtifactCollector());
         }
     }
 
@@ -1579,7 +1746,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         map.put("moduleName", property.getModuleName());
         map.put("containerPath", property.getContainerPath());
         map.put("propName", property.getPropertyName());
-        waitForText(property.getPropertyName()); //wait for the property name to appear
+        waitForText(property.getPropertyLabel()); //wait for the property label to appear
         String query = ComponentQuery.fromAttributes("field", map);
         return _ext4Helper.queryOne(query, Ext4FieldRef.class);
     }
@@ -2030,7 +2197,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 WebElement folderIcon = loc.findElement(getDriver());
                 // Moving to desired tree node should dismiss tooltip from previously clicked folder
                 new Actions(getDriver()).moveToElement(folderIcon).perform();
-                folderIcon.click();
+                try
+                {
+                    folderIcon.click();
+                }
+                catch (ElementClickInterceptedException retry)
+                {
+                    sleep(500); // Tooltip needs a moment to update
+                    folderIcon.click();
+                }
             }, "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
         }
@@ -2511,13 +2686,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public List<Map<String, Object>> loadTsv(File tsv)
     {
-        TabLoader loader = new TabLoader(tsv, true);
-        return loader.load();
+        try (TabLoader loader = new TabLoader(tsv, true))
+        {
+            return loader.load();
+        }
     }
 
     protected void flash(WebElement element)
     {
         DebugUtils.flash(getDriver(), element, 3);
+    }
+
+    public void dismissReleaseBanner(String productName, boolean dismiss)
+    {
+        String lkVersion = (String) executeScript("return LABKEY.versionString;");
+        String dismissBannerKey = DISMISSED_STORAGE_PREFIX + productName + lkVersion;
+        if (dismiss)
+            executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
+        else
+            executeScript("localStorage.removeItem('" + dismissBannerKey + "')");
     }
 
     @Target(ElementType.TYPE)
@@ -2569,7 +2756,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         private void setUp(BaseWebDriverTest test)
         {
             WebDriver oldWebDriver = getWebDriver();
-            File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
+            File newDownloadDir = new File(ArtifactCollector.ensureDumpDir(test.getClass().getSimpleName()), "downloads");
             _driverAndService = test.createNewWebDriver(_driverAndService, test.BROWSER_TYPE, newDownloadDir);
             if (getWebDriver() != oldWebDriver) // downloadDir only changes when a new WebDriver is started.
                 _downloadDir = newDownloadDir;
@@ -2612,6 +2799,52 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 getDriverService().stop();
             // Don't clear _downloadDir. Cleanup steps might still need it after tearDown
             _driverAndService = new ImmutablePair<>(null, null);
+        }
+    }
+
+    private static class CspCheckPageLoadListener implements PageLoadListener
+    {
+        private final ArtifactCollector _artifactCollector;
+        private final DeferredErrorCollector _checker;
+
+        public CspCheckPageLoadListener(BaseWebDriverTest baseWebDriverTest)
+        {
+            _artifactCollector = baseWebDriverTest.getArtifactCollector();
+            _checker = baseWebDriverTest.checker();
+        }
+
+        @Override
+        public void beforePageLoad()
+        {
+            try
+            {
+                CspLogUtil.checkNewCspWarnings(_artifactCollector);
+            }
+            catch (CspLogUtil.CspWarningDetectedException ex)
+            {
+                _checker.withScreenshot("csp_violation").recordError(ex);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CspCheckPageLoadListener that = (CspCheckPageLoadListener) o;
+            return Objects.equals(_artifactCollector, that._artifactCollector);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(_artifactCollector);
+        }
+
+        @Override
+        public String toString()
+        {
+            return getClass().getSimpleName() + "-" + _artifactCollector.getDumpDirName();
         }
     }
 }

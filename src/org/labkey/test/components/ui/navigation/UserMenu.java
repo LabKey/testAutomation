@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
  */
 public abstract class UserMenu extends BootstrapMenu
 {
-    private static final String MENU_ID = "user-menu-dropdown";
+    private static final String MENU_CLASS = "user-dropdown";
 
     protected UserMenu(WebElement element, WebDriver driver)
     {
@@ -23,7 +23,7 @@ public abstract class UserMenu extends BootstrapMenu
 
     protected static <U extends UserMenu> SimpleWebDriverComponentFinder<U> baseMenuFinder(WebDriver driver, BiFunction<WebElement, WebDriver, U> factory)
     {
-        return new MultiMenu.MultiMenuFinder(driver).withButtonId(MENU_ID).wrap(factory);
+        return new MultiMenu.MultiMenuFinder(driver).withClass(MENU_CLASS).wrap(factory);
     }
 
     // TODO: Placeholder for product update
@@ -47,6 +47,6 @@ public abstract class UserMenu extends BootstrapMenu
      */
     public static Locator appUserMenu()
     {
-        return Locator.tagWithId("a", MENU_ID);
+        return Locator.byClass(MENU_CLASS).childTag("a");
     }
 }

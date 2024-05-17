@@ -6,6 +6,7 @@ package org.labkey.test.components.react;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -35,6 +36,10 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     private static final String LOADING_TEXT = "loading...";
     protected static final String SELECTOR_CLASS = "select-input-container";
 
+    protected int _readyTimeout = WAIT_FOR_JAVASCRIPT;
+    protected int _openTimeout = 4_000;
+
+
     public BaseReactSelect(WebElement selectOrParent, WebDriver driver)
     {
         // Component needs to be a RefindingWebElement because Select may go stale after loading initial selections
@@ -44,6 +49,31 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     protected abstract T getThis();
 
+    /**
+     * Sets the timeout in milliseconds this instance will wait to become ready before throwing an error
+     * Default is 10000
+     * @param msec Time in milliseconds to wait before declaring failure in becoming ready
+     * @return  the current instance
+     */
+    public T setReadyTimeout(int msec)
+    {
+        _readyTimeout = msec;
+        return getThis();
+    }
+
+    /**
+     * Sets the timeout in milliseconds this instance will wait from clicking the 'open' caret to being open
+     * before throwing an error
+     * Default is 4000
+     * @param msec  Time in milliseconds to wait to open before declaring a failure
+     * @return the current instance
+     */
+    public T setOpenTimeout(int msec)
+    {
+        _openTimeout = msec;
+        return getThis();
+    }
+
     public boolean isExpanded()
     {
         try
@@ -51,7 +81,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             WebElement selectMenuElement = Locators.selectMenu.findElementOrNull(getComponentElement());
 
             if ((selectMenuElement != null && selectMenuElement.isDisplayed()) && isLoading())
-                waitForLoaded();
+                waitForReady();
 
             return (selectMenuElement != null && selectMenuElement.isDisplayed()) || isOpen();
         }
@@ -71,7 +101,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         return !isMulti();
     }
 
-    /* tells us whether or not the current instance of ReactSelect is in multiple-select mode */
+    /* tells us whether the current instance of ReactSelect is in multiple-select mode */
     public boolean isMulti()
     {
         return hasClass("select-input__value-container--is-multi");
@@ -109,16 +139,9 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         return hasClass("select-input__control--menu-is-open");
     }
 
-    protected T waitForLoaded()
-    {
-        waitFor(() -> getComponentElement().isDisplayed() && !isLoading(),
-                "Took too long for to become loaded", WAIT_FOR_JAVASCRIPT);
-        return getThis();
-    }
-
     public @Nullable String getPlaceholderText()
     {
-        waitForLoaded();
+        waitForReady();
 
         if (isPlaceholderVisible())
             return Locators.placeholder.findElement(getComponentElement()).getText().trim();
@@ -134,7 +157,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     public String getValue()
     {
-        waitForLoaded();
+        waitForReady();
 
         var selections = getSelections();
 
@@ -147,19 +170,19 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     {
         scrollIntoView();
         open();
-        getWrapper().setFormElement(elementCache().input, value);
-        WebElement foundElement;
+        elementCache().input.clear();
+        elementCache().input.sendKeys(value);
         try
         {
             var optionElement = ReactSelect.Locators.options.containing(value);
-            foundElement = optionElement.waitForElement(elementCache().selectMenu, 4000);
+            optionElement.waitForElement(elementCache().selectMenu, 4000);
             elementCache().input.clear();
+            return true;
         }
         catch (NoSuchElementException nse)
         {
             return false;
         }
-        return foundElement != null;
     }
 
     /* waits until the currently selected 'value' equals or contains the specified string */
@@ -168,6 +191,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         waitFor(() -> getValue().contains(value),
                 "took too long for the ReactSelect value to contain the expected value:[" + value + "]", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return getThis();
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        waitFor(() -> getComponentElement().isDisplayed() && !isLoading(),
+                "Took too long to become ready", _readyTimeout);
     }
 
     protected T waitForInteractive()
@@ -211,7 +241,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             getWrapper().fireEvent(elementCache().arrow, WebDriverWrapper.SeleniumEvent.click);
         }
 
-        waitFor(this::isExpanded, "Select didn't expand.", 4_000);
+        waitFor(this::isExpanded, "Select didn't expand.", _openTimeout);
         getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
         return getThis();
     }
@@ -240,6 +270,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         if (hasSelection())
         {
             var clear = Locators.clear.waitForElement(getComponentElement(), 1_500);
+            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(clear));
             clear.click();
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(clear));
         }
@@ -248,23 +279,35 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     public T removeSelection(String value)
     {
-        waitForLoaded();
+        waitForReady();
 
         if (isSingle())
             throw new IllegalArgumentException("This is a single value");
 
         scrollIntoView();
 
-        WebElement removeBtn = Locators.removeMultiSelectValueButton(value).findWhenNeeded(getComponentElement());
-        removeBtn.click();
-
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
+        attemptRemove(value);
 
         // Validate that the selected item really was removed.
         WebDriverWrapper.sleep(500);
-        waitFor(()->!getSelections().contains(value), String.format("Failed to remove selection '%s'.", value), WAIT_FOR_JAVASCRIPT);
+        if (getSelections().contains(value))
+        {
+            String msg = String.format("Failed to remove selection '%s'.", value);
+            TestLogger.warn(msg + ": retrying");
+            attemptRemove(value);
+            Assert.assertFalse(msg, getSelections().contains(value));
+        }
 
         return getThis();
+    }
+
+    private void attemptRemove(String value)
+    {
+        WebElement removeBtn = Locators.removeMultiSelectValueButton(value)
+                .waitForElement(getComponentElement(), 1_000);
+        removeBtn.click();
+
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(removeBtn));
     }
 
     public boolean hasSelection()
@@ -285,7 +328,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      */
     public List<String> getSelections()
     {
-        waitForLoaded();
+        waitForReady();
 
         if (!hasValue())
             return Collections.emptyList();
@@ -320,7 +363,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         List<String> rawItems = getWrapper().getTexts(selectedItems);
 
         // If it wasn't open before close it, otherwise leave it in the open state.
-        if(!alreadyOpened)
+        if (!alreadyOpened)
             close();
 
         return rawItems.stream().map(String::trim).collect(Collectors.toList());
@@ -356,7 +399,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      */
     public T createValue(String value)
     {
-        waitForLoaded();
+        waitForReady();
         waitForInteractive();
 
         elementCache().input.sendKeys(value);
@@ -375,7 +418,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      */
     public T enterValueInTextbox(String value)
     {
-        waitForLoaded();
+        waitForReady();
         waitForInteractive();
         elementCache().input.sendKeys(value);
         return getThis();
@@ -401,7 +444,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     protected class ElementCache extends WebDriverComponent<?>.ElementCache
     {
-        WebElement input = new EphemeralWebElement(Locator.css(".select-input__input > input"), this);
+        WebElement input = new EphemeralWebElement(Locator.tagWithClass("input", "select-input__input"), this);
         WebElement arrow = new EphemeralWebElement(Locators.arrow, this);
         WebElement selectMenu = new EphemeralWebElement(Locators.selectMenu, this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 

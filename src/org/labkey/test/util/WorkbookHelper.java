@@ -62,15 +62,15 @@ public class WorkbookHelper
 
     public int getWorkbookIdFromUrl(URL url)
     {
-        // path is something like "http://localhost:8080/labkey/project/ContainerContextTest/2/begin.view?"
+        // path is something like "http://localhost:8080/labkey/ContainerContextTest/2/project-begin.view"
         // this code pulls "2" out by finding the last and second to last slashes
         try
         {
-        String path = url.toURI().getPath();
-        int idx = path.lastIndexOf("/");
-        path = path.substring(0, idx);
-        idx = path.lastIndexOf("/");
-        return Integer.parseInt(path.substring(idx + 1));
+            String path = url.toURI().getPath();
+            int idx = path.lastIndexOf("/");
+            path = path.substring(0, idx);
+            idx = path.lastIndexOf("/");
+            return Integer.parseInt(path.substring(idx + 1));
         }
         catch (URISyntaxException e)
         {

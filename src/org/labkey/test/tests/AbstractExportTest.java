@@ -51,17 +51,33 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected DataRegionTable dataRegion;
     protected DataRegionExportHelper exportHelper;
 
-    /** Return true if the rows can be selected in the grid. */
+    /**
+     * Return true if the rows can be selected in the grid.
+     */
     protected abstract boolean hasSelectors();
+
     protected abstract String getTestColumnTitle();
+
+    protected abstract String getTestLookUpColumnHeader();
+
+    protected abstract int getTestLookUpColumnIndex();
+
     protected abstract int getTestColumnIndex();
+
     protected abstract String getExportedXlsTestColumnHeader(ColumnHeaderType exportType); // tsv column headers might be field name, rather than label
+
     protected abstract String getExportedTsvTestColumnHeader(ColumnHeaderType exportType); // tsv column headers might be field name, rather than label
+
     protected abstract String getDataRegionColumnName();
+
     protected abstract String getDataRegionSchemaName();
+
     protected abstract String getDataRegionQueryName();
+
     protected abstract String getExportedFilePrefixRegex();
+
     protected abstract String getDataRegionId();
+
     protected abstract void goToDataRegionPage();
 
     @BeforeClass
@@ -179,13 +195,28 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         expectedExportColumn.add(getExportedXlsTestColumnHeader(ColumnHeaderType.Caption));
         expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()));
 
-        assertEquals(allRows, expectedExportColumn.size()-1);
+        assertEquals(allRows, expectedExportColumn.size() - 1);
 
         // Issue 19854: Check that all rows will be exported when nothing is selected and page size is less than grid row count.
         dataRegion.setMaxRows(2);
         assertEquals(2, dataRegion.getDataRowCount());
         File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
-        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, allRows, expectedExportColumn);
+        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, allRows, expectedExportColumn, getTestColumnIndex());
+    }
+
+    @Test
+    public final void testExportBrokenLookUpExcel()
+    {
+        Assume.assumeTrue("Skipping test since grid doesn't have any broken lookup", getTestLookUpColumnHeader() != null);
+
+        dataRegion.setFilter(getTestLookUpColumnHeader(), "Is Not Blank");
+
+        File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
+        assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
+        List<String> expectedExportColumn = new ArrayList<>();
+        expectedExportColumn.add(getTestLookUpColumnHeader());
+        expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestLookUpColumnHeader()));
+        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, dataRegion.getDataRowCount(), expectedExportColumn, getTestLookUpColumnIndex());
     }
 
     @Test
@@ -276,7 +307,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         });
 
         // Issue 42976: SQL wildcard should not be prefixed by '!' in exported scripts
-        dataRegion.setFilter(testColumn, "Contains One Of (example usage: a;b;c)", "under_score;two;");
+        dataRegion.setFilter(testColumn, "Contains One Of", "under_score;two;");
         exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
         {
             assertScriptContentLineCount(javaScriptScript, 35);
@@ -284,7 +315,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         });
 
         // multi-value separator ';' escaping uses json encoded filter value
-        dataRegion.setFilter(testColumn, "Contains One Of (example usage: a;b;c)", "{json:[\"a;b;c\",\"Z\"]}");
+        dataRegion.setFilter(testColumn, "Contains One Of", "{json:[\"a;b;c\",\"Z\"]}");
         exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
         {
             assertScriptContentLineCount(javaScriptScript, 35);
@@ -391,10 +422,10 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             expectedExportColumn.add(getExportedXlsTestColumnHeader(exportHeaderType));
 
         expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
-        assertExcelExportContents(exportHeaderType, exportedFile, expectedDataRowCount, expectedExportColumn);
+        assertExcelExportContents(exportHeaderType, exportedFile, expectedDataRowCount, expectedExportColumn, getTestColumnIndex());
     }
 
-    protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn)
+    protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn, int actualIndex)
     {
         try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
@@ -407,7 +438,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
 
             assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedFileRowCount, sheet.getLastRowNum());
 
-            List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
+            List<String> exportedColumn = ExcelHelper.getColumnData(sheet, actualIndex);
             assertColumnContentsEqual(expectedExportColumn, exportedColumn);
         }
         catch (IOException e)
@@ -441,8 +472,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         assertTrue("Script is missing labkey library", pythonScript.contains("from labkey.api_wrapper import APIWrapper"));
         assertTrue("Script is missing labkey.query.select_rows call", pythonScript.contains("api.query.select_rows("));
-        assertTrue("Script is missing schema_name property", pythonScript.contains("schema_name='" + getDataRegionSchemaName() + "'"));
-        assertTrue("Script is missing query_name property", pythonScript.contains("query_name='" + getDataRegionQueryName() + "'"));
+        assertTrue("Script is missing schema_name property", pythonScript.contains("schema_name=\"" + getDataRegionSchemaName() + "\""));
+        assertTrue("Script is missing query_name property", pythonScript.contains("query_name=\"" + getDataRegionQueryName() + "\""));
         if (null != filterColumn)
             assertTrue("Script is missing filter for column '" + filterColumn + "'", pythonScript.contains(filterColumn));
     }
@@ -496,7 +527,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         assertTrue("Script is missing schemaName property", perlScript.contains("-schemaName => '" + getDataRegionSchemaName() + "'"));
         assertTrue("Script is missing queryName property", perlScript.contains("-queryName => '" + getDataRegionQueryName() + "'"));
         if (null != filterColumn)
-            assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', eq, ''foo'']"));
+            assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', 'eq', 'foo']"));
     }
 
     protected boolean expectSortedExport()

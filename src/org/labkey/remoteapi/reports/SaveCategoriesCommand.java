@@ -15,8 +15,8 @@
  */
 package org.labkey.remoteapi.reports;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.PostCommand;
 
@@ -40,7 +40,7 @@ public class SaveCategoriesCommand extends PostCommand<CommandResponse>
 
     public void setCategories(String... categoryLabels)
     {
-        _categories = Arrays.stream(categoryLabels).map(label -> new Category(label)).collect(Collectors.toList());
+        _categories = Arrays.stream(categoryLabels).map(Category::new).collect(Collectors.toList());
     }
 
     @Override
@@ -50,7 +50,7 @@ public class SaveCategoriesCommand extends PostCommand<CommandResponse>
         JSONArray jsonArray = new JSONArray();
         for (org.labkey.remoteapi.reports.Category cat : _categories)
         {
-            jsonArray.add(cat.getAllProperties());
+            jsonArray.put(cat.toJSONObject());
         }
         jsonObject.put("categories", jsonArray);
         return jsonObject;

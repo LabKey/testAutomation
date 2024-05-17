@@ -18,7 +18,8 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.TestProperties;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class ExperimentalFeaturesHelper
         parameters.put("feature", feature);
         parameters.put("enabled", enable);
 
-        PostCommand command = new PostCommand("admin", "experimentalFeature");
+        SimplePostCommand command = new SimplePostCommand("admin", "experimentalFeature");
         command.setParameters(parameters);
         try
         {
@@ -67,5 +68,20 @@ public class ExperimentalFeaturesHelper
         }
     }
 
+    public static boolean isExperimentalFeatureEnabled(Connection cn, String feature)
+    {
+        SimpleGetCommand command = new SimpleGetCommand("admin", "experimentalFeature");
+        command.setParameters(Map.of("feature", feature));
+        try
+        {
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
 
+            return (Boolean)response.get("enabled");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Error retrieving experimental feature '" + feature + "'.", e);
+        }
+    }
 }

@@ -45,14 +45,14 @@ public class SampleTypeExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        SampleTypeExportTest initTest = (SampleTypeExportTest)getCurrentTest();
+        SampleTypeExportTest initTest = (SampleTypeExportTest) getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
 
         initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listSampleTypes.view");
         SampleTypeHelper sampleHelper = new SampleTypeHelper(initTest);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
-                .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
+                        .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
                 SAMPLE_DATA);
     }
 
@@ -78,6 +78,18 @@ public class SampleTypeExportTest extends AbstractExportTest
     protected String getTestColumnTitle()
     {
         return "Name";
+    }
+
+    @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return null;
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 0;
     }
 
     @Override

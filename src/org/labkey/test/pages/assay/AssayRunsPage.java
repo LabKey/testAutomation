@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentRunTable;
@@ -97,7 +98,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
         if (expectError)
         {
             clickButton("update", 0);
-            ModalDialog dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Error").find();
+            ModalDialog dialog = new LabKeyAlert(getDriver());
             Assert.assertEquals("A comment is required when changing a QC State for the selected run(s).", dialog.getBodyText());
             dialog.dismiss();
             return updatePage.clickCancel();

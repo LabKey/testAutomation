@@ -15,8 +15,7 @@
  */
 package org.labkey.remoteapi.security;
 
-import org.json.simple.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.List;
@@ -24,9 +23,9 @@ import java.util.Map;
 
 public class BulkUpdateGroupResponse extends CommandResponse
 {
-    public BulkUpdateGroupResponse(String text, int statusCode, String contentType, JSONObject json, Command sourceCommand)
+    public BulkUpdateGroupResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, sourceCommand);
+        super(text, statusCode, contentType, json);
     }
 
     public Number getId()

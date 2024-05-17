@@ -28,6 +28,12 @@ public class UserDetailsPage extends LabKeyPage<UserDetailsPage.ElementCache>
         return new UpdateUserDetailsPage(getDriver());
     }
 
+    public ClonePermissionsPage clickClonePermission()
+    {
+        clickAndWait(elementCache().cloneButton);
+        return new ClonePermissionsPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -37,5 +43,6 @@ public class UserDetailsPage extends LabKeyPage<UserDetailsPage.ElementCache>
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         WebElement editButton = Locator.lkButton("Edit").findWhenNeeded(this);
+        WebElement cloneButton = Locator.lkButton("Clone Permissions").findWhenNeeded(this);
     }
 }

@@ -26,7 +26,6 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
 
@@ -44,7 +43,6 @@ import static org.junit.Assert.assertTrue;
 public class AdminConsoleTest extends BaseWebDriverTest
 {
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
-    protected static final String APP_ADMIN_USER_PASS = PasswordUtil.getPassword();
 
     @Override
     public String getProjectName()
@@ -70,7 +68,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message without providing a message to show')]"));
 
         String linkText = "and also click this...";
-        String html = "READ ME!!!  <a href='<%=contextPath%>/project/home/begin.view'>" + linkText + "</a>";
+        String html = "READ ME!!!  <a href='<%=contextPath%>" + "/home/project-begin.view'>" + linkText + "</a>";
 
         //only check if not already checked
         checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
@@ -86,7 +84,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         Locator ribbonLink = Locator.tagWithClassContaining("div", "alert").append(Locator.linkContainingText("and also click this..."));
         assertElementPresent(ribbonLink);
         String href = ribbonLink.findElement(getDriver()).getAttribute("href");
-        String expected = WebTestHelper.getBaseURL() + "/project/home/begin.view";
+        String expected = WebTestHelper.getBaseURL() + "/home/project-begin.view";
         assertEquals("Incorrect URL", expected, href);
 
         goToHome();
@@ -110,9 +108,9 @@ public class AdminConsoleTest extends BaseWebDriverTest
         
         // log out as siteAdmin, log in as appAdmin
         signOut();
-        signIn(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
+        signIn(APP_ADMIN_USER);
 
-        // verify that all of the following links are visible to AppAdmin:
+        // verify that all the following links are visible to AppAdmin:
         goToAdminConsole().goToSettingsSection();
         List<String> expectedLinkTexts = new ArrayList<>(Arrays.asList("change user properties",
                 "folder types",
@@ -219,9 +217,23 @@ public class AdminConsoleTest extends BaseWebDriverTest
         log("Verifying cannot be duplicate");
         setFormElement(Locator.name("newExternalRedirectHost"), host);
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("\'" + host + "\' already exists. Duplicate hosts not allowed."));
+        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
 
     }
+
+    /*
+       Test coverage : Issue 46587: Add test for display of credits page
+       https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=46587
+    */
+    @Test
+    public void testAdminConsoleCredits()
+    {
+        goToAdminConsole().clickCredits();
+        log("Verifying the page is properly loaded");
+        assertTextPresent("JAR Files Distributed with the API Module");
+    }
+
+
 
     @Override
     public List<String> getAssociatedModules()
@@ -257,7 +269,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
     private void createTestUser()
     {
         _userHelper.createUser(APP_ADMIN_USER, true, false);
-        setInitialPassword(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
+        setInitialPassword(APP_ADMIN_USER);
 
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");

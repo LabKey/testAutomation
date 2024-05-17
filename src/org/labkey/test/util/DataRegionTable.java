@@ -54,8 +54,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.tagWithAttribute;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -975,7 +975,7 @@ public class DataRegionTable extends DataRegion
         TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + getDataRegionName() + " for " + columnName);
         clickColumnMenu(columnName, false, "Summary Statistics...");
 
-        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(this);
 
         if (expectedValue != null)
             assertEquals("Stat value not as expected for: " + stat, expectedValue, statsWindow.getValue(stat));
@@ -991,7 +991,7 @@ public class DataRegionTable extends DataRegion
     public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue, String filterDescription)
     {
         clickColumnMenu(columnName, false, "Summary Statistics...");
-        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(this);
         assertEquals("Stat value not as expected for " + stat + " with filter " + filterDescription, expectedValue, statsWindow.getValue(stat));
         statsWindow.cancel();
     }
@@ -1037,8 +1037,9 @@ public class DataRegionTable extends DataRegion
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         WebElement filterDialogElement = getWrapper().waitForElement(filterDialog);
 
-        WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
-                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
+        WebDriverWrapper.waitFor(() -> getWrapper().isElementPresent(filterDialog.append(Locator.tagWithText("span","[All]")).notHidden()) ||
+                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())) ||
+                        getWrapper().isElementPresent(filterDialog.append(Locator.tagWithId("textarea", "value_1-1").notHidden())),
                 "Filter Dialog", WAIT_FOR_JAVASCRIPT);
         getWrapper()._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
@@ -1112,7 +1113,8 @@ public class DataRegionTable extends DataRegion
 
         if (filter1 != null && !filter1Type.contains("Blank"))
         {
-            getWrapper().setFormElement(Locator.id("value_1"), filter1);
+            String id = (filter1Type.matches("Contains One Of|Does Not Contain Any Of|Equals One Of|Does Not Equal Any Of")) ? "value_1-1" : "value_1";
+            getWrapper().setFormElement(Locator.id(id), filter1);
         }
 
         if (filter2Type != null && !filter2Type.contains("Blank"))
@@ -1146,9 +1148,9 @@ public class DataRegionTable extends DataRegion
         assertEquals("Faceted filter tab should be selected.", "Choose Values", getWrapper().getText(Locator.css(".x-tab-strip-active")));
         if (!getWrapper().isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
         {
-            getWrapper().click(Locator.linkWithText("[All]"));
+            getWrapper().click(Locator.tagWithText("span","[All]"));
         }
-        getWrapper().click(Locator.linkWithText("[All]"));
+        getWrapper().click(Locator.tagWithText("span", "[All]"));
 
         if (values.length > 1)
         {
@@ -1188,6 +1190,12 @@ public class DataRegionTable extends DataRegion
         TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
         openFilterDialog(columnName);
         doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : getUpdateTimeout()));
+    }
+
+    public void clearVariables()
+    {
+        TestLogger.log("Clear variable in" + getDataRegionName());
+        doAndWaitForUpdate(()-> getWrapper().click(Locator.tagWithClass("span", "labkey-button ctx-clear-var")));
     }
 
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
@@ -1304,6 +1312,20 @@ public class DataRegionTable extends DataRegion
     public void setContainerFilter(ContainerFilterType filterType)
     {
         getViewsMenu().clickSubMenu(true, "Folder Filter", filterType.getLabel());
+    }
+
+    public ContainerFilterType getContainerFilter()
+    {
+        getViewsMenu().openMenuTo("Folder Filter", "Folder Filter");
+        var visibleFilterMenuItemOptions = getViewsMenu().findVisibleMenuItems();
+        for (WebElement el : visibleFilterMenuItemOptions)
+        {
+            if (Locator.tagWithClass("i", "fa-check-square-o").existsIn(el))
+            {
+                return ContainerFilterType.fromLabel(el.getText());
+            }
+        }
+        return null;
     }
 
     /**
@@ -1493,6 +1515,11 @@ public class DataRegionTable extends DataRegion
         {
             return Locator.tagWithClass("div", "lk-region-context-action").withChild(Locator.tagWithClass("i", "fa-filter"));
         }
+
+        public static Locator.XPathLocator contextAction()
+        {
+            return Locator.tagWithClass("div", "lk-region-context-action");
+        }
     }
 
     public class Elements extends ElementCache
@@ -1516,7 +1543,7 @@ public class DataRegionTable extends DataRegion
         private List<WebElement> summaryStatCells;
         private final WebElement toggleHeaderCell = Locator.tag("th").withClasses("labkey-column-header", "labkey-selectors").findWhenNeeded(columnHeaderRow);
         private final WebElement toggleAllOnPage = Locator.input(".toggle").findWhenNeeded(toggleHeaderCell); // tri-state checkbox
-        private SelectorMenu selectionMenu = new SelectorMenu(toggleHeaderCell);
+        private final SelectorMenu selectionMenu = new SelectorMenu(toggleHeaderCell);
 
         protected List<WebElement> getDataRows()
         {
@@ -1669,6 +1696,8 @@ public class DataRegionTable extends DataRegion
     {
         CURRENT_FOLDER("Current folder"),
         CURRENT_AND_SUBFOLDERS("Current folder and subfolders"),
+        CURRENT_AND_SUBFOLDERS_PLUS_SHARED("Current folder, subfolders, and Shared project"),
+        CURRENT_PLUS_PROJECT_AND_SHARED("Current folder, project, and Shared project"),
         ALL_FOLDERS("All folders");
 
         private final String _label;
@@ -1676,6 +1705,12 @@ public class DataRegionTable extends DataRegion
         ContainerFilterType(String label)
         {
             _label = label;
+        }
+
+        public static ContainerFilterType fromLabel(String label)
+        {
+            return Arrays.stream(ContainerFilterType.values())
+                    .filter(a-> a.getLabel().equals(label)).findFirst().orElse(null);
         }
 
         public String getLabel()

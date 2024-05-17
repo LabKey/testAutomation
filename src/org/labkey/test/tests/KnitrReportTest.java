@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     }
 
     @Test
-    public void testKnitrMarkupFormat() throws Exception
+    public void testKnitrMarkupFormat()
     {
         Locator.XPathLocator plotLocator = Locator.xpath("//div[@class='labkey-knitr']//img");
         Locator[] reportContains = {Locator.tag("h1").withText("A Minimal Example for Markdown"),
@@ -110,10 +110,10 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         {
             deleteLibXml();
         }
-        verifyAdhocReportDependencies("Strings",
-                "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
-                "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js;\r\n" +
-                "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"
+
+            verifyAdhocReportDependencies("Strings",
+                "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js;\r\n" +
+                "https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
         );
     }
 
@@ -128,7 +128,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     }
 
     @Test
-    public void testRmarkdownV2Support() throws Exception
+    public void testRmarkdownV2Support()
     {
         markdownV2();
     }

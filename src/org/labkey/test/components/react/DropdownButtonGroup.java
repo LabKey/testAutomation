@@ -254,7 +254,7 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
 
         static public Locator.XPathLocator buttonGroupWithClass(String cls)
         {
-            return Locator.tagWithClass("div", "dropdown").withChild(Locators.toggleAnchor().withClass(cls));
+            return Locator.tagWithClass("div", "dropdown").withClass(cls);
         }
     }
 

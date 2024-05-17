@@ -72,7 +72,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Static methods for finding finding and reading test-related files
+ * Static methods for finding and reading test-related files
  */
 public abstract class TestFileUtils
 {
@@ -81,6 +81,7 @@ public abstract class TestFileUtils
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;
+    private static File _modulesDir = null;
     private static Set<File> _sampledataDirs = null;
 
     public static String getFileContents(String rootRelativePath)
@@ -151,6 +152,18 @@ public abstract class TestFileUtils
         return _labkeyRoot.toString();
     }
 
+    public static File getServerLogDir()
+    {
+        if (TestProperties.isEmbeddedTomcat())
+        {
+            return new File(getDefaultDeployDir(), "embedded/logs");
+        }
+        else
+        {
+            return new File(TestProperties.getTomcatHome(), "logs");
+        }
+    }
+
     public static File getTestRoot()
     {
         if (_testRoot == null)
@@ -174,24 +187,53 @@ public abstract class TestFileUtils
         return _buildDir;
     }
 
+    public static File getBaseFileRoot()
+    {
+        // Files are a sibling of the modules directory
+        return new File(getModulesDir().getParentFile(), "files");
+    }
+
     public static File getGradleReportDir()
     {
         return new File(getTestBuildDir(), "test/logs/reports");
     }
 
-    public static File getDefaultDeployDir()
+    /**
+     * Access is restricted because deployment structure varies between Non-embedded, locally built embedded, and
+     * deployed embedded distribution.
+     */
+    static File getDefaultDeployDir()
     {
         return new File(getLabKeyRoot(), "build/deploy");
     }
 
+    public static File getModulesDir()
+    {
+        if (_modulesDir == null)
+        {
+            _modulesDir = new File(getDefaultDeployDir(), "modules");
+            if (TestProperties.isEmbeddedTomcat() && !_modulesDir.isDirectory())
+            {
+                // Module root when deploying from embedded distribution
+                _modulesDir = new File(getDefaultDeployDir(), "embedded/modules");
+            }
+        }
+        return _modulesDir;
+    }
+
     public static File getDefaultFileRoot(String containerPath)
     {
-        return new File(getLabKeyRoot(), "build/deploy/files/" + containerPath + "/@files");
+        return new File(getBaseFileRoot(), containerPath + "/@files");
     }
 
     public static String getDefaultWebAppRoot()
     {
-        File path = new File(getLabKeyRoot(), "build/deploy/labkeyWebapp");
+        File path = new File(getModulesDir().getParentFile(), "labkeyWebapp");
+        if (!path.isDirectory())
+        {
+            // Casing is different when deployed from an embedded distribution
+            path = new File(getModulesDir().getParentFile(), "labkeywebapp");
+        }
         return path.toString();
     }
 
@@ -308,6 +350,13 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
+    public static File ensureTestTempDir() throws IOException
+    {
+        File file = getTestTempDir();
+        FileUtils.forceMkdir(file);
+        return file;
+    }
+
     public static void delete(File file)
     {
         LOG.info("Deleting from filesystem: " + file.toString());
@@ -377,6 +426,22 @@ public abstract class TestFileUtils
             e.printStackTrace(System.err);
             return null;
         }
+    }
+
+    /**
+     * Write text to a file in the test temp directory. Temp directory will be created if it does not exist.
+     * @param name Name of the file to be created. An existing file will be overwritten
+     * @param contents text to write to the file
+     * @return File object pointing to the new file
+     * @throws IOException If an I/O error occurs when opening or writing to the file
+     */
+    public static File writeTempFile(String name, InputStream contents) throws IOException
+    {
+        File file = new File(getTestTempDir(), name);
+        FileUtils.forceMkdirParent(file);
+
+        FileUtils.copyInputStreamToFile(contents, file);
+        return file;
     }
 
     /**

@@ -24,6 +24,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -150,10 +151,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public PipelineTriggerWizard setAction(String action)
     {
-        if (action.equals("Merge"))
-            elementCache().action.index(0).findElement(this).click();
-        else
-            elementCache().action.index(1).findElement(this).click(); // Append
+        Locator.radioButtonByNameAndValue("insertOption", action)
+                .findElement(this).click();
         return this;
     }
 
@@ -184,6 +183,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     public PipelineTriggerWizard setSubdirectoryMove(String value)
     {
         elementCache().subdirectoryMoveInput.set(value);
+        return this;
+    }
+
+    public PipelineTriggerWizard setConfigurationFile(String value)
+    {
+        elementCache().configurationFileInput.set(value);
         return this;
     }
 
@@ -248,17 +253,24 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         getWrapper().clickAndWait(elementCache().saveButton);
     }
 
-    public void saveAndExpectError(String error)
+    public PipelineTriggerWizard saveAndExpectError(String error)
     {
         goToConfiguration();
-        elementCache().saveButton.click();
+        doAndWaitForElementToRefresh(() -> elementCache().saveButton.click(), Locator.tagWithClass("div", "alert-danger"), 10);
         assertTrue("Pipeline Trigger Wizard did not produce an error as expected", elementCache().error.getText().contains(error));
+        return this;
     }
 
     public void cancelEditing()
     {
         goToConfiguration();
-        getWrapper().clickAndWait(elementCache().cancelButton);
+        elementCache().cancelButton.click();
+
+        // Depending on browser there may or may not be a dirty page alert
+        Alert alert = getWrapper().getAlertIfPresent();
+        if (alert != null) {
+            alert.accept();
+        }
     }
 
     @Override
@@ -289,8 +301,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input paramFunctionInput = new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
         WebElement showAdvanced = Locator.byClass("custom-config__button").withText("Show Advanced Settings").findWhenNeeded(this);
         WebElement addCustomParam = Locator.byClass("custom-config__button").withText("Add Custom Parameter").findWhenNeeded(this);
-        Locator action = Locator.radioButtonByName("mergeData");
         Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
+        Input configurationFileInput = new Input(Locator.name("configFileName").findWhenNeeded(this), getDriver());
         //navgiation elements
         WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
         WebElement configurationButton = Locator.buttonContainingText("Configuration").findWhenNeeded(this);
@@ -301,4 +313,24 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
         WebElement error = Locator.tagWithClass("div", "alert-danger").findWhenNeeded(this);
     }
+
+    public enum ActionOptions
+    {
+        MERGE("MERGE"),
+        UPDATE("UPDATE"),
+        APPEND("INSERT");
+
+        private final String value;
+
+        ActionOptions(String value)
+        {
+            this.value = value;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+    }
+
 }

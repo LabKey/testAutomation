@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.Locator.tag;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class ListHelper extends LabKeySiteWrapper
@@ -105,7 +105,7 @@ public class ListHelper extends LabKeySiteWrapper
     /**
      * From the list data grid, insert a new entry into the current list
      *
-     * @param data key = the the name of the field, value = the value to enter in that field
+     * @param data key = the name of the field, value = the value to enter in that field
      */
 
     public void insertNewRow(Map<String, ?> data)
@@ -188,7 +188,8 @@ public class ListHelper extends LabKeySiteWrapper
     {
         String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         beginAt(url);
-        clickButton("OK");
+        clickButton("Confirm Delete");
+        assertNoLabKeyErrors();
     }
 
     /**
@@ -199,7 +200,7 @@ public class ListHelper extends LabKeySiteWrapper
         String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         beginAt(url);
         assertTextPresent(confirmText);
-        clickButton("OK");
+        clickButton("Confirm Delete");
     }
 
     @LogMethod
@@ -332,16 +333,6 @@ public class ListHelper extends LabKeySiteWrapper
                 .submit();
     }
 
-    public boolean isMergeOptionPresent()
-    {
-        return isElementPresent(Locator.tagContainingText("label", "Update data"));
-    }
-
-    public void chooseMerge(boolean isFileUpload)
-    {
-        click(tag("input").withAttribute("type", "button").index(isFileUpload ? 0 : 2));
-    }
-
     public EditListDefinitionPage goToEditDesign(String listName)
     {
         goToList(listName);
@@ -383,24 +374,26 @@ public class ListHelper extends LabKeySiteWrapper
     @Deprecated
     public enum ListColumnType
     {
-        MultiLine("Multi-Line Text"),
-        Integer("Integer"),
-        String("Text (String)"),
-        Subject("Subject/Participant (String)"),
-        DateAndTime("Date Time"),
-        Boolean("Boolean"),
-        Decimal("Decimal"),
-        File("File"),
-        AutoInteger("Auto-Increment Integer"),
-        Flag("Flag (String)"),
-        Attachment("Attachment"),
-        User("User");
+        MultiLine("Multi-Line Text", ColumnType.MultiLine),
+        Integer("Integer", ColumnType.Integer),
+        String("Text (String)", ColumnType.String),
+        Subject("Subject/Participant (String)", ColumnType.Subject),
+        DateAndTime("Date Time", ColumnType.DateAndTime),
+        Boolean("Boolean", ColumnType.Boolean),
+        Decimal("Decimal", ColumnType.Decimal),
+        File("File", ColumnType.File),
+        AutoInteger("Auto-Increment Integer", null),
+        Flag("Flag (String)", ColumnType.Flag),
+        Attachment("Attachment", ColumnType.Attachment),
+        User("User", ColumnType.User);
 
         private final String _description;
+        private final ColumnType _newType;
 
-        ListColumnType(String description)
+        ListColumnType(String description, ColumnType newType)
         {
             _description = description;
+            _newType = newType;
         }
 
         public String toString()
@@ -410,19 +403,18 @@ public class ListHelper extends LabKeySiteWrapper
 
         public ColumnType toNew()
         {
-            for (ColumnType thisType : ColumnType.values())
+            if (_newType == null)
             {
-                if (name().equals(thisType.name()))
-                    return thisType;
+                throw new IllegalArgumentException("Not a valid column type: " + name());
             }
-            throw new IllegalArgumentException("Type mismatch: " + this);
+            return _newType;
         }
 
-        public static ListColumnType fromNew(ColumnType newType)
+        public static ListColumnType fromNew(@NotNull ColumnType newType)
         {
             for (ListColumnType thisType : values())
             {
-                if (newType.name().equals(thisType.name()))
+                if (newType == thisType.toNew())
                     return thisType;
             }
             throw new IllegalArgumentException("Type mismatch: " + newType);
@@ -437,20 +429,14 @@ public class ListHelper extends LabKeySiteWrapper
     {
         public ListColumn(String name, String label, ListColumnType type, String description)
         {
-            super(name);
+            super(name, type.toNew());
             setLabel(label);
             setDescription(description);
-            setType(type.toNew());
         }
 
         public ListColumn(String name, String label, ListColumnType type)
         {
             this(name, label, type, null);
-        }
-
-        public ListColumn(String name, ListColumnType type)
-        {
-            this(name, null, type);
         }
     }
 }

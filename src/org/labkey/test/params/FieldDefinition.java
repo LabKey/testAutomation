@@ -15,9 +15,10 @@
  */
 package org.labkey.test.params;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.exp.query.ExpSchema;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
@@ -35,11 +36,10 @@ public class FieldDefinition extends PropertyDescriptor
     private static final String ANGSTROM = "\u00C5";
     private static final String A_UMLAUT = "\u00E4";
     // Non-alphanumeric characters supported for field names
-    public static final String TRICKY_CHARACTERS = "><&$,/%\\'}{][ \"" + SNOWMAN + ANGSTROM + A_UMLAUT;
+    public static final String TRICKY_CHARACTERS = "><&$,/%\\'}{][ \";:" + SNOWMAN + ANGSTROM + A_UMLAUT;
 
     // for UI helpers
     private ColumnType _type;
-    private LookupInfo _lookup;
     private String _principalConceptSearchSourceOntology;
     private String _principalConceptSearchExpression;
     private ExpSchema.DerivationDataScopeType _aliquotOption;
@@ -59,29 +59,19 @@ public class FieldDefinition extends PropertyDescriptor
     {
         setName(name);
         setType(type);
+        // Clear out default advanced properties to avoid opening advanced field properties dialog
+        setMeasure(null);
+        setDimension(null);
+        setMvEnabled(null);
     }
 
     /**
      * Define a String field
-     * @deprecated Use {@link #FieldDefinition(String, ColumnType)} or {@link #FieldDefinition(String, LookupInfo)}
      * @param name field name
      */
-    @Deprecated
     public FieldDefinition(String name)
     {
-        setName(name);
-        super.setRangeURI(ColumnType.String.getRangeURI());
-    }
-
-    /**
-     * Define a lookup field
-     * @param name field name
-     * @param lookup info about the table targeted by the lookup
-     */
-    public FieldDefinition(String name, LookupInfo lookup)
-    {
-        setName(name);
-        setLookup(lookup);
+        this(name, ColumnType.String);
     }
 
     @Override
@@ -92,37 +82,25 @@ public class FieldDefinition extends PropertyDescriptor
 
     public ColumnType getType()
     {
-        return _type == null
-                ? ColumnType.String // null type indicates usage of the deprecated name-only constructor
-                : _type;
+        return _type;
     }
 
-    public FieldDefinition setType(ColumnType type)
+    private void setType(ColumnType type)
     {
-        if (_type != null)
-        {
-            throw new IllegalStateException(String.format("'%s' already has the type '%s'.", getName(), _type.toString()));
-        }
-        if (_lookup != null)
-        {
-            throw new IllegalStateException("This field is defined as a lookup. Use 'LookupInfo.setTableType' to set the rangeURI of the lookup.");
-        }
         if (type == ColumnType.Lookup)
         {
-            throw new IllegalArgumentException("Use 'setLookup' or construct with 'FieldDefinition(String, LookupInfo)' to create lookup fields");
+            throw new IllegalArgumentException("Use IntLookup or StringLookup to create lookup fields");
         }
 
         _type = type;
         if (type.getLookupInfo() != null)
         {
-            // Special 'User' and 'Sample' lookups
             super.setLookup(type.getLookupInfo().getSchema(),
                     type.getLookupInfo().getTable(),
                     type.getLookupInfo().getFolder());
         }
         super.setRangeURI(type.getRangeURI());
         setFieldProperty("conceptURI", type.getConceptURI());
-        return this;
     }
 
     @Override
@@ -177,25 +155,7 @@ public class FieldDefinition extends PropertyDescriptor
 
     public LookupInfo getLookup()
     {
-        return _lookup;
-    }
-
-    protected FieldDefinition setLookup(LookupInfo lookup)
-    {
-        if (_lookup != null)
-        {
-            throw new IllegalStateException(String.format("'%s' is already a lookup to '%s'.", getName(), _lookup.toString()));
-        }
-        if (_type != null)
-        {
-            throw new IllegalStateException(
-                    String.format("'%s' already has the type '%s'. Use 'new FieldDefinition(String, LookupInfo)' to define lookup fields",
-                            getName(), _type.toString()));
-        }
-        super.setLookup(lookup.getSchema(), lookup.getTable(), lookup.getFolder());
-        super.setRangeURI(lookup.getTableType().getRangeURI());
-        _lookup = lookup;
-        return this;
+        return _type.getLookupInfo();
     }
 
     @Override
@@ -227,7 +187,7 @@ public class FieldDefinition extends PropertyDescriptor
         if (validators != null)
         {
             propertyValidators = new JSONArray();
-            validators.stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::add);
+            validators.stream().map(FieldValidator::toJSONObject).forEachOrdered(propertyValidators::put);
         }
         setFieldProperty("propertyValidators", propertyValidators);
         _validators = validators;
@@ -320,6 +280,24 @@ public class FieldDefinition extends PropertyDescriptor
     {
         setFieldProperty("shownInUpdateView", shownInUpdateView);
         return this;
+    }
+
+    public FieldDefinition setPHI(PhiSelectType phiType)
+    {
+        super.setPHI(phiType.name());
+        return this;
+    }
+
+    public PhiSelectType getPhiLevel()
+    {
+        if (StringUtils.isBlank(getPHI()))
+        {
+            return PhiSelectType.NotPHI;
+        }
+        else
+        {
+            return PhiSelectType.valueOf(getPHI());
+        }
     }
 
     public String getSourceOntology()
@@ -440,63 +418,126 @@ public class FieldDefinition extends PropertyDescriptor
         }
     }
 
-    public enum ColumnType
+    public static class SampleColumnType implements ColumnType
     {
-        MultiLine("Multi-Line Text", "multiLine"),
-        Integer("Integer", "int"),
-        String("Text", "string"),
-        Subject("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null),
-        DateAndTime("Date Time", "dateTime"),
-        Boolean("Boolean", "boolean"),
-        Double("Number (Double)", "float"),
-        Decimal("Decimal (floating point)", "double"),
-        File("File", "http://cpas.fhcrc.org/exp/xml#fileLink"),
-        Flag("Flag", "string", "http://www.labkey.org/exp/xml#flag", null),
-        Attachment("Attachment", "attachment"),
-        User("User", "int", null, new LookupInfo(null, "core", "users")),
-        Lookup("Lookup", null),
-        OntologyLookup("Ontology Lookup", "string", "http://www.labkey.org/types#conceptCode", null),
-        VisitId("Visit ID","double","http://cpas.labkey.com/Study#VisitId",null),
-        VisitDate("Visit Date","dateTime","http://cpas.labkey.com/Study#VisitId",null),
-        Sample("Sample", "int", "http://www.labkey.org/exp/xml#sample", new LookupInfo(null, "exp", "Materials")),
-        Barcode("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null),
-        TextChoice("Text Choice", "string", "http://www.labkey.org/types#textChoice", null),
-        SMILES("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null),
-        ;
-
-        private final String _label; // the display value in the UI for this kind of field
-        private final String _rangeURI;     // the key used inside the API
-        private final String _conceptURI;
         private final LookupInfo _lookupInfo;
 
-        ColumnType(String label, String rangeURI, String conceptURI, LookupInfo lookupInfo)
+        public SampleColumnType(String sampleTypeName)
         {
-            _label = label;
-            _rangeURI = rangeURI;
-            _conceptURI = conceptURI;
-            _lookupInfo = lookupInfo;
+            _lookupInfo = new LookupInfo(null, "samples", sampleTypeName);
         }
 
-        ColumnType(String label, String rangeURI)
-        {
-            this(label, rangeURI, null, null);
-        }
-
+        @Override
         public String getLabel()
         {
-            return _label;
+            throw new IllegalStateException("UI helpers don't support this method of defining sample columns");
         }
 
-        public String getRangeURI() { return _rangeURI; }
-
-        protected String getConceptURI()
+        @Override
+        public boolean isLookup()
         {
-            return _conceptURI;
+            return false;
         }
 
+        @Override
+        public String getRangeURI()
+        {
+            return ColumnType.Sample.getRangeURI();
+        }
+
+        @Override
+        public String getConceptURI()
+        {
+            return ColumnType.Sample.getConceptURI();
+        }
+
+        @Override
         public LookupInfo getLookupInfo()
         {
             return _lookupInfo;
+        }
+
+    }
+
+    // Temporary, for 'ColumnType.values()'
+    private static final List<ColumnType> COLUMN_TYPES = List.of(
+            ColumnType.MultiLine, ColumnType.Integer, ColumnType.String, ColumnType.Subject,
+            ColumnType.DateAndTime, ColumnType.Date, ColumnType.Time,
+            ColumnType.Boolean, ColumnType.Double, ColumnType.Decimal, ColumnType.File, ColumnType.Flag,
+            ColumnType.Attachment, ColumnType.User, ColumnType.Lookup, ColumnType.OntologyLookup, ColumnType.VisitId,
+            ColumnType.VisitDate, ColumnType.Sample, ColumnType.Barcode, ColumnType.TextChoice, ColumnType.SMILES
+    );
+    
+    public interface ColumnType
+    {
+        ColumnType MultiLine = new ColumnTypeImpl("Multi-Line Text", "multiLine");
+        ColumnType Integer = new ColumnTypeImpl("Integer", "int");
+        ColumnType String = new ColumnTypeImpl("Text", "string");
+        ColumnType Subject = new ColumnTypeImpl("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null);
+        ColumnType DateAndTime = new ColumnTypeImpl("Date Time", "dateTime");
+        ColumnType Date = new ColumnTypeImpl("Date", "date");
+        ColumnType Time = new ColumnTypeImpl("Time", "http://www.w3.org/2001/XMLSchema#time");
+        ColumnType Boolean = new ColumnTypeImpl("Boolean", "boolean");
+        ColumnType Double = new ColumnTypeImpl("Number (Double)", "float");
+        ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double");
+        ColumnType File = new ColumnTypeImpl("File", "http://cpas.fhcrc.org/exp/xml#fileLink");
+        ColumnType Flag = new ColumnTypeImpl("Flag", "string", "http://www.labkey.org/exp/xml#flag", null);
+        ColumnType Attachment = new ColumnTypeImpl("Attachment", "attachment");
+        ColumnType User = new ColumnTypeImpl("User", "int", null, new IntLookup("core", "users"));
+        @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
+        ColumnType Lookup = new ColumnTypeImpl("Lookup", null);
+        ColumnType OntologyLookup = new ColumnTypeImpl("Ontology Lookup", "string", "http://www.labkey.org/types#conceptCode", null);
+        ColumnType VisitId = new ColumnTypeImpl("Visit ID", "double", "http://cpas.labkey.com/Study#VisitId", null);
+        ColumnType VisitDate = new ColumnTypeImpl("Visit Date", "dateTime", "http://cpas.labkey.com/Study#VisitId", null);
+        ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
+        ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
+        ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
+        ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
+
+        /**
+         * UI: The Option text for the column type.
+         * API: Unused
+         */
+        String getLabel();
+
+        /**
+         * UI: Is this a plain lookup field. (Formerly 'ColumnType.Lookup'). Some column type have lookup info but are
+         * defined as lookups in the domain designer.
+         * API: Unused
+         */
+        boolean isLookup();
+
+        /**
+         * UI: Unused
+         * API: The value used by the server to determine the field's type
+         */
+        String getRangeURI();
+
+        /**
+         * UI: Unused
+         * API: For definiting column types that add special functionality.
+         */
+        default String getConceptURI()
+        {
+            return null;
+        }
+
+        /**
+         * UI: Lookup info for plain lookup fields ({@link #isLookup()} == true)
+         * API: Lookup info for plain and special (e.g. 'Sample') lookup fields
+         */
+        default FieldDefinition.LookupInfo getLookupInfo()
+        {
+            return null;
+        }
+
+        /**
+         * @deprecated Bridge for converting away from enum
+         */
+        @Deprecated (since = "22.10")
+        static List<ColumnType> values()
+        {
+            return COLUMN_TYPES;
         }
     }
 
@@ -596,13 +637,17 @@ public class FieldDefinition extends PropertyDescriptor
         }
     }
 
-    public static class LookupInfo
+    public static class LookupInfo implements ColumnType
     {
         private final String _folder;
         private final String _schema;
         private final String _table;
         private ColumnType _tableType;
 
+        /**
+         * @deprecated Use {@link IntLookup} or {@link StringLookup}
+         */
+        @Deprecated (since = "22.10")
         public LookupInfo(@Nullable String folder, String schema, String table)
         {
             if (folder == null || folder.isEmpty())
@@ -619,9 +664,9 @@ public class FieldDefinition extends PropertyDescriptor
                 _folder = folder;
             }
 
-            _schema = ("".equals(schema) ? null : schema);
-            _table = ("".equals(table) ? null : table);
-            setTableType(ColumnType.String);
+            _schema = StringUtils.trimToNull(schema);
+            _table = StringUtils.trimToNull(table);
+            _tableType = ColumnType.String;
         }
 
         public String getFolder()
@@ -644,6 +689,10 @@ public class FieldDefinition extends PropertyDescriptor
             return _tableType;
         }
 
+        /**
+         * @deprecated Use {@link IntLookup} or {@link StringLookup}
+         */
+        @Deprecated (since = "22.10")
         public LookupInfo setTableType(ColumnType tableType)
         {
             _tableType = tableType;
@@ -667,6 +716,71 @@ public class FieldDefinition extends PropertyDescriptor
             sb.append(".");
             sb.append(getTable());
             return sb.toString();
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return ColumnType.Lookup.getLabel();
+        }
+
+        @Override
+        public String getRangeURI()
+        {
+            return _tableType.getRangeURI();
+        }
+
+        @Override
+        public LookupInfo getLookupInfo()
+        {
+            return this;
+        }
+
+        @Override
+        public boolean isLookup()
+        {
+            return true;
+        }
+    }
+
+    private static abstract class Lookup extends LookupInfo
+    {
+        public Lookup(@Nullable String folder, String schema, String table, ColumnType lookupType)
+        {
+            super(folder, schema, table);
+            super.setTableType(lookupType);
+        }
+
+        @Override
+        public LookupInfo setTableType(ColumnType tableType)
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public static class IntLookup extends Lookup
+    {
+        public IntLookup(@Nullable String folder, String schema, String table)
+        {
+            super(folder, schema, table, ColumnType.Integer);
+        }
+
+        public IntLookup(String schema, String table)
+        {
+            this(null, schema, table);
+        }
+    }
+
+    public static class StringLookup extends Lookup
+    {
+        public StringLookup(@Nullable String folder, String schema, String table)
+        {
+            super(folder, schema, table, ColumnType.String);
+        }
+
+        public StringLookup(String schema, String table)
+        {
+            this(null, schema, table);
         }
     }
 
@@ -910,4 +1024,52 @@ public class FieldDefinition extends PropertyDescriptor
 
     }
 
+}
+
+class ColumnTypeImpl implements FieldDefinition.ColumnType
+{
+    private final String _label; // the display value in the UI for this kind of field
+    private final String _rangeURI;     // the key used inside the API
+    private final String _conceptURI;
+    private final FieldDefinition.LookupInfo _lookupInfo;
+
+    ColumnTypeImpl(String label, String rangeURI, String conceptURI, FieldDefinition.LookupInfo lookupInfo)
+    {
+        _label = label;
+        _rangeURI = rangeURI;
+        _conceptURI = conceptURI;
+        _lookupInfo = lookupInfo;
+    }
+
+    ColumnTypeImpl(String label, String rangeURI)
+    {
+        this(label, rangeURI, null, null);
+    }
+
+    @Override
+    public String getLabel()
+    {
+        return _label;
+    }
+
+    @Override
+    public boolean isLookup()
+    {
+        return false;
+    }
+
+    @Override
+    public String getRangeURI() { return _rangeURI; }
+
+    @Override
+    public String getConceptURI()
+    {
+        return _conceptURI;
+    }
+
+    @Override
+    public FieldDefinition.LookupInfo getLookupInfo()
+    {
+        return _lookupInfo;
+    }
 }

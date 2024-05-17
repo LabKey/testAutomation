@@ -1,0 +1,5 @@
+TextKey	Category	CategorySort	Group
+EMPTY	Empty Values Test	4.0	TypeRange
+LOOKUP	Lookup Test	2.0	BasicTest
+LOOKUP2	2nd level lookup	3.0	BasicTest
+PLAIN	Basic functional test	1.0	Punctuation

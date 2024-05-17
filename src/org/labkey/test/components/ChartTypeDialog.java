@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
@@ -94,10 +95,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
                 classValue = "-disabled";
         }
 
-        if(classValue.contains("-disabled"))
-            return false;
-        else
-            return true;
+        return !classValue.contains("-disabled");
     }
 
     public List<String> getListOfChartTypes()
@@ -174,28 +172,19 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         return this;
     }
 
-    public ChartTypeDialog clickYAxisMeasure(String columnName)
-    {
-        getWrapper().waitAndClick(elementCache().Y_FIELD_TEXT.withText(columnName));
-        return this;
-    }
-
     public ChartTypeDialog setYAxisSide(int measureIndex, YAxisSide side)
     {
-        getWrapper().mouseOver(elementCache().yAxis());
-        switch(side)
+        WebElement measureEl = elementCache().Y_FIELD_DISPLAY.index(measureIndex).findElement(this);
+        if (!measureEl.getAttribute("class").contains("selected"))
         {
-            case Left:
-                final WebElement leftArrow = elementCache().Y_FIELD_SIDE_LEFT.index(measureIndex).findElement(this);
-                leftArrow.click();
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(leftArrow));
-                break;
-            case Right:
-                final WebElement rightArrow = elementCache().Y_FIELD_SIDE_RIGHT.index(measureIndex).findElement(this);
-                rightArrow.click();
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(rightArrow));
-                break;
+            Locator.byClass("field-selection-text").findElement(measureEl).click();
         }
+        WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
+        WebDriverWait quickWait = new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(4));
+        quickWait.until(ExpectedConditions.visibilityOf(arrow));
+        arrow.click();
+        quickWait.until(ExpectedConditions.stalenessOf(arrow));
+
         return this;
     }
 
@@ -322,7 +311,8 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         WebElement column = elementCache().getColumn(columnName, columnGridCls);
         getWrapper().scrollIntoView(column);
         column.click();
-        getWrapper().waitFor(() -> {
+        getWrapper();
+        WebDriverWrapper.waitFor(() -> {
             return target.isDisplayed();
         }, "Target element is not displayed", 5000);
         getWrapper().actionClick(target); // The drop text may be obscured, just need to click the location
@@ -517,8 +507,8 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
     class ElementCache extends ChartWizardDialog.ElementCache
     {
         public final String XAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
-        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis Categories')]";
-        public final String XSUBCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Split Categories By')]";
+        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
+        public final String XSUBCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Group By')]";
         public final String YAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]";
         public final String CATEGORIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Categories')]";
         public final String MEASURE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Measure')]";
@@ -529,10 +519,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         public final String FIELD_DISPLAY = "//div[contains(@class, 'field-selection-display')]";
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
-        public Locator Y_FIELD_TEXT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//div[contains(@class, 'field-selection-text')]");
-
-        public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-left')]");
-        public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-right')]");
+        public Locator Y_FIELD_DISPLAY = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY);
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
 
         public final String SERIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Series')]";

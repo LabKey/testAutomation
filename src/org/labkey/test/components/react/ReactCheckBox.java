@@ -81,7 +81,7 @@ public class ReactCheckBox extends Checkbox
      * @param checked   the intended state.
      * @param expectedState  The intended state to verify before returning.  If null, no verification will occur
      */
-    public void set(@NotNull Boolean checked, @Nullable CheckboxState expectedState)
+    public void set(boolean checked, @Nullable CheckboxState expectedState)
     {
         if (isIndeterminate())  // when the checkbox is in an indeterminate state, clicking it will un-check it.
         {
@@ -95,25 +95,26 @@ public class ReactCheckBox extends Checkbox
         // Sometimes (like when the box has a ternary state, as the 'select all' box in grids)
         // checking the box won't result in a checked state- it will instead land on 'indeterminate'.
 
-        if (expectedState != null)  // only validate if the caller has indicated their expectation
+        if (expectedState == null)
         {
-            switch (expectedState)
-            {
-                case Checked:
-                    WebDriverWrapper.waitFor(() -> isChecked(),
-                            "Failed to check checkbox", 1000);
-                    break;
-                case Indeterminate:
-                    WebDriverWrapper.waitFor(() -> isIndeterminate(),
-                            "Expected checkbox to be in an indeterminate state", 1000);
-                    break;
-                case Unchecked:
-                    WebDriverWrapper.waitFor(() -> !isChecked() && !isIndeterminate(),
-                            "Failed to uncheck checkbox", 1000);
-                    break;
-            }
+            expectedState = checked ? CheckboxState.Checked : CheckboxState.Unchecked;
         }
 
+        switch (expectedState)
+        {
+            case Checked:
+                WebDriverWrapper.waitFor(() -> isChecked(),
+                        "Failed to check checkbox", 1000);
+                break;
+            case Indeterminate:
+                WebDriverWrapper.waitFor(() -> isIndeterminate(),
+                        "Expected checkbox to be in an indeterminate state", 1000);
+                break;
+            case Unchecked:
+                WebDriverWrapper.waitFor(() -> !isChecked() && !isIndeterminate(),
+                        "Failed to uncheck checkbox", 1000);
+                break;
+        }
     }
 
     public enum CheckboxState

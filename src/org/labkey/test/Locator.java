@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
@@ -36,7 +37,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Quotes;
 
 import java.text.DecimalFormat;
 import java.time.Duration;
@@ -57,6 +60,7 @@ public abstract class Locator extends By
     private String _description;
 
     // XPATH fragments
+    @Language("XPath")
     public static final String HIDDEN = "ancestor-or-self::*[" +
             "contains(@style,'display: none') or " +
             "contains(@style,'visibility: hidden') or " +
@@ -64,8 +68,11 @@ public abstract class Locator extends By
             "contains(@class, 'x4-hide-offsets') or " +
             "contains(@class, 'x-hide-offsets')] or " +
             "(@type = 'hidden')";
+    @Language("XPath")
     public static final String NOT_HIDDEN = "not(" + HIDDEN + ")";
+    @Language("XPath")
     public static final String DISABLED = "ancestor-or-self::*[contains(@class, 'disabled')]";
+    @Language("XPath")
     public static final String ENABLED = "not(" + DISABLED + ")";
     public static final String NBSP = "\u00A0";
 
@@ -435,6 +442,22 @@ public abstract class Locator extends By
         return element != null && element.isDisplayed();
     }
 
+    /**
+     * Will check if any elements that match this locator are visible.
+     *
+     * @param context Search context.
+     * @return True if there are any elements visible, false otherwise.
+     */
+    public boolean areAnyVisible(SearchContext context)
+    {
+        List<WebElement> elements = findElements(context);
+
+        // The method invisibilityOfAllElements returns true/false, but visibilityOfAllElements returns a list or null.
+        // Dealing with a true/false response, and taking the not of it, is easier than having to deal with a list that
+        // may or may not be null.
+        return !ExpectedConditions.invisibilityOfAllElements(elements).apply(getWebDriver(context));
+    }
+
     protected final List<WebElement> decorateWebElements(List<WebElement> elements)
     {
         List<WebElement> decoratedElements = new ArrayList<>(elements.size());
@@ -481,7 +504,12 @@ public abstract class Locator extends By
 
     public WebElement waitForElement(final SearchContext context, final int msTimeout)
     {
-        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(Duration.ofMillis(msTimeout));
+        return waitForElement(context, Duration.ofMillis(msTimeout));
+    }
+
+    public WebElement waitForElement(final SearchContext context, final Duration timeout)
+    {
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(timeout);
 
         return waitForElement(wait);
     }
@@ -551,7 +579,7 @@ public abstract class Locator extends By
         return new CssLocator(selector);
     }
 
-    public static XPathLocator xpath(String xpathExpr)
+    public static XPathLocator xpath(@Language("XPath") String xpathExpr)
     {
         return new XPathLocator(xpathExpr);
     }
@@ -945,35 +973,7 @@ public abstract class Locator extends By
      */
     public static String xq(String value)
     {
-        if (!value.contains("'")) {
-            return "'" + value + "'";
-        } else if (!value.contains("\"")) {
-            return '"' + value + '"';
-        } else {
-            StringBuilder result = new StringBuilder("concat(");
-            while (true) {
-                int apos = value.indexOf("'");
-                int quot = value.indexOf('"');
-                if (apos < 0) {
-                    result.append("'").append(value).append("'");
-                    break;
-                } else if (quot < 0) {
-                    result.append('"').append(value).append('"');
-                    break;
-                } else if (quot < apos) {
-                    String part = value.substring(0, apos);
-                    result.append("'").append(part).append("'");
-                    value = value.substring(part.length());
-                } else {
-                    String part = value.substring(0, quot);
-                    result.append('"').append(part).append('"');
-                    value = value.substring(part.length());
-                }
-                result.append(',');
-            }
-            result.append(')');
-            return result.toString();
-        }
+        return Quotes.escape(value);
     }
 
     public static String cq(String value)
@@ -1181,7 +1181,7 @@ public abstract class Locator extends By
 
     public static class XPathLocator extends Locator
     {
-        protected XPathLocator(String loc)
+        protected XPathLocator(@Language("XPath") String loc)
         {
             super(loc);
         }
@@ -1234,7 +1234,7 @@ public abstract class Locator extends By
 
         public XPathLocator withoutText()
         {
-            return this.withPredicate("string-length() == 0");
+            return this.withPredicate("string-length() = 0");
         }
 
         public XPathLocator withTextMatching(String regex)
@@ -1326,7 +1326,7 @@ public abstract class Locator extends By
             return withPredicate("last()");
         }
 
-        public XPathLocator append(String clause)
+        public XPathLocator append(@Language("XPath") String clause)
         {
             return new XPathLocator(getLoc() + clause);
         }
@@ -1362,19 +1362,20 @@ public abstract class Locator extends By
             return this.withPredicate(descendant.getLoc());
         }
 
-        public XPathLocator withPredicate(String predicate)
+        public XPathLocator withPredicate(@Language("XPath") String predicate)
         {
-            return this.append("[" + getRelativeXPath(predicate) + "]");
+            // Make compatible with Chrome "/../self::*[predicate]" instead of "/..[predicate]"
+            return this.append((getLoc().endsWith("/..") ? "/self::*" : "") + "[" + getRelativeXPath(predicate) + "]");
         }
 
-        public XPathLocator withoutPredicate(String predicate)
+        public XPathLocator withoutPredicate(@Language("XPath") String predicate)
         {
-            return this.append("[not(" + getRelativeXPath(predicate) + ")]");
+            return this.withPredicate("not(" + getRelativeXPath(predicate) + ")");
         }
 
         public XPathLocator withoutPredicate(XPathLocator predicate)
         {
-            return this.append("[not(" + getRelativeXPath(predicate.toXpath()) + ")]");
+            return this.withoutPredicate(getRelativeXPath(predicate.toXpath()));
         }
 
         public XPathLocator attributeStartsWith(String attribute, String text)
@@ -1530,7 +1531,7 @@ public abstract class Locator extends By
             return getRelativeXPath(getLoc());
         }
 
-        private String getRelativeXPath(String xpath)
+        private String getRelativeXPath(@Language("XPath") String xpath)
         {
             if (xpath.startsWith("//") || xpath.startsWith("(//"))
                 xpath = xpath.replaceFirst("//", ".//");

@@ -1,7 +1,7 @@
 package org.labkey.remoteapi.core;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -55,7 +55,7 @@ public class SaveModulePropertiesCommand extends PostCommand<CommandResponse>
             propJson.put("moduleName", prop.getModuleName());
             propJson.put("propName", prop.getPropertyName());
             propJson.put("value", prop.getValue());
-            properties.add(propJson);
+            properties.put(propJson);
         }
         json.put("properties", properties);
         return json;

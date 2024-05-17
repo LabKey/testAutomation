@@ -40,7 +40,6 @@ public class SecurityApiTest extends BaseWebDriverTest
     private static final String GROUP_1 = "testgroup1";
     private static final String GROUP_2 = "testgroup2";
     private static final String ADMIN_USER = "security-api@clientapi.test";
-    private static final String ADMIN_USER_PWD = "Pa$$w0rd";
     private static final String USER_CREATED_BY_API = "api-created-user@securityapi.test"; // This email value is found in the security-api.xml file for the "create new user" test.
 
     protected File[] getTestFiles()
@@ -82,7 +81,7 @@ public class SecurityApiTest extends BaseWebDriverTest
 
         // Create the admin user that will be used to call the APIs.
         _userHelper.createUserAndNotify(ADMIN_USER);
-        setInitialPassword(ADMIN_USER, ADMIN_USER_PWD);
+        setInitialPassword(ADMIN_USER);
         apiPermissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
 
     }
@@ -128,12 +127,12 @@ public class SecurityApiTest extends BaseWebDriverTest
      * JSON output. A little ways down is a comment "Actual:" with the actual JSON output (go figure). It might be easier
      * to compare the expected vs. actual results from this log output.
      *
-     * The expected output comes from the security-api.xml file. If this is a role and/or permission error odds are you
+     * The expected output comes from the security-api.xml file. If this is a role and/or permission error, odds are you
      * will need to make a change to that file. Try to make the smallest change possible. If you are changing permissions,
      * either adding or removing, you will need to update the value(s) in the effectivePermissions collection for a given role.
      *
      * For example, under the Editor role ("roleLabel": "Editor") there is a effectivePermissions collections that shows
-     * the permissions for that role ("effectivePermissions": ["org.labkey.api.security.permissions.InsertPermission",etc...).
+     * the permissions for that role ("effectivePermissions": ["org.labkey.api.security.permissions.InsertPermission", etc...).
      * This collection is what you would most likely be modifying.
      *
      * If you still have a hard time getting the test to pass locally try running with a bootstrapped database. That is
@@ -147,7 +146,7 @@ public class SecurityApiTest extends BaseWebDriverTest
         APITestHelper apiTester = new APITestHelper(this);
         apiTester.setTestFiles(getTestFiles());
         apiTester.setIgnoredElements(getIgnoredElements());
-        apiTester.runApiTests(ADMIN_USER, ADMIN_USER_PWD);
+        apiTester.runApiTests(ADMIN_USER);
     }
 
     @Override
@@ -155,5 +154,4 @@ public class SecurityApiTest extends BaseWebDriverTest
     {
         return Arrays.asList("query");
     }
-
 }

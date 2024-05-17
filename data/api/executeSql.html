@@ -1,0 +1,38 @@
+<div><label for="qwpSchema">Schema:</label></div>
+<div><input id="qwpSchema"/></div>
+<div><label for="qwpSql">SQL:</label></div>
+<div><textarea rows="10" cols="65" id="qwpSql"></textarea></div>
+<div><input type="button" value="Execute SQL" id="button_loadqwp"/></div>
+<div id="qwp-div">Query Web Part DIV</div>
+
+<!-- Used as HTML wiki source, so nonce is NOT required -->
+<script type="text/javascript">
+    LABKEY.Utils.onReady(function() {
+        document.getElementById('button_loadqwp')['onclick'] = loadQWP;
+    });
+
+    function loadQWP()
+    {
+        const loadBtn = document.getElementById("button_loadqwp");
+        loadBtn.disabled = true;
+
+        const schema = document.getElementById("qwpSchema").value;
+        const sql = document.getElementById("qwpSql").value;
+
+        new LABKEY.QueryWebPart({
+            title: 'SQL Results',
+            schemaName: schema,
+            sql: sql,
+            renderTo: 'qwp-div',
+            success: function() {
+                loadBtn.disabled = false;
+            },
+            failure: function () {
+                loadBtn.disabled = false;
+                console.log(resp);
+                alert(resp.exception);
+            }
+        });
+    }
+
+</script>

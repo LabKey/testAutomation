@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
@@ -54,6 +55,8 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
     private static final String PIPELINETEST_MODULE = "pipelinetest";
     private static final File SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);
+
+    private final static String API_KEY_LABEL = "apikey: ";
 
     @BeforeClass
     public static void doSetup() throws Exception
@@ -137,7 +140,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         assertExtMsgBox("Error", "Cannot redefine an existing protocol", "OK");
 
         // Delete the job, including any referenced runs
-        deletePipelineJob(jobDescription, true);
+        deletePipelineJob(jobDescription, true, true);
 
         // Verify the analysis dir was deleted
         verifyPipelineAnalysisDeleted(pipelineName, protocolName);
@@ -242,7 +245,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, jobDescription, fileRoot, outputFiles);
 
         // Delete the job, including any referenced runs
-        deletePipelineJob(jobDescription, true);
+        deletePipelineJob(jobDescription, true, true);
 
         // Verify the analysis dir was deleted
         verifyPipelineAnalysisDeleted(pipelineName, protocolName);
@@ -314,12 +317,19 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         resetErrors();
 
         clickAndWait(Locator.linkWithText("ERROR"));
+        String fullBodyText = getBodyText();
+        int apiKeyIndex = fullBodyText.indexOf(API_KEY_LABEL);
+        assertFalse("Couldn't find API key echoed in job log file", apiKeyIndex == -1);
+
+        // Grab the first 10 characters of the API key to check for in the arg list
+        String startOfApiKey = fullBodyText.substring(apiKeyIndex + API_KEY_LABEL.length(), apiKeyIndex + API_KEY_LABEL.length() + 10);
+
         assertTextPresent(
                 "INFO : hello java timeout world!",
                 // ${pipeline, protocol name} token replacement
                 "arg[2]=" + protocolName,
                 // ${httpSessionId} token replacement. Expect apikey prefix
-                "arg[3]=apikey|",
+                "arg[3]=" + startOfApiKey,
                 "sleeping for 8 seconds",
                 "Process killed after exceeding timeout of 3 seconds");
         assertTextNotPresent("goodbye java timeout world!");

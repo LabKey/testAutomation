@@ -18,9 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -35,7 +33,6 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -78,7 +75,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";
-    public static final String GROUP_AUDIT_EVENT = "Group events";
+    public static final String GROUP_AUDIT_EVENT = "Group and role events";
     public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Link to Study events";
@@ -177,7 +174,7 @@ public class AuditLogTest extends BaseWebDriverTest
     protected ArrayList<String> getAuditLogFromFile() throws IOException
     {
         ArrayList<String> auditLog = new ArrayList<>();
-        File auditLogFile = new File(TestProperties.getTomcatHome(), "logs/labkey-audit.log");
+        File auditLogFile = new File(TestFileUtils.getServerLogDir(), "labkey-audit.log");
 
         try (FileReader fileReader = new FileReader(auditLogFile))
         {
@@ -193,7 +190,7 @@ public class AuditLogTest extends BaseWebDriverTest
         return auditLog;
     }
 
-    protected void compareAuditLogFileEntries(ArrayList<String> auditLogBefore, ArrayList<String> auditLogAfter, ArrayList<String> expectedValues) throws IOException
+    protected void compareAuditLogFileEntries(List<String> auditLogBefore, List<String> auditLogAfter, List<String> expectedValues) throws IOException
     {
         boolean pass = true;
         StringBuilder stringBuilder = new StringBuilder();
@@ -261,9 +258,9 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void userAuditTest() throws IOException
     {
-        ArrayList<String> auditLogBefore;
-        ArrayList<String> auditLogAfter;
-        ArrayList<String> expectedLogValues = new ArrayList<>();
+        List<String> auditLogBefore;
+        List<String> auditLogAfter;
+        List<String> expectedLogValues = new ArrayList<>();
 
         auditLogBefore = getAuditLogFromFile();
         // Use UI helper to avoid unexpected events from API authentication
@@ -281,10 +278,10 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(getUsername() + " stopped impersonating " + AUDIT_TEST_USER);
 
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
-        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
         stopImpersonating();
-        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
         String adminGroup = "Administrator";
         impersonateGroup(adminGroup, true);
@@ -323,8 +320,8 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void groupAuditTest() throws IOException
     {
-        ArrayList<String> auditLogBefore;
-        ArrayList<String> auditLogAfter;
+        List<String> auditLogBefore;
+        List<String> auditLogAfter;
 
         auditLogBefore = getAuditLogFromFile();
 
@@ -338,7 +335,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _userHelper.deleteUsers(true, AUDIT_TEST_USER);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
-        ArrayList<String> expectedLogValues = new ArrayList<>();
+        List<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add("Project " + AUDIT_TEST_PROJECT + " was created");
         expectedLogValues.add("A new security group named " + AUDIT_SECURITY_GROUP + " was created.");
         expectedLogValues.add("The group Guests was removed from the security role No Permissions.");
@@ -347,6 +344,8 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add("User: " + AUDIT_TEST_USER + " was added as a member to Group: " + AUDIT_SECURITY_GROUP);
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
         expectedLogValues.add("Project /" + AUDIT_TEST_PROJECT + " was deleted");
+        expectedLogValues.add("A new security policy was established for " + AUDIT_TEST_PROJECT + ". It will no longer inherit permissions from /");
+        expectedLogValues.add("The group Guests was assigned to the security role No Permissions.");
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), 10);
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), 10);
@@ -933,11 +932,11 @@ public class AuditLogTest extends BaseWebDriverTest
 
         String[] commentAsArray = comment.split(";");
 
-        Map<String, String> fieldComments = new HashMap();
+        Map<String, String> fieldComments = new HashMap<>();
 
-        for(int i = 0; i < commentAsArray.length; i++)
+        for (String s : commentAsArray)
         {
-            String[] fieldValue = commentAsArray[i].split(":");
+            String[] fieldValue = s.split(":");
 
             // If the split on the ':' produced more than two entries in the array it most likely means that the
             // comment for that property had a : in it. So treat the first entry as the field name and then concat the
@@ -949,7 +948,7 @@ public class AuditLogTest extends BaseWebDriverTest
             StringBuilder sb = new StringBuilder();
             sb.append(fieldValue[1].trim());
 
-            for(int j = 2; j < fieldValue.length; j++)
+            for (int j = 2; j < fieldValue.length; j++)
             {
                 sb.append(":");
                 sb.append(fieldValue[j]);
@@ -963,21 +962,14 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
     {
-        String value = null;
-
-        JSONParser parser = new JSONParser();
-        JSONObject jsonObject;
         try
         {
-            jsonObject = (JSONObject)parser.parse(rowEntry.get(columnName).toString());
-            value = jsonObject.get("value").toString();
+            return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
         }
-        catch(ParseException pe)
+        catch(JSONException je)
         {
             // Just fail here, don't toss the exception up the stack.
-            Assert.assertTrue("There was a parser exception: " + pe.toString(), false);
+            throw new IllegalArgumentException(je);
         }
-
-        return value;
     }
 }

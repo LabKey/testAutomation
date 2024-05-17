@@ -1,7 +1,7 @@
 Hooray!
 <p>
 The model row id is: <span id='model.rowid'>not set</span>!
-<script type="text/javascript" nonce="<%=getScriptNonce()%>">
+<script type="text/javascript" nonce="<%=scriptNonce%>">
     var span = document.getElementById("model.rowid");
     span.innerHTML = LABKEY.ActionURL.getParameter("rowid");
 </script>

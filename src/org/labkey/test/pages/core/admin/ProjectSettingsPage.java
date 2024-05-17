@@ -19,11 +19,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
-public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementCache>
+public class ProjectSettingsPage extends BaseSettingsPage
 {
     public ProjectSettingsPage(WebDriver driver)
     {
@@ -41,14 +39,20 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         return new ProjectSettingsPage(driver.getDriver());
     }
 
-    public void save()
+    public boolean getShouldInherit()
     {
-        elementCache().saveButton.click();
+        return elementCache().shouldInherit.isChecked();
     }
 
-    public Checkbox getDiscussionEnabledCheckbox()
+    public void setShouldInherit(boolean value)
     {
-        return elementCache().discussionEnabled;
+        elementCache().shouldInherit.set(value);
+    }
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
     }
 
     @Override
@@ -57,9 +61,8 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends BaseSettingsPage.ElementCache
     {
-        protected final Checkbox discussionEnabled = Checkbox.Checkbox(Locator.name("discussionEnabled")).findWhenNeeded(this);
-        protected final WebElement saveButton = findButton("Save");
+        protected final Checkbox shouldInherit = Checkbox.Checkbox(Locator.name("shouldInherit")).findWhenNeeded(this);
     }
 }

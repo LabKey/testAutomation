@@ -31,6 +31,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -370,22 +371,24 @@ public class ColumnChartTest extends BaseWebDriverTest
         plotTitleBox = columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BOX));
         expectedPlotCount++;
 
+        List<WebElement> plots;
         log("Get a count of the plots.");
-        Assert.assertEquals("Number of plots not as expected.", expectedPlotCount, plotRegion.getPlots().size());
+        plots = plotRegion.getPlots(expectedPlotCount);
+        Assert.assertEquals("Number of plots not as expected.", expectedPlotCount, plots.size());
 
         log("Validate the initial values of the plots.");
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(0));
         Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE.equals(plotComponent.getPlotType()));
         Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitlePie + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitlePie));
         Assert.assertEquals("Number of data points for the pie chart are not as expected.", UNFILTERED_PIE_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(1));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(1));
         Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BAR + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BAR.equals(plotComponent.getPlotType()));
         Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBar1 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBar1));
         Assert.assertEquals("Number of data points for the bar chart (" + plotTitleBar1 + ") are not as expected.", UNFILTERED_BAR1_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(2));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(2));
         Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX.equals(plotComponent.getPlotType()));
         Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBox + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBox));
         Assert.assertEquals("Number of data points for the box chart are not as expected.", UNFILTERED_BOX_COUNT, plotComponent.getNumberOfDataPoints());
@@ -393,41 +396,42 @@ public class ColumnChartTest extends BaseWebDriverTest
         log("Filter the data in the Pregnancy column.");
         dataRegionTable.setFacetedFilter(PREGNANCY_COLUMN_NAME, PREGNANCY_COLUMN_NAME);
 
+        plots = plotRegion.getPlots(expectedPlotCount);
         log("Validate the values of the plots have changed as expected.");
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(0));
         Assert.assertEquals("Number of data points for the pie chart are not as expected.", FILTERED_PIE_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(1));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(1));
         Assert.assertEquals("Number of data points for the bar chart (weight) are not as expected.", FILTERED_BAR1_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(2));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(2));
         Assert.assertEquals("Number of data points for the box chart are not as expected.", FILTERED_BOX_COUNT, plotComponent.getNumberOfDataPoints());
 
         log("Now add a new bar chart to the mix.");
         dataRegionTable.createBarChart(COL_NAME_BAR2);
         plotTitleBar2 = columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BAR2));
         expectedPlotCount++;
+        plots = plotRegion.getPlots(expectedPlotCount);
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(3));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(3));
         Assert.assertEquals("Number of data points for the bar chart (" + plotTitleBar2 + ") are not as expected.", FILTERED_BAR2_COUNT, plotComponent.getNumberOfDataPoints());
 
         log("Remove the filter, and make sure the counts go back to unfiltered values.");
         dataRegionTable.clearFilter(PREGNANCY_COLUMN_NAME);
 
-        // Sleep just a moment for the plot to redraw.
-        sleep(1000);
+        plots = plotRegion.getPlots(expectedPlotCount);
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(0));
         Assert.assertEquals("Number of data points for the pie chart are not as expected.", UNFILTERED_PIE_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(1));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(1));
         Assert.assertEquals("Number of data points for the bar chart (" + COL_NAME_BAR1 + ") are not as expected.", UNFILTERED_BAR1_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(2));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(2));
         Assert.assertEquals("Number of data points for the box chart are not as expected.", UNFILTERED_BOX_COUNT, plotComponent.getNumberOfDataPoints());
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(3));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(3));
         Assert.assertEquals("Number of data points for the bar chart (" + COL_NAME_BAR2 + ") are not as expected.", UNFILTERED_BAR2_COUNT, plotComponent.getNumberOfDataPoints());
 
         log("We are done so clean up (revert the view).");

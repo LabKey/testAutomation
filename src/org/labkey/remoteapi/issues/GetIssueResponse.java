@@ -1,15 +1,15 @@
 package org.labkey.remoteapi.issues;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 public class GetIssueResponse extends CommandResponse
 {
     private final IssueResponseModel _issueModel;
 
-    public GetIssueResponse(String text, int statucCode, String contentType, JSONObject json, GetIssueCommand sourceCommand)
+    public GetIssueResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statucCode, contentType, json, sourceCommand);
+        super(text, statusCode, contentType, json);
 
         // parse json into issueModel here
         _issueModel = new IssueResponseModel(json);

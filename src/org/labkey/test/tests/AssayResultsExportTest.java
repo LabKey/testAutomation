@@ -55,6 +55,18 @@ public class AssayResultsExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getTestLookUpColumnHeader()
+    {
+        return null;
+    }
+
+    @Override
+    protected int getTestLookUpColumnIndex()
+    {
+        return 0;
+    }
+
+    @Override
     protected int getTestColumnIndex()
     {
         return 1;
@@ -117,10 +129,10 @@ public class AssayResultsExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AssayResultsExportTest initTest = (AssayResultsExportTest)getCurrentTest();
+        AssayResultsExportTest initTest = (AssayResultsExportTest) getCurrentTest();
         initTest.setupTestContainers();
     }
-    
+
     protected void setupTestContainers() throws Exception
     {
         _containerHelper.createProject(getProjectName(), "Assay");

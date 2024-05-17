@@ -14,9 +14,9 @@ import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -31,9 +31,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -62,9 +60,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public Boolean isLoaded()
     {
         return getComponentElement().isDisplayed() &&
-                !Locators.loadingGrid.existsIn(this) &&
+                (!Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this);
+                Locator.tag("td").existsIn(this)) ||
+                getGridEmptyMessage().isPresent();
     }
 
     protected void waitForLoaded()
@@ -85,6 +84,27 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public Boolean hasData()
     {
         return !Locators.emptyGrid.existsIn(this);
+    }
+
+    /**
+     * Is the left column on this grid locked. I think this will always be true for this grid type.
+     *
+     * @return True if left column is locked, false otherwise.
+     */
+    public boolean hasLockedColumn()
+    {
+        return Locator.tagWithClass("div", "grid-panel__grid")
+                .findElement(getComponentElement())
+                .getAttribute("class").contains("grid-panel__lock-left");
+    }
+
+    /**
+     * Scroll the grid to the top row and left most column.
+     */
+    public void scrollToOrigin()
+    {
+        getWrapper().executeScript("arguments[0].scrollBy(-arguments[0].scrollLeft, -arguments[0].scrollHeight)",
+                Locators.responsiveGrid().findElement(getComponentElement()));
     }
 
     /**
@@ -123,8 +143,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
         Optional<WebElement> colHeaderIcon = Locator.XPathLocator.union(
-                Locator.tagWithClass("span", "fa-sort-amount-asc"),
-                Locator.tagWithClass("span", "fa-sort-amount-desc")
+                Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-asc"),
+                Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-desc")
         ).findOptionalElement(headerCell);
         return colHeaderIcon.isPresent();
 
@@ -138,20 +158,22 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
     {
         T _this = getThis();
-        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
-        filterModal.confirm();
+        doAndWaitForUpdate(()->initFilterColumn(columnLabel, operator, value).confirm());
         return _this;
     }
 
     public T filterColumn(String columnLabel, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
     {
         T _this = getThis();
-        GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
-        filterModal.selectExpressionTab().setFilters(
-                new FilterExpressionPanel.Expression(operator1, value1),
-                new FilterExpressionPanel.Expression(operator2, value2)
-        );
-        filterModal.confirm();
+        doAndWaitForUpdate(()-> {
+            GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
+            filterModal.selectExpressionTab().setFilters(
+                    new FilterExpressionPanel.Expression(operator1, value1),
+                    new FilterExpressionPanel.Expression(operator2, value2)
+            );
+            filterModal.confirm();
+        });
+
         return _this;
     }
 
@@ -178,21 +200,75 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return getThis();
     }
 
-    protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
+    public boolean hasColumnFilterIcon(String columnLabel)
     {
         WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
-        getWrapper().scrollIntoView(headerCell);    // for cells to the right or left of the viewport, scrollIntoView handles horizontal scroll
-        sleep(500);  //it would be nice to find a way to test for whether or not x-scroll is needed, and only x-scroll if necessary
-                         //  sleep here to give scrollToMiddle call below a better chance of firing
+        Optional<WebElement> colHeaderIcon = Locator.tagWithClass("span", "grid-panel__col-header-icon")
+                .withClass("fa-filter")
+                .findOptionalElement(headerCell);
+        return colHeaderIcon.isPresent();
+
+    }
+
+    /**
+     * use the column menu to hide the given column.
+     *
+     * @param columnLabel Column to hide.
+     * @return This grid.
+     */
+    public T hideColumn(String columnLabel)
+    {
+        // Because this will remove the column wait for the grid to update.
+        clickColumnMenuItem(columnLabel, "Hide Column", true);
+        return getThis();
+    }
+
+    /**
+     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridViewDialog}. This will click the first column
+     * in the grid.
+     * @return A {@link CustomizeGridViewDialog}
+     */
+    public CustomizeGridViewDialog insertColumn()
+    {
+        return insertColumn(getColumnNames().get(0));
+    }
+
+    /**
+     * Use the column menu to show a Customize Grid dialog {@link CustomizeGridViewDialog}. This will use the given column to
+     * get the menu. This should insert the column after (to the right) of this column.
+     *
+     * @param columnLabel The column to get the menu from.
+     * @return A {@link CustomizeGridViewDialog}
+     */
+    public CustomizeGridViewDialog insertColumn(String columnLabel)
+    {
+        // Because this is going to show the customize grid dialog don't wait for a grid update. the dialog will wait for the update.
+        clickColumnMenuItem(columnLabel, "Insert Column", false);
+        return new CustomizeGridViewDialog(getDriver(), this);
+    }
+
+    protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
+    {
+
+        if(hasLockedColumn())
+        {
+            scrollToOrigin();
+        }
+
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        // Scroll to middle in order to make room for the dropdown menu
+        getWrapper().scrollToMiddle(headerCell);
 
         WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
                 .findElement(headerCell);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
-        getWrapper().scrollToMiddle(toggle);        // scroll the target vertically to the middle of the page
         toggle.click();
 
-        WebElement menuItem = Locator.css("li > a").containing(menuText).findElement(headerCell);
-        waitFor(()-> menuItem.isDisplayed(), 1000);
+        // Use getDriver() because the grid menus are rendered in a "react portal" at the end of the HTML body, so they
+        // are totally detached from the rest of the grid.
+        WebElement menu = Locator.css("ul.grid-header-cell__dropdown-menu.open").findWhenNeeded(getDriver());
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(menu);
+        waitFor(menuItem::isDisplayed, 1000);
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
         else
@@ -355,21 +431,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public T selectAllOnPage(boolean checked, @Nullable ReactCheckBox.CheckboxState expectedState)
     {
         selectAllBox().set(checked, expectedState);
-        Locator selectedText = Locator.XPathLocator.union(
-                Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]"),
-                Locator.tagWithClass("span", "selection-status__count").containing("selected"));
-
-        // If checked is false, so un-selecting a value, don't wait for a confirmation message.
-        if(checked)
-            WebDriverWrapper.waitFor(()->
-                    selectedText.findOptionalElement(getComponentElement()).isPresent(), WAIT_FOR_JAVASCRIPT);
 
         if (expectedState == null)  // we didn't verify expected state of the select-all box,
         {                           // ensure intended state of rows here
             if (!checked)
                 assertThat("more than 0 rows in the current page were selected", getSelectedRows().size(), is(0));
             else
-                assertTrue("not all rows in the current page were selected", getSelectedRows().stream().allMatch(GridRow::isSelected));
+                assertEquals("not all rows in the current page were selected", getRows().size(), getSelectedRows().size());
         }
 
         return getThis();
@@ -583,8 +651,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public boolean getColumnPHIProtected(String columnText)
     {
-        return elementCache().getColumnHeaderCell(columnText)
-                .getAttribute("class").contains("phi-protected");
+        WebElement columnHeader = Locator.tagWithClass("th", "grid-header-cell")
+                .withDescendant(Locators.headerCellBody(columnText)).findElement(this);
+        return columnHeader.getAttribute("class").contains("phi-protected");
     }
 
     /**
@@ -596,6 +665,27 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public String getColumnTitleAttribute(String columnText)
     {
         return elementCache().getColumnHeaderCell(columnText).getAttribute("title");
+    }
+
+    public Optional<String> getGridEmptyMessage()
+    {
+        Optional<String> msg = Optional.empty();
+
+        try
+        {
+            WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+            if (tr.isDisplayed())
+            {
+                msg = Optional.of(Locator.tag("td").findElement(tr).getText());
+            }
+        }
+        catch (StaleElementReferenceException stale)
+        {
+            getWrapper().log("Grid empty message was present but has now gone stale (went away).");
+            msg = Optional.empty();
+        }
+
+        return msg;
     }
 
     /**
@@ -646,15 +736,21 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return hasSelectColumn;
         }
 
-        ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this));
+        ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this))
+        {
+            @Override
+            public void toggle()
+            {
+                doAndWaitForUpdate(super::toggle);
+            }
+        };
 
         private final Map<String, WebElement> headerCells = new HashMap<>();
         protected final WebElement getColumnHeaderCell(String headerText)
         {
             if (!headerCells.containsKey(headerText))
             {
-                WebElement headerCell = Locator.tagWithClass("th", "grid-header-cell")
-                        .withChild(Locator.tag("span").startsWith(headerText)).findElement(this);
+                WebElement headerCell = Locators.headerCellBody(headerText).findElement(this);
                 headerCells.put(headerText, headerCell);
             }
             return headerCells.get(headerText);
@@ -784,7 +880,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
         static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
-
+        static public Locator.XPathLocator headerCellBody(String headerText)
+        {
+            return Locator.tagWithClass("div", "grid-header-cell__body")
+                    .withChild(Locator.tag("span").startsWith(headerText));
+        }
     }
 
     public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid, ResponsiveGridFinder>

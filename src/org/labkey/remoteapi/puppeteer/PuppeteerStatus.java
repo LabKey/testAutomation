@@ -18,6 +18,8 @@ package org.labkey.remoteapi.puppeteer;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
+import java.util.Map;
+
 public class PuppeteerStatus
 {
     final private boolean _isAvailable;
@@ -28,12 +30,12 @@ public class PuppeteerStatus
     {
         _isAvailable = payload.getBoolean("isAvailable");
         _pingSuccess = payload.getBoolean("pingSuccess");
-        _service = new JSONObject(payload.get("service"));
+        _service = payload.getJSONObject("service");
     }
 
     public PuppeteerStatus(CommandResponse response)
     {
-        this(new JSONObject(response.getParsedData().get("data")));
+        this(new JSONObject((Map<String, Object>)response.getParsedData().get("data")));
     }
 
     public boolean isAvailable()

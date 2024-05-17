@@ -15,7 +15,7 @@
  */
 package org.labkey.remoteapi.reports;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 import java.util.ArrayList;
@@ -24,11 +24,11 @@ import java.util.Map;
 
 public class GetCategoriesResponse extends CommandResponse
 {
-    private List<Category> _categoryList;
+    private final List<Category> _categoryList;
 
-    public GetCategoriesResponse(String text, int statusCode, String contentType, JSONObject json, GetCategoriesCommand sourceCommand)
+    public GetCategoriesResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, sourceCommand);
+        super(text, statusCode, contentType, json);
         _categoryList = new ArrayList<>();
         for ( Map<String, Object> categoryMap : (List<Map<String, Object>>)getProperty("categories"))
         {
@@ -51,7 +51,7 @@ public class GetCategoriesResponse extends CommandResponse
         return null;
     }
 
-    public Category getCategory(Long rowId)
+    public Category getCategory(Integer rowId)
     {
         for (Category category : getCategoryList())
         {

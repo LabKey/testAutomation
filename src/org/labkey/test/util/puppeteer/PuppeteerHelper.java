@@ -17,10 +17,10 @@ package org.labkey.test.util.puppeteer;
 
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
-import org.labkey.test.WebTestHelper;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.puppeteer.PuppeteerSettings;
 import org.labkey.remoteapi.puppeteer.PuppeteerStatus;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 
@@ -43,14 +43,14 @@ public class PuppeteerHelper
 
     public static PuppeteerStatus getStatus(Connection connection) throws IOException, CommandException
     {
-        var statusCmd = new PostCommand<>("puppeteer", "status.api");
+        var statusCmd = new SimplePostCommand("puppeteer", "status.api");
         var response = statusCmd.execute(connection, "/");
         return new PuppeteerStatus(response);
     }
 
     public static PuppeteerSettings updateSettings(Connection connection, PuppeteerSettings settings) throws IOException, CommandException
     {
-        var updateCmd = new PostCommand<>("puppeteer", "updateSettings.api");
+        var updateCmd = new SimplePostCommand("puppeteer", "updateSettings.api");
         updateCmd.setRequiredVersion(0);
         updateCmd.setJsonObject(settings.toJSON());
         var response = updateCmd.execute(connection, "/");

@@ -135,7 +135,7 @@ public class SummaryStatisticsHelper
         DataRegionTable drt = new DataRegionTable("query", _wrapper);
         drt.clickColumnMenu(columnName, false, "Summary Statistics...");
 
-        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(_wrapper.getDriver());
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(drt);
 
         for (String stat : getExpectedColumnStats(colType, isLookup, isPK))
             assertTrue("Expected summary stat is not present: " + stat, statsWindow.isPresent(stat));

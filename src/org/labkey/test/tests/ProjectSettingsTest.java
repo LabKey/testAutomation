@@ -15,22 +15,35 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
+import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.pages.core.admin.ProjectSettingsPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,101 +51,285 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
-    private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
-    private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
+
+    private static final String DEFAULT_DATE_DISPLAY = "yyyy-MM-dd";
+    private static final String DEFAULT_DATE_TIME_DISPLAY = "yyyy-MM-dd HH:mm";
+    private static final String DEFAULT_TIME_DISPLAY = "HH:mm:ss";
+
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";
-    private static final String DATE_TIME_FORMAT_INJECTION = "yyyy-MM-dd HH:mm'" + INJECT_CHARS + "'";
-    private static final Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
+    private static final String DATE_TIME_FORMAT_INJECTION = DEFAULT_DATE_TIME_DISPLAY + "'" + INJECT_CHARS + "'";
+
+    private static final String PROJ_CHANGE = "Site Settings Test";
+    private static final String PROJ_BASE = "Site Settings Base Test";
 
     @Override
     //this project will remain unaltered and copy every property from the site.
     protected String getProjectName()
     {
-        return "Copycat Project";
+        return PROJ_CHANGE;
     }
 
-    protected void goToSiteLookAndFeel()
+    private LookAndFeelSettingsPage goToSiteLookAndFeel()
     {
         goToAdminConsole().goToSettingsSection().clickLookAndFeelSettings();
+        return new LookAndFeelSettingsPage(getDriver());
     }
 
-    //this project's properties will be altered and so should not copy site properties
-    protected String getProjectAlteredName()
+    private boolean checkHelpLinks(String projectName, boolean supportLinkPresent, boolean helpLinkPresent)
     {
-        return "Independent Project";
-    }
 
-    protected void checkHelpLinks(String projectName, boolean supportLinkPresent, boolean helpLinkPresent)
-    {
-        if(projectName!=null)
-            clickProject(projectName);
+        if (projectName != null)
+        {
+            goToProjectHome(projectName);
+        }
+        else
+        {
+            goToHome();
+        }
 
         BootstrapMenu menu = new SiteNavBar(getDriver()).userMenu();
         menu.expand();    // the support and help links are now on the user menu
         List<WebElement> visibleLinks = menu.findVisibleMenuItems();
-        assertEquals("Support link state unexpected.", supportLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("Support")));
-        assertEquals("Help link state unexpected.", helpLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("LabKey Documentation")));
+        checker().verifyEquals("Support link state unexpected.",
+                supportLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("Support")));
+        checker().verifyEquals("Help link state unexpected.",
+                helpLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("LabKey Documentation")));
+
+        // If there were no errors no screenshot will be taken, returning the "not" of the screenshot will return
+        // true if there were no errors.
+        return !checker().screenShotIfNewError("Menu_Error");
+    }
+
+    private boolean checkDataInList(String projectName, String listName, List<Map<String, String>> expectedValues)
+    {
+        goToProjectHome(projectName);
+
+        Locator listLink = Locator.tagWithId("table", "lists").descendant("a").withText(listName);
+
+        waitForElement(listLink, 10_000, true);
+        clickAndWait(listLink);
+
+        DataRegionTable actualValues = new DataRegionTable("query", getDriver());
+
+        int rowIndex = 0;
+        for(Map<String, String> listRow : expectedValues)
+        {
+            checker().verifyEquals(String.format("Row %d in list '%s' is not as expected.", rowIndex, listName),
+                    listRow, actualValues.getRowDataAsMap(rowIndex));
+            rowIndex++;
+        }
+
+        // checker().screenShotIfNewError returns true if it took a screenshot, which means there is an error.
+        return !checker().screenShotIfNewError("List_Data_Error");
+    }
+
+    private void checkSettingPageValues(BaseSettingsPage settingsPage, boolean helpMenu, String supportLink,
+                                        String dateFormat, String dateTimeFormat, String timeFormat)
+    {
+
+        checker().verifyEquals("Help menu should be " + (helpMenu ? "checked." : "unchecked."),
+                helpMenu, settingsPage.getHelpMenu());
+
+        checker().verifyEquals("Support link value not as expected.",
+                supportLink, settingsPage.getSupportLink());
+
+        checker().verifyEquals("'Default Date Display'  not as expected.",
+                dateFormat, settingsPage.getDefaultDateDisplay());
+
+        checker().verifyEquals("'Default Date Display'  not as expected.",
+                dateTimeFormat, settingsPage.getDefaultDateTimeDisplay());
+
+        checker().verifyEquals("'Default Time Display'  not as expected.",
+                timeFormat, settingsPage.getDefaultTimeDisplay());
+
+    }
+
+    private void resetSiteSettings() throws IOException, CommandException
+    {
+        BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
+    }
+
+    private void resetProjectSettings() throws IOException, CommandException
+    {
+        BaseSettingsPage.resetSettings(createDefaultConnection(), PROJ_CHANGE);
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws IOException, CommandException
     {
         ProjectSettingsTest init = (ProjectSettingsTest)getCurrentTest();
         init.setUpTest();
     }
 
-    protected void setUpTest()
+    protected void setUpTest() throws IOException, CommandException
     {
-        _containerHelper.createProject(getProjectName(), null);
-        checkHelpLinks(null, true, true);
-        _containerHelper.createProject(getProjectAlteredName(), null);
-        checkHelpLinks(null, true, true);
+        _containerHelper.deleteProject(PROJ_CHANGE, false);
+        _containerHelper.deleteProject(PROJ_BASE, false);
 
-        goToProjectSettings(getProjectAlteredName());
-        setFormElement(Locator.name("reportAProblemPath"), "");
-        clickButton("Save");
-        assertElementNotPresent(Locators.labkeyError);
+        // Make sure the site settings are reset.
+        resetSiteSettings();
+        _containerHelper.createProject(PROJ_CHANGE, null);
+        _containerHelper.createProject(PROJ_BASE, null);
+    }
 
-        checkHelpLinks(getProjectAlteredName(), false, true);
-//        assertElementNotPresent("Support link still present after removing link from settings", supportLink);
+    @AfterClass
+    public static void cleanUpAfter() throws IOException, CommandException
+    {
+        ((ProjectSettingsTest) getCurrentTest()).resetSiteSettings();
+    }
+
+    private static final String DT_LIST_NAME = "Date_And_Time";
+    private static final String DT_LIST_ID_COL = "id";
+    private static final String DT_LIST_DATE_COL = "Date";
+    private static final String DT_LIST_TIME_COL = "Time";
+    private static final String DT_LIST_DATETIME_COL = "DateTime";
+
+    private void createDateAndTimeList(String project, List<Map<String, String>> listData) throws IOException, CommandException
+    {
+
+        ListDefinition listDef = new IntListDefinition(DT_LIST_NAME, DT_LIST_ID_COL);
+        listDef.setFields(List.of(new FieldDefinition(DT_LIST_DATE_COL, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(DT_LIST_TIME_COL, FieldDefinition.ColumnType.Time),
+                new FieldDefinition(DT_LIST_DATETIME_COL, FieldDefinition.ColumnType.DateAndTime)));
+
+        TestDataGenerator tdg = listDef.create(createDefaultConnection(), project);
+
+        for(Map<String, String> listRow : listData)
+        {
+            Map<String, Object> tmap = new HashMap<>(listRow);
+            tdg.addCustomRow(tmap);
+        }
+
+        tdg.insertRows();
+
+        goToProjectHome(project);
+        new PortalHelper(getDriver()).addWebPart("Lists");
+
     }
 
     @Test
-    public void testSteps()
+    public void testSiteSettingOverride() throws IOException, CommandException
     {
-        //assert both locators are present in clone project
-        goToProjectHome();
-        checkHelpLinks(null, true, true);
 
-        //change global settings to exclude help link
-        goToSiteLookAndFeel();
-        click(Locator.checkboxByName("helpMenuEnabled"));
-        clickButtonContainingText("Save");
+        String siteDateDisplay = "MMMM dd, yyyy";
+        String siteTimeDisplay = "hh:mm a";
+        String siteDateTimeDisplay = "hh:mm a MMMM, dd yyyy";
+        boolean siteHelpMenuState = false;
+        String siteSupportLink = "";
 
+        SimpleDateFormat defaultDateFormat = new SimpleDateFormat(DEFAULT_DATE_DISPLAY);
+        SimpleDateFormat defaultTimeFormat = new SimpleDateFormat(DEFAULT_TIME_DISPLAY);
+        SimpleDateFormat defaultDateTimeFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_DISPLAY);
 
-        //assert help link missing in proj 1, present in proj 2
-        checkHelpLinks(getProjectName(), true, false);
-        checkHelpLinks(getProjectAlteredName(), false, true);
+        SimpleDateFormat updatedDateFormat = new SimpleDateFormat(siteDateDisplay);
+        SimpleDateFormat updateTimeFormat = new SimpleDateFormat(siteTimeDisplay);
+        SimpleDateFormat updateDateTimeFormat = new SimpleDateFormat(siteDateTimeDisplay);
 
-        //change proj 2 to exclude both help and support
-        goToProjectSettings(getProjectAlteredName());
-        uncheckCheckbox(Locator.checkboxByName("helpMenuEnabled"));
-        clickButtonContainingText("Save");
+        Date testDate01 = new Calendar.Builder()
+                .setDate(2023, 1, 17)
+                .setTimeOfDay(11, 12, 03)
+                .build().getTime();
 
-        //assert help link itself gone
-        assertElementNotPresent(helpMenuLink);
+        Date testDate02 = new Calendar.Builder()
+                .setDate(2022, 6, 10)
+                .setTimeOfDay(20, 45, 15)
+                .build().getTime();
+
+        List<Map<String, String>> datesDefaultFormat = new ArrayList<>();
+        datesDefaultFormat.add(Map.of(
+                DT_LIST_DATE_COL, defaultDateFormat.format(testDate01),
+                DT_LIST_TIME_COL, defaultTimeFormat.format(testDate01),
+                DT_LIST_DATETIME_COL, defaultDateTimeFormat.format(testDate01)
+        ));
+        datesDefaultFormat.add(Map.of(
+                DT_LIST_DATE_COL, defaultDateFormat.format(testDate02),
+                DT_LIST_TIME_COL, defaultTimeFormat.format(testDate02),
+                DT_LIST_DATETIME_COL, defaultDateTimeFormat.format(testDate02)
+        ));
+
+        List<Map<String, String>> datesUpdatedFormat = new ArrayList<>();
+        datesUpdatedFormat.add(Map.of(
+                DT_LIST_DATE_COL, updatedDateFormat.format(testDate01),
+                DT_LIST_TIME_COL, updateTimeFormat.format(testDate01),
+                DT_LIST_DATETIME_COL, updateDateTimeFormat.format(testDate01)
+        ));
+        datesUpdatedFormat.add(Map.of(
+                DT_LIST_DATE_COL, updatedDateFormat.format(testDate02),
+                DT_LIST_TIME_COL, updateTimeFormat.format(testDate02),
+                DT_LIST_DATETIME_COL, updateDateTimeFormat.format(testDate02)
+        ));
+
+        createDateAndTimeList(PROJ_CHANGE, datesDefaultFormat);
+        createDateAndTimeList(PROJ_BASE, datesDefaultFormat);
+
+        log("Change global settings to exclude some menu links and change the format of date and time fields.");
+        LookAndFeelSettingsPage settingsPage = goToSiteLookAndFeel();
+        settingsPage.setHelpMenu(siteHelpMenuState);
+        settingsPage.setSupportLink(siteSupportLink);
+        settingsPage.setDefaultDateDisplay(siteDateDisplay);
+        settingsPage.setDefaultTimeDisplay(siteTimeDisplay);
+        settingsPage.setDefaultDateTimeDisplay(siteDateTimeDisplay);
+        settingsPage.save();
+
+        log("Go to the project settings page and validate that various settings match the site settings.");
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
+        checkSettingPageValues(projectSettingsPage, siteHelpMenuState, siteSupportLink,
+                siteDateDisplay, siteDateTimeDisplay, siteTimeDisplay);
+
+        log("Validate help and report links are missing from the menu in the project.");
+        checkHelpLinks(PROJ_CHANGE, false, false);
+
+        log("Validate format of the data in the list.");
+        checkDataInList(PROJ_CHANGE, DT_LIST_NAME, datesUpdatedFormat);
+
+        log("Validate help and report links are missing from the menu in the root project.");
+        checkHelpLinks(null, false, false);
+
+        log("Change settings in folder/project re-enable help and report options.");
+
+        String supportLink = "${contextPath}/home/support/project-begin.view";
+
+        projectSettingsPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
+        projectSettingsPage.setHelpMenu(true);
+        projectSettingsPage.setSupportLink(supportLink);
+        projectSettingsPage.setDefaultDateDisplay(DEFAULT_DATE_DISPLAY);
+        projectSettingsPage.setDefaultTimeDisplay(DEFAULT_TIME_DISPLAY);
+        projectSettingsPage.setDefaultDateTimeDisplay(DEFAULT_DATE_TIME_DISPLAY);
+        projectSettingsPage.save();
+
+        log("Check 'help' and 'report' links are present in the menu in the project.");
+        checkHelpLinks(PROJ_CHANGE, true, true);
+
+        log(String.format("In '%s' validate format of data is back to site settings.", PROJ_CHANGE));
+        checkDataInList(PROJ_CHANGE, DT_LIST_NAME, datesDefaultFormat);
+
+        log("Check the settings and links in the second project.");
+        projectSettingsPage = ProjectSettingsPage.beginAt(this, PROJ_BASE);
+
+        checkSettingPageValues(projectSettingsPage, siteHelpMenuState, siteSupportLink,
+                siteDateDisplay, siteDateTimeDisplay, siteTimeDisplay);
+
+        log(String.format("In '%s' validate format of data is defined by the settings in the folder.", PROJ_BASE));
+        checkDataInList(PROJ_BASE, DT_LIST_NAME, datesUpdatedFormat);
+
+        checkHelpLinks(PROJ_BASE, false, false);
+
+        resetSiteSettings();
+        resetProjectSettings();
     }
 
     @Test
-    public void testInjection()
+    public void testInjection() throws IOException, CommandException
     {
-        goToProjectHome();
-        goToProjectSettings();
-        setFormElement(Locator.name("defaultDateTimeFormat"), DATE_TIME_FORMAT_INJECTION);
-        clickButtonContainingText("Save");
+        resetSiteSettings();
+        resetProjectSettings();
+
+        var projectSettingPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
+        projectSettingPage.setDefaultDateTimeDisplay(DATE_TIME_FORMAT_INJECTION);
+        projectSettingPage.save();
+
         _listHelper.createList(getProjectName(), "IceCream", ListHelper.ListColumnType.AutoInteger, "IceCreamID",
                 new ListHelper.ListColumn("IceCreamDate", "", ListHelper.ListColumnType.DateAndTime, ""));
         goToProjectHome();
@@ -149,12 +346,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        goToSiteLookAndFeel();
-        checkCheckbox(Locator.checkboxByName("helpMenuEnabled"));
-        clickButtonContainingText("Save");
-
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _containerHelper.deleteProject(getProjectAlteredName(), afterTest);
+        _containerHelper.deleteProject(PROJ_CHANGE, false);
+        _containerHelper.deleteProject(PROJ_BASE, false);
     }
 
     @Override

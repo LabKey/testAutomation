@@ -70,6 +70,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,42 +95,55 @@ public class ListTest extends BaseWebDriverTest
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
     protected final static String LIST_DESCRIPTION = "A list of colors and what they are like";
-    protected final static String FAKE_COL1_NAME = "FakeName";
+    protected final static String FAKE_COL_NAME = "FakeName";
     protected final static String ALIASED_KEY_NAME = "Material";
     protected final static String HIDDEN_TEXT = "CantSeeMe";
 
-    protected final FieldDefinition _listCol1Fake = new FieldDefinition(FAKE_COL1_NAME, ColumnType.String).setDescription("What the color is like");
-    protected final FieldDefinition _listCol1 = new FieldDefinition("Desc", ColumnType.String).setLabel("Description").setDescription("What the color is like");
-    protected final FieldDefinition _listCol2 = new FieldDefinition("Month", ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
-    protected final FieldDefinition _listCol3 = new FieldDefinition("JewelTone", ColumnType.Boolean).setLabel("Jewel Tone").setDescription("Am I a jewel tone?");
-    protected final FieldDefinition _listCol4 = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
-    protected final FieldDefinition _listCol5 = new FieldDefinition("HiddenColumn", ColumnType.String).setLabel(HIDDEN_TEXT).setDescription("I should be hidden!");
-    protected final FieldDefinition _listCol6 = new FieldDefinition("Aliased,Column", ColumnType.String).setLabel("Element").setDescription("I show aliased data.");
+    protected final FieldDefinition _listColFake = new FieldDefinition(FAKE_COL_NAME, ColumnType.String).setDescription("What the color is like");
+    protected final FieldDefinition _listColDesc = new FieldDefinition("Desc", ColumnType.String).setLabel("Description").setDescription("What the color is like");
+
+    protected final FieldDefinition _listColMonth = new FieldDefinition("Month", FieldDefinition.ColumnType.TextChoice)
+        .setTextChoiceValues(List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+        .setLabel("Month to Wear").setDescription("When to wear the color");
+
+
+    protected final FieldDefinition _listColTone = new FieldDefinition("JewelTone", ColumnType.Boolean).setLabel("Jewel Tone").setDescription("Am I a jewel tone?");
+    protected final FieldDefinition _listColGood = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
+    protected final FieldDefinition _listColHidden = new FieldDefinition("HiddenColumn", ColumnType.String).setLabel(HIDDEN_TEXT).setDescription("I should be hidden!");
+    protected final FieldDefinition _listColAliased = new FieldDefinition("Aliased,Column", ColumnType.String).setLabel("Element").setDescription("I show aliased data.");
+
+    private static final int TD_COLOR = 0;
+    private static final int TD_DESC = 1;
+    private static final int TD_TONE = 2;
+    private static final int TD_MONTH = 3;
+    private static final int TD_GOOD = 4;
+    private static final int TD_ALIAS = 5;
+
+    protected final static String[] VALID_MONTHS = { "Jan", "Apr", "Mar", "Feb" };
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
             { "true", "false", "true", "false"},
-            { "1", "4", "3", "2" },
+            VALID_MONTHS,
             { "10", "9", "8", "7"},
             { "Water", "Earth", "Fire", "Air"}};
-    protected final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
-    private final static String LIST_ROW1 = TEST_DATA[0][0] + "\t" + TEST_DATA[1][0] + "\t" + TEST_DATA[2][0] + "\t" + CONVERTED_MONTHS[0];
-    private final static String LIST_ROW2 = TEST_DATA[0][1] + "\t" + TEST_DATA[1][1] + "\t" + TEST_DATA[2][1] + "\t" + CONVERTED_MONTHS[1];
-    private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + TEST_DATA[2][2] + "\t" + CONVERTED_MONTHS[2];
+    private final static String LIST_ROW1 = TEST_DATA[TD_COLOR][0] + "\t" + TEST_DATA[TD_DESC][0] + "\t" + TEST_DATA[TD_TONE][0] + "\t" + VALID_MONTHS[0];
+    private final static String LIST_ROW2 = TEST_DATA[TD_COLOR][1] + "\t" + TEST_DATA[TD_DESC][1] + "\t" + TEST_DATA[TD_TONE][1] + "\t" + VALID_MONTHS[1];
+    private final static String LIST_ROW3 = TEST_DATA[TD_COLOR][2] + "\t" + TEST_DATA[TD_DESC][2] + "\t" + TEST_DATA[TD_TONE][2] + "\t" + VALID_MONTHS[2];
     private final String LIST_DATA =
-            LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" +
+            LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\n" +
             LIST_ROW1 + "\n" +
             LIST_ROW2 + "\n" +
             LIST_ROW3;
     private final String LIST_DATA2 =
-            LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\t" + _listCol4.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listCol5.getName() + "\n" +
-            LIST_ROW1 + "\t" + TEST_DATA[4][0] + "\t" + TEST_DATA[5][0] + "\t" + HIDDEN_TEXT + "\n" +
-            LIST_ROW2 + "\t" + TEST_DATA[4][1] + "\t" + TEST_DATA[5][1] + "\t" + HIDDEN_TEXT + "\n" +
-            LIST_ROW3 + "\t" + TEST_DATA[4][2] + "\t" + TEST_DATA[5][2] + "\t" + HIDDEN_TEXT;
+            LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\t" + _listColGood.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listColHidden.getName() + "\n" +
+            LIST_ROW1 + "\t" + TEST_DATA[TD_GOOD][0] + "\t" + TEST_DATA[TD_ALIAS][0] + "\t" + HIDDEN_TEXT + "\n" +
+            LIST_ROW2 + "\t" + TEST_DATA[TD_GOOD][1] + "\t" + TEST_DATA[TD_ALIAS][1] + "\t" + HIDDEN_TEXT + "\n" +
+            LIST_ROW3 + "\t" + TEST_DATA[TD_GOOD][2] + "\t" + TEST_DATA[TD_ALIAS][2] + "\t" + HIDDEN_TEXT;
     private final static String TEST_FAIL = "testfail";
     private final static String TEST_FAIL2 = "testfail\n2\n";
-    private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
-            LIST_ROW1 + "\t" + "String";
+    private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColMonth.getName() + "\n" +
+            LIST_ROW1;
     private final static String TEST_VIEW = "list_view";
     private final static String LIST2_NAME_CARS = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
     protected final static ListColumnType LIST2_KEY_TYPE = ListColumnType.String;
@@ -243,7 +257,8 @@ public class ListTest extends BaseWebDriverTest
         // Previously it was called from the @BeforeClass method, even though none of the other test cases use this list.
 
         log("Add list -- " + LIST_NAME_COLORS);
-        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1Fake, _listCol2, _listCol3);
+        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listColFake,
+        _listColMonth, _listColTone);
 
         log("Add description and test edit");
         _listHelper.goToEditDesign(LIST_NAME_COLORS)
@@ -261,68 +276,68 @@ public class ListTest extends BaseWebDriverTest
         importDataPage.submitExpectingErrorContaining("Data does not contain required field: Color");
 
         importDataPage.setText(TEST_FAIL3);
-        importDataPage.submitExpectingErrorContaining("Could not convert");
+        importDataPage.submitExpectingErrorContaining(String.format("Value 'true' for field '%s' is invalid.", _listColMonth.getLabel()));
 
         importDataPage.setText(LIST_DATA);
         importDataPage.submit();
 
         log("Check upload worked correctly");
         assertTextPresent(
-                _listCol2.getLabel(),
-                TEST_DATA[0][0],
-                TEST_DATA[1][1],
-                TEST_DATA[3][2]);
+                _listColMonth.getLabel(),
+                TEST_DATA[TD_COLOR][0],
+                TEST_DATA[TD_DESC][1],
+                TEST_DATA[TD_MONTH][2]);
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
-        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][2], table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][0], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][0]), _listColTone.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][1], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][1]), _listColTone.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][2], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][2]), _listColTone.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
-        assertEquals(1, table.getRowIndex(TEST_DATA[0][1]));
+        assertEquals(1, table.getRowIndex(TEST_DATA[TD_COLOR][1]));
         clickAndWait(table.updateLink(1));
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
+        setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
         clickButton("Submit");
         // Third row (Red)
-        assertEquals(2, table.getRowIndex(TEST_DATA[0][2]));
+        assertEquals(2, table.getRowIndex(TEST_DATA[TD_COLOR][2]));
         clickAndWait(table.updateLink(2));
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
+        setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         clickButton("Submit");
 
         table = new DataRegionTable("query", getDriver());
-        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
-        assertEquals("true", table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals("false", table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][0], table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][0]), _listColTone.getLabel()));
+        assertEquals("true", table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][1]), _listColTone.getLabel()));
+        assertEquals("false", table.getDataAsText(table.getRowIndex(TEST_DATA[TD_COLOR][2]), _listColTone.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
         _listHelper.goToList(LIST_NAME_COLORS);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(1)
-            .setName(_listCol1.getName())
-            .setLabel(_listCol1.getLabel());
-        fieldsPanel.addField(_listCol4);
+        fieldsPanel.getField(_listColFake.getName())
+            .setName(_listColDesc.getName())
+            .setLabel(_listColDesc.getLabel());
+        fieldsPanel.addField(_listColGood);
 
         // Create "Hidden Field" and remove from all views.
-        fieldsPanel.addField(_listCol5);
-        fieldsPanel.getField(_listCol5.getName())
+        fieldsPanel.addField(_listColHidden);
+        fieldsPanel.getField(_listColHidden.getName())
             .showFieldOnDefaultView(false)
             .showFieldOnInsertView(false)
             .showFieldOnUpdateView(false)
             .showFieldOnDetailsView(false);
 
-        fieldsPanel.addField(_listCol6);
-        fieldsPanel.getField(_listCol6.getName())
+        fieldsPanel.addField(_listColAliased);
+        fieldsPanel.getField(_listColAliased.getName())
             .setImportAliases(ALIASED_KEY_NAME);
 
         listDefinitionPage.clickSave();
 
         log("Check new field was added correctly");
-        assertTextPresent(_listCol4.getName());
+        assertTextPresent(_listColGood.getName());
 
         log("Set title field of 'Colors' to 'Desc'");
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
@@ -330,9 +345,9 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         assertTextPresent(
-                TEST_DATA[0][0],
-                TEST_DATA[1][1],
-                TEST_DATA[3][2]);
+                TEST_DATA[TD_COLOR][0],
+                TEST_DATA[TD_DESC][1],
+                TEST_DATA[TD_MONTH][2]);
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
 
@@ -340,15 +355,15 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that data was added correctly");
         assertTextPresent(
-                TEST_DATA[0][0],
-                TEST_DATA[1][1],
-                TEST_DATA[3][2],
-                TEST_DATA[4][0],
-                TEST_DATA[4][1],
-                TEST_DATA[4][2],
-                TEST_DATA[5][0],
-                TEST_DATA[5][1],
-                TEST_DATA[5][2]);
+                TEST_DATA[TD_COLOR][0],
+                TEST_DATA[TD_DESC][1],
+                TEST_DATA[TD_MONTH][2],
+                TEST_DATA[TD_GOOD][0],
+                TEST_DATA[TD_GOOD][1],
+                TEST_DATA[TD_GOOD][2],
+                TEST_DATA[TD_ALIAS][0],
+                TEST_DATA[TD_ALIAS][1],
+                TEST_DATA[TD_ALIAS][2]);
 
         log("Check that hidden column is hidden.");
         DataRegionTable regionTable = new DataRegionTable("query", getDriver());
@@ -363,35 +378,30 @@ public class ListTest extends BaseWebDriverTest
         regionTable.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         String html = getHtmlSource();
-        assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
-        assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
-        setFormElement(Locator.name("quf_" + _listCol1.getName()), TEST_DATA[1][3]);
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), "wrong type");
+        assertTrue("Description \"" + _listColDesc.getDescription() + "\" not present.", html.contains(_listColDesc.getDescription()));
+        assertTrue("Description \"" + _listColTone.getDescription() + "\" not present.", html.contains(_listColTone.getDescription()));
+        setFormElement(Locator.name("quf_" + _listColDesc.getName()), TEST_DATA[TD_DESC][3]);
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
-        setFormElement(Locator.name("quf_" + _listCol4.getName()), TEST_DATA[4][3]);
+        setFormElement(Locator.name("quf_" + _listColGood.getName()), TEST_DATA[TD_GOOD][3]);
         clickButton("Submit");
         assertTextPresent("This field is required");
-        setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[0][3]);
-        clickButton("Submit");
-        assertTextPresent("Could not convert");
-        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[3]);
+        setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[TD_COLOR][3]);
         clickButton("Submit");
 
         log("Check new row was added");
         assertTextPresent(
-                TEST_DATA[0][3],
-                TEST_DATA[1][3],
-                TEST_DATA[2][3],
-                TEST_DATA[3][3]);
+                TEST_DATA[TD_COLOR][3],
+                TEST_DATA[TD_DESC][3],
+                TEST_DATA[TD_TONE][3]);
         table = new DataRegionTable("query", getDriver());
-        assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
-        assertEquals(3, table.getRowIndex(TEST_DATA[0][3]));
-        assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
+        assertEquals(TEST_DATA[TD_TONE][2], table.getDataAsText(2, _listColTone.getLabel()));
+        assertEquals(3, table.getRowIndex(TEST_DATA[TD_COLOR][3]));
+        assertEquals(TEST_DATA[TD_TONE][3], table.getDataAsText(3, _listColTone.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnDefaultView(true);
         listDefinitionPage.clickSave();
 
@@ -400,19 +410,19 @@ public class ListTest extends BaseWebDriverTest
         table = new DataRegionTable("query", getDriver());
         clickAndWait(table.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
-        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        assertTextBefore(_listColMonth.getLabel(), _listColTone.getLabel());
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
-        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        assertTextBefore(_listColMonth.getLabel(), _listColTone.getLabel());
         clickButton("Cancel");
         table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
-        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        assertTextBefore(_listColMonth.getLabel(), _listColTone.getLabel());
         clickButton("Cancel");
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnDefaultView(false)
             .showFieldOnInsertView(true);
         listDefinitionPage.clickSave();
@@ -430,7 +440,7 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnInsertView(false)
             .showFieldOnUpdateView(true);
         listDefinitionPage.clickSave();
@@ -448,7 +458,7 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME_COLORS);
         fieldsPanel = listDefinitionPage.getFieldsPanel();
-        fieldsPanel.getField(5) // Select Hidden field.
+        fieldsPanel.getField(_listColHidden.getName()) // Select Hidden field.
             .showFieldOnUpdateView(false)
             .showFieldOnDetailsView(true);
         listDefinitionPage.clickSave();
@@ -476,36 +486,46 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test Sort and Filter in Data View");
         DataRegionTable region = new DataRegionTable("query", getDriver());
-        region.setSort(_listCol1.getName(), SortDirection.ASC);
-        assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
+        region.setSort(_listColDesc.getName(), SortDirection.ASC);
+        assertTextBefore(TEST_DATA[TD_COLOR][0], TEST_DATA[TD_COLOR][1]);
 
         clearSortTest();
 
-        region.setFilter(_listCol4.getName(), "Is Greater Than", "7");
-        assertTextNotPresent(TEST_DATA[0][3]);
+        region.setFilter(_listColGood.getName(), "Is Greater Than", "7");
+        assertTextNotPresent(TEST_DATA[TD_COLOR][3]);
 
         log("Test Customize View");
         // Re-navigate to the list to clear filters and sorts
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeColumn(_listCol4.getName());
-        _customizeViewsHelper.addFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(_listCol2.getName(), _listCol2.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.removeColumn(_listColGood.getName());
+        _customizeViewsHelper.addFilter(_listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_listColMonth.getName(), _listColMonth.getLabel(), SortDirection.ASC);
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check Customize View worked");
-        assertTextPresent(TEST_DATA[0][3]);
-        assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(TEST_DATA[0][0], _listCol4.getLabel());
+        assertTextPresent(TEST_DATA[TD_COLOR][3]);
+
+        // Sorting is different between MSSQL and postgres if one of the values is empty / blank.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][3], TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2]);
+        }
+        else
+        {
+            assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        }
+
+        assertTextNotPresent(TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeColumn(LIST_KEY_NAME2);
-        _customizeViewsHelper.removeColumn(_listCol1.getName());
-        _customizeViewsHelper.removeColumn(_listCol2.getName());
-        _customizeViewsHelper.removeColumn(_listCol3.getName());
-        _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
+        _customizeViewsHelper.removeColumn(_listColDesc.getName());
+        _customizeViewsHelper.removeColumn(_listColMonth.getName());
+        _customizeViewsHelper.removeColumn(_listColTone.getName());
+        _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listColAliased.getName()));
         _customizeViewsHelper.clickViewGrid();
         assertExt4MsgBox("You must select at least one field to display in the grid.", "OK");
         _customizeViewsHelper.closePanel();
@@ -515,8 +535,16 @@ public class ListTest extends BaseWebDriverTest
         File tableFile = new DataRegionExportHelper(new DataRegionTable("query", getDriver())).exportText();
         TextSearcher tsvSearcher = new TextSearcher(tableFile);
 
-        assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(tsvSearcher, TEST_DATA[0][0], _listCol4.getLabel());
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][3], TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2]);
+        }
+        else
+        {
+            assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
+        }
+
+        assertTextNotPresent(tsvSearcher, TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
         filterTest();
 
         clickProject(getProjectName());
@@ -524,31 +552,31 @@ public class ListTest extends BaseWebDriverTest
         log("Test that sort only affects one web part");
         DataRegionTable firstList = DataRegionTable.DataRegion(getDriver()).find();
         DataRegionTable secondList = DataRegionTable.DataRegion(getDriver()).index(1).find();
-        firstList.setSort(_listCol4.getName(), SortDirection.ASC);
-        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[4]));
-        List<String> firstListColumn = secondList.getColumnDataAsText(_listCol4.getName());
+        firstList.setSort(_listColGood.getName(), SortDirection.ASC);
+        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[TD_GOOD]));
+        List<String> firstListColumn = secondList.getColumnDataAsText(_listColGood.getName());
         assertEquals("Second query webpart shouldn't have been sorted", expectedColumn, firstListColumn);
         expectedColumn.sort(Comparator.comparingInt(Integer::parseInt)); // Parse to check sorting of 10 vs 7, 8, 9
-        List<String> secondListColumn = firstList.getColumnDataAsText(_listCol4.getName());
+        List<String> secondListColumn = firstList.getColumnDataAsText(_listColGood.getName());
         assertEquals("First query webpart should have been sorted", expectedColumn, secondListColumn);
 
         log("Test list history");
         clickAndWait(Locator.linkWithText("manage lists"));
         clickAndWait(Locator.linkWithText("view history"));
-        assertTextPresent(":History");
-        assertTextPresent("record was modified", 2);    // An existing list record was modified
-        assertTextPresent("were modified", 6);          // The column(s) of domain ></% 1äöüColors were modified
-        assertTextPresent("Bulk inserted", 2);
-        assertTextPresent("A new list record was inserted", 1);
-        assertTextPresent("was created", 2);                // Once for the list, once for the domain
+        checker().wrapAssertion(()->assertTextPresent(":History"));
+        checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
+        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of domain ></% 1äöüColors were modified
+        checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
+        checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
+        checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
-        assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size());
-        assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size());
-        assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size());
+        checker().wrapAssertion(()->assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
-        assertTextPresent("List Item Details");
-        assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event");
+        checker().wrapAssertion(()->assertTextPresent("List Item Details"));
+        checker().wrapAssertion(()->assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event"));
 
         clickButton("Done");
         clickAndWait(Locator.linkWithText(PROJECT_VERIFY).index(3));
@@ -589,21 +617,21 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol1.getName(), _list2Col1.getLabel() + " " + _listCol1.getLabel());
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol2.getName(), _list2Col1.getLabel() + " " + _listCol2.getLabel());
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
-        _customizeViewsHelper.addFilter(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColDesc.getName(), _list2Col1.getLabel() + " " + _listColDesc.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColMonth.getName(), _list2Col1.getLabel() + " " + _listColMonth.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColGood.getName(), _list2Col1.getLabel() + " " + _listColGood.getLabel());
+        _customizeViewsHelper.addFilter(_list2Col1.getName() + "/" + _listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_list2Col1.getName() + "/" + _listColGood.getName(), _listColGood.getLabel(), SortDirection.ASC);
         _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
         _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
-        waitForText(WAIT_FOR_JAVASCRIPT, _listCol1.getLabel());
+        waitForText(WAIT_FOR_JAVASCRIPT, _listColDesc.getLabel());
         assertTextPresent(
-                _listCol1.getLabel(),
-                _listCol2.getLabel(),
-                _listCol4.getLabel(),
+                _listColDesc.getLabel(),
+                _listColMonth.getLabel(),
+                _listColGood.getLabel(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(LIST2_KEY);
@@ -617,9 +645,9 @@ public class ListTest extends BaseWebDriverTest
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
         TextSearcher srch = new TextSearcher(expFile);
-        assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listCol1.getName(),
-                LIST_KEY_NAME2 + '/' + _listCol2.getName(),
-                LIST_KEY_NAME2 + '/' + _listCol4.getName(),
+        assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listColDesc.getName(),
+                LIST_KEY_NAME2 + '/' + _listColMonth.getName(),
+                LIST_KEY_NAME2 + '/' + _listColGood.getName(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
@@ -627,12 +655,12 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test edit row");
         list.updateRow(LIST2_KEY3, Maps.of(
-                "Color", TEST_DATA[1][1],
+                "Color", TEST_DATA[TD_DESC][1],
                 "Owner", LIST2_FOREIGN_KEY_OUTSIDE));
 
         final DataRegionTable dt = DataRegion(getDriver()).withName("query").find();
         dt.goToView("Default");
-        assertTextPresent(TEST_DATA[1][1], 2);
+        assertTextPresent(TEST_DATA[TD_DESC][1], 2);
 
         log("Test deleting rows");
         dataRegionTable.checkAll();
@@ -647,7 +675,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        _listHelper.deleteList("Custom view '" + TEST_VIEW + "'");
+        _listHelper.deleteList();
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
@@ -662,7 +690,7 @@ public class ListTest extends BaseWebDriverTest
         String exportUrl = "/" + EscapeUtil.encode(PROJECT_VERIFY) + "/query-exportRowsTsv.view?schemaName=lists&query.queryName=" + EscapeUtil.encode(LIST_NAME_COLORS);
         beginAt(exportUrl);
         assertEquals("Incorrect response code", 404, getResponseCode());
-        assertTextPresent("The specified query does not exist in schema 'lists'");
+        assertTextPresent("The specified query '%s' does not exist in schema '%s'".formatted(LIST_NAME_COLORS, "lists"));
 
         clickButton("Back");
         // after the 13.2 audit log migration, we are no longer going to co-mingle domain and list events in the same table
@@ -703,10 +731,10 @@ public class ListTest extends BaseWebDriverTest
         createList(mergeListName, BatchListColumns, BatchListData);
         _listHelper.beginAtList(PROJECT_VERIFY, mergeListName);
 
-        _listHelper.clickImportData();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", _listHelper.isMergeOptionPresent());
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for copy/paste", importDataPage.isPasteMergeOptionPresent());
         _listHelper.chooseFileUpload();
-        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", _listHelper.isMergeOptionPresent());
+        checker().verifyTrue("For list with an integer, non-auto-increment key, merge option should be available for file upload", importDataPage.isFileMergeOptionPresent());
         _listHelper.chooseCopyPasteText();
 
         log("Try to upload the same data without choosing to merge.  Errors are expected.");
@@ -718,14 +746,14 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Upload the same data using the merge operation. No errors should result.");
-        _listHelper.clickImportData();
-        _listHelper.chooseMerge(false);
+        importDataPage = _listHelper.clickImportData();
+        importDataPage.setCopyPasteMerge(true);
         setListImportAsTestDataField(toTSV(BatchListColumns, BatchListData));
         _listHelper.verifyListData(BatchListColumns, BatchListData, checker());
 
         log("Now upload some new data and modify existing data");
-        _listHelper.clickImportData();
-        _listHelper.chooseMerge(false);
+        importDataPage = _listHelper.clickImportData();
+        importDataPage.setCopyPasteMerge(true);
         setListImportAsTestDataField(toTSV(BatchListMergeColumns, BatchListMergeData));
         _listHelper.verifyListData(BatchListColumns, BatchListAfterMergeData, checker());
     }
@@ -737,8 +765,8 @@ public class ListTest extends BaseWebDriverTest
 
         _listHelper.createList(PROJECT_VERIFY, mergeListName, ListColumnType.AutoInteger, "Key", col("Name", ColumnType.String));
 
-        _listHelper.clickImportData();
-        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", _listHelper.isMergeOptionPresent());
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        checker().verifyFalse("For list with an integer, auto-increment key, merge option should not be available", importDataPage.isPasteMergeOptionPresent());
     }
 
     @Test
@@ -917,19 +945,19 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test that the right filters are present for each type");
         DataRegionTable region = new DataRegionTable("qwp3", getDriver());
-        region.openFilterDialog(_listCol4.getName());
+        region.openFilterDialog(_listColGood.getName());
         _extHelper.clickExtTab("Choose Filters");
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 
         assertElementNotPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
         assertElementPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
-        _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "Cancel", 0);
+        _extHelper.clickExtButton("Show Rows Where " + _listColGood.getLabel(), "Cancel", 0);
 
         log("Test that filters don't affect multiple web parts");
-        assertTextPresent(TEST_DATA[1][0], 2);
-        region.setFilter(_listCol4.getName(), "Is Less Than", "10");
-        assertTextPresent(TEST_DATA[1][0], 1);
+        assertTextPresent(TEST_DATA[TD_DESC][0], 2);
+        region.setFilter(_listColGood.getName(), "Is Less Than", "10");
+        assertTextPresent(TEST_DATA[TD_DESC][0], 1);
 
         clickAndWait(Locator.linkContainingText(LIST_NAME_COLORS));
     }
@@ -937,7 +965,7 @@ public class ListTest extends BaseWebDriverTest
     /*  Issue 11825: Create test for "Clear Sort"
         Issue 15567: Can't sort DataRegion by column name that has comma
 
-        sort by a parameter, than clear sort.
+        sort by a parameter, then clear sort.
         Verify that reverts to original sort and the dropdown menu disappears
 
         preconditions:  table already sorted by description
@@ -946,19 +974,19 @@ public class ListTest extends BaseWebDriverTest
     private void clearSortTest()
     {
         //make sure elements are ordered the way they should be
-        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_ALIAS][0], TEST_DATA[TD_ALIAS][1],TEST_DATA[TD_ALIAS][2]);
 
-        String encodedName = EscapeUtil.fieldKeyEncodePart(_listCol6.getName());
+        String encodedName = EscapeUtil.fieldKeyEncodePart(_listColAliased.getName());
 
         DataRegionTable query = new DataRegionTable("query", getDriver());
 
         //sort  by element and verify it worked
         query.setSort(encodedName, SortDirection.DESC);
-        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][2], TEST_DATA[5][1]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_ALIAS][0], TEST_DATA[TD_ALIAS][2], TEST_DATA[TD_ALIAS][1]);
 
         //remove sort and verify we return to initial state
         query.clearSort(encodedName);
-        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
+        assertTextPresentInThisOrder(TEST_DATA[TD_ALIAS][0], TEST_DATA[TD_ALIAS][1],TEST_DATA[TD_ALIAS][2]);
     }
 
     @Test
@@ -1232,7 +1260,7 @@ public class ListTest extends BaseWebDriverTest
                 .openAdvancedListSettings()
                 .indexEntireListAsASingleDocument(true, "",
                         AdvancedListSettingsDialog.SearchIncludeOptions.MetadataAndData,
-                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText)
+                        AdvancedListSettingsDialog.SearchIndexOptions.NonPhiText, null)
                 .setIndexFileAttachments(true)
                 .clickApply()
                 .clickSave();
@@ -1248,6 +1276,30 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
         new PortalHelper(this).addWebPart("Search");
         searchFor(getProjectName(), "hypertrophimadeupword", 1, null);
+    }
+
+    @Test
+    public void testAttachmentFieldWithSpace()
+    {
+        final String listName = "Attachment Field with Space List";
+        final String attachmentFileName = "searchData.tsv";
+        final String path = TestFileUtils.getSampleData("lists/" + attachmentFileName).getAbsolutePath();
+        final String attachmentCol = "Attachment Field With Space";
+
+        Map<String, String> row = new HashMap<>();
+        row.put(attachmentCol, path);
+
+        goToProjectHome();
+
+        log("create list with an attachment column '" + attachmentCol + "'");
+        _listHelper.createList(getProjectName(), listName, ListColumnType.AutoInteger, "id",
+                col(attachmentCol, ColumnType.Attachment));
+
+        log("Insert data, upload attachment for col '" + attachmentCol + "'");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.insertNewRow(row, false);
+        assertTextPresent(attachmentFileName);
     }
 
     @Test
@@ -1287,6 +1339,67 @@ public class ListTest extends BaseWebDriverTest
             .clickRemoveField(true);
         listDefinitionPage.clickSave();
         AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        String listName = "Unique Constraint List";
+        String fieldName1 = "field Name1";
+        String fieldName2 = "fieldName_2";
+        String fieldName3 = "FieldName@3";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
+                new FieldDefinition(fieldName1, ColumnType.Integer),
+                new FieldDefinition(fieldName2, ColumnType.DateAndTime),
+                new FieldDefinition(fieldName3, ColumnType.Boolean)
+        );
+
+        // verify initial set of indices
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", Collections.emptyList());
+
+        // set two fields to have unique constraints
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName1).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.clickSave();
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
+        assertTextNotPresent("unique_constraint_list_fieldname_3");
+
+        // remove a field unique constraint and add a new one
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldName3).expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        listDefinitionPage.clickSave();
+        viewRawTableMetadata(listName);
+        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_list_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String listName)
+    {
+        goToSchemaBrowser();
+        selectQuery("lists", listName);
+        waitAndClickAndWait(Locator.linkWithText("view raw table metadata"));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("pk");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     //
@@ -1483,7 +1596,7 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
+            assertTrue(getCurrentRelativeURL(false).contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
     }

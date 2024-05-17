@@ -3,12 +3,14 @@ package org.labkey.test.pages.assay;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.react.Tabs;
 import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -33,19 +35,22 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
     @Override
     protected void waitForPage()
     {
-        waitFor(() -> elementCache().stdAssayTabLocator().existsIn(getDriver()) &&
-                elementCache().specialtyAssayTabLocator().existsIn(getDriver()), WAIT_FOR_PAGE);
+        waitFor(() -> {
+                    try
+                    {
+                        return elementCache().assayTypeTabs.getTabText().size() > 1;
+                    }
+                    catch (NoSuchElementException retry)
+                    {
+                        return false;
+                    }
+                }, WAIT_FOR_PAGE);
     }
 
 
     public ReactAssayDesignerPage selectStandardAssay()
     {
-        elementCache().stdAssayTab.click();
-
-        WebElement standardPanel = elementCache().stdAssayPaneLocator().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        waitFor(()-> standardPanel.getAttribute("class") != null &&
-                standardPanel.getAttribute("class").contains("active"),
-                "took too long to select the standard assay panel", 2000);
+        elementCache().assayTypeTabs.selectTab("Standard Assay");
 
         clickSelectButton();
         return new ReactAssayDesignerPage(getDriver());
@@ -57,14 +62,11 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
             return selectStandardAssay();
         }
 
-        elementCache().specialtyAssayTab.click();
-        WebElement specialtyPanel = elementCache().specialtyAssayPaneLocator().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        waitFor(()-> specialtyPanel.getAttribute("class") != null &&
-                        specialtyPanel.getAttribute("class").contains("active"),
-                "took too long to select the specialty assay panel", 2000);
+        WebElement activeTab = elementCache().assayTypeTabs.selectTab("Specialty Assays");
 
-        waitForElementToBeVisible(elementCache().specialtySelectLocator);
-        selectOptionByText(elementCache().specialtySelect, name);
+        WebElement specialtySelect = Locator.id("specialty-assay-type-select").findWhenNeeded(activeTab);
+        shortWait().until(ExpectedConditions.visibilityOf(specialtySelect));
+        selectOptionByText(specialtySelect, name);
 
         waitFor(()->
            elementCache().selectButton.getText().toLowerCase().contains(name.toLowerCase()),
@@ -74,9 +76,16 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         return new ReactAssayDesignerPage(getDriver());
     }
 
+    public ChooseAssayTypePage selectAssayLocation(String value)
+    {
+        elementCache().assayTypeTabs.selectTab("Standard Assay");
+        selectOptionByText(elementCache().containerSelect, value);
+        return this;
+    }
+
     public ChooseAssayTypePage goToImportAssayDesignTab()
     {
-        elementCache().importAssayTab.click();
+        elementCache().assayTypeTabs.selectTab("Import Assay Design");
         return this;
     }
 
@@ -99,42 +108,16 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         public final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(getDriver());
         // selectButton's text changes depending upon which assay is selected- it can be 'Choose Standard Assay' or 'Choose x Assay'
         public final WebElement selectButton = Locator.tagWithClass("button", "pull-right").findWhenNeeded(getDriver());
 
-        public final WebElement specialtyPanel = Locator.tagWithId("div", "assay-picker-tabs-pane-specialty").findWhenNeeded(this);
-
-        public final WebElement stdAssayTab = stdAssayTabLocator().findWhenNeeded(this);
-        public final WebElement specialtyAssayTab = specialtyAssayTabLocator().findWhenNeeded(this);
-        public final WebElement importAssayTab = Locator.tagContainingText("a", "Import Assay Design").findWhenNeeded(this);
+        public final Tabs assayTypeTabs = new Tabs.TabsFinder(getDriver())
+                .locatedBy(Locator.XPathLocator.union(Locator.id("assay-picker-tabs"), Locator.byClass("lk-tabs")))
+                .findWhenNeeded(this);
 
         public final WebElement containerSelect = Locator.tagWithId("select", "assay-type-select-container").findWhenNeeded(this);
-
-        public final Locator specialtySelectLocator = Locator.tagWithId("select", "specialty-assay-type-select");
-        public final WebElement specialtySelect = specialtySelectLocator.findWhenNeeded(specialtyPanel);
-
-        protected Locator.XPathLocator buttonPanelLocator()
-        {
-            return Locator.byClass("assay-designer-section");
-        }
-        public Locator.XPathLocator stdAssayTabLocator()
-        {
-            return Locator.id("assay-picker-tabs-tab-standard");
-        }
-        public Locator.XPathLocator stdAssayPaneLocator()
-        {
-            return Locator.id("assay-picker-tabs-pane-standard");
-        }
-        public Locator.XPathLocator specialtyAssayTabLocator()
-        {
-            return Locator.id("assay-picker-tabs-tab-specialty");
-        }
-        public Locator.XPathLocator specialtyAssayPaneLocator()
-        {
-            return Locator.id("assay-picker-tabs-pane-specialty");
-        }
     }
 }

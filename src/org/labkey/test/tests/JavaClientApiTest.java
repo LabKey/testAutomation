@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -23,9 +25,10 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainDetailsResponse;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
-import org.labkey.remoteapi.domain.GetDomainCommand;
+import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -54,6 +57,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
@@ -75,7 +79,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -83,15 +86,16 @@ import static org.junit.Assert.fail;
 /**
  * Test for the Java Client API library. This test is written in
  * Selenium because we don't yet have a way to create a list via
- * the API, so this test will setup a list and then use the Java
+ * the API, so this test will set up a list and then use the Java
  * client API library to insert, read, update, and delete from that list
  */
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class JavaClientApiTest extends BaseWebDriverTest
 {
-    public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
-    public static final String LIST_NAME = "People";
+    public static final String PROJECT_NAME = JavaClientApiTest.class.getSimpleName() + " Project " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    public static final String LIST_NAME = "People" + FieldDefinition.TRICKY_CHARACTERS;
+    public static final String LAST_NAME = "LastName" + FieldDefinition.TRICKY_CHARACTERS;
     public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String USER2_NAME = "user2@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
@@ -121,7 +125,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Domain domain = createCmd.getDomainDesign();
         domain.setFields(List.of(
                 new PropertyDescriptor("FirstName", "First Name", "string"),
-                new PropertyDescriptor("LastName", "Last Name", "string"),
+                new PropertyDescriptor(LAST_NAME, "Last Name " + FieldDefinition.TRICKY_CHARACTERS, "string"),
                 new PropertyDescriptor("Birthdate", "Birthdate", "dateTime"),
                 new PropertyDescriptor("GooAmount", "Goo Amount", "double").setDescription("Amount of Goo"),
                 new PropertyDescriptor("Crazy", "Crazy", "boolean").setDescription("Crazy?"),
@@ -188,7 +192,6 @@ public class JavaClientApiTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));
         doCRUDtTest();
-        doCommandFromResponseTest();
         doExtendedFormatTest();
 
         // NOTE: This test deletes all rows in the table so it should be done last.
@@ -208,7 +211,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         InsertRowsCommand insertCmd = new InsertRowsCommand("lists", LIST_NAME);
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("FirstName", "first to be inserted");
-        rowMap.put("LastName", "last to be inserted");
+        rowMap.put(LAST_NAME, "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS);
         rowMap.put("Birthdate", now);
         rowMap.put("GooAmount", 4.2);
         rowMap.put("Crazy", true);
@@ -227,7 +230,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals("Wrong number of rows returned", 1, selResp.getRowCount().intValue());
         Map<String, Object> responseRow = selResp.getRows().get(0);
         assertEquals("Wrong FirstName in response", "first to be inserted", responseRow.get("FirstName"));
-        assertEquals("Wrong LastName in response", "last to be inserted", responseRow.get("LastName"));
+        assertEquals("Wrong LastName in response", "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS, responseRow.get(LAST_NAME));
         assertEquals("Wrong type for Birthdate in response", Date.class, responseRow.get("Birthdate").getClass());
         assertEquals("Wrong GooAmount in response", 4.2, (Double)responseRow.get("GooAmount"), 0.001);
         assertEquals("Wrong type for 'Crazy' in response", Boolean.class, responseRow.get("Crazy").getClass());
@@ -235,14 +238,15 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         //refresh the list in the browser and make sure it appears there too
         refresh();
-        assertTextPresent("first to be inserted", "last to be inserted");
+        assertTextPresent("first to be inserted", "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS);
 
         //update the record
         log("Updating the record...");
         UpdateRowsCommand updateCmd = new UpdateRowsCommand("lists", LIST_NAME);
         rowMap = new HashMap<>();
         rowMap.put("Key", key);
-        rowMap.put("firstname", "UPDATED first name"); //testing for case-insensitivity
+        rowMap.put("firstname", "UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS); //testing for case-insensitivity
+        rowMap.put(LAST_NAME, "UPDATED last name"); // Issue 49959: UpdateRowsAction can't handle fields with quotes in their name
         rowMap.put("gooamount", 5.5);
         updateCmd.addRow(rowMap);
         saveResp = updateCmd.execute(cn, PROJECT_NAME);
@@ -252,12 +256,13 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selectCmd.addFilter("Key", key, Filter.Operator.EQUAL);
         selResp = selectCmd.execute(cn, PROJECT_NAME);
         responseRow = selResp.getRows().get(0);
-        assertEquals("UPDATED first name", responseRow.get("FirstName"));
+        assertEquals("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS, responseRow.get("FirstName"));
+        assertEquals("UPDATED last name", responseRow.get(LAST_NAME));
         assertEquals(5.5, (Double)responseRow.get("GooAmount"), 0.001);
 
         //verify that it's updated in the browser as well
         refresh();
-        assertTextPresent("UPDATED first name");
+        assertTextPresent("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS, "UPDATED last name");
 
         //delete the record
         log("Deleting the record...");
@@ -288,38 +293,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         TruncateTableCommand truncCmd = new TruncateTableCommand("lists", LIST_NAME);
         TruncateTableResponse resp = truncCmd.execute(cn, PROJECT_NAME);
 
-        assertEquals(2L, resp.getDeletedRowCount());
+        assertEquals((Integer)3, resp.getDeletedRowCount());
 
         log("Completed TruncateTable test...");
-    }
-
-    protected void doCommandFromResponseTest() throws Exception
-    {
-        log("Testing the copy command to response functionality...");
-        SelectRowsCommand selCmd = new SelectRowsCommand("lists", LIST_NAME);
-        selCmd.setRequiredVersion(9.1);
-        selCmd.setMaxRows(2);
-        selCmd.addFilter(new Filter("FirstName", "Fred", Filter.Operator.STARTS_WITH));
-
-        Connection cn = new Connection(WebTestHelper.getBaseURL());
-        SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
-
-        //verify that the command we get back from the response object is a copy
-        //yet has the same settings
-        SelectRowsCommand cmdFromResp = (SelectRowsCommand) resp.getSourceCommand();
-        assertNotSame(selCmd, cmdFromResp);
-        assertEquals(2, cmdFromResp.getMaxRows());
-        assertEquals(9.1, cmdFromResp.getRequiredVersion(), 0.001);
-        assertNotNull(cmdFromResp.getFilters());
-        assertEquals(1, cmdFromResp.getFilters().size());
-
-        Filter filter = cmdFromResp.getFilters().get(0);
-        assertNotSame(selCmd.getFilters().get(0), filter);
-        assertEquals("FirstName", filter.getColumnName());
-        assertEquals("Fred", filter.getValue());
-        assertEquals(Filter.Operator.STARTS_WITH, filter.getOperator());
-
-        log("Completed testing the copy command to response functionality.");
     }
 
     protected void doExtendedFormatTest() throws Exception
@@ -329,29 +305,53 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         InsertRowsCommand insCmd = new InsertRowsCommand("lists", LIST_NAME);
 
-        Map<String,Object> row = new HashMap<>();
-        row.put("FirstName", "Barney");
-        row.put("LastName", "Rubble");
-        insCmd.addRow(row);
-
-        row.put("FirstName", "Fred");
-        row.put("LastName", "Flintstone");
-        insCmd.addRow(row);
+        insCmd.addRow(Map.of(
+                "FirstName", "Barney",
+                LAST_NAME, "Rubble"));
+        insCmd.addRow(Map.of(
+                "FirstName", "Fred",
+                LAST_NAME, "Flintstone"));
+        insCmd.addRow(Map.of(
+                "FirstName", "Betty",
+                LAST_NAME, "Rabble"));
 
         insCmd.execute(cn, PROJECT_NAME);
         
         SelectRowsCommand selCmd = new SelectRowsCommand("lists", LIST_NAME);
         selCmd.setRequiredVersion(9.1);
-        selCmd.addSort("LastName", Sort.Direction.ASCENDING);
         SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
 
         assertNotNull("null rows array", resp.getRows());
         assertNotEquals("empty rows array", 0, resp.getRows().size());
-        assertTrue("FirstName column value was not a map: " + resp.getRows().get(0).get("FirstName").getClass().getName(), resp.getRows().get(0).get("FirstName") instanceof Map);
+        Assertions.assertThat(resp.getRows().get(0).get("FirstName")).as("FirstName column").isInstanceOf(Map.class);
         Map<?, ?> firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
-        assertEquals("FirstName.value is incorrect", "Fred", firstNameField.get("value"));
+        assertEquals("FirstName.value is incorrect", "Barney", firstNameField.get("value"));
 
         log("Completed test of the new extended select results format.");
+
+        // Issue 49960: Java API Sort/Colum/Filter do not handle special characters
+        selCmd.setFilters(List.of(new Filter(LAST_NAME, "R", Filter.Operator.STARTS_WITH)));
+        selCmd.setSorts(List.of(new Sort(LAST_NAME, Sort.Direction.ASCENDING)));
+        selCmd.setColumns(List.of("FirstName", LAST_NAME));
+        resp = selCmd.execute(cn, PROJECT_NAME);
+        firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        assertEquals("Known issue. Sort with tricky characters is ignored", "Barney" /*"Betty"*/, firstNameField.get("value"));
+        assertEquals("Known issue. Filter with tricky characters is ignored", 3 /*2*/, resp.getRowCount());
+        assertEquals("Known issue. Column list with tricky characters is ignored",
+                List.of("FirstName") /*List.of("FirstName", LAST_NAME)*/,
+                resp.getColumnModel().stream().map(m -> m.get("dataIndex")).toList());
+
+        // Column references work if you use our special escape characters like org.labkey.api.query.QueryKey
+        selCmd.setFilters(List.of(new Filter(encodeColumnName(LAST_NAME), "R", Filter.Operator.STARTS_WITH)));
+        selCmd.setSorts(List.of(new Sort(encodeColumnName(LAST_NAME), Sort.Direction.ASCENDING)));
+        selCmd.setColumns(List.of("FirstName", encodeColumnName(LAST_NAME)));
+        resp = selCmd.execute(cn, PROJECT_NAME);
+        firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        assertEquals("Known issue. Sort with tricky characters is ignored", "Betty", firstNameField.get("value"));
+        assertEquals("Filter with tricky characters", 2, resp.getRowCount());
+        assertEquals("Known issue. Column list with tricky characters is ignored",
+                List.of("FirstName", LAST_NAME),
+                resp.getColumnModel().stream().map(m -> m.get("dataIndex")).toList());
 
         //also test maxrows = 0
         log("Testing maxrows=0...");
@@ -388,9 +388,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Set<String> expected = new HashSet<>(Arrays.asList("key", "foo", "bar", "baz"));
         verifyDomain(response.getDomain(), expected);
 
-        GetDomainCommand getCmd = new GetDomainCommand("lists", LIST_NAME);
-        response = getCmd.execute(cn, PROJECT_NAME);
-        verifyDomain(response.getDomain(), expected);
+        GetDomainDetailsCommand getCmd = new GetDomainDetailsCommand("lists", LIST_NAME);
+        DomainDetailsResponse detailsResponse = getCmd.execute(cn, PROJECT_NAME);
+        verifyDomain(detailsResponse.getDomain(), expected);
 
         log("modify the existing domain");
         SaveDomainCommand saveCmd = new SaveDomainCommand("lists", LIST_NAME);
@@ -599,7 +599,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals(USER2_NAME, who.getEmail());
         assertTrue(who.isImpersonated());
 
-        cn.stopImpersonate();
+        cn.stopImpersonating();
     }
 
     @Override
@@ -620,5 +620,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
+    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
+    private static String encodeColumnName(String columnName)
+    {
+        return StringUtils.replaceEach(columnName, ILLEGAL, REPLACEMENT);
     }
 }

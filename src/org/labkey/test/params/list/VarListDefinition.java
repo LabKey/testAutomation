@@ -1,7 +1,7 @@
 package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.params.FieldDefinition;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class VarListDefinition extends ListDefinition
     }
 
     @Override
-    public ListDefinition addField(@NotNull FieldDefinition field)
+    public ListDefinition addField(@NotNull PropertyDescriptor field)
     {
         if (getKeyName() == null)
         {
@@ -26,7 +26,7 @@ public class VarListDefinition extends ListDefinition
     }
 
     @Override
-    public ListDefinition setFields(List<FieldDefinition> fields)
+    public ListDefinition setFields(List<? extends PropertyDescriptor> fields)
     {
         if (!fields.isEmpty() && getKeyName() == null)
         {

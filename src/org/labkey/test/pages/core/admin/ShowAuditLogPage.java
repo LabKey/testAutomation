@@ -20,13 +20,11 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
-import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
 
-import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
@@ -36,20 +34,20 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
         super(driver);
     }
 
-    public static ShowAuditLogPage beginAt(WebDriverWrapper driver)
+    public static ShowAuditLogPage beginAt(WebDriverWrapper driver, String eventType)
     {
-        return beginAt(driver, driver.getCurrentContainerPath());
+        return beginAt(driver, eventType, null);
     }
 
-    public static ShowAuditLogPage beginAt(WebDriverWrapper driver, String containerPath)
+    public static ShowAuditLogPage beginAt(WebDriverWrapper driver, String eventType, Integer rowIdCutoff)
     {
-        driver.beginAt(WebTestHelper.buildURL("audit", containerPath, "showAuditLog"));
-        return new ShowAuditLogPage(driver.getDriver());
-    }
-
-    public static ShowAuditLogPage beginAt(WebDriverWrapper driver, String containerPath, String eventType)
-    {
-        driver.beginAt(WebTestHelper.buildURL("audit", containerPath, "showAuditLog", Map.of("view", eventType)));
+        Map<String, Object> params = new HashMap<>();
+        params.put("view", eventType);
+        if (rowIdCutoff != null)
+        {
+            params.put("query.RowId~gt", rowIdCutoff);
+        }
+        driver.beginAt(WebTestHelper.buildURL("audit", "showAuditLog", params));
         return new ShowAuditLogPage(driver.getDriver());
     }
 
@@ -70,19 +68,13 @@ public class ShowAuditLogPage extends LabKeyPage<ShowAuditLogPage.ElementCache>
         return new DataRegionTable("query", getDriver());
     }
 
-    public File exportExcelxlsx()
-    {
-        return new DataRegionExportHelper(getLogTable())
-                .exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
-    }
-
     @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         Select viewSelect = SelectWrapper.Select(Locator.tagWithName("select", "view")).timeout(4000)
                 .findWhenNeeded(this);

@@ -22,11 +22,14 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DataClassHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
@@ -34,6 +37,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
@@ -142,21 +146,23 @@ public class DataClassTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields("created");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'created' is a reserved name."),
+                "'created' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("rowid");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'rowid' is a reserved name."),
+                "'rowid' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("name");
         assertEquals("Data class reserved field name error", Arrays.asList(
-                "Property name 'name' is a reserved name."),
+                "'name' is a reserved field name in 'Reserved Field Names Test'.",
+                "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
-        domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
     }
@@ -221,6 +227,185 @@ public class DataClassTest extends BaseWebDriverTest
         domainFormPanel.removeAllFields(false);
 
         createPage.clickCancel();
+    }
+
+    @Test // Issue 48705
+    public void testLongFieldNames()
+    {
+        goToProjectHome();
+
+        String name = "Long Field Names Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(name);
+
+        log("Add a field name > 49 characters");
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields("This_field_name_is_longer_than_50_characters_for_testing");
+        createPage.clickSave();
+
+        DataClassHelper sourceHelper = DataClassHelper.beginAtDataClassesList(this, getProjectName());
+        assertEquals("Data class grid should have zero rows", 0, sourceHelper.goToDataClass(name).getDataCount());
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        goToProjectHome();
+
+        String dataClassName = "Unique Constraint Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(dataClassName);
+
+        log("Add a field with a unique constraint");
+        String fieldName1 = "field Name1";
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields(fieldName1)
+                .setType(FieldDefinition.ColumnType.Integer)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field with a unique constraint");
+        String fieldName2 = "fieldName_2";
+        domainFormPanel.addField(fieldName2)
+                .setType(FieldDefinition.ColumnType.DateAndTime)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field which does not have a unique constraint");
+        String fieldName3 = "FieldName@3";
+        domainFormPanel.addField(fieldName3)
+                .setType(FieldDefinition.ColumnType.Boolean);
+        createPage.clickSave();
+
+        viewRawTableMetadata(dataClassName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+
+        log("Remove a field unique constraint and add a new one");
+        goToProjectHome();
+        CreateDataClassPage updatePage = goToDataClass(dataClassName);
+        domainFormPanel = updatePage.getDomainEditor();
+        domainFormPanel.getField(fieldName2)
+                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        domainFormPanel.getField(fieldName3)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        updatePage.clickSave();
+        viewRawTableMetadata(dataClassName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_test_fieldname_2");
+    }
+
+    @Test
+    public void testDateAndTimeFields()
+    {
+
+        goToProjectHome();
+
+        String dataClassName = "Date and Time Fields Test";
+        CreateDataClassPage createPage = goToCreateNewDataClass();
+        createPage.setName(dataClassName);
+
+        log("Add a date-time field.");
+
+        String dateTimeField = "DateTime";
+        String dateTimeFormat = "MMM dd, yyyy hh:mm:ss a";
+        DomainFormPanel domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.manuallyDefineFields(dateTimeField)
+                .setType(FieldDefinition.ColumnType.DateAndTime)
+                .setDateFormat(dateTimeFormat);
+
+        log("Add a date-only field.");
+
+        String dateField = "Date";
+        String dateFormat = "MMM dd, yyyy";
+        domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.addField(dateField)
+                .setType(FieldDefinition.ColumnType.Date)
+                .setDateFormat(dateFormat);
+
+        log("Add a time-only field.");
+
+        String timeField = "Time";
+        String timeFormat = "hh:mm:ss a";
+        domainFormPanel = createPage.getDomainEditor();
+        domainFormPanel.addField(timeField)
+                .setType(FieldDefinition.ColumnType.Time)
+                .setDateFormat(timeFormat);
+
+        createPage.clickSave();
+
+        Locator.linkWithText(dataClassName).waitForElement(getDriver(), 1_000);
+
+        clickAndWait(Locator.linkWithText(dataClassName));
+
+        String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeField, dateField, timeField)
+                + "A\t12/23/24 14:45\t12/23/24\t14:45\n"
+                + "B\t11/19/99 9:32:06\t11/19/99\t9:32:06\n"
+                + "C\t3/2/1972 10:45 pm\t3/2/1972\t10:45 pm\n"
+                + "D\t2-3-05 00:00\t2-3-05\t00:00\n";
+
+        DataRegionTable listTable = new DataRegionTable("query", getDriver());
+        listTable.clickImportBulkData()
+                .setText(bulkData);
+        clickButton("Submit");
+
+        listTable = new DataRegionTable("query", getDriver());
+        UpdateQueryRowPage insertRowPage = listTable.clickInsertNewRow();
+        insertRowPage.setField("Name", "E");
+        insertRowPage.setField(dateTimeField, "2/29/24 13:13:13");
+        insertRowPage.setField(dateField, "2/29/24");
+        insertRowPage.setField(timeField, "13:13:13");
+        insertRowPage.submit();
+
+        List<String> expectedDateTimeCol = List.of(
+                "Feb 29, 2024 01:13:13 PM",
+                "Feb 03, 2005 12:00:00 AM",
+                "Mar 02, 1972 10:45:00 PM",
+                "Nov 19, 1999 09:32:06 AM",
+                "Dec 23, 2024 02:45:00 PM");
+
+        List<String> expectedDateCol = List.of(
+                "Feb 29, 2024",
+                "Feb 03, 2005",
+                "Mar 02, 1972",
+                "Nov 19, 1999",
+                "Dec 23, 2024");
+
+        List<String> expectedTimeCol = List.of(
+                "01:13:13 PM",
+                "12:00:00 AM",
+                "10:45:00 PM",
+                "09:32:06 AM",
+                "02:45:00 PM");
+
+        listTable = new DataRegionTable("query", getDriver());
+
+        // Just going to validate that the values were inserted correctly.
+        // Testing of filtering and sorting of date-time, date-only and time-only fields is done in ListDateAndTimeTest.
+
+        checker().verifyEquals("Values in date-time column not as expected.",
+                expectedDateTimeCol, listTable.getColumnDataAsText("Date Time"));
+
+        checker().verifyEquals("Values in date-only column not as expected.",
+                expectedDateCol, listTable.getColumnDataAsText(dateField));
+
+        // It looks like Dataclasses do not support milliseconds.
+        checker().verifyEquals("Values in time-only column not as expected.",
+                expectedTimeCol, listTable.getColumnDataAsText(timeField));
+
+    }
+
+    private void viewRawTableMetadata(String dataClassName)
+    {
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "exp.data", "query.queryName", dataClassName)));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("lsid");
+        suffixes.add("name_classid");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     private CreateDataClassPage goToCreateNewDataClass()

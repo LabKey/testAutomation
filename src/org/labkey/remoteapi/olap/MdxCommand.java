@@ -15,14 +15,14 @@
  */
 package org.labkey.remoteapi.olap;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.serverapi.reader.Readers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -35,15 +35,6 @@ public class MdxCommand extends PostCommand<MdxResponse>
     private String _schemaName;
     private String _cubeName;
     private String _query;
-
-    public MdxCommand(MdxCommand source)
-    {
-        super(source);
-        _configId = source.getConfigId();
-        _schemaName = source.getSchemaName();
-        _cubeName = source.getCubeName();
-        _query = source.getQuery();
-    }
 
     public MdxCommand(String configId, String schema, String query)
     {
@@ -96,23 +87,18 @@ public class MdxCommand extends PostCommand<MdxResponse>
     @Override
     protected MdxResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new MdxResponse(text, status, contentType, json, this);
+        return new MdxResponse(text, status, contentType, json);
     }
 
     @Override
     public JSONObject getJsonObject()
     {
-        JSONObject result = super.getJsonObject();
-        if (result == null)
-        {
-            result = new JSONObject();
-        }
+        JSONObject result = new JSONObject();
         result.put("configId", _configId);
         result.put("schemaName", _schemaName);
         if (_cubeName != null)
             result.put("cubeName", _cubeName);
         result.put("query", _query);
-        setJsonObject(result);
         return result;
     }
 
@@ -120,10 +106,9 @@ public class MdxCommand extends PostCommand<MdxResponse>
     public MdxResponse execute(Connection connection, String folderPath) throws IOException, CommandException
     {
         // Hack override to decode the gzip response, as that's not yet supported in the java client api
-        try (Response response = _execute(connection, folderPath))
+        try (Response response = _execute(connection, folderPath); InputStream is = new GZIPInputStream(response.getInputStream()))
         {
-            JSONObject json;
-            json = (JSONObject) JSONValue.parse(Readers.getReader(new GZIPInputStream(response.getInputStream())));
+            JSONObject json = new JSONObject(new JSONTokener(is));
             return createResponse(null, response.getStatusCode(), response.getContentType(), json);
         }
     }

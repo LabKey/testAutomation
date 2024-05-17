@@ -11,7 +11,6 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.serverapi.reader.Readers;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -23,11 +22,9 @@ import org.labkey.test.components.ui.grids.GridFilterModal;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
-import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
@@ -46,12 +43,8 @@ import java.util.stream.Collectors;
 
 
 @Category({Daily.class})
-public class GridPanelTest extends BaseWebDriverTest
+public class GridPanelTest extends GridPanelBaseTest
 {
-
-    private static final String TEST_SCHEMA = "samples";
-
-    private static final int DEFAULT_PAGE_SIZE = 20;
 
     // A sample type with a small number of rows. Used to test paging controls (lack of) when results are small and no
     // filters are applied. Also used to test views (since that is a column centric feature).
@@ -66,18 +59,15 @@ public class GridPanelTest extends BaseWebDriverTest
 
     // Column names.
     private static final String FILTER_NAME_COL = "Name";
+    private static final String FILTER_EXPDATE_COL = "Expiration Date";
     private static final String FILTER_STRING_COL = "Str";
     private static final String FILTER_INT_COL = "Int";
     private static final String FILTER_EXTEND_CHAR_COL = "\u0106\u00D8\u0139";
     private static final String FILTER_BOOL_COL = "Bool";
     private static final String FILTER_DATE_COL = "Date";
-
-    // Column removed from default view.
-    private static final String REMOVED_FLAG_COLUMN = "Flag";
+    private static final String FILTER_STORED_AMOUNT_COL = "Amount";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
-    private static final String VIEW_DEFAULT = "Default"; // In LKS the default view, even if modified is always named 'Default'.
-    private static final String VIEW_DEFAULT_MODIFIED = "My Default"; // If you change the default view the menu item in the grid changes.
     private static final String VIEW_EXTRA_COLUMNS = "Extra_Columns";
     private static final String VIEW_FEWER_COLUMNS = "Fewer_Columns";
     private static final String VIEW_FILTERED_COLUMN = "Filtered_Column";
@@ -131,13 +121,8 @@ public class GridPanelTest extends BaseWebDriverTest
 
     private void doSetup() throws IOException, CommandException
     {
-        _containerHelper.createProject(getProjectName(), null);
 
-        // Add the 'Sample Types' web part. It is easier when debugging etc...
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.enterAdminMode();
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.exitAdminMode();
+        initProject();
 
         // Create list of strings that has the various sets of the letters A, B, C & D
         stringSets = getAllSets(stringSetMembers, stringSetMembers.size() - 1);
@@ -190,6 +175,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         log(String.format("Create the '%s' view for the '%s' sample type.", VIEW_EXTRA_COLUMNS, SMALL_SAMPLE_TYPE));
         CustomizeView cv = drtSamples.openCustomizeGrid();
+        cv.showHiddenItems();
         for(String columnName : extraColumnsNames)
         {
             cv.addColumn(columnName);
@@ -209,7 +195,7 @@ public class GridPanelTest extends BaseWebDriverTest
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
-        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of (example usage: a;b;c)", String.format("%1$s;%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of", String.format("%1$s;%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
         cv = drtSamples.openCustomizeGrid();
         cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
@@ -311,80 +297,53 @@ public class GridPanelTest extends BaseWebDriverTest
 
         sampleSetDataGenerator.insertRows();
 
-        // This modifies the default view of the grid. As a result the default view is now labeled "My Default" in the grid menu.
         removeFlagColumnFromDefaultView(FILTER_SAMPLE_TYPE);
 
     }
 
-    /**
-     * Helper to remove the 'Flag' column from the default view. It just gets in the way for some tests, and is easier
-     * to remove it.
-     *
-     * @param sampleType Name of sample type.
-     */
-    private void removeFlagColumnFromDefaultView(String sampleType)
+    @Test
+    public void testShiftClick()
     {
-        goToProjectHome();
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
-        refresh();
+        // select a range of rows
+        grid.shiftSelectRange(2, 11);
 
-        waitAndClickAndWait(Locator.linkWithText(sampleType));
-
-        log(String.format("Remove '%s' column form default view.", REMOVED_FLAG_COLUMN));
-
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
-        drtSamples.goToView(VIEW_DEFAULT);
-
-        CustomizeView cv = drtSamples.openCustomizeGrid();
-        cv.removeColumn(REMOVED_FLAG_COLUMN);
-        cv.saveCustomView("", true);
-
-    }
-
-    // Generate a list of string that has different combinations/sets from the list of strings passed in.
-    // For example if values = ['A', 'B', 'C'] this will return the list ['', 'A', 'B', 'C', 'AB', 'AC', 'ABC', 'BC'].
-    // This is all the sets of the characters from the list, including the empty set.
-    private static List<String> getAllSets(List<String> values, int index)
-    {
-        List<String> allSets = new ArrayList<>();
-        if(index < 0) {
-            allSets.add("");
-            return allSets;
-        }
-
-        allSets = getAllSets(values, index - 1);
-        List<String> newSets = new ArrayList<>();
-
-        for (String allCombination : allSets)
+        // verify rows 2-11 are selected, 1 and 12 are not
+        checker().verifyFalse("row1 should remain unchecked", grid.isRowSelected(1));
+        for (int i=2; i<12; i++)
         {
-            newSets.add(allCombination + values.get(index));
+            checker().verifyTrue(String.format("row %d should be selected", i), grid.isRowSelected(i));
         }
+        checker().verifyFalse("row12 should remain unchecked", grid.isRowSelected(12));
+        checker().verifyEquals("expect selection status to equal",
+                "10 of 300 selected" ,grid.getSelectionStatusCount());
+        checker().screenShotIfNewError("unexpected range select");
 
-        allSets.addAll(newSets);
 
-        return allSets;
-    }
+        // negatively select from within a selected range - uncheck 7, shift down, uncheck 4
+        grid.shiftSelectRange(7, 4);
 
-    /**
-     * Make sure there are no filters or search values persisted for the given sample type.
-     *
-     * @param sampleType The sample type used to populate the grid.
-     * @return A queryGrid object.
-     */
-    public QueryGrid beforeTest(String sampleType)
-    {
-        QueryGrid grid = CoreComponentsTestPage.beginAt(this, getProjectName())
-                .getGridPanel(TEST_SCHEMA, sampleType);
+        // verify 4567 are unchecked, 3 and 8 remain checked
+        checker().verifyTrue("row3 should remain checked", grid.isRowSelected(3));
+        for (int i=4; i<8; i++)
+        {
+            checker().verifyFalse(String.format("row %d should be unchecked", i), grid.isRowSelected(i));
+        }
+        checker().verifyTrue("row8 should remain checked", grid.isRowSelected(8));
+        checker().verifyEquals("expect selection status to equal",
+                "6 of 300 selected" ,grid.getSelectionStatusCount());
+        checker().screenShotIfNewError("unexpected range select");
 
-        // Selections can persist, clear them.
-        grid.clearAllSelections();
-
-        // Searches and filter values shouldn't persist, but clear them just to be safe.
-        grid.clearFilters();
-        grid.clearSearch();
-
-        return grid;
+        // select a non-adjacent range, verify
+        grid.shiftSelectRange(13, 17);
+        for (int i=13; i<17; i++)
+        {
+            checker().verifyTrue(String.format("row %d should be checked", i), grid.isRowSelected(i));
+        }
+        checker().verifyEquals("expect selection status to equal",
+                "11 of 300 selected" ,grid.getSelectionStatusCount());
+        checker().screenShotIfNewError("unexpected range select");
     }
 
     /**
@@ -394,7 +353,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testFirstAndLastPageNavigation()
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Check default paging values.");
         checker().verifyEquals("Start row number on first page not as expected.",
@@ -460,7 +419,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testSelectPageSize()
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate paging with defaults.");
 
@@ -555,7 +514,7 @@ public class GridPanelTest extends BaseWebDriverTest
     @Test
     public void testSinglePageOfData()
     {
-        QueryGrid grid = beforeTest(SMALL_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(SMALL_SAMPLE_TYPE);
 
         String expectedText = String.format("1 - %d", SMALL_SAMPLE_TYPE_SIZE);
         String actualText = grid.getGridBar().pager().summary();
@@ -593,7 +552,7 @@ public class GridPanelTest extends BaseWebDriverTest
     @Test
     public void testSelectAllButtonWithFilteredResults()
     {
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate that the 'Select All' button works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -627,7 +586,7 @@ public class GridPanelTest extends BaseWebDriverTest
     @Test
     public void testSelectAllOnPageWithFilteredResults()
     {
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate the select all check box at the top of the gird works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -659,7 +618,7 @@ public class GridPanelTest extends BaseWebDriverTest
     @Test
     public void testSelectOnPageAndSelectAllButton()
     {
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Filter grid to multiple pages.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -721,7 +680,7 @@ public class GridPanelTest extends BaseWebDriverTest
     @Test
     public void testIsBlankAndIsNotBlankFilter()
     {
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Filter grid to only rows with blank entries.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.ISBLANK);
@@ -752,7 +711,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testMultipleFiltersOnOneColumn() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         int low = INT_MAX - 3;
         int high = INT_MAX;
@@ -775,6 +734,88 @@ public class GridPanelTest extends BaseWebDriverTest
     }
 
     /**
+     * Verify filtering on a column that has >250 distinct values for the Choose Values filter tab.
+     * Issue 47266: For a grid the filter dialog does not enable the 'Apply' button if filter and select a single option
+     * Issue 47247: LKSM: Filtering values >250 doesn't save selection
+     */
+    @Test
+    public void testFilterWithMaxDistinctValues() throws IOException, CommandException
+    {
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+        checker().verifyEquals("Unfiltered grid row count not as expected", 300, grid.getRecordCount());
+
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(FILTER_NAME_COL);
+
+        log("Verify the facet filter list initially includes a max of 250 options and they are not initially selected");
+        FilterFacetedPanel facetedPanel = filterDialog.selectFacetTab();
+        List<String> availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Initial filter options should include max options of 250", 250, availableValues.size());
+        checker().verifyEquals("First value not as expected", FILTER_SAMPLE_PREFIX + "1", availableValues.get(0));
+        checker().verifyFalse("Available options should not be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "1"));
+        checker().verifyEquals("Last value not as expected", FILTER_SAMPLE_PREFIX + "300", availableValues.get(249));
+        checker().verifyFalse("Available options should not be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "300"));
+
+        log("Verify we can filter down to a single value that is not initially shown and select it");
+        String filterValue = FILTER_SAMPLE_PREFIX + "75";
+        facetedPanel.filterValues(filterValue);
+        availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Only one option should be available after filter", 1, availableValues.size());
+        checker().verifyEquals("Only one option should be available after filter", filterValue, availableValues.get(0));
+        facetedPanel.checkValues(filterValue);
+        List<String> selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Only one option should be selected after filter", 1, selectedValues.size());
+        checker().verifyEquals("Only one option should be selected after filter", filterValue, selectedValues.get(0));
+
+        log("Remove filter and verify the available and selected options");
+        facetedPanel.filterValues("");
+        availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Should be back to showing initial 250 options", 250, availableValues.size());
+        checker().verifyFalse("Filtered value should not exist in the available options", availableValues.contains(filterValue));
+        selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Should retain single filtered selection", 1, selectedValues.size());
+        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.get(0));
+
+        log("Verify single filtered value filter applied as expected");
+        filterDialog.confirm();
+        checker().verifyEquals("Filtered grid row count not as expected", 1, grid.getRecordCount());
+
+        log("Add more filtered options to verify selections retain");
+        filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(FILTER_NAME_COL);
+        facetedPanel = filterDialog.selectFacetTab();
+        selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Should retain single filtered selection", 1, selectedValues.size());
+        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.get(0));
+        facetedPanel.filterValues(FILTER_SAMPLE_PREFIX + "8");
+        availableValues = facetedPanel.getAvailableValues();
+        checker().verifyEquals("Filtered set of available options not as expected", 11, availableValues.size());
+        facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "8");
+        for (int i = 0; i < 10; i++)
+            facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "8" + i);
+        selectedValues = facetedPanel.getSelectedValues();
+        checker().verifyEquals("Should retain filtered selection", 12, selectedValues.size());
+        checker().verifyEquals("Should retain filtered selection", filterValue, selectedValues.get(0));
+        checker().verifyEquals("Should retain filtered selection", FILTER_SAMPLE_PREFIX + "89", selectedValues.get(11));
+
+        log("And verify adding selections from the unfiltered set");
+        facetedPanel.filterValues("");
+        facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "1", FILTER_SAMPLE_PREFIX + "10");
+        filterDialog.confirm();
+        checker().verifyEquals("Filtered grid row count not as expected", 14, grid.getRecordCount());
+
+        log("Verify the selections are checked in the available list when modal opened");
+        filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(FILTER_NAME_COL);
+        facetedPanel = filterDialog.selectFacetTab();
+        checker().verifyTrue("Previous filter value should be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "1"));
+        checker().verifyTrue("Previous filter value should be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "10"));
+        filterDialog.cancel();
+
+        grid.clearFilters();
+    }
+
+    /**
      * Validate that if required fields are not set for filter the dialog shows an error. Also validate that for some
      * field types, like an integer, there is only a Filter tab and not a Values tab in the filter dialog.
      */
@@ -782,7 +823,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testFilterErrorAndFilterOnlyTab()
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
@@ -814,7 +855,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         checker().withScreenshot("Unexpected_Filter_Error")
                 .verifyTrue("It looks like there are filters applied after canceling out of the dialog.",
-                        grid.getFilterStatusValues(true).isEmpty());
+                        grid.getFilterStatusValues().isEmpty());
 
     }
 
@@ -836,7 +877,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testInteractionBetweenDialogTabs() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
@@ -882,7 +923,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualValues = facetedPanel.getAvailableValues();
 
         // Hard coding the string combinations (AB, AC, etc...) to make the code more readable.
-        expectedValues = Arrays.asList(ALL_OPTION, BLANK_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
+        expectedValues = Arrays.asList(ALL_OPTION, "AB", "AC", "BC", "C", NUMBER_STRING, FIVE_RECORD_STRING, MULTI_PAGE_STRING);
 
         Collections.sort(actualValues);
         Collections.sort(expectedValues);
@@ -938,13 +979,13 @@ public class GridPanelTest extends BaseWebDriverTest
         checker().verifyTrue("The second filter expression should be empty.",
                 filterTypes.get(1).getValue().isEmpty());
 
-        List<WebElement> filterValues = Locator.tagWithClass("input", "filter-expression__input").findElements(panelElement);
+        List<WebElement> filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElements(panelElement);
 
         checker().verifyEquals("There should only be one filter value text box.",
                 1, filterValues.size());
 
         checker().verifyEquals("The filter value is not as expected.",
-                String.format("%s;%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
+                String.format("%s\n%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
 
         checker().screenShotIfNewError("Updated_Filter_Error");
 
@@ -979,7 +1020,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testSearchAndFilter() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         int low = 4;
         int high = INT_MAX - 3;
@@ -1072,7 +1113,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testFilterPills() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         int high = INT_MAX - 3;
         int low = 3;
@@ -1118,7 +1159,7 @@ public class GridPanelTest extends BaseWebDriverTest
         expectedValues.add(String.format("%s > %d", FILTER_INT_COL, low));
         expectedValues.add(String.format("%s Contains One Of %s", FILTER_STRING_COL, oneOfFilter.replace(";", ", ")));
 
-        List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
+        List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
 
         actualValues = filterPills.stream().map(FilterStatusValue::getText).collect(Collectors.toList());
 
@@ -1163,7 +1204,7 @@ public class GridPanelTest extends BaseWebDriverTest
         // next pill to get the 'x' icon. This causes the next call to getFilterStatusValues to not recognize the pill as a filter.
         Locator.tagWithClass("input", "grid-panel__search-input").findElement(getDriver()).click();
 
-        FilterStatusValue filterPill = grid.getFilterStatusValues(false).get(0);
+        FilterStatusValue filterPill = grid.getFilterStatusValues().get(0);
 
         filterPill.getComponentElement().click();
 
@@ -1215,10 +1256,10 @@ public class GridPanelTest extends BaseWebDriverTest
         checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_STRING_COL),
                 "Contains One Of", filterTypes.get(0).getValue());
 
-        filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
+        filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElement(panelElement);
 
         checker().verifyEquals(String.format("The filter value for '%s' is not as expected.", FILTER_STRING_COL),
-                oneOfFilter, getFormElement(filterValues));
+                oneOfFilter.replaceAll(";", "\n"), getFormElement(filterValues));
 
         checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
 
@@ -1231,7 +1272,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testSearchIsSameAsContainsFilter() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         // Set search string to 'AB'.
         String searchString = stringSetMembers.get(0) + stringSetMembers.get(1);
@@ -1285,7 +1326,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testSearchAcrossColumns() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         // Something of a "magic number". A search for 12 will find values in sample name and the Str column.
         String searchString = "12";
@@ -1339,7 +1380,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testFilteringAndSearchingForExtendedCharacters() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log(String.format("Search for '%s'.", EXTEND_RECORD_STRING));
 
@@ -1381,7 +1422,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testExport() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(FILTER_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Filter the grid and validate only the filtered results are exported.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -1414,7 +1455,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         log(String.format("Using sample type '%s' validate that if a view is selected the expected columns are exported.", SMALL_SAMPLE_TYPE));
 
-        grid = beforeTest(SMALL_SAMPLE_TYPE);
+        grid = beginAtQueryGrid(SMALL_SAMPLE_TYPE);
 
         log(String.format("Select the '%s' view.", VIEW_EXTRA_COLUMNS));
         grid.selectView(VIEW_EXTRA_COLUMNS);
@@ -1441,6 +1482,42 @@ public class GridPanelTest extends BaseWebDriverTest
         columns.add(FILTER_STRING_COL);
         columns.add(FILTER_INT_COL);
         validateExportedColumnHeader(exportedFile, columns, removedColumns);
+
+        // Test for Issue 46465 (Sample export do not respect filter when samples have been selected)
+        grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+
+        grid.clearAllSelections()
+                .clearFilters();
+
+        grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, NUMBER_STRING);
+        grid.selectAllOnPage(true);
+
+        int rowsCountBefore = grid.getRecordCount();
+
+        grid.filterColumn(FILTER_INT_COL, Filter.Operator.GT, 10);
+
+        int rowCountAfter = grid.getRecordCount();
+
+        // If the filters did not generate the needed data don't continue.
+        if(checker().verifyTrue("Applying the second filter did not provide the expected number of rows. Cannot continue.",
+                (rowCountAfter < rowsCountBefore) && (rowCountAfter > 0)))
+        {
+
+            List<Map<String, Object>> expectedData = new ArrayList<>();
+
+            List<String> intColData = grid.getColumnDataAsText(FILTER_INT_COL);
+
+            for(String colValue : intColData)
+            {
+                // All the rows will have the same value in the string column (FILTER_STRING_COL).
+                expectedData.add(Map.of(FILTER_STRING_COL, NUMBER_STRING,
+                        FILTER_INT_COL, colValue));
+            }
+
+            exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
+
+            validateExportedData(exportedFile, expectedData, Arrays.asList(FILTER_STRING_COL, FILTER_INT_COL));
+        }
 
     }
 
@@ -1476,7 +1553,7 @@ public class GridPanelTest extends BaseWebDriverTest
     public void testFilterDialogWithViews() throws IOException, CommandException
     {
 
-        QueryGrid grid = beforeTest(SMALL_SAMPLE_TYPE);
+        QueryGrid grid = beginAtQueryGrid(SMALL_SAMPLE_TYPE);
 
         log(String.format("For sample type '%s' use view '%s'.", SMALL_SAMPLE_TYPE, VIEW_EXTRA_COLUMNS));
 
@@ -1550,9 +1627,11 @@ public class GridPanelTest extends BaseWebDriverTest
 
         expectedList = new ArrayList<>();
         expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_EXPDATE_COL);
         expectedList.add(FILTER_INT_COL);
         expectedList.add(FILTER_STRING_COL);
         expectedList.add(FILTER_DATE_COL);
+        expectedList.add(FILTER_STORED_AMOUNT_COL);
 
         actualList = filterDialog.getAvailableFields();
 
@@ -1578,7 +1657,6 @@ public class GridPanelTest extends BaseWebDriverTest
             }
         }
         expectedList.add(ALL_OPTION);
-        expectedList.add(BLANK_OPTION);
 
         log(String.format("Validate that the list of values for the '%s' is as expected.", FILTER_STRING_COL));
         filterDialog.selectField(FILTER_STRING_COL);
@@ -1598,7 +1676,7 @@ public class GridPanelTest extends BaseWebDriverTest
 
         grid.selectView(VIEW_EXTRA_COLUMNS);
 
-        List<FilterStatusValue> filterPills = grid.getFilterStatusValues(false);
+        List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
         String expectedValue = String.format("%s = true", FILTER_BOOL_COL);
         checker().withScreenshot("View_Filter_Pill_Error").verifyTrue(String.format("Filter pills not as expected. There should only be one with value of '%s'", expectedValue),
                 filterPills.size() == 1 && filterPills.get(0).getText().equals(expectedValue));
@@ -1607,10 +1685,12 @@ public class GridPanelTest extends BaseWebDriverTest
 
         expectedList = new ArrayList<>(extraColumnsHeaders);
         expectedList.add(FILTER_NAME_COL);
+        expectedList.add(FILTER_EXPDATE_COL);
         expectedList.add(FILTER_STRING_COL);
         expectedList.add(FILTER_INT_COL);
         expectedList.add(FILTER_BOOL_COL);
         expectedList.add(FILTER_DATE_COL);
+        expectedList.add(FILTER_STORED_AMOUNT_COL);
 
         filterDialog = grid.getGridBar().openFilterDialog();
 
@@ -1650,7 +1730,7 @@ public class GridPanelTest extends BaseWebDriverTest
         actualList = filterDialog.selectFacetTab().getAvailableValues();
 
         // Going to hard code the expected values rather try and be clever and figure them out.
-        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, BLANK_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
+        expectedList = new ArrayList<>(Arrays.asList(ALL_OPTION, "A", "AB", "ABC", "ABCD", "ABD", "AC", "ACD", "AD"));
 
         Collections.sort(expectedList);
         Collections.sort(actualList);
@@ -1782,20 +1862,9 @@ public class GridPanelTest extends BaseWebDriverTest
     }
 
     @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
-
-    @Override
     protected String getProjectName()
     {
         return "QueryGridTest Project";
     }
 
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return Arrays.asList();
-    }
 }

@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -248,6 +248,7 @@ public class WebDavTest extends BaseWebDriverTest
 
         log("Visit WebDav and WebFiles after project creation");
         WebDavPage.beginAt(this, "");
+        _fileBrowserHelper.waitForFileGridReady();
         assertTextPresent(OTHER_PROJECT);
         WebFilesHtmlViewPage.beginAt(this, "");
         assertTextPresent(OTHER_PROJECT);

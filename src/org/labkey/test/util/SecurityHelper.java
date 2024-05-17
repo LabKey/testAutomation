@@ -40,7 +40,7 @@ public class SecurityHelper
     public void setProjectPerm(String userOrGroupName, String folder, String permission)
     {
         if(_test.getCurrentContainerPath().equals("/" + folder))
-            _test.beginAt("/project/" + folder + "/begin.view?");
+            _test.beginAt("/" + folder + "/project-begin.view");
         _test._permissionsHelper.setPermissions(userOrGroupName, permission);
     }
 }

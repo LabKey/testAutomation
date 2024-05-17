@@ -15,16 +15,14 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.labkey.PortalTab;
-import org.labkey.test.components.list.ManageListsGrid;
-import org.labkey.test.pages.list.EditListDefinitionPage;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
@@ -33,6 +31,7 @@ import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -43,12 +42,6 @@ import static org.junit.Assert.assertTrue;
 public class TabTest extends SimpleModuleTest
 {
     @Override
-    public BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
-
-    @Override
     protected void doVerifySteps() throws Exception
     {
         doTabManagementTests();
@@ -57,7 +50,7 @@ public class TabTest extends SimpleModuleTest
     }
 
     @Override
-    @Test
+    @Ignore
     public void testModuleProperties()
     {
         //do nothing
@@ -123,14 +116,23 @@ public class TabTest extends SimpleModuleTest
         String tab2Delete = "RENAMED TAB 1";
         portalHelper.activateTab(tab2Delete);
         portalHelper.deleteTab("Test Tab 2");
-        List<BodyWebPart> bodyparts = portalHelper.getBodyWebParts();
-        assertTrue("Webparts failed to load after tab delete while on page", bodyparts != null && bodyparts.size() > 0);
-        assertEquals("Wrong tab selected after tab deletion", tab2Delete, getText(PortalHelper.Locators.activeTab().containing(tab2Delete)).replace(Locator.NBSP, " ").trim());
+        WebDriverWrapper.waitFor(()-> portalHelper.getBodyWebParts().size() > 0,
+                "Webparts failed to load after tab delete while on page", 2000);
+        WebDriverWrapper.waitFor(()-> {
+                    try
+                    {
+                        return getText(PortalHelper.Locators.activeTab())
+                                .replace(Locator.NBSP, " ").equals(tab2Delete);
+                    }catch (NoSuchElementException retry)
+                    {
+                        return false;
+                    }
+                }, "Wrong tab selected after tab deletion", 2000);
 
         //Delete tab while on the Tab
         portalHelper.deleteTab(tab2Delete);
-        bodyparts = portalHelper.getBodyWebParts();
-        assertTrue("Webparts failed to load after tab delete", bodyparts != null && bodyparts.size() > 0);
+        WebDriverWrapper.waitFor(()-> portalHelper.getBodyWebParts().size() > 0,
+                "Webparts failed to load after tab delete while on page", 2000);
     }
 
     @LogMethod
@@ -254,21 +256,10 @@ public class TabTest extends SimpleModuleTest
         clickTab("Study Container");
         clickAndWait(Locator.lkButton("Create Study"));     // Create study
         clickAndWait(Locator.lkButton("Create Study"));
-
-        // Create the list again so we can pass query validation.
-        log("Create list in subfolder to prevent query validation failure");
-        clickTab(STUDY_FOLDER_TAB_LABEL);
-        new PortalHelper(this).addWebPart("Lists");
-        clickAndWait(Locator.linkWithText("manage lists"));
-        final EditListDefinitionPage editListPage = new ManageListsGrid(getDriver()).clickCreateList();
-        editListPage.setName(LIST_NAME).manuallyDefineFieldsWithAutoIncrementingKey("Key")
-                .addField(new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription("Name"))
-                .addField(new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"))
-                .addField(new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?"));
-        editListPage.clickSave();
     }
 
-    private void revertFolder(String folderName) {
+    private void revertFolder(String folderName)
+    {
         waitForText(folderName);
         WebElement revertButton = Ext4Helper.Locators.ext4Button("Revert").findElement(getDriver());
         shortWait().until(LabKeyExpectedConditions.animationIsDone(revertButton));

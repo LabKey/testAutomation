@@ -35,14 +35,15 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 
@@ -70,14 +71,14 @@ public class ContainerContextTest extends BaseWebDriverTest
     protected static final String TEST_ASSAY_B = "Test Assay B";
     protected static final String TEST_ASSAY_DESC_B = "Description for assay B";
 
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
 
     private static final String COLOR = "Red";
     private static final String MANUFACTURER = "Toyota";
     private static final String MODEL = "Prius C";
-    private RReportHelper _RReportHelper = new RReportHelper(this);
-    private PortalHelper _portalHelper = new PortalHelper(this);
+
+    private final RReportHelper _RReportHelper = new RReportHelper(this);
+    private final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
     protected String getProjectName()
@@ -122,45 +123,49 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
-        _portalHelper.addWebPart("Workbooks");
-
-        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
-        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+        _portalHelper.doInAdminMode(ph -> {
+            ph.addWebPart("Workbooks");
+            ph.addWebPart("Lists");
+            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+            ph.addWebPart("Lists");
+            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+            ph.addWebPart("Lists");
+        });
     }
 
     @Test
-    public void testListLookupURL()
+    public void testListLookupURL() throws Exception
     {
+        Connection conn = createDefaultConnection();
+
         log("** Creating lookup target list in sub-folder");
-        goToProjectHome();
-        FieldDefinition[] lookupTargetCols = {
+        List<FieldDefinition> lookupTargetCols = List.of(
             new FieldDefinition("LookupName", FieldDefinition.ColumnType.String).setDescription("Lookup Name"),
             new FieldDefinition("LookupAge", FieldDefinition.ColumnType.Integer).setDescription("Lookup Age").setURL("fake/action.view?key=${Key}")
-        };
+        );
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
-        _listHelper.createList(getProjectName() + "/" + SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
+        TestDataGenerator subfolderDgen = new IntListDefinition(lookupTargetListName, LIST_KEY_NAME).setFields(lookupTargetCols)
+                .create(conn, getProjectName() + "/" + SUB_FOLDER_A);
 
         log("** Insert row into lookup target list");
-        goToProjectHome();
-        clickFolder(SUB_FOLDER_A);
-        clickAndWait(Locator.linkWithText(lookupTargetListName));
-        _listHelper.insertNewRow(Maps.of(
+        subfolderDgen.addCustomRow(Maps.of(
                 "LookupName", "MyLookupItem1",
                 "LookupAge", "100"
         ));
-        _listHelper.insertNewRow(Maps.of(
+        subfolderDgen.addCustomRow(Maps.of(
                 "LookupName", "MyLookupItem2",
                 "LookupAge", "200"
         ));
+        subfolderDgen.insertRows(conn);
 
         log("** Creating list with lookup to list in sub-folder");
         goToProjectHome();
-        FieldDefinition[] cols = {
+        List<FieldDefinition> cols = List.of(
             new FieldDefinition("MyName", FieldDefinition.ColumnType.String).setDescription("My Name"),
-            new FieldDefinition("ListLookup", new FieldDefinition.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.Integer)).setDescription("List Lookup"),
-        };
+            new FieldDefinition("ListLookup", new FieldDefinition.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName).setTableType(FieldDefinition.ColumnType.Integer)).setDescription("List Lookup")
+        );
         String lookupSourceListName = "Project-LookupSource-List";
-        _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        new IntListDefinition(lookupSourceListName, LIST_KEY_NAME).setFields(cols).create(conn, getProjectName());
 
         log("** Insert row into list");
         goToProjectHome();
@@ -198,9 +203,10 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href.contains(getProjectName() + "/" + SUB_FOLDER_A) && href.contains("fake") && href.contains("action.view?key=2"));
     }
 
+    // TODO: Move this to 'CAVDStudyTest'
     // Issue 15610: viscstudieslist - URLs generated from lookups are broken
     @Test
-    public void testIssue15610()
+    public void testIssue15610() throws Exception
     {
         log("** Creating study in " + SUB_FOLDER_A);
         goToProjectHome();
@@ -219,10 +225,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickButton("Create Study");
 
         log("** Creating list with lookup to viscstudies.studies");
-        FieldDefinition[] cols = {
-            new FieldDefinition("StudyLookup", new FieldDefinition.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)).setDescription("Study Lookup"),
-        };
-        _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        List<FieldDefinition> cols = List.of(
+            new FieldDefinition("StudyLookup", new FieldDefinition.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)).setDescription("Study Lookup")
+        );
+        new IntListDefinition("Issue15610-List", LIST_KEY_NAME).setFields(cols)
+                .create(createDefaultConnection(), getProjectName());
 
         log("** Inserting row into list");
         goToProjectHome();
@@ -249,14 +256,14 @@ public class ContainerContextTest extends BaseWebDriverTest
 
     // Issue 15751: Pipeline job list generates URLs without correct container
     @Test
-    public void testIssue15751()
+    public void testIssue15751() throws Exception
     {
         log("** Create pipeline jobs");
         insertJobIntoSubFolder(SUB_FOLDER_A);
         insertJobIntoSubFolder(SUB_FOLDER_B);
 
         log("** Viewing pipeline status from project container. Sort by Description (report name) and include sub-folders");
-        beginAt("/pipeline-status/" + getProjectName() + "/showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
+        beginAt("/" + getProjectName() + "/pipeline-status-showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(0), "href");
@@ -271,16 +278,15 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    public void insertJobIntoSubFolder(String folder)
+    public void insertJobIntoSubFolder(String folder) throws Exception
     {
-        goToProjectHome();
-
         log("** Creating list in folder '" + folder + "'");
-        ListHelper.ListColumn[] cols = {
-            new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name")
-        };
+        List<FieldDefinition> cols = List.of(
+            new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription("Name")
+        );
         String listName = folder + "-Issue15751-List";
-        _listHelper.createList(getProjectName() + "/" + folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        new IntListDefinition(listName, LIST_KEY_NAME).setFields(cols)
+                .create(createDefaultConnection(), getProjectName() + "/" + folder);
 
         log("** Creating background R script");
         goToProjectHome();
@@ -558,7 +564,6 @@ public class ContainerContextTest extends BaseWebDriverTest
             String workbookContainer = EscapeUtil.encode(getProjectName()) + "/" + workbookIds[i];
             String href;
             String expectedHref;
-            String expectedContainerRelativeHref;
 
             // update link
             if (hasUpdate)
@@ -566,14 +571,13 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getUpdateHref(i);
                 log("  [edit] column href = " + href);
 
-                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
-                expectedHref = "/query/" + workbookContainer + "/updateQueryRow.view" + rest;
-                expectedContainerRelativeHref = "/" + workbookContainer + "/query-updateQueryRow.view" + rest;
+                expectedHref = WebTestHelper.buildRelativeUrl("query", workbookContainer, "updateQueryRow",
+                        Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", emissionIds[i]));
 
                 assertTrue("Expected and actual [edit] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual  : " + href,
-                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        href != null && (href.contains(expectedHref)));
             }
 
             // details link
@@ -582,45 +586,44 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getDetailsHref(i);
                 log("  [details] column href = " + href);
 
-                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
-                expectedHref = "/query/" + workbookContainer + "/" + detailsAction + rest;
-                expectedContainerRelativeHref = "/" + workbookContainer + "/query-" + detailsAction + rest;
+                expectedHref = WebTestHelper.buildRelativeUrl("query", workbookContainer, detailsAction,
+                        Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", emissionIds[i]));
 
                 assertTrue("Expected and actual [details] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual:   " + href,
-                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        href != null && (href.contains(expectedHref)));
             }
 
             // vehicle link
             href = dr.getHref(i, "Vehicle Id");
             log("  Vehicle column href = " + href);
 
-            expectedHref = "/simpletest/" + getProjectName() + "/vehicle.view?rowid=" + vehicleId;
-            expectedContainerRelativeHref = "/" + getProjectName() + "/simpletest-vehicle.view?rowid=" + vehicleId;
+            expectedHref = WebTestHelper.buildRelativeUrl("simpletest", getProjectName(), "vehicle",
+                    Maps.of("rowid", vehicleId));
 
             assertTrue("Expected and actual Vehicle column URL differ:\n" +
                     "Expected: " + expectedHref + "\n" +
                     "Actual:   " + href,
-                    href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                    href != null && (href.contains(expectedHref)));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
             if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
             {
                 String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
                 String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/" + parentTestWorkbookId;
-                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + parentRowIds[i];
-                expectedHref = "/query/" + parentTestContainer + "/" + parentDetailsAction + rest;
-                expectedContainerRelativeHref = "/" + parentTestContainer + "/query-" + parentDetailsAction + rest;
+                expectedHref = WebTestHelper.buildRelativeUrl("query", parentTestContainer, parentDetailsAction,
+                        Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", parentRowIds[i]));
+
 
                 href = dr.getHref(i, "Parent Test");
                 if (href != null)
                 {
                     log("  Parent test column href = " + href);
                     assertTrue("Expected and actual parent test column URL differ:\n" +
-                            "Expected: " + expectedHref + "\n" +
-                            "Actual:   " + href,
-                            (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                        "Expected: " + expectedHref + "\n" +
+                        "Actual:   " + href,
+                        (href.contains(expectedHref)));
                 }
             }
 
@@ -630,13 +633,12 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getHref(i, "Folder");
 
                 log("  Folder column href = " + href);
-                expectedHref = "/project/" + workbookContainer + "/begin.view?";
-                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view?";
+                expectedHref = WebTestHelper.buildRelativeUrl("project", workbookContainer, "begin");
 
                 assertTrue("Expected and actual container column URL differ:\n" +
-                        "Expected container: " + workbookContainer + "\n" +
-                        "Actual URL        : " + href,
-                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
+                    "Expected container: " + workbookContainer + "\n" +
+                    "Actual URL        : " + href,
+                    href != null && (href.contains(expectedHref)));
             }
 
             log("");
@@ -648,125 +650,124 @@ public class ContainerContextTest extends BaseWebDriverTest
     @LogMethod
     private String insertEmissionTest(String workbookId, String suffix, int vehicleId, String parentRowId) throws IOException, CommandException
     {
-            Connection cn = WebTestHelper.getRemoteApiConnection();
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
-            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
-            Map<String, Object> rowMap = new HashMap<>();
-            rowMap.put("name", "EmissionTest" + suffix);
-            rowMap.put("vehicleId", vehicleId);
+        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
+        Map<String, Object> rowMap = new HashMap<>();
+        rowMap.put("name", "EmissionTest" + suffix);
+        rowMap.put("vehicleId", vehicleId);
 
-            if (parentRowId != null)
-                rowMap.put("ParentTest", parentRowId);
+        if (parentRowId != null)
+            rowMap.put("ParentTest", parentRowId);
 
-            rowMap.put("result", false);
+        rowMap.put("result", false);
 
-            insertCmd.addRow(rowMap);
-            SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
-            Map<String, Object> row = response.getRows().get(0);
-            Long rowId = (Long)row.get("RowId");
-            return rowId.toString();
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
+        Map<String, Object> row = response.getRows().get(0);
+        Integer rowId = (Integer)row.get("RowId");
+        return rowId.toString();
     }
 
     @LogMethod
     private void deleteVehicleRecords() throws IOException, CommandException
     {
-            log("deleting records from vehicle schema that may have been created by this test");
-            Connection cn = WebTestHelper.getRemoteApiConnection();
+        log("deleting records from vehicle schema that may have been created by this test");
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
-            SelectRowsCommand sr0 = new SelectRowsCommand("vehicle", "EmissionTest");
-            SelectRowsResponse resp0 = sr0.execute(cn, getProjectName());
+        SelectRowsCommand sr0 = new SelectRowsCommand("vehicle", "EmissionTest");
+        SelectRowsResponse resp0 = sr0.execute(cn, getProjectName());
 
-            if (resp0.getRowCount().intValue() > 0)
+        if (resp0.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "EmissionTest");
+            for (Map<String, Object> row : resp0.getRows())
             {
-                DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "EmissionTest");
-                for (Map<String, Object> row : resp0.getRows())
-                {
-                    del.addRow(row);
-                }
-                del.execute(cn, getProjectName());
+                del.addRow(row);
             }
+            del.execute(cn, getProjectName());
+        }
 
-            SelectRowsCommand sr1 = new SelectRowsCommand("vehicle", "vehicles");
-            SelectRowsResponse resp1 = sr1.execute(cn, getProjectName());
+        SelectRowsCommand sr1 = new SelectRowsCommand("vehicle", "vehicles");
+        SelectRowsResponse resp1 = sr1.execute(cn, getProjectName());
 
-            if (resp1.getRowCount().intValue() > 0)
+        if (resp1.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "vehicles");
+            for (Map<String, Object> row : resp1.getRows())
             {
-                DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "vehicles");
-                for (Map<String, Object> row : resp1.getRows())
-                {
-                    del.addRow(row);
-                }
-                del.execute(cn, getProjectName());
+                del.addRow(row);
             }
+            del.execute(cn, getProjectName());
+        }
 
-            SelectRowsCommand sr2 = new SelectRowsCommand("vehicle", "models");
-            sr2.addFilter(new Filter("name", MODEL));
-            SelectRowsResponse resp2 = sr2.execute(cn, getProjectName());
+        SelectRowsCommand sr2 = new SelectRowsCommand("vehicle", "models");
+        sr2.addFilter(new Filter("name", MODEL));
+        SelectRowsResponse resp2 = sr2.execute(cn, getProjectName());
 
-            if (resp2.getRowCount().intValue() > 0)
-            {
-                DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
-                del2.addRow(Maps.of("rowid", resp2.getRows().get(0).get("rowid")));
-                del2.execute(cn, getProjectName());
-            }
-
-            SelectRowsCommand sr = new SelectRowsCommand("vehicle", "manufacturers");
-            sr.addFilter(new Filter("name", MANUFACTURER));
-            SelectRowsResponse resp = sr.execute(cn, getProjectName());
-
-            if (resp.getRowCount().intValue() > 0)
-            {
-                DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
-                del1.addRow(Maps.of("rowid", resp.getRows().get(0).get("rowid")));
-                del1.execute(cn, getProjectName());
-            }
-
-            DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
-            del2.addRow(Maps.of("name", COLOR + "!"));
+        if (resp2.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
+            del2.addRow(Maps.of("rowid", resp2.getRows().get(0).get("rowid")));
             del2.execute(cn, getProjectName());
+        }
+
+        SelectRowsCommand sr = new SelectRowsCommand("vehicle", "manufacturers");
+        sr.addFilter(new Filter("name", MANUFACTURER));
+        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+
+        if (resp.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
+            del1.addRow(Maps.of("rowid", resp.getRows().get(0).get("rowid")));
+            del1.execute(cn, getProjectName());
+        }
+
+        DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
+        del2.addRow(Maps.of("name", COLOR + "!"));
+        del2.execute(cn, getProjectName());
     }
 
     @LogMethod
     private int createRequiredRecords() throws IOException, CommandException
     {
-            deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
+        deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
 
-            Connection cn = WebTestHelper.getRemoteApiConnection();
+        Connection cn = WebTestHelper.getRemoteApiConnection();
 
-            //look like we need to create this too
-            InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");
-            insertCmd0.addRow(Maps.of("Name", COLOR, "Hex", "#FF0000"));
-            insertCmd0.execute(cn, getProjectName());
+        //look like we need to create this too
+        InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");
+        insertCmd0.addRow(Maps.of("Name", COLOR, "Hex", "#FF0000"));
+        insertCmd0.execute(cn, getProjectName());
 
-            //then create manufacturer
-            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
-            Map<String,Object> rowMap = new HashMap<>();
-            rowMap.put("name", MANUFACTURER);
-            insertCmd.addRow(rowMap);
-            SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
+        //then create manufacturer
+        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+        Map<String,Object> rowMap = new HashMap<>();
+        rowMap.put("name", MANUFACTURER);
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
 
-            //then create model
-            InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
-            rowMap = new HashMap<>();
-            rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
-            rowMap.put("name", MODEL);
-            insertCmd2.addRow(rowMap);
-            SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
+        //then create model
+        InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
+        rowMap = new HashMap<>();
+        rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
+        rowMap.put("name", MODEL);
+        insertCmd2.addRow(rowMap);
+        SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
 
-            InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
-            rowMap = new HashMap<>();
-            rowMap.put("Color", COLOR + "!");
-            rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
-            rowMap.put("ModelYear", 2050);
-            rowMap.put("Milage", 2);
-            rowMap.put("LastService", new Date());
+        InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
+        rowMap = new HashMap<>();
+        rowMap.put("Color", COLOR + "!");
+        rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
+        rowMap.put("ModelYear", 2050);
+        rowMap.put("Milage", 2);
+        rowMap.put("LastService", new Date());
 
-            insertCmd3.addRow(rowMap);
-            SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
+        insertCmd3.addRow(rowMap);
+        SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
 
-            Map<String, Object> row = response.getRows().get(0);
-            Long rowId = (Long)row.get("RowId");
-            return rowId.intValue();
+        Map<String, Object> row = response.getRows().get(0);
+        return (Integer)row.get("RowId");
     }
 
     @Override

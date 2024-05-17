@@ -34,7 +34,7 @@ public class DataImportPage extends LabKeyPage
     public void uploadFile(File dataFile)
     {
         setFormElement(Locator.id("upload-run-field-file"), dataFile);
-        Locator.tagWithAttributeContaining("a", "onclick", "saveBatch();return false;")
+        Locator.tagWithId("a","btnSaveBatch")
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
         waitForElement(Locator.linkWithText(dataFile.getName()));   // the link will be in a dataRegion below
     }

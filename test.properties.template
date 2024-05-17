@@ -105,7 +105,7 @@ selenium.debug.port=5005
 #==============================================================================
 labkey.port=8080
 labkey.server=http://localhost
-labkey.contextpath=/labkey
+labkey.contextpath=
 
 
 #==============================================================================
@@ -152,6 +152,8 @@ scriptCheck=true
 queryCheck=false
 ## Verify all custom views after each test class
 viewCheck=false
+## Check for CSP warning after tests
+webtest.cspCheck=false
 
 
 #==============================================================================

@@ -58,12 +58,10 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 
     public FilePicker addAttachment(File file)
     {
-        getWrapper().waitFor(()-> elementCache().pickerLink.getAttribute("href") != null, 2000);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().pickerLink));
 
         int initialInputCount = elementCache().findAttachmentInputs().size();
-        // work-around issue where clicking the pickerLink doesn't take
-        String script = elementCache().pickerLink.getAttribute("href");
-        getWrapper().executeScript(script);     // should be "javascript:addFilePicker('filePickerTable', 'filePickerLink')
+        elementCache().pickerLink.click();
 
         List<FileInput> attachmentInputs = new ArrayList<>();
         WebDriverWrapper.waitFor(() -> {
@@ -78,25 +76,27 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 
     public FilePicker removeAllAttachments()
     {
-        for (WebElement link : elementCache().findRemoveLinks())
+        for (WebElement row : elementCache().findAttachmentRows())
         {
-            clickRemove(link);
+            clickRemove(row);
         }
         return this;
     }
 
     public FilePicker removeAttachment(int index)
     {
-        clickRemove(elementCache().findRemoveLinks().get(index));
+        clickRemove(elementCache().findAttachmentRows().get(index));
         return this;
     }
 
     /**
      * Click provided remove link and handle confirmation
      */
-    private void clickRemove(WebElement removeLink)
+    private void clickRemove(WebElement attachmentRow)
     {
-        boolean savedAttachment = removeLink.getAttribute("onclick") != null;
+        boolean savedAttachment = !Locator.tag("input").existsIn(attachmentRow);
+
+        WebElement removeLink = Locator.linkWithText("remove").findElement(attachmentRow);
         removeLink.click();
 
         if (savedAttachment)
@@ -125,12 +125,17 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         protected List<FileInput> findAttachmentInputs()
         {
             List<WebElement> inputElements = Locators.attachmentInput.findElements(this);
             return inputElements.stream().map(el -> new FileInput(el, getDriver())).collect(Collectors.toList());
+        }
+
+        protected List<WebElement> findAttachmentRows()
+        {
+            return Locator.xpath("./tbody/tr").findElements(this);
         }
 
         protected List<WebElement> findRemoveLinks()

@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controls 'Tabs' and 'Tab' components from 'react-bootstrap'
+ * Controls 'Tabs' and 'Tab' components from 'react-bootstrap' or 'packages/components/src/internal/Tabs.tsx'
  *
  * Corresponding application code looks something like:
  * <pre>{@code
- * <Tabs id="panel-tabs" >
+ * <Tabs className="panel-tabs" >
  *     <Tab title="First Tab">
  *         <PanelComponent1/>
  *     </Tab>
@@ -35,7 +35,7 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
     private final WebElement _el;
     private final WebDriver _driver;
 
-    protected Tabs(WebElement element, WebDriver driver)
+    public Tabs(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
@@ -60,7 +60,9 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     public WebElement selectTab(String tabText)
     {
-        elementCache().findTab(tabText).click();
+        WebElement tab = elementCache().findTab(tabText);
+        getWrapper().scrollIntoView(tab);
+        tab.click();
         WebElement panel = findPanelForTab(tabText);
         getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
         return panel;
@@ -86,11 +88,11 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement tabList = Locator.xpath("./ul").withClass("nav-tabs").findWhenNeeded(this);
+        final WebElement tabList = Locator.xpath("(ul|div/ul)").withClass("nav-tabs").findWhenNeeded(this);
         final Map<String, WebElement> tabMap = new HashMap<>();
         final List<WebElement> tabs = new ArrayList<>();
         private final Locator.XPathLocator tabLoc = Locator.tag("a").withAttribute("role", "tab");
-        final WebElement tabContent = Locator.xpath("./div").withClass("tab-content").findWhenNeeded(this);
+        final WebElement tabContent = Locator.xpath("(div|div/div)").withClass("tab-content").findWhenNeeded(this);
 
         public ElementCache()
         {

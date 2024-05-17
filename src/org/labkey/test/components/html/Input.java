@@ -82,13 +82,20 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
     @Override
     public String get()
     {
-        return getWrapper().getFormElement(getComponentElement());
+        return getComponentElement().getDomProperty("value");
     }
 
     @Override
     public void set(String value)
     {
         getWrapper().setFormElement(getComponentElement(), value);
+    }
+
+    public void setWithPaste(String value)
+    {
+        getWrapper().actionClear(getComponentElement());
+        getWrapper().actionPaste(getComponentElement(), value);
+        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.change);
     }
 
     public void blur()

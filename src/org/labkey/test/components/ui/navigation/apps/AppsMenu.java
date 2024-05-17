@@ -1,22 +1,66 @@
 package org.labkey.test.components.ui.navigation.apps;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.Optional;
 
 /**
  * Wraps the expand/collapse toggle piece of the Apps menu in Biologics and SampleManager.
  * In LKS views, LKAppsMenu is the analog of this component
  */
-public class AppsMenu extends BaseBootstrapMenu
+public class AppsMenu extends WebDriverComponent<AppsMenu.ElementCache>
 {
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
 
     protected AppsMenu(WebElement element, WebDriver driver)
     {
-        super(element, driver);
+        _componentElement = element;
+        _driver = driver;
+    }
+
+    @Override
+    protected WebDriver getDriver()
+    {
+        return _driver;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _componentElement;
+    }
+
+    protected boolean isExpanded()
+    {
+        return "true".equals(elementCache().toggle.getAttribute("aria-expanded"));
+    }
+
+    protected boolean isLoaded()
+    {
+        return elementCache().getList().isPresent();
+    }
+
+    public void expand()
+    {
+        if (!isExpanded())
+        {
+            elementCache().toggle.click();
+            WebDriverWrapper.waitFor(this::isLoaded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
+    public void collapse()
+    {
+        if (isExpanded())
+        {
+            elementCache().toggle.click();
+        }
     }
 
     /**
@@ -26,6 +70,7 @@ public class AppsMenu extends BaseBootstrapMenu
     public ProductsNavContainer showProductsPanel()
     {
         expand();
+
         return new ProductsNavContainer.ProductNavContainerFinder(getDriver()).withTitle("Applications")
                 .waitFor();
     }
@@ -43,26 +88,38 @@ public class AppsMenu extends BaseBootstrapMenu
                 .clickItem(node);
     }
 
-    public void navigateToLabKey(String project)
-    {
-        showProductsPanel()
-                .clickLabkey()
-                .clickProject(project);
-    }
-
+    public static Locator rootLocator = Locator.XPathLocator.union(
+        Locator.byClass("product-navigation-menu"), // Bio/FM/SM
+        Locator.id("headerProductDropdown")); // LKS
 
     @Override
-    protected Locator getToggleLocator()
+    protected AppsMenu.ElementCache newElementCache()
     {
-        return BootstrapMenu.Locators.dropdownToggle();
+        return new AppsMenu.ElementCache();
     }
 
+    protected class ElementCache extends Component<?>.ElementCache
+    {
+        public final WebElement rootElement = rootLocator.findWhenNeeded(getDriver());
+
+        private final Locator _toggleLocator = Locator.XPathLocator.union(
+                Locator.byClass("navbar-menu-button"), // Bio/FM/SM
+                Locator.byClass("dropdown-toggle") // LKS
+        );
+        public final WebElement toggle = _toggleLocator.findWhenNeeded(rootElement);
+
+        public Optional<WebElement> getList()
+        {
+            return Locator.byClass("product-navigation-listing").findOptionalElement(rootElement);
+        }
+    }
 
     public static class AppsMenuFinder extends WebDriverComponent.WebDriverComponentFinder<AppsMenu, AppsMenuFinder>
     {
-        private Locator _locator = Locator.XPathLocator.union(
-                Locator.id("product-navigation-button").parent(),   //lksm/bio
-                Locator.id("headerProductDropdown"));               //lks
+        private final Locator _locator = Locator.XPathLocator.union(
+                Locator.byClass("product-navigation-menu"), // Bio/FM/SM
+                Locator.id("headerProductDropdown") // LKS
+        );
 
         public AppsMenuFinder(WebDriver driver)
         {
@@ -72,7 +129,7 @@ public class AppsMenu extends BaseBootstrapMenu
         @Override
         protected Locator locator()
         {
-            return _locator;
+            return AppsMenu.rootLocator;
         }
 
         @Override

@@ -70,13 +70,28 @@ public class CrawlerTestController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class ExternalLinkAction extends SimpleViewAction<Object>
+    public static class ExternalLinkAction extends SimpleViewAction<Object>
     {
         @Override
         public ModelAndView getView(Object form, BindException errors)
         {
             getPageConfig().setTitle("External link test page");
             return new JspView<>("/org/labkey/crawlertest/view/externalLink.jsp");
+        }
+
+        @Override
+        public void addNavTrail(NavTree root)
+        { }
+    }
+
+    @RequiresPermission(ReadPermission.class)
+    public static class CspWarningAction extends SimpleViewAction<Object>
+    {
+        @Override
+        public ModelAndView getView(Object form, BindException errors)
+        {
+            getPageConfig().setTitle("CSP Warning Test Page");
+            return new JspView<>("/org/labkey/crawlertest/view/cspWarning.jsp");
         }
 
         @Override
