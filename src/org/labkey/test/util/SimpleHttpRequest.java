@@ -22,6 +22,8 @@ import org.labkey.remoteapi.Connection;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
+import javax.mail.internet.ContentDisposition;
+import javax.mail.internet.ParseException;
 import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
@@ -33,7 +35,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -177,28 +178,16 @@ public class SimpleHttpRequest
                 // Example:
                 // attachment; filename="diagnostics_2023-03-31_12-36-31.zip"
                 String contentDisposition = StringUtils.trimToEmpty(con.getHeaderField("Content-Disposition"));
-                String[] splitDisposition = contentDisposition.split("; ");
-                Map<String, String> params = new LinkedHashMap<>();
-                for (String s : splitDisposition)
+                String responseFilename = null;
+                if (!contentDisposition.isEmpty())
                 {
-                    String[] param = s.split("=", 2);
-                    params.put(param[0], param.length == 2 ? StringUtils.strip(param[1], "\"") : null);
-                }
-                String responseFilename = params.get("filename");
-                if (responseFilename == null)
-                {
-                    // Sometimes filename includes encoding information
-                    // attachment; filename*=UTF-8''diagnostics_2023-10-19_14-39-56.zip
-                    responseFilename = params.get("filename*");
-                    if (responseFilename != null)
+                    try
                     {
-                        String[] split = responseFilename.split("'", 3);
-                        if (split.length == 3)
-                        {
-                            responseFilename = split[2];
-                        }
+                        responseFilename = new ContentDisposition(contentDisposition).getParameter("filename");
                     }
+                    catch (ParseException ignore) { }
                 }
+
                 if (fileName == null)
                 {
                     if (responseFilename == null)

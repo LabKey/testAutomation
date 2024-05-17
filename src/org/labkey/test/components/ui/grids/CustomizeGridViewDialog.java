@@ -324,11 +324,6 @@ public class CustomizeGridViewDialog extends ModalDialog
     public CustomizeGridViewDialog removeColumn(String column, int index)
     {
         WebElement listItem = getShownInGridListItems(column).get(index);
-
-        // Make sure the mouse is on the identified row. Tests that remove columns one after another can show the mouse
-        // hovering for a moment over the remove icon of the previous row.
-        listItem.click();
-
         WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findElement(listItem);
         getWrapper().mouseOver(removeIcon);
         removeIcon.click();
