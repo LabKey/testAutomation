@@ -10,7 +10,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,17 +37,18 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
     {
         selectTypeTab(type);
 
-        List<WebElement> elements = Locator.tagWithClass("input", "gwt-TextBox").findElements(getDriver());
-        WebElement wellGroup = elements.get(elements.size()-1);
-        setFormElement(wellGroup, name);
-        fireEvent(wellGroup, SeleniumEvent.change);
+        WebElement nameField = Locator.tagWithName("input", "wellGroupName")
+                .withAttribute("data-type", type)
+                .findElement(getDriver());
+        setFormElement(nameField, name);
+        fireEvent(nameField, SeleniumEvent.change);
         clickButton("Create", 0);
         waitForElement(Locator.tagContainingText("label", name));
     }
 
     public void selectTypeTab(String name)
     {
-        Locator.tagWithClass("*", "gwt-Label").withText(name).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        Locator.tagWithClass("div", "gwt-Label").withText(name).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
     }
 
     public void selectWellsForWellgroup(String type, String wellGroup, String startLocation, String endLocation)
