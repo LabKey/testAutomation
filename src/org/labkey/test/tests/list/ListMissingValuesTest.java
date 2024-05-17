@@ -7,9 +7,10 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ImportDataPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.util.Arrays;
@@ -64,20 +65,21 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
                         "J.D.\t50\t\tmale\t.Q";
 
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
+        FieldDefinition[] columns = new FieldDefinition[3];
 
-        ListHelper.ListColumn listColumn = new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "");
+        FieldDefinition listColumn = new FieldDefinition("name", ColumnType.String).setLabel("Name");
         columns[0] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("age with space", "Age with space", ListHelper.ListColumnType.Integer, "");
+        listColumn = new FieldDefinition("age with space", ColumnType.Integer).setLabel("Age with space");
         listColumn.setMvEnabled(true);
         columns[1] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("sex", "Sex", ListHelper.ListColumnType.String, "");
+        listColumn = new FieldDefinition("sex", ColumnType.String).setLabel("Sex");
         listColumn.setMvEnabled(true);
         columns[2] = listColumn;
 
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        String containerPath = getProjectName();
+        _listHelper.createList(containerPath, LIST_NAME, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.goToList(LIST_NAME);

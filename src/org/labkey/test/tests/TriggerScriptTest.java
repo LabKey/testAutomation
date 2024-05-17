@@ -36,10 +36,10 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
@@ -179,20 +179,18 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //create List
         FieldDefinition[] columns = new FieldDefinition[] {
-                new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, ""),
-                new ListHelper.ListColumn("ssn","SSN", ListHelper.ListColumnType.String,""),
-                new ListHelper.ListColumn("company","Company",ListHelper.ListColumnType.String,"")
+                new FieldDefinition("name", ColumnType.String).setLabel("Name"),
+                new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
+                new FieldDefinition("company", ColumnType.String).setLabel("Company")
 
         };
 
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns );
+        String containerPath1 = getProjectName();
+        _listHelper.createList(containerPath1, LIST_NAME, "Key", columns);
 
         log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(getProjectName(), "People",
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+        String containerPath = getProjectName();
+        _listHelper.createList(containerPath, "People", "Key", new FieldDefinition("Name", ColumnType.String).setDescription("Name"), new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"), new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
@@ -815,8 +813,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
                 .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
+                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
+                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
         dataClass.create(createDefaultConnection(), getProjectName());
     }
 
@@ -827,8 +825,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         SampleTypeDefinition sampleType = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                 .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
+                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
+                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
     }
 }

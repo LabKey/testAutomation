@@ -21,7 +21,8 @@ import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Perf;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 
 import java.io.File;
 import java.io.IOException;
@@ -181,11 +182,9 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     {
         for (int x = 0; x < count; x++)
         {
-            _listHelper.createList(getProjectName(), "TestList"+x,
-                    ListHelper.ListColumnType.AutoInteger, "AuthorId",
-                    new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "first name test desc"),
-                    new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "")
-            );
+            String containerPath = getProjectName();
+            FieldDefinition[] cols = new FieldDefinition[]{new FieldDefinition("FirstName", ColumnType.String).setDescription("first name test desc"), new FieldDefinition("LastName", ColumnType.String)};
+            _listHelper.createList(containerPath, "TestList"+x, "AuthorId", cols);
         }
 
     }

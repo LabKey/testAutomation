@@ -29,10 +29,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ListHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -52,7 +53,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
 {
     protected final static String LIST_NAME = "InlineImagesList";
     protected final static String LIST_KEY_NAME = "Key";
-    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
+    protected final static ColumnType LIST_KEY_TYPE = ColumnType.Integer;
 
     protected final static String LIST_ATTACHMENT01_NAME = "Attachment01";
     protected final static String LIST_ATTACHMENT01_LABEL = "Attachment Column 01";
@@ -62,16 +63,16 @@ public class InlineImagesListTest extends BaseWebDriverTest
     protected final static String LIST_ATTACHMENT02_LABEL = "Attachment Column 02";
     protected final static String LIST_ATTACHMENT02_DESC = "An 2nd attachment column.";
 
-    protected final static ListHelper.ListColumnType LIST_ATTACHMENT_TYPE = ListHelper.ListColumnType.Attachment;
+    protected final static ColumnType LIST_ATTACHMENT_TYPE = ColumnType.Attachment;
 
     protected final static String LIST_DESC_COL_NAME = "Description";
     protected final static String LIST_DESC_COL_LABEL = "Description";
     protected final static String LIST_DESC_COL_DESC = "A simple description(text) field.";
-    protected final static ListHelper.ListColumnType LIST_DESC_COL_TYPE = ListHelper.ListColumnType.String;
+    protected final static ColumnType LIST_DESC_COL_TYPE = ColumnType.String;
 
-    protected final ListHelper.ListColumn _listColAttachment01 = new ListHelper.ListColumn(LIST_ATTACHMENT01_NAME, LIST_ATTACHMENT01_LABEL, LIST_ATTACHMENT_TYPE, LIST_ATTACHMENT01_DESC);
-    protected final ListHelper.ListColumn _listColAttachment02 = new ListHelper.ListColumn(LIST_ATTACHMENT02_NAME, LIST_ATTACHMENT02_LABEL, LIST_ATTACHMENT_TYPE, LIST_ATTACHMENT02_DESC);
-    protected final ListHelper.ListColumn _listColDescription = new ListHelper.ListColumn(LIST_DESC_COL_NAME, LIST_DESC_COL_LABEL, LIST_DESC_COL_TYPE, LIST_DESC_COL_DESC);
+    protected final FieldDefinition _listColAttachment01 = new FieldDefinition(LIST_ATTACHMENT01_NAME, LIST_ATTACHMENT_TYPE).setLabel(LIST_ATTACHMENT01_LABEL).setDescription(LIST_ATTACHMENT01_DESC);
+    protected final FieldDefinition _listColAttachment02 = new FieldDefinition(LIST_ATTACHMENT02_NAME, LIST_ATTACHMENT_TYPE).setLabel(LIST_ATTACHMENT02_LABEL).setDescription(LIST_ATTACHMENT02_DESC);
+    protected final FieldDefinition _listColDescription = new FieldDefinition(LIST_DESC_COL_NAME, LIST_DESC_COL_TYPE).setLabel(LIST_DESC_COL_LABEL).setDescription( LIST_DESC_COL_DESC);
 
     protected final static File LRG_PNG_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
     protected final static File JPG01_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
@@ -140,7 +141,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         List<String> exportedColumn;
 
         log("Create a list named: " + LIST_NAME);
-        _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listColDescription, _listColAttachment01);
+        _listHelper.createList(getProjectName(), LIST_NAME, new FieldDefinition(LIST_KEY_NAME, LIST_KEY_TYPE), _listColDescription, _listColAttachment01);
 
         Map<String, String> newValues = new HashMap<>();
         goToManageLists();

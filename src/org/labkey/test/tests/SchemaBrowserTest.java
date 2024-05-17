@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -120,23 +119,10 @@ public class SchemaBrowserTest extends BaseWebDriverTest
 
     public void createLists()
     {
-        _listHelper.createList(PROJECT_NAME, AUTHORS_LIST,
-                ListHelper.ListColumnType.AutoInteger, "AuthorId",
-                new FieldDefinition("FirstName", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_AUTHORS),
-                new FieldDefinition("LastName", FieldDefinition.ColumnType.String)
-        );
+        _listHelper.createList(PROJECT_NAME, AUTHORS_LIST, "AuthorId", new FieldDefinition("FirstName", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_AUTHORS), new FieldDefinition("LastName", FieldDefinition.ColumnType.String));
 
-        _listHelper.createList(PROJECT_NAME, PUBLISHERS_LIST,
-                ListHelper.ListColumnType.AutoInteger, "PublisherId",
-                new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_PUBLISHERS)
-        );
+        _listHelper.createList(PROJECT_NAME, PUBLISHERS_LIST, "PublisherId", new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_PUBLISHERS));
 
-        _listHelper.createList(PROJECT_NAME, BOOKS_LIST,
-                ListHelper.ListColumnType.AutoInteger, "TitleId",
-                new FieldDefinition("Title", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_BOOKS),
-                new FieldDefinition("Subtitle", FieldDefinition.ColumnType.String),
-                new FieldDefinition("AuthorId", new FieldDefinition.LookupInfo("", "lists", AUTHORS_LIST).setTableType(FieldDefinition.ColumnType.Integer)),
-                new FieldDefinition("PublisherId", new FieldDefinition.LookupInfo("", "lists", PUBLISHERS_LIST).setTableType(FieldDefinition.ColumnType.Integer))
-        );
+        _listHelper.createList(PROJECT_NAME, BOOKS_LIST, "TitleId", new FieldDefinition("Title", FieldDefinition.ColumnType.String).setDescription(TEST_DESC_BOOKS), new FieldDefinition("Subtitle", FieldDefinition.ColumnType.String), new FieldDefinition("AuthorId", new FieldDefinition.LookupInfo("", "lists", AUTHORS_LIST).setTableType(FieldDefinition.ColumnType.Integer)), new FieldDefinition("PublisherId", new FieldDefinition.LookupInfo("", "lists", PUBLISHERS_LIST).setTableType(FieldDefinition.ColumnType.Integer)));
     }
 }

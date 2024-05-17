@@ -8,9 +8,10 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
@@ -36,10 +37,8 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName());
         log("Creating test list");
-        _listHelper.createList(getProjectName() + "/", LIST_NAME, ListHelper.ListColumnType.AutoInteger, "RowId",
-                new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String),
-                new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer));
+        String containerPath = getProjectName() + "/";
+        _listHelper.createList(containerPath, LIST_NAME, "RowId", new FieldDefinition("FirstName", ColumnType.String), new FieldDefinition("LastName", ColumnType.String), new FieldDefinition("Age", ColumnType.Integer));
 
         log("Adding Single list webpart");
         goToProjectHome();

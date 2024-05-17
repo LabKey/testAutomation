@@ -181,9 +181,8 @@ public class ListIndexingTest extends BaseWebDriverTest
     {
         String attachmentList = "List with Attachment";
         File attachmentFile = TestFileUtils.getSampleData("fileTypes/pdf_sample.pdf");
-        _listHelper.createList(getProjectName(), attachmentList, ListHelper.ListColumnType.AutoInteger, "id",
-                new FieldDefinition("Name", FieldDefinition.ColumnType.String),
-                new FieldDefinition("File", FieldDefinition.ColumnType.Attachment));
+        String containerPath = getProjectName();
+        _listHelper.createList(containerPath, attachmentList, "id", new FieldDefinition("Name", FieldDefinition.ColumnType.String), new FieldDefinition("File", FieldDefinition.ColumnType.Attachment));
         _listHelper.beginAtList(getProjectName(), attachmentList);
         _listHelper.insertNewRow(Map.of("Name", "pdf file",
                 "File", attachmentFile.getAbsolutePath()), false);

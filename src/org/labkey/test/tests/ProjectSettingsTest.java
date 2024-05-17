@@ -30,10 +30,10 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
@@ -190,9 +190,9 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     {
 
         ListDefinition listDef = new IntListDefinition(DT_LIST_NAME, DT_LIST_ID_COL);
-        listDef.setFields(List.of(new FieldDefinition(DT_LIST_DATE_COL, FieldDefinition.ColumnType.Date),
-                new FieldDefinition(DT_LIST_TIME_COL, FieldDefinition.ColumnType.Time),
-                new FieldDefinition(DT_LIST_DATETIME_COL, FieldDefinition.ColumnType.DateAndTime)));
+        listDef.setFields(List.of(new FieldDefinition(DT_LIST_DATE_COL, ColumnType.Date),
+                new FieldDefinition(DT_LIST_TIME_COL, ColumnType.Time),
+                new FieldDefinition(DT_LIST_DATETIME_COL, ColumnType.DateAndTime)));
 
         TestDataGenerator tdg = listDef.create(createDefaultConnection(), project);
 
@@ -330,8 +330,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         projectSettingPage.setDefaultDateTimeDisplay(DATE_TIME_FORMAT_INJECTION);
         projectSettingPage.save();
 
-        _listHelper.createList(getProjectName(), "IceCream", ListHelper.ListColumnType.AutoInteger, "IceCreamID",
-                new ListHelper.ListColumn("IceCreamDate", "", ListHelper.ListColumnType.DateAndTime, ""));
+        String containerPath = getProjectName();
+        _listHelper.createList(containerPath, "IceCream", "IceCreamID", new FieldDefinition("IceCreamDate", ColumnType.DateAndTime));
         goToProjectHome();
         clickAndWait(Locator.linkWithText("IceCream"));
         Map<String, String> testRow = new HashMap<>();

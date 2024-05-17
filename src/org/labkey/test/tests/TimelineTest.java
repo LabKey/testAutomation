@@ -20,7 +20,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -41,15 +42,14 @@ public class TimelineTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "TimelineTestProject";
     private static final String FOLDER_NAME = "timeline folder";
     private final static String LIST_NAME = "People";
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
 
-    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
+    private final static FieldDefinition[] LIST_COLUMNS = new FieldDefinition[]
     {
-        new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
-        new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
-        new ListHelper.ListColumn("DOB", "DOB", ListHelper.ListColumnType.DateAndTime, "Date of Birth"),
-        new ListHelper.ListColumn("DOD", "DOD", ListHelper.ListColumnType.DateAndTime, "Date of Death"),
+        new FieldDefinition("FirstName", ColumnType.String).setDescription("The first name"),
+        new FieldDefinition("LastName", ColumnType.String).setDescription("The last name"),
+        new FieldDefinition("DOB", ColumnType.DateAndTime).setLabel("DOB").setDescription("Date of Birth"),
+        new FieldDefinition("DOD", ColumnType.DateAndTime).setLabel("DOD").setDescription("Date of Death"),
     };
 
     private final static String[][] TEST_DATA =
@@ -156,7 +156,8 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void createList()
     {
-        _listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        String containerPath = getProjectName() + "/" + FOLDER_NAME;
+        _listHelper.createList(containerPath, LIST_NAME, LIST_KEY_NAME, LIST_COLUMNS);
 
         StringBuilder data = new StringBuilder();
         data.append(LIST_KEY_NAME).append("\t");

@@ -22,8 +22,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -56,9 +56,10 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         new PortalHelper(this).addWebPart("Lists");
-        ListHelper.ListColumn col1 = new ListHelper.ListColumn(OVER_CUTOFF, OVER_CUTOFF, ListHelper.ListColumnType.Integer, "");
-        ListHelper.ListColumn col2 = new ListHelper.ListColumn(AT_CUTOFF, AT_CUTOFF, ListHelper.ListColumnType.Integer, "");
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", col1, col2);
+        FieldDefinition col1 = new FieldDefinition(OVER_CUTOFF, FieldDefinition.ColumnType.Integer).setLabel(OVER_CUTOFF);
+        FieldDefinition col2 = new FieldDefinition(AT_CUTOFF, FieldDefinition.ColumnType.Integer).setLabel(AT_CUTOFF);
+        String containerPath = getProjectName();
+        _listHelper.createList(containerPath, LIST_NAME, "Key", col1, col2);
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData()
                 .setText(getListData())
