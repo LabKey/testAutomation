@@ -83,9 +83,11 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.bidi.BiDi;
+import org.openqa.selenium.bidi.Network;
 import org.openqa.selenium.bidi.log.GenericLogEntry;
 import org.openqa.selenium.bidi.log.Log;
 import org.openqa.selenium.bidi.log.LogEntry;
+import org.openqa.selenium.bidi.network.ResponseDetails;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -133,6 +135,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -4027,6 +4030,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
         Locator.XPathLocator headerLoc = Locator.byClass("header-logo");
         if (isElementPresent(headerLoc))
             mouseOver(headerLoc);
+    }
+
+    void doAndMeasureRequests(Runnable runnable)
+    {
+        try (Network network = new Network(getDriver())) {
+            List<ResponseDetails> future = new CopyOnWriteArrayList<>();
+            network.onResponseCompleted(future::add);
+
+            runnable.run();
+            sleep(10_000);
+            ResponseDetails response = future.get(0);
+            String windowHandle = getDriver().getWindowHandle();
+
+            Assert.assertEquals(windowHandle, response.getBrowsingContextId());
+            Assert.assertEquals("get", response.getRequest().getMethod().toLowerCase());
+            Assert.assertEquals(200L, response.getResponseData().getStatus());
+        }
     }
 }
 
