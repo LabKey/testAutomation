@@ -83,14 +83,12 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.bidi.BiDi;
-import org.openqa.selenium.bidi.log.BaseLogEntry;
 import org.openqa.selenium.bidi.log.GenericLogEntry;
 import org.openqa.selenium.bidi.log.Log;
 import org.openqa.selenium.bidi.log.LogEntry;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxDriverService;
@@ -99,7 +97,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -354,24 +351,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     firefoxOptions.setLogLevel(FirefoxDriverLogLevel.WARN);
                     firefoxOptions.addPreference("--log", "WARN");
                     firefoxOptions.setCapability("webSocketUrl", true);
-
-                    String browserPath = System.getProperty("selenium.firefox.binary", "");
-                    FirefoxBinary binary;
-                    if (browserPath.length() > 0)
-                    {
-                        binary = new FirefoxBinary(new File(browserPath));
-                    }
-                    else
-                    {
-                        binary = new FirefoxBinary();
-                    }
-
                     if (TestProperties.isRunWebDriverHeadless())
                     {
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
-                        binary.addCommandLineOptions("--headless");
+                        firefoxOptions.addArguments("--headless");
                     }
-                    firefoxOptions.setBinary(binary);
+
+                    String browserPath = System.getProperty("selenium.firefox.binary", "");
+                    firefoxOptions.setBinary(browserPath);
 
                     newDriverService = GeckoDriverService.createDefaultService();
                     try
@@ -4078,7 +4065,7 @@ class BrowserConsoleLog
     {
         String type = logEntry.getType();
         String prefix = type != null ? "[" + type + "] " : "";
-        Level logLevel = LOG_ENTRY_LEVELS.get(String.valueOf(logEntry.getLevel()));
-        LOGGER.log(logLevel == null ? Level.INFO : logLevel, prefix + logEntry.getText());
+        Level logLevel = LOG_ENTRY_LEVELS.getOrDefault(String.valueOf(logEntry.getLevel()), Level.INFO);
+        LOGGER.log(logLevel, prefix + logEntry.getText());
     }
 }
