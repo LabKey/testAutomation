@@ -217,13 +217,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             case REMOTE: //experimental
             {
-                try
+                if (oldWebDriver == null)
                 {
-                    newWebDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
-                }
-                catch (MalformedURLException e)
-                {
-                    throw new RuntimeException(e);
+                    try
+                    {
+                        newWebDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
+                    }
+                    catch (MalformedURLException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
                 }
                 break;
             }
