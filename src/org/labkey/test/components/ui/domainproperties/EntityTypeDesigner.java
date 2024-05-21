@@ -7,6 +7,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.components.html.ValidatingInput;
@@ -38,6 +39,15 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     }
 
     protected abstract T getThis();
+
+    public T setSystemFieldVisibility(String fieldName, boolean isVisible)
+    {
+        var xpath = "//div[contains(@class, 'domain-system-fields__grid')]//td[text()='" + fieldName + "']/preceding-sibling::td//input";
+        var checkBox = Checkbox.Checkbox(Locator.xpath(xpath));
+        var enabledCheckBox = checkBox.find(getFieldsPanel());
+        enabledCheckBox.set(isVisible);
+        return getThis();
+    }
 
     public T removeField(boolean confirmDialogExpected, String fieldName)
     {

@@ -14,10 +14,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CspLogUtil
 {
@@ -41,22 +41,28 @@ public class CspLogUtil
         if (TestProperties.isServerRemote() || missingLog)
             return;
 
-        if (!logFile.isFile())
+        BasicFileAttributes logFileAttributes = null;
+        try
+        {
+            logFileAttributes = Files.readAttributes(logFile.toPath(), BasicFileAttributes.class);
+            if (!logFileAttributes.isRegularFile())
+            {
+                throw new IOException(logFile.getAbsolutePath() + " is not a file");
+            }
+        }
+        catch (IOException e)
         {
             missingLog = true; // Only fail one test if CSP check is enabled but log is missing.
             if (TestProperties.isCspCheckSkipped())
             {
-                TestLogger.warn("CSP log not found");
+                TestLogger.warn(e.getMessage());
                 return;
             }
-            else
-            {
-                assertThat(logFile).as("CSP log file").isFile(); // Should fail
-            }
+            throw new RuntimeException("Unable to read CSP log", e);
         }
 
-        long logSize = logFile.length();
-        long modified = logFile.lastModified();
+        long logSize = logFileAttributes.size();
+        long modified = logFileAttributes.lastModifiedTime().toMillis();
         if (logSize > 0 && (logSize > lastSize || modified > lastModified))
         {
             try
