@@ -6,6 +6,7 @@ import org.labkey.api.collections.RowMapFactory;
 import org.labkey.api.util.JsonUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,11 @@ public class PlateParams
     private Integer _columns;
     private Integer _rowId;
 
-    public PlateParams(String name, Integer plateSetId)
+    public PlateParams(String name, Integer plateSetId, PlateParams.PlateType plateType)
     {
         _name = name;
         _plateSetId = plateSetId;
+        _plateType = plateType.getValue();
     }
 
     public PlateParams(JSONObject json)
@@ -111,10 +113,15 @@ public class PlateParams
      * @param plateType
      * @return
      */
-    public PlateParams setPlateType(Integer plateType)
+    public PlateParams setPlateType(PlateType plateType)
     {
-        _plateType = plateType;
+        _plateType = plateType.getValue();
         return this;
+    }
+
+    public PlateType getPlateType()
+    {
+        return PlateType.fromValue(_plateType);
     }
 
     public Integer getPlateSetId()
@@ -178,5 +185,40 @@ public class PlateParams
     public boolean getArchived()
     {
         return _archived;
+    }
+
+    // // 1- 3x4(12), 2- 4x6(24), 3-6x8(48), 4-8x12(96), 5-16x24(384)
+    public enum PlateType{
+        Plate_3x4(1, "3x4(12)"),
+        Plate_4x6(2, "4x6(24)"),
+        Plate_6x8(3, "6x8(48)"),
+        Plate_8x12(4, "8x12(96)"),
+        Plate_16x24(4, "16x24(384)");
+
+        private final int _value;
+        private final String _description;
+        private static final Map<Integer, PlateType> _map = new HashMap<>();
+        PlateType(int value, String description)
+        {
+            _value = value;
+            _description = description;
+        }
+
+        public Integer getValue()
+        {
+            return _value;
+        }
+
+        static {
+            for (PlateType plateType : PlateType.values())
+            {
+                _map.put(plateType.getValue(), plateType);
+            }
+        }
+
+        public static PlateType fromValue(int value)
+        {
+            return _map.get(value);
+        }
     }
 }

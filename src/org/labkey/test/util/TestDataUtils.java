@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,43 @@ public class TestDataUtils
                                               boolean includeHeaders)
     {
         return toTabular(rowMaps, columns, ",", includeHeaders);
+    }
+
+    /**
+     * convert a List of Map<String, Object> to a list of List<String>
+     * @param rowMaps   Source data
+     * @param columns   keys contained in each map, will copy values associated with them to the resulting list
+     * @return A List<List<String>> containing values
+     * @throws IOException
+     */
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders) throws IOException
+    {
+        List<List<String>> lists = new ArrayList<>();
+
+        if (includeHeaders)
+        {
+            List<String> headers = new ArrayList<>();
+            for(String col : columns)
+                headers.add(col);
+
+            lists.add(headers);
+        }
+
+        for (int i=0; i<rowMaps.size(); i++)
+        {
+            List<String> rowList = new ArrayList<>();
+            var rowMap = rowMaps.get(i);
+            for(String column : columns)
+            {
+                var value = (String) rowMap.get(column);
+                if (value == null)
+                    rowList.add("");
+                else
+                    rowList.add(value);
+            }
+            lists.add(rowList);
+        }
+        return lists;
     }
 
     /**
