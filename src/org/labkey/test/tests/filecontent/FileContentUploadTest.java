@@ -349,7 +349,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         row = editor.fieldsPanel().addField(COLUMN_NAME);
         row.setLabel(COLUMN_NAME);
-        row.setLookup(new FieldDefinition.LookupInfo(getProjectName(), "lists", LIST_NAME).setTableType(ColumnType.String));
+        row.setLookup(new FieldDefinition.StringLookup(getProjectName(), "lists", LIST_NAME));
         editor.clickFinish();
     }
 

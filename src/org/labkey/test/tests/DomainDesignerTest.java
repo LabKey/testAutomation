@@ -254,8 +254,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String sampleType = "TestSampleForInvalidLookupField";
 
         log("Creating a list used for look up");
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, listName, "Id");
+        _listHelper.createList(getProjectName(), listName, "Id");
 
         log("Creating a sample type with look up field to above list");
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);

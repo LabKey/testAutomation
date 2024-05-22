@@ -137,8 +137,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
         String listName = "Export List";
         goToProjectHome();
 
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, listName, "id", new FieldDefinition("Color", FieldDefinition.ColumnType.String), new FieldDefinition("Shape", FieldDefinition.ColumnType.String));
+        _listHelper.createList(getProjectName(), listName, "id", new FieldDefinition("Color", FieldDefinition.ColumnType.String), new FieldDefinition("Shape", FieldDefinition.ColumnType.String));
         _listHelper.beginAtList(getProjectName(), listName);
         _listHelper.insertNewRow(Map.of("Color", "Yellow", "Shape", "Triangle"));
 

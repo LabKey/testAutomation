@@ -244,10 +244,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         // Create list
         impersonate(ADMIN_USER);
         FieldDefinition userColumn = new FieldDefinition("user",
-                new FieldDefinition.LookupInfo(getProjectName(), "core", "Users").setTableType(FieldDefinition.ColumnType.Integer));
+                new FieldDefinition.IntLookup(getProjectName(), "core", "Users"));
 
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, EMAIL_TEST_LIST, "Key", userColumn);
+        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, "Key", userColumn);
         goToManageLists();
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         DataRegionTable.findDataRegion(this).clickInsertNewRow();

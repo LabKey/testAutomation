@@ -105,8 +105,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickTab("Portal");
 
         ListHelper listHelper = new ListHelper(getDriver());
-        String containerPath = getProjectName() + "/" + FOLDER_NAME;
-        listHelper.createList(containerPath, LIST_NAME, LIST_KEY, new FieldDefinition("Name", ColumnType.String), new FieldDefinition("File", ColumnType.Attachment));
+        listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY,
+                new FieldDefinition("Name", ColumnType.String),
+                new FieldDefinition("File", ColumnType.Attachment));
         goToManageLists();
         listHelper.click(Locator.linkContainingText(LIST_NAME));
         // todo: import actual data here

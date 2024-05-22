@@ -58,8 +58,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
         new PortalHelper(this).addWebPart("Lists");
         FieldDefinition col1 = new FieldDefinition(OVER_CUTOFF, FieldDefinition.ColumnType.Integer).setLabel(OVER_CUTOFF);
         FieldDefinition col2 = new FieldDefinition(AT_CUTOFF, FieldDefinition.ColumnType.Integer).setLabel(AT_CUTOFF);
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, LIST_NAME, "Key", col1, col2);
+        _listHelper.createList(getProjectName(), LIST_NAME, "Key", col1, col2);
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData()
                 .setText(getListData())

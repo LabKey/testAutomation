@@ -274,7 +274,8 @@ public class FolderTest extends BaseWebDriverTest
     private void createListWithData(String subfolder) throws Exception
     {
         String containerPath = getProjectName() + "/" + subfolder;
-        _listHelper.createList(containerPath, "List1", "RowId", new FieldDefinition("Col1", FieldDefinition.ColumnType.String).setLabel("ColLabel"));
+        _listHelper.createList(containerPath, "List1", "RowId",
+                new FieldDefinition("Col1", FieldDefinition.ColumnType.String).setLabel("ColLabel"));
 
         InsertRowsCommand ir = new InsertRowsCommand("lists", "List1");
         Map<String, Object> row1 = new HashMap<>();
@@ -283,7 +284,7 @@ public class FolderTest extends BaseWebDriverTest
         ir.addRow(row1);
 
         Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        ir.execute(cn, getProjectName() + "/" + subfolder);
+        ir.execute(cn, containerPath);
     }
 
     @Test

@@ -37,8 +37,10 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName());
         log("Creating test list");
-        String containerPath = getProjectName() + "/";
-        _listHelper.createList(containerPath, LIST_NAME, "RowId", new FieldDefinition("FirstName", ColumnType.String), new FieldDefinition("LastName", ColumnType.String), new FieldDefinition("Age", ColumnType.Integer));
+        _listHelper.createList(getProjectName(), LIST_NAME, "RowId",
+                new FieldDefinition("FirstName", ColumnType.String),
+                new FieldDefinition("LastName", ColumnType.String),
+                new FieldDefinition("Age", ColumnType.Integer));
 
         log("Adding Single list webpart");
         goToProjectHome();
@@ -85,11 +87,11 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
     private void insertListData(String firstName, String lastName, String age)
     {
         DataRegionTable listTable = DataRegionTable.findDataRegionWithinWebpart(this, LIST_WEBPART_TITLE);
-        listTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_FirstName"), firstName);
-        setFormElement(Locator.name("quf_LastName"), lastName);
-        setFormElement(Locator.name("quf_Age"), age);
-        clickButton("Submit");
+        listTable.clickInsertNewRow()
+                .setField("FirstName", firstName)
+                .setField("LastName", lastName)
+                .setField("Age", age)
+                .submit();
     }
 
     @Override

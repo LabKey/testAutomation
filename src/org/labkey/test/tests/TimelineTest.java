@@ -156,8 +156,7 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void createList()
     {
-        String containerPath = getProjectName() + "/" + FOLDER_NAME;
-        _listHelper.createList(containerPath, LIST_NAME, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY_NAME, LIST_COLUMNS);
 
         StringBuilder data = new StringBuilder();
         data.append(LIST_KEY_NAME).append("\t");

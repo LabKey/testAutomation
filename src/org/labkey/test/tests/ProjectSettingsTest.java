@@ -330,8 +330,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         projectSettingPage.setDefaultDateTimeDisplay(DATE_TIME_FORMAT_INJECTION);
         projectSettingPage.save();
 
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, "IceCream", "IceCreamID", new FieldDefinition("IceCreamDate", ColumnType.DateAndTime));
+        _listHelper.createList(getProjectName(), "IceCream", "IceCreamID",
+                new FieldDefinition("IceCreamDate", ColumnType.DateAndTime));
         goToProjectHome();
         clickAndWait(Locator.linkWithText("IceCream"));
         Map<String, String> testRow = new HashMap<>();

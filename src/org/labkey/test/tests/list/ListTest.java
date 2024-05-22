@@ -1148,7 +1148,8 @@ public class ListTest extends BaseWebDriverTest
         String listName = "new";
         String origFieldName = "BarBar";
         String newFieldName = "FooFoo";
-        _listHelper.createList(PROJECT_VERIFY, listName, "key", new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
+        _listHelper.createList(PROJECT_VERIFY, listName, "key",
+                new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
 
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.getFieldsPanel()
@@ -1177,7 +1178,13 @@ public class ListTest extends BaseWebDriverTest
         String limitedPhiColumn = "LimitedPhiColumn";
         String phiColumn = "PhiColumn";
         String restrictedPhiColumn = "RestrictedPhiColumn";
-        _listHelper.createList(PROJECT_VERIFY, listName, "key", new FieldDefinition("FileName", ColumnType.String).setLabel("FileName").setDescription("name of the file"), new FieldDefinition("FileExtension", ColumnType.String).setLabel("ext").setDescription("the file extension"), new FieldDefinition(notPhiColumn, ColumnType.Attachment).setLabel("NotPhiFile").setDescription("the file itself"), new FieldDefinition(limitedPhiColumn, ColumnType.Attachment).setLabel("LimitedPhiFile").setDescription("the file itself"), new FieldDefinition(phiColumn, ColumnType.Attachment).setLabel("PhiFile").setDescription("the file itself"), new FieldDefinition(restrictedPhiColumn, ColumnType.Attachment).setLabel("RestrictedFile").setDescription("the file itself"));
+        _listHelper.createList(PROJECT_VERIFY, listName, "key",
+                new FieldDefinition("FileName", ColumnType.String).setLabel("FileName").setDescription("name of the file"),
+                new FieldDefinition("FileExtension", ColumnType.String).setLabel("ext").setDescription("the file extension"),
+                new FieldDefinition(notPhiColumn, ColumnType.Attachment).setLabel("NotPhiFile").setDescription("the file itself"),
+                new FieldDefinition(limitedPhiColumn, ColumnType.Attachment).setLabel("LimitedPhiFile").setDescription("the file itself"),
+                new FieldDefinition(phiColumn, ColumnType.Attachment).setLabel("PhiFile").setDescription("the file itself"),
+                new FieldDefinition(restrictedPhiColumn, ColumnType.Attachment).setLabel("RestrictedFile").setDescription("the file itself"));
 
 
         // set phi levels
@@ -1245,8 +1252,9 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
 
         // create list with an attachment column
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, listName, "id", col(descriptionCol, ColumnType.String), col(attachmentCol, ColumnType.Attachment));
+        _listHelper.createList(getProjectName(), listName, "id",
+                col(descriptionCol, ColumnType.String),
+                col(attachmentCol, ColumnType.Attachment));
         // index for entire list as single document and index on attachment column
         _listHelper.goToEditDesign(listName)
                 .openAdvancedListSettings()
@@ -1284,8 +1292,8 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
 
         log("create list with an attachment column '" + attachmentCol + "'");
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, listName, "id", col(attachmentCol, ColumnType.Attachment));
+        _listHelper.createList(getProjectName(), listName, "id",
+                col(attachmentCol, ColumnType.Attachment));
 
         log("Insert data, upload attachment for col '" + attachmentCol + "'");
         goToProjectHome();
@@ -1309,8 +1317,9 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
 
         // create list with an attachment column
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, listName, "id", col(descriptionCol, ColumnType.String), col(attachmentCol, ColumnType.Attachment));
+        _listHelper.createList(getProjectName(), listName, "id",
+                col(descriptionCol, ColumnType.String),
+                col(attachmentCol, ColumnType.Attachment));
         // index on attachment column
         EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign(listName);
         editListDefinitionPage.openAdvancedListSettings()
@@ -1339,7 +1348,10 @@ public class ListTest extends BaseWebDriverTest
         String fieldName1 = "field Name1";
         String fieldName2 = "fieldName_2";
         String fieldName3 = "FieldName@3";
-        _listHelper.createList(PROJECT_VERIFY, listName, "key", new FieldDefinition(fieldName1, ColumnType.Integer), new FieldDefinition(fieldName2, ColumnType.DateAndTime), new FieldDefinition(fieldName3, ColumnType.Boolean));
+        _listHelper.createList(PROJECT_VERIFY, listName, "key",
+                new FieldDefinition(fieldName1, ColumnType.Integer),
+                new FieldDefinition(fieldName2, ColumnType.DateAndTime),
+                new FieldDefinition(fieldName3, ColumnType.Boolean));
 
         // verify initial set of indices
         viewRawTableMetadata(listName);

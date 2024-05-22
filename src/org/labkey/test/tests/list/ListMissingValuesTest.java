@@ -78,8 +78,7 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
         listColumn.setMvEnabled(true);
         columns[2] = listColumn;
 
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, LIST_NAME, "Key", columns);
+        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.goToList(LIST_NAME);

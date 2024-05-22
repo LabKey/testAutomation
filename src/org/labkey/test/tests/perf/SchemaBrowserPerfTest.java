@@ -182,9 +182,10 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     {
         for (int x = 0; x < count; x++)
         {
-            String containerPath = getProjectName();
-            FieldDefinition[] cols = new FieldDefinition[]{new FieldDefinition("FirstName", ColumnType.String).setDescription("first name test desc"), new FieldDefinition("LastName", ColumnType.String)};
-            _listHelper.createList(containerPath, "TestList"+x, "AuthorId", cols);
+            _listHelper.createList(getProjectName(), "TestList"+x,
+                    "AuthorId",
+                    new FieldDefinition("FirstName", ColumnType.String).setDescription("first name test desc"),
+                    new FieldDefinition("LastName", ColumnType.String));
         }
 
     }

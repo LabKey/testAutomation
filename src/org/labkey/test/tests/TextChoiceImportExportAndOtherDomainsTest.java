@@ -114,8 +114,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         log(String.format("Create a list named '%s' with a string field '%s' and a TextChoice field '%s'.",
                 LIST_NAME, LIST_TEXT_FIELD, LIST_TC_FIELD));
 
-        String containerPath = getCurrentContainerPath();
-        _listHelper.createList(containerPath, LIST_NAME, "Key", tcField, txtField);
+        _listHelper.createList(getCurrentContainerPath(), LIST_NAME, "Key", tcField, txtField);
 
         log("Bulk upload data into the list.");
 

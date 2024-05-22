@@ -185,12 +185,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         };
 
-        String containerPath1 = getProjectName();
-        _listHelper.createList(containerPath1, LIST_NAME, "Key", columns);
+        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
 
         log("Create list in subfolder to prevent query validation failure");
-        String containerPath = getProjectName();
-        _listHelper.createList(containerPath, "People", "Key", new FieldDefinition("Name", ColumnType.String).setDescription("Name"), new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"), new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
+        _listHelper.createList(getProjectName(), "People", "Key",
+                new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
+                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
