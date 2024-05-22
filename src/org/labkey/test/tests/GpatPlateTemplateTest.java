@@ -12,10 +12,8 @@ import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -78,12 +76,6 @@ public class GpatPlateTemplateTest extends BaseWebDriverTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    @Override
-    public void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Test
