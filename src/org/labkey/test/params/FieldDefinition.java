@@ -25,6 +25,7 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -459,15 +460,6 @@ public class FieldDefinition extends PropertyDescriptor
 
     }
 
-    // Temporary, for 'ColumnType.values()'
-    private static final List<ColumnType> COLUMN_TYPES = List.of(
-            ColumnType.MultiLine, ColumnType.Integer, ColumnType.String, ColumnType.Subject,
-            ColumnType.DateAndTime, ColumnType.Date, ColumnType.Time,
-            ColumnType.Boolean, ColumnType.Double, ColumnType.Decimal, ColumnType.File, ColumnType.Flag,
-            ColumnType.Attachment, ColumnType.User, ColumnType.Lookup, ColumnType.OntologyLookup, ColumnType.VisitId,
-            ColumnType.VisitDate, ColumnType.Sample, ColumnType.Barcode, ColumnType.TextChoice, ColumnType.SMILES
-    );
-    
     public interface ColumnType
     {
         ColumnType MultiLine = new ColumnTypeImpl("Multi-Line Text", "multiLine");
@@ -531,13 +523,9 @@ public class FieldDefinition extends PropertyDescriptor
             return null;
         }
 
-        /**
-         * @deprecated Bridge for converting away from enum
-         */
-        @Deprecated (since = "22.10")
         static List<ColumnType> values()
         {
-            return COLUMN_TYPES;
+            return ColumnTypeImpl.COLUMN_TYPES;
         }
     }
 
@@ -1028,6 +1016,8 @@ public class FieldDefinition extends PropertyDescriptor
 
 class ColumnTypeImpl implements FieldDefinition.ColumnType
 {
+    static final List<FieldDefinition.ColumnType> COLUMN_TYPES = new ArrayList<>();
+
     private final String _label; // the display value in the UI for this kind of field
     private final String _rangeURI;     // the key used inside the API
     private final String _conceptURI;
@@ -1039,6 +1029,8 @@ class ColumnTypeImpl implements FieldDefinition.ColumnType
         _rangeURI = rangeURI;
         _conceptURI = conceptURI;
         _lookupInfo = lookupInfo;
+
+        COLUMN_TYPES.add(this);
     }
 
     ColumnTypeImpl(String label, String rangeURI)
