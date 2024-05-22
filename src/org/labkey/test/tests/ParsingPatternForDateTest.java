@@ -168,24 +168,8 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         testParsingPatternsList(false);
     }
 
-    @Test
-    public void testNonUSDateParsingMode() throws IOException, CommandException
+    private void importBulkNonUSDate(String bulkData)
     {
-        createList(TEST_MODE);
-
-        log("Use 'Non-U.S. date parsing (DMY)'.");
-        setSiteAdditionalParsingPatterns(null, null, null, false);
-
-        String bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
-                + "A\t23/12/24 14:45\t23/12/24\t14:45\n"
-                + "B\t19/11/99 9:32:06.001\t19/11/99\t9:32:06.001\n"
-                + "C\t2/3/1972 10:45 pm\t2/3/1972\t10:45 pm\n"
-                + "D\t3-2-05 00:00\t3-2-05\t00:00\n"
-                + "E\t19July1999 19:32:06\t19/07/99\t19:32:06\n";
-
-        List<String> expectedDateTimeCol = List.of("2024-12-23 14:45", "1999-11-19 09:32", "1972-03-02 22:45", "2005-02-03 00:00", "1999-07-19 19:32");
-        List<String> expectedDateCol = List.of("2024-12-23", "1999-11-19", "1972-03-02", "2005-02-03", "1999-07-19");
-        List<String> expectedTimeCol = List.of("14:45:00", "09:32:06", "22:45:00", "00:00:00", "19:32:06");
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_MODE));
@@ -194,9 +178,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
                 .setText(bulkData);
         clickButton("Submit");
 
+    }
+
+    private void verifyImportedNonUSDate(List<String> expectedDateTimeCol, List<String> expectedDateCol, List<String> expectedTimeCol)
+    {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_MODE));
-        listTable = new DataRegionTable("query", getDriver());
+        DataRegionTable listTable = new DataRegionTable("query", getDriver());
 
         checker().verifyEquals("Values in " + COL_DATETIME + " are not as expected.",
                 expectedDateTimeCol, listTable.getColumnDataAsText(COL_DATETIME));
@@ -209,6 +197,41 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
         checker().screenShotIfNewError("Non_US_Mode_Error");
 
+        listTable.checkAllOnPage();
+        listTable.deleteSelectedRows();
+    }
+
+    @Test
+    public void testNonUSDateParsingMode() throws IOException, CommandException
+    {
+        final String bulkData = String.format("%s\t%s\t%s\t%s\n", COL_NAME, COL_DATETIME, COL_DATE, COL_TIME)
+                + "A\t23/12/24 14:45\t23/12/24\t14:45\n"
+                + "B\t19/11/99 9:32:06.001\t19/11/99\t9:32:06.001\n"
+                + "C\t2/3/1972 10:45 pm\t2/3/1972\t10:45 pm\n"
+                + "D\t3-2-05 00:00\t3-2-05\t00:00\n"
+                + "E\t19July1999 19:32:06\t19/07/99\t19:32:06\n";
+
+        createList(TEST_MODE);
+
+        log("Use 'Non-U.S. date parsing (DMY)'.");
+        setSiteAdditionalParsingPatterns(null, null, null, false);
+
+        List<String> expectedDateTimeCol = List.of("2024-12-23 14:45", "1999-11-19 09:32", "1972-03-02 22:45", "2005-02-03 00:00", "1999-07-19 19:32");
+        List<String> expectedDateCol = List.of("2024-12-23", "1999-11-19", "1972-03-02", "2005-02-03", "1999-07-19");
+        List<String> expectedTimeCol = List.of("14:45:00", "09:32:06", "22:45:00", "00:00:00", "19:32:06");
+
+        importBulkNonUSDate(bulkData);
+        verifyImportedNonUSDate(expectedDateTimeCol, expectedDateCol, expectedTimeCol);
+
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
+        projectSettingsPage.setDefaultDateDisplay("MM-dd-yyyy");
+        projectSettingsPage.save();
+        // Issue 50420: LKS/LKSM: Non US parsing doesn't seem to be respected: US parsing setting should be queried at Root folder level
+        log("Change Project Settings - Default display format for dates");
+        expectedDateCol = List.of("12-23-2024", "11-19-1999", "03-02-1972", "02-03-2005", "07-19-1999");
+
+        importBulkNonUSDate(bulkData);
+        verifyImportedNonUSDate(expectedDateTimeCol, expectedDateCol, expectedTimeCol);
     }
 
     private void createList(String listName) throws IOException, CommandException

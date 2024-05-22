@@ -94,19 +94,21 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         }
         else
         {
+
             WebDriverWrapper.waitFor(()->
                     {
                         try
                         {
                             return groupItem.getText().trim().toLowerCase()
-                                    .contains(getWrapper().getFormElement(elementCache().labelField.getComponentElement()).trim().toLowerCase());
+                                    .contains(elementCache().labelField.get().trim().toLowerCase());
                         }
                         catch (NoSuchElementException | StaleElementReferenceException exp)
                         {
                             return false;
                         }
                     },
-                    "Edit part of the panel for a locked status did not render in time.", 1_000);
+                    String.format("Edit part of the panel for a locked status did not render in time. Value in label textbox '%s' did not contain '%s'.",
+                            elementCache().labelField.get(), groupItem.getText()), 1_000);
 
         }
 
