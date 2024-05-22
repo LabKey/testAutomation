@@ -83,10 +83,13 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.bidi.BiDi;
+import org.openqa.selenium.bidi.HasBiDi;
 import org.openqa.selenium.bidi.Network;
 import org.openqa.selenium.bidi.log.GenericLogEntry;
 import org.openqa.selenium.bidi.log.Log;
 import org.openqa.selenium.bidi.log.LogEntry;
+import org.openqa.selenium.bidi.network.BaseParameters;
+import org.openqa.selenium.bidi.network.BeforeRequestSent;
 import org.openqa.selenium.bidi.network.ResponseDetails;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -135,7 +138,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -386,8 +389,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html", rethrow);
                         }
                     }
-                    BiDi biDi = ((FirefoxDriver) newWebDriver).getBiDi();
-                    biDi.addListener(Log.entryAdded(), BrowserConsoleLog::log);
                 }
                 break;
             }
@@ -397,6 +398,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (newWebDriver != null)
         {
+            if (TestProperties.isConsoleLogEnabled() && newWebDriver instanceof HasBiDi bidiDriver)
+            {
+                BiDi biDi = bidiDriver.getBiDi();
+                biDi.addListener(Log.entryAdded(), BrowserConsoleLog::log);
+            }
+
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getBrowserVersion();
@@ -4035,20 +4042,45 @@ public abstract class WebDriverWrapper implements WrapsDriver
             mouseOver(headerLoc);
     }
 
-    void doAndMeasureRequests(Runnable runnable)
+    public void doAndMeasureRequests(Runnable runnable)
+    {
+        doAndMeasureRequests(runnable, 30_000);
+    }
+
+    public void doAndMeasureRequests(Runnable runnable, int timeoutMs)
     {
         try (Network network = new Network(getDriver())) {
-            List<ResponseDetails> future = new CopyOnWriteArrayList<>();
-            network.onResponseCompleted(future::add);
+            Map<String, BeforeRequestSent> requests = new ConcurrentHashMap<>();
+            Map<String, ResponseDetails> responses = new ConcurrentHashMap<>();
+            network.onBeforeRequestSent(brs -> maybeAdd(requests, brs));
+            network.onResponseCompleted(rd -> maybeAdd(responses, rd));
 
             runnable.run();
-            sleep(10_000);
-            ResponseDetails response = future.get(0);
+
+            sleep(1_000);
+            waitFor(() -> requests.size() == responses.size(), timeoutMs);
+            ResponseDetails response = responses.get(0);
+
             String windowHandle = getDriver().getWindowHandle();
 
             Assert.assertEquals(windowHandle, response.getBrowsingContextId());
             Assert.assertEquals("get", response.getRequest().getMethod().toLowerCase());
             Assert.assertEquals(200L, response.getResponseData().getStatus());
+        }
+    }
+
+    private static final Pattern actionPattern = Pattern.compile("\\.(view|api)(\\?|$)");
+    private static <T extends BaseParameters> void maybeAdd(Map<String, T> list, T candidate)
+    {
+        String requestUrl = candidate.getRequest().getUrl();
+        String requestId = candidate.getRequest().getRequestId();
+        if (actionPattern.matcher(requestUrl).find())
+        {
+            list.put(requestId, candidate);
+        }
+        else
+        {
+            TestLogger.warn("Ignoring request " + requestId + ": " + requestUrl);
         }
     }
 }
