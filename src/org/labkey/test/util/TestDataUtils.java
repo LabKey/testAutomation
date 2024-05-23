@@ -1,7 +1,10 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.IOUtils;
+import org.labkey.api.data.TSVMapWriter;
+import org.labkey.api.data.TSVWriter;
 import org.labkey.serverapi.reader.TabLoader;
+import org.openqa.selenium.devtools.v85.io.IO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +49,12 @@ public class TestDataUtils
         return toTabular(rowMaps, columns, ",", includeHeaders);
     }
 
+
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
+    {
+        return rowListsFromMaps(rowMaps, columns, false, true);
+    }
+
     /**
      * convert a List of Map<String, Object> to a list of List<String>
      * @param rowMaps   Source data
@@ -53,7 +62,7 @@ public class TestDataUtils
      * @return A List<List<String>> containing values
      * @throws IOException
      */
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders) throws IOException
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean preserveEmptyValues)
     {
         List<List<String>> lists = new ArrayList<>();
 
@@ -73,7 +82,7 @@ public class TestDataUtils
             for(String column : columns)
             {
                 var value = (String) rowMap.get(column);
-                if (value == null)
+                if (value == null && preserveEmptyValues)
                     rowList.add("");
                 else
                     rowList.add(value);
