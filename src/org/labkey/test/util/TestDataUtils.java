@@ -1,16 +1,12 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.IOUtils;
-import org.labkey.api.data.TSVMapWriter;
-import org.labkey.api.data.TSVWriter;
 import org.labkey.serverapi.reader.TabLoader;
-import org.openqa.selenium.devtools.v85.io.IO;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
