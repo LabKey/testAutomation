@@ -5,11 +5,12 @@ import org.json.JSONObject;
 
 public class PlateSetParams
 {
-    private String _name = null;
-    private String _description = null;
-    private PlateSetType _type = null;
-    private Integer _id = null;
-    private Integer _parentPlateSetId = null;
+    private String _name;
+    private String _description;
+    private PlateSetType _type;
+    private String _plateSetId;
+    private Integer _rowId;
+    private Integer _rootPlateSetId;
 
     public PlateSetParams()
     {
@@ -20,8 +21,9 @@ public class PlateSetParams
         _name = json.getString("name");
         _description = json.optString("description", null);
         _type = PlateSetType.fromName(json.optString("type", null));
-        _id = json.getInt("rowId");
-        _parentPlateSetId = json.optIntegerObject("parentPlateSetId", null);
+        _rowId = json.getInt("rowId");
+        _plateSetId = json.getString("plateSetId");
+        _rootPlateSetId = json.optIntegerObject("rootPlateSetId", null);
     }
 
     public JSONObject toJSON()
@@ -31,8 +33,8 @@ public class PlateSetParams
         json.put("description", _description);
         if (_type != null)
             json.put("type", _type.getType());
-        json.put("rowId", _id);
-        json.put("parentPlateSetId", _parentPlateSetId);
+        json.put("rowId", _rowId);
+        json.put("parentPlateSetId", _rootPlateSetId);
         return json;
     }
 
@@ -69,22 +71,26 @@ public class PlateSetParams
         return _type;
     }
 
-    public Integer getId()
+    public Integer getRowId()
     {
-        return _id;
+        return _rowId;
     }
 
-    public PlateSetParams setParentPlateSetId(Integer parentPlateSetId)
+    public PlateSetParams setRootPlateSetId(Integer rootPlateSetId)
     {
-        _parentPlateSetId = parentPlateSetId;
+        _rootPlateSetId = rootPlateSetId;
         return this;
     }
 
-    public Integer getParentPlateSetId()
+    public Integer getRootPlateSetId()
     {
-        return _parentPlateSetId;
+        return _rootPlateSetId;
     }
 
+    public String getPlateSetId()
+    {
+        return _plateSetId;
+    }
 
     public enum PlateSetType
     {
