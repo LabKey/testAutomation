@@ -98,7 +98,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
      *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
      */
     @Test
-    @Ignore
     public void testLineageWithImplicitParentColumn() throws IOException, CommandException
     {
         goToProjectHome();
