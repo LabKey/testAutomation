@@ -6,7 +6,7 @@ import org.labkey.remoteapi.PostCommand;
 public class CreatePlateCommand extends PostCommand<PlateResponse>
 {
     private final CreatePlateParams _plateParams;
-    public  CreatePlateCommand(CreatePlateParams plateParams)
+    public CreatePlateCommand(CreatePlateParams plateParams)
     {
         super("plate", "createPlate");
         setRequiredVersion(0);

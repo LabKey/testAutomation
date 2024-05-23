@@ -22,7 +22,6 @@ public class PlateParams
     private String _assayType;
     private boolean _template;
     private boolean _archived;
-    private List<Map<String, Object>> _data = new ArrayList<>();
 
 
     public PlateParams(JSONObject json)
@@ -53,22 +52,6 @@ public class PlateParams
 
         if (json.has("archived"))
             _archived = json.getBoolean("archived");
-
-        if (json.has("data"))
-        {
-            RowMapFactory<Object> factory = new RowMapFactory<>();
-            JSONArray data = json.getJSONArray("data");
-            for (int i = 0; i < data.length(); i++)
-            {
-                JSONObject jsonObj = data.getJSONObject(i);
-                if (jsonObj != null)
-                {
-                    Map<String, Object> rowMap = factory.getRowMap();
-                    JsonUtil.fillMapShallow(jsonObj, rowMap);
-                    _data.add(rowMap);
-                }
-            }
-        }
     }
 
     public String getName()
@@ -119,11 +102,6 @@ public class PlateParams
     public boolean isArchived()
     {
         return _archived;
-    }
-
-    public List<Map<String, Object>> getData()
-    {
-        return _data;
     }
 
     public PlateTypes getPlateType()

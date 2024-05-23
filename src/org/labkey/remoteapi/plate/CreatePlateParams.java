@@ -1,9 +1,6 @@
 package org.labkey.remoteapi.plate;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.labkey.api.collections.RowMapFactory;
-import org.labkey.api.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
