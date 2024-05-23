@@ -69,6 +69,11 @@ public abstract class ListDefinition extends DomainProps
 
     public ListDefinition setFields(List<? extends PropertyDescriptor> fields)
     {
+        if (!fields.isEmpty() && getKeyName() == null)
+        {
+            // Use first field as key
+            setKeyName(fields.get(0).getName());
+        }
         _fields = new ArrayList<>(fields); // Make sure it isn't immutable
         return this;
     }
@@ -82,6 +87,11 @@ public abstract class ListDefinition extends DomainProps
 
     public ListDefinition addField(@NotNull PropertyDescriptor field)
     {
+        if (getKeyName() == null)
+        {
+            // Use first field as key
+            setKeyName(field.getName());
+        }
         _fields.add(field);
         return this;
     }
@@ -106,7 +116,14 @@ public abstract class ListDefinition extends DomainProps
     protected Domain getDomainDesign()
     {
         Domain domain = new Domain(getName());
-        domain.setFields(new ArrayList<>(getFields()));
+        List<PropertyDescriptor> fields = getFields().stream()
+                .peek(pd -> {
+                    if (pd.getName().equals(getKeyName()))
+                    {
+                        pd.setRequired(true);
+                    }
+                }).toList();
+        domain.setFields(fields);
         domain.setDescription(getDescription());
         return domain;
     }
@@ -119,6 +136,7 @@ public abstract class ListDefinition extends DomainProps
         options.put("name", getName());
         options.put("description", getDescription());
         options.put("keyName", getKeyName());
+        options.put("keyType", getKeyType());
         if (getTitleColumn() != null)
         {
             options.put("titleColumn", getTitleColumn());
@@ -137,4 +155,6 @@ public abstract class ListDefinition extends DomainProps
     {
         return getName();
     }
+
+    protected abstract String getKeyType();
 }

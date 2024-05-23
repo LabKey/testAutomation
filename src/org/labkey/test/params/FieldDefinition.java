@@ -78,7 +78,13 @@ public class FieldDefinition extends PropertyDescriptor
     @Override
     public Map<String, Object> getAllProperties()
     {
-        return _extraFieldProperties;
+        Map<String, Object> allProperties = new HashMap<>(_extraFieldProperties);
+        allProperties.putIfAbsent("defaultValueType", DefaultType.FIXED_EDITABLE);
+        if (getMeasure() == null)
+        {
+            setMeasure(getType().isMeasureByDefault());
+        }
+        return allProperties;
     }
 
     public ColumnType getType()
@@ -463,18 +469,39 @@ public class FieldDefinition extends PropertyDescriptor
     public interface ColumnType
     {
         ColumnType MultiLine = new ColumnTypeImpl("Multi-Line Text", "multiLine");
-        ColumnType Integer = new ColumnTypeImpl("Integer", "int");
+        ColumnType Integer = new ColumnTypeImpl("Integer", "int")
+        {
+            @Override
+            public boolean isMeasureByDefault()
+            {
+                return true;
+            }
+        };
         ColumnType String = new ColumnTypeImpl("Text", "string");
         ColumnType Subject = new ColumnTypeImpl("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null);
         ColumnType DateAndTime = new ColumnTypeImpl("Date Time", "dateTime");
         ColumnType Date = new ColumnTypeImpl("Date", "date");
-        ColumnType Time = new ColumnTypeImpl("Time", "http://www.w3.org/2001/XMLSchema#time");
+        ColumnType Time = new ColumnTypeImpl("Time", "time");
         ColumnType Boolean = new ColumnTypeImpl("Boolean", "boolean");
-        ColumnType Double = new ColumnTypeImpl("Number (Double)", "float");
-        ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double");
+        ColumnType Double = new ColumnTypeImpl("Number (Double)", "float")
+        {
+            @Override
+            public boolean isMeasureByDefault()
+            {
+                return true;
+            }
+        };
+        ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double")
+        {
+            @Override
+            public boolean isMeasureByDefault()
+            {
+                return true;
+            }
+        };
         ColumnType File = new ColumnTypeImpl("File", "http://cpas.fhcrc.org/exp/xml#fileLink");
         ColumnType Flag = new ColumnTypeImpl("Flag", "string", "http://www.labkey.org/exp/xml#flag", null);
-        ColumnType Attachment = new ColumnTypeImpl("Attachment", "attachment");
+        ColumnType Attachment = new ColumnTypeImpl("Attachment", "http://www.labkey.org/exp/xml#attachment");
         ColumnType User = new ColumnTypeImpl("User", "int", null, new IntLookup("core", "users"));
         @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
         ColumnType Lookup = new ColumnTypeImpl("Lookup", null);
@@ -521,6 +548,11 @@ public class FieldDefinition extends PropertyDescriptor
         default FieldDefinition.LookupInfo getLookupInfo()
         {
             return null;
+        }
+
+        default boolean isMeasureByDefault()
+        {
+            return false;
         }
 
         static List<ColumnType> values()
@@ -1026,7 +1058,15 @@ class ColumnTypeImpl implements FieldDefinition.ColumnType
     ColumnTypeImpl(String label, String rangeURI, String conceptURI, FieldDefinition.LookupInfo lookupInfo)
     {
         _label = label;
-        _rangeURI = rangeURI;
+        if (rangeURI != null && !rangeURI.contains("#"))
+        {
+            // Use default rangeUri prefix
+            _rangeURI = "http://www.w3.org/2001/XMLSchema#" + rangeURI;
+        }
+        else
+        {
+            _rangeURI = rangeURI;
+        }
         _conceptURI = conceptURI;
         _lookupInfo = lookupInfo;
 
