@@ -1,13 +1,6 @@
 package org.labkey.remoteapi.plate;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.labkey.api.collections.RowMapFactory;
-import org.labkey.api.util.JsonUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class PlateParams
 {
@@ -106,6 +99,6 @@ public class PlateParams
 
     public PlateTypes getPlateType()
     {
-        return PlateTypes.fromValue(_plateType);
+        return PlateTypes.fromRowId(_plateType);
     }
 }

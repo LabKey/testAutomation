@@ -20,7 +20,7 @@ public class CreatePlateParams
     {
         _name = name;
         _plateSetId = plateSetId;
-        _plateType = plateType.getValue();
+        _plateType = plateType.getRowId();
     }
 
     public JSONObject toJSON()
@@ -60,13 +60,13 @@ public class CreatePlateParams
      */
     public CreatePlateParams setPlateType(PlateTypes plateType)
     {
-        _plateType = plateType.getValue();
+        _plateType = plateType.getRowId();
         return this;
     }
 
     public PlateTypes getPlateType()
     {
-        return PlateTypes.fromValue(_plateType);
+        return PlateTypes.fromRowId(_plateType);
     }
 
     public List<Map<String, Object>> getData()

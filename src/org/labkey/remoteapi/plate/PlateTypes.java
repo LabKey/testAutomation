@@ -52,7 +52,7 @@ public enum PlateTypes
         _map = Collections.unmodifiableMap(temp);
     }
 
-    public static PlateTypes fromValue(int value)
+    public static PlateTypes fromRowId(int value)
     {
         return _map.get(value);
     }
