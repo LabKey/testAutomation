@@ -43,10 +43,10 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PermissionsHelper;
@@ -368,8 +368,8 @@ public class AuditLogTest extends BaseWebDriverTest
         simpleSignIn();
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
         _containerHelper.createSubfolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
-        createList(AUDIT_TEST_PROJECT, "Parent List", "Name\nData",new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name") );
-        createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"));
+        createList(AUDIT_TEST_PROJECT, "Parent List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name") );
+        createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name"));
 
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, "Project Administrator");
@@ -461,9 +461,9 @@ public class AuditLogTest extends BaseWebDriverTest
         }
     }
 
-    private void createList(String containerPath, String listName, @Nullable String tsvData, ListHelper.ListColumn... listColumns)
+    private void createList(String containerPath, String listName, @Nullable String tsvData, FieldDefinition... listColumns)
     {
-        _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", listColumns);
+        _listHelper.createList(containerPath, listName, "Key", listColumns);
         if(null != tsvData)
         {
             _listHelper.goToList(listName);
@@ -560,18 +560,18 @@ public class AuditLogTest extends BaseWebDriverTest
         final String FIELD01_NAME = "Field01";
         final String FIELD01_LABEL = "This is Field 01";
         final String FIELD01_UPDATED_LABEL = "This is Update Label for Field 01";
-        final ListHelper.ListColumnType FIELD01_TYPE = ListHelper.ListColumnType.String;
+        final ColumnType FIELD01_TYPE = ColumnType.String;
         final String FIELD01_DESCRIPTION = "Simple String field.";
         final String FIELD01_UPDATED_DESCRIPTION = "This should be a new description for the field.";
 
         final String FIELD02_NAME = "Field02";
         final String FIELD02_LABEL = "This is Field 02";
-        final ListHelper.ListColumnType FIELD02_TYPE = ListHelper.ListColumnType.Integer;
+        final ColumnType FIELD02_TYPE = ColumnType.Integer;
         final String FIELD02_DESCRIPTION = "Simple Integer field.";
 
         final String FIELD03_NAME = "Field03";
         final String FIELD03_LABEL = "Field 03 Lookup";
-        final ListHelper.ListColumnType FIELD03_TYPE = ListHelper.ListColumnType.Integer;
+        final ColumnType FIELD03_TYPE = ColumnType.Integer;
 
         final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
 
@@ -581,18 +581,18 @@ public class AuditLogTest extends BaseWebDriverTest
 
         portalHelper.addWebPart("Lists");
 
-        ListHelper.ListColumn[] listColumns = new ListHelper.ListColumn[]{
-                new ListHelper.ListColumn("id", "id", ListHelper.ListColumnType.Integer, "Simple integer index."),
-                new ListHelper.ListColumn("value", "value", ListHelper.ListColumnType.String, "Value of the look up.")};
+        FieldDefinition[] listColumns = new FieldDefinition[]{
+                new FieldDefinition("id", ColumnType.Integer).setLabel("id").setDescription("Simple integer index."),
+                new FieldDefinition("value", ColumnType.String).setLabel("value").setDescription("Value of the look up.")};
 
         log("Create a couple of lists to be used as lookups.");
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LOOK_UP_LIST01, LIST01_TSV, listColumns);
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LOOK_UP_LIST02, LIST02_TSV, listColumns);
 
         log("Create the list that will have it's column attributes modified.");
-        listColumns = new ListHelper.ListColumn[]{
-                new ListHelper.ListColumn(FIELD01_NAME, FIELD01_LABEL, FIELD01_TYPE, FIELD01_DESCRIPTION),
-                new ListHelper.ListColumn(FIELD02_NAME, FIELD02_LABEL, FIELD02_TYPE, FIELD02_DESCRIPTION)};
+        listColumns = new FieldDefinition[]{
+                new FieldDefinition(FIELD01_NAME, FIELD01_TYPE).setLabel(FIELD01_LABEL).setDescription(FIELD01_DESCRIPTION),
+                new FieldDefinition(FIELD02_NAME, FIELD02_TYPE).setLabel(FIELD02_LABEL).setDescription(FIELD02_DESCRIPTION)};
 
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null, listColumns);
 
@@ -613,11 +613,11 @@ public class AuditLogTest extends BaseWebDriverTest
 
         log("Validate that the expected rows are there.");
         Map<String, String> field01ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field01ExpectedComment = Maps.of("Name", FIELD01_NAME,"Label", FIELD01_LABEL,"Type", FIELD01_TYPE.name(),"Description", FIELD01_DESCRIPTION);
+        Map<String, String> field01ExpectedComment = Maps.of("Name", FIELD01_NAME,"Label", FIELD01_LABEL,"Type", "String","Description", FIELD01_DESCRIPTION);
         boolean pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
 
         Map<String, String> field02ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field02ExpectedComment = Maps.of("Name", FIELD02_NAME,"Label", FIELD02_LABEL,"Type", FIELD02_TYPE.name(),"Description", FIELD02_DESCRIPTION);
+        Map<String, String> field02ExpectedComment = Maps.of("Name", FIELD02_NAME,"Label", FIELD02_LABEL,"Type", FIELD02_TYPE.getLabel(),"Description", FIELD02_DESCRIPTION);
         pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
@@ -688,7 +688,7 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.getFieldsPanel()
                 .addField(new FieldDefinition(FIELD03_NAME,
                         new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
-                                .setTableType(FieldDefinition.ColumnType.Integer))
+                                .setTableType(ColumnType.Integer))
                         .setLabel(FIELD03_LABEL));
         listDefinitionPage.clickSave();
 
@@ -727,7 +727,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Change properties on field '" + FIELD03_NAME + "'.");
         listDefinitionPage.getFieldsPanel()
                 .getField(FIELD03_NAME)
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.Integer));
+                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(ColumnType.Integer));
         listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");

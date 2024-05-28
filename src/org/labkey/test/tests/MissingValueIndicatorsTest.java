@@ -22,8 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
@@ -185,7 +185,7 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
                         "50";
 
         goToModule("List");
-        _listHelper.createList(getProjectName(), "Ages", ListHelper.ListColumnType.Integer, "Age");
+        _listHelper.createList(getProjectName(), "Ages", new FieldDefinition("Age", ColumnType.Integer));
         _listHelper.goToList("Ages");
         _listHelper.uploadData(TEST_DATA_AGE_LIST);
     }
@@ -202,14 +202,14 @@ public abstract class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         resultsPanel.addField("age")
             .setLabel("Age")
-            .setType(FieldDefinition.ColumnType.Lookup)
+            .setType(ColumnType.Lookup)
             .setFromSchema("lists")
             .setFromTargetTable("Ages (Integer)")
             .setMissingValuesEnabled(true);
 
         resultsPanel.addField("sex")
             .setLabel("Sex")
-            .setType(FieldDefinition.ColumnType.String)
+            .setType(ColumnType.String)
             .setMissingValuesEnabled(true);
 
         assayDesignerPage.clickFinish();

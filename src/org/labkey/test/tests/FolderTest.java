@@ -38,9 +38,9 @@ import org.labkey.test.pages.FolderManagementFolderTree;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.ReorderFoldersPage;
 import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -273,7 +273,9 @@ public class FolderTest extends BaseWebDriverTest
 
     private void createListWithData(String subfolder) throws Exception
     {
-        _listHelper.createList(getProjectName() + "/" + subfolder, "List1", ListHelper.ListColumnType.AutoInteger, "RowId", new ListHelper.ListColumn("Col1", "ColLabel", ListHelper.ListColumnType.String));
+        String containerPath = getProjectName() + "/" + subfolder;
+        _listHelper.createList(containerPath, "List1", "RowId",
+                new FieldDefinition("Col1", FieldDefinition.ColumnType.String).setLabel("ColLabel"));
 
         InsertRowsCommand ir = new InsertRowsCommand("lists", "List1");
         Map<String, Object> row1 = new HashMap<>();
@@ -282,7 +284,7 @@ public class FolderTest extends BaseWebDriverTest
         ir.addRow(row1);
 
         Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        ir.execute(cn, getProjectName() + "/" + subfolder);
+        ir.execute(cn, containerPath);
     }
 
     @Test

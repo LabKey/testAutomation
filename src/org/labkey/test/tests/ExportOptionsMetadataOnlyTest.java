@@ -17,7 +17,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -138,7 +137,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
         String listName = "Export List";
         goToProjectHome();
 
-        _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "id", new FieldDefinition("Color", FieldDefinition.ColumnType.String), new FieldDefinition("Shape", FieldDefinition.ColumnType.String));
+        _listHelper.createList(getProjectName(), listName, "id", new FieldDefinition("Color", FieldDefinition.ColumnType.String), new FieldDefinition("Shape", FieldDefinition.ColumnType.String));
         _listHelper.beginAtList(getProjectName(), listName);
         _listHelper.insertNewRow(Map.of("Color", "Yellow", "Shape", "Triangle"));
 

@@ -32,7 +32,6 @@ import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -245,9 +244,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         // Create list
         impersonate(ADMIN_USER);
         FieldDefinition userColumn = new FieldDefinition("user",
-                new FieldDefinition.LookupInfo(getProjectName(), "core", "Users").setTableType(FieldDefinition.ColumnType.Integer));
+                new FieldDefinition.IntLookup(getProjectName(), "core", "Users"));
 
-        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
+        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, "Key", userColumn);
         goToManageLists();
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         DataRegionTable.findDataRegion(this).clickInsertNewRow();

@@ -28,7 +28,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -163,7 +162,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "key",
+        _listHelper.createList(PROJECT_NAME, listName, "key",
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
                 new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setLabel(dateTimeCol)
@@ -305,7 +304,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "key",
+        _listHelper.createList(PROJECT_NAME, listName, "key",
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
                 new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setLabel(dateTimeCol)
@@ -528,7 +527,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, keyCol,
+        _listHelper.createList(PROJECT_NAME, listName, keyCol,
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
                 new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time)
         );
@@ -778,7 +777,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with date-only and time-only fields.", listName));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, keyCol,
+        _listHelper.createList(PROJECT_NAME, listName, keyCol,
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
                 new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time)
         );
@@ -1028,7 +1027,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "Key",
+        _listHelper.createList(PROJECT_NAME, listName, "Key",
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
                 new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setLabel(dateTimeCol)
@@ -1131,7 +1130,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "key",
+        _listHelper.createList(PROJECT_NAME, listName, "key",
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date).setFormat(dateFormat01),
                 new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time).setFormat(timeFormat01),
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(dateTimeFormat01).setLabel(dateTimeCol)
@@ -1260,7 +1259,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         log(String.format("Set the format for one DateTime field to '%s'.", dtFormatDate));
         log(String.format("Set the format for the other DateTime field to '%s'. This field will be converted to a tine-only field.", dtFormatTime));
 
-        _listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.AutoInteger, "Key",
+        _listHelper.createList(PROJECT_NAME, listName, "Key",
                 new FieldDefinition(dateTimeToDateCol, FieldDefinition.ColumnType.DateAndTime).setFormat(dtFormatDate).setLabel(dateTimeToDateCol),
                 new FieldDefinition(dateTimeToTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(dtFormatTime).setLabel(dateTimeToTimeCol)
         );
