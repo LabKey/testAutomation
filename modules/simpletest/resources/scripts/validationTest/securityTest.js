@@ -77,20 +77,30 @@ function doTest()
     result = LABKEY.Security.getGroupsForCurrentUser({
         containerPath: containerPath
     });
-    if( !result.groups )
+
+    if( !result.groups || result.groups.length < 3) // User should be in at least 3 groups (id): Guests (-3), All Site Users (-2), and Site Administrators (-1)
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
-    else if (result.groups.length < 4
-            // User should be in at least 3 groups (id): Guests (-3), All Site Users (-2), and Site Administrators (-1)
-            // They should be in order by group Id; possibly starting with the Developers (-4) group.
-            || result.groups[0].id !== -4
-            || result.groups[0].name !== "Developers"
-            || result.groups[1].id !== -3
-            || result.groups[1].name !== 'Guests'
-            || result.groups[2].id !== -2
-            || result.groups[2].name !== 'All Site Users'
-            || result.groups[3].id !== -1
-            || result.groups[3].name !== 'Site Administrators')
-        errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
+    else
+    {
+        var success = false;
+        var g = result.groups.shift();
+        if (g.id === -4) // Developers group is fine, but optional... skip to Guests
+            g = result.groups.shift();
+
+        if (g.id === -3 && g.name === 'Guests')
+        {
+            g = result.groups.shift();
+            if (g.id === -2 && g.name === 'All Site Users')
+            {
+                g = result.groups.shift();
+                if (g.id === -1 && g.name === 'Site Administrators')
+                    success = true;
+            }
+        }
+
+        if (!success)
+            errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
+    }
 
     // LABKEY.Security.getContainers()
     result = LABKEY.Security.getContainers({

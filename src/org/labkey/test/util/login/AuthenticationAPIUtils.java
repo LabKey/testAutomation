@@ -1,11 +1,11 @@
 package org.labkey.test.util.login;
 
-import org.json.simple.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
@@ -31,7 +31,7 @@ public class AuthenticationAPIUtils
       "primaryProviders": {
         "TestSSO": {
           "helpLink": "https://www.labkey.org/Documentation/20.0/wiki-page.view?name=authenticationModule",
-          "saveLink": "/labkey/testsso-testSsoSaveConfiguration.view?",
+          "saveLink": "/labkey/testsso-testSsoSaveConfiguration.view",
           "settingsFields": [],
           "description": "A trivial, insecure SSO authentication provider (for test purposes only)",
           "sso": true
@@ -70,7 +70,7 @@ public class AuthenticationAPIUtils
       "secondaryProviders": {
         "TestSecondary": {
           "helpLink": "https://www.labkey.org/Documentation/20.0/wiki-page.view?name=authenticationModule",
-          "saveLink": "/labkey/testsecondary-testSecondarySaveConfiguration.view?",
+          "saveLink": "/labkey/testsecondary-testSecondarySaveConfiguration.view",
           "settingsFields": [],
           "description": "Adds a trivial, insecure secondary authentication requirement (for test purposes only)"
         }
@@ -80,7 +80,7 @@ public class AuthenticationAPIUtils
 
     private static List<Configuration> getAllConfigurations(Connection connection)
     {
-        Command<?> initialMount = new Command<>("login", "initialMount");
+        SimpleGetCommand initialMount = new SimpleGetCommand("login", "initialMount");
         try
         {
             CommandResponse response = initialMount.execute(connection, "/");
@@ -92,7 +92,7 @@ public class AuthenticationAPIUtils
             List<Configuration> configurations = new ArrayList<>();
             for (Map<String, Object> configMap : parsedConfigurations)
             {
-                long configuration = (long) configMap.get("configuration");
+                int configuration = (int) configMap.get("configuration");
                 String description = (String) configMap.get("description");
                 String provider = (String) configMap.get("provider");
                 Configuration config = new Configuration(description, configuration, provider);
@@ -136,7 +136,7 @@ public class AuthenticationAPIUtils
 
     private static void deleteConfiguration(Configuration configuration, Connection connection)
     {
-        PostCommand<?> delete = new PostCommand<>("login", "deleteConfiguration");
+        SimplePostCommand delete = new SimplePostCommand("login", "deleteConfiguration");
         JSONObject json = new JSONObject();
         json.put("configuration", configuration._configuration);
         delete.setJsonObject(json);
@@ -155,10 +155,10 @@ public class AuthenticationAPIUtils
     public static class Configuration
     {
         private final String _description;
-        private final long _configuration;
+        private final int _configuration;
         private final String _provider;
 
-        public Configuration(String description, long configuration, String provider)
+        public Configuration(String description, int configuration, String provider)
         {
             _description = description;
             _configuration = configuration;
@@ -170,7 +170,7 @@ public class AuthenticationAPIUtils
             return _description;
         }
 
-        public long getConfiguration()
+        public int getConfiguration()
         {
             return _configuration;
         }

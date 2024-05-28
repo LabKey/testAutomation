@@ -28,11 +28,17 @@ import junit.runner.BaseTestRunner;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
@@ -46,15 +52,15 @@ import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Empty;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.testpicker.TestHelper;
-import org.labkey.test.tests.BasicTest;
-import org.labkey.test.tests.DatabaseDiagnosticsTest;
 import org.labkey.test.tests.JUnitTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
+import org.labkey.test.util.ExportDiagnosticsPseudoTest;
 import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.Timer;
 import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.BufferedReader;
@@ -90,7 +96,7 @@ public class Runner extends TestSuite
     private static final Logger LOG = LogManager.getLogger(Runner.class);
 
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
-    private static SuiteBuilder _suites = SuiteBuilder.getInstance();
+    private static SuiteFactory _suites = SuiteFactory.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
     private static List<Class<?>> _remainingTests;
@@ -400,8 +406,10 @@ public class Runner extends TestSuite
         return suite;
     }
 
-    private static void addTests(TestSuite suite, Set<Class<?>> testClasses)
+    private static void addTests(TestSuite suite, Set<Class<?>> testClasses) throws IOException
     {
+        waitForTomcat();
+
         boolean foundServerSideTest = false;
         for (Class<?> testClass : testClasses)
         {
@@ -424,7 +432,6 @@ public class Runner extends TestSuite
             {
                 List<Class<?>> interfaces = ClassUtils.getAllInterfaces(testClass);
                 WebTestHelper.DatabaseType databaseType = WebTestHelper.getDatabaseType();
-                String osName = System.getProperty("os.name", "<unknown>");
                 if (interfaces.contains(PostgresOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.PostgreSQL)
                 {
                     LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
@@ -441,14 +448,14 @@ public class Runner extends TestSuite
                     LOG.warn("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
                     continue;
                 }
-                else if(interfaces.contains(WindowsOnlyTest.class) && !osName.toLowerCase().contains("windows"))
+                else if(interfaces.contains(WindowsOnlyTest.class) && !SystemUtils.IS_OS_WINDOWS)
                 {
-                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + SystemUtils.OS_NAME);
                     continue;
                 }
-                else if(interfaces.contains(NonWindowsTest.class) && osName.toLowerCase().contains("windows"))
+                else if(interfaces.contains(NonWindowsTest.class) && SystemUtils.IS_OS_WINDOWS)
                 {
-                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + SystemUtils.OS_NAME);
                     continue;
                 }
                 test = new JUnit4TestAdapter(testClass);
@@ -460,7 +467,7 @@ public class Runner extends TestSuite
                     final Set<String> foundTests = new HashSet<>();
                     final Set<String> ignoredTests = new HashSet<>();
 
-                    org.junit.runner.manipulation.Filter testNameFilter = new Filter()
+                    Filter testNameFilter = new Filter()
                     {
                         @Override
                         public boolean shouldRun(Description description)
@@ -529,7 +536,7 @@ public class Runner extends TestSuite
             }
         }
 
-        if (!foundServerSideTest)
+        if (!foundServerSideTest && BatchInfo.get().isLastBatch())
         {
             // Automatically run server-side tests based on 'suite' parameter
             // if standard JUnitTest isn't already included
@@ -552,6 +559,7 @@ public class Runner extends TestSuite
     }
 
     // for error reporting
+    @SuppressWarnings("JUnitMalformedDeclaration")
     public static class ErrorTest extends TestCase
     {
         Throwable t;
@@ -800,7 +808,7 @@ public class Runner extends TestSuite
             if (testNames.isEmpty())
             {
                 final List<String> specifiedSuites = getSpecifiedSuites();
-                set = getCompositeTestSet(specifiedSuites);
+                set = BatchInfo.get().getBatch(getCompositeTestSet(specifiedSuites));
             }
             else
             {
@@ -974,11 +982,12 @@ public class Runner extends TestSuite
             }
         }
 
-        set.prioritizeTest(BasicTest.class, 0); // Always start with BasicTest (if present)
+        List<Class<?>> testClasses = testNames.isEmpty() ? set.getSortedTestList() : getTestClasses(testNames);
 
-        set.prioritizeTest(DatabaseDiagnosticsTest.class, set.getTestList().size() - 1); // Always end with DatabaseDiagnosticsTest (if present)
-
-        List<Class<?>> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(testNames);
+        if (TestProperties.isServerRemote() && TestProperties.isTestRunningOnTeamCity() || TestProperties.isDiagnosticsExportEnabled())
+        {
+            testClasses.add(ExportDiagnosticsPseudoTest.class);
+        }
 
         TestSuite suite = getSuite(testClasses, cleanOnly);
 
@@ -1107,5 +1116,88 @@ public class Runner extends TestSuite
             return ((JUnit4TestAdapter) test).getTestClass();
         else
             return test.getClass();
+    }
+
+    private static void waitForTomcat() throws IOException
+    {
+        Duration timeout = Duration.ofSeconds(TestProperties.getServerStartupTimeout());
+        LOG.info("Waiting for server to respond");
+        Timer timer = new Timer(timeout);
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        do {
+            try (CloseableHttpClient client = WebTestHelper.getHttpClient())
+            {
+                HttpGet method = new HttpGet(WebTestHelper.getBaseURL());
+                client.execute(method, context, response -> {
+                    EntityUtils.consumeQuietly(response.getEntity());
+                    return response.getCode();
+                });
+                // Any response is ok.
+                LOG.info("Server started after: " + formatDuration(timer.elapsed().toMillis()));
+                return;
+            }
+            catch (IOException e)
+            {
+                if (timer.isTimedOut())
+                {
+                    LOG.info("Server failed to start after: " + formatDuration(timeout.toMillis()));
+                    throw e;
+                }
+                WebDriverWrapper.sleep(1000);
+            }
+        } while(true);
+    }
+}
+
+class BatchInfo
+{
+    private static BatchInfo _instance;
+
+    private final int _currentBatch;
+    private final int _totalBatches;
+
+    private BatchInfo(int currentBatch, int totalBatches)
+    {
+        this._currentBatch = currentBatch;
+        this._totalBatches = totalBatches;
+    }
+
+    static BatchInfo get()
+    {
+        if (_instance == null)
+        {
+            String currentBatch = StringUtils.trimToNull(System.getProperty("webtest.parallelTests.currentBatch"));
+            String totalBatches = StringUtils.trimToNull(System.getProperty("webtest.parallelTests.totalBatches"));
+            try
+            {
+                _instance = new BatchInfo(Integer.parseInt(currentBatch), Integer.parseInt(totalBatches));
+            }
+            catch (NumberFormatException ex)
+            {
+                _instance = new BatchInfo(1, 1);
+            }
+        }
+        return _instance;
+    }
+
+    int getCurrentBatch()
+    {
+        return _currentBatch;
+    }
+
+    int getTotalBatches()
+    {
+        return _totalBatches;
+    }
+
+    boolean isLastBatch()
+    {
+        return _currentBatch == _totalBatches;
+    }
+
+    @NotNull
+    public TestSet getBatch(TestSet testSet)
+    {
+        return new TestSet(SuiteFactory.extractBatch(new HashSet<>(testSet.getTestList()), getCurrentBatch(), getTotalBatches()), testSet.getSuite());
     }
 }

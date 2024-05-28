@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadResponse>
@@ -33,7 +33,7 @@ public class DeleteMessageThreadCommand extends PostCommand<DeleteMessageThreadR
     @Override
     protected DeleteMessageThreadResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new DeleteMessageThreadResponse(text, status, contentType, json, this);
+        return new DeleteMessageThreadResponse(text, status, contentType, json);
     }
 
     public void setEntityId(String entityId)

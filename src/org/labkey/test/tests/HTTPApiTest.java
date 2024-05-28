@@ -23,8 +23,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.APITestHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -37,9 +37,9 @@ public class HTTPApiTest extends BaseWebDriverTest
 {
     private static final String LIST_NAME = "Test List";
 
-    private static final FieldDefinition COL1 = new FieldDefinition("Like", FieldDefinition.ColumnType.String).setLabel("Like").setDescription("What the color is like");
-    private static final FieldDefinition COL2 = new FieldDefinition("Month", FieldDefinition.ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
-    private static final FieldDefinition COL3 = new FieldDefinition("Good", FieldDefinition.ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
+    private static final FieldDefinition COL1 = new FieldDefinition("Like", ColumnType.String).setLabel("Like").setDescription("What the color is like");
+    private static final FieldDefinition COL2 = new FieldDefinition("Month", ColumnType.DateAndTime).setLabel("Month to Wear").setDescription("When to wear the color").setFormat("M");
+    private static final FieldDefinition COL3 = new FieldDefinition("Good", ColumnType.Integer).setLabel("Quality").setDescription("How nice the color is");
     private final static String[][] TEST_DATA = { { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
             { "1", "4", "3", "2" },
@@ -91,7 +91,7 @@ public class HTTPApiTest extends BaseWebDriverTest
         portalHelper.addWebPart("Lists");
 
         log("Create List");
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
+        _listHelper.createList(getProjectName(), LIST_NAME, new FieldDefinition("Color", ColumnType.String), COL1, COL2, COL3);
         _listHelper.goToList(LIST_NAME);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(LIST_NAME);
         listDefinitionPage.openAdvancedListSettings().setFieldUsedForDisplayTitle("Like").clickApply();

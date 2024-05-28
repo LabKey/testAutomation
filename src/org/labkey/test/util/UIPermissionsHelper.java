@@ -15,14 +15,17 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.PermissionsEditor;
+import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Date;
 import java.util.List;
@@ -31,12 +34,17 @@ import static org.junit.Assert.assertFalse;
 
 public class UIPermissionsHelper extends PermissionsHelper
 {
-    protected BaseWebDriverTest _test;
+    private final BaseWebDriverTest _driver;
 
     public UIPermissionsHelper(BaseWebDriverTest test)
     {
-        super(test);
-        _test = test;
+        _driver = test;
+    }
+
+    @Override
+    protected Connection getConnection()
+    {
+        return _driver.createDefaultConnection();
     }
 
     @Override
@@ -48,8 +56,10 @@ public class UIPermissionsHelper extends PermissionsHelper
     @LogMethod
     public void startCreateGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists)
     {
-        _test.goToHome();
+        _driver.goToHome();
         _driver.goToSiteGroups();
+        WebElement groupNameInput = _driver.shortWait().until(ExpectedConditions.elementToBeClickable(Locator.input("sitegroupsname")));
+
         if (_driver.isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if (failIfAlreadyExists)
@@ -58,11 +68,8 @@ public class UIPermissionsHelper extends PermissionsHelper
                 return;
         }
 
-        Locator l = Locator.xpath("//input[contains(@name, 'sitegroupsname')]");
-        _driver.waitForElement(l, _driver.defaultWaitForPage);
-
-        _driver.setFormElement(l, groupName);
-        _driver.pressEnter(l);
+        _driver.setFormElement(groupNameInput, groupName);
+        groupNameInput.sendKeys(Keys.ENTER);
         _driver._extHelper.waitForExtDialog(groupName + " Information");
     }
 
@@ -80,8 +87,8 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
         _driver.waitForElement(Locator.name("names"));
-        _driver.setFormElement(Locator.name("names"), namesList.toString());
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
+        _driver.setFormElement(Locator.name("names"), namesList.toString());
 
         Integer groupId = Integer.parseInt(WebTestHelper.parseUrlQuery(_driver.getURL()).get("id"));
         _driver.clickButton("Update Group Membership");
@@ -215,7 +222,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public void addUserToSiteGroup(String userName, String groupName)
     {
-        _test.ensureAdminMode();
+        _driver.ensureAdminMode();
         switch (groupName)
         {
             case "Administrators":
@@ -252,7 +259,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         if (!_driver.getCurrentContainerPath().startsWith("/" + projectName))
         {
-            _test.goToProjectHome(projectName);
+            _driver.goToProjectHome(projectName);
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
@@ -260,9 +267,9 @@ public class UIPermissionsHelper extends PermissionsHelper
     } //addUserToProjGroup()
 
     @Deprecated
-    public void enterPermissionsUI()
+    public PermissionsPage enterPermissionsUI()
     {
-        PermissionsEditor.enterPermissionsUI(_test);
+        return PermissionsPage.enterPermissionsUI(_driver);
     }
 
     public void exitPermissionsUI()
@@ -340,8 +347,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public boolean doesGroupExist(String groupName, String projectName)
     {
-        _test.ensureAdminMode();
-        _test.clickProject(projectName);
+        _driver.ensureAdminMode();
+        _driver.clickProject(projectName);
         enterPermissionsUI();
         _driver._ext4Helper.clickTabContainingText("Project Groups");
         _driver.waitForText("Member Groups");
@@ -355,8 +362,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public boolean isUserInGroup(String user, String groupName, String projectName, PrincipalType principalType)
     {
-        _test.ensureAdminMode();
-        _test.clickProject(projectName);
+        _driver.ensureAdminMode();
+        _driver.clickProject(projectName);
         enterPermissionsUI();
         _driver._ext4Helper.clickTabContainingText("Project Groups");
         _driver.waitForElement(Locator.css(".groupPicker"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -440,8 +447,8 @@ public class UIPermissionsHelper extends PermissionsHelper
     public void addUserToGroupFromGroupScreen(String userName)
     {
         _driver.waitForElement(Locator.name("names"));
-        _driver.setFormElement(Locator.name("names"), userName);
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
+        _driver.setFormElement(Locator.name("names"), userName);
         _driver.clickButton("Update Group Membership");
     }
 

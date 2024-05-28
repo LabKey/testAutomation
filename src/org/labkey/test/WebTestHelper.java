@@ -17,34 +17,35 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.ConnectionConfig;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.config.CharCodingConfig;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.LogMethod;
@@ -81,6 +82,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
@@ -103,18 +105,14 @@ public class WebTestHelper
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
-    private static boolean NO_QUESTION_MARK_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
     private static final Map<String, String> savedSessionKeys = new HashMap<>();
+
+    static { TestProperties.load(); }
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
         USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
-    }
-
-    public static void setNoQuestionMarkUrl(boolean noQuestionMarkUrl)
-    {
-        NO_QUESTION_MARK_URL = noQuestionMarkUrl;
     }
 
     /**
@@ -144,7 +142,7 @@ public class WebTestHelper
         if (!savedSessionKeys.containsKey(sessionId))
         {
             Connection connection = getRemoteApiConnection(user, true);
-            PostCommand<?> command = new PostCommand<>("security", "createApiKey");
+            SimplePostCommand command = new SimplePostCommand("security", "createApiKey");
             JSONObject json = new JSONObject();
             json.put("type", "session");
             command.setJsonObject(json);
@@ -171,11 +169,6 @@ public class WebTestHelper
     public static boolean isUseContainerRelativeUrl()
     {
         return USE_CONTAINER_RELATIVE_URL;
-    }
-
-    public static boolean isNoQuestionMarkUrl()
-    {
-        return NO_QUESTION_MARK_URL;
     }
 
     private static void acceptLocalhostCert() throws Exception
@@ -235,7 +228,7 @@ public class WebTestHelper
             if (_webPort == null)
             {
                 String webPortStr = System.getProperty("labkey.port");
-                if (webPortStr == null || webPortStr.trim().length() == 0)
+                if (webPortStr == null || StringUtils.isBlank(webPortStr))
                 {
                     LOG.info("Using default labkey port (" + DEFAULT_WEB_PORT +
                                         ").\nThis can be changed by setting the property 'labkey.port=[yourport]'.");
@@ -255,10 +248,10 @@ public class WebTestHelper
     {
         synchronized (SERVER_LOCK)
         {
-            if (_targetServer == null || !_targetServer.equals(System.getProperty("labkey.server")))
+            if (_targetServer == null)
             {
                 _targetServer = System.getProperty("labkey.server");
-                if (_targetServer == null || _targetServer.length() == 0)
+                if (_targetServer == null || _targetServer.isEmpty())
                 {
                     LOG.info("Using default target server (" + DEFAULT_TARGET_SERVER +
                                         ").\nThis can be changed by setting the property 'labkey.server=[yourserver]'.");
@@ -278,9 +271,9 @@ public class WebTestHelper
      */
     public static String makeRelativeUrl(String url)
     {
-        if (url.startsWith("http://") || url.startsWith("https://"))
+        if (isAbsoluteUrl(url))
         {
-            if (url.startsWith(getBaseURL()))
+            if (isTestServerUrl(url))
             {
                 url = url.substring(getBaseURL().length());
             }
@@ -300,10 +293,20 @@ public class WebTestHelper
         return StringUtils.stripStart(url, "/");
     }
 
+    public static boolean isAbsoluteUrl(String url)
+    {
+        return url.startsWith("http://") || url.startsWith("https://");
+    }
+
+    public static boolean isTestServerUrl(String url)
+    {
+        return url.startsWith(getBaseURL()) || !isAbsoluteUrl(url);
+    }
+
     public enum DatabaseType
     {
         PostgreSQL("org.postgresql.Driver", "pg", "postgres"),
-        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "net.sourceforge.jtds.jdbc.Driver", "mssql", "sqlserver");
+        MicrosoftSQLServer("com.microsoft.sqlserver.jdbc.SQLServerDriver", "mssql", "sqlserver");
 
         private static final Map<String, DatabaseType> DATABASE_TYPE_MAP;
 
@@ -405,7 +408,7 @@ public class WebTestHelper
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
-                    LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+                    LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextpath'.");
 
                 _contextPath = StringUtils.strip(_contextPath, "/ ");
                 if (!_contextPath.isEmpty())
@@ -523,29 +526,27 @@ public class WebTestHelper
         }
     }
 
-    public static void logToServer(String message)
+    public static void logToServer(@NotNull String message)
     {
         logToServer(message, getRemoteApiConnection());
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent
-    public static void logToServer(String message, Connection connection)
+    public static void logToServer(@NotNull String message, Connection connection)
     {
         if (message.contains("\n"))
         {
             String [] splitMessage = message.split("\n");
             for (String thisMessage: splitMessage)
             {
-                if (thisMessage.length() > 0)
+                if (!thisMessage.isEmpty())
                     logToServer(thisMessage, connection);
             }
             return;
         }
 
-        PostCommand<?> command = new PostCommand<>("admin", "log");
-        Map<String, Object> params = new HashMap<>();
-        params.put("message", message);
-        command.setParameters(params);
+        SimplePostCommand command = new SimplePostCommand("admin", "log");
+        command.setParameters(Map.of("message", message));
         try
         {
             command.execute(connection, "/");
@@ -560,12 +561,12 @@ public class WebTestHelper
         }
     }
 
-    public static HttpClient getHttpClient()
+    public static CloseableHttpClient getHttpClient()
     {
         return getHttpClient(PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
-    public static HttpClient getHttpClient(String username, String password)
+    public static CloseableHttpClient getHttpClient(String username, String password)
     {
         return getHttpClientBuilder(username, password).build();
     }
@@ -578,10 +579,34 @@ public class WebTestHelper
     public static HttpClientBuilder getHttpClientBuilder(String username, String password)
     {
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom()
-                .setSocketTimeout(60000)
-                .setConnectTimeout(60000)
-                .setConnectionRequestTimeout(60000);
+            .setResponseTimeout(60000, TimeUnit.MILLISECONDS)
+            .setConnectTimeout(60000, TimeUnit.MILLISECONDS)
+            .setConnectionRequestTimeout(60000, TimeUnit.MILLISECONDS);
         return getHttpClientBuilder(username, password, requestConfigBuilder);
+    }
+
+    private static final HttpClientConnectionManager SELF_SIGNED_CONNECTION_MANAGER;
+
+    static
+    {
+        try
+        {
+            SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+            sslContextBuilder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContextBuilder.build());
+            SELF_SIGNED_CONNECTION_MANAGER = PoolingHttpClientConnectionManagerBuilder.create()
+                .setSSLSocketFactory(sslConnectionSocketFactory)
+                .setConnectionFactory(
+                    ManagedHttpClientConnectionFactory.builder().charCodingConfig(
+                        CharCodingConfig.custom().setCharset(StandardCharsets.UTF_8).build()
+                    ).build()
+                )
+                .build();
+        }
+        catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public static HttpClientBuilder getHttpClientBuilder(String username, String password, RequestConfig.Builder requestConfigBuilder)
@@ -596,37 +621,17 @@ public class WebTestHelper
             throw new RuntimeException(ex);
         }
 
-        HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
+        HttpHost targetHost = new HttpHost(target.getScheme(), target.getHost(), target.getPort());
         AuthScope authScope = new AuthScope(targetHost.getHostName(), target.getPort());
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
-
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password.toCharArray());
+        BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(authScope, credentials);
 
-        RequestConfig requestConfig = requestConfigBuilder
-                .build();
-
-        ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                .setCharset(StandardCharsets.UTF_8)
-                .build();
-
-        SSLConnectionSocketFactory socketFactory;
-        try
-        {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            socketFactory = new SSLConnectionSocketFactory(builder.build());
-        }
-        catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
-                .setDefaultCredentialsProvider(credentialsProvider)
-                .setDefaultRequestConfig(requestConfig)
-                .setDefaultConnectionConfig(connectionConfig)
-                .setSSLSocketFactory(socketFactory);
+            .setConnectionManager(SELF_SIGNED_CONNECTION_MANAGER)
+            .setConnectionManagerShared(true)
+            .setDefaultCredentialsProvider(credentialsProvider)
+            .setDefaultRequestConfig(requestConfigBuilder.build());
 
         Map<String, Cookie> cookies = getCookies(username);
         if (!cookies.isEmpty())
@@ -640,9 +645,9 @@ public class WebTestHelper
     }
 
     @NotNull
-    private static org.apache.http.cookie.Cookie seleniumCookieToApacheCookie(Cookie c)
+    private static org.apache.hc.client5.http.cookie.Cookie seleniumCookieToApacheCookie(Cookie c)
     {
-        return new org.apache.http.cookie.Cookie()
+        return new org.apache.hc.client5.http.cookie.Cookie()
         {
             @Override
             public String getName()
@@ -654,18 +659,6 @@ public class WebTestHelper
             public String getValue()
             {
                 return c.getValue();
-            }
-
-            @Override
-            public String getComment()
-            {
-                return c.toString();
-            }
-
-            @Override
-            public String getCommentURL()
-            {
-                return null;
             }
 
             @Override
@@ -693,21 +686,9 @@ public class WebTestHelper
             }
 
             @Override
-            public int[] getPorts()
-            {
-                return new int[0];
-            }
-
-            @Override
             public boolean isSecure()
             {
                 return c.isSecure();
-            }
-
-            @Override
-            public int getVersion()
-            {
-                return 0;
             }
 
             @Override
@@ -715,35 +696,40 @@ public class WebTestHelper
             {
                 return getExpiryDate() != null && date.compareTo(getExpiryDate()) > 0;
             }
+
+            @Override
+            public String getAttribute(String name)
+            {
+                return null;
+            }
+
+            @Override
+            public boolean containsAttribute(String name)
+            {
+                return false;
+            }
+
+            @Override
+            public Date getCreationDate()
+            {
+                return null;
+            }
         };
     }
 
     public static HttpClientContext getBasicHttpContext()
     {
-        try
-        {
-            URI target = new URI(getBaseURL());
-            HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
+        // Create AuthCache instance
+        AuthCache authCache = new BasicAuthCache();
 
-            // Create AuthCache instance
-            AuthCache authCache = new BasicAuthCache();
-            // Generate BASIC scheme object and add it to the local auth cache
-            BasicScheme basicAuth = new BasicScheme();
-            authCache.put(targetHost, basicAuth);
+        // Add AuthCache to the execution context
+        HttpClientContext localcontext = HttpClientContext.create();
+        localcontext.setAuthCache(authCache);
 
-            // Add AuthCache to the execution context
-            HttpClientContext localcontext = HttpClientContext.create();
-            localcontext.setAuthCache(authCache);
-
-            return localcontext;
-        }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return localcontext;
     }
 
-    public static String getHttpResponseBody(HttpResponse response)
+    public static String getHttpResponseBody(CloseableHttpResponse response)
     {
         StringBuilder builder = new StringBuilder();
         try

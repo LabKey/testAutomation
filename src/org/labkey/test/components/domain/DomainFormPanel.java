@@ -6,6 +6,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.react.ToggleButton;
+import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.TimeoutException;
@@ -38,6 +40,48 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         super(element, driver);
     }
 
+    public static List<AdvancedFieldSetting> advancedSettingsFromFieldDefinition(FieldDefinition def)
+    {
+        List<AdvancedFieldSetting> advancedSettings = new ArrayList<>();
+
+        //TODO: Add missing settings to 'FieldDefinitions:
+        //      Show in default view
+        //      Default type
+        //      Exclude from shifting
+        //      Recommended variable
+
+        if (def.getShownInUpdateView() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.shownInUpdateView(def.getShownInUpdateView()));
+        }
+        if (def.getShownInInsertView() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.shownInInsertView(def.getShownInInsertView()));
+        }
+        if (def.getShownInDetailsView() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.shownInDetailsView(def.getShownInDetailsView()));
+        }
+        if (def.getMeasure() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.measure(def.getMeasure()));
+        }
+        if (def.getDimension() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.measure(def.getDimension()));
+        }
+        if (def.getMvEnabled() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.mvEnabled(def.getMvEnabled()));
+        }
+        if (def.getPHI() != null)
+        {
+            advancedSettings.add(AdvancedFieldSetting.PHI(def.getPhiLevel()));
+        }
+
+        return advancedSettings;
+    }
+
     @Override
     protected DomainFormPanel getThis()
     {
@@ -50,6 +94,15 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return editField(fieldRow, fieldDefinition);
     }
 
+    public DomainFormPanel addFields(List<FieldDefinition> fieldDefinitions)
+    {
+        for (FieldDefinition fieldDefinition : fieldDefinitions)
+        {
+            addField(fieldDefinition);
+        }
+        return this;
+    }
+
     public DomainFormPanel setField(FieldDefinition fieldDefinition)
     {
         DomainFieldRow fieldRow = getField(fieldDefinition.getName());
@@ -58,10 +111,13 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     private DomainFormPanel editField(DomainFieldRow fieldRow, FieldDefinition fieldDefinition)
     {
-        if (fieldDefinition.getLookup() != null)
-            fieldRow.setLookup(fieldDefinition.getLookup());
-        else if (fieldDefinition.getType() != null)
-            fieldRow.setType(fieldDefinition.getType());
+        if (fieldDefinition.getType() != null)
+        {
+            if (fieldDefinition.getType().isLookup())
+                fieldRow.setLookup(fieldDefinition.getLookup());
+            else
+                fieldRow.setType(fieldDefinition.getType());
+        }
 
         if (fieldDefinition.getDescription() != null)
             fieldRow.setDescription(fieldDefinition.getDescription());
@@ -75,8 +131,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             fieldRow.setUrl(fieldDefinition.getURL());
         if (fieldDefinition.getImportAliases() != null)
             fieldRow.setImportAliases(fieldDefinition.getImportAliases());
-        if (fieldDefinition.getMvEnabled())
-            fieldRow.setMissingValuesEnabled(fieldDefinition.getMvEnabled());
         if (fieldDefinition.getRequired())
             fieldRow.setRequiredField(fieldDefinition.getRequired());
         if (fieldDefinition.getLookupValidatorEnabled() != null)
@@ -145,6 +199,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 fieldRow.setRangeValidators(rangeValidators);
             }
         }
+
+        fieldRow.setAdvancedSettings(advancedSettingsFromFieldDefinition(fieldDefinition));
 
         fieldRow.collapse();
 
@@ -280,49 +336,148 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return this;
     }
 
-    public String getMode()
+    // default system fields
+    /*
+        Default System Fields, for the nonce, will appear in the 'Fields' form of the domain designer for Sample and
+        DataClass domains. They will be shown in a ResponsiveGrid that can be shown/hidden via a toggle
+     */
+
+    /*
+        shows the DefaultSystemFields grid if it is available and not shown
+     */
+    public DomainFormPanel expandDefaultSystemFields()
     {
-        String button = elementCache().toggleButton.getAttribute("class");
-        if (button != null && button.contains("default"))
-            return "Summary Mode";
-        else
-            return "Detail Mode";
+        if (!isDefaultSystemFieldsExpanded())
+            elementCache().defaultSystemFieldsToggle().click();
+
+        WebDriverWrapper.waitFor(()-> isDefaultSystemFieldsExpanded(),
+                "the default system fields display did not expand in time", 2000);
+        return this;
     }
 
-    public DomainFormPanel switchMode(String name)
+    /*
+        collapses the DefaultSystemFields grid if it is available and expanded
+    */
+    public DomainFormPanel collapseDefaultSystemFields()
     {
-        if (!getMode().equals(name))
-            elementCache().toggleButton.click();
+        if (isDefaultSystemFieldsExpanded())
+            elementCache().defaultSystemFieldsToggle().click();
+
+        WebDriverWrapper.waitFor(()-> !isDefaultSystemFieldsExpanded(),
+                "the default system fields display did not collapse in time", 2000);
+        return this;
+    }
+
+    public ResponsiveGrid getDefaultSystemFieldsGrid()
+    {
+        expandDefaultSystemFields();
+        WebElement gridContainer = Locator.tagWithClass("div", "domain-system-fields__grid")
+                .waitForElement(this, 2000);
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(gridContainer);
+    }
+
+    /*
+        When expanded, the i tag will show a minus, when collapsed it will advertise its expandability
+        by showing a "+" icon
+     */
+    public boolean isDefaultSystemFieldsExpanded()
+    {
+        var toggleClass = elementCache().defaultSystemFieldsToggle().getAttribute("class");
+        return toggleClass != null && toggleClass.contains("fa-minus-square");
+    }
+
+    /*
+        Mode, in this context, means how the fields in this domain will be shown.
+        Mode is toggled via the toggle in the custom fields action bar.
+        in 'Summary mode', fields are shown in a grid, with columns representing field attributes like 'name', 'range uri', etc
+        in 'Detail mode', fields appear as editable, in FieldRows
+     */
+    private String getMode()
+    {
+        return elementCache().customFieldsViewToggle.getSelectedStatus(); // will be either "Summary" or "Detail"
+    }
+
+    /**
+     * Selects the desired mode.  Possible values are "Summary" and "Detail"
+     * @param name The name of the desired mode, or the text to appear in the toggle in its desired state
+     * @return an instance of the current DomainFormPanel
+     */
+    private DomainFormPanel switchMode(String name)
+    {
+        if (!getMode().equalsIgnoreCase(name))
+        {
+            boolean isSummary = elementCache().customFieldsViewToggle.isOn();
+            elementCache().customFieldsViewToggle.set(!isSummary);
+        }
+        WebDriverWrapper.waitFor(()-> getMode().equalsIgnoreCase(name),
+                "the mode select toggle did not become [" +name+ "] as expected", 2000);
 
         return this;
     }
 
+    /*
+        Summary mode shows a responsive grid containing a row per field, with columns for field attributes
+    */
     public boolean isSummaryMode()
     {
-        return getMode().equals("Summary Mode");
+        return getMode().equalsIgnoreCase("Summary");
     }
 
+    public DomainFormPanel selectSummaryMode()
+    {
+        return switchMode("Summary");
+    }
+
+    /*
+        gets the grid containing row data/metadata in summary view
+     */
+    public ResponsiveGrid getSummaryModeGrid()
+    {
+        selectSummaryMode();
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver())
+                .locatedBy(Locator.tagWithClass("div", "domain-field-toolbar").followingSibling("div").followingSibling("div"))
+                .waitFor(this);
+    }
+
+    /*
+
+     */
+    public DomainFormPanel clickSummaryGridNameLink(String linkText)
+    {
+        var targetCell = getSummaryModeGrid().getRow("Name", linkText).getCell("Name");
+        var clickable = Locator.linkWithText(linkText).findElement(targetCell);
+        clickable.click();
+        WebDriverWrapper.waitFor(()-> isDetailMode(),
+                "DomainFormPanel did not switch to detail mode as expected", 2000);
+        return this;
+    }
+
+    public List<String> getSummaryModeColumns()
+    {
+        var rawColumns = getSummaryModeGrid().getColumnNames();
+        return rawColumns.subList(1, rawColumns.size());    // omit the 'select' column, it is an empty value
+    }
+
+    /*
+        Detail mode is the default view, it shows the list of (expandable, collapsable, editable) fieldRows
+     */
     public boolean isDetailMode()
     {
-        return getMode().equals("Detail Mode");
+        return getMode().equalsIgnoreCase("Detail");
     }
 
-    public List<String> getDetailModeHeaders()
+    public DomainFormPanel selectDetailMode()
     {
-        List<String> headers = new ArrayList();
-        for (WebElement e : Locator.xpath("//table/thead/tr/th").findElements(this))
-            if (!e.getText().isBlank())
-                headers.add(e.getText().trim());
-
-        return headers;
+        return switchMode("Detail");
     }
 
-    public int getRowCountInDetailMode()
+    /*
+        Summary mode shows a table containing a row per field, with columns representing field attributes
+     */
+    public int getRowcountInSummaryMode()
     {
-        if (!getMode().equals("Detail Mode"))
-            switchMode("Detail Mode");
-
-        return Locator.xpath("//table/tbody/tr").findElements(this).size();
+        selectSummaryMode();
+        return getSummaryModeGrid().getRows().size();
     }
 
     public DomainFormPanel setInferFieldFile(File file)
@@ -332,9 +487,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                 "fields were not inferred from file in time", WAIT_FOR_JAVASCRIPT);
         return this;
     }
-
-    // TODO: add ability to select "import data"/"don't import" here, after inferring fields from file
-    // for datasets, the ability to map key columns is exposed when 'import data' is selected
 
     public List<String> fieldNames()
     {
@@ -419,10 +571,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
         public final WebElement toggleButton = Locator.tagWithAttributeContaining("div", "id", "domain-toggle-summary").
                 findWhenNeeded(this);
+        public final ToggleButton customFieldsViewToggle = new ToggleButton.ToggleButtonFinder(getDriver())
+                .withState("Detail").timeout(5000).findWhenNeeded(this);
 
         protected WebElement addFieldButton = new WebElementWrapper()
         {
-            WebElement el = Locator.css(".domain-form-add-btn .btn").findWhenNeeded(DomainFormPanel.this);
+            final WebElement el = Locator.css(".domain-form-add-btn .btn").findWhenNeeded(DomainFormPanel.this);
 
             @Override
             public WebElement getWrappedElement()
@@ -456,7 +610,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
         // Should only modify row collections with findFieldRows() and addFieldButton.click()
         private List<DomainFieldRow> fieldRows;
-        private Map<String, Integer> fieldNames = new TreeMap<>();
+        private final Map<String, Integer> fieldNames = new TreeMap<>();
         private final Locator rowLoc = Locator.tagWithClass("div", "domain-field-row").withoutClass("domain-floating-hdr");
 
         private List<DomainFieldRow> findFieldRows()
@@ -471,6 +625,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
         private DomainFieldRow findFieldRow(String name)
         {
+            WebDriverWrapper.waitFor(() -> !findFieldRows().isEmpty(), 1_000);
             List<DomainFieldRow> fieldRows = findFieldRows();
             for (int i = 0; i < fieldRows.size(); i++)
             {
@@ -493,7 +648,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         Locator.XPathLocator manuallyDefineFieldsLoc = Locator.tagWithClass("div", "domain-form-manual-btn");
         protected WebElement manuallyDefineButton = new WebElementWrapper()
         {
-            WebElement el = Locator.css(".domain-form-manual-btn").findWhenNeeded(DomainFormPanel.this);
+            final WebElement el = Locator.css(".domain-form-manual-btn").findWhenNeeded(DomainFormPanel.this);
 
             @Override
             public WebElement getWrappedElement()
@@ -513,6 +668,14 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         };
 
         WebElement fileUploadInput = Locator.tagWithClass("input", "file-upload--input").findWhenNeeded(DomainFormPanel.this).withTimeout(2000);
+
+        WebElement defaultSystemFieldsContainer = Locator.tagWithClass("div", "domain-system-fields")
+                .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement defaultSystemFieldsToggle()
+        {
+            return Locator.tagWithClass("div", "domain-system-fields-header__icon")
+                    .child("i").waitForElement(defaultSystemFieldsContainer, 2000);
+        }
 
     }
 

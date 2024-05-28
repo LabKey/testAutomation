@@ -17,33 +17,43 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.JSONHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -56,6 +66,8 @@ public class ScriptValidationTest extends BaseWebDriverTest
 {
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
+
+    public static final String VEHICLES_TABLE = "vehicles";
 
     public static class ColorRecord
     {
@@ -79,17 +91,19 @@ public class ScriptValidationTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void initTest()
+    public static void initTest() throws Exception
     {
         ScriptValidationTest init = (ScriptValidationTest) getCurrentTest();
         init.doSetup();
     }
 
     @LogMethod
-    protected void doSetup()
+    protected void doSetup() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModule(getProjectName(), MODULE_NAME);
+        new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE).truncateTable();
+        new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, "Colors").truncateTable();
     }
 
     @Test
@@ -98,13 +112,114 @@ public class ScriptValidationTest extends BaseWebDriverTest
         clickProject(getProjectName());
         doTestTransformation();
         doTestValidation();
+        doTestCrossFolderSaveRows();
 
         log("Create list to prevent query validation failure");
-        _listHelper.createList(getProjectName(), "People",
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+        new IntListDefinition("People", "Key")
+                .setFields(List.of(
+                        new FieldDefinition("Name", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("Age", FieldDefinition.ColumnType.Integer),
+                        new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean)))
+                .create(createDefaultConnection(), getProjectName());
+    }
+
+    public void doTestCrossFolderSaveRows() throws Exception
+    {
+        Connection cn = createDefaultConnection();
+
+        List<ColorRecord> colors = insertColors(Arrays.asList(
+                new ColorRecord("Yellow2", "#f00")
+        ));
+
+        // Create manufacturers:
+        ArrayList<Map<String, Object>> list1 = new ArrayList<>();
+        list1.add(Map.of("Name", "Manufacturer1"));
+        InsertRowsCommand cmd1 = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
+        cmd1.getRows().addAll(list1);
+        Object manufacturerId = cmd1.execute(cn, getProjectName()).getRows().get(0).get("rowid");
+
+        // Create model:
+        ArrayList<Map<String, Object>> list2 = new ArrayList<>();
+        list2.add(Map.of("ManufacturerId", manufacturerId, "Name", "Model1"));
+        InsertRowsCommand cmd2 = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
+        cmd2.getRows().addAll(list2);
+        Object modelId = cmd2.execute(cn, getProjectName()).getRows().get(0).get("RowId");
+        assertNotNull("RowId not returned for models insert, values", modelId);
+
+        PostCommand<CommandResponse> saveRowsCommand = prepareSaveRowsCommand("insertWithKeys", getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE, "RowId",
+                new String[]{"ModelId", "Color", "ModelYear", "Milage", "LastService"},
+                new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
+        CommandResponse response = saveRowsCommand.execute(cn, "/home");
+        CaseInsensitiveHashMap row = new CaseInsensitiveHashMap<>((Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values"));
+        // See discussion in: https://github.com/LabKey/testAutomation/pull/1338
+        Object vehicleRowId = row.get("rowId");  // NOTE: even though the XML for this table defines the case as RowId, using SaveRows/insertWithKeys results in the code converting the first letter of the field names to lowercase, in ResultSetRowMapFactory
+        assertNotNull("RowId not returned for vehicles insert, keys found: " + StringUtils.join(row.keySet(), ","), vehicleRowId);
+
+        SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
+        src.setColumns(Arrays.asList("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
+        src.setSorts(Arrays.asList(new Sort("RowId", Sort.Direction.DESCENDING)));
+        SelectRowsResponse sr2 = src.execute(cn, getProjectName());
+        assertEquals("Incorrect model", modelId, sr2.getRows().get(0).get("ModelId"));
+        assertEquals("Incorrect Milage", 1234, sr2.getRows().get(0).get("Milage"));
+        assertEquals("Incorrect RowId for First Record", vehicleRowId, sr2.getRows().get(0).get("rowId"));
+
+        // This should be true for all rows, including the one we just added:
+        sr2.getRows().forEach(r -> {
+            assertEquals("Containers should match, rowId: " + r.get("RowId"), r.get("Container"), r.get("TriggerScriptContainer"));
+        });
+
+    }
+
+    private PostCommand<CommandResponse> prepareSaveRowsCommand(String command, String containerPath, String schema, String queryName, String pkName, String[] fieldNames, Object[][] rows, @Nullable Object[][] oldKeys)
+    {
+        SimplePostCommand postCommand = new SimplePostCommand("query", "saveRows");
+
+        JSONObject commandJson = new JSONObject();
+        commandJson.put("containerPath", containerPath);
+        commandJson.put("schemaName", schema);
+        commandJson.put("queryName", queryName);
+        commandJson.put("command", command);
+        JSONArray jsonRows = new JSONArray();
+        int idx = 0;
+        for (Object[] row : rows)
+        {
+            JSONObject oldKeyMap = new JSONObject();
+            JSONObject values = new JSONObject();
+
+            int position = 0;
+            for (String name : fieldNames)
+            {
+                Object v = row[position];
+                values.put(name, v);
+                if (pkName.equals(name))
+                    oldKeyMap.put(name, v);
+
+                position++;
+            }
+
+            if (oldKeys != null && oldKeys.length > idx)
+            {
+                JSONObject obj = new JSONObject();
+                int j = 0;
+                for (String field : fieldNames)
+                {
+                    obj.put(field, oldKeys[idx][j]);
+                    j++;
+                }
+                oldKeyMap = obj;
+            }
+
+            JSONObject ro = new JSONObject();
+            ro.put("oldKeys", oldKeyMap);
+            ro.put("values", values);
+            jsonRows.put(ro);
+        }
+        commandJson.put("rows", jsonRows);
+
+        JSONObject commands = new JSONObject();
+        commands.put("commands", Collections.singletonList(commandJson));
+        postCommand.setJsonObject(commands);
+        return postCommand;
     }
 
     private void doTestTransformation() throws Exception
@@ -150,33 +265,34 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("single message", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"single message\"," +
-                "\"extraContext\":{" +
-                    "\"A\":\"a\"," +
-                    "\"B\":3" +
-                "}," +
-                "\"errors\":[{" +
-                    "\"errors\":[{" +
-                        "\"id\":\"Hex\"," +
-                        "\"field\":\"Hex\"," +
-                        "\"message\":\"single message\"," +
-                        "\"msg\":\"single message\"" +
-                    "}]," +
-                    "\"schemaName\":\"vehicle\"," +
-                    "\"queryName\":\"Colors\"," +
-                    "\"exception\":\"single message\"," +
-                    "\"rowNumber\":1," +
-                    "\"row\":{" +
-                        "\"Name\":\"TestFieldErrorMessage!\"," +
-                        "\"Hex\":null" +
-                        "\"_rowNumber\":1" +
-                    "}" +
-                "}]" +
-            "}");
+            JSONObject expected = new JSONObject("""
+                    {
+                        "exception":"single message",
+                        "extraContext":{
+                            "A":"a",
+                            "B":3
+                        },
+                        "errors":[{
+                            "errors":[{
+                                "id":"Hex",
+                                "field":"Hex",
+                                "message":"single message",
+                                "msg":"single message"
+                            }],
+                            "schemaName":"vehicle",
+                            "queryName":"Colors",
+                            "exception":"single message",
+                            "rowNumber":1,
+                            "row":{
+                                "Name":"TestFieldErrorMessage!",
+                                "Hex":null,
+                                "_rowNumber":1
+                            }
+                        }]
+                    }
+                    """);
             
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -188,29 +304,30 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("one error message", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"one error message\"," +
-                "\"errors\":[{" +
-                    "\"errors\":[" +
-                        "{\"id\":\"Name\",\"field\":\"Name\",\"message\":\"one error message\",\"msg\":\"one error message\"}," +
-                        "{\"id\":\"Name\",\"field\":\"Name\",\"message\":\"two error message!\",\"msg\":\"two error message!\"}," +
-                        "{\"id\":\"Name\",\"field\":\"Name\",\"message\":\"ha ha ha!\",\"msg\":\"ha ha ha!\"}," +
-                        "{\"id\":\"Hex\",\"field\":\"Hex\",\"message\":\"also an error here\",\"msg\":\"also an error here\"}" +
-                    "]," +
-                    "\"schemaName\":\"vehicle\"," +
-                    "\"queryName\":\"Colors\"," +
-                    "\"exception\":\"one error message\"," +
-                    "\"rowNumber\":1," +
-                    "\"row\":{" +
-                        "\"Name\":\"TestFieldErrorArray!\"," +
-                        "\"Hex\":null" +
-                        "\"_rowNumber\":1" +
-                    "}" +
-                "}]" +
-            "}");
+            JSONObject expected = new JSONObject("""
+                    {
+                        "exception":"one error message",
+                        "errors":[{
+                            "errors":[
+                                {"id":"Name","field":"Name","message":"one error message","msg":"one error message"},
+                                {"id":"Name","field":"Name","message":"two error message!","msg":"two error message!"},
+                                {"id":"Name","field":"Name","message":"ha ha ha!","msg":"ha ha ha!"},
+                                {"id":"Hex","field":"Hex","message":"also an error here","msg":"also an error here"}
+                            ],
+                            "schemaName":"vehicle",
+                            "queryName":"Colors",
+                            "exception":"one error message",
+                            "rowNumber":1,
+                            "row":{
+                                "Name":"TestFieldErrorArray!",
+                                "Hex":null,
+                                "_rowNumber":1
+                            }
+                        }]
+                    }
+                    """);
 
-            json.assertEquals("FAILED", expected, properties);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -223,26 +340,27 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("boring error message", e.getMessage());
 
-            JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"boring error message\"," +
-                "\"errors\":[{" +
-                    "\"errors\":[{" +
-                        "\"message\":\"boring error message\"," +
-                        "\"msg\":\"boring error message\"" +
-                    "}]," +
-                    "\"schemaName\":\"blarg\"," +
-                    "\"queryName\":\"zorg\"," +
-                    "\"exception\":\"boring error message\"," +
-                    "\"rowNumber\":1000," +
-                    "\"row\":{" +
-                        "\"Name\":\"TestRowError!\"," +
-                        "\"Hex\":null" +
-                        "\"_rowNumber\":1" +
-                    "}" +
-                "}]" +
-            "}");
-            json.assertEquals("FAILED", expected, properties);
+            JSONObject expected = new JSONObject("""
+                    {
+                        "exception":"boring error message",
+                        "errors":[{
+                            "errors":[{
+                                "message":"boring error message",
+                                "msg":"boring error message"
+                            }],
+                            "schemaName":"blarg",
+                            "queryName":"zorg",
+                            "exception":"boring error message",
+                            "rowNumber":1000,
+                            "row":{
+                                "Name":"TestRowError!",
+                                "Hex":null,
+                                "_rowNumber":1
+                            }
+                        }]
+                    }
+                    """);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -255,29 +373,30 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             assertEquals("beforeInsert validation failed", e.getMessage());
 
-            JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"beforeInsert validation failed\"," +
-                "\"errorCount\":1," +
-                "\"errors\":[{" +
-                    "\"errors\":[{" +
-                        "\"message\":\"beforeInsert validation failed\"," +
-                        "\"msg\":\"beforeInsert validation failed\"" +
-                    "}]," +
-                    "\"schemaName\":\"vehicle\"," +
-                    "\"queryName\":\"Colors\"," +
-                    "\"exception\":\"beforeInsert validation failed\"," +
-                    "\"rowNumber\":1," +
-                    "\"row\":{" +
-                        "\"Name\":\"TestReturnFalse\"," +
-                        "\"Hex\":null" +
-                        "\"_rowNumber\":1" +
-                    "}" +
-                "}]," +
-                "\"success\":false," +
-                "\"extraContext\":{}," +
-            "}");
-            json.assertEquals("FAILED", expected, properties);
+            JSONObject expected = new JSONObject("""
+                    {
+                        "exception":"beforeInsert validation failed",
+                        "errorCount":1,
+                        "errors":[{
+                            "errors":[{
+                                "message":"beforeInsert validation failed",
+                                "msg":"beforeInsert validation failed"
+                            }],
+                            "schemaName":"vehicle",
+                            "queryName":"Colors",
+                            "exception":"beforeInsert validation failed",
+                            "rowNumber":1,
+                            "row":{
+                                "Name":"TestReturnFalse",
+                                "Hex":null,
+                                "_rowNumber":1
+                            }
+                        }],
+                        "success":false,
+                        "extraContext":{},
+                    }
+                    """);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -293,26 +412,27 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("TestErrorInComplete error global four!", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"TestErrorInComplete error global four!\"," +
-                "\"success\":false" +
-                "\"errors\":[{" +
-                    "\"errors\":[{" +
-                        "\"id\":\"Name\"," +
-                        "\"field\":\"Name\"," +
-                        "\"message\":\"TestErrorInComplete error global four!\"," +
-                        "\"msg\":\"TestErrorInComplete error global four!\"" +
-                    "}]," +
-                    "\"exception\":\"TestErrorInComplete error global four!\"," +
-                    "\"rowNumber\":2," +
-                    "\"row\":{" +
-                        "\"a\":\"A\"," +
-                        "\"b\":\"B\"" +
-                    "}" +
-                "}]" +
-            "}");
-            json.assertEquals("FAILED", expected, properties);
+            JSONObject expected = new JSONObject("""
+                    {
+                        "exception":"TestErrorInComplete error global four!",
+                        "success":false,
+                        "errors":[{
+                            "errors":[{
+                                "id":"Name",
+                                "field":"Name",
+                                "message":"TestErrorInComplete error global four!",
+                                "msg":"TestErrorInComplete error global four!"
+                            }],
+                            "exception":"TestErrorInComplete error global four!",
+                            "rowNumber":2,
+                            "row":{
+                                "a":"A",
+                                "b":"B"
+                            }
+                        }]
+                    }
+                    """);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try
@@ -324,41 +444,42 @@ public class ScriptValidationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             assertEquals("one error message", e.getMessage());
-            JSONObject properties = (JSONObject)e.getProperties();
-            JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"one error message\"," +
-                "\"success\":false" +
-                "\"errors\":[{" +
-                    "\"errors\":[{" +
-                        "\"id\":\"Name\"," +
-                        "\"field\":\"Name\"," +
-                        "\"message\":\"one error message\"," +
-                        "\"msg\":\"one error message\"" +
-                    "},{" +
-                        "\"id\":\"Name\"," +
-                        "\"field\":\"Name\"," +
-                        "\"message\":\"two error message\"," +
-                        "\"msg\":\"two error message\"" +
-                    "},{" +
-                        "\"id\":\"Hex\"," +
-                        "\"field\":\"Hex\"," +
-                        "\"message\":\"three error message\"," +
-                        "\"msg\":\"three error message\"" +
-                    "}]," +
-                    "\"exception\":\"one error message\"," +
-                    "\"rowNumber\":0" +
-                "},{" +
-                   "\"errors\":[{" +
-                       "\"id\":\"Hex\"," +
-                       "\"field\":\"Hex\"," +
-                       "\"message\":\"four error message\"," +
-                       "\"msg\":\"four error message\"" +
-                    "}]," +
-                    "\"exception\":\"four error message\"," +
-                    "\"rowNumber\":0" +
-                "}]" +
-            "}");
-            json.assertEquals("FAILED", expected, properties);
+            JSONObject expected = new JSONObject("""
+                    {
+                        "exception":"one error message",
+                        "success":false,
+                        "errors":[{
+                            "errors":[{
+                                "id":"Name",
+                                "field":"Name",
+                                "message":"one error message",
+                                "msg":"one error message"
+                            },{
+                                "id":"Name",
+                                "field":"Name",
+                                "message":"two error message",
+                                "msg":"two error message"
+                            },{
+                                "id":"Hex",
+                                "field":"Hex",
+                                "message":"three error message",
+                                "msg":"three error message"
+                            }],
+                            "exception":"one error message",
+                            "rowNumber":0
+                        },{
+                            "errors":[{
+                                "id":"Hex",
+                                "field":"Hex",
+                                "message":"four error message",
+                                "msg":"four error message"
+                            }],
+                            "exception":"four error message",
+                            "rowNumber":0
+                        }]
+                    }
+                    """);
+            json.assertEquals("FAILED", expected, new JSONObject(e.getProperties()));
         }
 
         try

@@ -1,12 +1,11 @@
 package org.labkey.remoteapi.issues;
 
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ContentType;
 import org.json.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 import java.io.File;
@@ -31,7 +30,7 @@ public class IssuesCommand extends PostCommand<IssueResponse>
     @Override
     protected IssueResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new IssueResponse(text, status, contentType, json, this);
+        return new IssueResponse(text, status, contentType, json);
     }
 
     public void setIssues(List<IssueModel> issues)
@@ -46,7 +45,7 @@ public class IssuesCommand extends PostCommand<IssueResponse>
     }
 
     @Override
-    protected HttpUriRequest createRequest(URI uri)
+    protected HttpPost createRequest(URI uri)
     {
         HttpPost request = new HttpPost(uri);
 
@@ -58,7 +57,7 @@ public class IssuesCommand extends PostCommand<IssueResponse>
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.setMode(HttpMultipartMode.LEGACY);
         builder.addTextBody("issues", issuesArray.toString(), ContentType.APPLICATION_JSON);
 
         for(IssueModel issue: _issues)

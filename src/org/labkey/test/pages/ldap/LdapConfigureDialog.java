@@ -1,10 +1,10 @@
 package org.labkey.test.pages.ldap;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.core.login.AuthDialogBase;
 import org.labkey.test.pages.core.login.LoginConfigRow;
-import org.labkey.test.pages.core.login.SvgCheckbox;
 import org.labkey.test.params.ldap.LdapAuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -113,13 +113,13 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 
     public LdapConfigureDialog enableSearch(boolean enable)
     {
-        elementCache().searchCheckBox.set(enable);
+        elementCache().searchCheckbox.set(enable);
         return this;
     }
 
     public boolean isSearchEnabled()
     {
-        return elementCache().searchCheckBox.get();
+        return elementCache().searchCheckbox.get();
     }
 
     public LdapConfigureDialog enableSasl(boolean enable)
@@ -135,13 +135,13 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 
     public LdapConfigureDialog enableReadAttribute(boolean enable)
     {
-        elementCache().readAttributeCheckBox.set(enable);
+        elementCache().readAttributeCheckbox.set(enable);
         return this;
     }
 
     public boolean isReadAttributeEnabled()
     {
-        return elementCache().readAttributeCheckBox.get();
+        return elementCache().readAttributeCheckbox.get();
     }
 
     public LdapTestPage openLdapTestWindow()
@@ -172,6 +172,11 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 
     protected class ElementCache extends AuthDialogBase.ElementCache
     {
+        Checkbox checkbox(String inputId)
+        {
+            return new Checkbox(Locator.tagWithId("input", inputId).findWhenNeeded(this));
+        }
+
         Input serverUrlsInput = new Input(Locator.input("servers")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
         Input domainsInput = new Input(Locator.input("domain")
@@ -181,12 +186,9 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
 
         WebElement testButton = Locator.tagWithClass("button", "labkey-button")
                 .withText("Test").findWhenNeeded(this).withTimeout(2000);
-        SvgCheckbox saslCheckbox = new SvgCheckbox(Locator.tagWithClass("span", "SASL")
-                .findWhenNeeded(this).withTimeout(2000), getDriver());
-        SvgCheckbox searchCheckBox = new SvgCheckbox(Locator.tagWithClass("span", "search")
-                .findWhenNeeded(this).withTimeout(2000), getDriver());
-        SvgCheckbox readAttributeCheckBox = new SvgCheckbox(Locator.tagWithClass("span", "readAttributes")
-            .findWhenNeeded(this).withTimeout(2000), getDriver());
+        Checkbox saslCheckbox = checkbox("sasl");
+        Checkbox searchCheckbox = checkbox("search");
+        Checkbox readAttributeCheckbox = checkbox("readAttributes");
         Input userInput = new Input(Locator.input("username")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
         Input passwordInput = new Input(Locator.input("password")
@@ -197,13 +199,6 @@ public class LdapConfigureDialog extends AuthDialogBase<LdapConfigureDialog>
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
         Input searchTemplateInput = new Input(Locator.input("searchTemplate")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());
-
-        WebElement checkBox(String label)
-        {
-            WebElement searchContext = Locator.tagWithClass("div", "dynamicFieldSpread").withChild(Locator.tagWithText("span", label))
-                    .findWhenNeeded(this).withTimeout(2000);
-            return Locator.tagWithClass("span", "clickable").findWhenNeeded(searchContext).withTimeout(2000);
-        }
     }
 
 }

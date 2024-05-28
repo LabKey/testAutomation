@@ -1,6 +1,7 @@
 package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -8,19 +9,31 @@ import java.util.List;
 
 public class IntListDefinition extends ListDefinition
 {
-    private static final String AUTO_INCREMENT_DOMAIN_KIND = "IntList";
+    private static final String DOMAIN_KIND = "IntList";
+
+    private final boolean isAutoIncrementKey;
 
     public IntListDefinition(String name, String autoIncrementKeyName)
     {
         super(name);
         setKeyName(autoIncrementKeyName);
+        isAutoIncrementKey = true;
+    }
+
+    public IntListDefinition(String name)
+    {
+        super(name);
+        isAutoIncrementKey = false;
     }
 
     @Override
-    public List<FieldDefinition> getFields()
+    public List<PropertyDescriptor> getFields()
     {
-        List<FieldDefinition> fields = super.getFields();
-        fields.add(0, new FieldDefinition(getKeyName(), FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
+        List<PropertyDescriptor> fields = super.getFields();
+        if (isAutoIncrementKey)
+        {
+            fields.add(0, new FieldDefinition(getKeyName(), FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
+        }
         return fields;
     }
 
@@ -28,7 +41,13 @@ public class IntListDefinition extends ListDefinition
     @Override
     protected String getKind()
     {
-        return AUTO_INCREMENT_DOMAIN_KIND;
+        return DOMAIN_KIND;
+    }
+
+    @Override
+    protected String getKeyType()
+    {
+        return isAutoIncrementKey ? "AutoIncrementInteger" : "Integer";
     }
 
     @Override

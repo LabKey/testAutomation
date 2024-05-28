@@ -13,9 +13,7 @@
         plot(as.factor(labkey.data$name), labkey.data$age, main="Age")
         dev.off()
 
-filename <- paste("do_render", ".gct");
-write.table(labkey.data, file = filename, sep = "\t", qmethod = "double", col.names=NA)
-filename <- paste("dont_render", ".gct");
-write.table(labkey.data, file = filename, sep = "\t", qmethod = "double", col.names=NA)
+write.table(labkey.data, file = "do_render.gct", sep = "\t", qmethod = "double", col.names=NA)
+write.table(labkey.data, file = "dont_render.gct", sep = "\t", qmethod = "double", col.names=NA)
 
 # ${fileout:regex(.*?(do_.*\.gct))}

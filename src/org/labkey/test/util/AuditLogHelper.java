@@ -1,11 +1,13 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +22,7 @@ public class AuditLogHelper
         _wrapper = wrapper;
     }
 
-    public Integer getLatestAuditRowId(String auditTable, String containerPath) throws IOException, CommandException
+    public Integer getLatestAuditRowId(String auditTable) throws IOException, CommandException
     {
         String rowId = "rowId";
 
@@ -28,8 +30,9 @@ public class AuditLogHelper
         selectRows.setColumns(List.of(rowId));
         selectRows.setSorts(List.of(new Sort(rowId, Sort.Direction.DESCENDING)));
         selectRows.setMaxRows(1);
+        selectRows.setContainerFilter(ContainerFilter.AllFolders);
 
-        SelectRowsResponse response = selectRows.execute(_wrapper.createDefaultConnection(), containerPath);
+        SelectRowsResponse response = selectRows.execute(_wrapper.createDefaultConnection(), null);
         List<Map<String, Object>> rows = response.getRows();
         if (rows.isEmpty())
         {
@@ -38,9 +41,9 @@ public class AuditLogHelper
         return (Integer) rows.get(0).get(rowId);
     }
 
-    public Integer getLatestAuditRowId(String auditTable) throws IOException, CommandException
+    public DataRegionTable beginAtAuditEventView(String auditTable, Integer rowIdCutoff)
     {
-        return getLatestAuditRowId(auditTable, "/");
+        return ShowAuditLogPage.beginAt(_wrapper, auditTable, rowIdCutoff).getLogTable();
     }
 
     public DataRegionTable goToAuditEventView(String eventType)

@@ -18,11 +18,12 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.jetty.util.URIUtil;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +47,7 @@ import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
@@ -58,6 +60,7 @@ import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -151,6 +154,7 @@ import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
+import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_LOG_PROPERTY;
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
@@ -260,6 +264,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
                     options.addArguments("disable-infobars");
+                    options.addArguments("short-reporting-delay");
                     if (TestProperties.isRunWebDriverHeadless())
                     {
                         TestLogger.warn("Launching Chrome in headless mode. This is still experimental");
@@ -327,6 +332,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "text/csv");
                     profile.setPreference("pdfjs.disabled", true); // disable Firefox's built-in PDF viewer
                     profile.setPreference("pdfjs.enabledCache.state", false);
+                    profile.setPreference("widget.gtk.overlay-scrollbars.enabled", false); // Disable mini-scrollbars on Linux
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
@@ -432,7 +438,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 String logFileName = new SimpleDateFormat("'geckodriver_'HHmmss'.log'").format(new Date());
                 final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
                 log("Saving geckodriver log to: " + logPath);
-                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, logPath);
+                System.setProperty(GECKO_DRIVER_LOG_PROPERTY, logPath);
                 return;
             }
             else
@@ -440,7 +446,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 log("Failed to create directory for geckodriver log: " + downloadDir.getParentFile().getAbsolutePath());
             }
         }
-        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+        System.setProperty(GECKO_DRIVER_LOG_PROPERTY, "/dev/null");
     }
 
     public boolean isFirefox()
@@ -448,7 +454,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return getDriver().getClass().isAssignableFrom(FirefoxDriver.class);
     }
 
-    public Object executeScript(String script, Object... arguments)
+    public Object executeScript(@Language("JavaScript") String script, Object... arguments)
     {
         return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
     }
@@ -457,7 +463,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wrapper for executing JavaScript through WebDriver and verifying return type.
      * @param <T> See {@link JavascriptExecutor#executeScript(java.lang.String, java.lang.Object...)} for valid return types
      */
-    public <T> T executeScript(String script, Class<T> expectedResultType, Object... arguments)
+    public <T> T executeScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
         Object o = executeScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
@@ -470,7 +476,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wrapper for synchronous execution of asynchronous JavaScript. This wrapper extracts the 'callback' from the argument list
      * See {@link JavascriptExecutor#executeAsyncScript(java.lang.String, java.lang.Object...)} for details
      */
-    public Object executeAsyncScript(String script, Object... arguments)
+    public Object executeAsyncScript(@Language("XPath") String script, Object... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
                 "try {" +
@@ -505,8 +511,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         // Enable/disable server side logging of client errors.
         if (isScriptCheckEnabled())
         {
-            // Don't use browser session. Some tests need to pause briefly, while impersonating.
-            Connection cn = WebTestHelper.getRemoteApiConnection(false);
+            WhoAmIResponse whoAmI = whoAmI();
+            // Don't use browser session when impersonating. Impersonated user/role might not have correct permission.
+            boolean useBrowserSession = PasswordUtil.getUsername().equals(whoAmI.getEmail()) && !whoAmI.isImpersonated();
+            Connection cn = WebTestHelper.getRemoteApiConnection(useBrowserSession);
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", b);
         }
     }
@@ -1106,14 +1114,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return createDefaultConnection();
     }
 
-    public long beginAt(String relativeURL)
+    public long beginAt(String url)
     {
-        return beginAt(relativeURL, defaultWaitForPage);
+        return beginAt(url, defaultWaitForPage);
     }
 
-    public long beginAt(String relativeURL, int millis)
+    public long beginAt(String url, int millis)
     {
-        relativeURL = makeRelativeUrl(relativeURL);
+        String relativeURL = makeRelativeUrl(url);
         String logMessage = "";
 
         try
@@ -1122,14 +1130,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 logMessage = "Navigating to root";
             else
             {
+                relativeURL = "/" + relativeURL;
                 logMessage = "Navigating to " + relativeURL;
-                if (relativeURL.charAt(0) != '/')
-                {
-                    relativeURL = "/" + relativeURL;
-                }
             }
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
+            final boolean expectPageLoad = expectPageLoad(fullURL);
 
             long elapsedTime = doAndWaitForPageToLoad(() -> {
                 try
@@ -1140,7 +1146,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 {
                     throw new TestTimeoutException(ex); // Triggers thread dump.
                 }
-            }, millis);
+            }, expectPageLoad ? millis : 0);
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
 
@@ -1152,6 +1158,36 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     * Navigating within an app will not trigger a page load.
+     * Compare current page URL with destination to determine whether to expect a page load.
+     */
+    private boolean expectPageLoad(String destinationUrl)
+    {
+        String appAction = "app";
+        try
+        {
+            String currentUrl = getDriver().getCurrentUrl();
+            String destinationAction = new Crawler.ControllerActionId(destinationUrl).getAction();
+            String currentSansHash = URIUtil.decodePath(currentUrl.split("#", 2)[0]);
+            String destinationSansHash = URIUtil.decodePath(destinationUrl.split("#", 2)[0]);
+
+            return !destinationAction.equals(appAction) ||
+                    !destinationUrl.contains("#") || // Will always navigate if there is no hash
+                    !destinationSansHash.equals(currentSansHash);
+        }
+        catch (IllegalArgumentException bustedUrl)
+        {
+            // this will happen when the url looks like 'about:blank', or where there isn't a folder or action to
+            // parse from the URL
+            return true;
+        }
+    }
+
+    /**
+     * @deprecated Use {@link #beginAt(String, int)}
+     */
+    @Deprecated (since = "22.9")
     public long goToURL(final URL url, int milliseconds)
     {
         return beginAt(url.toString(), milliseconds);
@@ -1242,9 +1278,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return whoAmI().getDisplayName();
     }
 
-    public String getCurrentDateFormatString()
+    public String getCurrentDateTimeFormatString()
     {
         return (String)executeScript("return LABKEY.container.formats.dateTimeFormat");
+    }
+
+    public String getCurrentTimeFormatString()
+    {
+        return (String)executeScript("return LABKEY.container.formats.timeFormat");
+    }
+
+    public String getCurrentDateFormatString()
+    {
+        return (String)executeScript("return LABKEY.container.formats.dateFormat");
     }
 
     public boolean onLabKeyPage()
@@ -1441,16 +1487,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void fireEvent(WebElement el, SeleniumEvent event)
     {
-        executeScript("" +
-                "var element = arguments[0];" +
-                "var eventType = arguments[1];" +
-                "var myEvent = document.createEvent('UIEvent');" +
-                "myEvent.initEvent(" +
-                "   eventType, /* event type */" +
-                "   true,      /* can bubble? */" +
-                "   true       /* cancelable? */" +
-                ");" +
-                "element.dispatchEvent(myEvent);", el, event.toString());
+        executeScript("""
+                var element = arguments[0];
+                var eventType = arguments[1];
+                var myEvent = document.createEvent('UIEvent');
+                myEvent.initEvent(
+                   eventType, /* event type */
+                   true,      /* can bubble? */
+                   true       /* cancelable? */
+                );
+                element.dispatchEvent(myEvent);""", el, event.toString());
     }
 
     public void assertTitleEquals(String match)
@@ -1786,7 +1832,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getTextInNonDataRegionTable(String title, int row, int column)
     {
-        return getTableCellText(Locator.xpath("//div/h3/a/span[text()='" + title + "']/../../../../div/table"), row, column);
+        Locator.XPathLocator tableLoc = Locator.tagWithAttribute("div", "name", "webpart")
+                .withDescendant(Locator.tagWithClass("span", "labkey-wp-title-text").withText(title))
+                .descendant(Locator.tagWithClass("table", "labkey-data-region-legacy"));
+        return getTableCellText(tableLoc, row, column);
     }
 
     public void assertTableRowInNonDataRegionTable(String title, String textToCheck, int row, int column)
@@ -1849,10 +1898,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
+            toBeStale.isEnabled();
             new WebDriverWait(getDriver(), timer.timeRemaining())
-                    .ignoring(NullPointerException.class)
                     .withMessage("waiting for browser to navigate")
                     .until(ExpectedConditions.stalenessOf(toBeStale));
+        }
+        catch (StaleElementReferenceException | NoSuchElementException | NullPointerException ignore)
+        {
+            // `ExpectedConditions.stalenessOf(toBeStale)` sometimes chokes when coming from a blank page (about:blank)
         }
         catch (TimeoutException ex)
         {
@@ -1864,6 +1917,35 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 .withMessage("waiting for document to be ready")
                 .until(wd -> Objects.equals(executeScript("return document.readyState;"), "complete"));
         Locators.documentRoot.waitForElement(getDriver(), (int) timer.timeRemaining().toMillis());
+        if (TestProperties.isDumpBrowserConsole())
+        {
+            executeScript("""
+                    if (console.everything === undefined)
+                    {
+                        console.everything = [];
+
+                        console.defaultLog = console.log.bind(console);
+                        console.log = function(){
+                            console.everything.push({"type":"log", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultLog.apply(console, arguments);
+                        }
+                        console.defaultError = console.error.bind(console);
+                        console.error = function(){
+                            console.everything.push({"type":"error", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultError.apply(console, arguments);
+                        }
+                        console.defaultWarn = console.warn.bind(console);
+                        console.warn = function(){
+                            console.everything.push({"type":"warn", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultWarn.apply(console, arguments);
+                        }
+                        console.defaultDebug = console.debug.bind(console);
+                        console.debug = function(){
+                            console.everything.push({"type":"debug", "datetime":Date().toLocaleString(), "value":Array.from(arguments)});
+                            console.defaultDebug.apply(console, arguments);
+                        }
+                    }""");
+        }
         waitForOnReady("jQuery");
         waitForOnReady("Ext");
         waitForOnReady("Ext4");
@@ -1910,8 +1992,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private void waitForDocument()
     {
-        waitFor(() -> null != executeScript("" +
-                "try {return document.documentElement;}" +
+        waitFor(() -> null != executeScript("try {return document.documentElement;}" +
                 "catch(e) {return null;}"), "Document did not load", getDefaultWaitForPage());
     }
 
@@ -2138,22 +2219,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * Wait for Supplier to return true
+     * Wait for Supplier to return non-null non-false value
      * @param wait milliseconds
-     * @return false if Supplier.get() doesn't return true within 'wait' ms
+     * @return final result of Supplier.get()
      */
     @Contract(pure = true)
-    public static boolean waitFor(Supplier<Boolean> checker, int wait)
+    public static <T> T waitFor(Supplier<T> checker, int wait)
     {
         long startTime = System.currentTimeMillis();
+        T result;
         do
         {
-            if( checker.get() )
-                return true;
+            result = checker.get();
+            if (result != null && !Boolean.FALSE.equals(result))
+                break;
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
 
-        return checker.get();
+        return result;
     }
 
     public static void waitForEquals(String message, Supplier<?> expected, Supplier<?> actual, int wait)
@@ -2236,9 +2319,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             log("  File downloaded: " + newFile.getName());
         }
         assertEquals("Wrong number of files downloaded to " + downloadDir, expectedFileCount, newFiles.length);
-
-        if (getDriver() instanceof FirefoxDriver)
-            Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
 
         return newFiles;
     }
@@ -2722,8 +2802,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void openLinkInNewWindow(WebElement link)
     {
-        Keys modifierKey = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
-        link.sendKeys(Keys.chord(modifierKey, Keys.ENTER));
+        link.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, Keys.ENTER));
         switchToWindow(1);
         waitForDocument();
     }
@@ -3341,8 +3420,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void actionClear(WebElement input)
     {
-        String osName = System.getProperty("os.name");
-        Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
         scrollIntoView(input);
         new Actions(getDriver())
             .keyDown(cmdKey)
@@ -3360,8 +3438,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void actionPaste(WebElement input, String text)
     {
-        String osName = System.getProperty("os.name");
-        Keys cmdKey = osName.toLowerCase().contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+        Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
 
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         StringSelection sel = new StringSelection(text);
@@ -3527,34 +3604,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String fileNames = String.join("\n", filePaths);
         TestLogger.debug(fileNames);
         el.sendKeys(fileNames);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.FileBrowserHelper#dragAndDropFileInDropZone(File)} or
-     * {@link org.labkey.test.util.FileBrowserHelper#dragDropUpload(File)}
-     */
-    @Deprecated
-    public void dragAndDropFileInDropZone(File fileName)
-    {
-        //Offsets for the drop zone
-        int offsetX = 0;
-        int offsetY = 0;
-
-        //Min version of the JS script - creates the dataTransfer object
-        String JS_DROP_FILES = "var c=arguments,b=c[0],k=c[1];c=c[2];for(var d=b.ownerDocument||document,l=0;;){var e=b.getBoundingClientRect(),g=e.left+(k||e.width/2),h=e.top+(c||e.height/2),f=d.elementFromPoint(g,h);if(f&&b.contains(f))break;if(1<++l)throw b=Error('Element not interactable'),b.code=15,b;}var a=d.createElement('INPUT');a.setAttribute('type','file');a.setAttribute('multiple','');a.setAttribute('style','position:fixed;z-index:2147483647;left:0;top:0;');a.onchange=function(b){a.parentElement.removeChild(a);b.stopPropagation();var c={constructor:DataTransfer,effectAllowed:'all',dropEffect:'none',types:['Files'],files:a.files,setData:function(){},getData:function(){},clearData:function(){},setDragImage:function(){}};window.DataTransferItemList&&(c.items=Object.setPrototypeOf(Array.prototype.map.call(a.files,function(a){return{constructor:DataTransferItem,kind:'file',type:a.type,getAsFile:function(){return a},getAsString:function(b){var c=new FileReader;c.onload=function(a){b(a.target.result)};c.readAsText(a)}}}),{constructor:DataTransferItemList,add:function(){},clear:function(){},remove:function(){}}));['dragenter','dragover','drop'].forEach(function(a){var b=d.createEvent('DragEvent');b.initMouseEvent(a,!0,!0,d.defaultView,0,0,0,g,h,!1,!1,!1,!1,0,null);Object.setPrototypeOf(b,null);b.dataTransfer=c;Object.setPrototypeOf(b,DragEvent.prototype);f.dispatchEvent(b)})};d.documentElement.appendChild(a);a.getBoundingClientRect();return a;";
-
-         //Execute the script to make the drop zone visible.
-        executeScript("LABKEY.internal.FileDrop.showDropzones()");
-
-        //Locator to the drop zone
-        WebElement element = Locator.tagWithClassContaining("div","dropzone").findElement(getDriver());
-        WebElement input = (WebElement)executeScript(JS_DROP_FILES,element,offsetX,offsetY);
-        log("Web element returned " + input);
-
-        //setting the input
-        input.sendKeys(fileName.getAbsolutePath());
-
-        executeScript("LABKEY.internal.FileDrop.hideDropzones()");
     }
 
     public void setFormElement(Locator loc, File file)
@@ -3795,22 +3844,25 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String suffix = "";
         if (currentURL.contains("#"))
         {
-            String[] parts = currentURL.split("#");
+            String[] parts = currentURL.split("#", 2);
             currentURL = parts[0];
             // There might not be anything after the '#'
             suffix = "#" + (parts.length > 1 ? parts[1] : "");
         }
         if (!currentURL.contains(parameter))
         {
+            final String paramSep;
             if (currentURL.contains("?"))
             {
                 if (currentURL.indexOf("?") == currentURL.length() - 1)
-                    beginAt(currentURL.concat(parameter + suffix), mils);
+                    paramSep = "";
                 else
-                    beginAt(currentURL.concat("&" + parameter + suffix), mils);
+                    paramSep = "&";
             }
             else
-                beginAt(currentURL.concat("?" + parameter + suffix), mils);
+                paramSep = "?";
+
+            beginAt(currentURL + paramSep + parameter + suffix, mils);
         }
     }
 
@@ -3957,7 +4009,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setCodeEditorValue(String id, String value)
     {
-        _extHelper.setCodeMirrorValue(id, value);
+        new CodeMirrorHelper(this, id).setCodeMirrorValue(value);
+    }
+
+    protected String getCodeEditorValue(String id)
+    {
+        return new CodeMirrorHelper(this, id).getCodeMirrorValue();
     }
 
     public void waitForElements(final Locator loc, final int count)
@@ -3969,5 +4026,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         waitFor(() -> count == loc.findElements(getDriver()).size(), wait);
         assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
+    }
+
+    public void clearTooltips()
+    {
+        // hack, but there might be a tooltip in the way that we need to clear by moving the mouse first
+        Locator.XPathLocator headerLoc = Locator.byClass("header-logo");
+        if (isElementPresent(headerLoc))
+            mouseOver(headerLoc);
     }
 }

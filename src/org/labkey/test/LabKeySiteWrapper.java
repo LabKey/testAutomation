@@ -16,36 +16,38 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Assume;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.core.ProjectMenu;
+import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.ui.navigation.UserMenu;
@@ -67,6 +69,7 @@ import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.core.login.DbLoginUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
@@ -127,7 +130,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             return;
         }
 
-        if (!getDriver().getTitle().startsWith("Sign In"))
+        if (!Locator.tagWithName("form", "login").existsIn(getDriver()) || !Locator.name("email").existsIn(getDriver()))
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt(WebTestHelper.buildURL("login", "login"));
@@ -168,7 +171,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
                 // If we get redirected here the message is not indicated as an error
-                if (errors.length() == 0 && null != getUrlParam("message", true))
+                if (errors.isEmpty() && null != getUrlParam("message", true))
                     errors = getUrlParam("message", true);
 
                 if (errors.contains("The email address and password you entered did not match any accounts on file."))
@@ -333,10 +336,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         waitForStartup();
         log("Signing in");
-        simpleSignOut();
+        Number userId = whoAmI().getUserId();
+        if (userId != null && userId.longValue() > 0)
+        {
+            simpleSignOut();
+        }
         checkForUpgrade();
         simpleSignIn();
         assertEquals("Signed in as wrong user.", PasswordUtil.getUsername(), getCurrentUser());
+    }
+
+    // Use default password
+    public void signIn(String email)
+    {
+        signIn(email, PasswordUtil.getPassword());
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -345,6 +358,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         attemptSignIn(email, password);
         Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
         WebTestHelper.saveSession(email, getDriver());
+    }
+
+    public void attemptSignIn()
+    {
+        attemptSignIn(PasswordUtil.getUsername());
+    }
+
+    public void attemptSignIn(String email)
+    {
+        attemptSignIn(email, PasswordUtil.getPassword());
     }
 
     public void attemptSignIn(String email, String password)
@@ -388,18 +411,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 
-    protected void setInitialPassword(String user, String password)
+    protected String setInitialPassword(String user)
     {
-        beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("email", user)));
-        // Get setPassword URL from notification email.
-        WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(getDriver());
+        String password = PasswordUtil.getPassword();
+        SetPasswordForm.goToInitialPasswordForUser(this, user)
+                .setNewPassword(password)
+                .clickSubmit();
 
-        clickAndWait(resetLink, WAIT_FOR_PAGE);
-
-        setFormElement(Locator.id("password"), password);
-        setFormElement(Locator.id("password2"), password);
-
-        clickButton("Set Password");
+        return password;
     }
 
     protected String getPasswordResetUrl(String username)
@@ -421,26 +440,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         assertTextPresent(username,
                 "has been verified! Create an account password below.",
-                "Your password must be at least six characters and cannot contain spaces or match your email address."
+                DbLoginUtils.PasswordStrength.Good.getGuidance()
         );
 
-        setFormElement(Locator.id("password"), newPassword);
-        setFormElement(Locator.id("password2"), newPassword);
-
-        clickButton("Set Password");
-    }
-
-    @LogMethod protected void changePassword(String oldPassword, @LoggedParam String password)
-    {
-        if (PasswordUtil.getUsername().equals(getCurrentUser()))
-            throw new IllegalArgumentException("Don't change the primary site admin user's password");
-
-        goToMyAccount();
-        clickButton("Change Password");
-
-        setFormElement(Locator.id("oldPassword"), oldPassword);
-        setFormElement(Locator.id("password"), password);
-        setFormElement(Locator.id("password2"), password);
+        new SetPasswordForm(getDriver())
+                .setNewPassword(newPassword);
 
         clickButton("Set Password");
     }
@@ -461,7 +465,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         setFormElement(Locator.name("requestedEmailConfirmation"), newUserEmail);
         clickButton("Submit");
     }
-
 
     protected void setSystemMaintenance(boolean enable)
     {
@@ -591,23 +594,31 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         // check to see if we're the first user:
         if (isTextPresent("Welcome! We see that this is your first time logging in."))
         {
+            String email = PasswordUtil.getUsername();
             bootstrapped = true;
             assertTitleEquals("Account Setup");
             log("Need to bootstrap");
             verifyInitialUserRedirects();
+
+            log("Verify strength gauge for 'ChangePasswordAction'");
+            SetPasswordForm setPasswordForm = new SetPasswordForm(getDriver());
+            setPasswordForm.setEmail(email);
+            setPasswordForm.verifyPasswordStrengthGauge(email);
+            refresh(); // Clear form
 
             log("Testing bad email addresses");
             verifyInitialUserError(null, null, null, "Invalid email address");
             verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
 
             log("Testing bad passwords");
-            String email = PasswordUtil.getUsername();
             verifyInitialUserError(email, null, null, "You must enter a password.");
-            verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
-            verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password must be at least six characters and cannot contain spaces.");
-            verifyInitialUserError(email, email, email, "Your password must not match your email address.");
-            verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
+            verifyInitialUserError(email, PasswordUtil.getPassword(), null, "You must confirm your password.");
+            verifyInitialUserError(email, null, PasswordUtil.getPassword(), "You must enter a password.");
+            verifyInitialUserError(email, "short", "short", "Your password is not complex enough."); // less than weak
+            verifyInitialUserError(email, "LongEnough", "LongEnough", "Your password is not complex enough."); // Weak
+            verifyInitialUserError(email, "Yekbal1!", "Yekbal1!", "Your password is not complex enough."); // Good
+            verifyInitialUserError(email, email, email, "Your password is not complex enough.");
+            verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword() + "ButDontMatch", "Your password entries didn't match.");
 
             log("Register the first user");
             pushLocation();
@@ -741,19 +752,24 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedError)
     {
+        SetPasswordForm setPasswordForm = new SetPasswordForm(getDriver());
         if (null != email)
-            setFormElement(Locator.id("email"), email);
+            setPasswordForm.setEmail(email);
 
         if (null != password1)
-            setFormElement(Locator.id("password"), password1);
+            setPasswordForm.setPassword1(password1);
 
         if (null != password2)
-            setFormElement(Locator.id("password2"), password2);
-
-        clickAndWait(Locator.linkWithText("Next"), 90000); // Initial user creation blocks during upgrade script execution
+            setPasswordForm.setPassword2(password2);
 
         if (null != expectedError)
-            assertEquals("Wrong error message.", expectedError, Locator.css(".labkey-error").findElement(getDriver()).getText());
+        {
+            setPasswordForm.clickSubmitExpectingError(expectedError);
+        }
+        else
+        {
+            setPasswordForm.clickSubmit(90_000); // Initial user creation blocks during upgrade script execution
+        }
     }
 
     private void verifyInitialUserRedirects()
@@ -772,24 +788,24 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
 
-        HttpResponse response = null;
+        CloseableHttpResponse response = null;
         HttpUriRequest method;
         int status;
 
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             // These requests should NOT redirect to the upgrade page
 
             method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
-            status = response.getStatusLine().getStatusCode();
+            status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
             method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
-            status = response.getStatusLine().getStatusCode();
+            status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
@@ -812,7 +828,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     }
                     if (!isRedirect)
                     {
-                        int responseCode = httpResponse.getStatusLine().getStatusCode();
+                        int responseCode = httpResponse.getCode();
                         if (responseCode == 301 || responseCode == 302)
                             return true;
 //                        if (WebTestHelper.getHttpResponseBody(httpResponse).contains("http-equiv=\"Refresh\""))
@@ -853,7 +869,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 loginMethod.setEntity(new UrlEncodedFormEntity(loginParams));
                 HttpClientContext httpContext = WebTestHelper.getBasicHttpContext();
                 response = redirectClient.execute(loginMethod, httpContext);
-                status = response.getStatusLine().getStatusCode();
+                status = response.getCode();
                 assertEquals("Unexpected response to login: \n" + TestFileUtils.getStreamContentsAsString(response.getEntity().getContent()), HttpStatus.SC_OK, status);
                 EntityUtils.consume(response.getEntity());
 
@@ -864,7 +880,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
                 response = redirectClient.execute(logoutMethod, httpContext);
-                status = response.getStatusLine().getStatusCode();
+                status = response.getCode();
                 assertEquals("Unexpected response to logout: \n" + TestFileUtils.getStreamContentsAsString(response.getEntity().getContent()), HttpStatus.SC_OK, status);
                 // TODO: check login, once http-equiv redirect is sorted out
                 assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
@@ -1133,7 +1149,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public boolean isMiniProfilerEnabled()
     {
         Connection cn = createDefaultConnection();
-        Command<?> command = new Command<>("mini-profiler", "isEnabled");
+        SimpleGetCommand command = new SimpleGetCommand("mini-profiler", "isEnabled");
         try
         {
             CommandResponse r = command.execute(cn, null);
@@ -1160,7 +1176,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void setMiniProfilerEnabled(boolean enabled)
     {
         Connection cn = createDefaultConnection();
-        PostCommand<?> setEnabled = new PostCommand<>("mini-profiler", "enable");
+        SimplePostCommand setEnabled = new SimplePostCommand("mini-profiler", "enable");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("enabled", enabled);
         setEnabled.setJsonObject(jsonObject);
@@ -1220,8 +1236,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void setAuthenticationProvider(@LoggedParam String provider, @LoggedParam boolean enabled, Connection cn)
     {
-        Command<?> command = new PostCommand<>("login", "setProviderEnabled");
-        command.setParameters(new HashMap<>(Maps.of("provider", provider, "enabled", enabled)));
+        SimplePostCommand command = new SimplePostCommand("login", "setProviderEnabled");
+        command.setParameters(Maps.of("provider", provider, "enabled", enabled));
         try
         {
             command.execute(cn, null);
@@ -1236,7 +1252,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     protected void invokeApiAction(@Nullable String folderPath, String controllerName, String actionName, String failureMessage)
     {
-        Command<CommandResponse> command = new PostCommand<>(controllerName, actionName);
+        SimplePostCommand command = new SimplePostCommand(controllerName, actionName);
         Connection connection = WebTestHelper.getRemoteApiConnection();
 
         try
@@ -1353,6 +1369,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void stopImpersonating(boolean goHome)
     {
         navBar().stopImpersonating();
+        if (goHome)
+            goToHome();
+    }
+
+    /**
+     * Stop impersonating user
+     * @param goHome go to Server Home or return to page where impersonation started
+     */
+    public void stopImpersonatingWithUnloadAlert(boolean goHome)
+    {
+        navBar().stopImpersonatingWithUnloadAlert();
         if (goHome)
             goToHome();
     }
@@ -1550,7 +1577,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             final List<String> descriptions = pipelineStatusTable.getColumnDataAsText("Description");
             fail("Timed out waiting for pipeline job to start. Waiting on " + (descriptions.isEmpty() ? "<unknown>" : descriptions));
         }
-        assertEquals("Running pipeline jobs were found.  Timeout:" + timeoutMilliseconds + "sec", 0, statusValues.size() - getFinishedCount(statusValues));
+        assertEquals("Running pipeline jobs were found. Timeout: " + timeoutMilliseconds + "ms", 0, statusValues.size() - getFinishedCount(statusValues));
 
         return statusValues;
     }

@@ -3,36 +3,37 @@ subprojects { Project p ->
     if (p.getProjectDir().exists())
     {
         if (p.file("src").exists())
-            apply plugin: 'org.labkey.module'
+            apply plugin: 'org.labkey.build.module'
         else
-            apply plugin: 'org.labkey.fileModule'
+            apply plugin: 'org.labkey.build.fileModule'
     }
 }
 
-task('build', group: 'Build', description: "Build all module files for subprojects",
-    {
-        subprojects.each { Project p ->
-            if (p.getProjectDir().exists())
-                dependsOn(p.tasks.module)
-        }
+tasks.register('build') {
+    group = 'Build'
+    description = "Build all module files for subprojects"
+    subprojects.each { Project p ->
+        if (p.getProjectDir().exists())
+            dependsOn(p.tasks.module)
     }
-)
+}
 
-task('deploy', group: 'Deploy', description: "Deploy all test module files",
-    {
-        subprojects.each { Project p ->
-            if (p.projectDir.exists())
-                dependsOn(p.tasks.deployModule)
-        }
-        dependsOn(project.tasks.build)
-    }
-)
+tasks.register('deploy') {
+    group = 'Deploy'
+    description = "Deploy all test module files"
 
-task('clean', group: 'Clean', description: 'Clean all build directories for subprojects',
-    {
-        subprojects.each { Project p ->
-            if (p.projectDir.exists())
-                dependsOn(p.tasks.clean)
-        }
+    subprojects.each { Project p ->
+        if (p.projectDir.exists())
+            dependsOn(p.tasks.deployModule)
     }
-)
+    dependsOn(project.tasks.build)
+}
+
+tasks.register('clean') {
+    group 'Clean'
+    description 'Clean all build directories for subprojects'
+    subprojects.each { Project p ->
+        if (p.projectDir.exists())
+            dependsOn(p.tasks.clean)
+    }
+}

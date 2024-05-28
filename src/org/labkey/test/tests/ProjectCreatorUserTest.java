@@ -6,7 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.admin.CreateProjectCommand;
+import org.labkey.remoteapi.security.CreateProjectCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -16,6 +16,7 @@ import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
 
@@ -150,7 +151,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
             .setFolderType("Template")
             .setTemplateSourceId(containerId)
             .setTemplateIncludeSubfolders(true)
-            .setTemplateWriterTypes("Lists");
+            .setTemplateWriterTypes("List Data");
         createProject(command);
         stopImpersonating();
 
@@ -160,6 +161,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
         permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
 
         ManageListsGrid listsGrid = goToManageLists().getGrid();
+        listsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_FOLDER);
         assertEquals("Incorrect lists copied from template", Arrays.asList("Lab Machines", "Reagents", "Technicians"), listsGrid.getListNames());
     }
 

@@ -1,6 +1,6 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.PostCommand;
 
 public abstract class AbstractMessageThreadCommand extends PostCommand<MessageThreadResponse>
@@ -14,7 +14,6 @@ public abstract class AbstractMessageThreadCommand extends PostCommand<MessageTh
     @Override
     protected MessageThreadResponse createResponse(String text, int status, String contentType, JSONObject json)
     {
-        return new MessageThreadResponse(text, status, contentType, json, this);
+        return new MessageThreadResponse(text, status, contentType, json);
     }
-
 }

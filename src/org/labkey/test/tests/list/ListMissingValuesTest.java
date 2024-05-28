@@ -7,13 +7,16 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ImportDataPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -62,20 +65,20 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
                         "J.D.\t50\t\tmale\t.Q";
 
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
+        FieldDefinition[] columns = new FieldDefinition[3];
 
-        ListHelper.ListColumn listColumn = new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "");
+        FieldDefinition listColumn = new FieldDefinition("name", ColumnType.String).setLabel("Name");
         columns[0] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("age with space", "Age with space", ListHelper.ListColumnType.Integer, "");
+        listColumn = new FieldDefinition("age with space", ColumnType.Integer).setLabel("Age with space");
         listColumn.setMvEnabled(true);
         columns[1] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("sex", "Sex", ListHelper.ListColumnType.String, "");
+        listColumn = new FieldDefinition("sex", ColumnType.String).setLabel("Sex");
         listColumn.setMvEnabled(true);
         columns[2] = listColumn;
 
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.goToList(LIST_NAME);
@@ -85,7 +88,22 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
 
         importDataPage.setText(TEST_DATA_SINGLE_COLUMN_LIST);
         importDataPage.submit();
-        validateSingleColumnData();
+        assertNoLabKeyErrors();
+
+        DataRegionTable dataRegion = new DataRegionTable("query", this);
+
+        Map<String, List<String>> expectedData = new HashMap<>();
+        expectedData.put("Name", List.of("Ted", "Alice", "Bob"));
+        expectedData.put("Age with space", List.of("N", "17", "Q"));
+        expectedData.put("Sex", List.of("male", "female", "N"));
+
+        Map<String, List<Integer>> expectedMVIndicators = new HashMap<>();
+        expectedMVIndicators.put("Age with space", List.of(0, 2));
+        expectedMVIndicators.put("Sex", List.of(2));
+
+        checkDataregionData(dataRegion, expectedData);
+        checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
+
         testMvFiltering(List.of("age with space", "sex"));
 
         deleteListData();
@@ -108,7 +126,23 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
 
         importDataPage.setText(TEST_DATA_TWO_COLUMN_LIST);
         importDataPage.submit();
-        validateTwoColumnData("query", "name");
+        assertNoLabKeyErrors();
+
+        dataRegion = new DataRegionTable("query", this);
+
+        expectedData = new HashMap<>();
+        expectedData.put("Name", List.of("Franny", "Zoe", "J.D."));
+        expectedData.put("Age with space", List.of("N", "Q", "50"));
+        expectedData.put("Sex", List.of("male", "female", "Q"));
+
+        expectedMVIndicators = new HashMap<>();
+        expectedMVIndicators.put("Age with space", List.of(0, 1));
+        expectedMVIndicators.put("Sex", List.of(2));
+
+        checkDataregionData(dataRegion, expectedData);
+        checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
+        checkOriginalValuePopup(dataRegion, "sex", 2, "male");
+
         testMvFiltering(List.of("age with space", "sex"));
     }
 

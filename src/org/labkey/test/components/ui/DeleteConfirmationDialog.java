@@ -1,8 +1,11 @@
 package org.labkey.test.components.ui;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.BootstrapLocators;
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
 
 import java.util.function.Supplier;
@@ -24,7 +27,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     protected DeleteConfirmationDialog(String partialTitle, @NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitle(partialTitle), sourcePage, confirmPageSupplier);
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), sourcePage, confirmPageSupplier);
     }
 
     protected DeleteConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
@@ -32,6 +35,15 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
         super(finder);
         _sourcePage = sourcePage;
         _confirmPageSupplier = confirmPageSupplier;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
+                !elementCache().title.getText().isEmpty() &&
+                !BootstrapLocators.loadingSpinner.existsIn(this),
+                "The delete confirmation dialog did not become ready.", 1_000);
     }
 
     public SourcePage cancelDelete()
@@ -42,13 +54,28 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public ConfirmPage confirmDelete()
     {
-        this.dismiss("Yes, Delete");
+        return confirmDelete(10);
+    }
+
+    public ConfirmPage confirmDelete(Integer waitSeconds)
+    {
+        this.dismiss("Yes, Delete", waitSeconds);
         return _confirmPageSupplier.get();
+    }
+
+    public Boolean isDeleteEnabled()
+    {
+        return isDismissEnabled("Yes, Delete");
     }
 
     public ConfirmPage confirmPermanentlyDelete()
     {
-        this.dismiss("Yes, Permanently Delete");
+        return confirmPermanentlyDelete(10);
+    }
+
+    public ConfirmPage confirmPermanentlyDelete(Integer waitSeconds)
+    {
+        this.dismiss("Yes, Permanently Delete", waitSeconds);
         return _confirmPageSupplier.get();
     }
 
@@ -57,4 +84,36 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
         this.dismiss("Dismiss");
         return _sourcePage;
     }
+
+    public DeleteConfirmationDialog setUserComment(String comment)
+    {
+
+        WebDriverWrapper.waitFor(()-> elementCache().commentInput.getComponentElement().isDisplayed(),
+                "The 'Comment' field is not visible.", 2_500);
+
+        elementCache().commentInput.set(comment);
+        return this;
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    @Override
+    protected ElementCache elementCache()
+    {
+        return (ElementCache) super.elementCache();
+    }
+
+    protected class ElementCache extends ModalDialog.ElementCache
+    {
+
+        Input commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
+                .refindWhenNeeded(this);
+
+    }
+
+
 }

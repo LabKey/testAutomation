@@ -23,10 +23,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
@@ -44,13 +45,13 @@ import static org.junit.Assert.assertEquals;
 public class DataRegionTest extends AbstractQWPTest
 {
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
-    private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
+    private static final FieldDefinition.ColumnType LIST_KEY_TYPE = FieldDefinition.ColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
 
-    private static final ListHelper.ListColumn NAME_COLUMN =
-            new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Color Name");
-    private static final ListHelper.ListColumn HEX_COLUMN =
-            new ListHelper.ListColumn("Hex", "Hex", ListHelper.ListColumnType.String, "Hexadecimal");
+    private static final FieldDefinition NAME_COLUMN =
+            new FieldDefinition("Name", ColumnType.String).setDescription("Color Name");
+    private static final FieldDefinition HEX_COLUMN =
+            new FieldDefinition("Hex", ColumnType.String).setDescription("Hexadecimal");
 
     private static final String LIST_DATA;
     private static final int TOTAL_ROWS;
@@ -64,17 +65,20 @@ public class DataRegionTest extends AbstractQWPTest
                     Pair.of("Set Paging to 3 with config", "testPagingConfig"),
                     Pair.of("Set Paging to 2 with API", "testSetPaging"),
                     Pair.of("Parameterized Queries", "testParameterizedQueries"),
+                    Pair.of("Issue #47735: Date filter format", "testDateFilterFormat"),
                     Pair.of("Regression #25337", "test25337"),
                     Pair.of("Change Page Offset", "testPageOffset"),
                     Pair.of("Keep Removable Filters", "testRemovableFilters"),
                     Pair.of("Collapse filter clauses", "testMultiClausesFilter"),
                     Pair.of("Filter field case insensitive", "testCaseInsensitiveFilterField"),
                     Pair.of("Hide Paging Count", "testHidePagingCount"),
+                    Pair.of("Async Total Rows Count", "testAsyncTotalRowsCount"),
                     Pair.of("Show All Rows", "testShowAllTotalRows"),
                     Pair.of("Use getBaseFilters", "testGetBaseFilters"),
                     Pair.of("Filter on \"Sort\" column", "testFilterOnSortColumn"),
                     Pair.of("Use onRender via ButtonBarOptions", "testButtonBarConfig"),
                     Pair.of("Exclude \"skipPrefixes\"", "testRespectExcludingPrefixes"),
+                    Pair.of("Show All Rows Limit (Regression #48715)", "testAllRowsLimit"),
                     Pair.of("Get Selected (Regression #41705)", "testGetSelected")
                     );
 
@@ -174,7 +178,7 @@ public class DataRegionTest extends AbstractQWPTest
         _containerHelper.createProject(getProjectName(), null);
 
         log("Define list");
-        _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
+        _listHelper.createList(getProjectName(), LIST_NAME, new FieldDefinition(LIST_KEY_NAME, LIST_KEY_TYPE), NAME_COLUMN, HEX_COLUMN);
 
         log("Upload data");
         _listHelper.goToList(LIST_NAME);

@@ -27,8 +27,8 @@
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
-<%@ page import="javax.mail.MessagingException" %>
-<%@ page import="javax.mail.internet.MimeMessage" %>
+<%@ page import="jakarta.mail.MessagingException" %>
+<%@ page import="jakarta.mail.internet.MimeMessage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
@@ -123,7 +123,7 @@ function toggleRecorder(checkbox)
 }
 </script>
 <!--Fake data region for ease of testing.-->
-<table id=<%=q(emailRegion.getDomId())%> lk-region-name=<%=q(emailRegion.getName())%> class="labkey-data-region-legacy labkey-show-borders">
+<table id="<%=h(emailRegion.getDomId())%>" lk-region-name="<%=h(emailRegion.getName())%>" class="labkey-data-region-legacy labkey-show-borders">
     <colgroup><col width="120"/><col width="120"/><col width="125"/><col width="400"></colgroup>
     <!-- hidden TRs where the header region and message box would normally be in a real data region -->
     <tr style="display:none"><td colspan="5">&nbsp;</td></tr>
@@ -191,9 +191,15 @@ function toggleRecorder(checkbox)
             <td><%=h(m.getHeaderValue("To"))%></td>
             <td><%=h(m.getHeaderValue("From"))%></td>
             <td><%=formatDateTime(m.getCreatedTimestamp())%></td>
-            <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
+            <%
+                var idSubject = "subject_" + rowIndex;
+                var idHeaders = "headers_" + rowIndex;
+                addHandler(idSubject, "click", "toggleBody('email_body_" + rowIndex + "'); return false;");
+                addHandler(idHeaders, "click", "toggleBody('email_headers_" + rowIndex + "'); return false;");
+            %>
+            <td><a id="<%=h(idSubject)%>"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><hr><%=body%></div></td>
-            <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
+            <td><a id="<%=h(idHeaders)%>">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=unsafe(headers.toString())%></div></td>
             <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD())%>
             <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD())%>
@@ -203,13 +209,14 @@ function toggleRecorder(checkbox)
         }
     }
 %>
-    <tr id=<%=q(renderId)%> style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
+    <tr id="<%=h(renderId)%>" style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
 </table>
 <%
     if (getUser().hasRootAdminPermission())
     {
+        addHandler("emailRecordOn", "click", "toggleRecorder(this);");
 %>
-        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);"<%=checked(recorder)%>> Record email messages sent
+        <input id="emailRecordOn" name="emailRecordOn" type="checkbox" <%=checked(recorder)%>> Record email messages sent
 <%
     }
 %>

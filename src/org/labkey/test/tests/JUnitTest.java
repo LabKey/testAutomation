@@ -21,39 +21,42 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONValue;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.ExtraSiteWrapper;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Runner;
-import org.labkey.test.SuiteBuilder;
+import org.labkey.test.SuiteFactory;
 import org.labkey.test.TestProperties;
-import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.UnitTests;
+import org.labkey.test.util.ApiBootstrapHelper;
 import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.QuickBootstrapPseudoTest;
 import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
@@ -61,7 +64,6 @@ import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,46 +110,37 @@ public class JUnitTest extends TestSuite
         return getClass().getName();
     }
 
-    public static class JUnitSeleniumHelper extends BaseWebDriverTest
-    {
-        @Override
-        protected String getProjectName() {return null;}
-        @Override
-        protected void doCleanup(boolean afterTest) throws TestTimeoutException
-        { }
-        @Override
-        public List<String> getAssociatedModules() { return null; }
-
-        @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
-    }
-
     // Use WebDriver to ensure we're upgraded
     @LogMethod
     private static void upgradeHelper(boolean skipInitialUserChecks)
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
-        BaseWebDriverTest helper;
+
         if (skipInitialUserChecks)
         {
-            helper = new QuickBootstrapPseudoTest();
+            new ApiBootstrapHelper().signIn();
+            return;
         }
-        else
-        {
-            helper = new JUnitSeleniumHelper();
-        }
+
+        ExtraSiteWrapper bootstrapBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX,
+                ArtifactCollector.ensureDumpDir(JUnitTest.class.getSimpleName()));
+
         try
         {
-            helper.setUp();
             // sign in performs upgrade if necessary
-            helper.signIn();
+            bootstrapBrowser.signIn();
         }
         catch (Throwable t)
         {
-            if (helper.getWrappedDriver() != null)
+            if (bootstrapBrowser.getWrappedDriver() != null)
             {
-                helper.getArtifactCollector().dumpPageSnapshot("ServerBootstrap", null);
+                new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName()).dumpPageSnapshot("ServerBootstrap", null);
             }
             throw t;
+        }
+        finally
+        {
+            bootstrapBrowser.close();
         }
     }
 
@@ -156,7 +149,7 @@ public class JUnitTest extends TestSuite
         if (categories.isEmpty())
             return new TestSuite();
 
-        final List<SuiteBuilder.SuiteInfo> suiteInfos = categories.stream().map(SuiteBuilder.SuiteInfo::new).toList();
+        final List<SuiteFactory.SuiteInfo> suiteInfos = categories.stream().map(SuiteFactory.SuiteInfo::new).toList();
         try
         {
             return _suite(testProps -> {
@@ -166,7 +159,7 @@ public class JUnitTest extends TestSuite
                     if (testCategories.contains(excludedCategory))
                         return false;
                 }
-                for (SuiteBuilder.SuiteInfo suiteInfo : suiteInfos)
+                for (SuiteFactory.SuiteInfo suiteInfo : suiteInfos)
                 {
                     if (testCategories.contains(suiteInfo.getName()) &&
                             suiteInfo.getSubset() == suiteInfo.getSubsetCount()) // Only run in last shard for sharded suite
@@ -198,10 +191,10 @@ public class JUnitTest extends TestSuite
         }
 
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = null;
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        CloseableHttpResponse response = null;
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
-            final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view?";
+            final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view";
             HttpGet method = new HttpGet(url);
             try
             {
@@ -221,16 +214,22 @@ public class JUnitTest extends TestSuite
                     return failsuite;
                 }
             }
-            int status = response.getStatusLine().getStatusCode();
+            int status = response.getCode();
             if (status == HttpStatus.SC_OK)
             {
                 final String responseBody = WebTestHelper.getHttpResponseBody(response);
                 if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
-                Object json = JSONValue.parse(responseBody);
-                if (json == null)
+                final JSONObject json;
+
+                try
                 {
+                    json = new JSONObject(responseBody);
+                }
+                catch (JSONException e)
+                {
+                    // Server likely sent back HTML instead of JSON
 
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
@@ -290,29 +289,28 @@ public class JUnitTest extends TestSuite
 
                         return testSuite;
                     }
+
+                    throw new AssertionFailedError("Unexpected responseBody: " + responseBody);
                 }
 
-                if (!(json instanceof Map))
-                    throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
-
                 TestSuite remotesuite = new JUnitTest();
-                Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
 
                 boolean addedHeader = false;
-                for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
+                for (String key : json.keySet())
                 {
-                    String suiteName = entry.getKey();
-                    TestSuite testsuite = new TestSuite(suiteName);
+                    TestSuite testsuite = new TestSuite(key);
+                    JSONArray testClassArray = json.getJSONArray(key);
                     // Individual tests include both the class name and the requested timeout
-                    for (Map<String, Object> testClass : entry.getValue())
+                    for (int i = 0; i < testClassArray.length(); i++)
                     {
+                        JSONObject testClass = testClassArray.getJSONObject(i);
                         // For the time being do not run performance tests with every junit check-in test suite.
-                        if(!((String)testClass.get("when")).equalsIgnoreCase("performance"))
+                        if(!(testClass.getString("when")).equalsIgnoreCase("performance"))
                         {
-                            String className = (String) testClass.get("className");
+                            String className = testClass.getString("className");
                             // Timeout is represented in seconds
-                            int timeout = ((Number) testClass.get("timeout")).intValue();
-                            if (accept.test(testClass))
+                            int timeout = testClass.getInt("timeout");
+                            if (accept.test(testClass.toMap()))
                                 testsuite.addTest(new RemoteTest(className, timeout));
                         }
 
@@ -339,7 +337,7 @@ public class JUnitTest extends TestSuite
                 LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
                 final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
                 response.getEntity().writeTo(streamLogger);
-                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getStatusLine() + "): " + url);
+                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getReasonPhrase() + "): " + url);
             }
         }
         finally
@@ -349,6 +347,7 @@ public class JUnitTest extends TestSuite
         }
     }
 
+    @SuppressWarnings("JUnitMalformedDeclaration")
     public static class RemoteTest extends TestCase
     {
         String _remoteClass;
@@ -371,10 +370,8 @@ public class JUnitTest extends TestSuite
             long startTime = System.currentTimeMillis();
             try
             {
-                Command<CommandResponse> command = new PostCommand<>("junit", "go");
-                Map<String, Object> params = new HashMap<>();
-                params.put("testCase", _remoteClass);
-                command.setParameters(params);
+                SimplePostCommand command = new SimplePostCommand("junit", "go");
+                command.setParameters(Map.of("testCase", _remoteClass));
                 command.setTimeout(_timeout * 1000);
 
                 CommandResponse response = command.execute(connection, "/");
@@ -418,12 +415,16 @@ public class JUnitTest extends TestSuite
 
         static String dump(String response, boolean dumpFailures)
         {
-            Map<String, Object> json = (Map<String, Object>)JSONValue.parse(response);
-
-            if (json == null)
-                return response;
-
-            return dump(json, dumpFailures);
+            try
+            {
+                JSONObject json = new JSONObject(response);
+                return dump(json.toMap(), dumpFailures);
+            }
+            catch (JSONException ex)
+            {
+                return "Error parsing response: " + ex.getMessage() + "\n" +
+                        response.split("\n", 2)[0];
+            }
         }
 
         @NotNull
@@ -457,8 +458,6 @@ public class JUnitTest extends TestSuite
 
     public static class BaseJUnitTestWrapper extends BaseWebDriverTest
     {
-        // Used by 'JUnitFooter' to check for leaks from server-side tests
-        protected static Long startTime = null;
         // Don't configure pipeline tools or R for smoke suite
         protected static boolean extraSetup = false;
 

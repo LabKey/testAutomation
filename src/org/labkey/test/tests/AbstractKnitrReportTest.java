@@ -34,12 +34,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
- * User: tgaluhn
- * Date: 9/20/2017
- *
  * Split helper methods and tests from KnitrReportTest so a subset of those test cases can be run in RSandboxTest
  */
 public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
@@ -57,7 +54,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
         reportSource = TestFileUtils.getFileContents(reportFile);
 
-        assertTrue("No data in report file [" + reportFile.getFileName() + "]", reportSource.length() > 0);
+        assertFalse("No data in report file [" + reportFile.getFileName() + "]", reportSource.isEmpty());
 
         return reportSource;
     }
@@ -127,9 +124,9 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         return saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }
 
-    protected void setPandocEnabled(boolean useRmarkdownV2)
+    protected void setPandocEnabled(boolean enable)
     {
-        _rReportHelper.setPandocEnabled(useRmarkdownV2);
+        _rReportHelper.setPandocEnabled(RReportHelper.LOCAL_R_ENGINE, enable);
     }
 
     protected WebElement saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
@@ -141,7 +138,10 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     protected void htmlFormat()
     {
         Locator[] reportContains = {Locator.tag("p").withText("This is a minimal example which shows knitr working with HTML pages in LabKey."),
-                                    Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"),
+                                    Locator.XPathLocator.union(
+                                            // Image output varies slightly between versions (not sure if it's pandoc or some R package(s))
+                                            Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"), // old
+                                            Locator.tag("img").withAttribute("alt", "plot of chunk blood-pressure-scatter")), // new
                                     Locator.tag("pre").containing("## \"1\",249318596,\"2008-05-17\",86,36,129,76,64"),
                                     Locator.tag("pre").withText("## knitr says hello to HTML!"),
                                     Locator.tag("pre").startsWith("## Error").containing(": non-numeric argument to binary operator"),

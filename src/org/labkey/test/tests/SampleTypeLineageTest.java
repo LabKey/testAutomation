@@ -98,7 +98,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
      *  coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=37466
      */
     @Test
-    @Ignore
     public void testLineageWithImplicitParentColumn() throws IOException, CommandException
     {
         goToProjectHome();
@@ -819,35 +818,53 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     }
 
     /**
-     * This test creates a domain with an explicit 'parent' column and supplies a set of lineage nodes that use the explicit
-     * column and an ad-hoc column (MaterialInput/TableName) for lineage
-     * The test then deletes some rows and confirms that values in the 'parent' columns persist when their parent row
-     * is deleted, but lineage values in MaterialInputs/TableName do not persist after their parent is deleted,
+     * This test creates samples with lineage then deletes various parents and children in the lineage and confirms
+     * the runs are deleted when either all inputs or all outputs are removed.
      */
     @Test
     public void testDeleteLineageParent() throws IOException, CommandException
     {
         goToProjectHome();
 
-        // create a sampleset with the following explicit domain columns
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "Family",
-                getCurrentContainerPath())
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
-                        TestDataGenerator.simpleFieldDef("age", FieldDefinition.ColumnType.Integer),
-                        TestDataGenerator.simpleFieldDef("height", FieldDefinition.ColumnType.Integer)
-                ));
-        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-        dgen.addRow(List.of("A", 56, 60));
-        dgen.addRow(List.of("B", 48, 50));
-        dgen.addCustomRow(Map.of("name", "C", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
-        dgen.addCustomRow(Map.of("name", "D", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
-        dgen.addCustomRow(Map.of("name", "E", "age", 12, "height", 44, "MaterialInputs/Family", "B"));
-        dgen.addCustomRow(Map.of("name", "F", "age", 12, "height", 44, "MaterialInputs/Family", "A,B"));
-        dgen.addCustomRow(Map.of("name", "G", "age", 12, "height", 44, "MaterialInputs/Family", "C"));
-        dgen.addCustomRow(Map.of("name", "H", "age", 12, "height", 44, "MaterialInputs/Family", "A,B,C"));
-        dgen.addCustomRow(Map.of("name", "I", "age", 12, "height", 44, "MaterialInputs/Family", "G"));
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        // create a data class to use for parenting
+        DataClassDefinition dataClass = new DataClassDefinition("Sources");
+
+        TestDataGenerator dataGenerator = dataClass.create(createDefaultConnection(), getProjectName());
+        dataGenerator.addCustomRow(Map.of("Name", "S-1"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-2"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-3", "DataInputs/Sources", "S-1"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-4", "DataInputs/Sources", "S-1,S-2"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-5", "DataInputs/Sources", "S-4"));
+        List<Map<String, Object>> savedDataRows = dataGenerator.insertRows(createDefaultConnection(), dataGenerator.getRows()).getRows();
+
+        // create a sample type with the following explicit domain columns
+        SampleTypeDefinition sampleType = new SampleTypeDefinition("Family");
+        TestDataGenerator sampleGenerator = sampleType.create(createDefaultConnection(), getProjectName());
+        
+        sampleGenerator.addRow(List.of("A"));
+        sampleGenerator.addRow(List.of("B"));
+        sampleGenerator.addCustomRow(Map.of("name", "C", "MaterialInputs/Family", "A,B"));
+        sampleGenerator.addCustomRow(Map.of("name", "D", "MaterialInputs/Family", "B"));
+        sampleGenerator.addCustomRow(Map.of("name", "E", "MaterialInputs/Family", "B"));
+        sampleGenerator.addCustomRow(Map.of("name", "F", "MaterialInputs/Family", "A,B"));
+        sampleGenerator.addCustomRow(Map.of("name", "G", "MaterialInputs/Family", "C"));
+        sampleGenerator.addCustomRow(Map.of("name", "H", "MaterialInputs/Family", "A,B,C"));
+        sampleGenerator.addCustomRow(Map.of("name", "I", "MaterialInputs/Family", "G"));
+        sampleGenerator.addCustomRow(Map.of("name", "J", "MaterialInputs/Family", "A", "DataInputs/Sources", "S-1"));
+        sampleGenerator.addCustomRow(Map.of("name", "K", "MaterialInputs/Family", "D", "DataInputs/Sources", "S-1"));
+        sampleGenerator.addCustomRow(Map.of("name", "L", "MaterialInputs/Family", "A,B", "DataInputs/Sources", "S-1,S-2"));
+        List<Map<String, Object>> savedSampleRows = sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows()).getRows();;
+
+        // add data objects with samples as parents
+        dataGenerator = dataClass.getTestDataGenerator(getProjectName());
+        dataGenerator.addCustomRow(Map.of("Name", "S-6", "MaterialInputs/Family", "A"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-7", "MaterialInputs/Family", "A,B"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-8", "MaterialInputs/Family", "A,C"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-9", "MaterialInputs/Family", "A", "DataInputs/Sources", "S-1"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-10", "MaterialInputs/Family", "D", "DataInputs/Sources", "S-1"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-11", "MaterialInputs/Family", "A,B", "DataInputs/Sources", "S-1,S-2"));
+        dataGenerator.addCustomRow(Map.of("Name", "S-12", "MaterialInputs/Family", "A,D", "DataInputs/Sources", "S-1,S-2"));
+        savedDataRows.addAll(dataGenerator.insertRows(createDefaultConnection(), dataGenerator.getRows()).getRows());
 
         // Refresh the page so the new sample type shows up in the UI.
         refresh();
@@ -855,41 +872,131 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DOMAIN_KIND).waitFor();
         waitAndClick(Locator.linkWithText("Family"));
         DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        assertEquals(9, materialsList.getDataRowCount());
+        assertEquals(12, materialsList.getDataRowCount());
 
-        // peel saved rows A and B from the insert response
-        List<Map<String, Object>> rowsToDelete = saveRowsResponse.getRows().stream()
-                .filter((a)-> a.get("name").equals("B") ||
-                        a.get("name").equals("A")).collect(Collectors.toList());
+        // peel saved rows A, B, and I from the insert response
+        List<Map<String, Object>> rowsToDelete = savedSampleRows.stream()
+                .filter((a)->
+                        a.get("name").equals("B") ||
+                        a.get("name").equals("A") ||
+                        a.get("name").equals("I")
+                ).collect(Collectors.toList());
 
-        Map<String, Object> E = saveRowsResponse.getRows().stream()
-                .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
-        LineageCommand lineageCommand = new LineageCommand.Builder(E.get("lsid").toString())
+        verifyParentRunCount("initial runs for sample with a single parent",
+                savedSampleRows, "E", 1);
+
+        // Verify the initial number of runs for a parent with more than one run
+        verifyChildRunCount("the parent sample with more than one derivation run",
+                savedSampleRows, "C", 3);
+
+        // delete rows A, B, and I
+        sampleGenerator.getQueryHelper(createDefaultConnection()).deleteRows(rowsToDelete);
+        SelectRowsResponse selectResponse = sampleGenerator.getQueryHelper(createDefaultConnection()).selectRows(
+                List.of("rowId", "lsid", "name"));
+        List<Map<String, Object>> remainingSamples = selectResponse.getRows();
+
+        // When all inputs are deleted, the run should be deleted
+        verifyParentRunCount("the child sample whose parent was deleted", remainingSamples, "E", 0);
+        verifyParentRunCount("the child source whose parent was deleted", savedDataRows, "S-6", 0);
+
+        // multiple inputs that were deleted
+        verifyParentRunCount("the child sample with all parents deleted", remainingSamples, "F", 0);
+        verifyParentRunCount("the child source with all parents deleted", savedDataRows, "S-7", 0);
+
+        // When a subset of inputs is deleted, the run should be retained
+        verifyParentRunCount("the child sample with a subset of parents deleted", remainingSamples, "H", 1);
+        verifyParentRunCount("the child source with a subset of parents deleted", savedDataRows, "S-8", 1);
+
+        // when all sample inputs are deleted but data class inputs remain the run should be retained
+        verifyParentRunCount("the child sample with all sample parents deleted but data class parents not deleted", remainingSamples, "J", 1);
+        verifyParentRunCount("the child source with all sample parents deleted but data class parents not deleted", savedDataRows, "S-9", 1);
+
+        // when all outputs are deleted, the run that produced the output should also be deleted
+        Map<String, Object> rowG = verifyChildRunCount("the parent sample with all children deleted", remainingSamples, "G", 0);
+
+        // delete child that is now no longer a parent
+        sampleGenerator.getQueryHelper(createDefaultConnection()).deleteRows(List.of(rowG));
+
+        // the parent of this child should now have one fewer run
+        verifyChildRunCount("the parent sample with all children deleted", remainingSamples, "C", 2);
+
+        // delete data class object that is a parent to some samples and data class objects
+        rowsToDelete = savedDataRows.stream()
+                .filter((a)-> a.get("name").equals("S-1"))
+                .collect(Collectors.toList());
+        dataGenerator.getQueryHelper(createDefaultConnection()).deleteRows(rowsToDelete);
+        selectResponse = dataGenerator.getQueryHelper(createDefaultConnection()).selectRows(
+                List.of("rowId", "lsid", "name"));
+        List<Map<String, Object>> remainingData = selectResponse.getRows();
+
+        // sample J that now has neither sample nor source parents should have no parent run
+        verifyParentRunCount("the child sample with both sample and data class parents deleted", remainingSamples, "J", 0);
+
+        // sample K that has a sample parent but had its source parent deleted should still have a parent run
+        verifyParentRunCount("a child sample with data class parent deleted but sample parent retained", remainingSamples, "K", 1);
+
+        // source S-3 that has had its only data parent deleted should have no parent run
+        verifyParentRunCount("a child source with its source parent deleted", remainingData, "S-3", 0);
+
+        // source S-4 that has had a subset of data parents deleted should still have a parent run
+        verifyParentRunCount("a child source with a subset of source parents deleted", remainingData, "S-4", 1);
+        verifyChildRunCount("a parent source with one remaining source child", remainingData, "S-4", 1);
+
+        // delete child data class object S-5
+        rowsToDelete = savedDataRows.stream()
+                .filter((a)-> a.get("name").equals("S-5"))
+                .collect(Collectors.toList());
+        dataGenerator.getQueryHelper(createDefaultConnection()).deleteRows(rowsToDelete);
+        // source S-4 that has no more children should have no child runs
+        verifyChildRunCount("a parent source with all children deleted", remainingData, "S-4", 0);
+
+        // source S-9 has had both sample and source parents deleted
+        verifyParentRunCount("a child source with all sample and source parents deleted", remainingData, "S-9", 0);
+
+        // source S-10 has had source but not sample parents deleted
+        verifyParentRunCount("a child source with all source parents deleted but not all sample parents", remainingData, "S-10", 1);
+
+        // source S-11 has had all sample parents and a subset of source parents deleted
+        verifyParentRunCount("a child source with all sample parents deleted but not all source parents", remainingData, "S-11", 1);
+
+        // source S-12 has had a subset of sample parents and a subset of source parents deleted
+        verifyParentRunCount("a child source with a subset of sample and source parents deleted", remainingData, "S-12", 1);
+
+        sampleGenerator.getQueryHelper(createDefaultConnection()).deleteDomain();
+        dataGenerator.getQueryHelper(createDefaultConnection()).deleteDomain();
+    }
+
+    private void verifyParentRunCount(String description, List<Map<String, Object>> rows, String name, int expectedCount) throws IOException, CommandException
+    {
+        Map<String, Object> row = rows.stream()
+                .filter((a)-> a.get("name").equals(name)).findFirst().orElse(null);
+        if (row == null)
+            fail("Could not find row with name '" + name + "' to verify parent run count for.");
+
+        LineageCommand linCommand = new LineageCommand.Builder(row.get("lsid").toString())
                 .setChildren(false)
                 .setParents(true)
                 .setDepth(1).build();
-        LineageResponse lineageResponse = lineageCommand.execute(createDefaultConnection(), getCurrentContainerPath());
-        assertEquals("don't expect MaterialInput/tablename columns to persist records that have been deleted",
-                1, lineageResponse.getSeed().getParents().size());
+        LineageResponse linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The parent run count for " + description + " is not as expected.",
+                expectedCount, linResponse.getSeed().getParents().size());
+    }
 
-        // delete rows A, B
-        dgen.deleteRows(createDefaultConnection(), rowsToDelete);
-        SelectRowsResponse selectResponse = dgen.getRowsFromServer(createDefaultConnection(),
-                List.of("rowId", "lsid", "name", "parent", "age", "height", "MaterialInputs/Family", "Inputs/First"));
-        List<Map<String, Object>> remainingRows = selectResponse.getRows();
+    private Map<String, Object> verifyChildRunCount(String description, List<Map<String, Object>> rows, String name, int expectedCount) throws IOException, CommandException
+    {
+        Map<String, Object> row = rows.stream()
+                .filter((a)-> a.get("name").equals(name)).findFirst().orElse(null);
+        if (row == null)
+            fail("Could not find row with name '" + name + "' to verify child run count for.");
 
-        // now make sure materialInputs derivations don't persist references to deleted records
-        Map<String, Object> rowE = remainingRows.stream()
-                .filter((a)-> a.get("name").equals("E")).findFirst().orElse(null);
-        LineageCommand linCmd = new LineageCommand.Builder(rowE.get("lsid").toString())
-                .setChildren(false)
-                .setParents(true)
+        LineageCommand linCommand = new LineageCommand.Builder(row.get("lsid").toString())
+                .setChildren(true)
+                .setParents(false)
                 .setDepth(1).build();
-        LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
-        assertEquals("don't expect MaterialInput/tablename columns to persist records that have been deleted",
-                0, linResponse.getSeed().getParents().size());
-
-        dgen.deleteDomain(createDefaultConnection());
+        LineageResponse linResponse = linCommand.execute(createDefaultConnection(), getCurrentContainerPath());
+        assertEquals("The child run count for " + description + " is not as expected.",
+                expectedCount, linResponse.getSeed().getChildren().size());
+        return row;
     }
 
     @Test

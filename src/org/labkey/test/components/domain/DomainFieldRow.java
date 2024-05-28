@@ -25,8 +25,8 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -97,7 +97,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             if (ct.getLabel().equalsIgnoreCase(typeString))
                 return ct;
         }
-        return null;
+        throw new IllegalStateException("Unknown column type: " + typeString);
+    }
+
+    public List<String> getTypeOptions()
+    {
+        List<String> typeOptions = new ArrayList<>();
+        for (WebElement option : elementCache().fieldTypeSelectInput.getOptions())
+        {
+            typeOptions.add(option.getText());
+        }
+        return typeOptions;
     }
 
     /**
@@ -124,6 +134,20 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
 
         return this;
+    }
+
+    /**
+     * Selects the field data type and returns the 'are you sure' dialog.
+     */
+    public ModalDialog setTypeWithDialog(FieldDefinition.ColumnType columnType)
+    {
+        elementCache().fieldTypeSelectInput.selectByVisibleText(columnType.getLabel());
+
+        ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Data Type Change").timeout(1000).waitFor();
+
+        return confirmDialog;
+
     }
 
     public boolean getRequiredField()
@@ -177,11 +201,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
     }
 
-    public DomainFieldRow setAdvancedSettings(Map<AdvancedFieldSetting, Object> settings)
+    public DomainFieldRow setAdvancedSettings(List<AdvancedFieldSetting> settings)
     {
-        clickAdvancedSettings()
-                .setAdvancedFieldSettings(settings)
-                .apply();
+        if (!settings.isEmpty())
+        {
+            AdvancedSettingsDialog advancedSettingsDialog = clickAdvancedSettings();
+            for (AdvancedFieldSetting setting : settings)
+            {
+                setting.accept(advancedSettingsDialog);
+            }
+            advancedSettingsDialog.apply();
+        }
         return this;
     }
 
@@ -276,6 +306,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             WebDriverWrapper.sleep(500);
             getWrapper().setFormElement(elementCache().descriptionTextArea, description);
         }
+        return this;
+    }
+
+    public String getAttachmentBehavior()
+    {
+        expand();
+        return elementCache().attachmentBehavior.getFirstSelectedOption().getText();
+    }
+
+    public DomainFieldRow setAttachmentBehavior(String value)
+    {
+        expand();
+        elementCache().attachmentBehavior.selectByVisibleText(value);
         return this;
     }
 
@@ -402,6 +445,30 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getWrapper().isElementPresent(elementCache().getCharScaleInputLocForRow(rowIndex));
     }
 
+    // barcode- scannable options
+
+    /**
+     *  Indicates that the field should be searched when
+     */
+    public boolean isFieldScannable()
+    {
+        expand();
+        return elementCache().scannableCheckbox.get();
+    }
+
+    public DomainFieldRow setFieldScannable(boolean checked)
+    {
+        expand();
+        elementCache().scannableCheckbox.set(checked);
+        return this;
+    }
+
+    public boolean isScannableCheckboxPresent()
+    {
+        expand();
+        return elementCache().scannableCheckboxLoc.existsIn(this);
+    }
+
     //
     // date field options.
 
@@ -423,9 +490,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         setType(FieldDefinition.ColumnType.Lookup);
         setFromFolder(lookupInfo.getFolder());
         setFromSchema(lookupInfo.getSchema());
-        if (lookupInfo.getTableType() == null)
-            throw new IllegalArgumentException("No lookup type specified for " + lookupInfo.getTable());
-        String tableType = lookupInfo.getTableType().name();
+        String tableType;
+        if (lookupInfo.getTableType() == FieldDefinition.ColumnType.Integer)
+            tableType = "Integer";
+        else if (lookupInfo.getTableType() == FieldDefinition.ColumnType.String)
+            tableType = "String";
+        else
+            throw new IllegalArgumentException("Invalid lookup type specified for " + lookupInfo.getTable() + ": " + lookupInfo.getTableType());
+
         setFromTargetTable(lookupInfo.getTable() + " (" + tableType + ")");
         return this;
     }
@@ -448,6 +520,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().lookupContainerSelect.getFirstSelectedOption().getAttribute("value");
         if (!containerPath.equals(initialValue))
         {
+            getWrapper().scrollIntoView(elementCache().lookupContainerSelect.getWrappedElement(), true);
             elementCache().lookupContainerSelect.selectByValue(containerPath);
             getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
@@ -470,6 +543,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         String initialValue = elementCache().getLookupSchemaSelect().getFirstSelectedOption().getText();
         if (!schemaName.equals(initialValue))
         {
+            getWrapper().scrollIntoView(elementCache().getLookupSchemaSelect().getWrappedElement(), true);
             elementCache().getLookupSchemaSelect().selectByVisibleText(schemaName);
             getWrapper().shortWait().withMessage("Query select didn't update after selecting lookup schema")
                     .until(ExpectedConditions.attributeToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
@@ -622,7 +696,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setTextChoiceValues(List<String> values)
     {
-        Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this).click();
+        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
         addValuesDialog.addValues(values);
@@ -692,7 +767,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow selectTextChoiceValue(String value)
     {
-        Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this).click();
+        WebElement element = Locator.tagWithClass("button", "list-group-item").withText(value).findElement(this);
+        element.click();
         return this;
     }
 
@@ -1037,6 +1113,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setSampleType(String sampleTypeName)
     {
         expand();
+        getWrapper().scrollIntoView(elementCache().getLookupSampleTypeSelect().getWrappedElement(), true);
         elementCache().getLookupSampleTypeSelect().selectByVisibleText(sampleTypeName);
         return this;
     }
@@ -1044,7 +1121,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public DomainFieldRow setAliquotOption(ExpSchema.DerivationDataScopeType option)
     {
         expand();
-        elementCache().aliquotOption(option).check();
+        RadioButton button = elementCache().aliquotOption(option);
+        button.check();
         return this;
     }
 
@@ -1080,7 +1158,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row").withoutClass("domain-floating-hdr");
         private String _title = null;
-        private DomainFormPanel _domainFormPanel;
+        private final DomainFormPanel _domainFormPanel;
 
         public DomainFieldRowFinder(DomainFormPanel panel, WebDriver driver)
         {
@@ -1128,13 +1206,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
 
         public final Locator expandToggleLoc = Locator.tagWithClass("div", "field-icon")
-                .child(Locator.tagWithClassContaining("svg", "fa-plus-square"));
+                .child(Locator.tagWithClassContaining("span", "fa-chevron-right"));
         public final Locator collapseToggleLoc = Locator.tagWithClass("div", "field-icon")
-                .child(Locator.tagWithClassContaining("svg", "fa-minus-square"));
+                .child(Locator.tagWithClassContaining("span", "fa-chevron-down"));
         public final WebElement expandToggle = expandToggleLoc.findWhenNeeded(this);
 
         public final Locator removeFieldLoc = Locator.tagWithClass("span", "field-icon")
-                .child(Locator.tagWithClassContaining("svg", "domain-field-delete-icon"));
+                .child(Locator.tagWithClassContaining("span", "domain-field-delete-icon"));
         public final WebElement removeField = removeFieldLoc.findWhenNeeded(this);
 
         // controls revealed when expanded
@@ -1166,6 +1244,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this));
         public final Input charScaleInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-scale")
                 .refindWhenNeeded(this), getDriver());
+
+        // barcode option
+        protected final Locator scannableCheckboxLoc = Locator.input("domainpropertiesrow-scannable");
+        public final Checkbox scannableCheckbox = new Checkbox(scannableCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+
         // date field options
         public final Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
@@ -1312,6 +1395,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             return new RadioButton.RadioButtonFinder().withValue(option.name()).find(this);
         }
 
+        public Select attachmentBehavior = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-format"))
+                .findWhenNeeded(this);
 
     }
 }

@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -100,13 +101,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void createList()
     {
-        beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/project-begin.view");
         clickTab("Portal");
 
         ListHelper listHelper = new ListHelper(getDriver());
-        listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, LIST_KEY,
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String),
-                new ListHelper.ListColumn("File", "File", ListHelper.ListColumnType.Attachment));
+        listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY,
+                new FieldDefinition("Name", ColumnType.String),
+                new FieldDefinition("File", ColumnType.Attachment));
         goToManageLists();
         listHelper.click(Locator.linkContainingText(LIST_NAME));
         // todo: import actual data here
@@ -130,7 +131,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void createSampleType()
     {
-        beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/project-begin.view");
         clickTab("Portal");
 
         PortalHelper portalHelper = new PortalHelper(getDriver());
@@ -139,13 +140,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         log("adding sample type with file column");
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLESET_NAME).setFields(List.of(new FieldDefinition("color", FieldDefinition.ColumnType.String))), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLESET_NAME).setFields(List.of(new FieldDefinition("color", ColumnType.String))), Collections.singletonList(Map.of("Name", "ed", "color", "green")));
 
         // add a 'file' column
         log("editing fields for sample type");
         clickFolder(FOLDER_NAME);
         UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(SAMPLESET_NAME);
-        updatePage.addFields(List.of(new FieldDefinition("File", FieldDefinition.ColumnType.File)));
+        updatePage.addFields(List.of(new FieldDefinition("File", ColumnType.File)));
         updatePage.clickSave();
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
@@ -160,7 +161,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        beginAt("/project/" + getProjectName() +"/"+ FOLDER_NAME + "/begin.view?");
+        beginAt(getProjectName() + "/" + FOLDER_NAME + "/project-begin.view");
     }
 
     @Override

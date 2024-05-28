@@ -24,14 +24,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.assertj.core.api.Assertions;
+import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
@@ -207,10 +206,11 @@ public class Crawler
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
 
-            // Disable crawler for single-page apps until we make `beginAt` work with them
+            // Disable crawler for single-page apps until we make the crawler able to navigate them
             new ControllerActionId("biologics", "app"),
             new ControllerActionId("cds", "app"),
             new ControllerActionId("samplemanager", "app"),
+            new ControllerActionId("freezermanager", "app"),
 
             // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
             new ControllerActionId("biologics", "begin"),
@@ -265,7 +265,7 @@ public class Crawler
         return controllers;
     }
 
-    public List<Function<UrlToCheck, Boolean>> getSpecialCrawlExclusions()
+    private List<Function<UrlToCheck, Boolean>> getSpecialCrawlExclusions()
     {
         final List<Function<UrlToCheck, Boolean>> urlVisitableChecks = new ArrayList<>();
 
@@ -460,6 +460,10 @@ public class Crawler
 
         public UrlToCheck(URL origin, String urlText, int depth)
         {
+            if (depth < 0)
+            {
+                throw new IllegalArgumentException("Invalid crawl depth: " + depth);
+            }
             _origin = origin;
             _urlText = urlText;
             _depth = depth;
@@ -479,10 +483,17 @@ public class Crawler
                 {
                     int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
                     final String relativeURL = urlText.substring(relativeURLStart);
-                    if (!relativeURL.isBlank())
+                    if (!relativeURL.isBlank() && "/".equals(relativeURL))
                     {
                         _relativeURL = relativeURL;
-                        _actionId = new ControllerActionId(_relativeURL);
+
+                        ControllerActionId tempActionId = null;
+                        try
+                        {
+                            tempActionId = new ControllerActionId(_relativeURL);
+                        }
+                        catch (IllegalArgumentException ignore) { } // Probably a resource, not an action.
+                        _actionId = tempActionId;
                     }
                     else
                     {
@@ -516,6 +527,16 @@ public class Crawler
             if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getFolder(),"/")))
                 p += (_prioritizeAdminPages ? -1 : 1);
             priority = p + random.nextFloat();
+
+            try
+            {
+                isVisitableURL();
+            }
+            catch (RuntimeException ex)
+            {
+                // Get a more useful exception if we hit a URL that we REALLY don't understand
+                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()));
+            }
         }
 
         private boolean isLabKeyShortUrl(String urlText)
@@ -528,9 +549,10 @@ public class Crawler
             return _isFromForm;
         }
 
-        public void setFromForm(boolean fromForm)
+        public UrlToCheck setFromForm(boolean fromForm)
         {
             _isFromForm = fromForm;
+            return this;
         }
 
         public URL getOrigin()
@@ -584,7 +606,7 @@ public class Crawler
             String strippedRelativeURL = stripQueryParams(getRelativeURL());
 
             // never go to the exactly same URL (minus query params) twice:
-            if (_urlsChecked.contains(strippedRelativeURL))
+            if (_urlsChecked.contains(URIUtil.decodePath(strippedRelativeURL)))
                 return false;
 
             if (getRelativeURL().contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
@@ -702,8 +724,6 @@ public class Crawler
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
             _folder = StringUtils.strip(rootRelativeURL, "/");
-            if (_folder.endsWith("/"))
-                _folder = _folder.substring(0,_folder.length()-1);
         }
 
         @NotNull public String getAction()
@@ -857,7 +877,7 @@ public class Crawler
         try
         {
             String messagePrefix = "Navigating to ";
-            if (relativeUrl.length() == 0)
+            if (relativeUrl.isEmpty())
             {
                 logMessage = messagePrefix + "root";
             }
@@ -877,11 +897,11 @@ public class Crawler
             final File[] existingDownloads = downloadDir.listFiles();
 
             long elapsedTime = _test.doAndMaybeWaitForPageToLoad(WebDriverWrapper.WAIT_FOR_PAGE, () -> {
+                final String initialUrl = _test.getDriver().getCurrentUrl();
                 final WebElement mightGoStale = Locators.documentRoot.findElement(_test.getDriver());
                 ExpectedCondition<Boolean> stalenessOf = ExpectedConditions.stalenessOf(mightGoStale);
                 // 'getDriver().navigate().to(fullURL)' assumes navigation and fails for file downloads
                 _test.executeScript("document.location = arguments[0]", fullURL);
-                //noinspection ResultOfMethodCallIgnored
                 if (!WebDriverWrapper.waitFor(() -> {
                     boolean stale;
                     try
@@ -908,6 +928,14 @@ public class Crawler
                             navigated.setValue(false); // Don't wait for page load when a download occurs
                             return true; // Stop waiting
                         }
+                    }
+                    String currentUrl = _test.getDriver().getCurrentUrl();
+                    if (!currentUrl.equals(initialUrl) && stripHash(currentUrl).equals(stripHash(initialUrl)))
+                    {
+                        // URL changed without document going stale.
+                        // Probably a single-page app navigation or page anchor navigation.
+                        navigated.setValue(false);
+                        return true; // Stop waiting
                     }
                     return false; // No navigation or download detected. Continue waiting.
                 }, WebDriverWrapper.WAIT_FOR_PAGE))
@@ -950,6 +978,7 @@ public class Crawler
         // Keep track of where crawler has been
         _actionsVisited.add(actionId);
         _urlsChecked.add(stripQueryParams(relativeURL));
+        _urlsChecked.add(URIUtil.decodePath(stripQueryParams(relativeURL)));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
         String originMessage = (origin != null ? "\nOriginating page: " + origin : "") +
@@ -1020,13 +1049,15 @@ public class Crawler
                     if (code == 200 && _test.getDriver().getTitle().isEmpty())
                         _warnings.add("Action does not specify title: " + actionId);
 
-                    if (depth >= 0 && !_terminalActions.contains(actionId)) // Negative depth indicates a one-off check
+                    if (actualUrl.toString().startsWith(WebTestHelper.getBaseURL())) // Stop if redirected to an external site
                     {
                         List<Pair<String, Map<String, String>>> linksWithAttributes = _test.getLinkAddresses();
                         for (Pair<String, Map<String, String>> linkWithAttributes : linksWithAttributes)
                         {
                             String href = linkWithAttributes.getLeft();
-                            if (href.contains("://") && !href.startsWith(WebTestHelper.getBaseURL())) // Remote URL
+                            if ((href.startsWith("http://") || href.startsWith("https://")) && // Full URL
+                                    !href.startsWith(WebTestHelper.getBaseURL()) && // Not self
+                                    !href.startsWith("https://www.labkey.com/")) // Trust links to labkey.com
                             {
                                 Map<String, String> attributes = linkWithAttributes.getRight();
                                 String target = StringUtils.trimToEmpty(attributes.get("target"));
@@ -1034,32 +1065,36 @@ public class Crawler
                                 if (target.equals("_blank"))
                                 {
                                     // Issue 40708: Create automated tests to look for anchor tags with link to an outside server
-                                    MatcherAssert.assertThat(String.format("Bad 'rel' attribute for link to %s. On Page: %s", href, actualUrl),
-                                            rel, CoreMatchers.hasItems("noopener", "noreferrer"));
+                                    Assertions.assertThat(rel).as("Bad 'rel' attribute for link to %s. On Page: %s".formatted(href, actualUrl))
+                                            .containsAll(List.of("noopener", "noreferrer"));
                                 }
                             }
                         }
-                        List<String> linkAddresses = linksWithAttributes.stream().map(Pair::getLeft).collect(Collectors.toList());
-                        List<String> formAddresses = _test.getFormAddresses();
-                        linkAddresses.addAll(formAddresses);
 
-                        for (String url : linkAddresses)
+                        int nextDepth = depth + 1;
+
+                        for (Pair<String, ?> p : linksWithAttributes)
                         {
+                            String url = p.getLeft();
                             try
                             {
-                                UrlToCheck candidateUrl = new UrlToCheck(actualUrl, url, depth + 1);
-                                if (candidateUrl.isVisitableURL())
-                                {
-                                    candidateUrl.setFromForm(formAddresses.contains(url));
-                                    newUrlsToCheck.add(candidateUrl);
-                                }
+                                newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
                             }
                             catch (IllegalArgumentException badUrl)
                             {
-                                if (!formAddresses.contains(url)) // forms might have strange target action (e.g. '../formulations')
-                                {
-                                    throw new AssertionError("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
-                                }
+                                throw new IllegalArgumentException("Unable to parse link: \"" + url + "\". " + originMessage, badUrl);
+                            }
+                        }
+
+                        for (String url : _test.getFormAddresses())
+                        {
+                            try
+                            {
+                                newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth).setFromForm(true));
+                            }
+                            catch (IllegalArgumentException ignore)
+                            {
+                                // forms might have strange target action (e.g. '../formulations')
                             }
                         }
                     }
@@ -1083,7 +1118,7 @@ public class Crawler
                 {
                     originBrowser.simpleSignIn();
                     originBrowser.beginAt(origin.toString());
-                    ArtifactCollector collector = new ArtifactCollector(BaseWebDriverTest.getCurrentTest(), originBrowser);
+                    ArtifactCollector collector = new ArtifactCollector(originBrowser, _test.getArtifactCollector());
                     collector.dumpPageSnapshot("crawler", "crawlOrigin");
                 }
             }
@@ -1103,7 +1138,7 @@ public class Crawler
             throw new RuntimeException(e);
         }
 
-        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled && WebTestHelper.isTestServerUrl(actualUrl.toString()))
         {
             TestLogger.increaseIndent();
             try
@@ -1116,7 +1151,9 @@ public class Crawler
             }
         }
 
-        return newUrlsToCheck;
+        return _terminalActions.contains(actionId)
+                ? Collections.emptyList()
+                : newUrlsToCheck.stream().filter(UrlToCheck::isVisitableURL).toList();
     }
 
     private static final ControllerActionId spiderAction = new ControllerActionId("admin", "spider");
@@ -1157,25 +1194,21 @@ public class Crawler
 
         // Check whether 404 was due to a missing action
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = null;
 
-        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
+        try (CloseableHttpClient httpClient = WebTestHelper.getHttpClient())
         {
             // LabKey actions don't support HEAD requests. Only a non-existent action will 404
             var method = new HttpHead(url);
-            response = httpClient.execute(method, context);
-            // If url 404s, then the action doesn't exist
-            return response.getStatusLine().getStatusCode() != HttpStatus.SC_NOT_FOUND;
+            return httpClient.execute(method, context, response -> {
+                EntityUtils.consumeQuietly(response.getEntity());
+                // If url 404s, then the action doesn't exist
+                return response.getCode() != HttpStatus.SC_NOT_FOUND;
+            });
         }
         catch (IOException | IllegalArgumentException e)
         {
             TestLogger.warn("Unable to verify existence of action: " + urlToCheck.getActionId(), e);
             return true;
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
@@ -1198,8 +1231,8 @@ public class Crawler
 
     public static final String injectedAlert = "8(";
     public static final String maliciousScript = "alert('" + injectedAlert + "')";
-    public static final String injectScriptBlock = "-->\">'>'\"<script>" + maliciousScript + "</script>";
-    public static final String injectAttributeScript = "-->\">'>'\"</script><img src=\"xss\" onerror=\"" + maliciousScript + "\">";
+    public static final String injectScriptBlock = "\">'>'\"<script>" + maliciousScript + "</script>";
+    public static final String injectAttributeScript = "\">'>'\"</script><img src=\"x\" onerror=\"" + maliciousScript + "\">";
 
     public static void tryInject(WebDriverWrapper test, Runnable r)
     {
@@ -1332,7 +1365,7 @@ public class Crawler
 
         // Attempt injection against random parameters from the list of those found so far
         // Don't include 'start' or 'begin' actions unless they already have some parameters
-        if (!"start".equalsIgnoreCase(actionId.getAction()) || !"begin".equalsIgnoreCase(actionId.getAction()) || params.size() > 0)
+        if (!"start".equalsIgnoreCase(actionId.getAction()) || !"begin".equalsIgnoreCase(actionId.getAction()) || !params.isEmpty())
         {
             params = addRandomParams(params, actionId);
         }
@@ -1421,7 +1454,7 @@ public class Crawler
         StringBuilder sb = new StringBuilder();
         list.forEach(e ->
         {
-            if (sb.length()!=0)
+            if (!sb.isEmpty())
                 sb.append('&');
             sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8));
             sb.append('=');

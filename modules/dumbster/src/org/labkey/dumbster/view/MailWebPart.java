@@ -21,7 +21,7 @@ import org.labkey.api.view.JspView;
 import org.labkey.dumbster.DumbsterController;
 import org.labkey.dumbster.model.DumbsterManager;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 public class MailWebPart extends JspView<MailPage>
 {

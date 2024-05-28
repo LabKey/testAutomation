@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -37,11 +36,13 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -79,6 +80,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String DATA_CLASSES_SCHEMA = "exp.data";
     private static final String DATA_CLASSES_NAME = "DataClassTest";
 
+    private static final String SAMPLE_TYPE_SCHEMA = "samples";
+    private static final String SAMPLE_TYPE_NAME = "SampleTypeTest";
+
     private static final String COMMENTS_FIELD = "Comments";
     private static final String COUNTRY_FIELD = "Country";
 
@@ -106,14 +110,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
     public static class EmployeeRecord
     {
         public String name, ssn, company;
-        public Long key;
+        public Integer key;
 
         public EmployeeRecord(String name, String ssn, String company)
         {
             this(name, ssn, company, null);
         }
 
-        public EmployeeRecord(String name, String ssn, String company, Long key)
+        public EmployeeRecord(String name, String ssn, String company, Integer key)
         {
             this.name = name;
             this.ssn = ssn;
@@ -140,7 +144,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         {
             EmployeeRecord newbie = new EmployeeRecord((String)map.get("Name"), (String)map.get("ssn"), (String)map.get("Company"));
             if (map.containsKey("Key"))
-                newbie.key = (Long)map.get("Key");
+                newbie.key = (Integer)map.get("Key");
 
             return newbie;
         }
@@ -160,7 +164,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void projectSetup() throws Exception
+    public static void projectSetup()
     {
         TriggerScriptTest init = (TriggerScriptTest) getCurrentTest();
         init.doSetup();
@@ -175,28 +179,28 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //create List
         FieldDefinition[] columns = new FieldDefinition[] {
-                new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, ""),
-                new ListHelper.ListColumn("ssn","SSN", ListHelper.ListColumnType.String,""),
-                new ListHelper.ListColumn("company","Company",ListHelper.ListColumnType.String,"")
+                new FieldDefinition("name", ColumnType.String).setLabel("Name"),
+                new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
+                new FieldDefinition("company", ColumnType.String).setLabel("Company")
 
         };
 
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns );
+        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
 
         log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(getProjectName(), "People",
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+        _listHelper.createList(getProjectName(), "People", "Key",
+                new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
+                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
-        //Setup Data Class
+        //Add webparts for dataset, data class, sample type setup
         goToProjectHome();
 
         _portalHelper.addWebPart("Datasets");
         _portalHelper.addWebPart("Data Classes");
+        _portalHelper.addWebPart("Sample Types");
     }
 
     @Before
@@ -206,7 +210,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testListIndividualTriggers() throws Exception
+    public void testListIndividualTriggers()
     {
         EmployeeRecord caughtAfter = new EmployeeRecord("Emp 1", "1112223333", "Test"),
                 changedBefore = new EmployeeRecord("Emp 2", "2223334444", "Some Other");
@@ -218,7 +222,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //Check AfterInsert event
         log("** " + testName + " " + step + " Event");
-        assertTextPresent(AFTER_INSERT_ERROR, 1);
+        waitForText(AFTER_INSERT_ERROR, 1, 1_000);
         clickButton("Cancel");
 
         //Check BeforeInsert event
@@ -226,13 +230,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + " " + step + " Event");
         insertSingleRowViaUI(changedBefore);
         assertElementNotPresent("Transaction was committed after error", Locator.tagWithText("td", "Emp 1"));
-        assertElementPresent(Locator.tagWithText("td","Inserting Single"));
+        waitForElement(Locator.tagWithText("td","Inserting Single"));
 
         //Check BeforeDelete Event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
         deleteSingleRowViaUI("Company", "Inserting Single", "query", "Confirm Delete", true);
-        assertTextPresent(BEFORE_DELETE_ERROR);
+        waitForText(BEFORE_DELETE_ERROR);
         clickButton("Back");
 
         //Check AfterUpdate Event
@@ -240,7 +244,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + " " + step + " Event");
         new DataRegionTable("query", getDriver()).clickEditRow(0);
         clickButton("Submit");
-        assertTextPresent(AFTER_UPDATE_ERROR);
+        waitForText(AFTER_UPDATE_ERROR);
         clickButton("Cancel");
 
         //Check BeforeUpdate Event
@@ -248,21 +252,21 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + " " + step + " Event");
         changedBefore.name = "Emp 3";
         _listHelper.updateRow(1, changedBefore.toStringMap());
-        assertTextPresent(BEFORE_UPDATE_COMPANY);
+        waitForText(BEFORE_UPDATE_COMPANY);
 
         //Check AfterDelete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         deleteSingleRowViaUI("Company", BEFORE_UPDATE_COMPANY, "query", "Confirm Delete", true);
-        assertTextPresent(AFTER_DELETE_ERROR);
+        waitForText(AFTER_DELETE_ERROR);
         clickButton("Back");
         //Verify validation error prevented delete
-        assertElementPresent(Locator.tagWithText("td", "Emp 3"));
+        waitForElement(Locator.tagWithText("td", "Emp 3"));
         cleanUpListRows();
     }
 
     @Test
-    public void testListImportTriggers() throws Exception
+    public void testListImportTriggers()
     {
         goToManagedList(LIST_NAME);
         _listHelper.clickImportData();
@@ -292,7 +296,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         importDataPage.setText(tsvData);
         importDataPage.submit();
 
-        assertElementPresent(Locator.tagWithText("td","Importing TSV"));
+        waitForElement(Locator.tagWithText("td","Importing TSV"));
         cleanUpListRows();
     }
 
@@ -377,7 +381,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      ********************************/
 
     @Test
-    public void testDatasetIndividualTriggers() throws Exception
+    public void testDatasetIndividualTriggers()
     {
         GoToDataUI goToDataset = () -> goToDataset(DATASET_NAME);
 
@@ -387,9 +391,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
         checkExpectedErrors(6);
     }
 
-    @Ignore("Issue 25741: JS triggers for bulk import data (CSV or Excel) of datasets don't fire\n")
     @Test
-    public void testDatasetImportTriggers() throws Exception
+    public void testDatasetImportTriggers()
     {
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
         String testName = IMPORT_TEST;
@@ -423,10 +426,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         tsvData += row2 + "\n";
 
         goToDataset(DATASET_NAME);
-        clickButton("Import Data");
+        new DataRegionTable("Dataset", getDriver()).clickImportBulkData();
         new ImportDataPage(getDriver())
-                .setText(tsvData)
-                .submit();
+                .setText(tsvData).submitExpectingError("row 1: " + AFTER_INSERT_ERROR);
     }
 
     @Test
@@ -442,8 +444,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testDataClassIndividualTriggers() throws Exception
     {
-        //Generate delegate to move to dataset UI
-        GoToDataUI goToDataClass = () -> goToDataClass(DATA_CLASSES_NAME);
+        //Generate delegate to move to data class UI
+        GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
         setupDataClass();
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
@@ -457,13 +459,32 @@ public class TriggerScriptTest extends BaseWebDriverTest
         doAPITriggerTest(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME, "Name", false);
     }
 
+    /********************************
+     * Sample Type Trigger Script Tests
+     ********************************/
+
+    @Test
+    public void testSampleTypeIndividualTriggers() throws Exception
+    {
+        //Generate delegate to move to sample type UI
+        GoToDataUI goToSampleType = () -> goTo("Sample Types", SAMPLE_TYPE_NAME);
+
+        setupSampleType();
+        doIndividualTriggerTest("Material", goToSampleType, "Name", false, "Yes, Delete", false);
+    }
+
+
+    @Test
+    public void testSampleTypeAPITriggers() throws Exception
+    {
+        setupSampleType();
+        doAPITriggerTest(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME, "Name", false);
+    }
+
     /**
      * Run an api test against a schema and query based on preset trigger script
-     * @param schemaName
-     * @param queryName
      * @param keyColumnName Name of key column
      * @param requiresDate param to add a date column to inserted items
-     * @throws Exception
      */
     private void doAPITriggerTest(String schemaName, String queryName, String keyColumnName, boolean requiresDate) throws Exception
     {
@@ -516,22 +537,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         row3 = resp.getRows().get(1);
 
-        //Check After Update Event
-        step = "AfterUpdate";
-        log("** " + testName + " " + step + " Event");
-        UpdateRowsCommand updCmd = new UpdateRowsCommand(schemaName, queryName);
-        row2.put(flagField, "AfterUpdate");
-        updCmd.addRow(row2);
-        updCmd.addRow(row3);
-        assertAPIErrorMessage(updCmd, AFTER_UPDATE_ERROR, cn);
-
         //Check Before Update Event
         step = "BeforeUpdate";
         log("** " + testName + " " + step + " Event");
-        updCmd = new UpdateRowsCommand(schemaName,queryName);
+        UpdateRowsCommand updCmd = new UpdateRowsCommand(schemaName,queryName);
         row2.put(flagField, "BeforeUpdate");
         row2.put(updateField, "Labkey");
-        row3.put(flagField,"BeforeDelete");  //For later.
+        row3.put(flagField, "BeforeDelete");  //For later.
         updCmd.addRow(row2);
         updCmd.addRow(row3);
         resp = updCmd.execute(cn, getProjectName());
@@ -539,6 +551,15 @@ public class TriggerScriptTest extends BaseWebDriverTest
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
         //Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));
+
+        //Check After Update Event
+        step = "AfterUpdate";
+        log("** " + testName + " " + step + " Event");
+        updCmd = new UpdateRowsCommand(schemaName, queryName);
+        row2.put(flagField, "AfterUpdate");
+        updCmd.addRow(row2);
+        updCmd.addRow(row3);
+        assertAPIErrorMessage(updCmd, AFTER_UPDATE_ERROR, cn);
 
         //Check After Delete Event
         step = "After Delete";
@@ -586,7 +607,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //  Insert row into List
         goToData.goToDataUIPage();
         insertSingleRowViaUI(dataRegionName, caughtAfter);
-        assertTextPresent(AFTER_INSERT_ERROR, 1);
+        waitForText(AFTER_INSERT_ERROR, 1, 1_000);
         clickButton("Cancel");
 
         //Check BeforeInsert event
@@ -595,7 +616,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         goToData.goToDataUIPage();
         insertSingleRowViaUI(dataRegionName, changedBefore);
         assertElementNotPresent("Transaction was committed after error", Locator.tagWithText("td", badParticipant));
-        assertElementPresent(Locator.tagWithText("td","Inserting Single"));
+        waitForElement(Locator.tagWithText("td","Inserting Single"));
 
         //Check BeforeDelete Event
         step = "BeforeDelete";
@@ -603,19 +624,19 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //Check previous step prepared row for delete
         pushLocation();
-        assertElementPresent(Locator.tagWithText("td", "BeforeDelete"));
+        waitForElement(Locator.tagWithText("td", "BeforeDelete"));
         deleteSingleRowViaUI(flagField, step, dataRegionName, deleteButtonText, expectPageLoad);
-        assertTextPresent(BEFORE_DELETE_ERROR);
+        waitForText(1_000, BEFORE_DELETE_ERROR);
         popLocation();
         //Verify validation error prevented delete
-        assertElementPresent(Locator.tagWithText("td", "BeforeDelete"));
+        waitForElement(Locator.tagWithText("td", "BeforeDelete"));
 
         //Check AfterUpdate Event
         step = "AfterUpdate";
         log("** " + testName + " " + step + " Event");
         changedBefore.put(flagField, step);
         updateDataSetRow(1, dataRegionName, changedBefore);
-        assertTextPresent(AFTER_UPDATE_ERROR);
+        waitForText(1_000, AFTER_UPDATE_ERROR);
         clickButton("Cancel");
 
         //Check BeforeUpdate Event
@@ -623,18 +644,18 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + " " + step + " Event");
         changedBefore.put(flagField, step);
         updateDataSetRow(1, dataRegionName, changedBefore);
-        assertTextPresent(BEFORE_UPDATE_COMPANY);
-        assertTextPresent("BeforeUpdate");  //Check change was retained
+        waitForText(1_000, BEFORE_UPDATE_COMPANY);
+        waitForText(1_000, "BeforeUpdate");  //Check change was retained
 
         //Check AfterDelete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         pushLocation();
         deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName, deleteButtonText, expectPageLoad);
-        assertTextPresent(AFTER_DELETE_ERROR);
+        waitForText(1_000, AFTER_DELETE_ERROR);
         popLocation();
         //Verify validation error prevented delete
-        assertElementPresent(Locator.tagWithText("td", "BeforeUpdate"));
+        waitForElement(Locator.tagWithText("td", "BeforeUpdate"));
     }
 
     /**
@@ -642,13 +663,12 @@ public class TriggerScriptTest extends BaseWebDriverTest
      * @param cmd command to run
      * @param expected error message to check
      * @param cn connection object to run against
-     * @throws IOException
      */
     private void assertAPIErrorMessage(SaveRowsCommand cmd, String expected, Connection cn) throws IOException
     {
         try
         {
-            SaveRowsResponse resp = cmd.execute(cn, getProjectName());
+            cmd.execute(cn, getProjectName());
             Assert.fail("No error triggered. Expected: " + expected);
         }
         catch (CommandException e)
@@ -659,7 +679,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     /**
      * Insert a single record into list
-     * @param record
      */
     private void insertSingleRowViaUI(EmployeeRecord record)
     {
@@ -731,7 +750,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     /**
      * Navigate to a particular test
-     * @param listName
      */
     private void goToManagedList(String listName)
     {
@@ -741,7 +759,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     /**
      * Navigate to particular Dataset
-     * @param datasetName
      */
     private void goToDataset(String datasetName)
     {
@@ -750,21 +767,17 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     /**
-     * Navigate to particular Dataset
-     * @param dataClassName
+     * Navigate to particular dataclass/sampletype in the given webpart
      */
-    private void goToDataClass(String dataClassName)
+    private void goTo(String webPartName, String tableName)
     {
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("Data Classes"));
-        clickAndWait(Locator.linkWithText(dataClassName));
+        clickAndWait(Locator.linkWithText(webPartName));
+        clickAndWait(Locator.linkWithText(tableName));
     }
 
     /**
      * Generate delimited string of keys from a map
-     * @param data
-     * @param delimiter
-     * @return
      */
     private String joinMapValues(Map<String,String> data, String delimiter )
     {
@@ -775,9 +788,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     /**
      * Generate delimited string of keys from a map
-     * @param data
-     * @param delimiter
-     * @return
      */
     private String joinMapKeys(Map<String,String> data, String delimiter )
     {
@@ -804,8 +814,20 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
                 .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, FieldDefinition.ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, FieldDefinition.ColumnType.String)));
+                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
+                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
         dataClass.create(createDefaultConnection(), getProjectName());
+    }
+
+    /**
+     * Setup the sample type
+     */
+    private void setupSampleType()
+    {
+        SampleTypeDefinition sampleType = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
+                .setFields(List.of(
+                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
+                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
     }
 }

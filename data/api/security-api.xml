@@ -1,7 +1,7 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
 
     <test name="get group permissions" type="get">
-        <url>security/Security%20API%20Test%20Project/getGroupPerms.view?</url>
+        <url>Security%20API%20Test%20Project/security-getGroupPerms.view?</url>
         <response>
             {"container":
                 {
@@ -21,12 +21,7 @@
                             "isProjectGroup": false,
                             "type": "g",
                             "effectivePermissions": [],
-                            "groups": [{
-                                "isSystemGroup": true,
-                                "name": "Developers",
-                                "id": -4,
-                                "isProjectGroup": false
-                            }],
+                            "groups": []
                         },
                         {
                             "role": "NO_PERMISSIONS",
@@ -90,11 +85,13 @@
                                 "org.labkey.api.lists.permissions.ManagePicklistsPermission",
                                 "org.labkey.api.security.permissions.UpdatePermission",
                                 "org.labkey.announcements.model.SecureMessageBoardReadPermission",
+                                "org.labkey.api.security.permissions.SampleWorkflowDeletePermission",
                                 "org.labkey.api.security.permissions.SampleWorkflowJobPermission",
                                 "org.labkey.api.security.permissions.AssayReadPermission",
                                 "org.labkey.api.security.permissions.NotebookReadPermission",
                                 "org.labkey.api.security.permissions.DataClassReadPermission",
-                                "org.labkey.api.security.permissions.MediaReadPermission"
+                                "org.labkey.api.security.permissions.MediaReadPermission",
+                                "org.labkey.api.security.permissions.MoveEntitiesPermission",
                             ],
                             "groups": []
                         },
@@ -138,15 +135,9 @@
     </test>
 
     <test name="groups for current user" type="get">
-        <url>security/Security%20Api%20Test%20Project/getGroupsForCurrentUser.view?</url>
+        <url>Security%20Api%20Test%20Project/security-getGroupsForCurrentUser.view?</url>
         <response>
             {"groups": [
-                    {
-                        "id": -4,
-                        "name": "Developers",
-                        "isSystemGroup": true,
-                        "isProjectGroup": false
-                    },
                     {
                         "id": -3,
                         "name": "Guests",
@@ -171,7 +162,7 @@
     </test>
 
     <test name="ensure login" type="get">
-        <url>security/Security%20Api%20Test%20Project/ensureLogin.view?</url>
+        <url>Security%20Api%20Test%20Project/security-ensureLogin.view?</url>
         <response>
             {"currentUser":
                 {

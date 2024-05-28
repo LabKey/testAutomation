@@ -1,10 +1,9 @@
 package org.labkey.test.pages.core.admin;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
@@ -154,7 +153,7 @@ public class LimitActiveUserPage extends LabKeyPage<LimitActiveUserPage.ElementC
     {
         if (initialSettings != null)
         {
-            PostCommand<CommandResponse> command = new PostCommand<>("user", "limitActiveUsers");
+            SimplePostCommand command = new SimplePostCommand("user", "limitActiveUsers");
             command.setJsonObject(initialSettings.toJsonObject());
             command.execute(cn, "/");
             initialSettings = null;

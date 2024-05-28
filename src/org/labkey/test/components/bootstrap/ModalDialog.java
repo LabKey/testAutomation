@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.bootstrap;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -25,8 +26,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -69,7 +68,8 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     protected void waitForReady(ElementCache ec)
     {
         elementCache().body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
-        WebDriverWrapper.waitFor(() -> elementCache().body.getText().length() > 0, "Modal dialog not ready", 2000);
+        WebDriverWrapper.waitFor(() -> !BootstrapLocators.loadingSpinner.areAnyVisible(getDriver()) &&
+                elementCache().body.getText().length() > 0, "Modal dialog not ready.", 2_500);
     }
 
     @Override
@@ -121,6 +121,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         waitForClose(waitSeconds);
     }
 
+    public boolean isDismissEnabled(String buttonText)
+    {
+        return Locators.dismissButton(buttonText).findElement(getComponentElement()).isEnabled();
+    }
+
     protected void waitForClose()
     {
         waitForClose(10);
@@ -130,11 +135,8 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         if (waitSeconds > 0) // Zero to not expect dialog to close
         {
-            List<WebElement> elements = new ArrayList<>();
-            elements.add(getComponentElement());
-            elements.addAll(Locator.byClass("modal").findElements(getDriver()));
             new WebDriverWait(getDriver(), Duration.ofSeconds(waitSeconds))
-                    .until(ExpectedConditions.invisibilityOfAllElements(elements));
+                    .until(ExpectedConditions.stalenessOf(getComponentElement()));
         }
     }
 
@@ -146,12 +148,12 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected class ElementCache extends Component<ElementCache>.ElementCache
     {
-        public final WebElement title = Locators.title.findWhenNeeded(getComponentElement());
+        public final WebElement title = Locators.title.refindWhenNeeded(getComponentElement());
         public final WebElement closeButton = Locator.tagWithClass("button", "close")
                 .withAttribute("data-dismiss", "modal")
-                .findWhenNeeded(getComponentElement());
+                .refindWhenNeeded(getComponentElement());
         public final WebElement body = Locators.body
-                .findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
+                .refindWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     public static class Locators
@@ -177,13 +179,19 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
         public ModalDialogFinder withTitle(String title)
         {
-            _locator = Locators.dialog.withDescendant(Locator.tagWithClass("h4","modal-title")).containing(title);
+            _locator = Locators.dialog.withDescendant(Locator.tagWithClass("h4","modal-title").containing(title));
+            return this;
+        }
+
+        public ModalDialogFinder withTitleIgnoreCase(String title)
+        {
+            _locator = Locators.dialog.withDescendant(Locator.tagWithClass("h4","modal-title").containingIgnoreCase(title));
             return this;
         }
 
         public ModalDialogFinder withBodyTextContaining(String text)
         {
-            _locator = Locators.dialog.withDescendant(Locators.body).containing(text);
+            _locator = Locators.dialog.withDescendant(Locators.body.containing(text));
             return this;
         }
 

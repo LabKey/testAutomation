@@ -18,9 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -35,7 +33,6 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -46,10 +43,10 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PermissionsHelper;
@@ -78,7 +75,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";
-    public static final String GROUP_AUDIT_EVENT = "Group events";
+    public static final String GROUP_AUDIT_EVENT = "Group and role events";
     public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Link to Study events";
@@ -177,7 +174,7 @@ public class AuditLogTest extends BaseWebDriverTest
     protected ArrayList<String> getAuditLogFromFile() throws IOException
     {
         ArrayList<String> auditLog = new ArrayList<>();
-        File auditLogFile = new File(TestProperties.getTomcatHome(), "logs/labkey-audit.log");
+        File auditLogFile = new File(TestFileUtils.getServerLogDir(), "labkey-audit.log");
 
         try (FileReader fileReader = new FileReader(auditLogFile))
         {
@@ -193,7 +190,7 @@ public class AuditLogTest extends BaseWebDriverTest
         return auditLog;
     }
 
-    protected void compareAuditLogFileEntries(ArrayList<String> auditLogBefore, ArrayList<String> auditLogAfter, ArrayList<String> expectedValues) throws IOException
+    protected void compareAuditLogFileEntries(List<String> auditLogBefore, List<String> auditLogAfter, List<String> expectedValues) throws IOException
     {
         boolean pass = true;
         StringBuilder stringBuilder = new StringBuilder();
@@ -261,9 +258,9 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void userAuditTest() throws IOException
     {
-        ArrayList<String> auditLogBefore;
-        ArrayList<String> auditLogAfter;
-        ArrayList<String> expectedLogValues = new ArrayList<>();
+        List<String> auditLogBefore;
+        List<String> auditLogAfter;
+        List<String> expectedLogValues = new ArrayList<>();
 
         auditLogBefore = getAuditLogFromFile();
         // Use UI helper to avoid unexpected events from API authentication
@@ -281,10 +278,10 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(getUsername() + " stopped impersonating " + AUDIT_TEST_USER);
 
         impersonateRoles(PROJECT_ADMIN_ROLE, AUTHOR_ROLE);
-        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " impersonated roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
         stopImpersonating();
-        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + "," + AUTHOR_ROLE);
+        expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
         String adminGroup = "Administrator";
         impersonateGroup(adminGroup, true);
@@ -323,8 +320,8 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void groupAuditTest() throws IOException
     {
-        ArrayList<String> auditLogBefore;
-        ArrayList<String> auditLogAfter;
+        List<String> auditLogBefore;
+        List<String> auditLogAfter;
 
         auditLogBefore = getAuditLogFromFile();
 
@@ -338,7 +335,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _userHelper.deleteUsers(true, AUDIT_TEST_USER);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
-        ArrayList<String> expectedLogValues = new ArrayList<>();
+        List<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add("Project " + AUDIT_TEST_PROJECT + " was created");
         expectedLogValues.add("A new security group named " + AUDIT_SECURITY_GROUP + " was created.");
         expectedLogValues.add("The group Guests was removed from the security role No Permissions.");
@@ -347,6 +344,8 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add("User: " + AUDIT_TEST_USER + " was added as a member to Group: " + AUDIT_SECURITY_GROUP);
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
         expectedLogValues.add("Project /" + AUDIT_TEST_PROJECT + " was deleted");
+        expectedLogValues.add("A new security policy was established for " + AUDIT_TEST_PROJECT + ". It will no longer inherit permissions from /");
+        expectedLogValues.add("The group Guests was assigned to the security role No Permissions.");
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), 10);
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), 10);
@@ -369,8 +368,8 @@ public class AuditLogTest extends BaseWebDriverTest
         simpleSignIn();
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
         _containerHelper.createSubfolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
-        createList(AUDIT_TEST_PROJECT, "Parent List", "Name\nData",new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name") );
-        createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"));
+        createList(AUDIT_TEST_PROJECT, "Parent List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name") );
+        createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name"));
 
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, "Project Administrator");
@@ -462,9 +461,9 @@ public class AuditLogTest extends BaseWebDriverTest
         }
     }
 
-    private void createList(String containerPath, String listName, @Nullable String tsvData, ListHelper.ListColumn... listColumns)
+    private void createList(String containerPath, String listName, @Nullable String tsvData, FieldDefinition... listColumns)
     {
-        _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", listColumns);
+        _listHelper.createList(containerPath, listName, "Key", listColumns);
         if(null != tsvData)
         {
             _listHelper.goToList(listName);
@@ -561,18 +560,18 @@ public class AuditLogTest extends BaseWebDriverTest
         final String FIELD01_NAME = "Field01";
         final String FIELD01_LABEL = "This is Field 01";
         final String FIELD01_UPDATED_LABEL = "This is Update Label for Field 01";
-        final ListHelper.ListColumnType FIELD01_TYPE = ListHelper.ListColumnType.String;
+        final ColumnType FIELD01_TYPE = ColumnType.String;
         final String FIELD01_DESCRIPTION = "Simple String field.";
         final String FIELD01_UPDATED_DESCRIPTION = "This should be a new description for the field.";
 
         final String FIELD02_NAME = "Field02";
         final String FIELD02_LABEL = "This is Field 02";
-        final ListHelper.ListColumnType FIELD02_TYPE = ListHelper.ListColumnType.Integer;
+        final ColumnType FIELD02_TYPE = ColumnType.Integer;
         final String FIELD02_DESCRIPTION = "Simple Integer field.";
 
         final String FIELD03_NAME = "Field03";
         final String FIELD03_LABEL = "Field 03 Lookup";
-        final ListHelper.ListColumnType FIELD03_TYPE = ListHelper.ListColumnType.Integer;
+        final ColumnType FIELD03_TYPE = ColumnType.Integer;
 
         final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
 
@@ -582,18 +581,18 @@ public class AuditLogTest extends BaseWebDriverTest
 
         portalHelper.addWebPart("Lists");
 
-        ListHelper.ListColumn[] listColumns = new ListHelper.ListColumn[]{
-                new ListHelper.ListColumn("id", "id", ListHelper.ListColumnType.Integer, "Simple integer index."),
-                new ListHelper.ListColumn("value", "value", ListHelper.ListColumnType.String, "Value of the look up.")};
+        FieldDefinition[] listColumns = new FieldDefinition[]{
+                new FieldDefinition("id", ColumnType.Integer).setLabel("id").setDescription("Simple integer index."),
+                new FieldDefinition("value", ColumnType.String).setLabel("value").setDescription("Value of the look up.")};
 
         log("Create a couple of lists to be used as lookups.");
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LOOK_UP_LIST01, LIST01_TSV, listColumns);
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LOOK_UP_LIST02, LIST02_TSV, listColumns);
 
         log("Create the list that will have it's column attributes modified.");
-        listColumns = new ListHelper.ListColumn[]{
-                new ListHelper.ListColumn(FIELD01_NAME, FIELD01_LABEL, FIELD01_TYPE, FIELD01_DESCRIPTION),
-                new ListHelper.ListColumn(FIELD02_NAME, FIELD02_LABEL, FIELD02_TYPE, FIELD02_DESCRIPTION)};
+        listColumns = new FieldDefinition[]{
+                new FieldDefinition(FIELD01_NAME, FIELD01_TYPE).setLabel(FIELD01_LABEL).setDescription(FIELD01_DESCRIPTION),
+                new FieldDefinition(FIELD02_NAME, FIELD02_TYPE).setLabel(FIELD02_LABEL).setDescription(FIELD02_DESCRIPTION)};
 
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null, listColumns);
 
@@ -614,11 +613,11 @@ public class AuditLogTest extends BaseWebDriverTest
 
         log("Validate that the expected rows are there.");
         Map<String, String> field01ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field01ExpectedComment = Maps.of("Name", FIELD01_NAME,"Label", FIELD01_LABEL,"Type", FIELD01_TYPE.name(),"Description", FIELD01_DESCRIPTION);
+        Map<String, String> field01ExpectedComment = Maps.of("Name", FIELD01_NAME,"Label", FIELD01_LABEL,"Type", "String","Description", FIELD01_DESCRIPTION);
         boolean pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
 
         Map<String, String> field02ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field02ExpectedComment = Maps.of("Name", FIELD02_NAME,"Label", FIELD02_LABEL,"Type", FIELD02_TYPE.name(),"Description", FIELD02_DESCRIPTION);
+        Map<String, String> field02ExpectedComment = Maps.of("Name", FIELD02_NAME,"Label", FIELD02_LABEL,"Type", FIELD02_TYPE.getLabel(),"Description", FIELD02_DESCRIPTION);
         pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
@@ -689,7 +688,7 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.getFieldsPanel()
                 .addField(new FieldDefinition(FIELD03_NAME,
                         new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
-                                .setTableType(FieldDefinition.ColumnType.Integer))
+                                .setTableType(ColumnType.Integer))
                         .setLabel(FIELD03_LABEL));
         listDefinitionPage.clickSave();
 
@@ -728,7 +727,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Change properties on field '" + FIELD03_NAME + "'.");
         listDefinitionPage.getFieldsPanel()
                 .getField(FIELD03_NAME)
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(FieldDefinition.ColumnType.Integer));
+                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(ColumnType.Integer));
         listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");
@@ -933,11 +932,11 @@ public class AuditLogTest extends BaseWebDriverTest
 
         String[] commentAsArray = comment.split(";");
 
-        Map<String, String> fieldComments = new HashMap();
+        Map<String, String> fieldComments = new HashMap<>();
 
-        for(int i = 0; i < commentAsArray.length; i++)
+        for (String s : commentAsArray)
         {
-            String[] fieldValue = commentAsArray[i].split(":");
+            String[] fieldValue = s.split(":");
 
             // If the split on the ':' produced more than two entries in the array it most likely means that the
             // comment for that property had a : in it. So treat the first entry as the field name and then concat the
@@ -949,7 +948,7 @@ public class AuditLogTest extends BaseWebDriverTest
             StringBuilder sb = new StringBuilder();
             sb.append(fieldValue[1].trim());
 
-            for(int j = 2; j < fieldValue.length; j++)
+            for (int j = 2; j < fieldValue.length; j++)
             {
                 sb.append(":");
                 sb.append(fieldValue[j]);
@@ -963,21 +962,14 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
     {
-        String value = null;
-
-        JSONParser parser = new JSONParser();
-        JSONObject jsonObject;
         try
         {
-            jsonObject = (JSONObject)parser.parse(rowEntry.get(columnName).toString());
-            value = jsonObject.get("value").toString();
+            return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
         }
-        catch(ParseException pe)
+        catch(JSONException je)
         {
             // Just fail here, don't toss the exception up the stack.
-            Assert.assertTrue("There was a parser exception: " + pe.toString(), false);
+            throw new IllegalArgumentException(je);
         }
-
-        return value;
     }
 }

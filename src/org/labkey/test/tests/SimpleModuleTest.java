@@ -16,9 +16,8 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -49,13 +48,14 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -80,7 +80,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.TestFileUtils.getLabKeyRoot;
+import static org.labkey.test.TestFileUtils.getDefaultFileRoot;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -98,11 +98,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String CORE_SCHEMA = "core";
     public static final String LIST_NAME = "People";
-    public static final String LIST_DATA = "Name\tAge\tCrazy\n" +
-            "Dave\t39\tTrue\n" +
-            "Adam\t65\tTrue\n" +
-            "Britt\t30\tFalse\n" +
-            "Josh\t30\tTrue";
+    public static final String LIST_DATA = """
+            Name\tAge\tCrazy
+            Dave\t39\tTrue
+            Adam\t65\tTrue
+            Britt\t30\tFalse
+            Josh\t30\tTrue""";
 
     public static final String STUDY_FOLDER_TAB_NAME = "Study Container Tab";
     public static final String ASSAY_FOLDER_TAB_NAME = "Assay Container Tab 2";
@@ -132,57 +133,62 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private static final File CAMRY_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/camry.jpg");
     private static final File FOCUS_POPUP =  TestFileUtils.getSampleData("thumbnails/focusPopup.jpg");
 
-    private static final String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
-            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"Image\">\n" +
-            "        <datatype>varchar</datatype>\n" +
-            "        <displayColumnFactory>\n" +
-            "          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>\n" +
-            "          <properties>\n" +
-            "            <property name=\"thumbnailImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>\n" +
-            "            <property name=\"popupImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>\n" +
-            "            <property name=\"popupImageWidth\">150px</property>\n" +
-            "          </properties>\n" +
-            "        </displayColumnFactory>\n" +
-            "        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>\n";
+    private static final String XML_METADATA = """
+            <tables xmlns="http://labkey.org/data/xml">
+              <table tableName="Models" tableDbType="TABLE">
+                <columns>
+                  <column columnName="Image">
+                    <datatype>varchar</datatype>
+                    <displayColumnFactory>
+                      <className>org.labkey.api.data.URLDisplayColumn$Factory</className>
+                      <properties>
+                        <property name="thumbnailImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>
+                        <property name="popupImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${popupImage}</property>
+                        <property name="popupImageWidth">150px</property>
+                      </properties>
+                    </displayColumnFactory>
+                    <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>
+                  </column>
+                </columns>
+              </table>
+            </tables>
+            """;
 
-    private static final String XML_METADATA_NO_POPUP = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
-            "  <table tableName=\"Models\" tableDbType=\"TABLE\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"Image\">\n" +
-            "        <datatype>varchar</datatype>\n" +
-            "        <displayColumnFactory>\n" +
-            "          <className>org.labkey.api.data.URLDisplayColumn$Factory</className>\n" +
-            "          <properties>\n" +
-            "            <property name=\"thumbnailImageUrl\">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>\n" +
-            "            <property name=\"popupImageUrl\"></property>\n" +
-            "          </properties>\n" +
-            "        </displayColumnFactory>\n" +
-            "        <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>\n";
+    private static final String XML_METADATA_NO_POPUP = """
+            <tables xmlns="http://labkey.org/data/xml">
+              <table tableName="Models" tableDbType="TABLE">
+                <columns>
+                  <column columnName="Image">
+                    <datatype>varchar</datatype>
+                    <displayColumnFactory>
+                      <className>org.labkey.api.data.URLDisplayColumn$Factory</className>
+                      <properties>
+                        <property name="thumbnailImageUrl">/_webdav/SimpleModuleTest%20Project/%40files/${thumbnailImage}</property>
+                        <property name="popupImageUrl"></property>
+                      </properties>
+                    </displayColumnFactory>
+                    <url>/_webdav/SimpleModuleTest%20Project/%40files/${Image}</url>
+                  </column>
+                </columns>
+              </table>
+            </tables>
+            """;
 
-    private static final String XML_METADATA_CUSTOM_QUERY = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "  <table tableName=\"SelectOnColors\" tableDbType=\"NOT_IN_DB\">\n" +
-            "    <pkColumnName>Name</pkColumnName>\n" +
-            "     <insertUrl>/query/insertQueryRow.view?schemaName=vehicle&amp;queryName=Colors</insertUrl> \n" +
-            "     <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;queryName=Colors&amp;Name=${Name}</updateUrl> \n" +
-            "     <importUrl>/query/import.view?schemaName=vehicle&amp;queryName=Colors</importUrl> \n" +
-            "     <deleteUrl>/query/deleteQueryRows.view?schemaName=vehicle&amp;queryName=Colors</deleteUrl> \n" +
-            "    <columns>\n" +
-            "      \t<column columnName=\"Name\">\n" +
-            "        \t<isKeyField>true</isKeyField>\n" +
-            "        </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>";
+    private static final String XML_METADATA_CUSTOM_QUERY = """
+            <tables xmlns="http://labkey.org/data/xml">
+              <table tableName="SelectOnColors" tableDbType="NOT_IN_DB">
+                <pkColumnName>Name</pkColumnName>
+                 <insertUrl>/query/insertQueryRow.view?schemaName=vehicle&amp;queryName=Colors</insertUrl>\s
+                 <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;queryName=Colors&amp;Name=${Name}</updateUrl>\s
+                 <importUrl>/query/import.view?schemaName=vehicle&amp;queryName=Colors</importUrl>\s
+                 <deleteUrl>/query/deleteQueryRows.view?schemaName=vehicle&amp;queryName=Colors</deleteUrl>\s
+                <columns>
+                  <column columnName="Name">
+                    <isKeyField>true</isKeyField>
+                  </column>
+                </columns>
+              </table>
+            </tables>""";
 
     private final PortalHelper portalHelper = new PortalHelper(this);
 
@@ -349,13 +355,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         List<String> retVal = customQuery.getColumnDataAsText(colunmName);
         popLocation();
         return retVal;
-
     }
 
     @LogMethod
     private void doTestColumnValidators() throws Exception
     {
-        //first create a maufacturer:
+        //first create a manufacturer:
         InsertRowsCommand insertCmdM = new InsertRowsCommand("vehicle", "Manufacturers");
         Map<String, Object> rowMapM = new HashMap<>();
         rowMapM.put("Name", "TestManufacturer");
@@ -483,13 +488,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
-        Long fordId = null;
-        Long toyotaId = null;
-        Long hondaId = null;
+        Integer fordId = null;
+        Integer toyotaId = null;
+        Integer hondaId = null;
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long) row.get("RowId");
+            Integer rowId = (Integer) row.get("RowId");
             String name = (String) row.get("Name");
             assertNotNull("Expected response row to have a Name column", name);
             assertNotNull("Expected response row to have a RowId column", rowId);
@@ -559,12 +564,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("finished testing custom thumbnail and popup images");
 
-        Long priusId = null;
-        Long f150Id = null;
+        Integer priusId = null;
+        Integer f150Id = null;
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long) row.get("RowId");
+            Integer rowId = (Integer) row.get("RowId");
             String name = (String) row.get("Name");
             if (name.equalsIgnoreCase("Prius C"))
                 priusId = rowId;
@@ -591,7 +596,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
-        beginAt("/query/" + getProjectName() + "/begin.view?");
+        beginAt(getProjectName() + "/query-begin.view");
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
@@ -681,7 +686,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 9 rows.", 9, insertResp.getRowsAffected().intValue());
 
-        log("** Inserting vechicles...");
+        log("** Inserting vehicles...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.of(
@@ -702,17 +707,17 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
 
-        Long[] vehicleIds = new Long[2];
-        vehicleIds[0] = (Long) (insertResp.getRows().get(0).get("RowId"));
-        vehicleIds[1] = (Long) (insertResp.getRows().get(1).get("RowId"));
+        Integer[] vehicleIds = new Integer[2];
+        vehicleIds[0] = (Integer) (insertResp.getRows().get(0).get("RowId"));
+        vehicleIds[1] = (Integer) (insertResp.getRows().get(1).get("RowId"));
 
         log("** Trying to update Vehicle from wrong container...");
         updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         updateCmd.getRows().addAll(Arrays.asList(
                 Maps.of(
-                        "RowId", vehicleIds[1],
-                        "Milage", Integer.valueOf(4),
-                        "LastService", new Date(2009, 9, 10)
+                    "RowId", vehicleIds[1],
+                    "Milage", Integer.valueOf(4),
+                    "LastService", new Date(2009, 9, 10)
                 )
         ));
         try
@@ -807,7 +812,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         catch (CommandException ex)
         {
             assertEquals(403, ex.getStatusCode());
-//            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
     }
 
@@ -855,9 +859,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestViewEditing() throws Exception
+    private void doTestViewEditing()
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
+        beginAt("/" + getProjectName() + "/query-executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
 
         DataRegionTable dr = new DataRegionTable("query", this);
 
@@ -888,7 +892,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestTableAudit() throws Exception
+    private void doTestTableAudit()
     {
         goToSchemaBrowser();
         pushLocation();
@@ -1051,7 +1055,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("This is a web part view in the simple test module");
 
         Boolean value = (Boolean)executeScript("return LABKEY.moduleContext.simpletest.scriptLoaded");
-        assertTrue("Module context not being loaded propertly", value);
+        assertTrue("Module context not being loaded properly", value);
     }
 
     @LogMethod
@@ -1062,54 +1066,20 @@ public class SimpleModuleTest extends BaseWebDriverTest
         new PortalHelper(this).addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
-        createPeopleListInFolder(getProjectName());
+        ListDefinition listDef = new IntListDefinition(LIST_NAME, "Key");
+        listDef.setFields(List.of(
+                new FieldDefinition("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
+                new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
+        ));
+        listDef.create(createDefaultConnection(), getProjectName());
 
         log("Importing some data...");
+        goToManageLists();
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData()
                 .setText(LIST_DATA)
                 .submit();
-
-        log("Create list in subfolder to prevent query validation failure");
-        createPeopleListInFolder(FOLDER_NAME);
-        projectMenu().navigateToFolder(getProjectName(), "subfolder");
-        log("Create list in container tab containers to prevent query validation failure");
-        createPeopleListInTab(STUDY_FOLDER_TAB_LABEL, getProjectName() + "/subfolder/Study Container Tab");
-        createPeopleListInTab(ASSAY_FOLDER_TAB_LABEL, getProjectName() + "/subfolder/Assay Container Tab 2");
-    }
-
-    private void createPeopleListInFolder(String folderName) throws Exception
-    {
-        String containerPath = folderName.equals(getProjectName()) ? getProjectName() : getProjectName() + "/" + folderName;
-        TestDataGenerator dgen = new TestDataGenerator(new FieldDefinition.LookupInfo(containerPath, "lists", LIST_NAME))
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
-                        TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
-                        TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
-                ));
-        dgen.createList(createDefaultConnection(), "Key");
-        goToManageLists();
-        _listHelper.goToList(LIST_NAME);
-    }
-
-    private void createPeopleListInTab(String tabLabel, String containerPath) throws Exception  // todo: post-20.3, change this to go through the UI
-    {
-        clickTab(tabLabel.replace(" ", ""));
-        if (!isElementPresent(Locator.linkWithText("Lists")))
-        {
-            PortalHelper portalHelper = new PortalHelper(getDriver());
-            portalHelper.addWebPart("Lists");
-        }
-
-        waitAndClickAndWait(Locator.linkWithText("manage lists"));
-        TestDataGenerator dgen = new TestDataGenerator(new FieldDefinition.LookupInfo(containerPath, "lists", LIST_NAME))
-                .withColumns(List.of(
-                        TestDataGenerator.simpleFieldDef("Name", FieldDefinition.ColumnType.String).setDescription("Name"),
-                        TestDataGenerator.simpleFieldDef("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
-                        TestDataGenerator.simpleFieldDef("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
-                ));
-        dgen.createList(createDefaultConnection(), "Key");
-        refresh();
     }
 
     @LogMethod
@@ -1195,7 +1165,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'resultImage')]"));
         click(Locator.tagWithAttributeContaining("img", "src", "minus.gif"));
         log("Verify comment based output regex substitution syntax");
-        assertElementPresent(Locator.tagWithText("a", "Text output file (click to download)"));
+        assertElementPresent(Locator.tagWithText("a", "do_render.gct"));
         log("Verify comment based input file substitution syntax");
         assertTextPresent("Adam", "Britt", "Dave");
 
@@ -1217,7 +1187,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestReportIcon()
     {
-
         log("Verify custom module report icon image");
         setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), KNITR_PEOPLE);
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
@@ -1296,16 +1265,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
 
-        Map<String,Object> row = selectResp.getRows().get(0);
-        String entityId = (String)((JSONObject)row.get("EntityId")).get("value");
-        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((JSONObject)row.get("Path")).get("value"));
+        Map<String, Object> row = selectResp.getRows().get(0);
+        String entityId = (String)((Map<String, Object>)row.get("EntityId")).get("value");
+        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((Map<String, Object>)row.get("Path")).get("value"));
 
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectCmd.setColumns(columns);
         selectCmd.setRequiredVersion(9.1);
         selectResp = selectCmd.execute(cn, getProjectName());
-        JSONObject vehicleRow = (JSONObject)(selectResp.getRows().get(0)).get("container");
+        Map<String, Object> vehicleRow = (Map<String, Object>)(selectResp.getRows().get(0)).get("container");
 
         assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
         assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
@@ -1340,7 +1309,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectCmd.setMaxRows(-1);
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
 
-        String[] expectedCols = new String[]{"ModelId", "ModelYear", "Milage", "LastService", "RowId"};
+        String[] expectedCols = new String[]{"ModelId", "ModelYear", "Milage", "LastService", "RowId", "TriggerScriptContainer"};
         assertEquals("Expected to return " + expectedCols.length + " columns, based on the saved view", expectedCols.length, selectResp.getColumnModel().size());
         for (String col : expectedCols)
         {
@@ -1430,78 +1399,79 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
         assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
         assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
-
     }
 
-    private final String subfolderPath = "/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?";
+    private final String subfolderPath = getProjectName() + "/" + FOLDER_NAME + "/project-begin.view";
 
-    private final static String GET_MODULEP_PROPS_SCRIPT = "library('Rlabkey')\n" +
-            "baseUrl = labkey.url.base\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
-            "moduleName = \"simpletest\"\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp1\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp2\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCheckbox\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestSelect\")\n" +
-            "labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCombo\")";
+    private final static String GET_MODULE_PROPS_SCRIPT = """
+            library('Rlabkey')
+            baseUrl = labkey.url.base
+            folderPath = "SimpleModuleTest Project/subfolder"
+            moduleName = "simpletest"
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp1")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp2")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCheckbox")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestSelect")
+            labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCombo")""";
 
-    private static final String SET_MODULE_PROPS_SCRIPT = "library('Rlabkey')\n" +
-            "baseUrl = labkey.url.base\n" +
-            "moduleName = \"simpletest\"\n" +
-            "\n" +
-            "## set site wide properties\n" +
-            "folderPath = \"/\"\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp1\", propValue = \"Prop1apiValue\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCheckbox\", propValue = \"false\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestSelect\", propValue = \"value2\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestCombo\", propValue = \"comboValue2\")\n" +
-            "\n" +
-            "## set folder level properties\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestProp2\", propValue = \"Prop2apiValue\")\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\", propValue = \"$$folder1value$$\")\n" +
-            "\n" +
-            "## set folder level property for another folder\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder2\"\n" +
-            "labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = \"TestTextArea\", propValue = \"$$folder2value$$\")";
+    private static final String SET_MODULE_PROPS_SCRIPT = """
+            library('Rlabkey')
+            baseUrl = labkey.url.base
+            moduleName = "simpletest"
 
+            ## set site wide properties
+            folderPath = "/"
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp1", propValue = "Prop1apiValue")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCheckbox", propValue = "false")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestSelect", propValue = "value2")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestCombo", propValue = "comboValue2")
 
-    private static final String ENSURE_RLIBPATHS_SOURCE = "library('Rlabkey')\n" +
-            "baseUrl = labkey.url.base\n" +
-            "moduleName = \"simpletest\"\n" +
-            "propName = \"TestTextArea\"\n" +
-            "\n" +
-            "labkey.ensureRLibPath <- function(append=FALSE)\n" +
-            "{\n" +
-            "  propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)\n" +
-            "  \n" +
-            "  splits <- strsplit(propValue, '\\r\\n|\\n|\\r')\n" +
-            "  paths <- splits[[1]]\n" +
-            "  \n" +
-            "  if (append == TRUE)\n" +
-            "  \t.libPaths(c(paths, .libPaths()))\n" +
-            "  else\n" +
-            "  \t.libPaths(c(paths[1], paths[2]))\n" +
-            "  \n" +
-            "  .libPaths()\n" +
-            "}\n" +
-            "     \n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"\n" +
-            "print(\"BEGIN-FIRST-CALL\")\n" +
-            "labkey.ensureRLibPath()  \n" +
-            "print(\"END-FIRST-CALL\")\n" +
-            "     \n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder2\"  \n" +
-            "print(\"BEGIN-SECOND-CALL\")\n" +
-            "labkey.ensureRLibPath()\n" +
-            "print(\"END-SECOND-CALL\")     \n" +
-            "\n" +
-            "folderPath = \"SimpleModuleTest Project/subfolder\"  \n" +
-            "print(\"BEGIN-THIRD-CALL\")\n" +
-            "labkey.ensureRLibPath(append=TRUE)\n" +
-            "print(\"END-THIRD-CALL\")\n" +
-            "  ";
+            ## set folder level properties
+            folderPath = "SimpleModuleTest Project/subfolder"
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestProp2", propValue = "Prop2apiValue")
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea", propValue = "$$folder1value$$")
+
+            ## set folder level property for another folder
+            folderPath = "SimpleModuleTest Project/subfolder2"
+            labkey.setModuleProperty(baseUrl, folderPath, moduleName, propName = "TestTextArea", propValue = "$$folder2value$$")""";
+
+    private static final String ENSURE_RLIBPATHS_SOURCE = """
+            library('Rlabkey')
+            baseUrl = labkey.url.base
+            moduleName = "simpletest"
+            propName = "TestTextArea"
+
+            labkey.ensureRLibPath <- function(append=FALSE)
+            {
+              propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)
+             \s
+              splits <- strsplit(propValue, '\\r\\n|\\n|\\r')
+              paths <- splits[[1]]
+             \s
+              if (append == TRUE)
+              \t.libPaths(c(paths, .libPaths()))
+              else
+              \t.libPaths(c(paths[1], paths[2]))
+             \s
+              .libPaths()
+            }
+                \s
+            folderPath = "SimpleModuleTest Project/subfolder"
+            print("BEGIN-FIRST-CALL")
+            labkey.ensureRLibPath() \s
+            print("END-FIRST-CALL")
+                \s
+            folderPath = "SimpleModuleTest Project/subfolder2" \s
+            print("BEGIN-SECOND-CALL")
+            labkey.ensureRLibPath()
+            print("END-SECOND-CALL")    \s
+
+            folderPath = "SimpleModuleTest Project/subfolder" \s
+            print("BEGIN-THIRD-CALL")
+            labkey.ensureRLibPath(append=TRUE)
+            print("END-THIRD-CALL")
+             \s""";
 
     @LogMethod
     @Test
@@ -1536,7 +1506,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         validateValues(propList);
 
         log("Verify get module properties using Rlabkey api");
-        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", GET_MODULEP_PROPS_SCRIPT, false);
+        String apiModulePropResults = rReportHelper.createAndRunRReport("getModuleProps", GET_MODULE_PROPS_SCRIPT, false);
         List<String> expectedProps = Arrays.asList("[1] \"Prop1Value\"\n",
                 "[1] \"FolderValue\"\n",
                 "[1] \"updated1\\nupdated2\"\n",
@@ -1593,12 +1563,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         goToProjectHome();
         assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
-
     }
 
     private String getContainerRoot(String containerPath)
     {
-        File containerRoot = new File(getLabKeyRoot(), "build/deploy/files/" + containerPath);
+        File containerRoot = getDefaultFileRoot(containerPath).getParentFile();
         return containerRoot.getPath();
     }
 
@@ -1698,7 +1667,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextNotPresent("Participant Identifier");
     }
 
-    private void editMetadata(String schemaName, String tableName, String operations, String colunmName, String value, String operator)
+    private void editMetadata(String schemaName, String tableName, String operations, String columnName, String value, String operator)
     {
         goToSchemaBrowser();
         selectQuery(schemaName, tableName);
@@ -1711,7 +1680,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         String XML_METADATA = "<tables xmlns=\"http://labkey.org/data/xml\"> \n" +
                 "  <table tableName=\"" + tableName + "\" tableDbType=\"TABLE\">\n" +
                 "    <columns>\n" +
-                "      <column columnName=\"" + colunmName + "\">\n" +
+                "      <column columnName=\"" + columnName + "\">\n" +
                 "        <datatype>varchar</datatype>\n" +
                 "        <fk> \n" +
                 "           <fkColumnName >Name</fkColumnName > \n" +
@@ -1732,29 +1701,30 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Finish");
     }
 
-    private static final String vehicleMetadataJsQuery = "function onFailure(errorInfo, options, responseObj)\n" +
-            "{\n" +
-            "    if (errorInfo && errorInfo.exception)\n" +
-            "        callback(\"Failure: \" + errorInfo.exception);\n" +
-            "    else\n" +
-            "        callback(\"Failure: \" + responseObj.statusText);\n" +
-            "}\n" +
-            "\n" +
-            "function onSuccess(data)\n" +
-            "{\n" +
-            "    if(data)\n" +
-            "        callback(data);\n" +
-            "    else\n" +
-            "        callback(\"No data returned!\");\n" +
-            "}\n" +
-            "\n" +
-            "LABKEY.Query.selectRows({\n" +
-            "            schemaName: 'vehicle',\n" +
-            "            queryName: 'Vehicles',\n" +
-            "            columns: ['Color'],\n" +
-            "            success: onSuccess,\n" +
-            "            failure: onFailure\n" +
-            "        });";
+    private static final String vehicleMetadataJsQuery = """
+            function onFailure(errorInfo, options, responseObj)
+            {
+                if (errorInfo && errorInfo.exception)
+                    callback("Failure: " + errorInfo.exception);
+                else
+                    callback("Failure: " + responseObj.statusText);
+            }
+
+            function onSuccess(data)
+            {
+                if(data)
+                    callback(data);
+                else
+                    callback("No data returned!");
+            }
+
+            LABKEY.Query.selectRows({
+                        schemaName: 'vehicle',
+                        queryName: 'Vehicles',
+                        columns: ['Color'],
+                        success: onSuccess,
+                        failure: onFailure
+                    });""";
 
     @LogMethod
     private void doTestFkLookupFilter()
@@ -1872,9 +1842,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
-
     @LogMethod
-    private void doTestRestrictedModule() throws Exception
+    private void doTestRestrictedModule()
     {
         log("Create folder with restricted");
         clickProject(getProjectName());
@@ -1883,7 +1852,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         portalHelper.addWebPart("Restricted Module Web Part");
         assertTextPresent("This is a web part view in the restricted module.");
         assertModuleEnabledByDefault(RESTRICTED_MODULE_NAME);
-        createPeopleListInFolder(RESTRICTED_FOLDER_NAME);
 
         log("folder admin without restricted permission can still see existing restricted folder, web parts");
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
@@ -1901,7 +1869,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("folder admin without restricted permission cannot import restricted folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
-        createPeopleListInFolder(NEW_FOLDER_NAME);
         navigateToFolder(getProjectName(), NEW_FOLDER_NAME);
         importFolderFromZip(RESTRICTED_FOLDER_IMPORT_NAME, false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));

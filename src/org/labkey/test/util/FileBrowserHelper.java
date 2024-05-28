@@ -43,8 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -157,7 +157,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         WebElement sortMenuLink = Locator.tagWithClass("a", "x4-menu-item-link")
                 .withDescendant(Locator.tagWithClass("span", "x4-menu-item-text").withText(sortText))
                 .waitForElement(getDriver(), 1500);
-        doAndWaitForFileListRefresh(()-> sortMenuLink.click());
+        doAndWaitForFileListRefresh(sortMenuLink::click);
 
         assertThat("Did not get expected sort for column ["+columnText+"]",
                 getSortDirection(headerLoc), is(sortDirection));
@@ -294,24 +294,28 @@ public class FileBrowserHelper extends WebDriverWrapper
     public void renameFile(String currentName, String newName)
     {
         selectFileBrowserItem(currentName);
-        clickFileBrowserButton(BrowserAction.RENAME);
-        Window renameWindow = Window(getDriver()).withTitle("Rename").waitFor();
-        setFormElement(Locator.name("renameText-inputEl").findElement(renameWindow), newName);
-        renameWindow.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.RENAME);
+            Window renameWindow = Window(getDriver()).withTitle("Rename").waitFor();
+            setFormElement(Locator.name("renameText-inputEl").findElement(renameWindow), newName);
+            renameWindow.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
         waitForElement(fileGridCell.withText(newName));
     }
 
     public void moveFile(String fileName, String destinationPath)
     {
         selectFileBrowserItem(fileName);
-        clickFileBrowserButton(BrowserAction.MOVE);
-        Window moveWindow = Window(getDriver()).withTitle("Choose Destination").waitFor();
-        //NOTE:  this doesn't yet support nested folders
-        WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
-        shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
-        sleep(500);
-        folder.click();
-        moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.MOVE);
+            Window moveWindow = Window(getDriver()).withTitle("Choose Destination").waitFor();
+            //NOTE:  this doesn't yet support nested folders
+            WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
+            shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
+            sleep(500);
+            folder.click();
+            moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
 
         waitForElementToDisappear(fileGridCell.withText(fileName));
     }
@@ -319,9 +323,11 @@ public class FileBrowserHelper extends WebDriverWrapper
     public void deleteFile(String fileName)
     {
         selectFileBrowserItem(fileName);
-        clickFileBrowserButton(BrowserAction.DELETE);
-        Window(getDriver()).withTitle("Delete Files").waitFor()
-                .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.DELETE);
+            Window(getDriver()).withTitle("Delete Files").waitFor()
+                    .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
         waitForElementToDisappear(fileGridCell.withText(fileName));
     }
 
@@ -363,35 +369,38 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public List<String> getFileList()
     {
-        return getTexts(Locators.gridRow().childTag("td").position(3).findElements(getDriver()));
+        return getFileList(true);
+    }
+
+    public List<String> getFileList(boolean hasCheckboxColumn)
+    {
+        return getTexts(Locators.gridRow().childTag("td").position(hasCheckboxColumn ? 3 : 2).findElements(getDriver()));
     }
 
     public void createFolder(String folderName)
     {
-        clickFileBrowserButton(BrowserAction.NEW_FOLDER);
-        setFormElement(Locator.name("folderName"), folderName);
-        clickButton("Submit", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        doAndWaitForFileListRefresh(() -> {
+            clickFileBrowserButton(BrowserAction.NEW_FOLDER);
+            setFormElement(Locator.name("folderName"), folderName);
+            clickButton("Submit", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        });
         waitForElement(fileGridCell.withText(folderName));
     }
 
     public void setDescription(String fileName, String description)
     {
-        Window propWindow = editProperty(fileName);
-        setFormElement(Locator.name("Flag/Comment"), description);
-        propWindow.clickButton("Save", true);
-        _ext4Helper.waitForMaskToDisappear();
+        doAndWaitForFileListRefresh(() -> {
+            Window propWindow = editProperty(fileName);
+            setFormElement(Locator.name("Flag/Comment"), description);
+            propWindow.clickButton("Save", true);
+            _ext4Helper.waitForMaskToDisappear();
+            Locators.gridRow(fileName).childTag("td").withText(description).waitForElement(getDriver(), 5_000);
+        });
     }
 
     public String getFileDescription(String fileName)
     {
-        List<String> fileList = getFileList();
-        int fileInd = fileList.indexOf(fileName);
-        if (fileInd > -1)
-        {
-            return Locators.gridRow(fileName).childTag("td").position(7).findElement(getDriver()).getText();
-        }
-
-        return null;
+        return Locators.gridRow(fileName).childTag("td").position(7).refindWhenNeeded(getDriver()).getText();
     }
 
     public Window editProperty(String fileName)
@@ -485,6 +494,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             actionRadioButton.check();
             assertTrue("Failed to select action: " + actionName, actionRadioButton.isSelected());
         }
+
         importWindow.clickButton("Import");
     }
 
@@ -569,16 +579,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         assertEquals("Description didn't clear after upload", "", getFormElement(Locator.name("description")));
     }
 
-    /**
-     *
-     * @param file
-     */
-    @Override
-    @LogMethod
-    public void dragAndDropFileInDropZone(@LoggedParam File file)
+    private void dragAndDropFileInDropZone(File file)
     {
-        waitForFileGridReady();
-
         //Offsets for the drop zone
         int offsetX = 0;
         int offsetY = 0;
@@ -615,11 +617,17 @@ public class FileBrowserHelper extends WebDriverWrapper
         selectImportDataAction(importAction);
     }
 
+    private WebElement waitForToolbar()
+    {
+        return Locator.byClass("fbrowser").append(Locator.byClass("x4-toolbar"))
+                .describedAs("File browser toolbar").waitForElement(getDriver(), 5_000);
+    }
+
     @LogMethod (quiet = true)
     public void clickFileBrowserButton(@LoggedParam BrowserAction action)
     {
         waitForFileGridReady();
-        WebElement button = action.findButton(getDriver());
+        WebElement button = action.findButton(waitForToolbar());
         if (button.isDisplayed())
         {
             waitFor(() -> !button.getAttribute("class").contains("disabled"), "Button not enabled: " + action, WAIT_FOR_JAVASCRIPT);
@@ -641,7 +649,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     public List<WebElement> findBrowserButtons()
     {
         waitForFileGridReady();
-        return Locator.css(".fbrowser > .x4-toolbar a.x4-btn[data-qtip]").findElements(getDriver());
+        return Locator.css("a.x4-btn[data-qtip]").findElements(waitForToolbar());
     }
 
     public List<BrowserAction> getAvailableBrowserActions()
@@ -684,10 +692,10 @@ public class FileBrowserHelper extends WebDriverWrapper
         ADMIN("cog", "Admin", "customize"),
         CREATE_RUN("sitemap", "Create Run", "createRun");
 
-        private String _iconName;
-        private String _buttonText;
-        private String _extId; // from Browser.js
-        private boolean _triggersPageLoad;
+        private final String _iconName;
+        private final String _buttonText;
+        private final String _extId; // from Browser.js
+        private final boolean _triggersPageLoad;
 
         BrowserAction(String iconName, String buttonText, String extId, boolean triggersPageLoad)
         {

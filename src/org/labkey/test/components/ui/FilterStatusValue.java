@@ -33,17 +33,12 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
     public String getText()
     {
-        return elementCache().textSpan().getText();
+        return elementCache().textSpan.getText();
     }
 
     private boolean isActive()
     {
         return getComponentElement().getAttribute("class").contains("is-active");
-    }
-
-    public boolean isFilter()
-    {
-        return elementCache().icon.getAttribute("class").contains("fa-filter");
     }
 
     private boolean isClose()
@@ -57,16 +52,26 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
         getWrapper().mouseOver(getComponentElement());
         getWrapper().mouseOver(elementCache().icon);
         WebDriverWrapper.waitFor(()-> isActive() && isClose(),
-                "the filter status item with text ["+getText()+"] did not become active", 500);
+                "The filter status item with text ["+getText()+"] did not become active.", 500);
         elementCache().icon.click();
 
-        // if the item you're dismissing is not the rightmost, it won't become stale; instead, its text will
+        // If the item you're dismissing is not the rightmost, it won't become stale; instead, its text will
         // be swapped out with the one to its right.  So, we check to see that either the text has changed or
-        // the item became stale.
-        WebDriverWrapper.waitFor(()->  {
-                return ExpectedConditions.stalenessOf(getComponentElement()).apply(getDriver())
-                        || !getText().equals(originalText);
-        }, "the value item ["+originalText+"] did not disappear", 1000);
+        // the item became stale. ExpectedConditions.textToBePresentInElement returns false if element is stale.
+        WebDriverWrapper.waitFor(()-> ExpectedConditions.not(
+                ExpectedConditions.textToBePresentInElement(elementCache().textSpan, originalText))
+                        .apply(getDriver())
+                , "The value item ["+originalText+"] did not disappear.", 1000);
+    }
+
+    /**
+     * A filter will be locked if it was applied by a view.
+     *
+     * @return True if the locked icon is present, false otherwise.
+     */
+    public boolean isLocked()
+    {
+        return Locator.tagWithClass("i", "fa-lock").findWhenNeeded(this).isDisplayed();
     }
 
     @Override
@@ -77,10 +82,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement textSpan()
-        {
-            return Locator.tag("span").findElement(getComponentElement());
-        }
+        public final WebElement textSpan = Locator.tag("span").refindWhenNeeded(getComponentElement());
 
         public final WebElement icon = Locator.tag("i").findWhenNeeded(getComponentElement());
     }

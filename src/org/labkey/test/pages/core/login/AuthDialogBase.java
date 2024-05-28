@@ -58,7 +58,7 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
 
     public boolean isEnabled()
     {
-        return elementCache().enableToggle.get();
+        return elementCache().enableToggle.isOn();
     }
 
     public T clickApplyExpectingError()
@@ -101,7 +101,7 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
     protected class ElementCache extends ModalDialog.ElementCache
     {
         ToggleButton enableToggle = new ToggleButton.ToggleButtonFinder(getDriver())
-            .withState("Enabled").timeout(2000).findWhenNeeded(this);
+                .timeout(2000).findWhenNeeded(this);
 
         Input descriptionInput = new Input(Locator.input("description")
                 .findWhenNeeded(this).withTimeout(2000), getDriver());

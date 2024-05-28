@@ -1,14 +1,19 @@
 package org.labkey.test.components.ui.domainproperties;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.html.ValidatingInput;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.params.FieldDefinition;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -16,6 +21,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.util.List;
 import java.util.Optional;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
@@ -33,6 +39,15 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     }
 
     protected abstract T getThis();
+
+    public T setSystemFieldVisibility(String fieldName, boolean isVisible)
+    {
+        var xpath = "//div[contains(@class, 'domain-system-fields__grid')]//td[text()='" + fieldName + "']/preceding-sibling::td//input";
+        var checkBox = Checkbox.Checkbox(Locator.xpath(xpath));
+        var enabledCheckBox = checkBox.find(getFieldsPanel());
+        enabledCheckBox.set(isVisible);
+        return getThis();
+    }
 
     public T removeField(boolean confirmDialogExpected, String fieldName)
     {
@@ -76,8 +91,13 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public T setName(String name)
     {
+        return setName(name, false);
+    }
+
+    public T setName(String name, boolean validateValue)
+    {
         expandPropertiesPanel();
-        elementCache().nameInput.set(name);
+        elementCache().nameInput.set(name, validateValue);
         return getThis();
     }
 
@@ -103,8 +123,8 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getNameExpressionPreview()
     {
         getWrapper().mouseOver(elementCache().helpTarget("Naming "));
-        waitFor(()->elementCache().toolTip.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
-        return elementCache().toolTip.getText();
+        waitFor(()->elementCache().popover.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
+        return elementCache().popover.getText();
     }
 
     public T dismissToolTip()
@@ -115,7 +135,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         // Of course this may not be true in the future.
         getWrapper().mouseOver(elementCache().learnMoreLink);
 
-        waitFor(()->!elementCache().toolTip.isDisplayed(), "The tool tip did not go away.", 1_000);
+        waitFor(()->!elementCache().popover.isDisplayed(), "The tool tip did not go away.", 1_000);
 
         return getThis();
     }
@@ -139,7 +159,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         // Protect against scenarios where the genId banner takes a moment to show up.
         waitFor(()->elementCache().genIdAlert.isDisplayed(),
-                "The GenId banner is not visible.", 1_000);
+                "The GenId banner is not visible.", 5_000);
 
         String rawText = elementCache().genIdAlert.getText().split("\n")[0];
         rawText = rawText.substring(rawText.indexOf(":")+1);
@@ -155,7 +175,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         // There is code that checks to see if the Edit genId button should be shown. Try to protect against that.
         waitFor(()->elementCache().editGenIdButton.isDisplayed(),
-                "The 'Edit GenId' is not visible.", 1_000);
+                "The 'Edit GenId' is not visible.", 5_000);
 
         elementCache().editGenIdButton.click();
         return new GenIdDialog();
@@ -180,7 +200,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         // There is code that checks to see if the Reset genId button should be shown. Try to protect against that.
         waitFor(()->elementCache().resetGenIdButton.isDisplayed(),
-                "The 'Reset GenId' is not visible.", 1_000);
+                "The 'Reset GenId' is not visible.", 5_000);
 
         elementCache().resetGenIdButton.click();
         return new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Are you sure you want to reset genId").waitFor();
@@ -230,6 +250,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().optionalWarningAlert();
     }
 
+
     /**
      * Dialog that allows the user to set the genId value.
      */
@@ -266,15 +287,105 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     }
 
+    protected int findEmptyAlias()
+    {
+        List<Input> aliases = elementCache().parentAliases();
+        int index = -1;
+        for(int i = 0; i < aliases.size(); i++)
+        {
+            if(aliases.get(i).getValue().isEmpty())
+            {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
+
+    }
+
+    public int getParentAliasIndex(String parentAlias)
+    {
+        List<Input> inputs = elementCache().parentAliases();
+        for (int i = 0; i < inputs.size(); i++)
+        {
+            if (inputs.get(i).get().equals(parentAlias))
+            {
+                return i;
+            }
+        }
+        throw new NotFoundException("No such parent alias: " + parentAlias);
+    }
+
+    public T removeParentAlias(String parentAlias)
+    {
+        expandPropertiesPanel();
+        int aliasIndex = getParentAliasIndex(parentAlias);
+        return removeParentAlias(aliasIndex);
+    }
+
+    public T removeParentAlias(int index)
+    {
+        expandPropertiesPanel();
+        elementCache().removeParentAliasIcon(index).click();
+        return getThis();
+    }
+
+    public String getParentAlias(int index)
+    {
+        expandPropertiesPanel();
+        WebDriverWrapper.waitFor(()->elementCache().parentAliases().size() > 0,
+                "There are no parent aliases visible.", 2_500);
+        return elementCache().parentAlias(index).get();
+    }
+
+    public List<String> getParentAliasOptions(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAliasSelect(index).getOptions();
+    }
+
+    protected T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    {
+        expandPropertiesPanel();
+        elementCache().parentAlias(index).setValue(alias);
+        if (optionDisplayText != null)
+        {
+            elementCache().parentAliasSelect(index).select(optionDisplayText);
+        }
+        return getThis();
+    }
+
+    public T setParentAlias(String alias, String optionDisplayText)
+    {
+        expandPropertiesPanel();
+        int index = getParentAliasIndex(alias);
+        elementCache().parentAliasSelect(index).select(optionDisplayText);
+        return getThis();
+    }
+
+    public String getParentAliasSelectText(int index)
+    {
+        expandPropertiesPanel();
+        return elementCache().parentAliasSelect(index).getSelections().get(0);
+    }
+
     protected class ElementCache extends DomainDesigner<?>.ElementCache
     {
-        protected final Input nameInput = Input.Input(Locator.id("entity-name"), getDriver()).findWhenNeeded(this);
-        protected final Input nameExpressionInput = Input.Input(Locator.id("entity-nameExpression"), getDriver()).waitFor(this);
-        protected final Input descriptionInput = Input.Input(Locator.id("entity-description"), getDriver()).findWhenNeeded(this);
+        public ElementCache()
+        {
+            // Add a little speed bump to prevent form initialization from clearing out entered values
+            WebDriverWrapper.sleep(500);
+        }
+
+        protected final ValidatingInput nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(propertiesPanel), getDriver());
+        protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(propertiesPanel), getDriver());
+        protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(propertiesPanel), getDriver());
 
         protected final Select autoLinkDataToStudy = SelectWrapper.Select(Locator.id("entity-autoLinkTargetContainerId"))
-                .findWhenNeeded(this);
-        protected final Input linkedDatasetCategory = Input.Input(Locator.id("entity-autoLinkCategory"), getDriver()).findWhenNeeded(this);
+                .findWhenNeeded(propertiesPanel);
+        protected final Input linkedDatasetCategory = new ValidatingInput(Locator.id("entity-autoLinkCategory")
+                .findWhenNeeded(propertiesPanel), getDriver());
 
         Optional<WebElement> optionalWarningAlert()
         {
@@ -289,7 +400,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         }
 
         // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.
-        public final WebElement toolTip = Locator.tagWithId("div", "tooltip").refindWhenNeeded(getDriver());
+        public final WebElement popover = Locator.byClass("popover").refindWhenNeeded(getDriver());
 
         protected final WebElement genIdAlert = Locator.tagWithClass("div", "genid-alert").refindWhenNeeded(this);
 
@@ -297,6 +408,32 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         protected final WebElement resetGenIdButton = Locator.tagWithClass("button", "reset-genid-btn").findWhenNeeded(this);
 
+        protected final ReactSelect storedAmountDisplayUnitsSelect = ReactSelect.finder(getDriver())
+                .withContainerClass("sampleset-metric-unit-select-container").timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
+
+        final Locator uniqueIdMsgLoc = Locator.tagWithClass("div", "uniqueid-msg");
+
+        public List<Input> parentAliases()
+        {
+            return Input.Input(Locator.name("alias"), getDriver()).findAll(propertiesPanel);
+        }
+
+        public Input parentAlias(int index)
+        {
+            return parentAliases().get(index);
+        }
+
+        public WebElement removeParentAliasIcon(int index)
+        {
+            return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
+        }
+
+        public ReactSelect parentAliasSelect(int index)
+        {
+            return ReactSelect.finder(getDriver())
+                    .withInputClass("import-alias--parent-select")
+                    .index(index).find(propertiesPanel);
+        }
     }
 
 }

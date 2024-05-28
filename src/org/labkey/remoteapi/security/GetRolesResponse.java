@@ -15,8 +15,7 @@
  */
 package org.labkey.remoteapi.security;
 
-import org.json.simple.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.ResponseObject;
 
@@ -28,9 +27,9 @@ public class GetRolesResponse extends CommandResponse
 {
     private List<Role> _roles;
 
-    public GetRolesResponse(String text, int statusCode, String contentType, JSONObject json, Command sourceCommand)
+    public GetRolesResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, sourceCommand);
+        super(text, statusCode, contentType, json);
     }
 
     public List<Role> getRoles()

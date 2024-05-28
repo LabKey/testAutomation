@@ -37,13 +37,17 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -174,6 +178,107 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertThat(names.get(0), startsWith("a-b.3." + batchRandomId + "."));
         assertThat(names.get(1), startsWith("a-b.2." + batchRandomId + "."));
         assertThat(names.get(2), startsWith("a-b.1." + batchRandomId + "."));
+    }
+
+    // Coverage for Issue 47504
+    /**
+     * Validate that a name expression works correctly with commas and other 'tricky' characters.
+     */
+    @Test
+    public void testWithTrickyCharacters()
+    {
+
+        goToProjectHome();
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+
+        final String sampleTypeName = "TrickyNameExprTest";
+
+        CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
+
+        createPage.setName(sampleTypeName);
+
+        String tricky01 = "S\u00f8\u03bc\u2211,String,,,";
+        String tricky02 = "NE\u222b,";
+        String tricky03 = "@-\\*-";
+        String tricky04 = "+{My'Text}=%#$"; // These curly braces cause the warning when saving.
+        String tricky05 = String.format("@\"%s", tricky01);
+        String dateFormat = "yy-MM-dd";
+        int counterStart = 500;
+
+        //Søµ∑,String,,,${NE∫,:withCounter(500)}@-\\*-${genId:number('000,000')}+{My'Text}=%#$${now:date('yy-MM-dd')}@\"Søµ∑,String,,,
+        String nameExpression = String.format("%s${%s:withCounter(%d)}%s${genId:number('000,000')}%s${now:date('%s')}%s",
+                tricky01, tricky02, counterStart, tricky03, tricky04, dateFormat, tricky05);
+
+        log(String.format("Use name expression: '%s'.", nameExpression));
+
+        createPage.setNameExpression(nameExpression);
+
+        log("Click the 'Save' button and wait for the warning dialog.");
+        Locator.button("Save").findElement(getDriver()).click();
+
+        ModalDialog dialog = null;
+
+        try
+        {
+            dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Naming Pattern Warning(s)").waitFor();
+        }
+        catch (TimeoutException toe)
+        {
+            checker().withScreenshot("No_Warning_Dialog")
+                    .error("The expected warning dialog for this name expression did not show up.");
+        }
+
+        if(null != dialog)
+        {
+            log("Verify that you can save with the warning.");
+            dialog.dismiss("Save anyways...", 2_500);
+        }
+
+        log("Validate save worked. Should be sent back to the project begin page and there should be a link with the sample type name.");
+
+        checker().fatal()
+                .verifyTrue(String.format("Did not find link with text '%s' for sample type. Fatal error.", sampleTypeName),
+                        waitFor(()->Locator.linkWithText(sampleTypeName).findWhenNeeded(getDriver()).isDisplayed(), 5_000));
+
+        log("Create some samples and validate the name(s).");
+
+        int samplesCount = 4;
+        String pasteData = """
+                Description
+                A
+                B
+                C
+                D""";
+
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        var importDataPage = dataRegion.clickImportBulkData();
+        importDataPage.setCopyPasteInsertOption(false);
+        importDataPage.selectCopyPaste()
+                .setFormat(ImportDataPage.Format.TSV)
+                .setText(pasteData)
+                .submit();
+
+        // Get the date as soon after sample creation as possible.
+        LocalDateTime ldt = LocalDateTime.now();
+        String date = DateTimeFormatter.ofPattern(dateFormat, Locale.ENGLISH).format(ldt);
+
+        var sampleTypeGrid = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("Material").waitFor();
+
+        checker().verifyEquals("Number of samples created not as expected.",
+                samplesCount, sampleTypeGrid.getDataRowCount());
+
+        // Only going to validate the name of the last sample created. It's counter and GenID values, in combination
+        // with the count of samples created, should be enough.
+        String expectedName = String.format("%s%s%d%s000,%03d%s%s%s",
+                tricky01, tricky02, counterStart + (samplesCount - 1), tricky03, samplesCount, tricky04, date, tricky05);
+        String actualName = sampleTypeGrid.getDataAsText(0, "Name");
+
+        checker().verifyEquals("Sample name not as expected.", expectedName, actualName);
+
+        checker().screenShotIfNewError("SampleCreationError");
     }
 
     @Test
@@ -345,7 +450,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      * <p>
      *     This test will:
      *     <ul>
-     *         <li>Create a derived sample using the UI and the name expression to name it.</li>
+     *         <li>Create a derived sample using the UI and the name expression that reference parent property to name it.</li>
+     *         <li>Create a derived sample using the UI and the name expression that references grandparent property to name it.</li>
+     *         <li>Create a derived sample using the bulk import and the name expression that references grandparent property to name it.</li>
      *     </ul>
      * </p>
      * @throws Exception Can be thrown by test helper.
@@ -379,8 +486,61 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.clickSave();
 
-        log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE));
-        Long sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), PARENT_SAMPLE_TYPE, Arrays.asList(PARENT_SAMPLE_01)).get(PARENT_SAMPLE_01);
+        String flagString = "Hello, I'm a derived sample.";
+        String intVal = "987";
+        String derivedSampleName = deriveSample(PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE, sampleType, flagString, intVal);
+
+        checker().verifyTrue("Name of derived sample doesn't look correct. Should contain 'Parent Sample'.",
+                derivedSampleName.contains("Parent Sample"));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
+                isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
+
+        final String ancestorNameExpression = String.format("GrandChild_${MaterialInputs/%s/..[MaterialInputs/%s]/Str}_${genId}", sampleType, PARENT_SAMPLE_TYPE);
+        log("Change the sample type name expression to support grandparent property lookup: " + ancestorNameExpression);
+        goToProjectHome();
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.goToSampleType(sampleType);
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        UpdateSampleTypePage updatePage = new UpdateSampleTypePage(getDriver());
+        updatePage.setNameExpression(ancestorNameExpression);
+        updatePage.clickSave();
+
+        String flagStringGD = "grand child sample.";
+        String intValGD = "567";
+        String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType, flagStringGD, intValGD);
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
+                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
+                isElementPresent(Locator.linkWithText(derivedSampleName)));
+
+        String flagStringBulkImport = "bulk imported grand child.";
+        log("Derive a sample using bulk import but give it no name. The name expression should be used to name the derived sample.");
+        String importData = "MaterialInputs/DerivedUI_SampleType\tStr\n" +
+                derivedSampleName + "\t" + flagStringBulkImport + "\n";
+        sampleHelper.goToSampleType(sampleType);
+        sampleHelper.getSamplesDataRegionTable()
+                .clickImportBulkData()
+                .setText(importData)
+                .submit();
+
+        waitForElement(Locator.tagWithText("td", flagStringBulkImport));
+
+        DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
+        int newSampleRowInd = table.getRowIndex("Str", flagStringBulkImport);
+        String grandImportChildSampleName = table.getDataAsText(newSampleRowInd, "Name");
+        click(Locator.tagWithText("td", grandImportChildSampleName));
+        waitForElement(Locator.tagWithText("td", flagStringBulkImport));
+
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
+                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
+                isElementPresent(Locator.linkWithText(derivedSampleName)));
+    }
+
+    private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, String strVal, String intVal) throws IOException, CommandException
+    {
+        log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", parentSampleName, parentSampleType));
+        Integer sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
 
         String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
         beginAt(url);
@@ -391,22 +551,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText("derive samples from this sample"));
 
-        selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", sampleType, getProjectName()));
+        selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", targetSampleType, getProjectName()));
         clickButton("Next");
 
-        String flagString = "Hello, I'm a derived sample.";
-        setFormElement(Locator.name("outputSample1_Int"), "987");
-        setFormElement(Locator.name("outputSample1_Str"), flagString);
+        setFormElement(Locator.name("outputSample1_Int"), intVal);
+        setFormElement(Locator.name("outputSample1_Str"), strVal);
         clickButton("Submit");
 
-        waitForElement(Locator.tagWithText("td", flagString));
+        waitForElement(Locator.tagWithText("td", strVal));
 
-        String derivedSampleName = Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
-
-        checker().verifyTrue("Name of derived sample doesn't look correct.", derivedSampleName.contains("Parent Sample"));
-
-        checker().verifyTrue("Doesn't look like there is a link to the parent sample.", isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
-
+        return Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
     }
 
     /**
@@ -619,11 +773,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         actualMsg = dialog.getBodyText();
         log("Dialog text: " + actualMsg);
 
-        checker().verifyTrue("Warning dialog does not have example name.", actualMsg.contains(nameExpression));
+        checker().verifyTrue(String.format("Warning dialog does not have example text '%s'.", nameExpression),
+                actualMsg.contains(nameExpression));
 
         expectedMsg = "The 'genId' substitution pattern starting at position 6 should be preceded by the string '${'.";
 
-        checker().verifyTrue("Warning dialog does not have expected warning message.", actualMsg.contains(expectedMsg));
+        checker().verifyTrue(String.format("Warning dialog does not have expected warning message '%s'.", expectedMsg),
+                actualMsg.contains(expectedMsg));
 
         checker().screenShotIfNewError("Warning_Dialog_Error");
 
@@ -874,8 +1030,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
 
-        log("The displayed genId should have incremented normall regardless of the minValue.");
-        checker().verifyEquals("After makin minValue smaller the value for the next genId is not as expected.",
+        log("The displayed genId should have incremented normally regardless of the minValue.");
+        checker().verifyEquals("After making minValue smaller the value for the next genId is not as expected.",
                 Integer.toString(nextGenId), updatePage.getCurrentGenId());
 
         minValue = 500;
@@ -1120,35 +1276,12 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         int badGenId = nextGenId / 2;
         idDialog.setGenId(Integer.toString(badGenId));
 
-        int serverErrorCount = getServerErrorCount();
-
-        log(String.format("Server error count before %d.", serverErrorCount));
-
         String actualMsg = idDialog.clickUpdateExpectError();
         expectedMsg = String.format("Unable to set genId to %d due to conflict with existing samples.", badGenId);
 
         checker()
                 .withScreenshot("Invalid_GenId_Warning_Error")
                 .verifyEquals("Warning in reset dialog not as expected.", expectedMsg, actualMsg);
-
-        // Don't know why but two server errors are generated.
-        checker().verifyEquals("A server error should have been generated by resetting the genId to a smaller value.",
-            serverErrorCount + 2, getServerErrorCount());
-
-        actualMsg = getServerErrors();
-
-        // The number recorded in the server error is off by one from the number shown in the UI. The API actually is
-        // sending the request with off by 1 value, just the UI on LKSM is displaying it with +1. The idea is, we want
-        // to show current as the next id to use. But in code, current is the previous.
-        expectedMsg = String.format("Unable to set genId to %d due to conflict with existing samples.", badGenId - 1);
-
-        checker().verifyTrue(String.format("Server message should contains '%s' but is doesn't look like it is there (see log for server error).", expectedMsg),
-                actualMsg.contains(expectedMsg));
-
-        // Reset the server errors so the test that follows this one does not fail.
-        resetErrors();
-
-        log("Clean up.");
 
         idDialog.dismiss("Cancel");
         updatePage.clickCancel();

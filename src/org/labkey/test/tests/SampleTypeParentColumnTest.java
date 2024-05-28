@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_COLUMN_NAME;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
@@ -134,8 +135,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
             switch(key)
             {
                 case COL_NAME_CAPTION:
-                    fields.add(new FieldDefinition(_mapCaptionToName.get(key))
-                            .setType(FieldDefinition.ColumnType.String));
+                    fields.add(new FieldDefinition(_mapCaptionToName.get(key), FieldDefinition.ColumnType.String));
                     break;
                 default:
                     // These fields are automatically created when the domain is created. Do nothing for them.
@@ -675,8 +675,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         List<FieldDefinition> fields = new ArrayList<>();
 
-        fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT)
-                .setType(FieldDefinition.ColumnType.String));
+        fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT, FieldDefinition.ColumnType.String));
 
         log("Create Sample Type - Add a parent alias column to the sample type that conflicts with a given column name.");
         CreateSampleTypePage createPage = sampleHelper.goToCreateNewSampleType()
@@ -711,7 +710,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         errors = updatePage.clickSaveExpectingErrors();
 
         String errorMsgExpectedTxt = "An existing sample type property conflicts with parent alias header: " + GOOD_PARENT_NAME;
-        Assert.assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
+        assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();
 

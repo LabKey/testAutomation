@@ -1,17 +1,16 @@
 package org.labkey.remoteapi.announcements;
 
-import org.json.simple.JSONObject;
-import org.labkey.remoteapi.Command;
+import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
 
 public class MessageThreadResponse extends CommandResponse
 {
     private final AnnouncementModel _announcementModel;
 
-    public MessageThreadResponse(String text, int statusCode, String contentType, JSONObject json, Command sourceCommand)
+    public MessageThreadResponse(String text, int statusCode, String contentType, JSONObject json)
     {
-        super(text, statusCode, contentType, json, sourceCommand);
-        _announcementModel = new AnnouncementModel((JSONObject) json.get("data"));
+        super(text, statusCode, contentType, json);
+        _announcementModel = new AnnouncementModel(json.getJSONObject("data"));
     }
 
     public AnnouncementModel getAnnouncementModel()

@@ -199,7 +199,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
 
         log("Deactivate the 2 users");
         ShowUsersPage usersPage = goToSiteUsers();
-        usersPage.getUsersTable().setFilter("Email", "Equals One Of (example usage: a;b;c)", USER1 + ";" + USER2);
+        usersPage.getUsersTable().setFilter("Email", "Equals One Of", USER1 + ";" + USER2);
         usersPage.getUsersTable().checkCheckbox(0);
         usersPage.getUsersTable().checkCheckbox(1);
         usersPage.getUsersTable().clickHeaderButton("Deactivate");
@@ -214,7 +214,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
         log("Reactivate the user");
         usersPage = goToSiteUsers();
         usersPage.includeInactiveUsers();
-        usersPage.getUsersTable().setFilter("Email", "Equals One Of (example usage: a;b;c)", USER1 + ";" + USER2);
+        usersPage.getUsersTable().setFilter("Email", "Equals One Of", USER1 + ";" + USER2);
         usersPage.getUsersTable().checkCheckbox(0);
         usersPage.getUsersTable().checkCheckbox(1);
         usersPage.getUsersTable().clickHeaderButton("Reactivate");

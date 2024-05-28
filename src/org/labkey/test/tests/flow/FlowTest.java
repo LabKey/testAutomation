@@ -318,26 +318,7 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("FlowTest Keyword Plate Name");
 
         goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
-        setFormElement(Locator.id("ff_name"), "FlowTestAnalysis");
-        clickButton("Create Analysis Script");
-
-        clickAndWait(Locator.linkWithText("Define compensation calculation from scratch"));
-        selectOptionByText(Locator.name("selectedRunId"), FCS_FILE_1);
-        clickButton("Next Step");
-
-        selectOptionByText(Locator.name("positiveKeywordName[3]"), "Comp");
-        selectOptionByText(Locator.name("positiveKeywordValue[3]"), "FITC CD4");
-        clickAndWait(Locator.tagWithAttribute("input", "value", "Submit"));
-        assertTextPresent("Missing data");
-        selectOptionByText(Locator.name("negativeKeywordName[0]"), "WELL ID");
-        selectOptionByText(Locator.name("negativeKeywordValue[0]"), "H01");
-        clickButtonWithText("Universal");
-        clickAndWait(Locator.tagWithAttribute("input", "value", "Submit"));
-        assertTextPresent("compensation calculation may be edited in a number");
-
-        goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
+        clickAndWait(Locator.linkWithText("Create Analysis script"));
         setFormElement(Locator.id("ff_name"), QUV_ANALYSIS_NAME);
         clickButton("Create Analysis Script");
         clickAndWait(Locator.linkWithText("View Source"));
@@ -529,7 +510,10 @@ public class FlowTest extends BaseFlowTest
     {
         // verify sample type and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("29 FCS files"));
+        clickAndWait(Locator.linkWithText("39 FCS files"));
+        DataRegion dr = DataRegionTable.DataRegion(getDriver()).find();
+        dr.clickHeaderMenu("Query", true, analysisName);
+
         new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
                     .withDescendant(Locator.tag("span").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).clickSubMenu(true, "Inline");
         waitForElement(Locator.css(".labkey-flow-graph"));

@@ -18,10 +18,9 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -33,7 +32,6 @@ import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -45,7 +43,7 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -100,9 +98,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         _userHelper.createUser(USER_INFO_VIEWER, true, true);
         _userHelper.createUser(IMPERSONATED_USER, true, true);
         _userHelper.createUser(CHECKED_USER, true, true);
-        setInitialPassword(ADMIN_USER, PasswordUtil.getPassword());
-        setInitialPassword(USER_INFO_VIEWER, PasswordUtil.getPassword());
-        setInitialPassword(IMPERSONATED_USER, PasswordUtil.getPassword());
+        setInitialPassword(ADMIN_USER);
+        setInitialPassword(USER_INFO_VIEWER);
+        setInitialPassword(IMPERSONATED_USER);
 
         _containerHelper.createProject(getProjectName(), null);
 
@@ -228,7 +226,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     private List<Map<String, String>> getAutoCompleteResponse(String user, String containerPath) throws IOException
     {
         Connection connection = new Connection(WebTestHelper.getBaseURL(), user, PasswordUtil.getPassword());
-        Command<CommandResponse> command = new Command<>("security", "CompleteUserRead");
+        SimpleGetCommand command = new SimpleGetCommand("security", "CompleteUserRead");
 
         try
         {
@@ -246,9 +244,9 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         // Create list
         impersonate(ADMIN_USER);
         FieldDefinition userColumn = new FieldDefinition("user",
-                new FieldDefinition.LookupInfo(getProjectName(), "core", "Users").setTableType(FieldDefinition.ColumnType.Integer));
+                new FieldDefinition.IntLookup(getProjectName(), "core", "Users"));
 
-        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
+        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, "Key", userColumn);
         goToManageLists();
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         DataRegionTable.findDataRegion(this).clickInsertNewRow();

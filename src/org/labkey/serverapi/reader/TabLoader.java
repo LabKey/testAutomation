@@ -17,8 +17,8 @@ package org.labkey.serverapi.reader;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.util.TestLogger;

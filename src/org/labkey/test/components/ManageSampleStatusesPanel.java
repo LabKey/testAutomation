@@ -1,5 +1,6 @@
 package org.labkey.test.components;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -18,6 +19,9 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 {
     private final WebDriver _driver;
     final WebElement _componentElement;
+    public static final String DEFAULT_AVAILABLE_STATUS_COLOR_HEX = "#F0F8ED";
+    public static final String DEFAULT_CONSUMED_STATUS_COLOR_HEX = "#FCF8E3";
+    public static final String DEFAULT_LOCKED_STATUS_COLOR_HEX = "#FDE6E6";
 
     public static final String PANEL_TITLE = "Manage Sample Statuses";
 
@@ -25,6 +29,8 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         public String label;
         public String description;
         public SampleTypeHelper.StatusType statusType;
+        public boolean isLocked;
+        public String color;
     }
 
     public ManageSampleStatusesPanel(WebElement element, WebDriver driver)
@@ -66,7 +72,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
                         return false;
                     }
                 },
-                "Edit part of the panel for a new status did not become active in time.", 1_000);
+                "Edit part of the panel for a new status did not become active in time.", 2_000);
     }
 
     public SampleStatus selectStatus(String name)
@@ -76,14 +82,40 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public SampleStatus selectStatus(String name, SampleTypeHelper.StatusType statusType)
     {
-        elementCache().statusItem(name, statusType).click();
+        WebElement groupItem = elementCache().statusItem(name);
+        groupItem.click();
         SampleStatus status = new SampleStatus();
 
-        waitForEditReady();
+        status.isLocked = isLocked();
+
+        if(!status.isLocked)
+        {
+            waitForEditReady();
+        }
+        else
+        {
+
+            WebDriverWrapper.waitFor(()->
+                    {
+                        try
+                        {
+                            return groupItem.getText().trim().toLowerCase()
+                                    .contains(elementCache().labelField.get().trim().toLowerCase());
+                        }
+                        catch (NoSuchElementException | StaleElementReferenceException exp)
+                        {
+                            return false;
+                        }
+                    },
+                    String.format("Edit part of the panel for a locked status did not render in time. Value in label textbox '%s' did not contain '%s'.",
+                            elementCache().labelField.get(), groupItem.getText()), 1_000);
+
+        }
 
         status.statusType = getStatusType();
         status.label = getLabel();
         status.description = getDescription();
+        status.color = getColor();
 
         return status;
     }
@@ -98,9 +130,23 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return elementCache().descriptionField.getText();
     }
 
+    public String getColor()
+    {
+        String style = elementCache().colorPickerChip.getAttribute("style");
+        // extract a value such as rgb(235, 253, 249) (trimming off the trailing semicolon)
+        return style.substring(style.indexOf("rgb("), style.length()-1);
+    }
+
     public SampleTypeHelper.StatusType getStatusType()
     {
         return SampleTypeHelper.StatusType.valueOf(elementCache().statusTypeSelect.getValue());
+    }
+
+    public boolean isLocked()
+    {
+        return Locator.tagWithClass("span", "domain-field-lock-icon")
+                .findWhenNeeded(elementCache().selectedStatusItem)
+                .isDisplayed();
     }
 
     public List<String> getStatusNames()
@@ -118,9 +164,26 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return this;
     }
 
+    public boolean isAddStatusPresent()
+    {
+        return elementCache().addStatusButton.isDisplayed();
+    }
+
     public ManageSampleStatusesPanel setLabel(String label)
     {
         elementCache().labelField.setValue(label);
+        return this;
+    }
+
+    public ManageSampleStatusesPanel setColor(String hexColor)
+    {
+        if (!StringUtils.isEmpty(hexColor))
+        {
+            elementCache().colorButton.click();
+            ColorPickerInput colorInput = new ColorPickerInput.ColorPickerInputFinder(getDriver()).findWhenNeeded();
+            colorInput.setHexValue(hexColor);
+            elementCache().colorPickerContainer.click(); // need to click outside the color picker to close it
+       }
         return this;
     }
 
@@ -146,6 +209,11 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return this;
     }
 
+    public boolean isSaveEnabled()
+    {
+        return elementCache().saveButton.isEnabled();
+    }
+
     public String clickSaveExpectError()
     {
         elementCache().saveButton.click();
@@ -153,15 +221,23 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     }
 
 
-    public ManageSampleStatusesPanel addStatus(String label, String description, SampleTypeHelper.StatusType statusType)
+    public ManageSampleStatusesPanel addStatus(String label, String description, SampleTypeHelper.StatusType statusType, String hexColor)
     {
         clickAddStatus();
 
         waitForEditReady();
 
-        setLabel(label).setDescription(description).setStatusType(statusType);
+        setLabel(label)
+                .setColor(hexColor)
+                .setDescription(description)
+                .setStatusType(statusType);
 
         elementCache().saveButton.click();
+
+        // Don't know why but on MSSQL/Windows in TC this is taking a long time to complete.
+        WebDriverWrapper.waitFor(()->elementCache().deleteButton.isDisplayed(),
+                "Delete button did not become visible after adding a status.", 5_000);
+
         return this;
     }
 
@@ -178,23 +254,25 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        WebElement statusItem(String name, SampleTypeHelper.StatusType statusType)
+        WebElement statusItem(String name)
         {
-            if (statusType == null || statusType.toString().equals(name))
-                return Locator.tagWithClass("button", "list-group-item").containing(name).findElement(getComponentElement());
-            else
-                return Locator.tagWithClass("button", "list-group-item").containing(name +  statusType).findElement(getComponentElement());
+            return Locator.tagWithClass("button", "list-group-item").containing(name).findElement(getComponentElement());
         }
 
         final Locator statusItems = Locator.tagWithClass("button", "list-group-item");
 
+        final WebElement selectedStatusItem = Locator.tagWithClass("button", "list-group-item").withClass("active")
+                .refindWhenNeeded(this);
         final WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
-                .findWhenNeeded(getComponentElement());
-        final Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).findWhenNeeded(this);
-        final WebElement descriptionField = Locator.textarea("description").findWhenNeeded(this);
-        final ReactSelect statusTypeSelect = ReactSelect.finder(getDriver()).findWhenNeeded(this);
-        final WebElement saveButton = Locator.tagWithText("button", "Save").findWhenNeeded(this);
-        final WebElement deleteButton = Locator.tagContainingText("button", "Delete").findWhenNeeded(this);
+                .refindWhenNeeded(getComponentElement());
+        final Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).refindWhenNeeded(this);
+        final WebElement colorPickerContainer = Locator.tagWithClassContaining("div", "color-picker").refindWhenNeeded(this);
+        final WebElement colorButton = Locator.tagWithClassContaining("button", "color-picker__button").refindWhenNeeded(this);
+        final WebElement descriptionField = Locator.textarea("description").refindWhenNeeded(this);
+        final WebElement colorPickerChip = Locator.tagWithClass("i", "color-picker__chip-small").refindWhenNeeded(this);
+        final ReactSelect statusTypeSelect = ReactSelect.finder(getDriver()).refindWhenNeeded(this);
+        final WebElement saveButton = Locator.tagWithText("button", "Save").refindWhenNeeded(this);
+        final WebElement deleteButton = Locator.tag("button").withChild(Locator.tagContainingText("span", "Delete")).refindWhenNeeded(this);
     }
 
     public static class ManageSampleStatusesPanelFinder extends WebDriverComponentFinder<ManageSampleStatusesPanel, ManageSampleStatusesPanelFinder>

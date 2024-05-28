@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.hamcrest.CoreMatchers;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -39,18 +39,17 @@ import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
-import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -78,7 +77,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -173,6 +171,51 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.verifyDataValues(data);
     }
 
+    // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
+    @Test
+    public void testImportSamplesWithTrailingSpace()
+    {
+        final String sampleTypeName = "SampleTypeWithProvidedName";
+        final List<FieldDefinition> fields = List.of(
+                new FieldDefinition("IntCol", FieldDefinition.ColumnType.Integer),
+                new FieldDefinition("StringCol", FieldDefinition.ColumnType.String),
+                new FieldDefinition("DateCol", FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition("BoolCol", FieldDefinition.ColumnType.Boolean));
+
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
+
+        log("Create a new sample type with no name expression");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.createSampleType(sampleTypeDefinition);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+
+        log("Add a single row to the sample type, with trailing spaces");
+        Map<String, String> fieldMap = Map.of("Name", " S-1 ", "StringCol", "Ess ", "IntCol", "1 ");
+        sampleTypeHelper.insertRow(fieldMap);
+
+        log("Verify values were saved are without trailing spaces");
+        sampleTypeHelper.verifyDataValues(Collections.singletonList(fieldMap));
+
+        log("Bulk insert into to the sample type, with trailing spaces");
+        List<Map<String, String>> data = new ArrayList<>();
+        data.add(Map.of("Name", " S-2 ", "StringCol", "Tee ", "IntCol", "2 ", "BoolCol", "true "));
+        data.add(Map.of("Name", " S-3 ", "StringCol", "Ewe ", "IntCol", "3 ", "BoolCol", "false "));
+        sampleTypeHelper.bulkImport(data);
+        assertEquals("Number of samples not as expected", 3, sampleTypeHelper.getSampleCount());
+
+        log("Verify values were saved are without trailing spaces");
+        sampleTypeHelper.verifyDataValues(data);
+
+        log("Import samples from file, with trialing spaces in Name, String, and Bool fields");
+        data = new ArrayList<>();
+        data.add(Map.of("Name", "SampleSetBVT1 ", "StringCol", "a ", "IntCol", "100 ", "BoolCol", "true "));
+        sampleTypeHelper.bulkImport(TestFileUtils.getSampleData("sampleType.xlsx"));
+
+        log("Verify values were imported are without trailing spaces");
+        sampleTypeHelper.verifyDataValues(data);
+    }
+
     @Test
     public void testMeFilterOnSampleType()
     {
@@ -211,8 +254,10 @@ public class SampleTypeTest extends BaseWebDriverTest
                 .findElement(getDriver());
         assertEquals("expect custom format for me filter",
                 "rgb(244, 78, 59)", meCell.getCssValue("background-color"));
-        assertThat("expect custom format popup for me filter",
-                meCell.getAttribute("onmouseover"), containsString("Formatting applied because column = ~me~"));
+        mouseOver(meCell);
+        WebElement helpDivBody = shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.id("helpDivBody")));
+        assertEquals("expect custom format popup for me filter",
+                helpDivBody.getText(), "Formatting applied because column = ~me~.");
         assertNotEquals("expect cell for other user not to get custom format",
                 "rgb(244, 78, 59)", notMeCell.getCssValue("background-color"));
     }
@@ -222,7 +267,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     {
         String sampleTypeName = "SimpleCreateWithExp";
         List<String> fieldNames = Arrays.asList("StringValue", "FloatValue");
-        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0)), new FieldDefinition(fieldNames.get(1), ColumnType.Decimal));
+        List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(fieldNames.get(0), ColumnType.String), new FieldDefinition(fieldNames.get(1), ColumnType.Decimal));
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
         log("Create a new sample type with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
@@ -286,7 +331,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Try to import overlapping data with TSV");
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickImportBulkData();
+        ImportDataPage importDataPage = drt.clickImportBulkData();
         String header = "Name\t" + fieldNames.get(0) + "\n";
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
@@ -294,7 +339,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Submit", "duplicate key");
 
         log("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 1);
+        importDataPage.setCopyPasteMerge(true);
         clickButton("Submit");
 
         log("Validate data was updated and new data added");
@@ -313,7 +358,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("Try to import overlapping data from file");
         final File sampleData = TestFileUtils.getSampleData("simpleSampleType.xls");
-        final ImportDataPage importDataPage = drt.clickImportBulkData();
+        importDataPage = drt.clickImportBulkData();
         importDataPage.setFile(sampleData);
         final String errorText = importDataPage.submitExpectingError();
         Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.contains("duplicate key"));
@@ -321,7 +366,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         // Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.length() < 100);
 
         log ("Switch to 'Insert and Replace'");
-        sampleHelper.selectImportOption(SampleTypeHelper.MERGE_DATA_LABEL, 0);
+        importDataPage.setFileMerge(true);
         importDataPage
                 .setFile(sampleData)
                 .submit();
@@ -1002,12 +1047,10 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         List<FieldDefinition> fields = new ArrayList<>();
-        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME)
-                .setType(ColumnType.String)
+        fields.add(new FieldDefinition(REQUIRED_FIELD_NAME, ColumnType.String)
                 .setMvEnabled(false)
                 .setRequired(true));
-        fields.add(new FieldDefinition(MISSING_FIELD_NAME)
-                .setType(ColumnType.String)
+        fields.add(new FieldDefinition(MISSING_FIELD_NAME, ColumnType.String)
                 .setMvEnabled(true)
                 .setRequired(false));
         SampleTypeDefinition def = new SampleTypeDefinition(SAMPLE_TYPE_NAME).setFields(fields);
@@ -1124,7 +1167,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_DATA_LABEL);
+        sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_OPTION);
 
         try
         {
@@ -1260,22 +1303,23 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Verify error message for reserved field names");
         domainFormPanel.manuallyDefineFields("created");
         checker().verifyEquals("Sample Type reserved field name error",
-                Arrays.asList("Property name 'created' is a reserved name."),
+                Arrays.asList("'created' is a reserved field name in 'ReservedFieldNameValidation'.",
+                        "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         domainFormPanel.manuallyDefineFields("rowid");
         checker().verifyEquals("Sample Type reserved field name error",
-                Arrays.asList("Property name 'rowid' is a reserved name."),
+                Arrays.asList("'rowid' is a reserved field name in 'ReservedFieldNameValidation'.",
+                        "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
         log("Verify error message for a few other special field names");
         domainFormPanel.manuallyDefineFields("name");
         checker().verifyEquals("Sample Type 'name' field name error",
-                Arrays.asList(
-                "The field name 'Name' is already taken. Please provide a unique name for each field.",
-                "Please correct errors in Fields before saving."),
+                Arrays.asList("The field name 'Name' is already taken. Please provide a unique name for each field.",
+                        "Please correct errors in Fields before saving."),
                 createPage.clickSaveExpectingErrors());
         domainFormPanel.removeAllFields(false);
 
@@ -1284,7 +1328,6 @@ public class SampleTypeTest extends BaseWebDriverTest
         checker().verifyEquals("Sample Type SampleId field name error",
                 Arrays.asList("The SampleID field name is reserved for imported or generated sample ids."),
                 createPage.clickSaveExpectingErrors());
-        domainFormPanel.removeAllFields(false);
     }
 
     @Test
@@ -1292,7 +1335,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     {
         final String expectedInfoMsg = BaseDomainDesigner.RESERVED_FIELDS_WARNING_PREFIX +
                 "These fields are already used by LabKey to support this sample type: " +
-                "Name, Created, createdBy, Modified, modifiedBy, container, created, createdby, modified, modifiedBy, Container, SampleId, SampleID.";
+                "Name, Created, createdBy, Modified, modifiedBy, container, SampleId, created, createdby, modified, modifiedBy, Container, SampleID.";
 
         List<String> lines = new ArrayList<>();
         lines.add("Name,TextField1,DecField1,DateField1,Created,createdBy,Modified,modifiedBy,container,SampleId,created,createdby,modified,modifiedBy,Container,SampleID");
@@ -1385,9 +1428,12 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         Set<String> expectedHeaders = new HashSet<>();
         expectedHeaders.add("Name");
+        expectedHeaders.add("Expiration Date");
         expectedHeaders.add("Flag");
         expectedHeaders.add("Other Prop");
         expectedHeaders.add("File Attachment");
+        expectedHeaders.add("Amount");
+        expectedHeaders.add("Units");
 
         setFileAttachment(0, experimentFilePath);
         setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
@@ -1418,25 +1464,31 @@ public class SampleTypeTest extends BaseWebDriverTest
     public void testCreateViaScript()
     {
         String sampleTypeName = "Created_by_Script";
-        String createScript = "LABKEY.Domain.create({\n" +
-                "  domainKind: \"SampleSet\",\n" +
-                "  domainDesign: {\n" +
-                "    name: \"" + sampleTypeName +"\",\n" +
-                "    fields: [{\n" +
-                "       name: \"name\", rangeURI: \"string\"\n" +
-                "    },{\n" +
-                "       name: \"intField\", rangeURI: \"int\"\n" +
-                "    },{\n" +
-                "       name: \"strField\", rangeURI: \"string\"\n" +
-                "    }]\n" +
-                "  }\n" +
-                "});";
+        String createScript = String.format("""
+                LABKEY.Domain.create({
+                  domainKind: "SampleSet",
+                  domainDesign: {
+                    name: "%s",
+                    fields: [{
+                       name: "name", rangeURI: "string"
+                    },{
+                       name: "intField", rangeURI: "int"
+                    },{
+                       name: "strField", rangeURI: "string"
+                    }]
+                  },
+                  success: callback,
+                  failure: callback
+                });
+                """, sampleTypeName);
 
         log("Go to project home.");
         goToProjectHome();
 
         log("Create a Sample Type using script.");
-        executeScript(createScript);
+        Map<String, Object> response = executeAsyncScript(createScript, Map.class);
+        Assertions.assertThat(response).as("'LABKEY.Domain.create' response")
+                .containsEntry("success", true);
 
         List<String> sampleNames = Arrays.asList("P-1", "P-2", "P-3", "P-4", "P-5");
         List<Map<String, String>> sampleData = new ArrayList<>();
@@ -1457,6 +1509,69 @@ public class SampleTypeTest extends BaseWebDriverTest
                 sampleNames.size(),
                 sampleHelper.getSampleCount());
 
+    }
+
+    @Test
+    public void testFieldUniqueConstraint()
+    {
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        String sampleTypeName = "Unique Constraint Test";
+
+        clickProject(PROJECT_NAME);
+        CreateSampleTypePage createPage = sampleHelper
+                .goToCreateNewSampleType()
+                .setName(sampleTypeName);
+
+        log("Add a field with a unique constraint");
+        String fieldName1 = "field Name1";
+        DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
+        domainFormPanel.manuallyDefineFields(fieldName1)
+                .setType(ColumnType.Integer)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field with a unique constraint");
+        String fieldName2 = "fieldName_2";
+        domainFormPanel.addField(fieldName2)
+                .setType(ColumnType.DateAndTime)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+        log("Add another field which does not have a unique constraint");
+        String fieldName3 = "FieldName@3";
+        domainFormPanel.addField(fieldName3)
+                .setType(ColumnType.Boolean);
+        createPage.clickSave();
+
+        viewRawTableMetadata(sampleTypeName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+
+        log("Remove a field unique constraint and add a new one");
+        goToProjectHome();
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+        domainFormPanel = updatePage.getFieldsPanel();
+        domainFormPanel.getField(fieldName2)
+                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .apply();
+        domainFormPanel.getField(fieldName3)
+                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .apply();
+        updatePage.clickSave();
+        viewRawTableMetadata(sampleTypeName);
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_test_fieldname_2");
+    }
+
+    private void viewRawTableMetadata(String sampleTypeName)
+    {
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "samples", "query.queryName", sampleTypeName)));
+    }
+
+    private void verifyTableIndices(String prefix, List<String> indexSuffixes)
+    {
+        List<String> suffixes  = new ArrayList<>();
+        suffixes.add("lsid");
+        suffixes.add("name");
+        suffixes.addAll(indexSuffixes);
+
+        for (String suffix : suffixes)
+            assertTextPresentCaseInsensitive(prefix + suffix);
     }
 
     private void setFileAttachment(int index, File attachment)

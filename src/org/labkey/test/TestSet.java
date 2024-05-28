@@ -17,17 +17,19 @@
 package org.labkey.test;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.util.Order;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class TestSet
 {
-    private String _suite;
+    private final String _suite;
     private List<Class<?>> _tests;
 
     TestSet(@NotNull Set<Class<?>> tests, @NotNull String suite)
@@ -88,6 +90,18 @@ public class TestSet
     public List<Class<?>> getTestList()
     {
         return _tests;
+    }
+
+    public List<Class<?>> getSortedTestList()
+    {
+        List<Class<?>> sortedTests = new ArrayList<>(_tests);
+        Comparator<Class<?>> comparator = Comparator.comparingDouble(c -> {
+            Order annotation = c.getAnnotation(Order.class);
+            return annotation == null ? 0.0 : annotation.value();
+        });
+        comparator = comparator.thenComparingInt(c -> _tests.indexOf(c)); // Retain order of un-annotated tests
+        sortedTests.sort(comparator);
+        return sortedTests;
     }
 
     public List<String> getTestNames()

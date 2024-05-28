@@ -263,7 +263,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         insertJobIntoSubFolder(SUB_FOLDER_B);
 
         log("** Viewing pipeline status from project container. Sort by Description (report name) and include sub-folders");
-        beginAt("/pipeline-status/" + getProjectName() + "/showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
+        beginAt("/" + getProjectName() + "/pipeline-status-showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(0), "href");
@@ -665,7 +665,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         insertCmd.addRow(rowMap);
         SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
         Map<String, Object> row = response.getRows().get(0);
-        Long rowId = (Long)row.get("RowId");
+        Integer rowId = (Integer)row.get("RowId");
         return rowId.toString();
     }
 
@@ -767,8 +767,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
 
         Map<String, Object> row = response.getRows().get(0);
-        Long rowId = (Long)row.get("RowId");
-        return rowId.intValue();
+        return (Integer)row.get("RowId");
     }
 
     @Override

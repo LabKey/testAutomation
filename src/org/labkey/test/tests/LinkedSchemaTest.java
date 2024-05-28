@@ -15,8 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -29,17 +27,17 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.QueryMetadataEditorPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.list.GridPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -493,62 +491,68 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @Test
-    public void verifyLinkedSchemaWithLookup()
+    public void verifyLinkedSchemaWithLookup() throws Exception
     {
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+
         // This test validates the fixes for issues 32454 & 32456
         log("Create a list in the study folder.");
-        _listHelper.createList(getProjectName() + "/" + STUDY_FOLDER, STUDY_LIST_NAME,
-                ListHelper.ListColumnType.String, "GlobalPid",
-                new ListHelper.ListColumn("Study", "Study", ListHelper.ListColumnType.String, "Study"));
-        _listHelper.goToList(STUDY_LIST_NAME);
-        _listHelper.clickImportData()
+        new VarListDefinition(STUDY_LIST_NAME).setFields(List.of(
+                new FieldDefinition("GlobalPid", FieldDefinition.ColumnType.String),
+                new FieldDefinition("Study", FieldDefinition.ColumnType.String).setDescription("Study"))
+        ).create(createDefaultConnection(), sourceContainerPath);
+
+        GridPage.beginAt(this, sourceContainerPath, STUDY_LIST_NAME).getGrid()
+                .clickImportBulkData()
                 .setText(STUDY_LIST_DATA)
                 .submit();
 
         log("Create the linked schema to the study.");
-        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
         _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, "study", "Demographics", STUDY_FILTER_METADATA);
 
         log("Validate that with no filter all of the participants are visible in the linked schema.");
         checkLinkedSchema(STUDY_FILTER_METADATA, null, 6);
 
         log("Apply the filter. This should limit the user to those in 'StudyA'.");
-        String updatedMetaData = STUDY_FILTER_METADATA.replace("<!-- ", "").replace(" -->", "");
-        checkLinkedSchema(updatedMetaData, "StudyA", 2);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyA"), "StudyA", 2);
 
         log("Replace the study name with a different value (should limit the number of participants returned).");
-        updatedMetaData = updatedMetaData.replace("StudyA", "StudyB");
-        checkLinkedSchema(updatedMetaData, "StudyB", 1);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyB"), "StudyB", 1);
 
         log("Replace the study name with one that is not there, no participants should be returned.");
-        updatedMetaData = updatedMetaData.replace("StudyB", "StudyC");
-        checkLinkedSchema(updatedMetaData, "StudyC", 0);
+        checkLinkedSchema(buildStudyFilterMetadata("StudyC"), "StudyC", 0);
 
-        log("Now validate that a wrapped field gives the expected error.");
+        log("Now validate wrapped field filter unwrapped field.");
         goToProjectHome();
         navigateToFolder(getProjectName(), STUDY_FOLDER);
         wrapField("study", "Demographics","Participant ID", "Pid2Consent");
 
-        log("Update the filter to use the wrapped field. Because the field is only wrapped and there is no foreign key it should error.");
-        updatedMetaData = updatedMetaData.replace("ParticipantId/Study", "Pid2Consent/Study");
-        _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
+        log("Filter on wrapped field without fk override");
+        checkLinkedSchema(buildStudyFilterMetadata("Demo Study", "Pid2Consent/Study/Label"), null, 6);
 
-        beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-begin.view?schemaName=CommonData&queryName=Demographics");
-        final WebElement error = Locator.tagWithClass("div", "lk-qd-error").waitForElement(shortWait());
-        MatcherAssert.assertThat("Schema browser error.", error.getText(),
-                CoreMatchers.containsString("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map."));
-
-        beginAt("/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/query-executeQuery.view?schemaName=CommonData&queryName=Demographics");
-        assertTextPresent("Error creating linked schema table 'Demographics': Column Pid2Consent.Study not found in column map.");
+        log("Add FK to the wrapped field and filter on it.");
+        checkLinkedSchema(buildStudyFilterMetadata("StudyA").replace("ParticipantId", "Pid2Consent"), null, 2);
 
         log("Looks good, going home.");
         goToProjectHome();
     }
 
+    private String buildStudyFilterMetadata(String study, String lookupColumn)
+    {
+        return buildStudyFilterMetadata(study).replace("ParticipantId/Study", lookupColumn);
+    }
+
+    private String buildStudyFilterMetadata(String study)
+    {
+        return STUDY_FILTER_METADATA
+                .replace("<!-- ", "").replace(" -->", "")
+                .replace("StudyA", study);
+    }
+
     private void checkLinkedSchema(String updatedMetaData, String studyName, int expectedUsersCount)
     {
         String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
-        _schemaHelper.updateLinkedSchema(getProjectName(), TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
+        _schemaHelper.updateLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, STUDY_SCHEMA_NAME, sourceContainerPath, null, null, null, updatedMetaData);
 
         navigateToQuery("CommonData", "Demographics");
         DataRegionTable table = new DataRegionTable("query", this);
@@ -574,8 +578,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         navigateToMetadataQuery(schema, query);
         QueryMetadataEditorPage queryMetadataEditorPage = new QueryMetadataEditorPage(getDriver());
-        queryMetadataEditorPage.aliasField().selectAliasField(fieldToWrap).clickApply();
-        queryMetadataEditorPage.getFieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
+        queryMetadataEditorPage.clickAliasField().selectAliasField(fieldToWrap).clickApply();
+        queryMetadataEditorPage.fieldsPanel().getField("WrappedParticipantId").setName(aliasFieldName);
         queryMetadataEditorPage.clickSave();
     }
 
@@ -846,7 +850,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
-        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 38, table.getDataRowCount());
+        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 33, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)

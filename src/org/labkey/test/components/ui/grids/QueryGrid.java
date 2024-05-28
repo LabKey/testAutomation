@@ -9,16 +9,23 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.react.QueryChartPanel;
+import org.labkey.test.components.react.QueryChartDialog;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
+import org.labkey.test.util.selenium.WebDriverUtils;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -31,8 +38,8 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
  */
 public class QueryGrid extends ResponsiveGrid<QueryGrid>
 {
-    final private WebDriver _driver;
-    final private WebElement _queryGridPanel;
+    private final WebDriver _driver;
+    private final WebElement _queryGridPanel;
 
     private QueryGrid(WebElement element, WebDriver driver)
     {
@@ -127,15 +134,69 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public List<FilterStatusValue> getFilterStatusValues()
     {
-        return getFilterStatusValues(false);
+        return elementCache().getFilterStatusFilterValues();
     }
 
-    public List<FilterStatusValue> getFilterStatusValues(boolean includeView)
+    /**
+     * Get the text of the filter(s).
+     *
+     * @return List of text filters.
+     */
+    public List<String> getFilterStatusValuesText()
     {
-        if (includeView)
-            return elementCache().getAllFilterStatusValues();
-        else
-            return elementCache().getFilterStatusFilterValues();
+        return getFilterStatusValues()
+                .stream().map(FilterStatusValue::getText)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a map of the filters. Use the filter text as the key, the filter element will be the value.
+     * It is possible, but rare, to have two or more filters with the exact same text. For example columns labels could
+     * be changed to be identical (and the same filter is applied). If that happens any filters after the first one will
+     * have a sequential number attached to their key value.
+     *
+     * @return Map of filters. Filter text is key.
+     */
+    public Map<String, FilterStatusValue> getMapOfFilterStatusValues()
+    {
+        Map<String, FilterStatusValue> filterMap = new HashMap<>();
+        Map<String, Integer> filterCount = new HashMap<>();
+
+        List<FilterStatusValue> filters = getFilterStatusValues();
+
+        for(FilterStatusValue fsv : filters)
+        {
+            String filterText = fsv.getText();
+
+            // Check if this filter text has already been saved. If it has, avoid a duplicate key error by adding a
+            // number to key value for the next entry.
+            if(filterCount.containsKey(filterText))
+            {
+                int count = filterCount.get(filterText) + 1;
+                filterText = String.format("%s_%d", filterText, count);
+                filterCount.replace(filterText, count);
+            }
+            else
+            {
+                filterCount.put(filterText, 1);
+            }
+
+            filterMap.put(filterText, fsv);
+        }
+
+        return filterMap;
+    }
+
+    /**
+     * Find a filter by the text displayed and remove it. Will wait for the grid to refresh before returning.
+     *
+     * @param filterText The text of the filter to remove.
+     * @return This grid.
+     */
+    public QueryGrid removeFilter(String filterText)
+    {
+        doAndWaitForUpdate(()->getMapOfFilterStatusValues().get(filterText).remove());
+        return this;
     }
 
     // record count
@@ -193,7 +254,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         String currentSearchExp = getGridBar().getSearchExpression();
         if (!currentSearchExp.isBlank())
-            doAndWaitForUpdate(()-> getGridBar().clearSearch());
+            getGridBar().clearSearch();
 
         return this;
     }
@@ -235,26 +296,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public QueryGrid selectAllRows()
     {
-        if (isGridPanel())
+        WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(elementCache());
+        if (selectAllBtn.isDisplayed())
         {
-            WebElement selectAllBtn = elementCache().selectAllBtnLoc.findWhenNeeded(elementCache());
-            if (selectAllBtn.isDisplayed())
-            {
-                doAndWaitForUpdate(selectAllBtn::click);
-            }
-            else
-            {
-                ReactCheckBox selectAll = selectAllBox();
-                if (selectAll.isIndeterminate() || !selectAll.isChecked())
-                {
-                    doAndWaitForUpdate(() -> selectAllOnPage(true, null));
-                }
-            }
+            doAndWaitForUpdate(selectAllBtn::click);
         }
         else
         {
-            doAndWaitForUpdate(() ->
-                    getGridBar().selectAllRows());
+            ReactCheckBox selectAll = selectAllBox();
+            if (selectAll.isIndeterminate() || !selectAll.isChecked())
+            {
+                doAndWaitForUpdate(() -> selectAllOnPage(true, null));
+            }
         }
 
         return this;
@@ -266,53 +319,420 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     public String getSelectionStatusCount()
-    {   // note: this element is only present when some number of rows in the set are selected
-        WebElement selectionStatus = Locator.tagWithClass("span", "selection-status__count")
-                .waitForElement(this, 4000);
-        return selectionStatus.getText();
+    {
+        // note: this element is only present when some number of rows in the set are selected
+        Optional<WebElement> selectionStatus = Locator.tagWithClass("span", "selection-status__count")
+                .findOptionalElement(this);
+        return selectionStatus.map(WebElement::getText).orElse(null);
     }
 
     public QueryGrid clearAllSelections()
     {
         if(hasItemsSelected())
         {
-            if (isGridPanel())
+            WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(elementCache());
+            if (clearBtn.isDisplayed())
             {
-                WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(elementCache());
-                if (clearBtn.isDisplayed())
-                {
-                    doAndWaitForUpdate(clearBtn::click);
-                }
-                else
-                {
-                    doAndWaitForUpdate(() -> selectAllOnPage(false));
-                }
+                doAndWaitForUpdate(clearBtn::click);
             }
             else
             {
-                doAndWaitForUpdate(() ->
-                        getGridBar().clearAllSelections());
+                doAndWaitForUpdate(() -> selectAllOnPage(false));
             }
         }
 
         return this;
     }
 
-
-    // select view
-    public QueryGrid selectView(String viewName)
+    /**
+     * Selects a range of rows in the current view.
+     * If the range is within a range of already-selected rows, will deselect the specified range
+     * @param start the starting index (0-based), of non-header rows with checkboxes
+     * @param end the ending index
+     * @return  the current instance
+     */
+    public QueryGrid shiftSelectRange(int start, int end)
     {
-        doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
+        var checkBoxes = Locator.tagWithClass("input", "grid-panel__row-checkbox").findElements(this);
+        getWrapper().scrollIntoView(checkBoxes.get(0), true); // scroll the top row to the top
+        new Actions(getDriver())
+                .click(checkBoxes.get(start))
+                .keyDown(Keys.SHIFT)
+                .click(checkBoxes.get(end))
+                .keyUp(Keys.SHIFT)
+                .perform();
         return this;
     }
 
     /**
-     * possible this is either a GridPanel, or a QueryGridPanel (QGP is to be deprecated).
-     * use this to test which one so we can fork behavior until QGP is gone
+     * Select a view from the 'Views' menu.
+     *
+     * @param viewName Name of the view to select.
+     * @return This grid.
      */
-    private boolean isGridPanel()
+    public QueryGrid selectView(String viewName)
     {
-        return elementCache().selectionStatusContainerLoc.existsIn(elementCache());
+        String currentView = getViewName();
+
+        // Clicking the view already shown will not cause a refresh of the grid.
+        if(!currentView.equalsIgnoreCase(viewName))
+            doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
+
+        return this;
+    }
+
+    public List<String> getViewMenuText()
+    {
+        BootstrapMenu menu = elementCache().viewMenu;
+        menu.expand();
+        return menu.findVisibleMenuItems().stream().map(WebElement::getText)
+                .toList();
+    }
+
+    /**
+     * Customize the view. Use the 'Customize Grid VIew' menu option.
+     *
+     * @return A {@link CustomizeGridViewDialog}.
+     */
+    public CustomizeGridViewDialog customizeView()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Customize Grid View");
+        return new CustomizeGridViewDialog(getDriver(), this);
+    }
+
+    public QueryGrid saveViewViaButton()
+    {
+        elementCache().saveViewButton.click();
+        return this;
+    }
+
+    /**
+     * Save the grid view. Use the 'Save Grid View' menu option which will always show the save dialog.
+     *
+     * @return A {@link SaveViewDialog}.
+     */
+    public SaveViewDialog saveView()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
+        return new SaveViewDialog(getDriver(), this);
+    }
+
+    /**
+     * Use the grid menu to save a view with the given name. View will not be default or
+     * shared with sub folders.
+     *
+     * @param viewName The name to save the view as.
+     */
+    public void saveView(String viewName)
+    {
+        saveView(viewName, false, false);
+    }
+
+    /**
+     * Use the grid menu to save a view with the given name. View will not be default. It may be
+     * shared with sub folders and may be shared with all users.
+     *
+     * @param viewName      The name to save the view as.
+     * @param makeAvailable Make the view available to sub folders.
+     * @param makeShared    Make the view shared with all users
+     */
+    public void saveView(String viewName, boolean makeAvailable, boolean makeShared)
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
+        SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
+        dialog.setMakeCustom()
+                .setViewName(viewName);
+
+        if(makeAvailable)
+        {
+            Assert.assertTrue("The option to make view available to sub folders is not present on the dialog.",
+                    dialog.isMakeAvailableVisible());
+
+            dialog.setMakeAvailable(true);
+        }
+        else
+        {
+            // If setting 'Make available' to false no need to assert control is present. If the option isn't present
+            // the view will not be visible to sub folders by default.
+            if(dialog.isMakeAvailableVisible())
+                dialog.setMakeAvailable(false);
+        }
+
+        if (makeShared)
+        {
+            Assert.assertTrue("The option to make the view shared is not present on the dialog.", dialog.isMakeSharedVisible());
+            dialog.setMakeShared(true);
+        }
+        else
+        {
+            if (dialog.isMakeSharedVisible())
+                dialog.setMakeShared(false);
+        }
+
+        dialog.saveView();
+    }
+
+    /**
+     * Save the view as the default view. Do not make default view available to sub-folders.
+     */
+    public void saveViewAsDefault()
+    {
+        saveViewAsDefault(false);
+    }
+
+    /**
+     * Save the view as the default. Can be made available to sub folders.
+     *
+     * @param makeAvailable If true will be default view in sub folders, if false will not be.
+     */
+    public void saveViewAsDefault(boolean makeAvailable)
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Save Grid View");
+        SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
+        dialog.setMakeDefault();
+
+        if(makeAvailable)
+        {
+            Assert.assertTrue("The option to make view available to sub folders is not present on the dialog.",
+                    dialog.isMakeAvailableVisible());
+
+            dialog.setMakeAvailable(true);
+        }
+        else
+        {
+            // If setting 'Make available' to false no need to assert control is present. If the option isn't present
+            // the view will not be visible to sub folders by default.
+            if(dialog.isMakeAvailableVisible())
+                dialog.setMakeAvailable(false);
+        }
+
+        dialog.saveView();
+    }
+
+    /**
+     * Open a {@link ManageViewsDialog}. Use the 'Manage Saved Views' menu option.
+     *
+     * @return A {@link ManageViewsDialog}.
+     */
+    public ManageViewsDialog manageViews()
+    {
+        elementCache().viewMenu.clickSubMenu(false, "Manage Saved Views");
+        return new ManageViewsDialog(getDriver());
+    }
+
+    /**
+     * If there are no saved views and the default view has not been changed the Manage Saved Views menu item will not be enabled.
+     *
+     * @return True if 'Manage Saved Views' menu item is enabled, false otherwise.
+     */
+    public boolean isManageViewsEnabled()
+    {
+        List<WebElement> menuItems = elementCache().viewMenu.findVisibleMenuItemsWithClass("disabled");
+        for(WebElement menuItem : menuItems)
+        {
+            // Why does menuItem.getText() return an empty string here?
+            if(menuItem.getAttribute("text").contains("Manage Saved Views"))
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the Edit Status text shown in the header. If no status is shown an empty string is returned.
+     *
+     * @return The edit status text.
+     */
+    public String getEditAlertText()
+    {
+
+        // Not sure how reliable this will be. It is possible that the automation can cause two statuses to show up, the
+        // 'EDITED' status and the 'SAVED' status can be there at the same time. May need to add a check in the save button
+        // and save menu code.
+        // If two alerts are show, this will grab the first which may disappear after it's display status is checked but
+        // before the text is gathered.
+        // The 'SAVED' status will fade away slowly (by design). It is possible, but less likely, that it will disappear after
+        // the call to isDisplayed but before the getText.
+        WebElement editAlert = Locator.tagWithClass("span", "view-edit-alert").findWhenNeeded(elementCache().panelHeader());
+
+        if(editAlert.isDisplayed())
+            return editAlert.getText();
+        else
+            return "";
+
+    }
+
+    /**
+     * Get the name of the current view. The name is in the panel header. If there is no panel header then the view is
+     * the default view and an empty string is returned.
+     *
+     * @return The name of the grid view from the header. Empty string if no header (default view).
+     */
+    public String getViewName()
+    {
+        String viewName;
+
+        // Unfortunately the view name in the header is not in a separate element. Getting the text from the panel header
+        // will result in the edit alert text and button text being included.
+        // There is a possible issue if the alert text is 'UPDATED'. This text will fade out and may return a -1 when
+        // calling headerText.indexOf(alertText). Trying to minimize that by first getting the alert text then the header text.
+        //
+        // If this proves to be unreliable it might be easier/safer to return the panel header text and let the test do
+        // a .contains() on it to see if it has the expected header.
+        WebElement panelHeader = elementCache().panelHeader();
+        if(panelHeader.isDisplayed())
+        {
+            // The view name in the header is not in a separate element.
+            viewName = WebDriverUtils.getTextNodeWithin(panelHeader);
+        }
+        else
+        {
+            viewName = "";
+        }
+
+        return viewName.trim();
+    }
+
+    /**
+     * Click the Undo button in the header. Will wait for the grid to update.
+     *
+     * @return This grid.
+     */
+    public QueryGrid clickUndoButton()
+    {
+        WebElement undoButton = Locator.buttonContainingText("Undo").findElement(elementCache().panelHeader());
+
+        // Wait for the grid to update.
+        doAndWaitForUpdate(undoButton::click);
+
+        return this;
+    }
+
+    /**
+     * Is the 'Undo' button visible on the grid.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isUndoButtonVisible()
+    {
+        return Locator.buttonContainingText("Undo").findWhenNeeded(elementCache().panelHeader()).isDisplayed();
+    }
+
+    /**
+     * Click the Save (View) button in the grid header. If the grid is showing the default view clicking save will show
+     * a {@link SaveViewDialog}, otherwise clicking save will save the changes to the view currently applied to the grid.
+     *
+     * @param expectSaveDialog Indicate if a 'Save View' dialog is expected. Should only happen if you are saving the default view.
+     * @return A {@link SaveViewDialog} or null if a saved dialog is not expected.
+     */
+    public SaveViewDialog clickSaveButton(boolean expectSaveDialog)
+    {
+        WebElement saveButton = Locator.buttonContainingText("Save").findElement(elementCache().panelHeader());
+        saveButton.click();
+
+        if(expectSaveDialog)
+        {
+            return new SaveViewDialog(getDriver(), this);
+        }
+        else
+        {
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(saveButton));
+            return null;
+        }
+    }
+
+    /**
+     * Click the 'Save as...' drop down button menu option to change the view name. The 'Save as...' option will not be
+     * visible if the default view is being changed.
+     *
+     * @return A {@link SaveViewDialog}
+     */
+    public SaveViewDialog clickSaveAsButton()
+    {
+        BootstrapMenu bootstrapMenu = new BootstrapMenu(getDriver(), elementCache().panelHeader());
+        bootstrapMenu.clickSubMenu(false, "Save as...");
+
+        return new SaveViewDialog(getDriver(), this);
+    }
+
+    /**
+     * Is the 'Save' button visible on the grid.
+     *
+     * @return True if visible, false otherwise.
+     */
+    public boolean isSaveButtonVisible()
+    {
+        return Locator.buttonContainingText("Save").isDisplayed(elementCache().panelHeader());
+    }
+
+    /**
+     * This will clear any selections, filters and search terms currently applied to the grid, and then apply the default
+     * view. If revertDefaultView is true it will revert the default view before applying it.
+     *
+     * @param revertDefaultView If true will revert the default view, if false will apply the default view with any
+     *                          modifications it might have.
+     * @return This grid.
+     */
+    public QueryGrid resetToDefaultState(boolean revertDefaultView)
+    {
+
+        // Unfortunately cannot just apply the 'Default' view to reset. For example if filters have been applied to the
+        // grid, and it is the default view, selecting the 'Default' view from the menu is a no-op and will not clear
+        // any filters.
+        clearFilters();
+        clearSearch();
+
+        // Apply the default view. This should restore any columns that have been hidden.
+        if(revertDefaultView && isManageViewsEnabled())
+        {
+            // If there are views to be managed it is possible the default view was changed.
+            manageViews().revertDefaultView().dismiss();
+        }
+
+        // If the panelHeader is visible then we probably have a non-default view
+        if (elementCache().panelHeader().isDisplayed())
+            selectView("Default");
+
+        // If after selecting the 'Default' view there is still a 'Undo' button visible it means the current view is the
+        // default view that has been modified but not saved.
+        if(isUndoButtonVisible())
+            clickUndoButton();
+
+        // Save clearing the selection for the last.
+        clearAllSelections();
+
+        return this;
+    }
+
+    public QueryChartPanel showChart(String chartName)
+    {
+        elementCache().chartsMenu.clickSubMenu(false, chartName);
+        return getChartPanel();
+    }
+
+    public QueryChartDialog createChart()
+    {
+        elementCache().chartsMenu.clickSubMenu(false, "Create Chart");
+        return new QueryChartDialog("Create Chart", getDriver(), this);
+    }
+
+    /*
+        gets a chart panel that is already being shown
+     */
+    public QueryChartPanel getChartPanel()
+    {
+        return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this).waitFor(this);
+    }
+
+    public WebElement showRReport(String reportName)
+    {
+        elementCache().chartsMenu.clickSubMenu(false, reportName);
+        return elementCache().rReport();
+    }
+
+    public void closeChart()
+    {
+        getChartPanel().clickClose();
     }
 
     @Override
@@ -331,6 +751,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
 
+        WebElement saveViewButton = Locator.button("Save").findWhenNeeded(getDriver());
+
         final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Views").findWhenNeeded(this);
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
@@ -341,18 +763,36 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
 
-        public List<FilterStatusValue> getAllFilterStatusValues()
+        public List<FilterStatusValue> getFilterStatusFilterValues()
         {
             return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
         }
 
-        public List<FilterStatusValue> getFilterStatusFilterValues()
+        final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
+
+        // The panel header element which will contain the edit status text, the view name and the Save & Undo buttons.
+        // If this is the default view this will not be present.
+        public WebElement panelHeader()
         {
-            return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel)
-                    .stream().filter(FilterStatusValue::isFilter).toList();
+            return Locator.xpath("preceding-sibling::div[contains(@class,'panel-heading')]").findWhenNeeded(this);
         }
 
-        final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
+        final BootstrapMenu chartsMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Charts").findWhenNeeded(this);
+
+        final WebElement chartPanel = Locator.byClass("chart-panel").refindWhenNeeded(this);
+
+        public WebElement svgChart()
+        {
+            return Locator.byClass("svg-chart").waitForElement(elementCache().chartPanel, WAIT_FOR_JAVASCRIPT);
+        }
+
+        public WebElement rReport()
+        {
+            return Locator.byClass("r-report").waitForElement(elementCache().chartPanel, WAIT_FOR_JAVASCRIPT);
+        }
+
+        final WebElement closeButton = Locator.tagContainingText("button", "Close").refindWhenNeeded(chartPanel);
+
     }
 
     public static class QueryGridFinder extends WebDriverComponentFinder<QueryGrid, QueryGridFinder>
@@ -391,4 +831,5 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return _locator;
         }
     }
+
 }

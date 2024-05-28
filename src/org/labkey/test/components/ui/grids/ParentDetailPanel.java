@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 /*
     Wraps the read-only state of ParentEntityEditPanel.
     If no parent is selected, the detailsTable is singluar and contains information saying that no parent/source type has been selected.
@@ -26,6 +28,8 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
 {
     private final WebElement _el;
     private final WebDriver _driver;
+
+    private Integer _readyTimeout = WAIT_FOR_JAVASCRIPT;
 
     protected ParentDetailPanel(WebElement element, WebDriver driver)
     {
@@ -43,6 +47,12 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
     public WebDriver getDriver()
     {
         return _driver;
+    }
+
+    public ParentDetailPanel setReadyTimeout(int timeoutMsec)
+    {
+        _readyTimeout = timeoutMsec;
+        return this;
     }
 
     public String title()
@@ -133,7 +143,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
                         return true;
                     }
                 },
-                "the component did not become ready in time", 4000);
+                "the component did not become ready in time", _readyTimeout);
     }
 
     @Override
@@ -191,7 +201,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "panel-default")
                 .withChild(Locator.tagWithClass("div", "panel-heading")
-                        .withChild(Locator.tagWithClass("div", "detail__edit--heading")));
+                .withChild(Locator.tagWithClass("span", "detail__edit--heading")));
         private String _title = null;
 
         public ParentDetailPanelFinder(WebDriver driver)
@@ -215,8 +225,8 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         protected Locator locator()
         {
             if (_title != null)
-                return  _baseLocator.withDescendant(Locator.tagWithClass("div", "detail__edit--heading")
-                        .withText(_title));
+                return  _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading")
+                        .startsWith(_title));
             else
                 return _baseLocator;
         }

@@ -27,6 +27,7 @@ public abstract class Locators
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
     public static final Locator.XPathLocator panelWebpartTitle = Locator.byClass("labkey-wp-title-text");
+    public static final Locator.XPathLocator folderTitle = Locator.tagWithClass("a", "lk-body-title-folder");
 
     public static Locator.XPathLocator headerContainer()
     {
@@ -40,7 +41,12 @@ public abstract class Locators
 
     public static Locator.XPathLocator appFloatingHeader()
     {
-        return Locator.tag("div").withClasses("app-header-wrapper", "scrolled");
+        return Locator.tag("div").withClass("app-navigation");
+    }
+
+    public static Locator.XPathLocator domainDesignerFloatingHeader()
+    {
+        return Locator.byClass("domain-floating-hdr");
     }
 
     public static Locator.XPathLocator bodyPanel()

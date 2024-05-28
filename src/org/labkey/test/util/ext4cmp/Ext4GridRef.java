@@ -21,7 +21,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -30,7 +29,6 @@ import org.openqa.selenium.interactions.Actions;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -331,5 +329,24 @@ public class Ext4GridRef extends Ext4CmpRef
         String fieldId = (String)getFnEval("return this.editingPlugin.getActiveEditor().items.getAt(0).id;");
 
         return new Ext4FieldRef(fieldId, _test);
+    }
+
+    private boolean isCollapsed()
+    {
+        return Locator.xpath("//*[@id='" + this._id + "']//img[contains(@class, 'x4-tool-expand-bottom')]").isDisplayed(_test.getDriver());
+    }
+
+    // Handle collapsible grids
+    public void expand()
+    {
+        // If collapsed indicator is not present then the grid is either not collapsible or already expanded
+        if (isCollapsed())
+        {
+            Locator.xpath("//*[@id='" + this._id + "']//img[contains(@class, 'x4-tool-expand-bottom')]").
+                    findElement(_test.getDriver()).click();
+
+            WebDriverWrapper.waitFor(() -> !isCollapsed(),
+                    "Grid could not be expanded", 100000);
+        }
     }
 }

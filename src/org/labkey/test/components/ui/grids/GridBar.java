@@ -7,19 +7,18 @@ package org.labkey.test.components.ui.grids;
 import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
-import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
@@ -59,28 +57,17 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public File exportData(ExportType exportType)
     {
-        WebElement exportButton = getExportButton(exportType);
-        return getWrapper().doAndWaitForDownload(exportButton::click);
+        return elementCache().exportMenu.exportData(exportType);
     }
 
-    private WebElement getExportButton(ExportType exportType)
+    public File exportData(ExportType exportType, int index)
     {
-        WebElement downloadBtn = Locator.tagWithClass("span", "fa-download").findElement(this);
-
-        if(!downloadBtn.isDisplayed())
-            throw new ElementNotInteractableException("File export button is not visible.");
-
-        downloadBtn.click();
-
-        return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElement(this);
+        return elementCache().exportMenu.exportData(exportType, index);
     }
 
     public TabSelectionExportDialog openExcelTabsModal()
     {
-        WebElement exportButton = getExportButton(ExportType.EXCEL);
-        exportButton.click();
-
-        return new TabSelectionExportDialog(this.getDriver());
+        return elementCache().exportMenu.openExcelTabsModal();
     }
 
     /**
@@ -183,54 +170,14 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     }
 
     /**
-     * Click the 'Select All' button in the grid bar.
-     *
-     * @return This grid bar.
-     */
-    public GridBar selectAllRows()
-    {
-        Locator selectBtn = Locator.xpath("//button[contains(text(), 'Select all')]");      // Select all n
-        Locator selectedText = Locator.xpath("//span[@class='QueryGrid-right-spacing' and normalize-space(contains(text(), 'selected'))]");   // n of n
-        Locator allSelected = Locator.xpath("//span[contains(text(), 'All ')]");            // All n selected
-        WebElement btn = selectBtn.waitForElement(_queryGrid, 5_000);
-        btn.click();
-
-        WebDriverWrapper.waitFor(() -> allSelected.findOptionalElement(this).isPresent() ||
-                        selectBtn.findOptionalElement(this).isEmpty() &&
-                                selectedText.findOptionalElement(this).isPresent() ,
-                WAIT_FOR_JAVASCRIPT);
-
-        return this;
-    }
-
-    /**
-     * Click the 'Clear All' button in the grid bar.
-     * @return This grid bar.
-     */
-    public GridBar clearAllSelections()
-    {
-        // Clear button can have text values of 'Clear', 'Clear both' or 'Clear all ' so just look for clear.
-        Locator clearBtn = Locator.xpath("//button[contains(text(), 'Clear')]");
-
-        if(clearBtn.findOptionalElement(this).isPresent())
-        {
-            WebElement btn = clearBtn.waitForElement(this, 5_000);
-            btn.click();
-
-            WebDriverWrapper.waitFor(() -> clearBtn.findOptionalElement(this).isEmpty(),
-                    WAIT_FOR_JAVASCRIPT);
-        }
-
-        return this;
-    }
-
-    /**
      * Click a button on the grid bar with the given text.
      * @param buttonCaption Button caption.
      */
     public void clickButton(String buttonCaption)
     {
-        BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000).click();
+        var btn = BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(btn));   // for cases when a disabled button
+        btn.click();                                                                    // awaits being enabled, for example by selecting grid items
     }
 
     public void doMenuAction(String buttonText, List<String> menuActions)
@@ -429,13 +376,18 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     public GridBar clearSearch()
     {
-        if(!elementCache().searchBox.get().isEmpty())
+        if (elementCache().clearSearchButton.isDisplayed())
         {
-            _queryGrid.doAndWaitForUpdate(()->
+            _queryGrid.doAndWaitForUpdate(() ->
             {
-                elementCache().searchBox.set("");
-                elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+                elementCache().clearSearchButton.click();
             });
+        }
+        else if (!elementCache().searchBox.get().isEmpty())
+        {
+            // Sometimes the search box has something in it, but the filter isn't set, so the clear button isn't visible
+            // This happens when we use beginAt to navigate to the page we're already on.
+            elementCache().searchBox.set("");
         }
         return this;
     }
@@ -459,6 +411,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
+        private final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(this);
 
         private final Map<String, MultiMenu> menus = new HashMap<>();
         protected MultiMenu findMenu(String buttonText)
@@ -469,10 +422,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return menus.get(buttonText);
         }
 
-        protected final BootstrapMenu aliquotView = BootstrapMenu.finder(getDriver()).locatedBy(
-                Locator.tagWithAttributeContaining("button", "id", "aliquotviewselector").parent()).findWhenNeeded(this);
+        protected final MultiMenu aliquotView = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("aliquot-view-selector").findWhenNeeded(this);
 
         protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
+        protected final WebElement clearSearchButton = Locator.byClass("fa-remove").findWhenNeeded(this);
     }
 
     protected static abstract class Locators

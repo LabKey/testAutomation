@@ -27,7 +27,6 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
@@ -38,7 +37,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.Locator.tag;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class ListHelper extends LabKeySiteWrapper
@@ -92,20 +90,10 @@ public class ListHelper extends LabKeySiteWrapper
         click(Locator.tagWithClass("h3", "panel-title").containing("Copy/paste text"));
     }
 
-
-    public void checkIndexFileAttachments(boolean index)
-    {
-        Locator indexFileAttachmentsCheckbox = Locator.checkboxByLabel("Index file attachments", false);
-        if (index)
-            checkCheckbox(indexFileAttachmentsCheckbox);
-        else
-            uncheckCheckbox(indexFileAttachmentsCheckbox);
-    }
-
     /**
      * From the list data grid, insert a new entry into the current list
      *
-     * @param data key = the the name of the field, value = the value to enter in that field
+     * @param data key = the name of the field, value = the value to enter in that field
      */
 
     public void insertNewRow(Map<String, ?> data)
@@ -188,39 +176,27 @@ public class ListHelper extends LabKeySiteWrapper
     {
         String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         beginAt(url);
-        clickButton("OK");
-    }
-
-    /**
-     * Starting at the grid view of a list, confirm dependencies, and delete it
-     */
-    public void deleteList(String confirmText)
-    {
-        String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
-        beginAt(url);
-        assertTextPresent(confirmText);
-        clickButton("OK");
+        clickButton("Confirm Delete");
+        assertNoLabKeyErrors();
     }
 
     @LogMethod
-    public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, FieldDefinition... cols)
+    public void createList(String containerPath, @LoggedParam String listName, FieldDefinition keyField, FieldDefinition... cols)
     {
-        beginCreateList(containerPath, listName);
-        createListHelper(listKeyType, listKeyName, cols);
+        EditListDefinitionPage listDefinitionPage = beginCreateList(containerPath, listName);
+        DomainFormPanel fieldsPanel = listDefinitionPage.manuallyDefineFieldsWithKey(keyField);
+        for (FieldDefinition col : cols)
+        {
+            fieldsPanel.addField(col);
+        }
+        listDefinitionPage.clickSave();
     }
 
-    private void createListHelper(ListColumnType listKeyType, String listKeyName, FieldDefinition... cols)
+    @LogMethod
+    public void createList(String containerPath, @LoggedParam String listName, String listKeyName, FieldDefinition... cols)
     {
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
-        DomainFormPanel fieldsPanel;
-        if (listKeyType == ListColumnType.AutoInteger)
-        {
-            fieldsPanel = listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey(listKeyName);
-        }
-        else
-        {
-            fieldsPanel = listDefinitionPage.manuallyDefineFieldsWithKey(new FieldDefinition(listKeyName, listKeyType.toNew()));
-        }
+        EditListDefinitionPage listDefinitionPage = beginCreateList(containerPath, listName);
+        DomainFormPanel fieldsPanel = listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey(listKeyName);
         for (FieldDefinition col : cols)
         {
             fieldsPanel.addField(col);
@@ -332,16 +308,6 @@ public class ListHelper extends LabKeySiteWrapper
                 .submit();
     }
 
-    public boolean isMergeOptionPresent()
-    {
-        return isElementPresent(Locator.tagContainingText("label", "Update data"));
-    }
-
-    public void chooseMerge(boolean isFileUpload)
-    {
-        click(tag("input").withAttribute("type", "button").index(isFileUpload ? 0 : 2));
-    }
-
     public EditListDefinitionPage goToEditDesign(String listName)
     {
         goToList(listName);
@@ -374,83 +340,6 @@ public class ListHelper extends LabKeySiteWrapper
                 FieldDefinition column = columns.get(c);
                 checker.verifyEquals(String.format("Value for column %s in row %d not as expected", column.getName(), r), data[r][c], row.get(column.getName()));
             }
-        }
-    }
-
-    /**
-     * @deprecated Use {@link ColumnType}
-     */
-    @Deprecated
-    public enum ListColumnType
-    {
-        MultiLine("Multi-Line Text"),
-        Integer("Integer"),
-        String("Text (String)"),
-        Subject("Subject/Participant (String)"),
-        DateAndTime("Date Time"),
-        Boolean("Boolean"),
-        Decimal("Decimal"),
-        File("File"),
-        AutoInteger("Auto-Increment Integer"),
-        Flag("Flag (String)"),
-        Attachment("Attachment"),
-        User("User");
-
-        private final String _description;
-
-        ListColumnType(String description)
-        {
-            _description = description;
-        }
-
-        public String toString()
-        {
-            return _description;
-        }
-
-        public ColumnType toNew()
-        {
-            for (ColumnType thisType : ColumnType.values())
-            {
-                if (name().equals(thisType.name()))
-                    return thisType;
-            }
-            throw new IllegalArgumentException("Type mismatch: " + this);
-        }
-
-        public static ListColumnType fromNew(ColumnType newType)
-        {
-            for (ListColumnType thisType : values())
-            {
-                if (newType.name().equals(thisType.name()))
-                    return thisType;
-            }
-            throw new IllegalArgumentException("Type mismatch: " + newType);
-        }
-    }
-
-    /**
-     * @deprecated Use {@link FieldDefinition}
-     */
-    @Deprecated
-    public static class ListColumn extends FieldDefinition
-    {
-        public ListColumn(String name, String label, ListColumnType type, String description)
-        {
-            super(name);
-            setLabel(label);
-            setDescription(description);
-            setType(type.toNew());
-        }
-
-        public ListColumn(String name, String label, ListColumnType type)
-        {
-            this(name, label, type, null);
-        }
-
-        public ListColumn(String name, ListColumnType type)
-        {
-            this(name, null, type);
         }
     }
 }

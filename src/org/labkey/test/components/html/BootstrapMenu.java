@@ -58,9 +58,9 @@ public class BootstrapMenu extends BaseBootstrapMenu
         return elementCache().findVisibleMenuItems();
     }
 
-    public List<WebElement> findVisibleMenuItemsWithCls(String cls)
+    public List<WebElement> findVisibleMenuItemsWithClass(String classValue)
     {
-        return elementCache().findVisibleMenuItemsWithClass(cls);
+        return elementCache().findVisibleMenuItemsWithClass(classValue);
     }
 
     protected WebElement findVisibleMenuItemOrNull(String text)
@@ -169,7 +169,7 @@ public class BootstrapMenu extends BaseBootstrapMenu
 
         protected WebElement findDisabledMenuItemOrNull(String text)
         {
-            Locator.XPathLocator loc=  Locator.xpath("./li/a").withText(text).parent().withClass("disabled");
+            Locator.XPathLocator loc = Locator.xpath("./li/a").withText(text).parent().withClass("disabled");
             return loc.findElementOrNull(findVisibleMenuPanel());
         }
     }
@@ -198,8 +198,8 @@ public class BootstrapMenu extends BaseBootstrapMenu
 
         private static Locator.XPathLocator dropdownMenu(Locator.XPathLocator toggleLoc)
         {
-            return Locator.byClass("dropdown")
-                    .withChild(toggleLoc)
+
+            return Locator.XPathLocator.union(Locator.byClass("dropup"), Locator.byClass("dropdown")).withChild(toggleLoc)
                     .withChild(Locator.tag("ul"));
         }
     }

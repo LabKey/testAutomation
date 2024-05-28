@@ -123,7 +123,7 @@
             label: 'Non Controller',
             }
         </formData>
-        <url>participant-group/StudyVerifyProject/My%20Study/deleteParticipantCategory.view?</url>
+        <url>StudyVerifyProject/My%20Study/participant-group-deleteParticipantCategory.view?</url>
         <response>{"success": true}</response>
     </test>
 </ApiTests>

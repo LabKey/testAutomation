@@ -31,19 +31,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class TestProperties
 {
+
     static
     {
+
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
         {
-            try
+            TestLogger.log(String.format("'%s' does not exist. Creating default from '%s'", propFile.getName(), propFileTemplate.getName()));
+            try (Stream<String> propStream = Files.lines(propFileTemplate.toPath()))
             {
-                TestLogger.log(String.format("'%s' does not exist. Creating default from '%s'", propFile.getName(), propFileTemplate.getName()));
-                final Iterator<String> iterator = Files.lines(propFileTemplate.toPath()).filter(line -> !line.startsWith("#!!")).iterator();
+                final Iterator<String> iterator = propStream.filter(line -> !line.startsWith("#!!")).iterator();
                 Files.write(propFile.toPath(), (Iterable<String>) () -> iterator, StandardOpenOption.CREATE_NEW);
             }
             catch (IOException e)
@@ -61,9 +64,10 @@ public abstract class TestProperties
         }
         catch (IOException ioe)
         {
-            TestLogger.log("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
-            ioe.printStackTrace(System.out);
+            TestLogger.error("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
+            ioe.printStackTrace(System.err);
         }
+
     }
 
     public static void load()
@@ -118,6 +122,12 @@ public abstract class TestProperties
         return "false".equals(System.getProperty("queryCheck", "true"));
     }
 
+    public static boolean isCspCheckSkipped()
+    {
+        // Skip by default
+        return "false".equals(System.getProperty("webtest.cspCheck", "false"));
+    }
+
     public static boolean isNewWebDriverForEachTest()
     {
         return !"true".equals(System.getProperty("selenium.reuseWebDriver", "false"));
@@ -138,9 +148,19 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.enable.heap.dump"));
     }
 
+    public static boolean isDiagnosticsExportEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.enable.export.diagnostics"));
+    }
+
     public static boolean isRunWebDriverHeadless()
     {
         return "true".equals(System.getProperty("webtest.webdriver.headless"));
+    }
+
+    public static boolean isDumpBrowserConsole()
+    {
+        return "true".equals(System.getProperty("webtest.dump.browser.console"));
     }
 
     public static double getTimeoutMultiplier()
@@ -207,9 +227,24 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.server.trial"));
     }
 
+    public static boolean isEmbeddedTomcat()
+    {
+        return !System.getProperty("useEmbeddedTomcat", "false").equals("false") || new File(TestFileUtils.getDefaultDeployDir(), "embedded").isDirectory();
+    }
+
     public static boolean isCheckerFatal()
     {
         return "true".equals(System.getProperty("webtest.checker.fatal"));
+    }
+
+    public static boolean isAssayProductFeatureAvailable()
+    {
+        return isProductFeatureAvailable("assay");
+    }
+
+    public static boolean isProductFeatureAvailable(String feature)
+    {
+        return "true".equals(System.getProperty("webtest.productFeature." + feature.toLowerCase(), "true"));
     }
 
     /**
@@ -226,7 +261,7 @@ public abstract class TestProperties
         }
         catch (NumberFormatException nfe)
         {
-            return 60;
+            return 120;
         }
     }
 

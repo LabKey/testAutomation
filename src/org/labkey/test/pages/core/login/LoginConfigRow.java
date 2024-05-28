@@ -1,6 +1,7 @@
 package org.labkey.test.pages.core.login;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.params.login.AuthenticationProvider;
@@ -44,7 +45,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         return new LoginConfigurePage(getDriver());
     }
 
-    public <P extends AuthDialogBase> P clickEdit(AuthenticationProvider<P> authenticationProvider)
+    public <P extends AuthDialogBase<?>> P clickEdit(AuthenticationProvider<P> authenticationProvider)
     {
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().editButton));
         elementCache().editButton.click();
@@ -75,7 +76,7 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
     }
 
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement baseFieldsElement = Locator.tagWithClass("div", "domain-row-base-fields").findWhenNeeded(this);
         final WebElement description = Locator.tagWithClass("div", "description").findWhenNeeded(baseFieldsElement);
@@ -83,11 +84,11 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         final WebElement provider = Locator.tagWithClass("div", "provider").findWhenNeeded(baseFieldsElement);
 
         WebElement statusElement = Locator.tagWithClass("div", "col-xs-7")
-                .withChild(Locator.tagWithClass("svg", "fa-circle")).findWhenNeeded(this);
+                .withChild(Locator.tagWithClass("span", "fa-circle")).findWhenNeeded(this);
 
-        final WebElement deleteButton = Locator.tagWithClass("svg", "fa-times-circle")
+        final WebElement deleteButton = Locator.tagWithClass("span", "fa-times-circle")
                 .findWhenNeeded(this).withTimeout(2000);
-        Locator editButtonLoc = Locator.tagWithClass("svg", "fa-pencil-alt");
+        Locator editButtonLoc = Locator.tagWithClass("span", "fa-pencil");
         final WebElement editButton = editButtonLoc.findWhenNeeded(this).withTimeout(2000);
     }
 

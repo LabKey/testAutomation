@@ -140,7 +140,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 infoCount <= 1);
 
         // A reference to the editing header title
-        WebElement editorHeading = Locator.tagContainingText("div", "Editing").withClass("detail__edit--heading").findWhenNeeded(getDriver());
+        Locator editingLocator = Locator.tagWithClass("div", "panel-heading").startsWith("Editing");
+
+        Assert.assertEquals("Cannot find a panel with 'Editing' in the header. There isn't a panel in edit mode.",
+                1, editingLocator.findElements(getDriver()).size());
 
         // Shouldn't need to do this, but when tests fail, because the panel did not exit edit mode, the button is not in view.
         getWrapper().scrollIntoView(button);
@@ -153,15 +156,15 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         // Wait until the counts of panels not in edit mode increases and the editor heading is no longer visible.
         WebDriverWrapper.waitFor(()->
-                        (defaultPanel.findElements(getDriver()).size() > defaultCount) && !editorHeading.isDisplayed(),
+                        defaultPanel.findElements(getDriver()).size() > defaultCount &&
+                                editingLocator.findElements(getDriver()).isEmpty(),
                 "Panel did not change state.", wait);
     }
 
     /** Click the 'Cancel' button. This will make the edit panel go away. */
     public void clickCancel()
     {
-        clickButtonWaitForPanel(elementCache()
-                .button("Cancel"));
+        clickButtonWaitForPanel(elementCache().cancelButton);
     }
 
     /** Click the 'Save' button. */
@@ -176,10 +179,12 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public void clickSave(int waitTime)
     {
+        // Making changes, like to lineage, may cause a slight delay before the save button is enabled.
+        WebDriverWrapper.waitFor(()->elementCache().saveButton.isEnabled(),
+                "Save button is not enabled.", 2_500);
+
         // The wait time is used here to validate the panel exits edit mode.
-        clickButtonWaitForPanel(elementCache()
-                .button("Save"),
-                waitTime);
+        clickButtonWaitForPanel(elementCache().saveButton, waitTime);
 
         // After the panel exits edit mode the page might still be updating, wait for that to happen.
         WebElement progressbar = Locator.tagWithClass("div", "progress-bar").findWhenNeeded(getDriver());
@@ -195,9 +200,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public String clickSaveExpectingError()
     {
-        elementCache()
-                .button("Save")
-                .click();
+        elementCache().saveButton.click();
         return BootstrapLocators.errorBanner.waitForElement(this, 1_000).getText();
     }
 
@@ -208,10 +211,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public boolean isSaveButtonEnabled()
     {
-        // If element is enabled the disabled attribute will not be there and getAttribute will return null.
-        return null == elementCache()
-                .button("Save")
-                .getAttribute("disabled");
+        return elementCache().saveButton.isEnabled();
     }
 
     /**
@@ -265,7 +265,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     {
         return ReactSelect.finder(getDriver())
                 .withNamedInput(String.format("entityType%d", index))
-                .find(this);
+                .waitFor(this);
     }
 
     public ReactSelect getEntityType(String entityName)
@@ -357,14 +357,20 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
         var selectParent = FilteringReactSelect.finder(getDriver())
                 .withNamedInput(String.format("parentEntityValue_%s", typeName))
-                .find(this);
+                .waitFor(this);
+
+        // Adding for debugging (trying to understand why save button is not enabled after setting).
+        getWrapper().log(String.format("Selections before adding: %s", selectParent.getSelections()));
 
         for (String id : parentIds)
         {
-            int selCount = selectParent.getSelections().size();
             selectParent.typeAheadSelect(id);
-            WebDriverWrapper.waitFor(()-> selectParent.getSelections().size() > selCount, 500);
+            WebDriverWrapper.waitFor(()-> selectParent.getSelections().contains(id) ,
+                    String.format("Parent '%s' was not added to the list.", parentIds), 2_500);
         }
+
+        // Adding for debugging (trying to understand why save button is not enabled after setting).
+        getWrapper().log(String.format("Selections after adding: %s", selectParent.getSelections()));
 
         return this;
     }
@@ -427,6 +433,17 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return this;
     }
 
+    public void setActionComment(String comment)
+    {
+        elementCache().commentInput.sendKeys(comment);
+    }
+
+    public void clearActionComment()
+    {
+        elementCache().commentInput.clear();
+    }
+
+
     /**
      * Simple finder for this panel.
      */
@@ -448,10 +465,29 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         {
             return Locator
                     .tagContainingText("div", "Editing")
-                    .withClass("detail__edit--heading")
+                    .withClass("panel-heading")
                     .parent()
-                    .followingSibling("div")
-                    .withClass("panel-body");
+                    .child(Locator.tagWithClass("div", "panel-body"));
+        }
+    }
+
+    public static class DataClassAddParentEntityPanelFinder extends WebDriverComponentFinder<ParentEntityEditPanel, DataClassAddParentEntityPanelFinder>
+    {
+        public DataClassAddParentEntityPanelFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        @Override
+        protected ParentEntityEditPanel construct(WebElement element, WebDriver driver)
+        {
+            return new ParentEntityEditPanel(element, driver);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return Locator.tagWithClass("div", "dataclass-insert-add-parent-panel");
         }
     }
 
@@ -463,23 +499,15 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        // The 'Save' and 'Cancel' buttons are actually on the page and not the panel, so the search context needs
-        // to be the entire page. This is has a dependence that only one entity panel can be in edit mode at a time.
-        WebElement button(String buttonText)
-        {
-            return Locator.tagWithClass("div", "detail__edit--heading")
-                    .parent("div")
-                    .parent("div")
-                    .followingSibling("div")
-                    .childTag("button")
-                    .withText(buttonText)
-                    .findElement(getDriver());
-        }
+        final WebElement saveButton = Locator.byClass("btn-success").withText("Save").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").findWhenNeeded(this);
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator
                 .tagContainingText("span", "Add")
                 .findWhenNeeded(this);
+
+        public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
 
         // This is the remove button that is used to remove a lineage entity.
         WebElement removeButton(int index)

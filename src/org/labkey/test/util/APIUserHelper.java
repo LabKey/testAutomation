@@ -17,7 +17,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -26,9 +26,10 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
+import org.labkey.remoteapi.security.GetUsersResponse.UserInfo;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.user.UpdateUserDetailsPage;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,7 +37,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,25 +46,37 @@ import static org.junit.Assert.assertTrue;
 
 public class APIUserHelper extends AbstractUserHelper
 {
+    private final Supplier<Connection> connectionSupplier;
+    public APIUserHelper(Supplier<Connection> connectionSupplier)
+    {
+        super(null);
+        this.connectionSupplier = connectionSupplier;
+    }
+
     public APIUserHelper(WebDriverWrapper driver)
     {
         super(driver);
+        connectionSupplier = driver::createDefaultConnection;
     }
 
     @Override
     public String getDisplayNameForEmail(@NotNull String email)
     {
-        GetUsersResponse users = getUsers(true);
-        Optional<GetUsersResponse.UserInfo> user = users.getUsersInfo().stream()
-                .filter(userInfo -> email.equals(userInfo.getEmail())).findFirst();
-        if (user.isPresent())
+        Map<String, String> displayNames = getDisplayNames();
+        if (displayNames.containsKey(email))
         {
-            return user.get().getDisplayName();
+            return displayNames.get(email);
         }
         else
         {
             return super.getDisplayNameForEmail(email);
         }
+    }
+
+    public Map<String, String> getDisplayNames()
+    {
+        GetUsersResponse users = getUsers(true);
+        return users.getUsersInfo().stream().collect(Collectors.toMap(UserInfo::getEmail, UserInfo::getDisplayName));
     }
 
     @Override
@@ -75,10 +89,15 @@ public class APIUserHelper extends AbstractUserHelper
             throw new IllegalArgumentException("No such user: " + email);
         }
 
-        // TODO: Update via API
-        final UpdateUserDetailsPage updateUserDetailsPage = UpdateUserDetailsPage.beginAt(getWrapper(), userId);
-        updateUserDetailsPage.setDisplayName(newDisplayName);
-        updateUserDetailsPage.clickSubmit();
+        try
+        {
+            new QueryApiHelper(connectionSupplier.get(), "/", "core", "siteusers")
+                    .updateRows(List.of(Maps.of("userId", userId, "DisplayName", newDisplayName)));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to set display name for user:" + email, e);
+        }
     }
 
     @Override
@@ -112,7 +131,7 @@ public class APIUserHelper extends AbstractUserHelper
             }
         };
         command.setSendEmail(sendEmail);
-        Connection connection = getWrapper().createDefaultConnection();
+        Connection connection = connectionSupplier.get();
         try
         {
             CreateUserResponse response = command.execute(connection, "");
@@ -125,7 +144,7 @@ public class APIUserHelper extends AbstractUserHelper
                     Assert.fail("Not able to create the user " + userName + " because " + response.getParsedData().get("htmlErrors").toString());
                 }
                 assertEquals(userName, response.getEmail());
-                assertTrue("Invalid userId", response.getUserId() != null);
+                assertNotNull("Invalid userId", response.getUserId());
             }
 
             return response;
@@ -143,12 +162,12 @@ public class APIUserHelper extends AbstractUserHelper
         return getUsers(false);
     }
 
-    public GetUsersResponse getUsers(boolean includeDeactivated)
+    public GetUsersResponse getUsers(boolean includeInactive)
     {
         GetUsersCommand command = new GetUsersCommand();
-        command.setIncludeDeactivated(includeDeactivated);
-        Connection connection = getWrapper().createDefaultConnection();
-        if (getWrapper().isImpersonating())
+        command.setIncludeInactive(includeInactive);
+        Connection connection = connectionSupplier.get();
+        if (getWrapper() != null && getWrapper().isImpersonating())
         {
             // Don't use browser session. Tests often call 'getDisplayNameForEmail' while impersonating non-admins.
             connection = WebTestHelper.getRemoteApiConnection(false);
@@ -169,11 +188,11 @@ public class APIUserHelper extends AbstractUserHelper
         return getUserIds(userEmails, true);
     }
 
-    public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeDeactivated)
+    public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeInactive)
     {
         Map<String, Integer> userIds = new HashMap<>();
-        List<GetUsersResponse.UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
-        for (GetUsersResponse.UserInfo userInfo : usersInfo)
+        List<UserInfo> usersInfo = getUsers(includeInactive).getUsersInfo();
+        for (UserInfo userInfo : usersInfo)
         {
             if (userEmails.contains(userInfo.getEmail()))
                 userIds.put(userInfo.getEmail(), userInfo.getUserId());
@@ -195,11 +214,10 @@ public class APIUserHelper extends AbstractUserHelper
 
     private void deleteUser(@NotNull Integer userId)
     {
-        Connection connection = getWrapper().createDefaultConnection();
         DeleteUserCommand command = new DeleteUserCommand(userId);
         try
         {
-            command.execute(connection, "/");
+            command.execute(connectionSupplier.get(), "/");
         }
         catch (IOException|CommandException e)
         {

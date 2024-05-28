@@ -1,10 +1,15 @@
 package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.Domain;
-import org.labkey.test.params.FieldDefinition;
+import org.labkey.remoteapi.domain.InferDomainCommand;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.property.DomainProps;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +19,7 @@ public abstract class ListDefinition extends DomainProps
 {
     private String _name;
     private String _description;
-    private List<FieldDefinition> _fields = new ArrayList<>();
+    private List<PropertyDescriptor> _fields = new ArrayList<>();
     private String _keyName;
     // API Options
     private String _titleColumn;
@@ -57,19 +62,36 @@ public abstract class ListDefinition extends DomainProps
         return this;
     }
 
-    public List<FieldDefinition> getFields()
+    public List<PropertyDescriptor> getFields()
     {
         return new ArrayList<>(_fields); // return a copy
     }
 
-    public ListDefinition setFields(List<FieldDefinition> fields)
+    public ListDefinition setFields(List<? extends PropertyDescriptor> fields)
     {
+        if (!fields.isEmpty() && getKeyName() == null)
+        {
+            // Use first field as key
+            setKeyName(fields.get(0).getName());
+        }
         _fields = new ArrayList<>(fields); // Make sure it isn't immutable
         return this;
     }
 
-    public ListDefinition addField(@NotNull FieldDefinition field)
+    public ListDefinition inferFields(File dataFile, Connection connection) throws IOException, CommandException
     {
+        return setFields(new InferDomainCommand(dataFile, getKind())
+                .execute(connection, "/")
+                .getFields());
+    }
+
+    public ListDefinition addField(@NotNull PropertyDescriptor field)
+    {
+        if (getKeyName() == null)
+        {
+            // Use first field as key
+            setKeyName(field.getName());
+        }
         _fields.add(field);
         return this;
     }
@@ -94,7 +116,14 @@ public abstract class ListDefinition extends DomainProps
     protected Domain getDomainDesign()
     {
         Domain domain = new Domain(getName());
-        domain.setFields(new ArrayList<>(getFields()));
+        List<PropertyDescriptor> fields = getFields().stream()
+                .peek(pd -> {
+                    if (pd.getName().equals(getKeyName()))
+                    {
+                        pd.setRequired(true);
+                    }
+                }).toList();
+        domain.setFields(fields);
         domain.setDescription(getDescription());
         return domain;
     }
@@ -107,6 +136,7 @@ public abstract class ListDefinition extends DomainProps
         options.put("name", getName());
         options.put("description", getDescription());
         options.put("keyName", getKeyName());
+        options.put("keyType", getKeyType());
         if (getTitleColumn() != null)
         {
             options.put("titleColumn", getTitleColumn());
@@ -125,4 +155,6 @@ public abstract class ListDefinition extends DomainProps
     {
         return getName();
     }
+
+    protected abstract String getKeyType();
 }
