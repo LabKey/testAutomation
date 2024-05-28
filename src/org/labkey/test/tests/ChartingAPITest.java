@@ -28,7 +28,6 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -443,13 +442,9 @@ public class ChartingAPITest extends BaseWebDriverTest
         verifyBottomLeftGroupNotBrushed();
     }
 
-    @Test @Ignore
+    @Test
     public void advancedBrushTest()
     {
-        // Only run this in Chrome. There is a bug in web driver for Firefox that prevents it from properly releasing
-        // the mouse. You can view the (very old) issue here:
-        // https://code.google.com/p/selenium/issues/detail?id=3356
-
         Actions builder = new Actions(getDriver());
         goToChartingTestPage("interactivityTest");
         waitForSvgWithTitle("Interactive Plot");
