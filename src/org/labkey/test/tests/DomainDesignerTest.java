@@ -39,7 +39,6 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
@@ -255,7 +254,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         String sampleType = "TestSampleForInvalidLookupField";
 
         log("Creating a list used for look up");
-        _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "Id");
+        _listHelper.createList(getProjectName(), listName, "Id");
 
         log("Creating a sample type with look up field to above list");
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);

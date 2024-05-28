@@ -33,6 +33,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.tests.MessagesLongTest;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -40,7 +41,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserExtendedProperty;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -336,7 +336,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     private void setupCustomFileProperties()
     {
         // Create list for lookup custom file property
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
+        _listHelper.createList(getProjectName(), LIST_NAME, new FieldDefinition(COLUMN_NAME, ColumnType.String));
         _listHelper.goToList(LIST_NAME);
         _listHelper.uploadData(COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(getProjectName());
@@ -349,7 +349,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         row = editor.fieldsPanel().addField(COLUMN_NAME);
         row.setLabel(COLUMN_NAME);
-        row.setLookup(new FieldDefinition.LookupInfo(getProjectName(), "lists", LIST_NAME).setTableType(FieldDefinition.ColumnType.String));
+        row.setLookup(new FieldDefinition.StringLookup(getProjectName(), "lists", LIST_NAME));
         editor.clickFinish();
     }
 

@@ -27,6 +27,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
@@ -92,14 +93,14 @@ public class ColumnResizeTest extends BaseWebDriverTest
     private void setUpList(String listName)
     {
         ListHelper listHelper = new ListHelper(this);
-        FieldDefinition maxCol = new FieldDefinition(MAX_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(Integer.MAX_VALUE);
-        FieldDefinition gtCol = new FieldDefinition(GT_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(GT_SCALE);
-        FieldDefinition ltCol = new FieldDefinition(LT_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(LT_SCALE);
-        FieldDefinition fourCol = new FieldDefinition(FOUR_K_COLUMN_NAME, FieldDefinition.ColumnType.String).setScale(DEFAULT_SCALE);
-        FieldDefinition textAreaCol = new FieldDefinition(MULTI_COLUMN_NAME, FieldDefinition.ColumnType.MultiLine);
-        FieldDefinition numberCol = new FieldDefinition(NUMBER_COLUMN_NAME, FieldDefinition.ColumnType.Integer);
+        FieldDefinition maxCol = new FieldDefinition(MAX_COLUMN_NAME, ColumnType.String).setScale(Integer.MAX_VALUE);
+        FieldDefinition gtCol = new FieldDefinition(GT_COLUMN_NAME, ColumnType.String).setScale(GT_SCALE);
+        FieldDefinition ltCol = new FieldDefinition(LT_COLUMN_NAME, ColumnType.String).setScale(LT_SCALE);
+        FieldDefinition fourCol = new FieldDefinition(FOUR_K_COLUMN_NAME, ColumnType.String).setScale(DEFAULT_SCALE);
+        FieldDefinition textAreaCol = new FieldDefinition(MULTI_COLUMN_NAME, ColumnType.MultiLine);
+        FieldDefinition numberCol = new FieldDefinition(NUMBER_COLUMN_NAME, ColumnType.Integer);
 
-        listHelper.createList(PROJECT_NAME, listName, ListHelper.ListColumnType.String, LIST_KEY_NAME,
+        listHelper.createList(PROJECT_NAME, listName, new FieldDefinition(LIST_KEY_NAME, ColumnType.String),
                 maxCol, gtCol, ltCol, fourCol, textAreaCol, numberCol);
     }
 
@@ -153,7 +154,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         changeScale(fieldsPanel, GT_ROW, LT_SCALE, false);   //Max --> LT
         changeScale(fieldsPanel, FOUR_ROW, GT_SCALE, true); //max checked
         changeScale(fieldsPanel, MULTI_ROW, GT_SCALE, false); //LT --> GT --> Max
-        fieldsPanel.getField(MAX_ROW).setType(FieldDefinition.ColumnType.MultiLine);
+        fieldsPanel.getField(MAX_ROW).setType(ColumnType.MultiLine);
         assertMaxChecked(fieldsPanel, MAX_ROW);
         listDefinitionPage.clickSave();
 
