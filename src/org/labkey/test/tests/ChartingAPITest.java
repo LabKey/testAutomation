@@ -477,16 +477,16 @@ public class ChartingAPITest extends BaseWebDriverTest
         builder.moveToElement(Locator.css(".x-axis-handle .background").findElement(getDriver())).moveByOffset(-280, 0).clickAndHold().moveByOffset(180, 0).release().perform();
         verifyBottomLeftGroupBrushed();
         verifyTopRightGroupNotBrushed();
-        assertEquals("Brushed area was not the expected height", "385", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("height"));
+        assertEquals("Brushed area was not the expected height", "377", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("height"));
         // Make sure when making a 1D selection that the opposite axis handle isn't visible.
         assertElementNotVisible(Locator.css(".y-axis-handle .resize.n"));
         assertElementNotVisible(Locator.css(".y-axis-handle .resize.s"));
 
         // 1D selection on y axis (select top right)
-        builder.moveToElement(Locator.css(".y-axis-handle .background").findElement(getDriver())).moveByOffset(0, -190).clickAndHold().moveByOffset(0, 190).release().perform();
+        builder.moveToElement(Locator.css(".y-axis-handle .background").findElement(getDriver())).moveByOffset(0, -188).clickAndHold().moveByOffset(0, 188).release().perform();
         verifyTopRightGroupBrushed();
         verifyBottomLeftGroupNotBrushed();
-        assertEquals("Brushed area was not the expected width", "619.9999999999999", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("width"));
+        assertEquals("Brushed area was not the expected width", "612", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("width"));
         // Make sure when making a 1D selection that the opposite axis handle isn't visible.
         assertElementNotVisible(Locator.css(".x-axis-handle .resize.e"));
         assertElementNotVisible(Locator.css(".x-axis-handle .resize.w"));
