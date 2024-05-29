@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 /*
  * Test wrapper for AttachmentCard in '@labkey/components'
@@ -72,15 +73,24 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
 
     public boolean canDownload()
     {
-        elementCache().menu.openMenuTo();
-        List<String> menuOptions = getWrapper().getTexts(elementCache().menu.findVisibleMenuItems());
+        if (!elementCache().menu.isPresent())
+            return false;
+        elementCache().menu.get().openMenuTo();
+        List<String> menuOptions = getWrapper().getTexts(elementCache().menu.get().findVisibleMenuItems());
         return menuOptions.contains(DOWNLOAD_ATTACHMENT);
     }
 
     public File clickDownload()
     {
+        if (!elementCache().menu.isPresent())
+            throw new IllegalStateException("Unable to download attachment/file");;
         return getWrapper().doAndWaitForDownload(()->
-                elementCache().menu.clickSubMenu(false, DOWNLOAD_ATTACHMENT));
+                elementCache().menu.get().clickSubMenu(false, DOWNLOAD_ATTACHMENT));
+    }
+
+    public boolean isFileUnavailable()
+    {
+        return elementCache().unavailableWarning.isPresent();
     }
 
     public boolean canRemove()
@@ -90,19 +100,24 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
 
     public void clickRemove()
     {
+        if (!elementCache().menu.isPresent())
+            throw new IllegalStateException("Unable to remove attachment/file");
         String remove = getRemoveOption();
         if (remove == null)
         {
             throw new IllegalStateException("Unable to remove attachment/file");
         }
-        elementCache().menu.clickSubMenu(false, remove);
+        elementCache().menu.get().clickSubMenu(false, remove);
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
     }
 
     private String getRemoveOption()
     {
-        elementCache().menu.openMenuTo();
-        List<String> menuOptions = getWrapper().getTexts(elementCache().menu.findVisibleMenuItems());
+        if (!elementCache().menu.isPresent())
+            return null;
+
+        elementCache().menu.get().openMenuTo();
+        List<String> menuOptions = getWrapper().getTexts(elementCache().menu.get().findVisibleMenuItems());
         return menuOptions.stream().filter(item -> item.startsWith("Remove ")).findFirst().orElse(null);
     }
 
@@ -116,12 +131,12 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     {
         final WebElement fileSize = Locator.byClass("attachment-card__size").findWhenNeeded(this);
         final WebElement icon = Locator.byClass("attachment-card__icon_img").findWhenNeeded(this);
-        BootstrapMenu menu = BootstrapMenu.finder(getDriver())
+        Optional<BootstrapMenu> menu = BootstrapMenu.finder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "attachment-card__menu"))
-                .findWhenNeeded(this);
+                .findOptional(this);
         WebElement fileContent = Locator.tagWithClass("div", "attachment-card__content")
                 .refindWhenNeeded(this).withTimeout(4000);
-
+        Optional<WebElement> unavailableWarning = Locator.tagWithClass("i", "fa-exclamation-triangle").findOptionalElement(this);
     }
 
 
