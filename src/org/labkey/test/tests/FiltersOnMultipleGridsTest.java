@@ -8,9 +8,10 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
@@ -36,10 +37,10 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName());
         log("Creating test list");
-        _listHelper.createList(getProjectName() + "/", LIST_NAME, ListHelper.ListColumnType.AutoInteger, "RowId",
-                new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String),
-                new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer));
+        _listHelper.createList(getProjectName(), LIST_NAME, "RowId",
+                new FieldDefinition("FirstName", ColumnType.String),
+                new FieldDefinition("LastName", ColumnType.String),
+                new FieldDefinition("Age", ColumnType.Integer));
 
         log("Adding Single list webpart");
         goToProjectHome();
@@ -86,11 +87,11 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
     private void insertListData(String firstName, String lastName, String age)
     {
         DataRegionTable listTable = DataRegionTable.findDataRegionWithinWebpart(this, LIST_WEBPART_TITLE);
-        listTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_FirstName"), firstName);
-        setFormElement(Locator.name("quf_LastName"), lastName);
-        setFormElement(Locator.name("quf_Age"), age);
-        clickButton("Submit");
+        listTable.clickInsertNewRow()
+                .setField("FirstName", firstName)
+                .setField("LastName", lastName)
+                .setField("Age", age)
+                .submit();
     }
 
     @Override

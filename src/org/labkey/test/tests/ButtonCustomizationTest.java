@@ -22,8 +22,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -92,11 +93,11 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
-                new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "")
+        FieldDefinition[] columns = new FieldDefinition[] {
+                new FieldDefinition("name", ColumnType.String).setLabel("Name")
         };
 
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, "Key", columns);
         goToManageLists();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);

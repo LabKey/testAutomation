@@ -25,6 +25,7 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,13 @@ public class FieldDefinition extends PropertyDescriptor
     @Override
     public Map<String, Object> getAllProperties()
     {
-        return _extraFieldProperties;
+        Map<String, Object> allProperties = new HashMap<>(_extraFieldProperties);
+        allProperties.putIfAbsent("defaultValueType", DefaultType.FIXED_EDITABLE);
+        if (getMeasure() == null)
+        {
+            setMeasure(getType().isMeasureByDefault());
+        }
+        return allProperties;
     }
 
     public ColumnType getType()
@@ -459,30 +466,42 @@ public class FieldDefinition extends PropertyDescriptor
 
     }
 
-    // Temporary, for 'ColumnType.values()'
-    private static final List<ColumnType> COLUMN_TYPES = List.of(
-            ColumnType.MultiLine, ColumnType.Integer, ColumnType.String, ColumnType.Subject,
-            ColumnType.DateAndTime, ColumnType.Date, ColumnType.Time,
-            ColumnType.Boolean, ColumnType.Double, ColumnType.Decimal, ColumnType.File, ColumnType.Flag,
-            ColumnType.Attachment, ColumnType.User, ColumnType.Lookup, ColumnType.OntologyLookup, ColumnType.VisitId,
-            ColumnType.VisitDate, ColumnType.Sample, ColumnType.Barcode, ColumnType.TextChoice, ColumnType.SMILES
-    );
-    
     public interface ColumnType
     {
         ColumnType MultiLine = new ColumnTypeImpl("Multi-Line Text", "multiLine");
-        ColumnType Integer = new ColumnTypeImpl("Integer", "int");
+        ColumnType Integer = new ColumnTypeImpl("Integer", "int")
+        {
+            @Override
+            public boolean isMeasureByDefault()
+            {
+                return true;
+            }
+        };
         ColumnType String = new ColumnTypeImpl("Text", "string");
         ColumnType Subject = new ColumnTypeImpl("Subject/Participant", "string", "http://cpas.labkey.com/Study#ParticipantId", null);
         ColumnType DateAndTime = new ColumnTypeImpl("Date Time", "dateTime");
         ColumnType Date = new ColumnTypeImpl("Date", "date");
-        ColumnType Time = new ColumnTypeImpl("Time", "http://www.w3.org/2001/XMLSchema#time");
+        ColumnType Time = new ColumnTypeImpl("Time", "time");
         ColumnType Boolean = new ColumnTypeImpl("Boolean", "boolean");
-        ColumnType Double = new ColumnTypeImpl("Number (Double)", "float");
-        ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double");
+        ColumnType Double = new ColumnTypeImpl("Number (Double)", "float")
+        {
+            @Override
+            public boolean isMeasureByDefault()
+            {
+                return true;
+            }
+        };
+        ColumnType Decimal = new ColumnTypeImpl("Decimal (floating point)", "double")
+        {
+            @Override
+            public boolean isMeasureByDefault()
+            {
+                return true;
+            }
+        };
         ColumnType File = new ColumnTypeImpl("File", "http://cpas.fhcrc.org/exp/xml#fileLink");
         ColumnType Flag = new ColumnTypeImpl("Flag", "string", "http://www.labkey.org/exp/xml#flag", null);
-        ColumnType Attachment = new ColumnTypeImpl("Attachment", "attachment");
+        ColumnType Attachment = new ColumnTypeImpl("Attachment", "http://www.labkey.org/exp/xml#attachment");
         ColumnType User = new ColumnTypeImpl("User", "int", null, new IntLookup("core", "users"));
         @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
         ColumnType Lookup = new ColumnTypeImpl("Lookup", null);
@@ -531,13 +550,14 @@ public class FieldDefinition extends PropertyDescriptor
             return null;
         }
 
-        /**
-         * @deprecated Bridge for converting away from enum
-         */
-        @Deprecated (since = "22.10")
+        default boolean isMeasureByDefault()
+        {
+            return false;
+        }
+
         static List<ColumnType> values()
         {
-            return COLUMN_TYPES;
+            return ColumnTypeImpl.COLUMN_TYPES;
         }
     }
 
@@ -1028,6 +1048,8 @@ public class FieldDefinition extends PropertyDescriptor
 
 class ColumnTypeImpl implements FieldDefinition.ColumnType
 {
+    static final List<FieldDefinition.ColumnType> COLUMN_TYPES = new ArrayList<>();
+
     private final String _label; // the display value in the UI for this kind of field
     private final String _rangeURI;     // the key used inside the API
     private final String _conceptURI;
@@ -1036,9 +1058,19 @@ class ColumnTypeImpl implements FieldDefinition.ColumnType
     ColumnTypeImpl(String label, String rangeURI, String conceptURI, FieldDefinition.LookupInfo lookupInfo)
     {
         _label = label;
-        _rangeURI = rangeURI;
+        if (rangeURI != null && !rangeURI.contains("#"))
+        {
+            // Use default rangeUri prefix
+            _rangeURI = "http://www.w3.org/2001/XMLSchema#" + rangeURI;
+        }
+        else
+        {
+            _rangeURI = rangeURI;
+        }
         _conceptURI = conceptURI;
         _lookupInfo = lookupInfo;
+
+        COLUMN_TYPES.add(this);
     }
 
     ColumnTypeImpl(String label, String rangeURI)

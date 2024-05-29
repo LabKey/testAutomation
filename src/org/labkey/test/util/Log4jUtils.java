@@ -60,8 +60,7 @@ public abstract class Log4jUtils
             if (!erroredPackages.contains(name))
             {
                 erroredPackages.add(name);
-                TestLogger.warn("Failed to set log level for '" + name + "'. We will not log any subsequent failures.");
-                e.printStackTrace();
+                TestLogger.warn("Failed to set log level for '" + name + "'. We will not log any subsequent failures.", e);
             }
         }
     }
@@ -69,7 +68,7 @@ public abstract class Log4jUtils
     @LogMethod(quiet = true)
     public static void resetAllLogLevels()
     {
-        if (TestProperties.isPrimaryUserAppAdmin())
+        if (TestProperties.isPrimaryUserAppAdmin() || !TestProperties.isTestRunningOnTeamCity())
             return;
 
         Connection connection = WebTestHelper.getRemoteApiConnection();
@@ -87,8 +86,7 @@ public abstract class Log4jUtils
             if (!loggedResetError)
             {
                 loggedResetError = true;
-                TestLogger.warn("Failed to reset server logging levels. We will not log any subsequent failures.");
-                e.printStackTrace();
+                TestLogger.warn("Failed to reset server logging levels. We will not log any subsequent failures.", e);
             }
         }
     }
