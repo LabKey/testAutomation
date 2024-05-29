@@ -17,7 +17,6 @@ import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 
@@ -99,7 +98,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         String fieldName = "testFile";
         goToProjectHome();
         log("Creating the list");
-        _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "id");
+        _listHelper.createList(getProjectName(), listName, "id");
 
         log("Adding a attachment field with Show attachment in Browser");
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
