@@ -38,13 +38,13 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,10 +189,14 @@ public class ChartingAPITest extends BaseWebDriverTest
     private void checkSVGConversion() throws Exception
     {
         //The server side svg converter is fairly strict and will fail with bad inputs
-        String svgText = (String)executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);");
+        String svgText = executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);", String.class);
+        checkSVGConversion(svgText, "application/pdf", "exportPDF");
+        checkSVGConversion(svgText, "image/png", "exportImage");
+    }
 
-        // TODO can we add a PNG export check here as well?
-        String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
+    private void checkSVGConversion(String svgText, String contentType, String exportAction) throws IOException
+    {
+        String url = WebTestHelper.buildURL("visualization", getProjectName(), exportAction);
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method;
 
@@ -208,7 +212,7 @@ public class ChartingAPITest extends BaseWebDriverTest
                 int status = response.getCode();
                 assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
                 assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-                assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
+                assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith(contentType));
 
                 EntityUtils.consumeQuietly(response.getEntity()); // Prevent server-side TranscoderException
             }
