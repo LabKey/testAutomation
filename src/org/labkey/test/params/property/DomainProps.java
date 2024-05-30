@@ -1,10 +1,12 @@
 package org.labkey.test.params.property;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 
@@ -17,6 +19,11 @@ import java.util.Map;
  */
 public abstract class DomainProps
 {
+    public static DomainPropsImpl forKind(String kind, String schemaName, String queryName)
+    {
+        return new DomainPropsImpl(kind, schemaName, queryName);
+    }
+
     protected abstract @NotNull Domain getDomainDesign();
     protected abstract @NotNull String getKind();
     protected abstract @NotNull Map<String, Object> getOptions();
@@ -40,7 +47,8 @@ public abstract class DomainProps
     public final TestDataGenerator create(Connection connection, String containerPath) throws IOException, CommandException
     {
         TestLogger.info(String.format("Creating %s domain '%s.%s' in '%s'", getKind(), getSchemaName(), getQueryName(), containerPath));
-        getCreateCommand().execute(connection, containerPath);
+        DomainResponse response = getCreateCommand().execute(connection, containerPath);
+        Assert.assertEquals("schemaName for created domain", getSchemaName(), response.getProperty("domainDesign.schemaName"));
         return getTestDataGenerator(containerPath);
     }
 }
