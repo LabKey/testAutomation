@@ -28,7 +28,6 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -38,13 +37,13 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,10 +188,14 @@ public class ChartingAPITest extends BaseWebDriverTest
     private void checkSVGConversion() throws Exception
     {
         //The server side svg converter is fairly strict and will fail with bad inputs
-        String svgText = (String)executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);");
+        String svgText = executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);", String.class);
+        checkSVGConversion(svgText, "application/pdf", "exportPDF");
+        checkSVGConversion(svgText, "image/png", "exportImage");
+    }
 
-        // TODO can we add a PNG export check here as well?
-        String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
+    private void checkSVGConversion(String svgText, String contentType, String exportAction) throws IOException
+    {
+        String url = WebTestHelper.buildURL("visualization", getProjectName(), exportAction);
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method;
 
@@ -208,7 +211,7 @@ public class ChartingAPITest extends BaseWebDriverTest
                 int status = response.getCode();
                 assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
                 assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-                assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
+                assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith(contentType));
 
                 EntityUtils.consumeQuietly(response.getEntity()); // Prevent server-side TranscoderException
             }
@@ -443,13 +446,9 @@ public class ChartingAPITest extends BaseWebDriverTest
         verifyBottomLeftGroupNotBrushed();
     }
 
-    @Test @Ignore
+    @Test
     public void advancedBrushTest()
     {
-        // Only run this in Chrome. There is a bug in web driver for Firefox that prevents it from properly releasing
-        // the mouse. You can view the (very old) issue here:
-        // https://code.google.com/p/selenium/issues/detail?id=3356
-
         Actions builder = new Actions(getDriver());
         goToChartingTestPage("interactivityTest");
         waitForSvgWithTitle("Interactive Plot");
@@ -482,16 +481,16 @@ public class ChartingAPITest extends BaseWebDriverTest
         builder.moveToElement(Locator.css(".x-axis-handle .background").findElement(getDriver())).moveByOffset(-280, 0).clickAndHold().moveByOffset(180, 0).release().perform();
         verifyBottomLeftGroupBrushed();
         verifyTopRightGroupNotBrushed();
-        assertEquals("Brushed area was not the expected height", "385", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("height"));
+        assertEquals("Brushed area was not the expected height", "377", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("height"));
         // Make sure when making a 1D selection that the opposite axis handle isn't visible.
         assertElementNotVisible(Locator.css(".y-axis-handle .resize.n"));
         assertElementNotVisible(Locator.css(".y-axis-handle .resize.s"));
 
         // 1D selection on y axis (select top right)
-        builder.moveToElement(Locator.css(".y-axis-handle .background").findElement(getDriver())).moveByOffset(0, -190).clickAndHold().moveByOffset(0, 190).release().perform();
+        builder.moveToElement(Locator.css(".y-axis-handle .background").findElement(getDriver())).moveByOffset(0, -188).clickAndHold().moveByOffset(0, 188).release().perform();
         verifyTopRightGroupBrushed();
         verifyBottomLeftGroupNotBrushed();
-        assertEquals("Brushed area was not the expected width", "619.9999999999999", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("width"));
+        assertEquals("Brushed area was not the expected width", "612", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("width"));
         // Make sure when making a 1D selection that the opposite axis handle isn't visible.
         assertElementNotVisible(Locator.css(".x-axis-handle .resize.e"));
         assertElementNotVisible(Locator.css(".x-axis-handle .resize.w"));

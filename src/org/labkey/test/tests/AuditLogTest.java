@@ -709,7 +709,7 @@ public class AuditLogTest extends BaseWebDriverTest
         Map<String, String> field03ExpectedColumns = Maps.of("action", "Created");
         Map<String, String> field03ExpectedComment = Maps.of("Name", FIELD03_NAME,
                 "Label", FIELD03_LABEL,
-                "Type", FIELD03_TYPE.toString(),
+                "Type", FIELD03_TYPE.getLabel(),
                 "Lookup", "[Schema: lists, Query: " + LOOK_UP_LIST01 + "]");
         pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
 
@@ -727,7 +727,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Change properties on field '" + FIELD03_NAME + "'.");
         listDefinitionPage.getFieldsPanel()
                 .getField(FIELD03_NAME)
-                .setLookup(new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST02).setTableType(ColumnType.Integer));
+                .setLookup(new FieldDefinition.IntLookup(null, "lists", LOOK_UP_LIST02));
         listDefinitionPage.clickSave();
 
         log("Validate that the expected row is there for the after modifying the Lookup field.");
