@@ -1,58 +1,91 @@
 package org.labkey.remoteapi.plate;
 
-
 import org.json.JSONObject;
 
 public class PlateSetParams
 {
-    private String _name;
+    private boolean _archived;
+    private String _containerId;
+    private String _containerName;
+    private String _containerPath;
+    private String _created;
+    private Integer _createdBy;
     private String _description;
-    private PlateSetType _type;
+    private String _modified;
+    private Integer _modifiedBy;
+    private String _name;
+    private Integer _plateCount;
     private String _plateSetId;
-    private Integer _rowId;
+    private Integer _primaryPlateSetId;
     private Integer _rootPlateSetId;
-
-    public PlateSetParams()
-    {
-    }
+    private Integer _rowId;
+    private boolean _template;
+    private CreatePlateSetParams.PlateSetType _plateSetType;
 
     public PlateSetParams(JSONObject json)
     {
-        _name = json.getString("name");
-        _description = json.optString("description", null);
-        _type = PlateSetType.fromName(json.optString("type", null));
-        _rowId = json.getInt("rowId");
-        _plateSetId = json.getString("plateSetId");
-        _rootPlateSetId = json.optIntegerObject("rootPlateSetId", null);
+        if (json.has("archived"))
+            _archived = json.getBoolean("archived");
+        if (json.has("containerId"))
+            _containerId = json.getString("containerId");
+        if (json.has("containerName"))
+            _containerName = json.getString("containerName");
+        if (json.has("containerPath"))
+            _containerPath = json.getString("containerPath");
+        if (json.has("created"))
+            _created = json.getString("created");
+        if (json.has("createdBy"))
+            _createdBy = json.getInt("createdBy");
+        if (json.has("description"))
+            _description = json.getString("description");
+        if (json.has("modified"))
+            _modified = json.getString("modified");
+        if (json.has("modifiedBy"))
+            _modifiedBy = json.getInt("modifiedBy");
+        if (json.has("name"))
+            _name = json.getString("name");
+        if (json.has("plateCount"))
+            _plateCount = json.getInt("plateCount");
+        if (json.has("plateSetId"))
+            _plateSetId = json.getString("plateSetId");
+        if (json.has("primaryPlateSetId"))
+            _primaryPlateSetId = json.getInt("primaryPlateSetId");
+        if (json.has("rootPlateSetId"))
+            _rootPlateSetId = json.getInt("rootPlateSetId");
+        if (json.has("rowId"))
+            _rowId = json.getInt("rowId");
+        if (json.has("type"))
+            _plateSetType = CreatePlateSetParams.PlateSetType.fromName(json.getString("type"));
     }
 
-    public JSONObject toJSON()
+    public boolean getArchived()
     {
-        JSONObject json = new JSONObject();
-        json.put("name", _name);
-        json.put("description", _description);
-        if (_type != null)
-            json.put("type", _type.getType());
-        json.put("rowId", _rowId);
-        json.put("parentPlateSetId", _rootPlateSetId);
-        return json;
+        return _archived;
     }
 
-    public PlateSetParams setName(String name)
+    public String getContainerId()
     {
-        _name = name;
-        return this;
+        return _containerId;
     }
 
-    public String getName()
+    public String getContainerName()
     {
-        return _name;
+        return _containerName;
     }
 
-    public PlateSetParams setDescription(String description)
+    public String getContainerPath()
     {
-        _description = description;
-        return this;
+        return _containerPath;
+    }
+
+    public String getCreated()
+    {
+        return _created;
+    }
+
+    public Integer getCreatedBy()
+    {
+        return _createdBy;
     }
 
     public String getDescription()
@@ -60,31 +93,24 @@ public class PlateSetParams
         return _description;
     }
 
-    public PlateSetParams setType(PlateSetType type)
+    public String getModified()
     {
-        _type = type;
-        return this;
+        return _modified;
     }
 
-    public PlateSetType getType()
+    public Integer getModifiedBy()
     {
-        return _type;
+        return _modifiedBy;
     }
 
-    public Integer getRowId()
+    public String getName()
     {
-        return _rowId;
+        return _name;
     }
 
-    public PlateSetParams setRootPlateSetId(Integer rootPlateSetId)
+    public Integer getPlateCount()
     {
-        _rootPlateSetId = rootPlateSetId;
-        return this;
-    }
-
-    public Integer getRootPlateSetId()
-    {
-        return _rootPlateSetId;
+        return _plateCount;
     }
 
     public String getPlateSetId()
@@ -92,31 +118,18 @@ public class PlateSetParams
         return _plateSetId;
     }
 
-    public enum PlateSetType
+    public Integer getPrimaryPlateSetId()
     {
-        Primary("primary"),
-        Assay("assay");
+        return _primaryPlateSetId;
+    }
 
-        PlateSetType(String type)
-                {
-                    this._type = type;
-                }
-        private final String _type;
-        public String getType()
-        {
-            return _type;
-        }
-        public static PlateSetType fromName(String type)
-        {
-            if (type != null)
-            {
-                for (PlateSetType plateSetType : PlateSetType.values())
-                {
-                    if (type.equalsIgnoreCase(plateSetType.getType()))
-                        return plateSetType;
-                }
-            }
-            return null;
-        }
+    public Integer getRootPlateSetId()
+    {
+        return _rootPlateSetId;
+    }
+
+    public Integer getRowId()
+    {
+        return _rowId;
     }
 }
