@@ -68,7 +68,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         }
         if (def.getDimension() != null)
         {
-            advancedSettings.add(AdvancedFieldSetting.measure(def.getDimension()));
+            advancedSettings.add(AdvancedFieldSetting.dimension(def.getDimension()));
         }
         if (def.getMvEnabled() != null)
         {
