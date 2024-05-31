@@ -80,10 +80,6 @@ public class FieldDefinition extends PropertyDescriptor
     {
         Map<String, Object> allProperties = new HashMap<>(_extraFieldProperties);
         allProperties.putIfAbsent("defaultValueType", DefaultType.FIXED_EDITABLE);
-        if (getMeasure() == null)
-        {
-            setMeasure(getType().isMeasureByDefault());
-        }
         return allProperties;
     }
 
