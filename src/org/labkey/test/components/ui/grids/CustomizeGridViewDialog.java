@@ -98,6 +98,11 @@ public class CustomizeGridViewDialog extends ModalDialog
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
     }
 
+    public boolean isFieldAvailable(String... fieldName)
+    {
+        return elementCache().getListItemElementByFieldKeyOrNull(expandAvailableFields(fieldName)) != null;
+    }
+
     /**
      * Add a field to the 'Shown in Grid' list. If more than one value is passed in it is assumed to be an expandable path.
      *
@@ -136,7 +141,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * are passed in it is assumed to be a path and all fields will be expanded to the last field.
      *
      * @param fields The list of fields to expand.
-     * @return This dialog.
+     * @return key for the expanded field.
      */
     private String expandAvailableFields(String... fields)
     {
@@ -524,6 +529,13 @@ public class CustomizeGridViewDialog extends ModalDialog
             return Locator.tagWithClass("div", "list-group-item")
                     .withAttributeIgnoreCase("data-fieldkey", fieldKey)
                     .findElement(availableFieldsPanel);
+        }
+
+        protected WebElement getListItemElementByFieldKeyOrNull(String fieldKey)
+        {
+            return Locator.tagWithClass("div", "list-group-item")
+                    .withAttributeIgnoreCase("data-fieldkey", fieldKey)
+                    .findElementOrNull(availableFieldsPanel);
         }
 
         // Get the displayed names/labels of list items in the given panel.
