@@ -144,15 +144,29 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "attachment-card");
         private String _fileName = null;
+        private String _title = null;
 
         public FileAttachmentCardFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public FileAttachmentCardFinder withFile(String fileName)
+        /*
+            Finds the card by the componentElement's title attribute
+            This is often the file name but can include more information, such as its location
+         */
+        public FileAttachmentCardFinder withTitle(String title)
         {
-            _fileName = fileName;
+            _title = title;
+            return this;
+        }
+
+        /*
+            Finds the card by the text of its attachment-card__name element
+         */
+        public FileAttachmentCardFinder withFileName(String name)
+        {
+            _fileName = name;
             return this;
         }
 
@@ -165,8 +179,11 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         @Override
         protected Locator locator()
         {
-            if (_fileName != null)
-                return _baseLocator.withAttribute("title", _fileName);
+            if (_title != null)
+                return _baseLocator.withAttribute("title", _title);
+            else if (_fileName != null)
+                return _baseLocator.withDescendant(
+                        Locator.tagWithClass("div", "attachment-card__name").withText(_fileName));
             else
                 return _baseLocator;
         }
