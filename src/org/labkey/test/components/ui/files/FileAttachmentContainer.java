@@ -73,17 +73,17 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
     }
 
     /*
-        Errors can be shown when you try to drop multiple files on a single-mode container
+        Alerts can be shown when you try to drop multiple files on a single-mode container
         they can also occur when files the container won't accept are uploaded
      */
-    public boolean hasError()
+    public boolean hasAlert()
     {
-        return elementCache().uploadErrorLoc.existsIn(this);
+        return elementCache().uploadAlertLoc.existsIn(this);
     }
 
-    public String getUploadError()
+    public String getUploadAlert()
     {
-        return elementCache().uploadErrorLoc.findElement(this).getText();
+        return elementCache().uploadAlertLoc.findElement(this).getText();
     }
 
     public FileAttachmentContainer attachFile(File file)
@@ -103,22 +103,47 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
         return this;
     }
 
+    public String attachFileExpectingAlert(File file)
+    {
+        elementCache().fileInput.set(file);
+        return elementCache().uploadAlertLoc.findElement(this).getText();
+    }
+
+    /**
+     * Returns true if there is a file with that name in the current instance
+     */
     private boolean hasFile(String fileName)
     {
         return new FileAttachmentEntry.FileAttachmentEntryFinder(getDriver())
                 .withTitle(fileName).findOptional(this).isPresent();
     }
 
+    /*
+        Assumes there is an attached file
+     */
     public FileAttachmentContainer removeFile()
     {
         getAttachedFileEntries().get(0).remove();
         return this;
     }
 
+    /**
+     * removes the specified attachment
+     * @param fileName the name of the attached file to detach
+     * @return the current instance
+     */
     public FileAttachmentContainer removeFile(String fileName)
     {
         getAttachedFileEntry(fileName).remove();
         clearElementCache();
+        return this;
+    }
+
+    public FileAttachmentContainer removeAllAttachedFiles()
+    {
+        var entries = getAttachedFileEntries();
+        for (FileAttachmentEntry entry : entries)
+            entry.remove();
         return this;
     }
 
@@ -173,7 +198,7 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
                 .findWhenNeeded(this);
         public WebElement fileEntryList = Locator.tagWithClass("div", "file-upload--file-entry-listing")
                 .findWhenNeeded(this);
-        public Locator uploadErrorLoc = Locator.tagWithClass("div", "alert-danger");
+        public Locator uploadAlertLoc = Locator.tagWithClass("div", "alert");
         public Locator fileUploadScrollFooterLoc = Locator.tagWithClass("div", "file-upload--scroll-footer");
     }
 
