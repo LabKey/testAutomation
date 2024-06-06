@@ -77,6 +77,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
             return false;
         elementCache().menu.get().openMenuTo();
         List<String> menuOptions = getWrapper().getTexts(elementCache().menu.get().findVisibleMenuItems());
+        elementCache().menu.get().collapse();
         return menuOptions.contains(DOWNLOAD_ATTACHMENT);
     }
 
