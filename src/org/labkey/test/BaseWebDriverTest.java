@@ -465,7 +465,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void skipped(AssumptionViolatedException e, Description description)
             {
-                super.skipped(e, description);
                 getCurrentTest().checker().reportResults();
             }
 
@@ -792,6 +791,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (_testFailed)
                     resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
+            }
+
+            @Override
+            protected void skipped(AssumptionViolatedException e, Description description)
+            {
+                succeeded(description);
             }
 
             @Override
