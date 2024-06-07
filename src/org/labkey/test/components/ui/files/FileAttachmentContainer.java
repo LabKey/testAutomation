@@ -155,7 +155,7 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
 
     public List<FileAttachmentEntry> getAttachedFileEntries()
     {
-        return new FileAttachmentEntry.FileAttachmentEntryFinder(getDriver()).timeout(2000)
+        return new FileAttachmentEntry.FileAttachmentEntryFinder(getDriver())
                 .findAll(elementCache().fileEntryList);
     }
 
