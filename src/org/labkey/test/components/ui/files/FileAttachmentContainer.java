@@ -14,8 +14,7 @@ import java.io.File;
 import java.util.List;
 
 /*
-    Wraps https://github.com/LabKey/labkey-ui-components/blob/fb_assayResultsFiles/packages/components/src/internal/components/files/FileAttachmentContainer.tsx
-
+    Wraps https://github.com/LabKey/labkey-ui-components/blob/develop/packages/components/src/internal/components/files/FileAttachmentContainer.tsx
  */
 public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentContainer.ElementCache>
 {
