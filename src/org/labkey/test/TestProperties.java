@@ -247,6 +247,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.productFeature." + feature.toLowerCase(), "true"));
     }
 
+    public static boolean ignoreDatabaseNotSupportedException()
+    {
+        return "true".equals(System.getProperty("webtest.ignoreDatabaseNotSupportedException"));
+    }
+
     /**
      * Parses system property 'webtest.server.startup.timeout' to determine maximum allowed server startup time.
      * If property is not defined or is not an integer, it defaults to 60 seconds.
