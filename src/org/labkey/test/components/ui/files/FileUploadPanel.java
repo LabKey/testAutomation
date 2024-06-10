@@ -78,6 +78,16 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
         return getWrapper().doAndWaitForDownload(()->elementCache().downloadTemplate.click());
     }
 
+    /*
+        for situations in which there are more than a single file attachment container/target,
+        you can specify which one you want by input name
+     */
+    public FileAttachmentContainer getFileAttachmentContainer(String inputName)
+    {
+        return new FileAttachmentContainer.FileAttachmentContainerFinder(getDriver())
+                .withNamedInput(inputName).waitFor(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

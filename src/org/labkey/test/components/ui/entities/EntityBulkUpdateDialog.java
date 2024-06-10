@@ -11,6 +11,8 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
+import org.labkey.test.components.ui.files.FileAttachmentContainer;
+import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -123,6 +125,17 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public String getDateField(String fieldKey)
     {
         return elementCache().dateInput(fieldKey).get();
+    }
+
+    public FileAttachmentContainer getFileField(String fieldKey)
+    {
+        return elementCache().fileUploadField(fieldKey);
+    }
+
+    public EntityBulkUpdateDialog removeFile(String fieldKey)
+    {
+        getFileField(fieldKey).removeFile();
+        return this;
     }
 
     public EntityBulkUpdateDialog setBooleanField(String fieldKey, boolean checked)
@@ -275,6 +288,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
                     .withInputId(fieldKey).waitFor(formRow(fieldKey));
+        }
+
+        public FileAttachmentContainer fileUploadField(String fieldKey)
+        {
+            return new FileAttachmentContainer(formRow(fieldKey), getDriver());
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");

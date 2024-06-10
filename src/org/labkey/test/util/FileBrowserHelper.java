@@ -674,6 +674,28 @@ public class FileBrowserHelper extends WebDriverWrapper
         return actions;
     }
 
+    public ActionStatus getActionStatus(BrowserAction action)
+    {
+        List<WebElement> buttons = findBrowserButtons();
+        for(WebElement button : buttons)
+        {
+            String cssClassString = button.getAttribute("class");
+            if (cssClassString.contains(action.buttonCls()))
+            {
+                // we've found the button for the action.
+                if (cssClassString.contains("x4-btn-disabled"))
+                    return ActionStatus.DISABLED;
+                else
+                    return ActionStatus.ENABLED;
+            }
+            else
+            {
+                log(cssClassString);
+            }
+        }
+        return ActionStatus.MISSING;
+    }
+
     public enum BrowserAction
     {
         FOLDER_TREE("sitemap", "Toggle Folder Tree", "folderTreeToggle"),
@@ -749,6 +771,12 @@ public class FileBrowserHelper extends WebDriverWrapper
         {
             return button().containing(_buttonText);
         }
+    }
+
+    public enum ActionStatus{
+        ENABLED,
+        DISABLED,
+        MISSING
     }
 
     /**
