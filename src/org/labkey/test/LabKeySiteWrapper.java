@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.labkey.api.data.dialect.DatabaseNotSupportedException;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -902,40 +903,55 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             return;
 
         ensureSignedInAsPrimaryTestUser();
-        String serverErrors = getServerErrors();
-        if (!serverErrors.isEmpty())
+        String errorLogContents = getServerErrors();
+        if (!errorLogContents.isEmpty())
         {
             TestLogger.error("Server errors:");
             TestLogger.increaseIndent();
-
-            final Iterator<String> iterator = Arrays.stream(serverErrors.split("\\n")).iterator();
+            final List<List<String>> serverErrors = new ArrayList<>();
+            List<String> currentError = null;
+            final Iterator<String> iterator = Arrays.stream(errorLogContents.split("\\n")).iterator();
             while (iterator.hasNext())
             {
                 String line = iterator.next();
-                if ((line.startsWith("ERROR") || line.startsWith("FATAL")) && !line.endsWith("Additional exception info:"))
+                if (currentError == null || ERROR_PATTERN.matcher(line).find() && !line.endsWith("Additional exception info:"))
                 {
+                    // New error has started
+                    currentError = new ArrayList<>();
+                    serverErrors.add(currentError);
+
                     TestLogger.error(line);
-                    if (iterator.hasNext())
-                    {
-                        // Line after the ERROR usually has the exception type and error message
-                        TestLogger.error("    " + iterator.next());
-                    }
                 }
-                if (line.startsWith("Caused by:"))
+                else if (currentError.size() == 1)
+                {
+                    // Line after the ERROR usually has the exception type and error message
+                    TestLogger.error("    " + iterator.next());
+                }
+                else if (line.startsWith("Caused by:"))
                 {
                     // Append all nested exception messages
                     TestLogger.error("  " + line);
                 }
+                currentError.add(line);
             }
 
             TestLogger.decreaseIndent();
 
-            beginAt(buildURL("admin", "showErrorsSinceMark"));
-            resetErrors();
-            if (serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
-                fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+            if (TestProperties.ignoreDatabaseNotSupportedException() &&
+                    serverErrors.stream().allMatch(er -> er.size() > 1 && er.get(1).contains(DatabaseNotSupportedException.class.getName())))
+            {
+                TestLogger.warn("Ignoring module startup errors for unsupported database");
+                resetErrors();
+            }
             else
-                fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+            {
+                beginAt(buildURL("admin", "showErrorsSinceMark"));
+                resetErrors();
+                if (errorLogContents.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
+                    fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+                else
+                    fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+            }
         }
         log("No new errors found.");
     }

@@ -58,6 +58,7 @@ import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ExportDiagnosticsPseudoTest;
 import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
+import org.labkey.test.util.ProductionModeOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.Timer;
@@ -443,17 +444,22 @@ public class Runner extends TestSuite
                     continue;
                 }
 
-                if(interfaces.contains(DevModeOnlyTest.class) && !TestProperties.isDevModeEnabled())
+                if (interfaces.contains(DevModeOnlyTest.class) && !TestProperties.isDevModeEnabled())
                 {
                     LOG.warn("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
                     continue;
                 }
-                else if(interfaces.contains(WindowsOnlyTest.class) && !SystemUtils.IS_OS_WINDOWS)
+                else if (interfaces.contains(ProductionModeOnlyTest.class) && TestProperties.isDevModeEnabled())
+                {
+                    LOG.warn("** Skipping " + testClass.getSimpleName() + ": server must be in production mode");
+                    continue;
+                }
+                else if (interfaces.contains(WindowsOnlyTest.class) && !SystemUtils.IS_OS_WINDOWS)
                 {
                     LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + SystemUtils.OS_NAME);
                     continue;
                 }
-                else if(interfaces.contains(NonWindowsTest.class) && SystemUtils.IS_OS_WINDOWS)
+                else if (interfaces.contains(NonWindowsTest.class) && SystemUtils.IS_OS_WINDOWS)
                 {
                     LOG.warn("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + SystemUtils.OS_NAME);
                     continue;
