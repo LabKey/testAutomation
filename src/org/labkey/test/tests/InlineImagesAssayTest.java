@@ -180,7 +180,10 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         customizeView.addColumn(new String[]{"Run", "RowId"});
         customizeView.addColumn(new String[]{"Run", "Protocol", "RowId"});
         customizeView.applyCustomView();
-        String helpJpgFilePath = "AssayId_" + list.getDataAsText(0, "Run/Protocol/RowId") + "/RunId_" + list.getDataAsText(0, "Run/RowId") + "/" + HELP_JPG_FILE.getName();
+        var protocolId = list.getDataAsText(0, "Run/Protocol/RowId");
+        var runId = list.getDataAsText(0, "Run/RowId");
+        String helpJpgFilePath = String.format("AssayId_%s%sRunId_%s%s%s", protocolId, File.separatorChar,
+                runId, File.separatorChar, HELP_JPG_FILE.getName());
 
         log("Validate that two links to this image file are now present.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
