@@ -27,6 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -172,14 +173,22 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         clickButton("Submit");
         waitForElement(DataRegionTable.updateLinkLocator()); // Wait to make sure the grid has been rendered.
 
+        // add columns to the grid to get assay and run id for file verification path
+        DataRegionTable list = new DataRegionTable("Data", getDriver());
+        CustomizeView customizeView = list.openCustomizeGrid();
+        customizeView.showHiddenItems();
+        customizeView.addColumn(new String[]{"Run", "RowId"});
+        customizeView.addColumn(new String[]{"Run", "Protocol", "RowId"});
+        customizeView.applyCustomView();
+        String helpJpgFilePath = "AssayId_" + list.getDataAsText(0, "Run/Protocol/RowId") + "/RunId_" + list.getDataAsText(0, "Run/RowId") + "/" + HELP_JPG_FILE.getName();
+
         log("Validate that two links to this image file are now present.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
 
         log("Export the grid to excel.");
         File exportedFile;
-        DataRegionTable list;
         DataRegionExportHelper exportHelper;
 
         list = new DataRegionTable("Data", getDriver());
@@ -188,7 +197,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
-            validateExcelExport(exportedFile, workbook);
+            validateExcelExport(exportedFile, workbook, helpJpgFilePath);
 
             log("Validate that the 'File' (last) column is as expected.");
             assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
@@ -210,7 +219,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Verify that the other 'File' fields are not affected.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");
@@ -221,7 +230,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
 
-            validateExcelExport(exportedFile, workbook);
+            validateExcelExport(exportedFile, workbook, helpJpgFilePath);
 
             log("Validate that the removed column no longer shows up in the export.");
             List<String> exportedHeaders = ExcelHelper.getRowData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 0);
@@ -230,7 +239,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         }
     }
 
-    private void validateExcelExport(File exportedFile, Workbook workbook)
+    private void validateExcelExport(File exportedFile, Workbook workbook, String helpJpgFilePath)
     {
         Sheet sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
 
@@ -267,7 +276,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Validate that the value for the file columns is as expected.");
         List<String> exportedColumn = ExcelHelper.getColumnData(sheet, 4);
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", HELP_JPG_FILE.getName()),
+                Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", helpJpgFilePath.toLowerCase()),
                 exportedColumn);
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 5);
