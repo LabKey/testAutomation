@@ -20,15 +20,13 @@ import org.labkey.api.assay.AssayRunDomainKind;
 import org.labkey.api.admin.HealthCheck;
 import org.labkey.api.data.Container;
 import org.labkey.api.issues.IssuesUrls;
-import org.labkey.api.ms2.MS2Urls;
 import org.labkey.api.security.User;
 import org.labkey.api.security.roles.TrustedAnalystRole;
-import org.labkey.api.targetedms.TargetedMSFolderTypeListener;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.di.DataIntegrationService;
 import org.labkey.api.inventory.InventoryService;
 
-public class StarterArtifactsManager implements HealthCheck, IssuesUrls, MS2Urls, TargetedMSFolderTypeListener
+public class StarterArtifactsManager implements HealthCheck, IssuesUrls
 {
     private static final StarterArtifactsManager _instance = new StarterArtifactsManager();
 
@@ -67,42 +65,6 @@ public class StarterArtifactsManager implements HealthCheck, IssuesUrls, MS2Urls
     public ActionURL getListURL(Container container, String s)
     {
         return null;
-    }
-
-    @Override
-    public ActionURL getShowPeptideUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getShowListUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getProteinSearchUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getPepSearchUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getPepSearchUrl(Container container, String s)
-    {
-        return null;
-    }
-
-    @Override
-    public void folderCreated(Container container, User user)
-    {
-
     }
 
     public void dataIntegrationServiceCheck()
