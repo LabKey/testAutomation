@@ -281,9 +281,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         int index = -1;
 
         List<String> columnData = getColumnData(columnLabel);
-        for(int i = 0; i < columnData.size(); i++)
+        for (int i = 0; i < columnData.size(); i++)
         {
-            if(columnData.get(i).equals(text))
+            if (columnData.get(i).equals(text))
             {
                 index = i;
                 break;
@@ -292,7 +292,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         return index;
     }
-
 
     /**
      * Get the td element for a cell.
@@ -463,13 +462,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             ReactDateTimePicker dateTimePicker = elementCache().datePicker();
             dateTimePicker.select(localDateTime);
         }
-        else if(value instanceof LocalDate localDate)
+        else if (value instanceof LocalDate localDate)
         {
             activateCell(gridCell);
             ReactDateTimePicker datePicker = elementCache().datePicker();
             datePicker.selectDate(localDate);
         }
-        else if(value instanceof LocalTime localTime)
+        else if (value instanceof LocalTime localTime)
         {
             activateCell(gridCell);
             ReactDateTimePicker datePicker = elementCache().datePicker();
@@ -487,7 +486,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
-            if(checkContains)
+            if (checkContains)
             {
                 // Wait until the grid cell has the updated text. Check for contains, not equal, because when updating a cell
                 // the cell's new value will be the old value plus the new value and the cursor may not be placed at the end
@@ -533,7 +532,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         clearCellValue(getRowIndex(columnNameToSearch, valueToSearch), columnNameToClear);
     }
 
-
     /**
      * Clear the cell (columnName) in the row.
      *
@@ -562,7 +560,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         return cell.getText().trim();
     }
-
 
     /**
      * Dismiss the dropdown list that is currently displayed on the grid.
@@ -615,7 +612,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         return lookupSelect.getOptions();
     }
-
 
     /**
      * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
@@ -774,7 +770,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 .build()
                 .perform();
 
-        return  (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+        return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
                 .getData(DataFlavor.stringFlavor);
     }
 
@@ -812,17 +808,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private void selectAllCells()
     {
-        if (!areAllInSelection())
-        {
-            int indexOffset = hasSelectColumn() ? 1 : 0;
-            selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
-                                                                // this resets the grid state to a known base condition
-            // use 'ctrl-a' to select the entire grid
-            Keys cmdKey = MODIFIER_KEY;
-            new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
-            WebDriverWrapper.waitFor(this::areAllInSelection,
-                    "the expected cells did not become selected", 3000);
-        }
+        if (areAllInSelection())
+            return;
+
+        int indexOffset = hasSelectColumn() ? 1 : 0;
+        selectCell(getCell(0, getColumnNames().get(1 + indexOffset)));    // forces the index cell into selected state
+                                                            // this resets the grid state to a known base condition
+        // use 'ctrl-a' to select the entire grid
+        Keys cmdKey = MODIFIER_KEY;
+        new Actions(getDriver()).keyDown(cmdKey).sendKeys("a").keyUp(cmdKey).build().perform();
+        WebDriverWrapper.waitFor(this::areAllInSelection,
+                "the expected cells did not become selected", 3000);
     }
 
     public WebElement selectCell(int row, String columnName)
@@ -842,18 +838,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         getWrapper().scrollIntoView(cell);
 
-        if (!isCellSelected(cell))
+        if (isCellSelected(cell))
+            return;
+
+        cell.click();
+
+        // The initial click may work but the selection style may go away in some scenarios, like click happening
+        // before some required cells are populated. This is a retry to protect against those scenarios.
+        if (Boolean.FALSE.equals(WebDriverWrapper.waitFor(()->  isCellSelected(cell), 1_000)))
         {
             cell.click();
-
-            // The initial click may work but the selection style may go away in some scenarios, like click happening
-            // before some required cells are populated. This is a retry to protect against those scenarios.
-            if(Boolean.FALSE.equals(WebDriverWrapper.waitFor(()->  isCellSelected(cell), 1_000)))
-            {
-                cell.click();
-                WebDriverWrapper.waitFor(()->  isCellSelected(cell),
-                        "The target cell did not become selected.", 1_000);
-            }
+            WebDriverWrapper.waitFor(()->  isCellSelected(cell), "The target cell did not become selected.", 1_000);
         }
     }
 
@@ -930,10 +925,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         WebElement gridCell = getCell(row, column);
 
-        if (! cellHasWarning(gridCell))
-            return null;
-        else
+        if (cellHasWarning(gridCell))
             return Locator.tagWithClass("div", "cell-warning").findElement(gridCell).getText();
+        return null;
     }
 
     public String getCellPopoverText(int row, String column)
@@ -945,8 +939,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             String popoverId = warnDiv.getAttribute("aria-describedby");
             return Locator.id(popoverId).findElement(getDriver()).getText();
         }
-        else
-            return null;
+        return null;
     }
 
     public List<WebElement> getCellErrors()
@@ -997,47 +990,37 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement topControls = Locator.byClass("editable-grid-buttons__action-buttons").findWhenNeeded(this);
-
         final WebElement bulkInsertBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
         final WebElement bulkUpdateBtn = Locator.byClass("bulk-update-button").findWhenNeeded(topControls);
         final WebElement deleteRowsBtn =  Locator.byClass("bulk-remove-button").findWhenNeeded(topControls);
         final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
-
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
-
         private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
 
         private List<String> columnNames = new ArrayList<>();
 
         public List<String> getColumnNames()
         {
-
             // If the number of header cells is not equal to the list of columnName the columns have been modified since
             // the last call to getColumnNames so get the column names again.
             List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
-            if(columnNames.size() != headerCells.size())
+            if (columnNames.size() != headerCells.size())
             {
                 columnNames = new ArrayList<>();
             }
 
             if (columnNames.isEmpty())
             {
-
                 for (WebElement el : headerCells)
                 {
                     columnNames.add(el.getText().trim());
                 }
 
-                int rowNumberColumn;
-
+                int rowNumberColumn = 0;
                 if (hasSelectColumn())
                 {
                     columnNames.set(0, SELECT_COLUMN_HEADER);
                     rowNumberColumn = 1;
-                }
-                else
-                {
-                    rowNumberColumn = 0;
                 }
 
                 if (columnNames.get(rowNumberColumn).trim().isEmpty())
@@ -1048,7 +1031,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
             return columnNames;
         }
-
 
         public WebElement inputCell()
         {
@@ -1085,8 +1067,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator spinner = Locator.css(".fa-spinner");
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         static final Locator headerCells = Locator.css("thead tr th");
-        static final Locator inputCell = Locator.tagWithClass("input", "cellular-input");
-
+        static final Locator inputCell = Locator.css(".eg-input-cell");
     }
 
     public static class EditableGridFinder extends WebDriverComponent.WebDriverComponentFinder<EditableGrid, EditableGridFinder>
