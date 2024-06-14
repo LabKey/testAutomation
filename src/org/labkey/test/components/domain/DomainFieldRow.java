@@ -727,7 +727,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // Intentionally using '.collect(Collectors.toList())' so the returned list is mutable (e.g. can sort it when
         // comparing against expected).
         return Locator.tagWithClass("button", "list-group-item")
-                .withChild(Locator.tagWithClass("span", "choices-list__locked"))
+                .withDescendant(Locator.tagWithClass("span", "choices-list__locked"))
                 .findElements(this)
                 .stream().map(WebElement::getText).collect(Collectors.toList());
     }
