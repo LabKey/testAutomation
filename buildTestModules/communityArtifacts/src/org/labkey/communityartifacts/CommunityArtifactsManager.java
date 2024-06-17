@@ -20,9 +20,7 @@ import org.labkey.api.assay.AssayRunDomainKind;
 import org.labkey.api.admin.HealthCheck;
 import org.labkey.api.data.Container;
 import org.labkey.api.issues.IssuesUrls;
-import org.labkey.api.ms2.MS2Urls;
 import org.labkey.api.security.User;
-import org.labkey.api.targetedms.TargetedMSFolderTypeListener;
 import org.labkey.api.view.ActionURL;
 
 /**
@@ -31,7 +29,7 @@ import org.labkey.api.view.ActionURL;
  * want to assure that the dependencies being declared are used in the build so an appropriate failure
  * will occur if they are not found.
  */
-public class CommunityArtifactsManager implements HealthCheck, IssuesUrls, MS2Urls, TargetedMSFolderTypeListener
+public class CommunityArtifactsManager implements HealthCheck, IssuesUrls
 {
     private static final CommunityArtifactsManager _instance = new CommunityArtifactsManager();
 
@@ -72,39 +70,4 @@ public class CommunityArtifactsManager implements HealthCheck, IssuesUrls, MS2Ur
         return null;
     }
 
-    @Override
-    public ActionURL getShowPeptideUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getShowListUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getProteinSearchUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getPepSearchUrl(Container container)
-    {
-        return null;
-    }
-
-    @Override
-    public ActionURL getPepSearchUrl(Container container, String s)
-    {
-        return null;
-    }
-
-    @Override
-    public void folderCreated(Container container, User user)
-    {
-
-    }
 }

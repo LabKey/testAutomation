@@ -33,9 +33,6 @@ dependencies {
     modules ("org.labkey.module:issues:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:luminex:${labkeyVersion}@module") {
-        transitive = true
-    }
     modules ("org.labkey.module:microarray:${labkeyVersion}@module") {
         transitive = true
     }
@@ -48,9 +45,6 @@ dependencies {
     modules ("org.labkey.module:survey:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:targetedms:${labkeyVersion}@module") {
-        transitive = true
-    }
     modules ("org.labkey.module:visualization:${labkeyVersion}@module") {
         transitive = true
     }
@@ -61,9 +55,6 @@ dependencies {
         transitive = true
     }
     modules ("org.labkey.module:cas:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:assayRequest:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:dataintegration:${labkeyVersion}@module") {
@@ -81,12 +72,16 @@ dependencies {
     modules ("org.labkey.module:saml:${labkeyVersion}@module") {
         transitive = true
     }
+    modules ("org.labkey.module:redshift:${labkeyVersion}@module") {
+        transitive = true
+    }
+    modules ("org.labkey.module:cloudServices:${labkeyVersion}@module") {
+        transitive = true
+    }
 
     // add dependencies on all starter API artifacts
     implementation "org.labkey.api:core:${labkeyVersion}"
     implementation "org.labkey.api:assay:${labkeyVersion}"
-    implementation "org.labkey.api:ms2:${labkeyVersion}"
-    implementation "org.labkey.api:targetedms:${labkeyVersion}"
     implementation "org.labkey.api:dataintegration:${labkeyVersion}"
     implementation "org.labkey.api:premium:${labkeyVersion}"
     implementation "org.labkey.api:inventory:${labkeyVersion}"
