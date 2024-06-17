@@ -21,6 +21,9 @@ dependencies {
     modules ("org.labkey.module:issues:${labkeyVersion}@module") {
         transitive = true
     }
+    modules ("org.labkey.module:list:${labkeyVersion}@module") {
+        transitive = true
+    }
     modules ("org.labkey.module:study:${labkeyVersion}@module") {
         transitive = true
     }
