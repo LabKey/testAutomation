@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.util.SampleTypeHelper;
@@ -64,7 +65,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
                     try
                     {
                         return elementCache().statusTypeSelect.isInteractive() &&
-                                elementCache().labelField.getComponentElement().isEnabled() &&
+                                elementCache().labelField().getComponentElement().isEnabled() &&
                                 elementCache().descriptionField.isEnabled();
                     }
                     catch (NoSuchElementException | StaleElementReferenceException exp)
@@ -82,8 +83,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public SampleStatus selectStatus(String name, SampleTypeHelper.StatusType statusType)
     {
-        WebElement groupItem = elementCache().statusItem(name);
-        groupItem.click();
+        elementCache().statusItem(name).click();
         SampleStatus status = new SampleStatus();
 
         status.isLocked = isLocked();
@@ -99,8 +99,8 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
                     {
                         try
                         {
-                            return groupItem.getText().trim().toLowerCase()
-                                    .contains(elementCache().labelField.get().trim().toLowerCase());
+                            return elementCache().selectedStatusItem().getText().trim().toLowerCase()
+                                    .contains(elementCache().labelField().get().trim().toLowerCase());
                         }
                         catch (NoSuchElementException | StaleElementReferenceException exp)
                         {
@@ -108,7 +108,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
                         }
                     },
                     String.format("Edit part of the panel for a locked status did not render in time. Value in label textbox '%s' did not contain '%s'.",
-                            elementCache().labelField.get(), groupItem.getText()), 1_000);
+                            elementCache().labelField().get(), elementCache().selectedStatusItem().getText()), 1_000);
 
         }
 
@@ -122,7 +122,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public String getLabel()
     {
-        return elementCache().labelField.getValue();
+        return elementCache().labelField().getValue();
     }
 
     public String getDescription()
@@ -145,7 +145,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     public boolean isLocked()
     {
         return Locator.tagWithClass("span", "domain-field-lock-icon")
-                .findWhenNeeded(elementCache().selectedStatusItem)
+                .findWhenNeeded(elementCache().selectedStatusItem())
                 .isDisplayed();
     }
 
@@ -171,7 +171,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
     public ManageSampleStatusesPanel setLabel(String label)
     {
-        elementCache().labelField.setValue(label);
+        elementCache().labelField().setValue(label);
         return this;
     }
 
@@ -241,7 +241,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return this;
     }
 
-    public ManageSampleStatusesPanel deleteStatus(String label)
+    public ModalDialog deleteStatus(String label)
     {
         selectStatus(label);
 
@@ -249,7 +249,8 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
                 "Delete button is not visible.", 1_000);
 
         elementCache().deleteButton.click();
-        return this;
+
+        return new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Permanently Delete Status?").find();
     }
 
     protected class ElementCache extends Component<?>.ElementCache
@@ -261,11 +262,17 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
 
         final Locator statusItems = Locator.tagWithClass("button", "list-group-item");
 
-        final WebElement selectedStatusItem = Locator.tagWithClass("button", "list-group-item").withClass("active")
-                .refindWhenNeeded(this);
+        final WebElement selectedStatusItem()
+        {
+            return Locator.tagWithClass("button", "list-group-item").withClass("active")
+                    .refindWhenNeeded(this);
+        }
         final WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
                 .refindWhenNeeded(getComponentElement());
-        final Input labelField = Input.Input(Locator.inputByNameContaining("label"), getDriver()).refindWhenNeeded(this);
+        final Input labelField()
+        {
+            return Input.Input(Locator.inputByNameContaining("label"), getDriver()).refindWhenNeeded(this);
+        }
         final WebElement colorPickerContainer = Locator.tagWithClassContaining("div", "color-picker").refindWhenNeeded(this);
         final WebElement colorButton = Locator.tagWithClassContaining("button", "color-picker__button").refindWhenNeeded(this);
         final WebElement descriptionField = Locator.textarea("description").refindWhenNeeded(this);
