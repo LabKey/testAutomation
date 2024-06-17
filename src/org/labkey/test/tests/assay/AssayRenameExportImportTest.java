@@ -52,6 +52,7 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
     private static final String ASSAY_XAR_SECOND_PROJECT = "Assay_Rename_XAR_Import_Test_Copy";
 
     private static final File FOLDER_EXPORT_RUN = TestFileUtils.getSampleData("GPAT/renameAssayTrialFolderExport.xls");
+    private static final File FOLDER_EXPORT_RUN_XLSX = TestFileUtils.getSampleData("GPAT/renameAssayTrialFolderExport.xlsx");
     private static final File ASSAY_EXPORT_RUN_01 = TestFileUtils.getSampleData("GPAT/renameAssayTrialAssayExport01.xls");
     private static final File ASSAY_EXPORT_RUN_02 = TestFileUtils.getSampleData("GPAT/renameAssayTrialAssayExport02.xls");
 
@@ -164,7 +165,7 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
 
         log("Validate that a new assay can be created in the second folder.");
         String secondAssay = "Assay Created In Copied Project";
-        createGpatAssayAndRun(SECOND_PROJECT, secondAssay, FOLDER_EXPORT_RUN);
+        createGpatAssayAndRun(SECOND_PROJECT, secondAssay, FOLDER_EXPORT_RUN_XLSX);
 
         log("Export runs table to validate date and time fields.");
 

@@ -169,7 +169,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
     public void testAssayRunsExportOptions()
     {
         String assayName = "Export Assay";
-        File runFile = new File(TestFileUtils.getSampleData("AssayImportExport"), "GenericAssay_Run1.xls");
+        File runFile = TestFileUtils.getSampleData("AssayImportExport/GenericAssay_Run1.xlsx");
 
         goToManageAssays();
         _assayHelper.createAssayDesign("General", assayName).clickSave();

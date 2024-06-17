@@ -81,9 +81,12 @@ public class AssayExportImportTest extends BaseWebDriverTest
     private static final File SAMPLE_DATA_LOCATION = TestFileUtils.getSampleData("AssayImportExport");
 
     private final File RUN01_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run1.xls");
+    private final File RUN01_XLSX_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run1.xlsx");
     private final File RUN02_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run2.xls");
+    private final File RUN02_XLSX_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run2.xlsx");
     private final File RUN03_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run3.xls");
     private final File RUN04_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run4.xls");
+    private final File RUN04_XLSX_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run4.xlsx");
 
     private final String RUN01_NAME = "Run01";
     private final String RUN02_NAME = "Run02";
@@ -349,7 +352,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT);
 
         List<File> runFiles = Arrays.asList(
-                RUN01_FILE,
+                RUN01_XLSX_FILE,
                 RUN02_FILE,
                 RUN03_FILE,
                 RUN04_FILE);
@@ -441,7 +444,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         List<File> runFiles = Arrays.asList(
                 RUN01_FILE,
-                RUN02_FILE,
+                RUN02_XLSX_FILE,
                 RUN03_FILE,
                 RUN04_FILE);
 
@@ -542,7 +545,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         assayDesignerPage.goToResultsFields()
                 .removeAllFields(false)
-                .setInferFieldFile(RUN01_FILE);
+                .setInferFieldFile(RUN01_XLSX_FILE);
         assayDesignerPage.clickFinish();
     }
 
@@ -634,7 +637,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         run3.setProperties(Maps.of("instrumentSetting", instrumentSetting));
         run3.execute(cn, exportProject);
 
-        ImportRunCommand run4 = new ImportRunCommand(assayId, RUN04_FILE);
+        ImportRunCommand run4 = new ImportRunCommand(assayId, RUN04_XLSX_FILE);
         run4.setName(RUN04_NAME);
         run4.setComment(commentPrefix + RUN04_NAME);
         run4.setProperties(Maps.of("instrumentSetting", instrumentSetting));

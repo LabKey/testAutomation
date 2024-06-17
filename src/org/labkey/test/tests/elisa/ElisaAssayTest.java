@@ -51,7 +51,7 @@ public class ElisaAssayTest extends AbstractAssayTest
 
     protected static final File TEST_ASSAY_ELISA_FILE1 = TestFileUtils.getSampleData("Elisa/biotek_01.xlsx");
     protected static final File TEST_ASSAY_ELISA_FILE2 = TestFileUtils.getSampleData("Elisa/biotek_02.xls");
-    protected static final File TEST_ASSAY_ELISA_FILE3 = TestFileUtils.getSampleData("Elisa/biotek_03.xls");
+    protected static final File TEST_ASSAY_ELISA_FILE3 = TestFileUtils.getSampleData("Elisa/biotek_03.xlsx");
     protected static final File TEST_ASSAY_ELISA_FILE4 = TestFileUtils.getSampleData("Elisa/biotek_04.xls");
 
     private static final String PLATE_TEMPLATE_NAME = "ELISAAssayTest Template";

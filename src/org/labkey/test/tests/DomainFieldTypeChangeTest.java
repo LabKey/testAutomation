@@ -136,7 +136,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
     {
         String assayName = "Assay1";
         String runName = "Run1";
-        File runFile = new File(TestFileUtils.getSampleData("AssayImportExport"), "GenericAssay_Run1.xls");
+        File runFile = new File(TestFileUtils.getSampleData("AssayImportExport"), "GenericAssay_Run1.xlsx");
         goToManageAssays();
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         ReactAssayDesignerPage assayDesignerPage = assayHelper.createAssayDesign("General", assayName);
