@@ -35,7 +35,7 @@ public class TabSelectionExportDialog extends ModalDialog
             for (WebElement checkbox : elementCache().checkboxes)
             {
                 String text = checkbox.getText();
-                if (!tabs.contains(text))
+                if (tabs.contains(text))
                 {
                     elementCache().getCheckBox(checkbox).check();
                     missingTabs.remove(text);
@@ -80,7 +80,7 @@ public class TabSelectionExportDialog extends ModalDialog
 
         Checkbox getCheckBox(WebElement checkboxDiv)
         {
-            return new Checkbox(Locator.tagWithClass("input", "export-modal-checkbox").findWhenNeeded(checkboxDiv));
+            return new Checkbox(Locator.tagWithAttribute("input", "type", "checkbox").findWhenNeeded(checkboxDiv));
         }
     }
 
