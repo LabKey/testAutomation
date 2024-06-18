@@ -18,37 +18,16 @@ dependencies {
     modules ("org.labkey.module:filecontent:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:bigiron:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:elisa:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:elispotassay:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:flow:${labkeyVersion}@module") {
-        transitive = true
-    }
     modules ("org.labkey.module:issues:${labkeyVersion}@module") {
         transitive = true
     }
-    modules ("org.labkey.module:luminex:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:microarray:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:nab:${labkeyVersion}@module") {
+    modules ("org.labkey.module:list:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:study:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:survey:${labkeyVersion}@module") {
-        transitive = true
-    }
-    modules ("org.labkey.module:targetedms:${labkeyVersion}@module") {
         transitive = true
     }
     modules ("org.labkey.module:visualization:${labkeyVersion}@module") {
@@ -61,8 +40,6 @@ dependencies {
     // add dependencies on all community API artifacts
     implementation "org.labkey.api:core:${labkeyVersion}"
     implementation "org.labkey.api:assay:${labkeyVersion}"
-    implementation "org.labkey.api:ms2:${labkeyVersion}"
-    implementation "org.labkey.api:targetedms:${labkeyVersion}"
 
 }
 
