@@ -194,14 +194,14 @@ public class Crawler
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
-            new ControllerActionId("ms2", "pepSearch"), // TODO: Issue 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
-            // Tested directly in XTandemTest
-            new ControllerActionId("ms2", "doProteinSearch"),
             new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("project", "togglePageAdminMode"),
+            // Tested directly in XTandemTest
+            new ControllerActionId("protein", "doProteinSearch"),
+            new ControllerActionId("protein", "pepSearch"), // TODO: Issue 36995: Check for SQL injection in StatementWrapper is not precise enough
             new ControllerActionId("query", "printRows"), // Data region print button. 404s on "TargetedMS Runs" grid
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
