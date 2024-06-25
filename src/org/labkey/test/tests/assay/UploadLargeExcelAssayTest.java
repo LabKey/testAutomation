@@ -10,6 +10,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
@@ -28,7 +29,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Category({Assays.class})
+@Category({Assays.class, Daily.class})
 public class UploadLargeExcelAssayTest extends BaseWebDriverTest
 {
     public static String LARGE_ASSAY = "chaos_assay";
