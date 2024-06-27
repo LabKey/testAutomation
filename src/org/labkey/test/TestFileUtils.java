@@ -26,6 +26,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
@@ -38,15 +41,18 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
+import org.labkey.serverapi.reader.Readers;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -661,4 +667,29 @@ public abstract class TestFileUtils
         return Streams.readAll(ld.getInputStream());
     }
 
+
+    public static File convertTabularToXlsx(File tabularFile, String delimiter, String sheetName, String xlsxFileName) throws IOException, PGPException
+    {
+        XSSFWorkbook workBook = new XSSFWorkbook();
+        XSSFSheet sheet = workBook.createSheet(sheetName);
+        String currentLine=null;
+        int RowNum=0;
+        BufferedReader br = Readers.getReader(tabularFile);
+        while ((currentLine = br.readLine()) != null) {
+            String str[] = currentLine.split(delimiter);
+            RowNum++;
+            XSSFRow currentRow=sheet.createRow(RowNum);
+            for(int i=0;i<str.length;i++){
+                currentRow.createCell(i).setCellValue(str[i]);
+            }
+        }
+
+        File excelFile = new File(getTestTempDir(), xlsxFileName);
+        FileUtils.forceMkdirParent(excelFile);
+        FileOutputStream fileOutputStream =  new FileOutputStream(excelFile);
+        workBook.write(fileOutputStream);
+        fileOutputStream.close();
+
+        return excelFile;
+    }
 }

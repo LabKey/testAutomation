@@ -17,6 +17,8 @@ package org.labkey.test.pages;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
@@ -25,6 +27,7 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
+import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -47,6 +50,13 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     public ReactAssayDesignerPage(WebDriver driver)
     {
         super(driver);
+    }
+
+    public static ReactAssayDesignerPage beginAt(WebDriverWrapper driver, String containerPath, int rowId, String providerName, String returnUrl)
+    {
+        driver.beginAt(WebTestHelper.buildURL("core", containerPath, "assayDesigner",
+                Maps.of("rowId", rowId, "providerName", providerName, "returnUrl", returnUrl)));
+        return new ReactAssayDesignerPage(driver.getDriver());
     }
 
     public ReactAssayDesignerPage setName(String name)
