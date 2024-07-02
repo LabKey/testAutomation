@@ -4,10 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.react.BaseReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
 import java.util.List;
+
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Wraps 'labkey-ui-component' defined in <code>internal/components/search/FindByIdsModal.tsx</code>
@@ -60,6 +62,14 @@ public class FindByIdsDialog extends ModalDialog
     {
         elementCache().findSamplesButton.click();
         waitForClose();
+    }
+
+    public String clickFindSamplesExpectError()
+    {
+        elementCache().findSamplesButton.click();
+        waitFor(()-> Locator.tagWithClass("div", "alert-danger").isDisplayed(getComponentElement()), 10_000);
+        return Locator.tagWithClass("div", "alert-danger").findElement(getComponentElement()).getText();
+
     }
 
     @Override
