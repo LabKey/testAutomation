@@ -100,23 +100,6 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         var largeTsvFile = dgen.writeGeneratedDataToFile(200000, "largeTsvFile.tsv");
         log("finished writing large tsv file");
 
-        // import to new sampleType
-//        var sampleTypeDef = new SampleTypeDefinition("chaos_samples");
-//        sampleTypeDef.setNameExpression("S-${dailySampleCount}");
-//        for (PropertyDescriptor def : ASSAY_FIELDS)
-//            sampleTypeDef.addField((FieldDefinition) def);
-//        log("importing tsv to samples");
-//        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDef);
-//        SampleTypeHelper.beginAtSampleTypesList(this, getProjectName())
-//                .goToSampleType("chaos_samples");
-//
-//        DataRegionTable drt = DataRegionTable.DataRegion(getDriver()).waitFor();
-//        TestLogger.log("Adding data from large tsv file");
-//        ImportDataPage importDataPage = drt.clickImportBulkData();
-//        importDataPage.setFile(largeTsvFile);
-//        importDataPage.setFileInsertOption(true);
-//        clickAndWait(Locator.button("Submit"), 10 * WAIT_FOR_PAGE);
-//        log("import to samples complete");
 
         // import tsv to assay1
         goToProjectHome();
