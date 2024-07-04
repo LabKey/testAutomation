@@ -15,11 +15,13 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +44,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private static final String FILLING_SAMPLE_TYPE = "FillingSampleType";
     private static final String FILL_STRING = "Filling String";
+    private static final String FILL_MULTI_LINE = "Filling Multi Line";
     private static final String FILL_INT = "Filling Int";
     private static final String FILL_DATE = "Filling Date";
 
@@ -51,6 +54,7 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final String PASTE_3 = "Paste Column 3";
     private static final String PASTE_4 = "Paste Column 4";
     private static final String PASTE_5 = "Paste Column 5";
+    private static final String PASTE_ML = "Paste Multi Line";
 
     @BeforeClass
     public static void setupProject() throws Exception
@@ -77,6 +81,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .setFields(
                         List.of(
                                 new FieldDefinition(FILL_STRING, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(FILL_MULTI_LINE, FieldDefinition.ColumnType.MultiLine),
                                 new FieldDefinition(FILL_INT, FieldDefinition.ColumnType.Integer),
                                 new FieldDefinition(FILL_DATE, FieldDefinition.ColumnType.DateAndTime)
                         ))
@@ -88,13 +93,14 @@ public class EditableGridTest extends BaseWebDriverTest
                                 new FieldDefinition(PASTE_2, FieldDefinition.ColumnType.String),
                                 new FieldDefinition(PASTE_3, FieldDefinition.ColumnType.String),
                                 new FieldDefinition(PASTE_4, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_5, FieldDefinition.ColumnType.String)
+                                new FieldDefinition(PASTE_5, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(PASTE_ML, FieldDefinition.ColumnType.MultiLine)
                         ))
                 .create(connection, getProjectName());
     }
 
     @Test
-    public void testTooWideErrorCase() throws Exception
+    public void testTooWideErrorCase()
     {
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
@@ -192,27 +198,58 @@ public class EditableGridTest extends BaseWebDriverTest
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
+        String stringValue = "ABC-1";
+        String multiLineValue = "Line 1" + System.lineSeparator() + "Line 2";
+        String intValue = "1";
+
         testGrid.addRows(4);
-        WebElement topLeft = testGrid.setCellValue(0, FILL_STRING, "ABC-1");
-        testGrid.setCellValue(0, FILL_INT, "1");
+
+        // Get the various row heights before adding a value to the multiLine field.
+        WebElement gridRow = Locator.tag("tr").findElements(testGrid).get(1);
+        int rowHeightBefore = gridRow.getSize().height;
+        var totalHeightBefore = new Object(){int size = 0; };
+        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightBefore.size = totalHeightBefore.size + gr.getSize().height);
+        WebElement topLeft = testGrid.setCellValue(0, FILL_STRING, stringValue);
+
+        testGrid.setCellValue(0, FILL_INT, intValue);
+        testGrid.setCellValue(0, FILL_MULTI_LINE, multiLineValue);
+
+        int rowHeightAfter = gridRow.getSize().height;
+
+        // Only going to check that the row height got bigger after adding text.
+        checker().withScreenshot()
+                .verifyTrue("Row height should have increased after putting multiple lines into the MultiLine field.",
+                        rowHeightAfter > rowHeightBefore);
+
         WebElement bottomRight = testGrid.setCellValue(0, FILL_DATE, now);
         WebElement fillTo = testGrid.getCell(2, FILL_DATE);
 
         testGrid.selectCellRange(topLeft, bottomRight);
         testGrid.dragFill(bottomRight, fillTo);
 
-        assertEquals("Drag-fill should have filled " + FILL_STRING,
-                List.of("ABC-1", "ABC-1", "ABC-1", ""),
+        checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
+                List.of(stringValue, stringValue, stringValue, ""),
                 testGrid.getColumnData(FILL_STRING));
-        assertEquals("Drag-fill should have filled " + FILL_INT,
-                List.of("1", "1", "1", ""),
+        checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
+                List.of(multiLineValue, multiLineValue, multiLineValue, ""),
+                testGrid.getColumnData(FILL_MULTI_LINE));
+        checker().verifyEquals("Drag-fill should have filled " + FILL_INT,
+                List.of(intValue, intValue, intValue, ""),
                 testGrid.getColumnData(FILL_INT));
-        assertEquals("Drag-fill should have filled " + FILL_DATE,
+        checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(2)),
                         ""),
                 testGrid.getColumnData(FILL_DATE));
+
+        // Check that pasting increased the size of all the rows.
+        var totalHeightAfter = new Object(){int size = 0; };
+        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightAfter.size = totalHeightAfter.size + gr.getSize().height);
+
+        checker().withScreenshot()
+                .verifyTrue("The total height of all the rows should have increases after the paste.",
+                        totalHeightBefore.size + (3 * rowHeightBefore) >= totalHeightAfter.size);
     }
 
     @Test
@@ -222,18 +259,29 @@ public class EditableGridTest extends BaseWebDriverTest
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
+        String mlRow1 = "Line 1" + System.lineSeparator() + "Line 2";
+        String mlRow2 = "Line 3" + System.lineSeparator() + "Line 4";
+
         testGrid.addRows(7);
         WebElement topLeft = setCellValues(testGrid, FILL_STRING, "QWE", "ASD", "ZXC").get(0);
+
+        // Just for fun put an empty row between.
+        testGrid.setCellValue(0, FILL_MULTI_LINE, mlRow1);
+        testGrid.setCellValue(2, FILL_MULTI_LINE, mlRow2);
+
         WebElement bottomRight = setCellValues(testGrid, FILL_DATE, now, now.plusDays(3), now.plusDays(1)).get(2);
         WebElement fillTo = testGrid.getCell(5, FILL_DATE);
 
         testGrid.selectCellRange(topLeft, bottomRight);
         testGrid.dragFill(bottomRight, fillTo);
 
-        assertEquals("Drag-fill should have filled " + FILL_STRING,
+        checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
                 List.of("QWE", "ASD", "ZXC", "QWE", "ASD", "ZXC", ""),
                 testGrid.getColumnData(FILL_STRING));
-        assertEquals("Drag-fill should have filled " + FILL_DATE,
+        checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
+                List.of(mlRow1, "", mlRow2, mlRow1, "", mlRow2, ""),
+                testGrid.getColumnData(FILL_MULTI_LINE));
+        checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(3)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
@@ -354,7 +402,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExpandedPaste() throws Exception
+    public void testExpandedPaste()
     {
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B"),
@@ -383,7 +431,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testInvalidExpandedPaste() throws Exception
+    public void testInvalidExpandedPaste()
     {
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B"),
@@ -411,7 +459,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExpandedPasteIntoSkinnySelection() throws Exception
+    public void testExpandedPasteIntoSkinnySelection()
     {
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B"),
@@ -432,6 +480,72 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(5, PASTE_1));
         actionPaste(null, rowsToString(clipRows));
         assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 2, size, clipRows), getActualPaste(testGrid));
+    }
+
+    @Test
+    public void testPasteIntoMultiLine()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(1);
+
+        List<String> expectedValues = List.of("Line 1",
+                "Line 2",
+                "Line 3",
+                "Line 4",
+                "Line 5"
+                );
+
+        StringBuilder sbPasteString = new StringBuilder();
+        Iterator<String> iStr = expectedValues.iterator();
+        while (iStr.hasNext())
+        {
+            sbPasteString.append(iStr.next());
+
+            if (iStr.hasNext())
+            {
+                sbPasteString.append(System.lineSeparator());
+            }
+
+        }
+
+        log("Test double clicking the MultiLine cell and pasting in a multi-line string.");
+        WebElement gridCell = editableGrid.getCell(0, PASTE_ML);
+        doubleClick(gridCell);
+        WebElement textArea = Locator.tag("textarea").findElement(gridCell);
+        actionPaste(textArea, sbPasteString.toString());
+
+        // Exit "edit" mode.
+        textArea.sendKeys(Keys.ENTER);
+
+        waitFor(()->shortWait().until(ExpectedConditions.stalenessOf(textArea)),
+                "TextArea did not go away.", 500);
+
+        checker().verifyEquals("All lines should have gone into one cell.",
+                1, editableGrid.getRowCount());
+
+        // Using a waitFor because there is a slight pause before the cell actually has the value.
+        checker().verifyTrue("Value in the cell is not as expected.",
+                waitFor(()->editableGrid.getCellValue(0, PASTE_ML).contentEquals(sbPasteString), 1_000));
+
+        checker().screenShotIfNewError("Paste_Into_One_Cell_Error");
+
+        log("Reset the grid.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Paste in a multi-line string without putting the cell into edit mode.");
+        editableGrid.addRows(1);
+        editableGrid.pasteFromCell(0, PASTE_ML, sbPasteString.toString());
+
+        checker().verifyEquals("Each line should have created a new row.",
+                expectedValues.size(), editableGrid.getRowCount());
+
+        checker().verifyEquals(String.format("Values in column '%s' not as expected.", PASTE_ML),
+                expectedValues, editableGrid.getColumnData(PASTE_ML));
+
+        checker().screenShotIfNewError("Paste_Into_Multiple_Cells_Error");
+
     }
 
     private String getActualPaste(EditableGrid testGrid)
