@@ -96,12 +96,11 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         String fileName = "200kXlsxFile.xlsx";
         var dgen = new TestDataGenerator("samples", "chaos_sample", getProjectName())
             .withColumns(ASSAY_FIELDS);
-        log("writing large tsv file");
-        var largeTsvFile = dgen.writeGeneratedDataToFile(200000, "largeTsvFile.tsv");
-        log("finished writing large tsv file");
+        log("writing large .xlsx file");
+        var largeExcelFile = dgen.writeGeneratedDataToExcel(200000, "chaos", fileName);
+        log("finished writing large .xlsx file");
 
-
-        // import tsv to assay1
+        // import large generated excel to assay1
         goToProjectHome();
         log("importing large excel file to assay");
         clickAndWait(Locator.linkWithText(LARGE_ASSAY));
@@ -109,7 +108,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         clickButton("Next");
         setFormElement(Locator.input("name"), "200k");
         checkRadioButton(Locator.inputById("Fileupload"));
-        setFormElement(Locator.input("__primaryFile__"), largeTsvFile);
+        setFormElement(Locator.input("__primaryFile__"), largeExcelFile);
         clickButton("Save and Finish");
 
         // wait for import complete
@@ -117,14 +116,15 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         var pipelineDetailsPage1 = assayJobsPage1.clickJobStatus("200k");
         pipelineDetailsPage1.waitForComplete(10 * WebDriverWrapper.WAIT_FOR_PAGE);
 
-        // export to excel
+        // export assay1 data to excel
         log("exporting samples fields to excel");
         var firstQPage = SourceQueryPage.beginAt(this, getProjectName(), "assay.General.chaos_assay", "Data");
         var firstDataregion  = firstQPage.viewData(Duration.ofSeconds(60));
         waitForText("1 - 100 of 200,000");
-        var largeXlsxFile = firstDataregion.expandExportPanel()
+        var largeExportExcelFile = firstDataregion.expandExportPanel()
                 .exportExcel(AbstractDataRegionExportOrSignHelper.ExcelFileType.XLSX);
 
+        // now import exported data to assay
         log("importing large excel file to assay");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(LARGE_ASSAY_2));
@@ -132,7 +132,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         clickButton("Next");
         setFormElement(Locator.input("name"), "200k take 2");
         checkRadioButton(Locator.inputById("Fileupload"));
-        setFormElement(Locator.input("__primaryFile__"), largeXlsxFile);
+        setFormElement(Locator.input("__primaryFile__"), largeExportExcelFile);
         clickButton("Save and Finish");
 
         var assayJobsPage2 = new AssayUploadJobsPage(getDriver());

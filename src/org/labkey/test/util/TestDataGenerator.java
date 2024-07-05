@@ -17,6 +17,8 @@ package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.poi.xssf.streaming.SXSSFRow;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.api.collections.CaseInsensitiveLinkedHashMap;
@@ -42,7 +44,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -408,6 +409,40 @@ public class TestDataGenerator
                 stream.write(rowMapString);
             }
         }
+        return file;
+    }
+
+    public File writeGeneratedDataToExcel(int numberOfRowsToGenerate, String sheetName, String fileName) throws IOException
+    {
+        File file = new File(TestFileUtils.getTestTempDir(), fileName);
+        FileUtils.forceMkdirParent(file);
+
+        try(SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
+            FileOutputStream out = new FileOutputStream(file))
+        {
+            var sheet = workbook.createSheet(sheetName);
+
+            // write headers as row 0
+            String[] columnNames = _columns.keySet().toArray(new String[0]);
+            var headerRow = sheet.createRow(0);
+            for (int i = 0; i < columnNames.length; i++)
+            {
+                headerRow.createCell(i).setCellValue(columnNames[i]);
+            }
+
+            // write content
+            for (int i = 1; i < numberOfRowsToGenerate +1; i++)
+            {
+                Map<String, Object> row = generateRow();
+                SXSSFRow currentRow = sheet.createRow(i);
+                for (int j = 0; j < columnNames.length; j++)
+                {
+                    currentRow.createCell(j).setCellValue(row.get(columnNames[j]).toString());
+                }
+            }
+            workbook.write(out);
+        }
+
         return file;
     }
 
