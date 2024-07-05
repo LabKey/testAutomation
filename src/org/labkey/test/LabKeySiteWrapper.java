@@ -57,7 +57,7 @@ import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -1099,17 +1099,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     private static Map<String, Boolean> _originalFeatureFlags = new HashMap<>();
 
     /**
-     * Enable/disable the experimental features specified by the test properties. Intended for use by base tests only.
+     * Enable/disable the optional features specified by the test properties. Intended for use by base tests only.
      * Currently only {@link BaseWebDriverTest}.
      */
-    protected void setExperimentalFlags()
+    protected void setOptionalFlags()
     {
-        Map<String, Boolean> flags = TestProperties.getExperimentalFeatures();
+        Map<String, Boolean> flags = TestProperties.getOptionalFeatures();
 
         if (flags.isEmpty())
             return;
 
-        TestLogger.log("Setting experimental flags for duration of the test:");
+        TestLogger.log("Setting optional feature flags for duration of the test:");
         TestLogger.increaseIndent();
 
         Connection cn = createDefaultConnection();
@@ -1117,7 +1117,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             String feature = flag.getKey();
             Boolean value = flag.getValue();
-            Boolean previouslyEnabled = ExperimentalFeaturesHelper.setExperimentalFeature(cn, feature, value);
+            Boolean previouslyEnabled = OptionalFeatureHelper.setOptionalFeature(cn, feature, value);
 
             // When setting a feature flag the first time, remember the previous setting
             if (!_originalFeatureFlags.containsKey(feature))
@@ -1129,23 +1129,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * Reset the experimental features specified by the test properties. Intended for use by base tests only.
+     * Reset the optional features specified by the test properties. Intended for use by base tests only.
      * Currently only {@link BaseWebDriverTest}.
      */
-    protected void resetExperimentalFlags()
+    protected void resetOptionalFlags()
     {
         if (_originalFeatureFlags.isEmpty() || TestProperties.isTestRunningOnTeamCity())
         {
             return;
         }
 
-        TestLogger.log("Resetting experimental flags to their original value:");
+        TestLogger.log("Resetting optional feature flags to their original value:");
 
         TestLogger.increaseIndent();
         Connection cn = createDefaultConnection();
         for (Map.Entry<String, Boolean> features : _originalFeatureFlags.entrySet())
         {
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, features.getKey(), features.getValue());
+            OptionalFeatureHelper.setOptionalFeature(cn, features.getKey(), features.getValue());
         }
         TestLogger.decreaseIndent();
 

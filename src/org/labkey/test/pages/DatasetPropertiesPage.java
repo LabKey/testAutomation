@@ -19,7 +19,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.study.DatasetDesignerPage;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

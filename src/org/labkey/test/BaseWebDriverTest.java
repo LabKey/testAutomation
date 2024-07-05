@@ -670,7 +670,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             enableTroubleshootingStacktraces();
         }
         setServerDebugLogging();
-        setExperimentalFlags();
+        setOptionalFlags();
 
         // Start logging JS errors.
         resumeJsErrorChecker();
@@ -1282,7 +1282,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
             setMiniProfilerEnabled(true);
 
-        resetExperimentalFlags();
+        resetOptionalFlags();
     }
 
     private void waitForPendingRequests(int msWait)
