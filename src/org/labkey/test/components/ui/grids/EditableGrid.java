@@ -916,6 +916,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
 
+    public boolean hasCellWarning(int row, String column)
+    {
+        WebElement gridCell = getCell(row, column);
+
+        return cellHasWarning(gridCell);
+    }
+
     private boolean cellHasWarning(WebElement cell)
     {
         return Locator.tagWithClass("div", "cell-warning").existsIn(cell);
