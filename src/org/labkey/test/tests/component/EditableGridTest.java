@@ -15,7 +15,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -510,16 +509,8 @@ public class EditableGridTest extends BaseWebDriverTest
         }
 
         log("Test double clicking the MultiLine cell and pasting in a multi-line string.");
-        WebElement gridCell = editableGrid.getCell(0, PASTE_ML);
-        doubleClick(gridCell);
-        WebElement textArea = Locator.tag("textarea").findElement(gridCell);
-        actionPaste(textArea, sbPasteString.toString());
 
-        // Exit "edit" mode.
-        textArea.sendKeys(Keys.ENTER);
-
-        waitFor(()->shortWait().until(ExpectedConditions.stalenessOf(textArea)),
-                "TextArea did not go away.", 500);
+        editableGrid.setMultiLineCellValue(0, PASTE_ML, sbPasteString.toString());
 
         checker().verifyEquals("All lines should have gone into one cell.",
                 1, editableGrid.getRowCount());
