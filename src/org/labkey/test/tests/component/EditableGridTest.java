@@ -24,6 +24,7 @@ import org.openqa.selenium.interactions.Actions;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -67,6 +68,10 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final String REQ_STR_FIELD_NAME = "Str Col Req";
     private static final String INT_FIELD_NAME = "Int Col";
     private static final String REQ_INT_FIELD_NAME = "Int Col Req";
+    private static final String DATE_FIELD_NAME = "Date Col";
+    private static final String REQ_DATETIME_FIELD_NAME = "Datetime Col Req";
+    private static final String TIME_FIELD_NAME = "Time Col";
+    private static final String REQ_TIME_FIELD_NAME = "Time Col Req";
     private static final String FLOAT_FIELD_NAME = "Float Col";
     private static final String BOOL_FIELD_NAME = "Bool Col";
     private static final String TEXTCHOICE_FIELD_NAME = "Textchoice Col";
@@ -77,6 +82,10 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final FieldDefinition REQ_STR_FIELD;
     private static final FieldDefinition INT_FIELD;
     private static final FieldDefinition REQ_INT_FIELD;
+    private static final FieldDefinition DATE_FIELD;
+    private static final FieldDefinition REQ_DATETTIME_FIELD;
+    private static final FieldDefinition TIME_FIELD;
+    private static final FieldDefinition REQ_TIME_FIELD;
     private static final FieldDefinition BOOLEAN_FIELD;
     private static final FieldDefinition FLOAT_FIELD;
     private static final FieldDefinition TEXTCHOICE_FIELD;
@@ -85,8 +94,9 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final FieldDefinition REQ_LOOKUP_FIELD;
     // TODO date fields
 
-    final List<String> ALL_FIELD_NAMES = Arrays.asList(STR_FIELD_NAME, REQ_STR_FIELD_NAME, INT_FIELD_NAME, REQ_INT_FIELD_NAME, BOOL_FIELD_NAME,
-            FLOAT_FIELD_NAME, TEXTCHOICE_FIELD_NAME, REQ_TEXTCHOICE_FIELD_NAME, LOOKUP_FIELD_NAME, REQ_LOOKUP_FIELD_NAME);
+    final List<String> ALL_FIELD_NAMES = Arrays.asList(STR_FIELD_NAME, REQ_STR_FIELD_NAME, INT_FIELD_NAME, REQ_INT_FIELD_NAME,
+            DATE_FIELD_NAME, REQ_DATETIME_FIELD_NAME, TIME_FIELD_NAME, REQ_TIME_FIELD_NAME,
+            BOOL_FIELD_NAME, FLOAT_FIELD_NAME, TEXTCHOICE_FIELD_NAME, REQ_TEXTCHOICE_FIELD_NAME, LOOKUP_FIELD_NAME, REQ_LOOKUP_FIELD_NAME);
 
     static
     {
@@ -98,6 +108,12 @@ public class EditableGridTest extends BaseWebDriverTest
         INT_FIELD = new FieldDefinition(INT_FIELD_NAME, FieldDefinition.ColumnType.Integer);
         REQ_INT_FIELD = new FieldDefinition(REQ_INT_FIELD_NAME, FieldDefinition.ColumnType.Integer);
         REQ_INT_FIELD.setRequired(true);
+        DATE_FIELD = new FieldDefinition(DATE_FIELD_NAME, FieldDefinition.ColumnType.Date);
+        REQ_DATETTIME_FIELD = new FieldDefinition(REQ_DATETIME_FIELD_NAME, FieldDefinition.ColumnType.DateAndTime);
+        REQ_DATETTIME_FIELD.setRequired(true);
+        TIME_FIELD = new FieldDefinition(TIME_FIELD_NAME, FieldDefinition.ColumnType.Time);
+        REQ_TIME_FIELD = new FieldDefinition(REQ_TIME_FIELD_NAME, FieldDefinition.ColumnType.Time);
+        REQ_TIME_FIELD.setRequired(true);
         FLOAT_FIELD = new FieldDefinition(FLOAT_FIELD_NAME, FieldDefinition.ColumnType.Decimal);
         BOOLEAN_FIELD = new FieldDefinition(BOOL_FIELD_NAME, FieldDefinition.ColumnType.Boolean);
         TEXTCHOICE_FIELD = new FieldDefinition(TEXTCHOICE_FIELD_NAME, FieldDefinition.ColumnType.TextChoice);
@@ -168,8 +184,8 @@ public class EditableGridTest extends BaseWebDriverTest
         new SampleTypeDefinition(ALL_TYPE_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                STR_FIELD, REQ_STR_FIELD, INT_FIELD, REQ_INT_FIELD, BOOLEAN_FIELD, FLOAT_FIELD,
-                                TEXTCHOICE_FIELD, REQ_TEXTCHOICE_FIELD, LOOKUP_FIELD, REQ_LOOKUP_FIELD
+                                STR_FIELD, REQ_STR_FIELD, INT_FIELD, REQ_INT_FIELD, DATE_FIELD, REQ_DATETTIME_FIELD, TIME_FIELD, REQ_TIME_FIELD,
+                                BOOLEAN_FIELD, FLOAT_FIELD, TEXTCHOICE_FIELD, REQ_TEXTCHOICE_FIELD, LOOKUP_FIELD, REQ_LOOKUP_FIELD
                         ))
                 .create(connection, getProjectName());
     }
@@ -628,7 +644,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD_NAME, false, testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
 
-        log("Input invalid data type value should trigger cell warnings.")
+        log("Input invalid data type value should trigger cell warnings.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(0, INT_FIELD_NAME, "1.23");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
@@ -663,11 +679,10 @@ public class EditableGridTest extends BaseWebDriverTest
     @Test
     public void testPasteCellValidation()
     {
-        // STR_FIELD, REQ_STR_FIELD, INT_FIELD, REQ_INT_FIELD, BOOLEAN_FIELD, FLOAT_FIELD, TEXTCHOICE_FIELD, REQ_TEXTCHOICE_FIELD, LOOKUP_FIELD, REQ_LOOKUP_FIELD
         final List<List<String>> clipRows = List.of(
-                List.of("A", "B", "1", "2", "Y", "-1.1", "red", "Orange", "Orange", "kiwi"),
-                List.of("", "", "", "", "", "", "", "", "", ""),
-                List.of("This value is too long", "This value is too long", "not a number", "1.234", "not boolean", "not float", "wrong text choice", "bad choice", "bad lookup", "bad lookup")
+                List.of("A", "B", "1", "2", "2024-07-07", "2024-07-07 11:23", "11:23 PM", "15:30", "Y", "-1.1", "red", "Orange", "Orange", "kiwi"),
+                List.of("", "", "", "", "", "", "", "", "", "", "", "", "", ""),
+                List.of("This value is too long", "This value is too long", "not a number", "1.234", "not date", "25-25-2025", "not time", "ab c", "not boolean", "not float", "wrong text choice", "bad choice", "bad lookup", "bad lookup")
         );
 
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
@@ -678,9 +693,9 @@ public class EditableGridTest extends BaseWebDriverTest
 
         actionPaste(null, rowsToString(clipRows));
         List<List<String>> expectedCellWarnings = List.of(
-                Arrays.asList(null, null, null, null, null, null, null, null, null, null),
-                Arrays.asList(null, REQ_STR_FIELD_NAME + " is required.", null, REQ_INT_FIELD_NAME + " is required.", null, null, null, REQ_TEXTCHOICE_FIELD_NAME + " is required.", null, REQ_LOOKUP_FIELD_NAME + " is required."),
-                Arrays.asList("22/10 characters", "22/10 characters", "Invalid integer", "Invalid integer", "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find data for \"bad lookup\"", "Could not find data for \"bad lookup\"")
+                Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
+                Arrays.asList(null, REQ_STR_FIELD_NAME + " is required.", null, REQ_INT_FIELD_NAME + " is required.", null, REQ_DATETIME_FIELD_NAME + " is required.", null, REQ_TIME_FIELD_NAME + " is required.", null, null, null, REQ_TEXTCHOICE_FIELD_NAME + " is required.", null, REQ_LOOKUP_FIELD_NAME + " is required."),
+                Arrays.asList("22/10 characters", "22/10 characters", "Invalid integer", "Invalid integer", "Invalid date", "Invalid date time", "Invalid time", "Invalid time", "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find data for \"bad lookup\"", "Could not find data for \"bad lookup\"")
         );
 
         log("Verify pasted values triggers cell warnings");
@@ -702,6 +717,10 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(1, REQ_LOOKUP_FIELD_NAME + " *", List.of("Orange"));
         mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", "not empty");
+        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30));
+        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
 
         for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
         {
@@ -716,7 +735,7 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(2, INT_FIELD_NAME, "bad");
         checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(2, INT_FIELD_NAME));
 
-        log("Correct bad data type values shoould remove paste data warnings");
+        log("Correct bad data type values should remove paste data warnings");
         testGrid.setCellValue(2, STR_FIELD_NAME, "good");
         testGrid.setCellValue(2, REQ_STR_FIELD_NAME + " *", "good");
         testGrid.setCellValue(2, INT_FIELD_NAME, "1");
@@ -727,6 +746,11 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(2, REQ_TEXTCHOICE_FIELD_NAME + " *", List.of("red"));
         testGrid.setCellValue(2, LOOKUP_FIELD_NAME, List.of("kiwi"));
         testGrid.setCellValue(2, REQ_LOOKUP_FIELD_NAME + " *", List.of("kiwi"));
+        testGrid.setCellValue(2, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(2, TIME_FIELD_NAME, LocalTime.of(2, 30));
+        testGrid.setCellValue(2, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30));
+        testGrid.setCellValue(2, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
+
         for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
         {
             String colName = ALL_FIELD_NAMES.get(col);
@@ -757,7 +781,7 @@ public class EditableGridTest extends BaseWebDriverTest
     public void testFillCellValidation()
     {
         final List<List<String>> clipRows = List.of(
-                List.of("This value is too long", "", "not a number", "1.234", "not boolean", "not float", "wrong text choice", "bad choice", "bad lookup", "")
+                List.of("This value is too long", "", "not a number", "1.234", "not a date", "", "not a time", "", "not boolean", "not float", "wrong text choice", "bad choice", "bad lookup", "")
         );
 
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
@@ -772,7 +796,9 @@ public class EditableGridTest extends BaseWebDriverTest
         WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD_NAME + " *");
         testGrid.dragFill(fillFrom, fillTo);
 
-        List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD_NAME + " is required.", "Invalid integer", "Invalid integer", "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find data for \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
+        List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD_NAME + " is required.", "Invalid integer", "Invalid integer",
+                "Invalid date", REQ_DATETIME_FIELD_NAME + " is required.", "Invalid time", REQ_TIME_FIELD_NAME + " is required.",
+                "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find data for \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
 
         log("Verify filled down cells have warnings");
         for (int i = 0; i < 3; i++)
