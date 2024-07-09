@@ -211,7 +211,7 @@ public class EditableGridTest extends BaseWebDriverTest
         WebElement topLeft = testGrid.setCellValue(0, FILL_STRING, stringValue);
 
         testGrid.setCellValue(0, FILL_INT, intValue);
-        testGrid.setCellValue(0, FILL_MULTI_LINE, multiLineValue);
+        testGrid.setMultiLineCellValue(0, FILL_MULTI_LINE, multiLineValue);
 
         int rowHeightAfter = gridRow.getSize().height;
 
@@ -265,8 +265,8 @@ public class EditableGridTest extends BaseWebDriverTest
         WebElement topLeft = setCellValues(testGrid, FILL_STRING, "QWE", "ASD", "ZXC").get(0);
 
         // Just for fun put an empty row between.
-        testGrid.setCellValue(0, FILL_MULTI_LINE, mlRow1);
-        testGrid.setCellValue(2, FILL_MULTI_LINE, mlRow2);
+        testGrid.setMultiLineCellValue(0, FILL_MULTI_LINE, mlRow1);
+        testGrid.setMultiLineCellValue(2, FILL_MULTI_LINE, mlRow2);
 
         WebElement bottomRight = setCellValues(testGrid, FILL_DATE, now, now.plusDays(3), now.plusDays(1)).get(2);
         WebElement fillTo = testGrid.getCell(5, FILL_DATE);
@@ -516,7 +516,8 @@ public class EditableGridTest extends BaseWebDriverTest
                 1, editableGrid.getRowCount());
 
         // Using a waitFor because there is a slight pause before the cell actually has the value.
-        checker().verifyTrue("Value in the cell is not as expected.",
+        checker().verifyTrue(String.format("Value in the cell is not as expected. Expecting '%s' but found '%s'.",
+                        sbPasteString, editableGrid.getCellValue(0, PASTE_ML)),
                 waitFor(()->editableGrid.getCellValue(0, PASTE_ML).contentEquals(sbPasteString), 1_000));
 
         checker().screenShotIfNewError("Paste_Into_One_Cell_Error");
