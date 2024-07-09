@@ -682,7 +682,8 @@ public class EditableGridTest extends BaseWebDriverTest
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B", "1", "2", "2024-07-07", "2024-07-07 11:23", "11:23 PM", "15:30", "Y", "-1.1", "red", "Orange", "Orange", "kiwi"),
                 List.of("", "", "", "", "", "", "", "", "", "", "", "", "", ""),
-                List.of("This value is too long", "This value is too long", "not a number", "1.234", "not date", "25-25-2025", "not time", "ab c", "not boolean", "not float", "wrong text choice", "bad choice", "bad lookup", "bad lookup")
+                List.of("This value is too long", "This value is too long", "not a number", "1.234", "not date", "25-25-2025", "not time", "ab c", "not boolean", "not float", "wrong text choice", "bad choice", "bad lookup", "bad lookup"),
+                List.of("", "abc", "", "1", "0218-11-18 00:00" /*Issue 46767*/, "0218-11-18 00:00", "0218-11-18 00:00", "0218-11-18 00:00", "", "", "", "Orange", "", "kiwi")
         );
 
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
@@ -759,6 +760,25 @@ public class EditableGridTest extends BaseWebDriverTest
 
             checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellWarning(2, colName));
         }
+
+        log("Issue 46767: start date before 1000-01-01");
+        for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
+        {
+            String colName = ALL_FIELD_NAMES.get(col);
+            if (colName.endsWith(" Req"))
+                colName += " *";
+
+            // start date before year 1000 shouldn't trigger warning
+            checker().verifyFalse("Cell warning should not be present for: " + colName, testGrid.hasCellWarning(0, colName));
+        }
+
+        log("Verify UI is interactable with values before 1000-01-01");
+        testGrid.setCellValue(3, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(3, TIME_FIELD_NAME, LocalTime.of(2, 30));
+        testGrid.setCellValue(3, REQ_DATETIME_FIELD_NAME + " *", LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(3, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
+
+        testGrid.clearAllCells();
 
     }
 
