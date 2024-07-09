@@ -49,7 +49,7 @@ import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -515,7 +515,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             // Don't use browser session when impersonating. Impersonated user/role might not have correct permission.
             boolean useBrowserSession = PasswordUtil.getUsername().equals(whoAmI.getEmail()) && !whoAmI.isImpersonated();
             Connection cn = WebTestHelper.getRemoteApiConnection(useBrowserSession);
-            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", b);
+            OptionalFeatureHelper.setOptionalFeature(cn, "javascriptErrorServerLogging", b);
         }
     }
 

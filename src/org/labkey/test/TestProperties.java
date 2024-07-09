@@ -35,10 +35,8 @@ import java.util.stream.Stream;
 
 public abstract class TestProperties
 {
-
     static
     {
-
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
@@ -67,7 +65,6 @@ public abstract class TestProperties
             TestLogger.error("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
             ioe.printStackTrace(System.err);
         }
-
     }
 
     public static void load()
@@ -284,7 +281,7 @@ public abstract class TestProperties
         return System.getProperty("additional.pipeline.tools");
     }
 
-    public static Map<String, Boolean> getExperimentalFeatures()
+    public static Map<String, Boolean> getOptionalFeatures()
     {
         Map<String, Boolean> features = new HashMap<>();
 
@@ -296,7 +293,7 @@ public abstract class TestProperties
                     ? (Boolean)entry.getValue()
                     : Boolean.valueOf(String.valueOf(entry.getValue()));
 
-            String prefix = "webtest.experimental.";
+            String prefix = "webtest.experimental."; // Can be used with any optional feature flags; "experimental" is used for backward-compatibility purposes.
             if (key.startsWith(prefix))
             {
                 String feature = key.substring(prefix.length());

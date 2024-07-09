@@ -17,7 +17,6 @@ package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
 import org.labkey.test.pages.study.DatasetDesignerPage;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
