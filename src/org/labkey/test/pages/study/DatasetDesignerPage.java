@@ -284,7 +284,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
                 .findWhenNeeded(propertiesPanel);
         protected Locator dataRowRadioBtn(Integer index)
         {
-            return Locator.tag("label").withAttribute("title").child(Locator.input("dataRowSetting")
+            return Locator.tag("label").child(Locator.input("dataRowSetting")
                     .withAttribute("value", index.toString()));
         }
         protected final RadioButton participantsOnlyRadioBtn = new RadioButton(dataRowRadioBtn(0) // demographic data
