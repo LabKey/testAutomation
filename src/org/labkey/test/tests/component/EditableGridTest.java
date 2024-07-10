@@ -609,17 +609,8 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(2);
 
         log("Verify no warnings when page first load");
-        for (int row = 0; row < 2; row++)
-        {
-            for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
-            {
-                String colName = ALL_FIELD_NAMES.get(col);
-                if (colName.endsWith(" Req"))
-                    colName += " *";
-
-                checker().verifyFalse("Cell warning should be absent when a row is added on page load", testGrid.hasCellWarning(row, colName));
-            }
-        }
+        checker().verifyEquals("Cell warning should be absent when a row is added on page load",
+                0, Locator.tagWithClass("div", "cell-warning").findElements(testGrid).size());
 
         log("Input empty string for required field should trigger cell warning.");
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
@@ -662,17 +653,8 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Clearing all grid values should reset to the initial page load state, with no warnings, including missing required value warnings.");
         testGrid.clearAllCells();
-        for (int row = 0; row < 2; row++)
-        {
-            for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
-            {
-                String colName = ALL_FIELD_NAMES.get(col);
-                if (colName.endsWith(" Req"))
-                    colName += " *";
-
-                checker().verifyFalse("Cell warning should be absent after clearing out all cell values", testGrid.hasCellWarning(row, colName));
-            }
-        }
+        checker().verifyEquals("Cell warning should be absent after clearing out all cell values",
+                0, Locator.tagWithClass("div", "cell-warning").findElements(testGrid).size());
 
     }
 
@@ -735,6 +717,7 @@ public class EditableGridTest extends BaseWebDriverTest
         log("Enter another bad value should retain cell warning");
         testGrid.setCellValue(2, INT_FIELD_NAME, "bad");
         checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(2, INT_FIELD_NAME));
+        checker().screenShotIfNewError("after required value correction error");
 
         log("Correct bad data type values should remove paste data warnings");
         testGrid.setCellValue(2, STR_FIELD_NAME, "good");
@@ -760,6 +743,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
             checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellWarning(2, colName));
         }
+        checker().screenShotIfNewError("after data correction error");
 
         log("Issue 46767: start date before 1000-01-01");
         for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
@@ -777,6 +761,8 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(3, TIME_FIELD_NAME, LocalTime.of(2, 30));
         testGrid.setCellValue(3, REQ_DATETIME_FIELD_NAME + " *", LocalDate.of(2024, 7, 7));
         testGrid.setCellValue(3, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
+
+        checker().screenShotIfNewError("Issue 46767");
 
         testGrid.clearAllCells();
 
