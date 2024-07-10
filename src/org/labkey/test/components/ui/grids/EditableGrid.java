@@ -506,7 +506,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Set the value of a multi-line field for the given row.
+     * Set the value of a multi-line field for the given row. This uses javascript to set the value, not sendKeys.
+     * Use '\n' for a new line.
      *
      * @param row Row to update.
      * @param columnName Column name of the multi-line field.
@@ -527,7 +528,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         waitFor(()->getWrapper().shortWait().until(ExpectedConditions.stalenessOf(textArea)),
                 "TextArea did not go away.", 500);
 
-        // Wait until the cell shows a difference before leaving.
+        // Wait until the cell shows some kind of update before leaving.
         WebDriverWrapper.waitFor(() -> !gridCell.getText().equals(beforeText),
                 "Doesn't look like the multi-line field was updated.", WAIT_FOR_JAVASCRIPT);
 

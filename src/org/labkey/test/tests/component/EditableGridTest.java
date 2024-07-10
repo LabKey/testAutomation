@@ -198,7 +198,7 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
         String stringValue = "ABC-1";
-        String multiLineValue = "Line 1" + System.lineSeparator() + "Line 2";
+        String multiLineValue = "Line 1\nLine 2";
         String intValue = "1";
 
         testGrid.addRows(4);
@@ -258,8 +258,8 @@ public class EditableGridTest extends BaseWebDriverTest
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
-        String mlRow1 = "Line 1" + System.lineSeparator() + "Line 2";
-        String mlRow2 = "Line 3" + System.lineSeparator() + "Line 4";
+        String mlRow1 = "Line 1\nLine 2";
+        String mlRow2 = "Line 3\nLine 4";
 
         testGrid.addRows(7);
         WebElement topLeft = setCellValues(testGrid, FILL_STRING, "QWE", "ASD", "ZXC").get(0);
@@ -503,14 +503,14 @@ public class EditableGridTest extends BaseWebDriverTest
 
             if (iStr.hasNext())
             {
-                sbPasteString.append(System.lineSeparator());
+                sbPasteString.append("\n");
             }
 
         }
 
         log("Test double clicking the MultiLine cell and pasting in a multi-line string.");
-
-        editableGrid.setMultiLineCellValue(0, PASTE_ML, sbPasteString.toString());
+        WebElement gridCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        actionPaste(gridCell, sbPasteString.toString());
 
         checker().verifyEquals("All lines should have gone into one cell.",
                 1, editableGrid.getRowCount());
@@ -530,8 +530,8 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
         editableGrid.pasteFromCell(0, PASTE_ML, sbPasteString.toString());
 
-        checker().verifyEquals("Each line should have created a new row.",
-                expectedValues.size(), editableGrid.getRowCount());
+        checker().verifyTrue("Each line should have created a new row.",
+                waitFor(()->expectedValues.size() == editableGrid.getRowCount(), 1_000));
 
         checker().verifyEquals(String.format("Values in column '%s' not as expected.", PASTE_ML),
                 expectedValues, editableGrid.getColumnData(PASTE_ML));
