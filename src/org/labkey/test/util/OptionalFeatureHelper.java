@@ -26,30 +26,30 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExperimentalFeaturesHelper
+public class OptionalFeatureHelper
 {
-    public static Boolean enableExperimentalFeature(Connection cn, String feature)
+    public static Boolean enableOptionalFeature(Connection cn, String feature)
     {
-        return setExperimentalFeature(cn, feature, true);
+        return setOptionalFeature(cn, feature, true);
     }
 
-    public static Boolean disableExperimentalFeature(Connection cn, String feature)
+    public static Boolean disableOptionalFeature(Connection cn, String feature)
     {
-        return setExperimentalFeature(cn, feature, false);
+        return setOptionalFeature(cn, feature, false);
     }
 
-    public static Boolean setExperimentalFeature(Connection cn, String feature, boolean enable)
+    public static Boolean setOptionalFeature(Connection cn, String feature, boolean enable)
     {
         if (TestProperties.isPrimaryUserAppAdmin())
-            return null; // App admin can't enable/disable experimental features
+            return null; // App admin can't enable/disable optional features
 
-        TestLogger.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);
+        TestLogger.log((enable ? "Enabling" : "Disabling") + " optional feature " + feature);
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("feature", feature);
         parameters.put("enabled", enable);
 
-        SimplePostCommand command = new SimplePostCommand("admin", "experimentalFeature");
+        SimplePostCommand command = new SimplePostCommand("admin", "optionalFeature");
         command.setParameters(parameters);
         try
         {
@@ -60,17 +60,17 @@ public class ExperimentalFeaturesHelper
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Error setting experimental feature '" + feature + "'.", e);
+            throw new RuntimeException("Error setting optional feature '" + feature + "'.", e);
         }
         catch (CommandException e)
         {
-            throw new RuntimeException("Error setting experimental feature '" + feature + "': " + e.getStatusCode(), e);
+            throw new RuntimeException("Error setting optional feature '" + feature + "': " + e.getStatusCode(), e);
         }
     }
 
-    public static boolean isExperimentalFeatureEnabled(Connection cn, String feature)
+    public static boolean isOptionalFeatureEnabled(Connection cn, String feature)
     {
-        SimpleGetCommand command = new SimpleGetCommand("admin", "experimentalFeature");
+        SimpleGetCommand command = new SimpleGetCommand("admin", "optionalFeature");
         command.setParameters(Map.of("feature", feature));
         try
         {
@@ -81,7 +81,7 @@ public class ExperimentalFeaturesHelper
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Error retrieving experimental feature '" + feature + "'.", e);
+            throw new RuntimeException("Error retrieving optional feature '" + feature + "'.", e);
         }
     }
 }

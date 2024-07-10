@@ -34,7 +34,7 @@ import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
@@ -122,7 +122,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection();
-        ExperimentalFeaturesHelper.setExperimentalFeature(cn, "disableGuestAccount", false);
+        OptionalFeatureHelper.setOptionalFeature(cn, "disableGuestAccount", false);
         DbLoginUtils.resetDbLoginConfig(cn);
     }
 
@@ -303,7 +303,7 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void disableGuestAccountTest()
     {
-        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", true);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "disableGuestAccount", true);
 
         goToHome();
         signOut();
@@ -314,7 +314,7 @@ public class SecurityTest extends BaseWebDriverTest
                         isElementPresent(Locator.tagWithName("form", "login")));
 
         signIn();
-        ExperimentalFeaturesHelper.setExperimentalFeature(createDefaultConnection(), "disableGuestAccount", false);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "disableGuestAccount", false);
     }
 
     @LogMethod
