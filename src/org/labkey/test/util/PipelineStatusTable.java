@@ -166,7 +166,12 @@ public class PipelineStatusTable extends DataRegionTable
 
     public PipelineStatusDetailsPage clickStatusLink(int row)
     {
-        getWrapper().clickAndWait(link(row, getStatusColumnIndex()));
+        return clickStatusLink(row, getWrapper().getDefaultWaitForPage());
+    }
+
+    public PipelineStatusDetailsPage clickStatusLink(int row, int waitTimeout)
+    {
+        getWrapper().clickAndWait(link(row, getStatusColumnIndex()), waitTimeout);
         return new PipelineStatusDetailsPage(getDriver());
     }
 
