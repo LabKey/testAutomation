@@ -619,7 +619,7 @@ public class EditableGridTest extends BaseWebDriverTest
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", " ");
         checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_INT_FIELD_NAME + " *"));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, "Invalid integer." + REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, "Invalid integer. " + REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
@@ -651,6 +651,11 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(0, INT_FIELD_NAME, "123");
         checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellWarning(0, INT_FIELD_NAME));
 
+        log("Required value warning should be absent before the cell is acted on");
+        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
+        mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
+        testGrid.clearCellValue(1, REQ_STR_FIELD_NAME + " *");
+        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
     }
 
     @Test
