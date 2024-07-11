@@ -15,6 +15,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -481,6 +482,18 @@ public class EditableGridTest extends BaseWebDriverTest
         assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 2, size, clipRows), getActualPaste(testGrid));
     }
 
+    /**
+     * <p>
+     *     Validate the pasting of text into the multi-line cell edit.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Double click to edit the multi-line cell and then paste text with line breaks into it.</li>
+     *         <li>Single click the multi-line cell and validate pasting multiple lines creates new grid rows.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
     public void testPasteIntoMultiLine()
     {
@@ -537,6 +550,242 @@ public class EditableGridTest extends BaseWebDriverTest
                 expectedValues, editableGrid.getColumnData(PASTE_ML));
 
         checker().screenShotIfNewError("Paste_Into_Multiple_Cells_Error");
+
+    }
+
+    /**
+     * <p>
+     *     Test the sizing of the multi-line edit cell in an editable grid.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Many long lines will size the textArea to the maximum allowed size.</li>
+     *         <li>Hitting enter removes focus and the updated text is saved.</li>
+     *         <li>One long line (no new line) expands only the width and does not change the heigth.</li>
+     *         <li>Clicking outside of the textArea save the changes.</li>
+     *         <li>Many shot lines expands only the height and not the width.</li>
+     *         <li>Hitting the 'ESC' key closes the textArea and does not save the changes.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testMultiLineCellSizing()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(1);
+
+        // Scroll the last column into view it will make any failure screenshots more useful.
+        String lastColumnName = editableGrid.getColumnNames().get(editableGrid.getColumnNames().size() - 1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        int emptyWidth = editableGrid.getCell(0, PASTE_ML).getSize().getWidth();
+        int emptyHeight = editableGrid.getCell(0, PASTE_ML).getSize().getHeight();
+
+        int maxWidth = 600;
+        int maxHeight = 205;
+
+        log("Test entering several long lines.");
+
+        StringBuilder longLine01 = new StringBuilder();
+        StringBuilder longLine02 = new StringBuilder();
+        StringBuilder longLine03 = new StringBuilder();
+
+        for(int i = 0; i < 250; i++)
+        {
+            longLine01.append("a");
+            longLine02.append("b");
+            longLine03.append("c");
+        }
+
+        WebElement gridCell = editableGrid.getCell(0, PASTE_ML);
+        log("Cell initial Width & Height: " + gridCell.getSize());
+        log("Empty width: " + emptyWidth + " empty height: " + emptyHeight);
+
+        WebElement editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        Actions actions;
+
+        for(int rows = 0; rows < 50; rows++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(longLine01)
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .sendKeys(longLine02)
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .sendKeys(longLine03)
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .build()
+                    .perform();
+        }
+
+        checker().verifyTrue(String.format("Height of editable cell, %d, is not as expected %d (+/- 5).",
+                        editCell.getSize().height, emptyHeight),
+                Math.abs(editCell.getSize().height - emptyHeight) <= 5);
+
+        checker().verifyTrue(String.format("Width of editable cell, %d, is not as expected %d (+/- 10).",
+                        editCell.getSize().width, emptyWidth),
+                Math.abs(editCell.getSize().width - emptyWidth) <= 10);
+
+        checker().screenShotIfNewError("Editable_Cell_Size_Error");
+
+        actions = new Actions(getDriver());
+        actions.pause(500)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
+
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        WebElement updatedGridCell01 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell not updated with many long lines.",
+                waitFor(()->!updatedGridCell01.getText().isEmpty(), 1_000));
+
+        log("Multi line updated cell Width & Height: " + updatedGridCell01.getSize());
+
+        checker().verifyTrue(String.format("Height of updated cell, %d, is not as expected %d (+/- 5).",
+                        updatedGridCell01.getSize().height, maxHeight),
+                Math.abs(updatedGridCell01.getSize().height - maxHeight) <= 5);
+
+        checker().verifyTrue(String.format("Width of updated cell, %d, is not as expected %d (+/- 10).",
+                        updatedGridCell01.getSize().width, maxWidth),
+                Math.abs(updatedGridCell01.getSize().width - maxWidth) <= 10);
+
+        checker().screenShotIfNewError("Many_Long_Lines_Size_Error");
+
+        log("Reset the grid.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Enter one long line.");
+        editableGrid.addRows(1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        actions = new Actions(getDriver());
+        actions.sendKeys(longLine01)
+                .build()
+                .perform();
+
+        // This should scroll the last cell into view.
+        editableGrid.getCell(0, lastColumnName).click();
+
+        checker().verifyTrue("TextArea should have gone away after clicking out of the edit cell.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        WebElement updatedGridCell02 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell not updated with one long line.",
+                waitFor(()->!updatedGridCell02.getText().isEmpty(), 1_000));
+
+        log("Single line updated cell Width & Height: " + updatedGridCell02.getSize());
+
+        int emptyHeightWithScroll = emptyHeight + 15;
+        checker().verifyTrue(String.format("Height of updated cell with one line, %d, is not as expected %d (+/- 5).",
+                        updatedGridCell02.getSize().height, emptyHeightWithScroll),
+                Math.abs(updatedGridCell02.getSize().height - emptyHeightWithScroll) <= 5);
+
+        checker().verifyTrue(String.format("Width of updated cell with one line, %d, is not as expected %d (+/- 10).",
+                        updatedGridCell02.getSize().width, maxWidth),
+                Math.abs(updatedGridCell02.getSize().width - maxWidth) <= 10);
+
+        checker().screenShotIfNewError("Single_Long_Line_Size_Error");
+
+        log("Reset the grid again.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Enter many short lines.");
+        editableGrid.addRows(1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        for(int rows = 0; rows < 75; rows++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys("y")
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .build()
+                    .perform();
+        }
+
+        actions = new Actions(getDriver());
+        actions.pause(500)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
+
+        checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        WebElement updatedGridCell03 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell not updated with many short lines.",
+                waitFor(()->!updatedGridCell03.getText().isEmpty(), 1_000));
+
+        log("Single line updated cell Width & Height: " + updatedGridCell03.getSize());
+
+        checker().verifyTrue(String.format("Height of updated cell with many short lines, %d, is not as expected %d (+/- 5).",
+                        updatedGridCell03.getSize().height, maxHeight),
+                Math.abs(updatedGridCell03.getSize().height - maxHeight) <= 5);
+
+        checker().verifyTrue(String.format("Width of updated cell many short lines, %d, is not as expected %d (+/- 10).",
+                        updatedGridCell03.getSize().width, emptyWidth),
+                Math.abs(updatedGridCell03.getSize().width - emptyWidth) <= 10);
+
+        checker().screenShotIfNewError("Many_Short_Line_Size_Error");
+
+        log("Reset the grid for the last time.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Validate <esc> exits edit mode and does not save.");
+        editableGrid.addRows(1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        for(int rows = 0; rows < 5; rows++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys("z")
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .build()
+                    .perform();
+        }
+
+        actions = new Actions(getDriver());
+        actions.pause(500)
+                .sendKeys(Keys.ESCAPE)
+                .build()
+                .perform();
+
+        checker().verifyTrue("TextArea should have gone away after hitting <Esc>.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        WebElement updatedGridCell04 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell should not be updated after hitting <esc>.",
+                waitFor(()->updatedGridCell04.getText().isEmpty(), 1_000));
+
+        checker().screenShotIfNewError("Exit_With_Escape_Error");
 
     }
 
