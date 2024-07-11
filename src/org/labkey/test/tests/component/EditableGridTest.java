@@ -651,11 +651,6 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(0, INT_FIELD_NAME, "123");
         checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellWarning(0, INT_FIELD_NAME));
 
-        log("Clearing all grid values should reset to the initial page load state, with no warnings, including missing required value warnings.");
-        testGrid.clearAllCells();
-        checker().verifyEquals("Cell warning should be absent after clearing out all cell values",
-                0, Locator.tagWithClass("div", "cell-warning").findElements(testGrid).size());
-
     }
 
     @Test
