@@ -789,6 +789,410 @@ public class EditableGridTest extends BaseWebDriverTest
 
     }
 
+    static final Locator SELECTED_CELL_LOCATOR = Locator.tagWithClass("div", "cell-selection");
+
+    /**
+     * <p>
+     *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
+     * </p>
+     * <p>
+     *     Validates shift arrow selection in a column.
+     * </p>
+     * <p>
+     *     <ul>
+     *         <li>Click a cell then use shift down arrow.</li>
+     *         <li>Use shift up arrow once.</li>
+     *         <li>Use shift up arrow to go above the starting cell.</li>
+     *         <li>Release shift key and use arrow key to validate selection is removed.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShiftArrowSelectVertical()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(10);
+
+        checker().fatal()
+                .verifyEquals("There should be no grid cells already selected. Fatal error.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        List<String> columns = editableGrid.getColumnNames();
+        int column = columns.size() / 2;
+
+        int startRow = 4;
+        editableGrid.getCell(startRow, columns.get(column)).click();
+
+        log("Select a few vertical cells in the grid.");
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(Keys.SHIFT)
+                .build()
+                .perform();
+
+        // Expected count is the number of down arrows plus the original cell selected.
+        int expectedSelectedCount = 5;
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_DOWN)
+                    .build()
+                    .perform();
+        }
+
+        int endRow = startRow + expectedSelectedCount - 1;
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                column,
+                startRow,
+                column,
+                endRow);
+
+        checker().screenShotIfNewError("SHIFT_DOWN_ARROW_ERROR");
+
+        log("Go up one row.");
+        actions = new Actions(getDriver());
+        actions.sendKeys(Keys.ARROW_UP)
+                .build()
+                .perform();
+
+        expectedSelectedCount = expectedSelectedCount - 1;
+        endRow = endRow - 1;
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                column,
+                startRow,
+                column,
+                endRow);
+
+        checker().screenShotIfNewError("SHIFT_UP_ARROW_ERROR");
+
+        log("Go up multiple times, past the original start row.");
+
+        for(int count = 1; count <= 5; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_UP)
+                    .build()
+                    .perform();
+        }
+
+        expectedSelectedCount = 3;
+        endRow = startRow;
+        startRow = startRow - expectedSelectedCount + 1;
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                column,
+                startRow,
+                column,
+                endRow);
+
+        checker().screenShotIfNewError("SHIFT_UP_ARROW_ABOVE_START_ERROR");
+
+        log("Validate that releasing the <shift> key and using an <arrow> key removes the selection.");
+        actions = new Actions(getDriver());
+        actions.keyUp(Keys.SHIFT)
+                .sendKeys(Keys.ARROW_DOWN)
+                .build()
+                .perform();
+
+        checker().withScreenshot()
+                .verifyEquals("There should be no grid cells selected after releasing <shift> key and using an <arrow> key.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+    }
+
+    /**
+     * <p>
+     *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
+     * </p>
+     * <p>
+     *     Validates shift arrow selection in a row.
+     * </p>
+     * <p>
+     *     <ul>
+     *         <li>Click a cell then use shift left arrow.</li>
+     *         <li>Use shift right arrow once.</li>
+     *         <li>Use shift right arrow to go to the right of the starting cell.</li>
+     *         <li>Release shift key and hit enter key and validate starter cell is 'activated'.</li>
+     *         <li>Hit tab key navigates to new cell and removes selection.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShiftArrowSelectHorizontal()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(10);
+
+        checker().fatal()
+                .verifyEquals("There should be no grid cells already selected. Fatal error.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        List<String> columns = editableGrid.getColumnNames();
+        int startColumn = columns.indexOf(PASTE_1);
+
+        int gridRow = 4;
+        WebElement startCell = editableGrid.getCell(gridRow, PASTE_1);
+        startCell.click();
+
+        log("Select a few horizontal cells the the left in the grid.");
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(Keys.SHIFT)
+                .build()
+                .perform();
+
+        // Expected count is the number of left arrows plus the original cell selected.
+        int expectedSelectedCount = 4;
+        int endColumn = startColumn - 3;
+        for(int count = 1; count <= 3; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_LEFT)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                endColumn,
+                gridRow,
+                startColumn,
+                gridRow);
+
+        checker().screenShotIfNewError("SHIFT_LEFT_ARROW_ERROR");
+
+        log("Go to the right one column.");
+        actions = new Actions(getDriver());
+        actions.sendKeys(Keys.ARROW_RIGHT)
+                .build()
+                .perform();
+
+        expectedSelectedCount = expectedSelectedCount - 1;
+        endColumn = endColumn + 1;
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                endColumn,
+                gridRow,
+                startColumn,
+                gridRow);
+
+        checker().screenShotIfNewError("SHIFT_RIGHT_ARROW_ERROR");
+
+        log("Go to the right multiple times, past the original start column.");
+
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_RIGHT)
+                    .build()
+                    .perform();
+        }
+
+        expectedSelectedCount = 3;
+        endColumn = startColumn + 2;
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                gridRow,
+                endColumn,
+                gridRow);
+
+        checker().screenShotIfNewError("SHIFT_RIGHT_ARROW_BEFORE_START_ERROR");
+
+        log("Validate release <shift> key and hitting <enter> leaves the current selection but 'activates' the cell where the selection started.");
+        actions = new Actions(getDriver());
+        actions.keyUp(Keys.SHIFT)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
+
+        // The cell with the textArea does not have the 'cell-selection' style so expectedSelectedCount is off by one.
+        checker().verifyEquals("The selected cells should have remained after hitting <enter>.",
+                expectedSelectedCount - 1, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        WebElement textArea = Locator.tag("textarea").findWhenNeeded(startCell);
+
+        checker().verifyTrue(String.format("Cell on row %d column %s should be active.",
+                        gridRow, PASTE_1),
+                waitFor(textArea::isDisplayed, 1_000));
+
+        checker().screenShotIfNewError("ENTER_WITH_SELECTION_ERROR");
+
+        log("Finally validate that hitting <tab> removes selection and moves the active cell.");
+
+        actions = new Actions(getDriver());
+        actions.sendKeys(Keys.TAB)
+                .build()
+                .perform();
+
+        checker().verifyEquals("Hitting <tab> should have removed the selection.",
+                0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_2));
+
+        checker().verifyTrue(String.format("The expected cell on row %d and column %s is not selected after hitting <tab>.",
+                        gridRow, PASTE_2),
+                endCell.getAttribute("class").toLowerCase().contains("cell-selected"));
+
+        checker().screenShotIfNewError("TAB_ERROR");
+    }
+
+    /**
+     * <p>
+     *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
+     * </p>
+     * <p>
+     *     Validates shift arrow selection in 2 dimensions.
+     * </p>
+     * <p>
+     *     <ul>
+     *         <li>Click a cell then use shift left and down arrow.</li>
+     *         <li>Use shift up arrow to go above starting row.</li>
+     *         <li>Use shift left arrow to go to the left of the starting column.</li>
+     *         <li>Validate that clicking the starting cell leaves the selection in place.</li>
+     *         <li>Validate clicking any other cell removes selection.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShiftArrowSelect2D()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(10);
+
+        checker().fatal()
+                .verifyEquals("There should be no grid cells already selected. Fatal error.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        List<String> columns = editableGrid.getColumnNames();
+        int startColumn = columns.indexOf("Description");
+
+        int startRow = 5;
+        WebElement startCell = editableGrid.getCell(startRow, columns.get(startColumn));
+
+        startCell.click();
+
+        log("Select a few cells in different rows and columns.");
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(Keys.SHIFT)
+                .build()
+                .perform();
+
+        int expectedSelectedCount = 9;
+        int endColumn = startColumn + 2;
+        int endRow = startRow + 2;
+        for(int count = 1; count <= 2; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_RIGHT)
+                    .sendKeys(Keys.ARROW_DOWN)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_SELECTION_ERROR");
+
+        log("Gow up four rows (above original start column).");
+        endRow = startRow - 2;
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_UP)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_SELECTION_ABOVE_START_ERROR");
+
+        log("Gow left four columns (to the left of the original start).");
+        endColumn = startColumn - 2;
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_LEFT)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_SELECTION_BEFORE_START_ERROR");
+
+        log("Validate that clicking the starting cell leaves the selection as is.");
+        startCell.click();
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_CLICK_START_CELL_ERROR");
+
+        log("Validate that clicking any cell other than the origin cell removes the selection.");
+        editableGrid.getCell(9, columns.get(startColumn)).click();
+
+        checker().verifyEquals("There should be no grid cells selected after clicking some other cell.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+    }
+
+    private void checkSelectedStyle(EditableGrid editableGrid,
+                                    int expectedSelectedCount,
+                                    int startCol,
+                                    int startRow,
+                                    int endCol,
+                                    int endRow)
+    {
+
+        int selectedSizeAfter = SELECTED_CELL_LOCATOR.findElements(editableGrid).size();
+
+        checker().fatal()
+                .verifyTrue("No cells are selected. Fatal error.",
+                        !SELECTED_CELL_LOCATOR.findElements(editableGrid).isEmpty());
+
+        checker().verifyEquals("Number of cells selected not as expected.",
+                expectedSelectedCount, selectedSizeAfter);
+
+        List<String> columnNames = editableGrid.getColumnNames();
+
+        for(int colIndex = startCol; colIndex <= endCol; colIndex++)
+        {
+            for(int rowIndex = startRow; rowIndex <= endRow; rowIndex++)
+            {
+                WebElement gridCell = Locator.tag("div").findElement(editableGrid.getCell(rowIndex, columnNames.get(colIndex)));
+                checker().verifyTrue(String.format("Cell (%s, %d) is not selected.",columnNames.get(colIndex), rowIndex),
+                        gridCell.getAttribute("class").toLowerCase().contains("cell-selection"));
+            }
+        }
+
+    }
+
     private String getActualPaste(EditableGrid testGrid)
     {
         List<Map<String, String>> gridData = testGrid.getGridData(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
