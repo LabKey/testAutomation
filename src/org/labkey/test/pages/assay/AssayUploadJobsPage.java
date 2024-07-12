@@ -38,8 +38,13 @@ public class AssayUploadJobsPage extends LabKeyPage<AssayUploadJobsPage.ElementC
 
     public PipelineStatusDetailsPage clickJobStatus(String jobDescription)
     {
+        return clickJobStatus(jobDescription, getDefaultWaitForPage());
+    }
+
+    public PipelineStatusDetailsPage clickJobStatus(String jobDescription, int waitTimeout)
+    {
         int jobRow = getDataTable().getJobRow(jobDescription);
-        return getDataTable().clickStatusLink(jobRow);
+        return getDataTable().clickStatusLink(jobRow, waitTimeout);
     }
 
     public AssayDataPage clickViewResults()
