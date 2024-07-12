@@ -92,7 +92,6 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final FieldDefinition REQ_TEXTCHOICE_FIELD;
     private static final FieldDefinition LOOKUP_FIELD;
     private static final FieldDefinition REQ_LOOKUP_FIELD;
-    // TODO date fields
 
     final List<String> ALL_FIELD_NAMES = Arrays.asList(STR_FIELD_NAME, REQ_STR_FIELD_NAME, INT_FIELD_NAME, REQ_INT_FIELD_NAME,
             DATE_FIELD_NAME, REQ_DATETIME_FIELD_NAME, TIME_FIELD_NAME, REQ_TIME_FIELD_NAME,
