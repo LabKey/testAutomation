@@ -1460,6 +1460,60 @@ public class SampleTypeTest extends BaseWebDriverTest
         exportGridVerifyRowCountAndHeader(3, expectedHeaders);
     }
 
+    @Test // Issue 49830
+    public void testFilePathOnBulkImport()
+    {
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+
+        String sampleTypeName = "FilePathValidation";
+        String fileFieldName = "FileField";
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName).setFields(
+            List.of(new FieldDefinition(fileFieldName, ColumnType.File))
+        ));
+
+        // add a file system file that isn't under the current container dir, i.e. in the parent dir
+        goToProjectHome();
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("sampleType.xlsx"));
+
+        // go back to subfolder and import data with relative path that shouldn't resolve
+        DataRegionTable drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test1", "../sampleType.xlsx");
+        checker().verifyEquals("Sample name in data row not as expected", "Test1", drt.getDataAsText(0, "Name"));
+        checker().verifyEquals("File field should be empty as path was invalid", " ", drt.getDataAsText(0, fileFieldName));
+
+        // add a file system file in current container dir and import data with relative path that should resolve
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("sampleType.xlsx"));
+        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test2", "sampleType.xlsx");
+        checker().verifyEquals("Sample name in data row not as expected", "Test2", drt.getDataAsText(0, "Name"));
+        checker().verifyEquals("File field should contain file name", " sampleType.xlsx", drt.getDataAsText(0, fileFieldName));
+
+        // try an import with a valid file that isn't accessible from this container
+        File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
+        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test3", propFile.getAbsolutePath());
+        checker().verifyEquals("Sample name in data row not as expected", "Test3", drt.getDataAsText(0, "Name"));
+        checker().verifyEquals("File field should contain file name", " ", drt.getDataAsText(0, fileFieldName));
+
+        // try an import with an invalid file path
+        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test4", "invalid/path/to/file");
+        checker().verifyEquals("Sample name in data row not as expected", "Test4", drt.getDataAsText(0, "Name"));
+        checker().verifyEquals("File field should contain file name", " invalid/path/to/file (unavailable)", drt.getDataAsText(0, fileFieldName));
+    }
+
+    private DataRegionTable importSampleTypeFilePathData(String sampleTypeName, String fileFieldName, String sampleName, String filePath)
+    {
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        drt.clickImportBulkData();
+        String header = "Name\t" + fileFieldName + "\n";
+        String data =  sampleName + "\t" + filePath + "\n";
+        setFormElement(Locator.name("text"), header + data);
+        clickButton("Submit");
+        return DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+    }
+
     @Test
     public void testCreateViaScript()
     {
