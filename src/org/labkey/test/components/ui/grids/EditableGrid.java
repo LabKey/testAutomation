@@ -555,7 +555,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
         return textArea;
     }
-    static final Locator SELECTED_CELL_LOCATOR = Locator.tagWithClass("div", "cell-selection");
 
     /**
      * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
