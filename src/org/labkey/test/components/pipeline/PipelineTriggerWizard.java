@@ -304,8 +304,8 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
         Input configurationFileInput = new Input(Locator.name("configFileName").findWhenNeeded(this), getDriver());
         //navgiation elements
-        WebElement detailsButton = Locator.buttonContainingText("Details").findWhenNeeded(this);
-        WebElement configurationButton = Locator.buttonContainingText("Configuration").findWhenNeeded(this);
+        WebElement detailsButton = Locator.linkContainingText("Details").findWhenNeeded(this);
+        WebElement configurationButton = Locator.linkContainingText("Configuration").findWhenNeeded(this);
 
         //page actions
         WebElement saveButton = Locator.buttonContainingText("save").findWhenNeeded(this);
