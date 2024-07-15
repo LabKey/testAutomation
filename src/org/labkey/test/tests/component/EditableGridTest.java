@@ -522,7 +522,7 @@ public class EditableGridTest extends BaseWebDriverTest
         }
 
         log("Test double clicking the MultiLine cell and pasting in a multi-line string.");
-        WebElement gridCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        WebElement gridCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
         actionPaste(gridCell, sbPasteString.toString());
 
         checker().verifyEquals("All lines should have gone into one cell.",
@@ -603,11 +603,12 @@ public class EditableGridTest extends BaseWebDriverTest
         log("Cell initial Width & Height: " + gridCell.getSize());
         log("Empty width: " + emptyWidth + " empty height: " + emptyHeight);
 
-        WebElement editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        WebElement editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
         Actions actions;
 
-        for(int rows = 0; rows < 50; rows++)
+        // Add each of the 3 long lines 10 times to the textArea.
+        for(int rows = 0; rows < 10; rows++)
         {
             actions = new Actions(getDriver());
             actions.sendKeys(longLine01)
@@ -671,7 +672,7 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
         scrollIntoView(editableGrid.getCell(0, lastColumnName));
 
-        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
         actions = new Actions(getDriver());
         actions.sendKeys(longLine01)
@@ -709,7 +710,7 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
         scrollIntoView(editableGrid.getCell(0, lastColumnName));
 
-        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
         for(int rows = 0; rows < 75; rows++)
         {
@@ -757,7 +758,7 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
         scrollIntoView(editableGrid.getCell(0, lastColumnName));
 
-        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
         for(int rows = 0; rows < 5; rows++)
         {
@@ -789,8 +790,6 @@ public class EditableGridTest extends BaseWebDriverTest
 
     }
 
-    static final Locator SELECTED_CELL_LOCATOR = Locator.tagWithClass("div", "cell-selection");
-
     /**
      * <p>
      *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
@@ -816,7 +815,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().fatal()
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
-                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                        0, editableGrid.getSelectedCells().size());
 
         List<String> columns = editableGrid.getColumnNames();
         int column = columns.size() / 2;
@@ -899,7 +898,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().withScreenshot()
                 .verifyEquals("There should be no grid cells selected after releasing <shift> key and using an <arrow> key.",
-                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                        0, editableGrid.getSelectedCells().size());
 
     }
 
@@ -929,7 +928,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().fatal()
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
-                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                        0, editableGrid.getSelectedCells().size());
 
         List<String> columns = editableGrid.getColumnNames();
         int startColumn = columns.indexOf(PASTE_1);
@@ -1012,7 +1011,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         // The cell with the textArea does not have the 'cell-selection' style so expectedSelectedCount is off by one.
         checker().verifyEquals("The selected cells should have remained after hitting <enter>.",
-                expectedSelectedCount - 1, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                expectedSelectedCount - 1, editableGrid.getSelectedCells().size());
 
         WebElement textArea = Locator.tag("textarea").findWhenNeeded(startCell);
 
@@ -1030,7 +1029,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .perform();
 
         checker().verifyEquals("Hitting <tab> should have removed the selection.",
-                0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                0, editableGrid.getSelectedCells().size());
 
         WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_2));
 
@@ -1067,7 +1066,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().fatal()
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
-                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                        0, editableGrid.getSelectedCells().size());
 
         List<String> columns = editableGrid.getColumnNames();
         int startColumn = columns.indexOf("Description");
@@ -1158,7 +1157,7 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.getCell(9, columns.get(startColumn)).click();
 
         checker().verifyEquals("There should be no grid cells selected after clicking some other cell.",
-                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+                        0, editableGrid.getSelectedCells().size());
 
     }
 
@@ -1170,11 +1169,11 @@ public class EditableGridTest extends BaseWebDriverTest
                                     int endRow)
     {
 
-        int selectedSizeAfter = SELECTED_CELL_LOCATOR.findElements(editableGrid).size();
+        int selectedSizeAfter = editableGrid.getSelectedCells().size();
 
         checker().fatal()
                 .verifyTrue("No cells are selected. Fatal error.",
-                        !SELECTED_CELL_LOCATOR.findElements(editableGrid).isEmpty());
+                        !editableGrid.getSelectedCells().isEmpty());
 
         checker().verifyEquals("Number of cells selected not as expected.",
                 expectedSelectedCount, selectedSizeAfter);
