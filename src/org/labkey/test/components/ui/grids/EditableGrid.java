@@ -506,7 +506,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Set the value of a multi-line field for the given row. This uses javascript to set the value, not sendKeys.
+     * Set the value of a multi-line field for the given row & column. This uses javascript to set the value, not sendKeys.
      * Use '\n' for a new line.
      *
      * @param row Row to update.
@@ -519,7 +519,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         WebElement gridCell = getCell(row, columnName);
         String beforeText = gridCell.getText();
 
-        WebElement textArea = doubleClickMultiLineCell(row, columnName);
+        WebElement textArea = activateCellUsingDoubleClick(row, columnName);
 
         // Using setFormElement won't call the blur even to remove focus and set the field.
         getWrapper().setFormElementJS(textArea, value);
@@ -535,20 +535,27 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Double-clicking a cell that is for a multi-line field will put the cell into "edit mode". This will return the
-     * value that can be used to set the field.
+     * Double-clicking a cell that is "text" value field will activate it and present a textArea for editing the value.
+     * This will return the textArea WebElement that can be used to set the field.
      * @param row Row to be edited.
-     * @param columnName Column name of the multi-line field.
+     * @param columnName Column name of the field.
      * @return The TextArea component that can be used to edit the field.
      */
-    public WebElement doubleClickMultiLineCell(int row, String columnName)
+    public WebElement activateCellUsingDoubleClick(int row, String columnName)
     {
         WebElement gridCell = getCell(row, columnName);
-        getWrapper().doubleClick(getCell(row, columnName));
-        WebElement textArea = Locator.tag("textarea").findWhenNeeded(gridCell);
-        waitFor(textArea::isDisplayed, "Table cell for multi-line field did not enter edit mode.", 1_000);
+        WebElement textArea = Locator.tag("textarea").refindWhenNeeded(gridCell);
+
+        // Account for the cell already being active.
+        if(!textArea.isDisplayed())
+        {
+            getWrapper().doubleClick(gridCell);
+            waitFor(textArea::isDisplayed,
+                    String.format("Table cell for row %d and column '%s' was not activated.", row, columnName), 1_000);
+        }
         return textArea;
     }
+    static final Locator SELECTED_CELL_LOCATOR = Locator.tagWithClass("div", "cell-selection");
 
     /**
      * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
@@ -736,6 +743,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         var cells = Locator.tagWithClass("div", "cellular-display")
                 .withAttributeContaining("class","cell-selection").findElements(this);
         return getWrapper().getTexts(cells);
+    }
+
+    public List<WebElement> getSelectedCells()
+    {
+        return Locator.tagWithClass("div", "cell-selection").parent("td").findElements(this);
     }
 
     /**
