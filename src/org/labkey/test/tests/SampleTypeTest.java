@@ -1461,7 +1461,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     }
 
     @Test // Issue 49830
-    public void testFilePathOnBulkImport()
+    public void testFilePathOnBulkImport() throws IOException
     {
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
 
@@ -1491,7 +1491,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         // try an import with a valid file that isn't accessible from this container
         File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
-        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test3", propFile.getAbsolutePath());
+        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test3", propFile.getCanonicalPath());
         checker().verifyEquals("Sample name in data row not as expected", "Test3", drt.getDataAsText(0, "Name"));
         checker().verifyEquals("File field should contain file name", " ", drt.getDataAsText(0, fileFieldName));
 
