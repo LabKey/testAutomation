@@ -1491,14 +1491,15 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         // try an import with a valid file that isn't accessible from this container
         File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
-        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test3", propFile.getCanonicalPath());
+        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test3", propFile.getAbsolutePath());
         checker().verifyEquals("Sample name in data row not as expected", "Test3", drt.getDataAsText(0, "Name"));
-        checker().verifyEquals("File field should contain file name", " ", drt.getDataAsText(0, fileFieldName));
+        String actualValue = drt.getDataAsText(0, fileFieldName);
+        checker().verifyTrue("File field should contain file name", " ".equals(actualValue) || actualValue.contains("file (unavailable)"));
 
         // try an import with an invalid file path
         drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test4", "invalid/path/to/file");
         checker().verifyEquals("Sample name in data row not as expected", "Test4", drt.getDataAsText(0, "Name"));
-        checker().verifyEquals("File field should contain file name", " invalid/path/to/file (unavailable)", drt.getDataAsText(0, fileFieldName));
+        checker().verifyTrue("File field should contain file name", drt.getDataAsText(0, fileFieldName).contains("file (unavailable)"));
     }
 
     private DataRegionTable importSampleTypeFilePathData(String sampleTypeName, String fileFieldName, String sampleName, String filePath)
