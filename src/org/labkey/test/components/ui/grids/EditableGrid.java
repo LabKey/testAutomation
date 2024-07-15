@@ -506,6 +506,51 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Set the value of a multi-line field for the given row. This uses javascript to set the value, not sendKeys.
+     * Use '\n' for a new line.
+     *
+     * @param row Row to update.
+     * @param columnName Column name of the multi-line field.
+     * @param value The value to set.
+     */
+    public void setMultiLineCellValue(int row, String columnName, String value)
+    {
+
+        WebElement gridCell = getCell(row, columnName);
+        String beforeText = gridCell.getText();
+
+        WebElement textArea = doubleClickMultiLineCell(row, columnName);
+
+        // Using setFormElement won't call the blur even to remove focus and set the field.
+        getWrapper().setFormElementJS(textArea, value);
+        getWrapper().fireEvent(textArea, WebDriverWrapper.SeleniumEvent.blur);
+
+        waitFor(()->getWrapper().shortWait().until(ExpectedConditions.stalenessOf(textArea)),
+                "TextArea did not go away.", 500);
+
+        // Wait until the cell shows some kind of update before leaving.
+        WebDriverWrapper.waitFor(() -> !gridCell.getText().equals(beforeText),
+                "Doesn't look like the multi-line field was updated.", WAIT_FOR_JAVASCRIPT);
+
+    }
+
+    /**
+     * Double-clicking a cell that is for a multi-line field will put the cell into "edit mode". This will return the
+     * value that can be used to set the field.
+     * @param row Row to be edited.
+     * @param columnName Column name of the multi-line field.
+     * @return The TextArea component that can be used to edit the field.
+     */
+    public WebElement doubleClickMultiLineCell(int row, String columnName)
+    {
+        WebElement gridCell = getCell(row, columnName);
+        getWrapper().doubleClick(getCell(row, columnName));
+        WebElement textArea = Locator.tag("textarea").findWhenNeeded(gridCell);
+        waitFor(textArea::isDisplayed, "Table cell for multi-line field did not enter edit mode.", 1_000);
+        return textArea;
+    }
+
+    /**
      * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
      * @param row   the row
      * @param columnName    name of the column

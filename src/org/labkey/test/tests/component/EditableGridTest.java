@@ -15,11 +15,13 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +44,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private static final String FILLING_SAMPLE_TYPE = "FillingSampleType";
     private static final String FILL_STRING = "Filling String";
+    private static final String FILL_MULTI_LINE = "Filling Multi Line";
     private static final String FILL_INT = "Filling Int";
     private static final String FILL_DATE = "Filling Date";
 
@@ -51,6 +54,7 @@ public class EditableGridTest extends BaseWebDriverTest
     private static final String PASTE_3 = "Paste Column 3";
     private static final String PASTE_4 = "Paste Column 4";
     private static final String PASTE_5 = "Paste Column 5";
+    private static final String PASTE_ML = "Paste Multi Line";
 
     @BeforeClass
     public static void setupProject() throws Exception
@@ -77,6 +81,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .setFields(
                         List.of(
                                 new FieldDefinition(FILL_STRING, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(FILL_MULTI_LINE, FieldDefinition.ColumnType.MultiLine),
                                 new FieldDefinition(FILL_INT, FieldDefinition.ColumnType.Integer),
                                 new FieldDefinition(FILL_DATE, FieldDefinition.ColumnType.DateAndTime)
                         ))
@@ -88,13 +93,14 @@ public class EditableGridTest extends BaseWebDriverTest
                                 new FieldDefinition(PASTE_2, FieldDefinition.ColumnType.String),
                                 new FieldDefinition(PASTE_3, FieldDefinition.ColumnType.String),
                                 new FieldDefinition(PASTE_4, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_5, FieldDefinition.ColumnType.String)
+                                new FieldDefinition(PASTE_5, FieldDefinition.ColumnType.String),
+                                new FieldDefinition(PASTE_ML, FieldDefinition.ColumnType.MultiLine)
                         ))
                 .create(connection, getProjectName());
     }
 
     @Test
-    public void testTooWideErrorCase() throws Exception
+    public void testTooWideErrorCase()
     {
         CoreComponentsTestPage testPage = CoreComponentsTestPage.beginAt(this, getProjectName());
         EditableGrid testGrid = testPage.getEditableGrid("exp", "Data");
@@ -192,27 +198,58 @@ public class EditableGridTest extends BaseWebDriverTest
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
+        String stringValue = "ABC-1";
+        String multiLineValue = "Line 1\nLine 2";
+        String intValue = "1";
+
         testGrid.addRows(4);
-        WebElement topLeft = testGrid.setCellValue(0, FILL_STRING, "ABC-1");
-        testGrid.setCellValue(0, FILL_INT, "1");
+
+        // Get the various row heights before adding a value to the multiLine field.
+        WebElement gridRow = Locator.tag("tr").findElements(testGrid).get(1);
+        int rowHeightBefore = gridRow.getSize().height;
+        var totalHeightBefore = new Object(){int size = 0; };
+        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightBefore.size = totalHeightBefore.size + gr.getSize().height);
+        WebElement topLeft = testGrid.setCellValue(0, FILL_STRING, stringValue);
+
+        testGrid.setCellValue(0, FILL_INT, intValue);
+        testGrid.setMultiLineCellValue(0, FILL_MULTI_LINE, multiLineValue);
+
+        int rowHeightAfter = gridRow.getSize().height;
+
+        // Only going to check that the row height got bigger after adding text.
+        checker().withScreenshot()
+                .verifyTrue("Row height should have increased after putting multiple lines into the MultiLine field.",
+                        rowHeightAfter > rowHeightBefore);
+
         WebElement bottomRight = testGrid.setCellValue(0, FILL_DATE, now);
         WebElement fillTo = testGrid.getCell(2, FILL_DATE);
 
         testGrid.selectCellRange(topLeft, bottomRight);
         testGrid.dragFill(bottomRight, fillTo);
 
-        assertEquals("Drag-fill should have filled " + FILL_STRING,
-                List.of("ABC-1", "ABC-1", "ABC-1", ""),
+        checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
+                List.of(stringValue, stringValue, stringValue, ""),
                 testGrid.getColumnData(FILL_STRING));
-        assertEquals("Drag-fill should have filled " + FILL_INT,
-                List.of("1", "1", "1", ""),
+        checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
+                List.of(multiLineValue, multiLineValue, multiLineValue, ""),
+                testGrid.getColumnData(FILL_MULTI_LINE));
+        checker().verifyEquals("Drag-fill should have filled " + FILL_INT,
+                List.of(intValue, intValue, intValue, ""),
                 testGrid.getColumnData(FILL_INT));
-        assertEquals("Drag-fill should have filled " + FILL_DATE,
+        checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(2)),
                         ""),
                 testGrid.getColumnData(FILL_DATE));
+
+        // Check that pasting increased the size of all the rows.
+        var totalHeightAfter = new Object(){int size = 0; };
+        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightAfter.size = totalHeightAfter.size + gr.getSize().height);
+
+        checker().withScreenshot()
+                .verifyTrue("The total height of all the rows should have increases after the paste.",
+                        totalHeightBefore.size + (3 * rowHeightBefore) >= totalHeightAfter.size);
     }
 
     @Test
@@ -222,18 +259,29 @@ public class EditableGridTest extends BaseWebDriverTest
 
         EditableGrid testGrid = goToEditableGrid(FILLING_SAMPLE_TYPE);
 
+        String mlRow1 = "Line 1\nLine 2";
+        String mlRow2 = "Line 3\nLine 4";
+
         testGrid.addRows(7);
         WebElement topLeft = setCellValues(testGrid, FILL_STRING, "QWE", "ASD", "ZXC").get(0);
+
+        // Just for fun put an empty row between.
+        testGrid.setMultiLineCellValue(0, FILL_MULTI_LINE, mlRow1);
+        testGrid.setMultiLineCellValue(2, FILL_MULTI_LINE, mlRow2);
+
         WebElement bottomRight = setCellValues(testGrid, FILL_DATE, now, now.plusDays(3), now.plusDays(1)).get(2);
         WebElement fillTo = testGrid.getCell(5, FILL_DATE);
 
         testGrid.selectCellRange(topLeft, bottomRight);
         testGrid.dragFill(bottomRight, fillTo);
 
-        assertEquals("Drag-fill should have filled " + FILL_STRING,
+        checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
                 List.of("QWE", "ASD", "ZXC", "QWE", "ASD", "ZXC", ""),
                 testGrid.getColumnData(FILL_STRING));
-        assertEquals("Drag-fill should have filled " + FILL_DATE,
+        checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
+                List.of(mlRow1, "", mlRow2, mlRow1, "", mlRow2, ""),
+                testGrid.getColumnData(FILL_MULTI_LINE));
+        checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(3)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
@@ -354,7 +402,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExpandedPaste() throws Exception
+    public void testExpandedPaste()
     {
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B"),
@@ -383,7 +431,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testInvalidExpandedPaste() throws Exception
+    public void testInvalidExpandedPaste()
     {
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B"),
@@ -411,7 +459,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExpandedPasteIntoSkinnySelection() throws Exception
+    public void testExpandedPasteIntoSkinnySelection()
     {
         final List<List<String>> clipRows = List.of(
                 List.of("A", "B"),
@@ -432,6 +480,717 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(5, PASTE_1));
         actionPaste(null, rowsToString(clipRows));
         assertEquals("Paste should expand to fill selection", getExpectedPaste(1, 2, size, clipRows), getActualPaste(testGrid));
+    }
+
+    /**
+     * <p>
+     *     Validate the pasting of text into the multi-line cell edit.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Double click to edit the multi-line cell and then paste text with line breaks into it.</li>
+     *         <li>Single click the multi-line cell and validate pasting multiple lines creates new grid rows.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testPasteIntoMultiLine()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(1);
+
+        List<String> expectedValues = List.of("Line 1",
+                "Line 2",
+                "Line 3",
+                "Line 4",
+                "Line 5"
+                );
+
+        StringBuilder sbPasteString = new StringBuilder();
+        Iterator<String> iStr = expectedValues.iterator();
+        while (iStr.hasNext())
+        {
+            sbPasteString.append(iStr.next());
+
+            if (iStr.hasNext())
+            {
+                sbPasteString.append("\n");
+            }
+
+        }
+
+        log("Test double clicking the MultiLine cell and pasting in a multi-line string.");
+        WebElement gridCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+        actionPaste(gridCell, sbPasteString.toString());
+
+        checker().verifyEquals("All lines should have gone into one cell.",
+                1, editableGrid.getRowCount());
+
+        // Using a waitFor because there is a slight pause before the cell actually has the value.
+        checker().verifyTrue(String.format("Value in the cell is not as expected. Expecting '%s' but found '%s'.",
+                        sbPasteString, editableGrid.getCellValue(0, PASTE_ML)),
+                waitFor(()->editableGrid.getCellValue(0, PASTE_ML).contentEquals(sbPasteString), 1_000));
+
+        checker().screenShotIfNewError("Paste_Into_One_Cell_Error");
+
+        log("Reset the grid.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Paste in a multi-line string without putting the cell into edit mode.");
+        editableGrid.addRows(1);
+        editableGrid.pasteFromCell(0, PASTE_ML, sbPasteString.toString());
+
+        checker().verifyTrue("Each line should have created a new row.",
+                waitFor(()->expectedValues.size() == editableGrid.getRowCount(), 1_000));
+
+        checker().verifyEquals(String.format("Values in column '%s' not as expected.", PASTE_ML),
+                expectedValues, editableGrid.getColumnData(PASTE_ML));
+
+        checker().screenShotIfNewError("Paste_Into_Multiple_Cells_Error");
+
+    }
+
+    /**
+     * <p>
+     *     Test the sizing of the multi-line edit cell in an editable grid.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Many long lines will size the textArea to the maximum allowed size.</li>
+     *         <li>Hitting enter removes focus and the updated text is saved.</li>
+     *         <li>One long line (no new line) expands only the width and does not change the heigth.</li>
+     *         <li>Clicking outside of the textArea save the changes.</li>
+     *         <li>Many shot lines expands only the height and not the width.</li>
+     *         <li>Hitting the 'ESC' key closes the textArea and does not save the changes.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testMultiLineCellSizing()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(1);
+
+        // Scroll the last column into view it will make any failure screenshots more useful.
+        String lastColumnName = editableGrid.getColumnNames().get(editableGrid.getColumnNames().size() - 1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        int emptyWidth = editableGrid.getCell(0, PASTE_ML).getSize().getWidth();
+        int emptyHeight = editableGrid.getCell(0, PASTE_ML).getSize().getHeight();
+
+        int maxWidth = 600;
+        int maxHeight = 205;
+
+        log("Test entering several long lines.");
+
+        StringBuilder longLine01 = new StringBuilder();
+        StringBuilder longLine02 = new StringBuilder();
+        StringBuilder longLine03 = new StringBuilder();
+
+        for(int i = 0; i < 250; i++)
+        {
+            longLine01.append("a");
+            longLine02.append("b");
+            longLine03.append("c");
+        }
+
+        WebElement gridCell = editableGrid.getCell(0, PASTE_ML);
+        log("Cell initial Width & Height: " + gridCell.getSize());
+        log("Empty width: " + emptyWidth + " empty height: " + emptyHeight);
+
+        WebElement editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        Actions actions;
+
+        for(int rows = 0; rows < 50; rows++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(longLine01)
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .sendKeys(longLine02)
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .sendKeys(longLine03)
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .build()
+                    .perform();
+        }
+
+        checker().verifyTrue(String.format("Height of editable cell, %d, is not as expected %d (+/- 5).",
+                        editCell.getSize().height, emptyHeight),
+                Math.abs(editCell.getSize().height - emptyHeight) <= 5);
+
+        checker().verifyTrue(String.format("Width of editable cell, %d, is not as expected %d (+/- 10).",
+                        editCell.getSize().width, emptyWidth),
+                Math.abs(editCell.getSize().width - emptyWidth) <= 10);
+
+        checker().screenShotIfNewError("Editable_Cell_Size_Error");
+
+        actions = new Actions(getDriver());
+        actions.pause(500)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
+
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        WebElement updatedGridCell01 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell not updated with many long lines.",
+                waitFor(()->!updatedGridCell01.getText().isEmpty(), 1_000));
+
+        log("Multi line updated cell Width & Height: " + updatedGridCell01.getSize());
+
+        checker().verifyTrue(String.format("Height of updated cell, %d, is not as expected %d (+/- 5).",
+                        updatedGridCell01.getSize().height, maxHeight),
+                Math.abs(updatedGridCell01.getSize().height - maxHeight) <= 5);
+
+        checker().verifyTrue(String.format("Width of updated cell, %d, is not as expected %d (+/- 10).",
+                        updatedGridCell01.getSize().width, maxWidth),
+                Math.abs(updatedGridCell01.getSize().width - maxWidth) <= 10);
+
+        checker().screenShotIfNewError("Many_Long_Lines_Size_Error");
+
+        log("Reset the grid.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Enter one long line.");
+        editableGrid.addRows(1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        actions = new Actions(getDriver());
+        actions.sendKeys(longLine01)
+                .build()
+                .perform();
+
+        // This should scroll the last cell into view.
+        editableGrid.getCell(0, lastColumnName).click();
+
+        checker().verifyTrue("TextArea should have gone away after clicking out of the edit cell.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        WebElement updatedGridCell02 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell not updated with one long line.",
+                waitFor(()->!updatedGridCell02.getText().isEmpty(), 1_000));
+
+        log("Single line updated cell Width & Height: " + updatedGridCell02.getSize());
+
+        int emptyHeightWithScroll = emptyHeight + 15;
+        checker().verifyTrue(String.format("Height of updated cell with one line, %d, is not as expected %d (+/- 5).",
+                        updatedGridCell02.getSize().height, emptyHeightWithScroll),
+                Math.abs(updatedGridCell02.getSize().height - emptyHeightWithScroll) <= 5);
+
+        checker().verifyTrue(String.format("Width of updated cell with one line, %d, is not as expected %d (+/- 10).",
+                        updatedGridCell02.getSize().width, maxWidth),
+                Math.abs(updatedGridCell02.getSize().width - maxWidth) <= 10);
+
+        checker().screenShotIfNewError("Single_Long_Line_Size_Error");
+
+        log("Reset the grid again.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Enter many short lines.");
+        editableGrid.addRows(1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        for(int rows = 0; rows < 75; rows++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys("y")
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .build()
+                    .perform();
+        }
+
+        actions = new Actions(getDriver());
+        actions.pause(500)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
+
+        checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        WebElement updatedGridCell03 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell not updated with many short lines.",
+                waitFor(()->!updatedGridCell03.getText().isEmpty(), 1_000));
+
+        log("Single line updated cell Width & Height: " + updatedGridCell03.getSize());
+
+        checker().verifyTrue(String.format("Height of updated cell with many short lines, %d, is not as expected %d (+/- 5).",
+                        updatedGridCell03.getSize().height, maxHeight),
+                Math.abs(updatedGridCell03.getSize().height - maxHeight) <= 5);
+
+        checker().verifyTrue(String.format("Width of updated cell many short lines, %d, is not as expected %d (+/- 10).",
+                        updatedGridCell03.getSize().width, emptyWidth),
+                Math.abs(updatedGridCell03.getSize().width - emptyWidth) <= 10);
+
+        checker().screenShotIfNewError("Many_Short_Line_Size_Error");
+
+        log("Reset the grid for the last time.");
+        editableGrid.selectAll(true);
+        editableGrid.clickRemove();
+
+        log("Validate <esc> exits edit mode and does not save.");
+        editableGrid.addRows(1);
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        editCell = editableGrid.doubleClickMultiLineCell(0, PASTE_ML);
+
+        for(int rows = 0; rows < 5; rows++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys("z")
+                    .keyDown(Keys.SHIFT)
+                    .sendKeys(Keys.ENTER)
+                    .keyUp(Keys.SHIFT)
+                    .build()
+                    .perform();
+        }
+
+        actions = new Actions(getDriver());
+        actions.pause(500)
+                .sendKeys(Keys.ESCAPE)
+                .build()
+                .perform();
+
+        checker().verifyTrue("TextArea should have gone away after hitting <Esc>.",
+                shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
+
+        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+
+        WebElement updatedGridCell04 = editableGrid.getCell(0, PASTE_ML);
+        checker().verifyTrue("Cell should not be updated after hitting <esc>.",
+                waitFor(()->updatedGridCell04.getText().isEmpty(), 1_000));
+
+        checker().screenShotIfNewError("Exit_With_Escape_Error");
+
+    }
+
+    static final Locator SELECTED_CELL_LOCATOR = Locator.tagWithClass("div", "cell-selection");
+
+    /**
+     * <p>
+     *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
+     * </p>
+     * <p>
+     *     Validates shift arrow selection in a column.
+     * </p>
+     * <p>
+     *     <ul>
+     *         <li>Click a cell then use shift down arrow.</li>
+     *         <li>Use shift up arrow once.</li>
+     *         <li>Use shift up arrow to go above the starting cell.</li>
+     *         <li>Release shift key and use arrow key to validate selection is removed.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShiftArrowSelectVertical()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(10);
+
+        checker().fatal()
+                .verifyEquals("There should be no grid cells already selected. Fatal error.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        List<String> columns = editableGrid.getColumnNames();
+        int column = columns.size() / 2;
+
+        int startRow = 4;
+        editableGrid.getCell(startRow, columns.get(column)).click();
+
+        log("Select a few vertical cells in the grid.");
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(Keys.SHIFT)
+                .build()
+                .perform();
+
+        // Expected count is the number of down arrows plus the original cell selected.
+        int expectedSelectedCount = 5;
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_DOWN)
+                    .build()
+                    .perform();
+        }
+
+        int endRow = startRow + expectedSelectedCount - 1;
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                column,
+                startRow,
+                column,
+                endRow);
+
+        checker().screenShotIfNewError("SHIFT_DOWN_ARROW_ERROR");
+
+        log("Go up one row.");
+        actions = new Actions(getDriver());
+        actions.sendKeys(Keys.ARROW_UP)
+                .build()
+                .perform();
+
+        expectedSelectedCount = expectedSelectedCount - 1;
+        endRow = endRow - 1;
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                column,
+                startRow,
+                column,
+                endRow);
+
+        checker().screenShotIfNewError("SHIFT_UP_ARROW_ERROR");
+
+        log("Go up multiple times, past the original start row.");
+
+        for(int count = 1; count <= 5; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_UP)
+                    .build()
+                    .perform();
+        }
+
+        expectedSelectedCount = 3;
+        endRow = startRow;
+        startRow = startRow - expectedSelectedCount + 1;
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                column,
+                startRow,
+                column,
+                endRow);
+
+        checker().screenShotIfNewError("SHIFT_UP_ARROW_ABOVE_START_ERROR");
+
+        log("Validate that releasing the <shift> key and using an <arrow> key removes the selection.");
+        actions = new Actions(getDriver());
+        actions.keyUp(Keys.SHIFT)
+                .sendKeys(Keys.ARROW_DOWN)
+                .build()
+                .perform();
+
+        checker().withScreenshot()
+                .verifyEquals("There should be no grid cells selected after releasing <shift> key and using an <arrow> key.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+    }
+
+    /**
+     * <p>
+     *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
+     * </p>
+     * <p>
+     *     Validates shift arrow selection in a row.
+     * </p>
+     * <p>
+     *     <ul>
+     *         <li>Click a cell then use shift left arrow.</li>
+     *         <li>Use shift right arrow once.</li>
+     *         <li>Use shift right arrow to go to the right of the starting cell.</li>
+     *         <li>Release shift key and hit enter key and validate starter cell is 'activated'.</li>
+     *         <li>Hit tab key navigates to new cell and removes selection.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShiftArrowSelectHorizontal()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(10);
+
+        checker().fatal()
+                .verifyEquals("There should be no grid cells already selected. Fatal error.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        List<String> columns = editableGrid.getColumnNames();
+        int startColumn = columns.indexOf(PASTE_1);
+
+        int gridRow = 4;
+        WebElement startCell = editableGrid.getCell(gridRow, PASTE_1);
+        startCell.click();
+
+        log("Select a few horizontal cells the the left in the grid.");
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(Keys.SHIFT)
+                .build()
+                .perform();
+
+        // Expected count is the number of left arrows plus the original cell selected.
+        int expectedSelectedCount = 4;
+        int endColumn = startColumn - 3;
+        for(int count = 1; count <= 3; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_LEFT)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                endColumn,
+                gridRow,
+                startColumn,
+                gridRow);
+
+        checker().screenShotIfNewError("SHIFT_LEFT_ARROW_ERROR");
+
+        log("Go to the right one column.");
+        actions = new Actions(getDriver());
+        actions.sendKeys(Keys.ARROW_RIGHT)
+                .build()
+                .perform();
+
+        expectedSelectedCount = expectedSelectedCount - 1;
+        endColumn = endColumn + 1;
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                endColumn,
+                gridRow,
+                startColumn,
+                gridRow);
+
+        checker().screenShotIfNewError("SHIFT_RIGHT_ARROW_ERROR");
+
+        log("Go to the right multiple times, past the original start column.");
+
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_RIGHT)
+                    .build()
+                    .perform();
+        }
+
+        expectedSelectedCount = 3;
+        endColumn = startColumn + 2;
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                gridRow,
+                endColumn,
+                gridRow);
+
+        checker().screenShotIfNewError("SHIFT_RIGHT_ARROW_BEFORE_START_ERROR");
+
+        log("Validate release <shift> key and hitting <enter> leaves the current selection but 'activates' the cell where the selection started.");
+        actions = new Actions(getDriver());
+        actions.keyUp(Keys.SHIFT)
+                .sendKeys(Keys.ENTER)
+                .build()
+                .perform();
+
+        // The cell with the textArea does not have the 'cell-selection' style so expectedSelectedCount is off by one.
+        checker().verifyEquals("The selected cells should have remained after hitting <enter>.",
+                expectedSelectedCount - 1, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        WebElement textArea = Locator.tag("textarea").findWhenNeeded(startCell);
+
+        checker().verifyTrue(String.format("Cell on row %d column %s should be active.",
+                        gridRow, PASTE_1),
+                waitFor(textArea::isDisplayed, 1_000));
+
+        checker().screenShotIfNewError("ENTER_WITH_SELECTION_ERROR");
+
+        log("Finally validate that hitting <tab> removes selection and moves the active cell.");
+
+        actions = new Actions(getDriver());
+        actions.sendKeys(Keys.TAB)
+                .build()
+                .perform();
+
+        checker().verifyEquals("Hitting <tab> should have removed the selection.",
+                0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_2));
+
+        checker().verifyTrue(String.format("The expected cell on row %d and column %s is not selected after hitting <tab>.",
+                        gridRow, PASTE_2),
+                endCell.getAttribute("class").toLowerCase().contains("cell-selected"));
+
+        checker().screenShotIfNewError("TAB_ERROR");
+    }
+
+    /**
+     * <p>
+     *     Test for <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=49953>Issue 49953: Shift up-arrow does not undo cell selection in editable grid.</a>
+     * </p>
+     * <p>
+     *     Validates shift arrow selection in 2 dimensions.
+     * </p>
+     * <p>
+     *     <ul>
+     *         <li>Click a cell then use shift left and down arrow.</li>
+     *         <li>Use shift up arrow to go above starting row.</li>
+     *         <li>Use shift left arrow to go to the left of the starting column.</li>
+     *         <li>Validate that clicking the starting cell leaves the selection in place.</li>
+     *         <li>Validate clicking any other cell removes selection.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testShiftArrowSelect2D()
+    {
+
+        EditableGrid editableGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
+        editableGrid.addRows(10);
+
+        checker().fatal()
+                .verifyEquals("There should be no grid cells already selected. Fatal error.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+        List<String> columns = editableGrid.getColumnNames();
+        int startColumn = columns.indexOf("Description");
+
+        int startRow = 5;
+        WebElement startCell = editableGrid.getCell(startRow, columns.get(startColumn));
+
+        startCell.click();
+
+        log("Select a few cells in different rows and columns.");
+        Actions actions = new Actions(getDriver());
+        actions.keyDown(Keys.SHIFT)
+                .build()
+                .perform();
+
+        int expectedSelectedCount = 9;
+        int endColumn = startColumn + 2;
+        int endRow = startRow + 2;
+        for(int count = 1; count <= 2; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_RIGHT)
+                    .sendKeys(Keys.ARROW_DOWN)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_SELECTION_ERROR");
+
+        log("Gow up four rows (above original start column).");
+        endRow = startRow - 2;
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_UP)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_SELECTION_ABOVE_START_ERROR");
+
+        log("Gow left four columns (to the left of the original start).");
+        endColumn = startColumn - 2;
+        for(int count = 1; count <= 4; count++)
+        {
+            actions = new Actions(getDriver());
+            actions.sendKeys(Keys.ARROW_LEFT)
+                    .build()
+                    .perform();
+        }
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_SELECTION_BEFORE_START_ERROR");
+
+        log("Validate that clicking the starting cell leaves the selection as is.");
+        startCell.click();
+
+        checkSelectedStyle(editableGrid,
+                expectedSelectedCount,
+                startColumn,
+                startRow,
+                endColumn,
+                endRow);
+
+        checker().screenShotIfNewError("2D_CLICK_START_CELL_ERROR");
+
+        log("Validate that clicking any cell other than the origin cell removes the selection.");
+        editableGrid.getCell(9, columns.get(startColumn)).click();
+
+        checker().verifyEquals("There should be no grid cells selected after clicking some other cell.",
+                        0, SELECTED_CELL_LOCATOR.findElements(editableGrid).size());
+
+    }
+
+    private void checkSelectedStyle(EditableGrid editableGrid,
+                                    int expectedSelectedCount,
+                                    int startCol,
+                                    int startRow,
+                                    int endCol,
+                                    int endRow)
+    {
+
+        int selectedSizeAfter = SELECTED_CELL_LOCATOR.findElements(editableGrid).size();
+
+        checker().fatal()
+                .verifyTrue("No cells are selected. Fatal error.",
+                        !SELECTED_CELL_LOCATOR.findElements(editableGrid).isEmpty());
+
+        checker().verifyEquals("Number of cells selected not as expected.",
+                expectedSelectedCount, selectedSizeAfter);
+
+        List<String> columnNames = editableGrid.getColumnNames();
+
+        for(int colIndex = startCol; colIndex <= endCol; colIndex++)
+        {
+            for(int rowIndex = startRow; rowIndex <= endRow; rowIndex++)
+            {
+                WebElement gridCell = Locator.tag("div").findElement(editableGrid.getCell(rowIndex, columnNames.get(colIndex)));
+                checker().verifyTrue(String.format("Cell (%s, %d) is not selected.",columnNames.get(colIndex), rowIndex),
+                        gridCell.getAttribute("class").toLowerCase().contains("cell-selection"));
+            }
+        }
+
     }
 
     private String getActualPaste(EditableGrid testGrid)
