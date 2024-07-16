@@ -51,7 +51,16 @@ public class ImportListArchivePage extends LabKeyPage<ImportListArchivePage.Elem
     public BeginPage clickImport()
     {
         clickAndWait(elementCache().importButton);
+        assertNoLabKeyErrors();
         return new BeginPage(getDriver());
+    }
+
+    public ImportListArchivePage clickImportExpectingError()
+    {
+        clickAndWait(elementCache().importButton);
+        assertLabKeyErrorPresent();
+        clearCache();
+        return this;
     }
 
     @Override
@@ -60,7 +69,7 @@ public class ImportListArchivePage extends LabKeyPage<ImportListArchivePage.Elem
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         WebElement zipInput = Locator.input("listZip").findWhenNeeded(this);
         WebElement importButton = Locator.lkButton("Import List Archive").findWhenNeeded(this);

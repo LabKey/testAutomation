@@ -30,6 +30,12 @@ public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
         super(driver);
     }
 
+    @Override
+    protected void waitForPage()
+    {
+        waitFor(() -> elementCache().listsGrid.getComponentElement().isDisplayed(), "List grid is not displayed", WAIT_FOR_JAVASCRIPT);
+    }
+
     public static BeginPage beginAt(WebDriverWrapper driver)
     {
         return beginAt(driver, driver.getCurrentContainerPath());
@@ -49,6 +55,14 @@ public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
                 .clickImport();
     }
 
+    public ImportListArchivePage importListArchiveExpectingError(File listArchive)
+    {
+        return getGrid()
+                .clickImportArchive()
+                .setZipFile(listArchive)
+                .clickImportExpectingError();
+    }
+
     public ManageListsGrid getGrid()
     {
         return elementCache().listsGrid;
@@ -60,7 +74,7 @@ public class BeginPage extends LabKeyPage<BeginPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         private final ManageListsGrid listsGrid = new ManageListsGrid(getDriver());
     }

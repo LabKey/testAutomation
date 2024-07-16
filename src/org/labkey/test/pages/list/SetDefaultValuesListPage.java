@@ -72,7 +72,7 @@ public class SetDefaultValuesListPage extends LabKeyPage<SetDefaultValuesListPag
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         private Map<String, FormItem> formItems = new HashMap<>();
         protected WebElement saveButton = Locator.lkButton("Save Defaults").findWhenNeeded(this);
