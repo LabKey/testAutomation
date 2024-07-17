@@ -1,7 +1,6 @@
 package org.labkey.test.stress;
 
 import org.junit.BeforeClass;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -14,18 +13,17 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 @Category({})
 public class SimpleParallelApiTest extends BaseWebDriverTest
 {
     private static final String USER = "template_user@simpleparallelapitest.test";
+    private static final String USER2 = "template_user2@simpleparallelapitest.test";
 
     @Override
     protected void doCleanup(boolean afterTest)
     {
 //        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _userHelper.deleteUsers(afterTest, USER);
+        _userHelper.deleteUsers(afterTest, USER, USER2);
     }
 
     @BeforeClass
@@ -40,26 +38,28 @@ public class SimpleParallelApiTest extends BaseWebDriverTest
     {
 //        _containerHelper.createProject(getProjectName(), null);
         _userHelper.createUser(USER);
-        new ApiPermissionsHelper(this).addUserAsAppAdmin(USER);
+        _userHelper.createUser(USER2);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.addUserAsAppAdmin(USER);
+        apiPermissionsHelper.addUserAsAppAdmin(USER2);
         setInitialPassword(USER);
+        setInitialPassword(USER2);
     }
 
     @Test
     public void testSomething() throws Exception
     {
-        File sampleData = TestFileUtils.getSampleData("api/http-api.xml");
+        File sampleData = TestFileUtils.getSampleData("stress/lksm/dashboard-load.xml");
 
         goToHome();
         ConcurrentApiTestHelper apiHelper = new ConcurrentApiTestHelper(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword());
-        apiHelper.start();
-        List<Integer> results = apiHelper.runTests(sampleData);
-        log("Results: " + results);
+        apiHelper.startSimulation(sampleData);
     }
 
     @Override
     protected String getProjectName()
     {
-        return "HTTPApiVerifyProject";
+        return "SM_Pro_Sample_Update_Test";
     }
 
     @Override

@@ -13,13 +13,13 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.WhoAmICommand;
 import org.labkey.test.credentials.Login;
-import org.labkey.test.util.APITestHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConcurrentApiTestHelper
 {
@@ -27,6 +27,11 @@ public class ConcurrentApiTestHelper
     private final String _username;
     private final String _password;
     private final Connection _connection;
+
+    private int maxThreads = 6;
+    private int delayBetweenActivities = 5_000;
+
+    private boolean running = false;
 
     public ConcurrentApiTestHelper(String baseUrl, String username, String password)
     {
@@ -41,35 +46,24 @@ public class ConcurrentApiTestHelper
         this(baseUrl, login.getUsername(), login.getPassword());
     }
 
-    public void start() throws IOException, CommandException
+    public void startSimulation(File... activityFiles) throws IOException, CommandException
     {
-        new WhoAmICommand().execute(_connection, null);
-    }
-
-    public static TestCaseType[] parseTests(File testFile)
-    {
-        try
+        if (!running)
         {
-            List<APITestHelper.ApiTestCase> tests = new ArrayList<>();
-            ApiTestsDocument doc = ApiTestsDocument.Factory.parse(testFile);
-
-            return doc.getApiTests().getTestArray();
-        }
-        catch (IOException | XmlException e)
-        {
-            throw new RuntimeException("An unexpected error occurred", e);
+            running = true;
+            new WhoAmICommand().execute(_connection, null);
+            Activity activity = new Activity(activityFiles[0]);
+            TestCaseType testCaseType;
+            while ((testCaseType = activity.getNextRequest()) != null)
+            {
+                makeRequest(testCaseType);
+            }
         }
     }
 
-    public List<Integer> runTests(File testFile)
+    private int makeRequest(TestCaseType testCase)
     {
-        List<Integer> results = new ArrayList<>();
-
-        for (TestCaseType testCase : parseTests(testFile))
-        {
-            results.add(makeRequest(testCase.getUrl(), testCase.getType(), testCase.getFormData()));
-        }
-        return results;
+        return makeRequest(testCase.getUrl(), testCase.getType(), testCase.getFormData());
     }
 
     private int makeRequest(String url, String type, String formData)
@@ -118,7 +112,7 @@ public class ConcurrentApiTestHelper
 
 class Command extends org.labkey.remoteapi.Command<CommandResponse, HttpUriRequest>
 {
-    final HttpUriRequest _request;
+    private final HttpUriRequest _request;
 
     public Command(HttpUriRequest request)
     {
@@ -136,4 +130,45 @@ class Command extends org.labkey.remoteapi.Command<CommandResponse, HttpUriReque
     {
         return _request;
     }
+}
+
+class Activity
+{
+    private final List<TestCaseType> request;
+    private final AtomicInteger i = new AtomicInteger(0);
+
+    public Activity(File activityFile)
+    {
+        request = Arrays.asList(parseTests(activityFile));
+    }
+
+    public synchronized TestCaseType getNextRequest()
+    {
+        if (i.get() < request.size())
+        {
+            return request.get(i.getAndIncrement());
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private static TestCaseType[] parseTests(File testFile)
+    {
+        try
+        {
+            ApiTestsDocument doc = ApiTestsDocument.Factory.parse(testFile);
+
+            return doc.getApiTests().getTestArray();
+        }
+        catch (IOException | XmlException e)
+        {
+            throw new RuntimeException("Failed to parse test file " + testFile, e);
+        }
+    }
+}
+
+class SimulationRunner
+{
 }
