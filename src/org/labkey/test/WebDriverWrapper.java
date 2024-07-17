@@ -2342,7 +2342,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
                     return files != null && files.length == 0;
                 },
-                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_JAVASCRIPT);
+                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_PAGE);
 
         MutableInt downloadSize = new MutableInt(-1);
         MutableInt stabilityDuration = new MutableInt(0);
