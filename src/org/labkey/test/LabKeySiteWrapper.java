@@ -720,6 +720,26 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     // Note: leave the self-report setting unchanged
                     customizeSitePage.save();
                 }
+
+                //Waiting for search service to boot up
+                Connection connection = createDefaultConnection();
+
+                SimpleGetCommand command = new SimpleGetCommand("search", "json");
+                command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
+                CommandResponse searchResponse;
+                try
+                {
+                    do
+                    {
+                        searchResponse = command.execute(connection, "/");
+                    }
+                    while (searchResponse.getStatusCode() != 200);
+
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
             else // Just upgrading
             {
