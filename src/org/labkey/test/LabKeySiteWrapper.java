@@ -33,6 +33,7 @@ import org.apache.hc.core5.http.ProtocolException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -727,19 +728,25 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 SimpleGetCommand command = new SimpleGetCommand("search", "json");
                 command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
                 CommandResponse searchResponse;
-                try
+                do
                 {
-                    do
+                    try
                     {
+                        sleep(10); // to poll the re-request
                         searchResponse = command.execute(connection, "/");
                     }
-                    while (searchResponse.getStatusCode() != 200);
+                    catch (IOException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                    catch (CommandException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+                while (searchResponse.getStatusCode() != 200);
 
-                }
-                catch (Exception e)
-                {
-                    throw new RuntimeException(e);
-                }
+
             }
             else // Just upgrading
             {
