@@ -8,6 +8,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.util.Arrays;
@@ -52,8 +53,19 @@ public class SimpleParallelApiTest extends BaseWebDriverTest
         File sampleData = TestFileUtils.getSampleData("stress/lksm/dashboard-load.xml");
 
         goToHome();
-        ConcurrentApiTestHelper apiHelper = new ConcurrentApiTestHelper(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword());
-        apiHelper.startSimulation(sampleData);
+        Simulation simulation1 = new Simulation.Builder(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword())
+                .setActivityFiles(sampleData)
+                .startSimulation();
+        Simulation simulation2 = new Simulation.Builder(WebTestHelper.getBaseURL(), USER2, PasswordUtil.getPassword())
+                .setActivityFiles(sampleData)
+                .startSimulation();
+        sleep(30_000);
+        Object results1 = simulation1.collectResults();
+        Object results2 = simulation2.collectResults();
+        TestLogger.log("Results from " + USER);
+        TestLogger.log(results1.toString());
+        TestLogger.log("Results from " + USER2);
+        TestLogger.log(results2.toString());
     }
 
     @Override
