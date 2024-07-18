@@ -1,5 +1,6 @@
 package org.labkey.test.stress;
 
+import org.assertj.core.api.Assertions;
 import org.labkey.query.xml.TestCaseType;
 
 import java.util.Collections;
@@ -14,6 +15,7 @@ public class Activity
     {
         _name = name;
         _requests = Collections.unmodifiableList(requests);
+        verifyUniqueNames();
     }
 
     public String getName()
@@ -24,5 +26,10 @@ public class Activity
     public List<TestCaseType> getRequests()
     {
         return _requests;
+    }
+
+    private void verifyUniqueNames()
+    {
+        Assertions.assertThat(_requests.stream().map(TestCaseType::getName)).as("Request names").doesNotHaveDuplicates();
     }
 }
