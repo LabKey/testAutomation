@@ -15,7 +15,7 @@ public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache
 
     public BeginPage confirmDelete()
     {
-        elementCache().deleteButton.click();
+        clickAndWait(elementCache().deleteButton);
         return new BeginPage(getDriver());
     }
 
@@ -25,7 +25,7 @@ public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         WebElement deleteButton = Locator.lkButton("Confirm Delete").findWhenNeeded(this);
     }
