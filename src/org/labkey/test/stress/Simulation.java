@@ -11,6 +11,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.WhoAmICommand;
 import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.test.credentials.Login;
+import org.labkey.test.credentials.Server;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 public class Simulation
 {
@@ -94,7 +96,6 @@ public class Simulation
             }
             catch (InterruptedException | ExecutionException e)
             {
-                e.getMessage();
                 result = -2;
             }
             results.put(entry.getKey(), result);
@@ -123,25 +124,30 @@ public class Simulation
 
     public static class Builder
     {
-        private final String _baseUrl;
-        private final String _username;
-        private final String _password;
+        private final Supplier<Connection> _connectionSupplier;
 
         private int maxActivityThreads = 6;
         private int delayBetweenActivities = 5_000;
         private List<Activity> activityDefinitions = Collections.emptyList();
 
+        public Builder(Supplier<Connection> connectionSupplier)
+        {
+            _connectionSupplier = connectionSupplier;
+        }
 
         public Builder(String baseUrl, String username, String password)
         {
-            _baseUrl = baseUrl;
-            _username = username;
-            _password = password;
+            this(() -> new Connection(baseUrl, username, password));
         }
 
         public Builder(String baseUrl, Login login)
         {
             this(baseUrl, login.getUsername(), login.getPassword());
+        }
+
+        public Builder(Server server)
+        {
+            this(server.getHost(), server.getLogins().get(0));
         }
 
         public Builder setMaxActivityThreads(int maxActivityThreads)
@@ -164,9 +170,9 @@ public class Simulation
 
         public Simulation startSimulation() throws IOException, CommandException
         {
-            Connection _connection = new Connection(_baseUrl, _username, _password);
-            new WhoAmICommand().execute(_connection, null);
-            return new Simulation(_connection, activityDefinitions, delayBetweenActivities, maxActivityThreads);
+            Connection connection = _connectionSupplier.get();
+            new WhoAmICommand().execute(connection, null);
+            return new Simulation(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads);
         }
 
         private static List<TestCaseType> parseTests(File testFile)

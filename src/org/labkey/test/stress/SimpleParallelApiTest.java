@@ -11,6 +11,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,14 +29,14 @@ public class SimpleParallelApiTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws Exception
     {
         SimpleParallelApiTest init = (SimpleParallelApiTest) getCurrentTest();
 
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws Exception
     {
 //        _containerHelper.createProject(getProjectName(), null);
         _userHelper.createUser(USER);
@@ -53,19 +54,21 @@ public class SimpleParallelApiTest extends BaseWebDriverTest
         File sampleData = TestFileUtils.getSampleData("stress/lksm/dashboard-load.xml");
 
         goToHome();
-        Simulation simulation1 = new Simulation.Builder(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword())
-                .setActivityFiles(sampleData)
-                .startSimulation();
-        Simulation simulation2 = new Simulation.Builder(WebTestHelper.getBaseURL(), USER2, PasswordUtil.getPassword())
-                .setActivityFiles(sampleData)
-                .startSimulation();
+        List<Simulation> simulations = new ArrayList<>();
+        Simulation.Builder builder = new Simulation.Builder(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword())
+                .setActivityFiles(sampleData);
+        for (int i = 0; i < 100; i++)
+        {
+            simulations.add(builder.startSimulation());
+        }
         sleep(30_000);
-        Object results1 = simulation1.collectResults();
-        Object results2 = simulation2.collectResults();
-        TestLogger.log("Results from " + USER);
-        TestLogger.log(results1.toString());
+        List<Object> results = new ArrayList<>();
+        for (Simulation simulation : simulations)
+        {
+            results.add(simulation.collectResults());
+        }
         TestLogger.log("Results from " + USER2);
-        TestLogger.log(results2.toString());
+        TestLogger.log(results.toString());
     }
 
     @Override
