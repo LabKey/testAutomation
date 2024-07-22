@@ -15,12 +15,18 @@
  */
 package org.labkey.test.util;
 
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.remoteapi.security.DeleteUserCommand;
@@ -32,12 +38,16 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -237,5 +247,80 @@ public class APIUserHelper extends AbstractUserHelper
             if (userId != null)
                 deleteUser(userId);
         }
+    }
+
+    private static final Pattern regEmailVerification = Pattern.compile("verification=([A-Za-z0-9]+)");
+    @Override
+    public String setInitialPassword(String email)
+    {
+        String verification;
+
+        try
+        {
+            SimpleGetCommand getRegEmailCommand = new SimpleGetCommand("security", "showRegistrationEmail");
+            getRegEmailCommand.setParameters(Map.of("email", email));
+
+            String responseText = getRegEmailCommand.execute(connectionSupplier.get(), null).getText();
+            Matcher matcher = regEmailVerification.matcher(responseText);
+
+            if (matcher.find())
+            {
+                verification = matcher.group(1);
+            }
+            else
+            {
+                throw new IllegalStateException("No verification code found:\n" + responseText);
+            }
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to fetch new user registration email.", e);
+        }
+
+        try
+        {
+            String password = PasswordUtil.getPassword();
+            new SetPasswordCommand(email, password, verification).execute(connectionSupplier.get(), null);
+            return password;
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+}
+
+class SetPasswordCommand extends PostCommand<CommandResponse>
+{
+    private final String _email;
+    private final String _password;
+    private final String _verification;
+
+    public SetPasswordCommand(String email, String password, String verification)
+    {
+        super("login", "setPassword");
+        _email = email;
+        _password = password;
+        _verification = verification;
+    }
+
+    protected List<BasicNameValuePair> getPostData()
+    {
+        List<BasicNameValuePair> postData = new ArrayList<>();
+        postData.add(new BasicNameValuePair("email", _email));
+        postData.add(new BasicNameValuePair("password", _password));
+        postData.add(new BasicNameValuePair("password2", _password));
+        postData.add(new BasicNameValuePair("verification", _verification));
+
+        return postData;
+    }
+
+    @Override
+    protected HttpPost createRequest(URI uri)
+    {
+        // SetPasswordAction is not a real API action, so we POST form data instead of JSON
+        HttpPost request = new HttpPost(uri);
+        request.setEntity(new UrlEncodedFormEntity(getPostData()));
+        return request;
     }
 }
