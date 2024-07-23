@@ -723,17 +723,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     customizeSitePage.save();
                 }
 
-                //Waiting for search service to boot up
+                /*
+                    Waiting for search service to boot up
+                    Issue 50601: PDF indexing is slow on first file after server startup on Windows
+                 */
                 Connection connection = createDefaultConnection();
                 SimpleGetCommand command = new SimpleGetCommand("search", "json");
                 command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
                 long searchEndTime = System.currentTimeMillis() + 180000; // Wait for maximum of 3 mins.
-                CommandResponse searchResponse = null;
                 do
                 {
                     try
                     {
-                        searchResponse = command.execute(connection, "/");
+                        command.execute(connection, "/");
                     }
                     catch (IOException e)
                     {
@@ -741,10 +743,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     }
                     catch (CommandException e)
                     {
-                        sleep(500); // Retry and to poll the re-request
+                        sleep(500); //poll the re-request
                     }
                 }
-                while ((searchResponse != null) && (searchResponse.getStatusCode() != 200) && (System.currentTimeMillis() < searchEndTime));
+                while (System.currentTimeMillis() < searchEndTime);
             }
             else // Just upgrading
             {
