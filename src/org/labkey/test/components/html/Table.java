@@ -102,7 +102,7 @@ public class Table extends WebDriverComponent<Table.Elements>
                 return counter;
             counter++;
         }
-        return counter;
+        throw new RuntimeException( headerText + " column not found");
     }
 
     public List<String> getTableHeaderColumnData(String headerText)
