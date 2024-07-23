@@ -62,7 +62,7 @@ public class GridPage extends LabKeyPage<GridPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         private final DataRegionTable table = new DataRegionTable("query", getDriver());
     }

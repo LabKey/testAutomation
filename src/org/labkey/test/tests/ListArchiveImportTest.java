@@ -70,7 +70,7 @@ public class ListArchiveImportTest extends BaseWebDriverTest
         log("Import list and test for expected validation error");
         goToProjectHome();
 
-        goToManageLists().importListArchive(new ZipUtil(listArchive).tempZip());
+        goToManageLists().importListArchiveExpectingError(new ZipUtil(listArchive).tempZip());
 
         String expectedError = "File: Could not find referenced file People.xls";
         String actualError = Locators.labkeyError.findOptionalElement(getDriver()).map(WebElement::getText).orElse(null);
