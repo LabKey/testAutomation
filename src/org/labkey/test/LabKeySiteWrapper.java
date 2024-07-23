@@ -727,8 +727,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 Connection connection = createDefaultConnection();
                 SimpleGetCommand command = new SimpleGetCommand("search", "json");
                 command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
-                CommandResponse searchResponse = null;
                 long searchEndTime = System.currentTimeMillis() + 180000; // Wait for maximum of 3 mins.
+                CommandResponse searchResponse = null;
                 do
                 {
                     try
@@ -744,7 +744,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         sleep(500); // Retry and to poll the re-request
                     }
                 }
-                while (searchResponse.getStatusCode() != 200 && System.currentTimeMillis() < searchEndTime);
+                while ((searchResponse != null) && (searchResponse.getStatusCode() != 200) && (System.currentTimeMillis() < searchEndTime));
             }
             else // Just upgrading
             {
