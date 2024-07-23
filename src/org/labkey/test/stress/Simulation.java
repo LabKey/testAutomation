@@ -33,8 +33,8 @@ public class Simulation
     private final Connection _connection;
     private final List<Activity> _activities;
     private final int _delayBetweenActivities;
-    private final int _maximumActivityThreads;
     private final ExecutorService _simulationExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService _activityExecutor;
     private final Future<Object> _runningSimulation;
     private final AtomicBoolean _stopped = new AtomicBoolean(false);
 
@@ -43,42 +43,56 @@ public class Simulation
         _connection = connection;
         _activities = activities;
         _delayBetweenActivities = delayBetweenActivities;
-        _maximumActivityThreads = maximumActivityThreads;
+        _activityExecutor = Executors.newFixedThreadPool(maximumActivityThreads);
         _runningSimulation = _simulationExecutor.submit(this::startSimulation);
     }
 
-    public Object collectResults() throws ExecutionException, InterruptedException, TimeoutException
+    public Object collectResults()
     {
         _simulationExecutor.shutdown();
         _stopped.set(true);
-        return _runningSimulation.get(60, TimeUnit.SECONDS);
+        try
+        {
+            return _runningSimulation.get(60, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException | ExecutionException | TimeoutException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
-    private Object startSimulation()// throws Exception
+    public void shutdownNow()
     {
-        ExecutorService activityExecutor = Executors.newFixedThreadPool(_maximumActivityThreads);
+        _stopped.set(true);
+        _simulationExecutor.shutdownNow();
+        _activityExecutor.shutdownNow();
+    }
+
+    private Object startSimulation()
+    {
         MultiValuedMap<String, Map<String, Integer>> results = new ArrayListValuedHashMap<>();
-        while (!_stopped.get())
+        while (!_stopped.get() && !Thread.interrupted())
         {
             for (Activity activity : _activities)
             {
-                Map<String, Integer> activityResult = runActivity(activity, activityExecutor);
-                results.put(activity.getName(), activityResult);
-
                 try
                 {
+                    Map<String, Integer> activityResult = runActivity(activity, _activityExecutor);
+                    results.put(activity.getName(), activityResult);
+
                     Thread.sleep(_delayBetweenActivities);
                 }
-                catch (InterruptedException e)
+                catch (ExecutionException | InterruptedException e)
                 {
-                    throw new RuntimeException(e);
+                    shutdownNow();
+                    return results;
                 }
             }
         }
         return results;
     }
 
-    private Map<String, Integer> runActivity(Activity activity, ExecutorService activityExecutor)
+    private Map<String, Integer> runActivity(Activity activity, ExecutorService activityExecutor) throws ExecutionException, InterruptedException
     {
         Map<String, Future<Integer>> futures = new ArrayListMap<>();
         for (TestCaseType request : activity.getRequests())
@@ -89,15 +103,11 @@ public class Simulation
         Map<String, Integer> results = new ArrayListMap<>();
         for (Map.Entry<String, Future<Integer>> entry : futures.entrySet())
         {
-            Integer result;
-            try
+            if (_stopped.get() || Thread.interrupted())
             {
-                result = entry.getValue().get();
+                return results;
             }
-            catch (InterruptedException | ExecutionException e)
-            {
-                result = -2;
-            }
+            Integer result = entry.getValue().get();
             results.put(entry.getKey(), result);
         }
         return results;
@@ -122,7 +132,7 @@ public class Simulation
     }
 
 
-    public static class Builder
+    public static class Definition
     {
         private final Supplier<Connection> _connectionSupplier;
 
@@ -130,41 +140,41 @@ public class Simulation
         private int delayBetweenActivities = 5_000;
         private List<Activity> activityDefinitions = Collections.emptyList();
 
-        public Builder(Supplier<Connection> connectionSupplier)
+        public Definition(Supplier<Connection> connectionSupplier)
         {
             _connectionSupplier = connectionSupplier;
         }
 
-        public Builder(String baseUrl, String username, String password)
+        public Definition(String baseUrl, String username, String password)
         {
             this(() -> new Connection(baseUrl, username, password));
         }
 
-        public Builder(String baseUrl, Login login)
+        public Definition(String baseUrl, Login login)
         {
             this(baseUrl, login.getUsername(), login.getPassword());
         }
 
-        public Builder(Server server)
+        public Definition(Server server)
         {
             this(server.getHost(), server.getLogins().get(0));
         }
 
-        public Builder setMaxActivityThreads(int maxActivityThreads)
+        public Definition setMaxActivityThreads(int maxActivityThreads)
         {
             this.maxActivityThreads = maxActivityThreads;
             return this;
         }
 
-        public Builder setDelayBetweenActivities(int delayBetweenActivities)
+        public Definition setDelayBetweenActivities(int delayBetweenActivities)
         {
             this.delayBetweenActivities = delayBetweenActivities;
             return this;
         }
 
-        public Builder setActivityFiles(File... activityFiles)
+        public Definition setActivityFiles(File... activityFiles)
         {
-            activityDefinitions = Arrays.stream(activityFiles).map(f -> new Activity(f.getName(), Builder.parseTests(f))).toList();
+            activityDefinitions = Arrays.stream(activityFiles).map(f -> new Activity(f.getName(), Definition.parseTests(f))).toList();
             return this;
         }
 

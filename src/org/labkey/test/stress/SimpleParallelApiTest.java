@@ -3,20 +3,18 @@ package org.labkey.test.stress;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.TestLogger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Category({})
-public class SimpleParallelApiTest extends BaseWebDriverTest
+public class SimpleParallelApiTest extends BaseBackgroundLoadTest
 {
     private static final String USER = "template_user@simpleparallelapitest.test";
     private static final String USER2 = "template_user2@simpleparallelapitest.test";
@@ -44,31 +42,24 @@ public class SimpleParallelApiTest extends BaseWebDriverTest
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addUserAsAppAdmin(USER);
         apiPermissionsHelper.addUserAsAppAdmin(USER2);
-        setInitialPassword(USER);
-        setInitialPassword(USER2);
+        _userHelper.setInitialPassword(USER);
+        _userHelper.setInitialPassword(USER2);
+    }
+
+    @Override
+    protected List<Simulation.Definition> getSimulationDefinitions()
+    {
+        File sampleData = TestFileUtils.getSampleData("stress/lksm/dashboard-load.xml");
+
+        Simulation.Definition definition = new Simulation.Definition(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword())
+                .setActivityFiles(sampleData);
+        return Collections.nCopies(100, definition);
     }
 
     @Test
     public void testSomething() throws Exception
     {
-        File sampleData = TestFileUtils.getSampleData("stress/lksm/dashboard-load.xml");
-
         goToHome();
-        List<Simulation> simulations = new ArrayList<>();
-        Simulation.Builder builder = new Simulation.Builder(WebTestHelper.getBaseURL(), USER, PasswordUtil.getPassword())
-                .setActivityFiles(sampleData);
-        for (int i = 0; i < 100; i++)
-        {
-            simulations.add(builder.startSimulation());
-        }
-        sleep(30_000);
-        List<Object> results = new ArrayList<>();
-        for (Simulation simulation : simulations)
-        {
-            results.add(simulation.collectResults());
-        }
-        TestLogger.log("Results from " + USER2);
-        TestLogger.log(results.toString());
     }
 
     @Override
