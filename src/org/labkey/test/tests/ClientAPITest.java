@@ -1418,7 +1418,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         Map<String, Object> expectedProps = new HashMap<>();
         expectedProps.put("success", false);
-        expectedProps.put("exception", "You must log in to view this content.");
+        expectedProps.put("exception", "The email address and password you entered did not match any accounts on file.");
 
         validateUnauthorizedResponses(cn, command, expectedProps);
 
@@ -1506,7 +1506,7 @@ public class ClientAPITest extends BaseWebDriverTest
             assertThat(responseContentType, containsString(expectedResponseContentType));
 
             // Command only supports parsing the body of a JSON response.
-            if ("application/json".equalsIgnoreCase(expectedResponseContentType) && expectedProps != null && expectedProps.size() > 0)
+            if ("application/json".equalsIgnoreCase(expectedResponseContentType) && expectedProps != null && !expectedProps.isEmpty())
             {
                 Map<String, Object> body = exception.getProperties();
 
