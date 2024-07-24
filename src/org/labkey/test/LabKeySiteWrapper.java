@@ -735,7 +735,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 {
                     try
                     {
-                        command.execute(connection, "/");
+                        CommandResponse response = command.execute(connection, "/");
+                        if (response.getStatusCode() == 200) break; // Server is up, we can exit the loop
+                        else throw new RuntimeException("Search server did not start properly");
                     }
                     catch (IOException e)
                     {
