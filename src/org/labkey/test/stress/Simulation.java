@@ -2,7 +2,9 @@ package org.labkey.test.stress;
 
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
+import org.assertj.core.api.Assertions;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.remoteapi.CommandException;
@@ -27,6 +29,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Simulation
 {
@@ -136,7 +141,7 @@ public class Simulation
     {
         private final Supplier<Connection> _connectionSupplier;
 
-        private int maxActivityThreads = 6;
+        private int maxActivityThreads = 6; // This seems to be the number of parallel requests browsers handle
         private int delayBetweenActivities = 5_000;
         private List<Activity> activityDefinitions = Collections.emptyList();
 
@@ -174,7 +179,15 @@ public class Simulation
 
         public Definition setActivityFiles(File... activityFiles)
         {
-            activityDefinitions = Arrays.stream(activityFiles).map(f -> new Activity(f.getName(), Definition.parseTests(f))).toList();
+            return setActivityFilesWithReplacements(
+                    Arrays.stream(activityFiles).collect(Collectors.toMap(f -> f, f -> Collections.emptyMap())));
+        }
+
+        public Definition setActivityFilesWithReplacements(Map<File, Map<String, String>> activityFilesWithReplacements)
+        {
+            activityDefinitions = activityFilesWithReplacements.entrySet().stream()
+                    .map(entry -> new Activity(entry.getKey().getName(), Definition.parseTests(entry.getKey(), entry.getValue())))
+                    .toList();
             return this;
         }
 
@@ -199,5 +212,34 @@ public class Simulation
             }
         }
 
+        private static List<TestCaseType> parseTests(File testFile, Map<String, String> replacements)
+        {
+            List<TestCaseType> testCases = parseTests(testFile);
+            for (TestCaseType testCase : testCases)
+            {
+                applyReplacements(testCase, replacements);
+            }
+            return testCases;
+        }
+
+        private static void applyReplacements(TestCaseType testCase, Map<String, String> replacements)
+        {
+            testCase.setUrl(calculateReplacements(testCase.getUrl(), replacements));
+            testCase.setFormData(calculateReplacements(testCase.getFormData(), replacements));
+        }
+
+        private static final Pattern replacementPattern = Pattern.compile("@@([a-zA-Z0-9_-]+)@@");
+        private static String calculateReplacements(String value, Map<String, String> replacements)
+        {
+            if (StringUtils.isBlank(value))
+                return value;
+
+            Matcher matcher = replacementPattern.matcher(value);
+            return matcher.replaceAll(r -> {
+                String key = r.group(1);
+                Assertions.assertThat(replacements).as("Missing replacement value").containsKey(key);
+                return replacements.get(key);
+            });
+        }
     }
 }

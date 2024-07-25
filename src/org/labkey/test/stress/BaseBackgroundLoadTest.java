@@ -18,12 +18,13 @@ public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
     protected abstract List<Simulation.Definition> getSimulationDefinitions();
     protected int getBaselineDataCollectionDuration()
     {
-        return 30_000;
+        return 10_000;
     }
 
     @Before
     public final void startSimulationsAndCollectBaselinePerf() throws InterruptedException
     {
+        log("Starting background simulations to collect baseline performance data");
         startBackgroundSimulations();
         Thread.sleep(getBaselineDataCollectionDuration());
     }
@@ -47,8 +48,13 @@ public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
     @After
     public final void collectBaselinePerfAndStopSimulations() throws InterruptedException
     {
-        Thread.sleep(getBaselineDataCollectionDuration());
-        stopBackgroundSimulations();
+        if (!_simulations.isEmpty())
+        {
+            log("Allow background simulations to collect baseline performance data before terminating");
+            Thread.sleep(getBaselineDataCollectionDuration());
+            log("Stop background simulations");
+            stopBackgroundSimulations();
+        }
     }
 
     private void stopBackgroundSimulations()
