@@ -537,7 +537,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             try
             {
                 String startPage = buildURL("project", "home", "start");
-                SimpleHttpResponse httpResponse = getHttpResponse(startPage);
+                SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(startPage, null, null);
                 if (httpResponse.getResponseCode() >= 400)
                 {
                     log("Waiting for server: " + httpResponse.getResponseCode());

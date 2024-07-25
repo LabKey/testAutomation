@@ -114,7 +114,7 @@ public class SimpleHttpRequest
             {
                 useCopiedSession(con);
             }
-            else
+            else if (_username != null && _password != null)
             {
                 // Authenticator.setDefault() call above doesn't seem to work (I don't know why), so add the basic auth header explicitly
                 String encoded = Base64.getEncoder().encodeToString((_username + ":" + _password).getBytes(StandardCharsets.UTF_8));
