@@ -93,11 +93,23 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
 
     public FilterFacetedPanel filterValues(String filterStr)
     {
+
+        List<WebElement> checkBoxes = elementCache().checkboxLabelLoc.findElements(this);
+
         if (StringUtils.isEmpty(filterStr))
             elementCache().filterInput.set("");
         else
             elementCache().filterInput.setWithPaste(filterStr);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().checkboxLabelLoc.waitForElement(this, 5_000)));
+
+        // If there were options before, wait until they are removed.
+        if (!checkBoxes.isEmpty())
+        {
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(checkBoxes.get(0)));
+        }
+
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache()
+                .checkboxLabelLoc.waitForElement(this, 5_000)));
+
         return this;
     }
 
