@@ -385,10 +385,10 @@ public class SecurityTest extends BaseWebDriverTest
         ShowUsersPage usersPage = goToProjectUsers();
 
         usersPage
-                .clickAddUsers()
-                .setNewUsers(Arrays.asList(ADDED_USER))
-                .setSendNotification(true)
-                .clickAddUsers();
+            .clickAddUsers()
+            .setNewUsers(Arrays.asList(ADDED_USER))
+            .setSendNotification(true)
+            .clickAddUsers();
 
         assertTextPresent(ADDED_USER);
         stopImpersonating();
@@ -435,6 +435,9 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void tokenAuthenticationTest() throws IOException
     {
+        // Remote Login API (aka, token authentication) is deprecated, but we'll continue to test it until it's removed
+        boolean previousSetting = OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "remoteLoginFeature");
+
         beginAt("/SecurityVerifyProject/project-begin.view");
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
         String relUrl = getCurrentRelativeURL();
@@ -499,8 +502,9 @@ public class SecurityTest extends BaseWebDriverTest
         // Test that LabKey Server sign out invalidates the token
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
-    }
 
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "remoteLoginFeature", previousSetting);
+    }
 
     @LogMethod
     public String postToUrl(String url) throws IOException
@@ -517,13 +521,11 @@ public class SecurityTest extends BaseWebDriverTest
         assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
     }
 
-
     protected void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
     {
         String correct = "<TokenAuthentication success=\"true\" token=\"" + token + "\" email=\"" + email + "\" permissions=\"" + permissions + "\"/>";
         assertTrue(xml, xml.startsWith(correct));
     }
-
 
     private String retrieveFromUrl(String relativeUrl)
     {
