@@ -144,12 +144,12 @@ public class SecurityApiTest extends BaseWebDriverTest
     @Test
     public void testApiUserRolesAndPermissions() throws Exception
     {
-        boolean previous = OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "effectivePermissions");
+        boolean previous = OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "restoreUseOfAcls");
         APITestHelper apiTester = new APITestHelper(this);
         apiTester.setTestFiles(getTestFiles());
         apiTester.setIgnoredElements(getIgnoredElements());
         apiTester.runApiTests(ADMIN_USER);
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "effectivePermissions", previous);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "restoreUseOfAcls", previous);
     }
 
     @Override
