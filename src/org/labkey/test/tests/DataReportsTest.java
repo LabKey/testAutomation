@@ -36,6 +36,7 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
@@ -303,6 +304,10 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doAdvancedViewTest()
     {
+        // Note: Enabling this feature flag requires a server restart, so just skip the test if not already enabled
+        if (!OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
+            return;
+
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         DataRegionTable dataRegion = DataRegionTable.DataRegion(getDriver()).find();
         String create_advanced_report = "Create Advanced Report";

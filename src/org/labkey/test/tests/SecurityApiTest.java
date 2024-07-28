@@ -24,6 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -143,10 +144,12 @@ public class SecurityApiTest extends BaseWebDriverTest
     @Test
     public void testApiUserRolesAndPermissions() throws Exception
     {
+        boolean previous = OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "effectivePermissions");
         APITestHelper apiTester = new APITestHelper(this);
         apiTester.setTestFiles(getTestFiles());
         apiTester.setIgnoredElements(getIgnoredElements());
         apiTester.runApiTests(ADMIN_USER);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "effectivePermissions", previous);
     }
 
     @Override
