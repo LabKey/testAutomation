@@ -20,6 +20,7 @@ import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.pages.admin.ImportFolderPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.study.ManageStudyPage;
+import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -50,6 +51,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String ASSAY_NAME = "Test assay";
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
+    private final static String visitLabel1 = "Screening";
+    private final static String visitLabel2 = "Baseline";
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
@@ -104,15 +107,16 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                         new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data1);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        String data2 = "Name\tVisitDate\tParticipantId\n" +
-                "First\t" + now + "\tP1\n" +
-                "Second\t" + now + "\tP2\n" +
-                "Third\t" + now + "\tP3\n" +
-                "Fourth\t" + now + "\tP4\n";
+        String data2 = "Name\tVisitLabel\tVisitDate\tParticipantId\n" +
+                "First\t" + visitLabel1 + "\t" + now + "\tP1\n" +
+                "Second\t" + visitLabel2 + "\t" + now + "\tP2\n" +
+                "Third\t" + visitLabel1 + "\t" + now + "\tP3\n" +
+                "Fourth\t" + visitLabel2 + "\t" + now + "\tP4\n";
 
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE2)
                 .setFields(List.of(
                         new FieldDefinition("VisitDate", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("VisitLabel", FieldDefinition.ColumnType.VisitLabel),
                         new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data2);
     }
 
@@ -130,7 +134,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
 
-        checker().verifyEquals("Incorrect number of rows linked", 2, table.getDataRowCount());
+        checker().verifyEquals("Incorrect number of rows linked", numOfRowsLinked, table.getDataRowCount());
         checker().verifyEquals("Incorrect Participant ID's", Arrays.asList("P3", "P4"), table.getColumnDataAsText("ParticipantId"));
         checker().verifyEquals("Incorrect category for the dataset(Uncategorized case)", " ", getCategory(VISIT_BASED_STUDY, SAMPLE_TYPE1));
 
@@ -662,6 +666,69 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 samplesTable.getRowDataAsText(0));
     }
 
+    @Test
+    public void testVisitLabelLinkToStudy()
+    {
+        log("Creating the visit labels");
+        createNewVisits(visitLabel1, "300", "550");
+        createNewVisits(visitLabel2, "100", "200");
+
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.linkToStudy(VISIT_BASED_STUDY, SAMPLE_TYPE2, 2, null);
+
+        goToProjectHome(VISIT_BASED_STUDY);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE2));
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+
+        checker().verifyEquals("Incorrect number of rows linked", 2, table.getDataRowCount());
+        checker().verifyEquals("Incorrect labels", Arrays.asList(visitLabel1, visitLabel2), table.getColumnDataAsText("VisitLabel"));
+    }
+
+    @Test
+    public void testVisitLabelAutoLinkToStudy()
+    {
+        log("Creating the visit labels");
+        String visitLabel = "Baseline";
+        createNewVisits(visitLabel, "100", "250");
+
+        String sampleName = "Sample with Visit label";
+        log("Creating sample type with auto link enabled");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleName)
+                .setAutoLinkDataToStudy("/" + VISIT_BASED_STUDY)
+                .setFields(List.of(
+                        new FieldDefinition("VisitID", FieldDefinition.ColumnType.VisitId),
+                        new FieldDefinition("Date", FieldDefinition.ColumnType.VisitDate),
+                        new FieldDefinition("Label", FieldDefinition.ColumnType.VisitLabel),
+                        new FieldDefinition("ParticipantID", FieldDefinition.ColumnType.Subject))));
+
+        log("Inserting row into the sample type with visit label");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(sampleName));
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        samplesTable.clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "one");
+        setFormElement(Locator.name("quf_Date"), "12/12/2020");
+        setFormElement(Locator.name("quf_Label"), visitLabel);
+        setFormElement(Locator.name("quf_ParticipantID"), "P1");
+        clickButton("Submit");
+
+        log("Verify Auto link to study with visit label");
+        goToProjectHome(SAMPLE_TYPE_PROJECT);
+        clickAndWait(Locator.linkWithText(sampleName));
+        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyTrue("Missing linked column",
+                samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyEquals("Missing auto link for the inserted row", "linked",
+                samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
+
+        checker().verifyEquals("Incorrect visit label for the dataset when auto linked.", visitLabel,
+                getVisitLabel(VISIT_BASED_STUDY, sampleName));
+
+    }
+
     @Before
     public void preTest() throws Exception
     {
@@ -674,6 +741,18 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
         if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
             TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
+    }
+
+    private void createNewVisits(String label, String startRange, String endRange)
+    {
+        goToProjectHome(VISIT_BASED_STUDY);
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        new ManageVisitPage(getDriver()).goToCreateNewVisit()
+                .setLabel(label)
+                .setMinSequence(startRange)
+                .setMaxSequence(endRange)
+                .clickSave();
     }
 
     private void createDatasetCategory(String projectName, String name)
@@ -700,6 +779,16 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable table = executeQueryPage.getDataRegion();
         table.setFilter("Label", "Equals", datasetName);
         return table.getDataAsText(0, "categoryid");
+    }
+
+    private String getVisitLabel(String projectName, String datasetName)
+    {
+        goToProjectHome(projectName);
+        goToSchemaBrowser();
+        ExecuteQueryPage executeQueryPage = ExecuteQueryPage.beginAt(this, "study", "DataSets");
+        DataRegionTable table = executeQueryPage.getDataRegion();
+        table.setFilter("Label", "Equals", datasetName);
+        return table.getDataAsText(0, "VisitLabel");
     }
 
     private void verifyLinkToHistory(String expectedComments)
