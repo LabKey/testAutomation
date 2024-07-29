@@ -730,14 +730,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 Connection connection = createDefaultConnection();
                 SimpleGetCommand command = new SimpleGetCommand("search", "json");
                 command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
-                long searchEndTime = System.currentTimeMillis() + 180000; // Wait for maximum of 3 mins.
+                Timer timer = new Timer(Duration.ofMinutes(3));
                 do
                 {
                     try
                     {
                         CommandResponse response = command.execute(connection, "/");
                         if (response.getStatusCode() == 200) break; // Server is up, we can exit the loop
-                        else throw new RuntimeException("Search server did not start properly");
+                        else throw new RuntimeException("Search service did not start properly");
                     }
                     catch (IOException e)
                     {
@@ -748,7 +748,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         sleep(500); //poll the re-request
                     }
                 }
-                while (System.currentTimeMillis() < searchEndTime);
+                while (!timer.isTimedOut());
             }
             else // Just upgrading
             {
