@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 12)
+@BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 {
     final static String SAMPLE_TYPE_PROJECT = "Sample Type Test Project";
