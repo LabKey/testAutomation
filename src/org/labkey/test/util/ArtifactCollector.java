@@ -329,8 +329,9 @@ public class ArtifactCollector
     private ArrayList<File> listFilesRecursive(File path, final FileFilter filter)
     {
         FileFilter directoryOrArtifactFilter = pathname ->
-                pathname.isDirectory() && !pathname.isHidden() && !pathname.getName().equals("@labkey_full_text_index") ||
-               pathname.lastModified() > _testStart && filter.accept(pathname);
+                pathname.isDirectory()
+                        ? !pathname.isHidden() && !pathname.getName().equals("@labkey_full_text_index")
+                        : pathname.lastModified() > _testStart && filter.accept(pathname);
 
         File[] files = path.listFiles(directoryOrArtifactFilter);
         ArrayList<File> allFiles = new ArrayList<>();
