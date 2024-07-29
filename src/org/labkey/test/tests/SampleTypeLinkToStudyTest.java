@@ -723,8 +723,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
         checker().verifyEquals("Missing auto link for the inserted row", "linked",
                 samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
-
-        checker().verifyEquals("Incorrect visit label for the dataset when auto linked.", visitLabel,
+        checker().verifyEquals("Incorrect visit label for the dataset when auto linked.", Arrays.asList(visitLabel),
                 getVisitLabel(VISIT_BASED_STUDY, sampleName));
 
     }
@@ -781,14 +780,12 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         return table.getDataAsText(0, "categoryid");
     }
 
-    private String getVisitLabel(String projectName, String datasetName)
+    private List<String> getVisitLabel(String projectName, String datasetName)
     {
         goToProjectHome(projectName);
-        goToSchemaBrowser();
-        ExecuteQueryPage executeQueryPage = ExecuteQueryPage.beginAt(this, "study", "DataSets");
-        DataRegionTable table = executeQueryPage.getDataRegion();
-        table.setFilter("Label", "Equals", datasetName);
-        return table.getDataAsText(0, "VisitLabel");
+        waitAndClickAndWait(Locator.linkWithText(datasetName));
+        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Dataset").waitFor();
+        return table.getColumnDataAsText("Label");
     }
 
     private void verifyLinkToHistory(String expectedComments)
