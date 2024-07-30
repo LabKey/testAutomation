@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Category({Daily.class})
 public class GridPanelTest extends GridPanelBaseTest
 {
@@ -739,7 +738,7 @@ public class GridPanelTest extends GridPanelBaseTest
      * Issue 47247: LKSM: Filtering values >250 doesn't save selection
      */
     @Test
-    public void testFilterWithMaxDistinctValues() throws IOException, CommandException
+    public void testFilterWithMaxDistinctValues()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
         checker().verifyEquals("Unfiltered grid row count not as expected", 300, grid.getRecordCount());
