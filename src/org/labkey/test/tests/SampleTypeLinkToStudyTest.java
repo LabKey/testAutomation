@@ -704,7 +704,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                         new FieldDefinition("Label", FieldDefinition.ColumnType.VisitLabel),
                         new FieldDefinition("ParticipantID", FieldDefinition.ColumnType.Subject))));
 
-        log("Inserting row into the sample type with visit label");
+        log("Inserting rows into the sample type with visit label");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(sampleName));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
@@ -715,17 +715,24 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_ParticipantID"), "P1");
         clickButton("Submit");
 
+        samplesTable.clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name"), "two");
+        setFormElement(Locator.name("quf_Date"), "12/12/2020");
+        setFormElement(Locator.name("quf_VisitID"), "2");
+        setFormElement(Locator.name("quf_Label"), visitLabel);
+        setFormElement(Locator.name("quf_ParticipantID"), "P2");
+        clickButton("Submit");
+
         log("Verify Auto link to study with visit label");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(sampleName));
         samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         checker().verifyTrue("Missing linked column",
                 samplesTable.getColumnNames().contains("linked_to_Visit_Based_Study_Test_Project_Study"));
-        checker().verifyEquals("Missing auto link for the inserted row", "linked",
-                samplesTable.getDataAsText(0, "linked_to_Visit_Based_Study_Test_Project_Study"));
-        checker().verifyEquals("Incorrect visit label for the dataset when auto linked.", Arrays.asList(visitLabel),
+        checker().verifyEquals("Missing auto link for the inserted row", Arrays.asList("linked", "linked"),
+                samplesTable.getColumnDataAsText("linked_to_Visit_Based_Study_Test_Project_Study"));
+        checker().verifyEquals("Incorrect visit label for the dataset when auto linked.", Arrays.asList(visitLabel, "2.0000"),
                 getVisitLabel(VISIT_BASED_STUDY, sampleName));
-
     }
 
     @Before
@@ -785,7 +792,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         goToProjectHome(projectName);
         waitAndClickAndWait(Locator.linkWithText(datasetName));
         DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("Dataset").waitFor();
-        return table.getColumnDataAsText("Label");
+        return table.getColumnDataAsText("ParticipantVisit/Visit");
     }
 
     private void verifyLinkToHistory(String expectedComments)
