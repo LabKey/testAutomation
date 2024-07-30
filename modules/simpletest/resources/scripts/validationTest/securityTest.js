@@ -59,7 +59,7 @@ function doTest()
         principalIds: [user.userId],
         containerPath: containerPath
     });
-    if (result.added !== user.userId )
+    if (result.added[0] !== user.userId)
         errors[errors.length] = new Error("Security.addGroupMembers() = " + Ext.util.JSON.encode(result));
 
     // LABKEY.Security.getFolderTypes()
