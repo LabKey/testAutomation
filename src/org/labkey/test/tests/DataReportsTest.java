@@ -304,15 +304,12 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doAdvancedViewTest()
     {
-        // Note: Enabling this feature flag requires a server restart, so just skip the test if not already enabled
-        if (!OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
-            return;
-
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         DataRegionTable dataRegion = DataRegionTable.DataRegion(getDriver()).find();
         String create_advanced_report = "Create Advanced Report";
 
-        if (TestProperties.isPrimaryUserAppAdmin())
+        // Note: Enabling this feature flag requires a server restart
+        if (TestProperties.isPrimaryUserAppAdmin() || !OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
         {
             BootstrapMenu reportMenu = dataRegion.getReportMenu();
             reportMenu.expand();
