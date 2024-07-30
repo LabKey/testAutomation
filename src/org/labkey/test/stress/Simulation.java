@@ -10,6 +10,9 @@ import org.labkey.query.xml.TestCaseType;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.miniprofiler.RequestInfo;
+import org.labkey.remoteapi.miniprofiler.RequestsResponse;
+import org.labkey.remoteapi.miniprofiler.SessionRequestsCommand;
 import org.labkey.remoteapi.security.WhoAmICommand;
 import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.test.credentials.Login;
@@ -17,6 +20,7 @@ import org.labkey.test.credentials.Server;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,8 +44,11 @@ public class Simulation
     private final int _delayBetweenActivities;
     private final ExecutorService _simulationExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService _activityExecutor;
-    private final Future<Object> _runningSimulation;
+    private final Future<List<RequestInfo>> _runningSimulation;
     private final AtomicBoolean _stopped = new AtomicBoolean(false);
+    private final List<RequestInfo> _requestInfos = new ArrayList<>();
+    private Long _requestId = 0L;
+    private Exception _lastException;
 
     Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads)
     {
@@ -52,7 +59,12 @@ public class Simulation
         _runningSimulation = _simulationExecutor.submit(this::startSimulation);
     }
 
-    public Object collectResults()
+    public boolean isStopped()
+    {
+        return _stopped.get();
+    }
+
+    public List<RequestInfo> collectResults()
     {
         _simulationExecutor.shutdown();
         _stopped.set(true);
@@ -73,7 +85,7 @@ public class Simulation
         _activityExecutor.shutdownNow();
     }
 
-    private Object startSimulation()
+    private List<RequestInfo> startSimulation() throws IOException, CommandException, ExecutionException, InterruptedException
     {
         MultiValuedMap<String, Map<String, Integer>> results = new ArrayListValuedHashMap<>();
         while (!_stopped.get() && !Thread.interrupted())
@@ -84,17 +96,19 @@ public class Simulation
                 {
                     Map<String, Integer> activityResult = runActivity(activity, _activityExecutor);
                     results.put(activity.getName(), activityResult);
+                    getRequestInfos();
 
                     Thread.sleep(_delayBetweenActivities);
                 }
-                catch (ExecutionException | InterruptedException e)
+                catch (Exception e)
                 {
+                    _lastException = e;
                     shutdownNow();
-                    return results;
+                    throw e;
                 }
             }
         }
-        return results;
+        return _requestInfos;
     }
 
     private Map<String, Integer> runActivity(Activity activity, ExecutorService activityExecutor) throws ExecutionException, InterruptedException
@@ -134,6 +148,18 @@ public class Simulation
         {
             return -1;
         }
+    }
+
+    private void getRequestInfos() throws IOException, CommandException
+    {
+        SessionRequestsCommand command = new SessionRequestsCommand(_requestId);
+        RequestsResponse response = command.execute(_connection, null);
+        List<RequestInfo> requestInfos = response.getRequestInfos();
+        if (!requestInfos.isEmpty())
+        {
+            _requestId = requestInfos.get(requestInfos.size() - 1).getId();
+        }
+        _requestInfos.addAll(requestInfos);
     }
 
 

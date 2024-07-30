@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.miniprofiler.RequestInfo;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.List;
 public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
 {
     private final List<Simulation> _simulations = new ArrayList<>();
+    private final List<RequestInfo> _requestInfos = new ArrayList<>();
 
     protected abstract List<Simulation.Definition> getSimulationDefinitions();
     protected int getBaselineDataCollectionDuration()
@@ -27,6 +29,14 @@ public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
         log("Starting background simulations to collect baseline performance data");
         startBackgroundSimulations();
         Thread.sleep(getBaselineDataCollectionDuration());
+        for (Simulation simulation : _simulations)
+        {
+            if (simulation.isStopped())
+            {
+                // Something probably went wrong. This should throw an error.
+                simulation.collectResults();
+            }
+        }
     }
 
     private void startBackgroundSimulations()
@@ -61,7 +71,7 @@ public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
     {
         for (Simulation simulation : _simulations)
         {
-            simulation.collectResults();
+            _requestInfos.addAll(simulation.collectResults());
         }
     }
 
