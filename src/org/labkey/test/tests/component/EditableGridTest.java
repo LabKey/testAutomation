@@ -1554,8 +1554,11 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.selectCell(0, STR_FIELD_NAME);
         actionPaste(null, rowsToString(clipRows));
 
+        // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD_NAME is within the viewport.
+        var index = testGrid.getColumnNames().indexOf(REQ_LOOKUP_FIELD_NAME + " *") + 1;
+        scrollIntoView(testGrid.getCell(0, testGrid.getColumnNames().get(index)));
+
         WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD_NAME + " *");
-        scrollIntoView(fillFrom);
         WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD_NAME + " *");
         testGrid.dragFill(fillFrom, fillTo);
 

@@ -92,6 +92,28 @@ public class Table extends WebDriverComponent<Table.Elements>
         return columnHeaders;
     }
 
+    public int getTableHeaderIndex(String headerText)
+    {
+        List<WebElement> headerEls = Locator.xpath("//thead//th").findElements(this);
+        int counter = 1;
+        for(WebElement headerEl : headerEls)
+        {
+            if(headerEl.getText().equalsIgnoreCase(headerText))
+                return counter;
+            counter++;
+        }
+        throw new RuntimeException( headerText + " column not found");
+    }
+
+    public List<String> getTableHeaderColumnData(String headerText)
+    {
+        List<String> columnData = new ArrayList<>();
+        int columnIndex = getTableHeaderIndex(headerText);
+        for(int i = 1; i <= getRowCount(); i++)
+            columnData.add(Locator.xpath("//tbody//tr[" + i + "]/td[" + columnIndex + "]").findElement(getDriver()).getText());
+        return columnData;
+    }
+
     public List<String> getColumnHeaders(int headerRow)
     {
         List<WebElement> headerEls = getColumnHeaderElements(headerRow);
@@ -179,7 +201,7 @@ public class Table extends WebDriverComponent<Table.Elements>
 
     public List<String> getColumnAsText(String col)
     {
-        return getColumnAsText(getColumnIndex(col),1);
+        return getColumnAsText(getColumnIndex(col), 1);
     }
 
     public List<String> getColumnAsText(String col, int colIndex)
