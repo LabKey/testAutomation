@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,16 +48,18 @@ public class Simulation
     private final Future<List<RequestInfo>> _runningSimulation;
     private final AtomicBoolean _stopped = new AtomicBoolean(false);
     private final List<RequestInfo> _requestInfos = new ArrayList<>();
+    private final ScenarioManager.RequestGate _gate;
     private Long _requestId = 0L;
     private Exception _lastException;
 
-    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads)
+    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ScenarioManager.RequestGate gate)
     {
         _connection = connection;
         _activities = activities;
         _delayBetweenActivities = delayBetweenActivities;
         _activityExecutor = Executors.newFixedThreadPool(maximumActivityThreads);
         _runningSimulation = _simulationExecutor.submit(this::startSimulation);
+        _gate = gate;
     }
 
     public boolean isStopped()
@@ -132,8 +135,9 @@ public class Simulation
         return results;
     }
 
-    private int makeRequest(TestCaseType testCase)
+    private int makeRequest(TestCaseType testCase) throws InterruptedException
     {
+        _gate.preRequest();
         ApiTestCommand command = new ApiTestCommand(testCase);
         try
         {
@@ -219,9 +223,14 @@ public class Simulation
 
         public Simulation startSimulation() throws IOException, CommandException
         {
+            return startSimulation(uri -> ScenarioManager.RequestGate.noop);
+        }
+
+        public Simulation startSimulation(Function<Connection, ScenarioManager.RequestGate> gateSupplier) throws IOException, CommandException
+        {
             Connection connection = _connectionSupplier.get();
             new WhoAmICommand().execute(connection, null);
-            return new Simulation(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads);
+            return new Simulation(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, gateSupplier.apply(connection));
         }
 
         private static List<TestCaseType> parseTests(File testFile)

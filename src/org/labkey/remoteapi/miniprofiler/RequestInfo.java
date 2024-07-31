@@ -24,6 +24,7 @@ public class RequestInfo
     private final long duration;
     private final Timing root;
     private final JSONObject objects;
+    private final String sessionId;
 
     public RequestInfo(JSONObject json)
     {
@@ -33,6 +34,7 @@ public class RequestInfo
         duration = json.getLong("duration");
         root = new Timing(json.getJSONObject("root"));
         objects = json.getJSONObject("objects");
+        sessionId = json.getString("sessionId");
     }
 
     public Long getId()
@@ -63,5 +65,10 @@ public class RequestInfo
     public JSONObject getObjects()
     {
         return objects;
+    }
+
+    public String getSessionId()
+    {
+        return sessionId;
     }
 }
