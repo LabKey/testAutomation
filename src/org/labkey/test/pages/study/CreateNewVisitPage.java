@@ -85,14 +85,14 @@ public class CreateNewVisitPage extends LabKeyPage<CreateNewVisitPage.ElementCac
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        Input label = new Input(Locator.name("label").findWhenNeeded(this), getDriver());
-        Input sequenceNumMin = new Input(Locator.name("sequenceNumMin").findWhenNeeded(this), getDriver());
-        Input sequenceNumMax = new Input(Locator.name("sequenceNumMax").findWhenNeeded(this), getDriver());
-        WebElement description = Locator.textarea("description").findWhenNeeded(this);
-        Select type = SelectWrapper.Select(Locator.name("typeCode")).findWhenNeeded(this);
-        Select sequenceNumHandling = SelectWrapper.Select(Locator.name("sequenceNumHandling")).findWhenNeeded(this);
-        Checkbox showByDefault = new Checkbox(Locator.name("showByDefault").findWhenNeeded(this));
-        WebElement save = Locator.linkWithText("Save").findWhenNeeded(this);
-        WebElement cancel = Locator.linkWithText("Cancel").findWhenNeeded(this);
+        final Input label = new Input(Locator.name("label").findWhenNeeded(this), getDriver());
+        final Input sequenceNumMin = new Input(Locator.name("sequenceNumMin").findWhenNeeded(this), getDriver());
+        final Input sequenceNumMax = new Input(Locator.name("sequenceNumMax").findWhenNeeded(this), getDriver());
+        final WebElement description = Locator.textarea("description").findWhenNeeded(this);
+        final Select type = SelectWrapper.Select(Locator.name("typeCode")).findWhenNeeded(this);
+        final Select sequenceNumHandling = SelectWrapper.Select(Locator.name("sequenceNumHandling")).findWhenNeeded(this);
+        final Checkbox showByDefault = new Checkbox(Locator.name("showByDefault").findWhenNeeded(this));
+        final WebElement save = Locator.linkWithText("Save").findWhenNeeded(this);
+        final WebElement cancel = Locator.linkWithText("Cancel").findWhenNeeded(this);
     }
 }
