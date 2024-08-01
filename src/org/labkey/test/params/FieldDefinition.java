@@ -504,6 +504,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType OntologyLookup = new ColumnTypeImpl("Ontology Lookup", "string", "http://www.labkey.org/types#conceptCode", null);
         ColumnType VisitId = new ColumnTypeImpl("Visit ID", "double", "http://cpas.labkey.com/Study#VisitId", null);
         ColumnType VisitDate = new ColumnTypeImpl("Visit Date", "dateTime", "http://cpas.labkey.com/Study#VisitId", null);
+        ColumnType VisitLabel = new ColumnTypeImpl("Visit Label", "string");
         ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);

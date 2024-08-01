@@ -60,9 +60,10 @@ public class ManageVisitPage extends LabKeyPage<ManageVisitPage.ElementCache>
         clickAndWait(elementCache().changeVisitOrderLoc);
     }
 
-    public void goToCreateNewVisit()
+    public CreateNewVisitPage goToCreateNewVisit()
     {
         clickAndWait(elementCache().createNewVisitLoc);
+        return new CreateNewVisitPage(getDriver());
     }
 
     public void goToImportVisitMap()
