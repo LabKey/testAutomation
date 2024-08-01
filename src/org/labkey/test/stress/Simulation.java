@@ -1,7 +1,5 @@
 package org.labkey.test.stress;
 
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.assertj.core.api.Assertions;
@@ -20,11 +18,12 @@ import org.labkey.test.credentials.Server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,21 +37,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Simulation
+public class Simulation<T>
 {
     private final Connection _connection;
     private final List<Activity> _activities;
     private final int _delayBetweenActivities;
     private final ExecutorService _simulationExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService _activityExecutor;
-    private final Future<List<RequestInfo>> _runningSimulation;
+    private final Future<T> _runningSimulation;
     private final AtomicBoolean _stopped = new AtomicBoolean(false);
-    private final List<RequestInfo> _requestInfos = new ArrayList<>();
-    private final ScenarioManager.RequestGate _gate;
-    private Long _requestId = 0L;
-    private Exception _lastException;
+    private final ResultCollector<T> _gate;
 
-    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ScenarioManager.RequestGate gate)
+    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> gate)
     {
         _connection = connection;
         _activities = activities;
@@ -67,7 +63,7 @@ public class Simulation
         return _stopped.get();
     }
 
-    public List<RequestInfo> collectResults()
+    public T collectResults()
     {
         _simulationExecutor.shutdown();
         _stopped.set(true);
@@ -88,30 +84,26 @@ public class Simulation
         _activityExecutor.shutdownNow();
     }
 
-    private List<RequestInfo> startSimulation() throws IOException, CommandException, ExecutionException, InterruptedException
+    private T startSimulation() throws ExecutionException, InterruptedException
     {
-        MultiValuedMap<String, Map<String, Integer>> results = new ArrayListValuedHashMap<>();
         while (!_stopped.get() && !Thread.interrupted())
         {
             for (Activity activity : _activities)
             {
                 try
                 {
-                    Map<String, Integer> activityResult = runActivity(activity, _activityExecutor);
-                    results.put(activity.getName(), activityResult);
-                    getRequestInfos();
+                    runActivity(activity, _activityExecutor);
 
                     Thread.sleep(_delayBetweenActivities);
                 }
                 catch (Exception e)
                 {
-                    _lastException = e;
                     shutdownNow();
                     throw e;
                 }
             }
         }
-        return _requestInfos;
+        return _gate.getResults();
     }
 
     private Map<String, Integer> runActivity(Activity activity, ExecutorService activityExecutor) throws ExecutionException, InterruptedException
@@ -137,7 +129,6 @@ public class Simulation
 
     private int makeRequest(TestCaseType testCase) throws InterruptedException
     {
-        _gate.preRequest();
         ApiTestCommand command = new ApiTestCommand(testCase);
         try
         {
@@ -152,20 +143,11 @@ public class Simulation
         {
             return -1;
         }
-    }
-
-    private void getRequestInfos() throws IOException, CommandException
-    {
-        SessionRequestsCommand command = new SessionRequestsCommand(_requestId);
-        RequestsResponse response = command.execute(_connection, null);
-        List<RequestInfo> requestInfos = response.getRequestInfos();
-        if (!requestInfos.isEmpty())
+        finally
         {
-            _requestId = requestInfos.get(requestInfos.size() - 1).getId();
+            _gate.postRequest();
         }
-        _requestInfos.addAll(requestInfos);
     }
-
 
     public static class Definition
     {
@@ -221,16 +203,21 @@ public class Simulation
             return this;
         }
 
-        public Simulation startSimulation() throws IOException, CommandException
+        public Simulation<Collection<RequestInfo>> startSimulation() throws IOException, CommandException
         {
-            return startSimulation(uri -> ScenarioManager.RequestGate.noop);
+            return startSimulation(SessionResultsCollector::new);
         }
 
-        public Simulation startSimulation(Function<Connection, ScenarioManager.RequestGate> gateSupplier) throws IOException, CommandException
+        public Simulation<Void> startSimulationIgnoringResults() throws IOException, CommandException
+        {
+            return startSimulation(connection -> RESULTS_NOOP);
+        }
+
+        public <T> Simulation<T> startSimulation(Function<Connection, ResultCollector<T>> gateSupplier) throws IOException, CommandException
         {
             Connection connection = _connectionSupplier.get();
             new WhoAmICommand().execute(connection, null);
-            return new Simulation(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, gateSupplier.apply(connection));
+            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, gateSupplier.apply(connection));
         }
 
         private static List<TestCaseType> parseTests(File testFile)
@@ -277,4 +264,65 @@ public class Simulation
             });
         }
     }
+
+    private static class SessionResultsCollector implements ResultCollector<Collection<RequestInfo>>
+    {
+        private final Connection _connection;
+        private final Object lock = new Object();
+        private Map<Long, RequestInfo> _requestInfos = new ConcurrentHashMap<>();
+
+        private Long _requestId = 0L;
+
+        public SessionResultsCollector(Connection connection)
+        {
+            _connection = connection;
+        }
+
+        @Override
+        public void postRequest() throws InterruptedException
+        {
+
+        }
+
+        @Override
+        public Collection<RequestInfo> getResults()
+        {
+            try
+            {
+                getRequestInfos();
+            }
+            catch (IOException | CommandException e)
+            {
+                throw new RuntimeException(e);
+            }
+            return _requestInfos.values();
+        }
+
+        private void getRequestInfos() throws IOException, CommandException
+        {
+            SessionRequestsCommand command = new SessionRequestsCommand(_requestId);
+            RequestsResponse response = command.execute(_connection, null);
+            List<RequestInfo> requestInfos = response.getRequestInfos();
+            if (!requestInfos.isEmpty())
+            {
+                _requestId = requestInfos.get(requestInfos.size() - 1).getId();
+                requestInfos.forEach(ri -> _requestInfos.put(ri.getId(), ri));
+            }
+
+        }
+    }
+
+    public interface ResultCollector<T>
+    {
+        void postRequest() throws InterruptedException;
+
+        T getResults();
+    }
+
+    public static final ResultCollector<Void> RESULTS_NOOP = new ResultCollector<>(){
+        @Override
+        public void postRequest() { }
+        @Override
+        public Void getResults() { return null; }
+    };
 }

@@ -9,12 +9,13 @@ import org.labkey.test.BaseWebDriverTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Category({})
 public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
 {
-    private final List<Simulation> _simulations = new ArrayList<>();
+    private final List<Simulation<Collection<RequestInfo>>> _simulations = new ArrayList<>();
     private final List<RequestInfo> _requestInfos = new ArrayList<>();
 
     protected abstract List<Simulation.Definition> getSimulationDefinitions();
@@ -29,7 +30,7 @@ public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
         log("Starting background simulations to collect baseline performance data");
         startBackgroundSimulations();
         Thread.sleep(getBaselineDataCollectionDuration());
-        for (Simulation simulation : _simulations)
+        for (Simulation<?> simulation : _simulations)
         {
             if (simulation.isStopped())
             {
@@ -69,10 +70,9 @@ public abstract class BaseBackgroundLoadTest extends BaseWebDriverTest
 
     private void stopBackgroundSimulations()
     {
-        for (Simulation simulation : _simulations)
+        for (Simulation<Collection<RequestInfo>> simulation : _simulations)
         {
             _requestInfos.addAll(simulation.collectResults());
         }
     }
-
 }
