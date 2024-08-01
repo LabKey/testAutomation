@@ -16,6 +16,7 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.AccessDeniedException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +157,8 @@ public class ApiBootstrapHelper
         }
         while (!timer.isTimedOut());
 
-        throw new RuntimeException("Server didn't finish starting.", lastException);
+        if (!(lastException.getCause() instanceof CommandException && lastException.getMessage().contains("Not Found")))
+            throw new RuntimeException("Server didn't finish starting.", lastException);
     }
 
     public Connection createDefaultConnection()
