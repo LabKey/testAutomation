@@ -469,7 +469,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().scannableCheckboxLoc.existsIn(this);
     }
 
-    //
     // date field options.
 
     public String getDateFormat()
@@ -484,6 +483,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         elementCache().dateFormatInput.setValue(formatString);
         return this;
     }
+
+    // lookup options.
 
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
@@ -911,6 +912,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    // Calculations field settings
+
+    public DomainFieldRow setValueExpression(String expression)
+    {
+        if (!isExpanded())
+            expand();
+
+        getWrapper().setFormElement(elementCache().expressionInput, expression);
+        return this;
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
@@ -1252,13 +1264,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // date field options
         public final Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
-        //lookup field options
+        // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
                 .findWhenNeeded(this);
         Locator.XPathLocator selectVocabularyBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
                 .withText("Expected Vocabulary");
         Locator.XPathLocator selectConceptBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
                 .withText("Select Concept");
+
+        // calculations field options
+        public final WebElement expressionInput = Locator.name("domainpropertiesrow-valueExpression")
+                .findWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 

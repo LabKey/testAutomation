@@ -509,7 +509,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
-
+        ColumnType Calculation = new ColumnTypeImpl("Calculation", "http://www.labkey.org/exp/xml#calculated");
         /**
          * UI: The Option text for the column type.
          * API: Unused
