@@ -6,6 +6,9 @@ import org.labkey.query.xml.TestCaseType;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Activity: A single user action in the app (e.g. viewing the SM dashboard). These will often trigger numerous API calls.
+ */
 public class Activity
 {
     private final String _name;

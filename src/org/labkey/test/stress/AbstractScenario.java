@@ -6,19 +6,23 @@ import org.labkey.test.util.TestLogger;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractScenarioManager<T>
+/**
+ * Scenario: A set of coordinated simulations across multiple servers, simulating a particular usage event (e.g. one server with a heavy workload of importing large amounts of data while other servers perform simple read-only activities).
+ * @param <T> Result type returned by simulations
+ */
+public abstract class AbstractScenario<T>
 {
     private final List<Simulation.Definition> simulationDefinitions;
     private final List<Simulation<T>> simulations = new ArrayList<>();
 
     private int baselineDataCollectionDuration = 10_000;
 
-    public AbstractScenarioManager(List<Simulation.Definition> simulationDefinitions)
+    public AbstractScenario(List<Simulation.Definition> simulationDefinitions)
     {
         this.simulationDefinitions = simulationDefinitions;
     }
 
-    public AbstractScenarioManager<T> setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
+    public AbstractScenario<T> setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
     {
         this.baselineDataCollectionDuration = baselineDataCollectionDuration;
         return this;
@@ -68,7 +72,6 @@ public abstract class AbstractScenarioManager<T>
 
     private List<T> stopBackgroundSimulations()
     {
-        return simulations.stream().map(Simulation::collectResults).toList();
+        return simulations.stream().flatMap(simulation -> simulation.collectResults().stream()).toList();
     }
-
 }

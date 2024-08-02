@@ -31,12 +31,18 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Simulation: A series of activities that represents some user workflow (e.g. loading the dashboard, navigating to the sample finder, and performing a search). For simplicity, API simulations in the initial proof of concept will consist of a single activity.
+ * @param <T> Data type returned when collecting results
+ */
 public class Simulation<T>
 {
     private final Connection _connection;
@@ -44,7 +50,7 @@ public class Simulation<T>
     private final int _delayBetweenActivities;
     private final ExecutorService _simulationExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService _activityExecutor;
-    private final Future<T> _runningSimulation;
+    private final Future<Collection<T>> _runningSimulation;
     private final AtomicBoolean _stopped = new AtomicBoolean(false);
     private final ResultCollector<T> _resultCollector;
 
@@ -63,7 +69,7 @@ public class Simulation<T>
         return _stopped.get();
     }
 
-    public T collectResults()
+    public Collection<T> collectResults()
     {
         _simulationExecutor.shutdown();
         _stopped.set(true);
@@ -84,7 +90,7 @@ public class Simulation<T>
         _activityExecutor.shutdownNow();
     }
 
-    private T startSimulation() throws ExecutionException, InterruptedException
+    private Collection<T> startSimulation() throws ExecutionException, InterruptedException
     {
         while (!_stopped.get() && !Thread.interrupted())
         {
@@ -93,8 +99,12 @@ public class Simulation<T>
                 try
                 {
                     runActivity(activity, _activityExecutor);
+                    _resultCollector.postRequest();
 
-                    Thread.sleep(_delayBetweenActivities);
+                    if (!_stopped.get())
+                    {
+                        Thread.sleep(_delayBetweenActivities);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -127,6 +137,9 @@ public class Simulation<T>
         return results;
     }
 
+    public static Map<String, AtomicInteger> counts = new ConcurrentHashMap<>();
+    public static AtomicInteger requestCount = new AtomicInteger(0);
+    public static AtomicInteger badRequestCount = new AtomicInteger(0);
     private int makeRequest(TestCaseType testCase) throws InterruptedException
     {
         ApiTestCommand command = new ApiTestCommand(testCase);
@@ -210,12 +223,12 @@ public class Simulation<T>
             return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorSupplier.apply(connection));
         }
 
-        public Simulation<Collection<RequestInfo>> startSimulation() throws IOException, CommandException
+        public Simulation<RequestInfo> startSimulation() throws IOException, CommandException
         {
             return startSimulation(SessionResultsCollector::new);
         }
 
-        public Simulation<Void> startSimulationIgnoringResults() throws IOException, CommandException
+        public Simulation<Void> startSimulationWithoutMiniProfiler() throws IOException, CommandException
         {
             return startSimulation(connection -> RESULTS_NOOP);
         }
@@ -265,50 +278,69 @@ public class Simulation<T>
         }
     }
 
-    private static class SessionResultsCollector implements ResultCollector<Collection<RequestInfo>>
+    public static class SessionResultsCollector implements ResultCollector<RequestInfo>
     {
         private final Connection _connection;
-        private final Object lock = new Object();
-        private Map<Long, RequestInfo> _requestInfos = new ConcurrentHashMap<>();
-
-        private Long _requestId = 0L;
+        private final AtomicBoolean lock = new AtomicBoolean(false);
+        private final Map<Long, RequestInfo> requestInfos = new ConcurrentHashMap<>();
+        private final AtomicLong requestId = new AtomicLong(0);
 
         public SessionResultsCollector(Connection connection)
         {
             _connection = connection;
+            // Get initial request Id
+            collectRequestInfos();
+            requestInfos.clear();
         }
 
         @Override
-        public void postRequest() throws InterruptedException
+        public void postRequest()
         {
-
+            if (!lock.getAndSet(true))
+            {
+                try
+                {
+                    collectRequestInfos();
+                }
+                finally
+                {
+                    lock.set(false);
+                }
+            }
         }
 
         @Override
         public Collection<RequestInfo> getResults()
         {
+            collectRequestInfos();
+            return requestInfos.values();
+        }
+
+        private void collectRequestInfos()
+        {
             try
             {
-                getRequestInfos();
+                SessionRequestsCommand command = new SessionRequestsCommand(requestId.get());
+                RequestsResponse response = command.execute(_connection, null);
+                List<RequestInfo> requestInfos = response.getRequestInfos();
+                if (!requestInfos.isEmpty())
+                {
+                    synchronized (requestId)
+                    {
+                        requestInfos.forEach(ri -> {
+                            this.requestInfos.put(ri.getId(), ri);
+                            if (ri.getId() > requestId.get())
+                            {
+                                requestId.set(ri.getId());
+                            }
+                        });
+                    }
+                }
             }
             catch (IOException | CommandException e)
             {
                 throw new RuntimeException(e);
             }
-            return _requestInfos.values();
-        }
-
-        private void getRequestInfos() throws IOException, CommandException
-        {
-            SessionRequestsCommand command = new SessionRequestsCommand(_requestId);
-            RequestsResponse response = command.execute(_connection, null);
-            List<RequestInfo> requestInfos = response.getRequestInfos();
-            if (!requestInfos.isEmpty())
-            {
-                _requestId = requestInfos.get(requestInfos.size() - 1).getId();
-                requestInfos.forEach(ri -> _requestInfos.put(ri.getId(), ri));
-            }
-
         }
     }
 
@@ -316,13 +348,13 @@ public class Simulation<T>
     {
         void postRequest() throws InterruptedException;
 
-        T getResults();
+        Collection<T> getResults();
     }
 
     public static final ResultCollector<Void> RESULTS_NOOP = new ResultCollector<>(){
         @Override
         public void postRequest() { }
         @Override
-        public Void getResults() { return null; }
+        public Collection<Void> getResults() { return Collections.emptyList(); }
     };
 }

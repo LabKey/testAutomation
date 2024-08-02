@@ -7,30 +7,32 @@ import org.labkey.remoteapi.miniprofiler.RecentRequestsCommand;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ScenarioManager extends AbstractScenarioManager<Void>
+public class BlockingScenario extends AbstractScenario<Void>
 {
     private final Map<URI, RequestGate> requestGates = new ConcurrentHashMap<>();
     private final Map<URI, Connection> miniProfilerConnections = new ConcurrentHashMap<>();
 
-    public ScenarioManager(List<Simulation.Definition> simulationDefinitions)
+    public BlockingScenario(List<Simulation.Definition> simulationDefinitions)
     {
         super(simulationDefinitions);
     }
 
     @Override
-    public ScenarioManager setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
+    public BlockingScenario setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
     {
         super.setBaselineDataCollectionDuration(baselineDataCollectionDuration);
         return this;
     }
 
-    public ScenarioManager setMiniProfilerConnections(Connection... miniProfilerConnections)
+    public BlockingScenario setMiniProfilerConnections(Connection... miniProfilerConnections)
     {
         Arrays.stream(miniProfilerConnections).forEach(this::verifyAndAddMiniProfilerConnection);
         return this;
@@ -83,9 +85,9 @@ public class ScenarioManager extends AbstractScenarioManager<Void>
         }
 
         @Override
-        public Void getResults()
+        public Collection<Void> getResults()
         {
-            return null;
+            return Collections.emptyList();
         }
 
         @Override
