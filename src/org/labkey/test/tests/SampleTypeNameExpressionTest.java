@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -40,6 +41,7 @@ import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,7 +69,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     private static final String PARENT_SAMPLE_01 = "parent01";
     private static final String PARENT_SAMPLE_02 = "parent02";
-    private static final String PARENT_SAMPLE_03 = "parent03";
+    private static final String PARENT_SAMPLE_03 = "#parent03";
+    private static final String PARENT_SAMPLE_04 = "#parent04";
+
+    private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
 
     @Override
     public List<String> getAssociatedModules()
@@ -130,6 +135,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Date", "12/25/2015");
         dataGenerator.addCustomRow(sampleData);
 
+        sampleData = Map.of(
+                "name", PARENT_SAMPLE_04,
+                "Int", 4,
+                "Str", "Parent Sample D",
+                "Date", "12/25/2019");
+        dataGenerator.addCustomRow(sampleData);
+
         dataGenerator.insertRows();
 
         // Just want to get an updated view of the sample types.
@@ -178,6 +190,67 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertThat(names.get(0), startsWith("a-b.3." + batchRandomId + "."));
         assertThat(names.get(1), startsWith("a-b.2." + batchRandomId + "."));
         assertThat(names.get(2), startsWith("a-b.1." + batchRandomId + "."));
+    }
+
+
+    // Issue 50924: LKSM: Importing samples using naming expression referencing parent inputs with # result in error
+    @Test
+    public void testDeriveFromCommentLikeParents()
+    {
+        final String sampleTypeName = "ParentNamesExprTest";
+
+        log("Verify import tsv would ignore lines starting with #");
+        String nameExpression = "${MaterialInputs/" + PARENT_SAMPLE_TYPE + "}-child";
+        String data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
+        data += PARENT_SAMPLE_01 + "\n";
+        data += PARENT_SAMPLE_01 + "," + PARENT_SAMPLE_02 + "," + PARENT_SAMPLE_03 + "\n";
+        // tsv lines starting with # should be ignored
+        data += PARENT_SAMPLE_03 + "\n";
+        data += PARENT_SAMPLE_03 + "," + PARENT_SAMPLE_02 + "\n";
+
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)
+                        .setNameExpression(nameExpression), data);
+
+        DataRegionTable materialTable = new DataRegionTable("Material", this);
+        List<String> names = materialTable.getColumnDataAsText("Name");
+
+        log("generated sample names:");
+        names.forEach(this::log);
+
+        assertEquals(2, names.size());
+
+        assertEquals(PARENT_SAMPLE_01 + "-child", names.get(1));
+        assertEquals("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_02 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(0));
+
+        log("Verify import tsv should successfully create derivatives from parent starting with #, as long as this is not the 1st field in the row");
+        data = "Description\tMaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
+        data += "Parent with leading # should work\t" + PARENT_SAMPLE_03 + "\n";
+        data += "Parents with leading # should work\t" + PARENT_SAMPLE_03 + "," + PARENT_SAMPLE_02 + "\n";
+
+        sampleHelper.bulkImport(data);
+
+        names = materialTable.getColumnDataAsText("Name");
+        log("generated sample names:");
+        names.forEach(this::log);
+
+        assertEquals(4, names.size());
+
+        assertEquals("[" + PARENT_SAMPLE_03 + ", " + PARENT_SAMPLE_02 + "]-child", names.get(0));
+        assertEquals(PARENT_SAMPLE_03 + "-child", names.get(1));
+
+        log("Verify import EXCEL should not ignore lines starting with #");
+        sampleHelper.bulkImport(PARENT_EXCEL);
+
+        names = materialTable.getColumnDataAsText("Name");
+        log("generated sample names:");
+        names.forEach(this::log);
+
+        assertEquals(7, names.size());
+        assertEquals("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_04 + "]-child", names.get(0));
+        assertEquals("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(1));
+        assertEquals(PARENT_SAMPLE_04 + "-child", names.get(2));
+
     }
 
     // Coverage for Issue 47504
