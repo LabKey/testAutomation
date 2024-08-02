@@ -77,7 +77,7 @@ class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
     protected HttpUriRequest createRequest(URI uri)
     {
         HttpUriRequest method;
-        String requestUrl = getRequestUrl(uri);
+        String requestUrl =  uri.getScheme() + "://" + uri.getAuthority() + '/' + _url;
 
         if (_type.equals("get"))
         {
