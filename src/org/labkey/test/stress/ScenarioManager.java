@@ -3,38 +3,30 @@ package org.labkey.test.stress;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.miniprofiler.RecentRequestsCommand;
-import org.labkey.remoteapi.miniprofiler.RequestInfo;
-import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ScenarioManager
+public class ScenarioManager extends AbstractScenarioManager<Void>
 {
     private final Map<URI, RequestGate> requestGates = new ConcurrentHashMap<>();
     private final Map<URI, Connection> miniProfilerConnections = new ConcurrentHashMap<>();
-    private final List<Simulation.Definition> simulationDefinitions;
-    private final List<Simulation<?>> simulations = new ArrayList<>();
-    private final List<RequestInfo> requestInfos = new ArrayList<>();
-
-    private int baselineDataCollectionDuration = 10_000;
 
     public ScenarioManager(List<Simulation.Definition> simulationDefinitions)
     {
-        this.simulationDefinitions = simulationDefinitions;
+        super(simulationDefinitions);
     }
 
+    @Override
     public ScenarioManager setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
     {
-        this.baselineDataCollectionDuration = baselineDataCollectionDuration;
+        super.setBaselineDataCollectionDuration(baselineDataCollectionDuration);
         return this;
     }
 
@@ -60,59 +52,11 @@ public class ScenarioManager
         }
     }
 
-    private RequestGate getGateForConnection(Connection connection)
+    @Override
+    protected RequestGate getResultsCollector(Connection connection)
     {
         verifyAndAddMiniProfilerConnection(connection);
         return requestGates.computeIfAbsent(connection.getBaseURI(), uri -> new RequestGate());
-    }
-
-    public final void startBackgroundSimulations() throws InterruptedException
-    {
-        TestLogger.log("Starting background simulations to collect baseline performance data");
-        try
-        {
-            for (Simulation.Definition definition : simulationDefinitions)
-            {
-                simulations.add(definition.startSimulation(this::getGateForConnection));
-            }
-        }
-        catch (Exception e)
-        {
-            stopBackgroundSimulations();
-            throw new RuntimeException("Failed to start simulation", e);
-        }
-
-        Thread.sleep(baselineDataCollectionDuration);
-
-        // Verify that simulations haven't already errored out
-        for (Simulation<?> simulation : simulations)
-        {
-            if (simulation.isStopped())
-            {
-                // Something probably went wrong. This should throw an error.
-                simulation.collectResults();
-            }
-        }
-    }
-
-    public final List<RequestInfo> collectBaselinePerfAndStopSimulations() throws InterruptedException
-    {
-        if (!simulations.isEmpty())
-        {
-            TestLogger.log("Allow background simulations to collect baseline performance data before terminating");
-            Thread.sleep(baselineDataCollectionDuration);
-            TestLogger.log("Stop background simulations");
-            stopBackgroundSimulations();
-        }
-        return Collections.unmodifiableList(requestInfos);
-    }
-
-    private void stopBackgroundSimulations()
-    {
-        for (Simulation<?> simulation : simulations)
-        {
-            simulation.collectResults();
-        }
     }
 
     public static class RequestGate implements Simulation.ResultCollector<Void>

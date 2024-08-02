@@ -46,16 +46,16 @@ public class Simulation<T>
     private final ExecutorService _activityExecutor;
     private final Future<T> _runningSimulation;
     private final AtomicBoolean _stopped = new AtomicBoolean(false);
-    private final ResultCollector<T> _gate;
+    private final ResultCollector<T> _resultCollector;
 
-    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> gate)
+    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector)
     {
         _connection = connection;
         _activities = activities;
         _delayBetweenActivities = delayBetweenActivities;
         _activityExecutor = Executors.newFixedThreadPool(maximumActivityThreads);
         _runningSimulation = _simulationExecutor.submit(this::startSimulation);
-        _gate = gate;
+        _resultCollector = resultCollector;
     }
 
     public boolean isStopped()
@@ -103,7 +103,7 @@ public class Simulation<T>
                 }
             }
         }
-        return _gate.getResults();
+        return _resultCollector.getResults();
     }
 
     private Map<String, Integer> runActivity(Activity activity, ExecutorService activityExecutor) throws ExecutionException, InterruptedException
@@ -145,7 +145,7 @@ public class Simulation<T>
         }
         finally
         {
-            _gate.postRequest();
+            _resultCollector.postRequest();
         }
     }
 
@@ -203,6 +203,13 @@ public class Simulation<T>
             return this;
         }
 
+        public <T> Simulation<T> startSimulation(Function<Connection, ResultCollector<T>> resultCollectorSupplier) throws IOException, CommandException
+        {
+            Connection connection = _connectionSupplier.get();
+            new WhoAmICommand().execute(connection, null);
+            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorSupplier.apply(connection));
+        }
+
         public Simulation<Collection<RequestInfo>> startSimulation() throws IOException, CommandException
         {
             return startSimulation(SessionResultsCollector::new);
@@ -211,13 +218,6 @@ public class Simulation<T>
         public Simulation<Void> startSimulationIgnoringResults() throws IOException, CommandException
         {
             return startSimulation(connection -> RESULTS_NOOP);
-        }
-
-        public <T> Simulation<T> startSimulation(Function<Connection, ResultCollector<T>> gateSupplier) throws IOException, CommandException
-        {
-            Connection connection = _connectionSupplier.get();
-            new WhoAmICommand().execute(connection, null);
-            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, gateSupplier.apply(connection));
         }
 
         private static List<TestCaseType> parseTests(File testFile)
