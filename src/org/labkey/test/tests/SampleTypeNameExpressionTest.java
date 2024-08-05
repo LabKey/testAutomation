@@ -251,9 +251,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertEquals("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(1));
         assertEquals(PARENT_SAMPLE_04 + "-child", names.get(2));
 
+        log("Verify importing tsv to create sample with # should work, as long as this is not the 1st field in the row");
+        data = "Description\tName\n";
+        data += "should succeed\t#RootSample1\n";
+        sampleHelper.bulkImport(data);
+        names = materialTable.getColumnDataAsText("Name");
+        assertEquals(8, names.size());
+        assertEquals("#RootSample1", names.get(0));
+
         log("Verify importing tsv to create sample should ignore lines starting with #");
         data = "Name\tDescription\n";
-        data += "#RootSample1\tshould be ignored\n";
+        data += "#RootSample2\tshould be ignored\n";
         sampleHelper.startTsvImport(data, "IMPORT").submitExpectingErrorContaining("No rows were inserted. Please check to make sure your data is formatted properly.");
     }
 
