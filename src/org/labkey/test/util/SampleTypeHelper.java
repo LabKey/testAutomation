@@ -272,7 +272,7 @@ public class SampleTypeHelper extends WebDriverWrapper
                 .submitExpectingError();
     }
 
-    private ImportDataPage startTsvImport(String tsv, String importOption)
+    public ImportDataPage startTsvImport(String tsv, String importOption)
     {
         DataRegionTable drt = getSamplesDataRegionTable();
         ImportDataPage importDataPage = drt.clickImportBulkData();

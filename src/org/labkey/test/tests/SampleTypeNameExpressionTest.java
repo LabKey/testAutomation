@@ -199,7 +199,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         final String sampleTypeName = "ParentNamesExprTest";
 
-        log("Verify import tsv would ignore lines starting with #");
+        log("Verify import tsv to create derivative would ignore lines starting with #");
         String nameExpression = "${MaterialInputs/" + PARENT_SAMPLE_TYPE + "}-child";
         String data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
         data += PARENT_SAMPLE_01 + "\n";
@@ -251,6 +251,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertEquals("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(1));
         assertEquals(PARENT_SAMPLE_04 + "-child", names.get(2));
 
+        log("Verify importing tsv to create sample should ignore lines starting with #");
+        data = "Name\tDescription\n";
+        data += "#RootSample1\tshould be ignored\n";
+        sampleHelper.startTsvImport(data, "IMPORT").submitExpectingErrorContaining("No rows were inserted. Please check to make sure your data is formatted properly.");
     }
 
     // Coverage for Issue 47504
