@@ -239,6 +239,12 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertEquals("[" + PARENT_SAMPLE_03 + ", " + PARENT_SAMPLE_02 + "]-child", names.get(0));
         assertEquals(PARENT_SAMPLE_03 + "-child", names.get(1));
 
+        log("Check that lineage is created as expected.");
+        clickAndWait(Locator.linkWithText(PARENT_SAMPLE_03 + "-child"));
+        checker().verifyTrue("Derivation run is not present.",
+                isElementPresent(Locator.linkWithText("Derive sample from " + PARENT_SAMPLE_03)));
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+
         log("Verify import EXCEL should not ignore lines starting with #");
         sampleHelper.bulkImport(PARENT_EXCEL);
 
