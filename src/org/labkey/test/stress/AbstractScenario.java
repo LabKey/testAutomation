@@ -72,6 +72,6 @@ public abstract class AbstractScenario<T>
 
     private List<T> stopBackgroundSimulations()
     {
-        return simulations.stream().flatMap(simulation -> simulation.collectResults().stream()).toList();
+        return simulations.stream().parallel().flatMap(simulation -> simulation.collectResults().stream()).toList();
     }
 }

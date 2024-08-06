@@ -1,8 +1,10 @@
 package org.labkey.test.stress;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.xmlbeans.XmlException;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.remoteapi.CommandException;
@@ -12,15 +14,19 @@ import org.labkey.remoteapi.miniprofiler.RequestInfo;
 import org.labkey.remoteapi.miniprofiler.RequestsResponse;
 import org.labkey.remoteapi.miniprofiler.SessionRequestsCommand;
 import org.labkey.remoteapi.security.WhoAmICommand;
-import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.test.credentials.Login;
 import org.labkey.test.credentials.Server;
+import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.Timer;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,6 +98,9 @@ public class Simulation<T>
 
     private Collection<T> startSimulation() throws ExecutionException, InterruptedException
     {
+        // Random sleep to stagger simulations
+        Thread.sleep((long) (Math.random() * _delayBetweenActivities));
+
         while (!_stopped.get() && !Thread.interrupted())
         {
             for (Activity activity : _activities)
@@ -99,7 +108,6 @@ public class Simulation<T>
                 try
                 {
                     runActivity(activity, _activityExecutor);
-                    _resultCollector.postRequest();
 
                     if (!_stopped.get())
                     {
@@ -116,49 +124,49 @@ public class Simulation<T>
         return _resultCollector.getResults();
     }
 
-    private Map<String, Integer> runActivity(Activity activity, ExecutorService activityExecutor) throws ExecutionException, InterruptedException
+    private void runActivity(Activity activity, ExecutorService activityExecutor) throws ExecutionException, InterruptedException
     {
-        Map<String, Future<Integer>> futures = new ArrayListMap<>();
-        for (TestCaseType request : activity.getRequests())
+        List<Future<?>> futures = new ArrayList<>();
+        for (Activity.RequestParams request : activity.getRequests())
         {
-            futures.put(request.getName(), activityExecutor.submit(() -> makeRequest(request)));
+            futures.add(activityExecutor.submit(() -> {
+                makeRequest(request);
+                return null;
+            }));
         }
 
-        Map<String, Integer> results = new ArrayListMap<>();
-        for (Map.Entry<String, Future<Integer>> entry : futures.entrySet())
+        for (Future<?> future : futures)
         {
-            if (_stopped.get() || Thread.interrupted())
+            if (_stopped.get())
             {
-                return results;
+                return;
             }
-            Integer result = entry.getValue().get();
-            results.put(entry.getKey(), result);
+            future.get();
         }
-        return results;
     }
 
-    public static Map<String, AtomicInteger> counts = new ConcurrentHashMap<>();
-    public static AtomicInteger requestCount = new AtomicInteger(0);
-    public static AtomicInteger badRequestCount = new AtomicInteger(0);
-    private int makeRequest(TestCaseType testCase) throws InterruptedException
+    private void makeRequest(Activity.RequestParams testCase) throws InterruptedException
     {
         ApiTestCommand command = new ApiTestCommand(testCase);
+        StopWatch timer = StopWatch.createStarted();
+        int statusCode = 0;
         try
         {
             CommandResponse response = command.execute(_connection);
-            return response.getStatusCode();
+            statusCode = response.getStatusCode();
         }
         catch (CommandException e)
         {
-            return e.getStatusCode();
+            statusCode = e.getStatusCode();
         }
         catch (IOException e)
         {
-            return -1;
+            statusCode = -1;
         }
         finally
         {
-            _resultCollector.postRequest();
+            timer.stop();
+            _resultCollector.postRequest(new RequestResult(testCase, statusCode, timer));
         }
     }
 
@@ -280,27 +288,38 @@ public class Simulation<T>
 
     public static class SessionResultsCollector implements ResultCollector<RequestInfo>
     {
+        private static final int MAX_TRACKED_REQUESTS = 500;
+
         private final Connection _connection;
+        private final String sessionId;
+        private final long initialRequestId;
         private final AtomicBoolean lock = new AtomicBoolean(false);
         private final Map<Long, RequestInfo> requestInfos = new ConcurrentHashMap<>();
-        private final AtomicLong requestId = new AtomicLong(0);
+        private final AtomicLong maxRequestId = new AtomicLong(0);
+        private final AtomicInteger requestCount = new AtomicInteger(0);
 
         public SessionResultsCollector(Connection connection)
         {
             _connection = connection;
             // Get initial request Id
-            collectRequestInfos();
+            RequestsResponse sessionRequests = getSessionRequests();
+            sessionId = sessionRequests.getSessionId();
+            initialRequestId = sessionRequests.getRequestInfos().stream().map(RequestInfo::getId).max(Comparator.naturalOrder()).orElse(0L);
+            maxRequestId.set(initialRequestId);
             requestInfos.clear();
         }
 
         @Override
-        public void postRequest()
+        public void postRequest(RequestResult requestResult)
         {
+            requestCount.incrementAndGet();
+
+            // Only allow one thread to collect session info
             if (!lock.getAndSet(true))
             {
                 try
                 {
-                    collectRequestInfos();
+                    collectSessionRequestInfos();
                 }
                 finally
                 {
@@ -312,30 +331,47 @@ public class Simulation<T>
         @Override
         public Collection<RequestInfo> getResults()
         {
-            collectRequestInfos();
+            collectSessionRequestInfos();
+            try
+            {
+                Timer timer = new Timer(Duration.ofSeconds(5));
+                while (!timer.isTimedOut() && requestCount.get() > requestInfos.size())
+                {
+                    // Wait to get lingering request info
+                    Thread.sleep(500);
+                    collectSessionRequestInfos();
+                }
+            }
+            catch (InterruptedException ignore) { }
+            int missingInfos = requestCount.get() - requestInfos.size();
+            if (missingInfos != 0)
+            {
+                TestLogger.warn("Didn't find request info for %d requests".formatted(missingInfos));
+            }
             return requestInfos.values();
         }
 
-        private void collectRequestInfos()
+        private void collectSessionRequestInfos()
+        {
+            RequestsResponse response = getSessionRequests();
+            Assert.assertEquals("Session ID has changed during simulation", sessionId, response.getSessionId());
+            List<RequestInfo> responseRequestInfos = response.getRequestInfos();
+            if (!responseRequestInfos.isEmpty())
+            {
+                responseRequestInfos.forEach(ri -> {
+                    requestInfos.putIfAbsent(ri.getId(), ri);
+                    maxRequestId.getAndUpdate(old -> Math.max(ri.getId(), old));
+                });
+            }
+        }
+
+        private RequestsResponse getSessionRequests()
         {
             try
             {
-                SessionRequestsCommand command = new SessionRequestsCommand(requestId.get());
-                RequestsResponse response = command.execute(_connection, null);
-                List<RequestInfo> requestInfos = response.getRequestInfos();
-                if (!requestInfos.isEmpty())
-                {
-                    synchronized (requestId)
-                    {
-                        requestInfos.forEach(ri -> {
-                            this.requestInfos.put(ri.getId(), ri);
-                            if (ri.getId() > requestId.get())
-                            {
-                                requestId.set(ri.getId());
-                            }
-                        });
-                    }
-                }
+                long requestIdForCommand = Math.max(initialRequestId, maxRequestId.get() - MAX_TRACKED_REQUESTS);
+                SessionRequestsCommand command = new SessionRequestsCommand(requestIdForCommand);
+                return command.execute(_connection, null);
             }
             catch (IOException | CommandException e)
             {
@@ -346,15 +382,44 @@ public class Simulation<T>
 
     public interface ResultCollector<T>
     {
-        void postRequest() throws InterruptedException;
+        void postRequest(RequestResult requestResult) throws InterruptedException;
 
         Collection<T> getResults();
     }
 
     public static final ResultCollector<Void> RESULTS_NOOP = new ResultCollector<>(){
         @Override
-        public void postRequest() { }
+        public void postRequest(RequestResult requestResult) { }
         @Override
         public Collection<Void> getResults() { return Collections.emptyList(); }
     };
+
+    public static class RequestResult
+    {
+        private final Activity.RequestParams _requestParams;
+        private final int _statusCode;
+        private final StopWatch _timer;
+
+        public RequestResult(Activity.RequestParams requestParams, int statusCode, StopWatch timer)
+        {
+            _requestParams = requestParams;
+            _statusCode = statusCode;
+            _timer = timer;
+        }
+
+        public Activity.RequestParams getRequestParams()
+        {
+            return _requestParams;
+        }
+
+        public int getStatusCode()
+        {
+            return _statusCode;
+        }
+
+        public StopWatch getTimer()
+        {
+            return _timer;
+        }
+    }
 }

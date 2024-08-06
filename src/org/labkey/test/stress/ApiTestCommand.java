@@ -8,7 +8,6 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.labkey.query.xml.TestCaseType;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -32,7 +31,7 @@ class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
         _formData = StringUtils.trimToEmpty(formData);
     }
 
-    public ApiTestCommand(TestCaseType requestParams)
+    public ApiTestCommand(Activity.RequestParams requestParams)
     {
         this(requestParams.getUrl(), requestParams.getType(), requestParams.getFormData());
     }

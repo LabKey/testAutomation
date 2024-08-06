@@ -91,7 +91,7 @@ public class BlockingScenario extends AbstractScenario<Void>
         }
 
         @Override
-        public synchronized void postRequest() throws InterruptedException
+        public synchronized void postRequest(Simulation.RequestResult requestResult) throws InterruptedException
         {
             semaphore.acquire();
             if (requestCount.incrementAndGet() > maxUncollectedRequests)
