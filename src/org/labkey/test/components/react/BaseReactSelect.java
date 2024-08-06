@@ -541,9 +541,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
         public BaseReactSelectFinder<Select> withId(String id)
         {
-            Locator.XPathLocator idElementLoc = Locator.XPathLocator.union(
-                    Locator.tagWithId("div", id), Locator.tagWithId("input", id));
-            _locator = Locators.containerWithDescendant(idElementLoc);
+            _locator = Locators.containerWithDescendant(Locator.id(id));
             return this;
         }
 
