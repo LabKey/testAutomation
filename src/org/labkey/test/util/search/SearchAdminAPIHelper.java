@@ -16,17 +16,24 @@
 package org.labkey.test.util.search;
 
 import org.apache.hc.core5.http.HttpStatus;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
+import org.labkey.test.util.Timer;
 import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -67,6 +74,36 @@ public abstract class SearchAdminAPIHelper
         cmd.setParameters(Map.of("priority", "background"));
 
         executeWaitForIndexer(cmd);
+    }
+
+    @LogMethod(quiet = true)
+    public static void waitForSearchServiceBootstrap(Connection cn)
+    {
+        SimpleGetCommand command = new SimpleGetCommand("search", "json");
+        command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
+        Timer timer = new Timer(Duration.ofMinutes(3));
+        do
+        {
+            try
+            {
+                CommandResponse response = command.execute(cn, "/");
+                if (response.getStatusCode() == 200)
+                    return; // Server is up, we can exit the loop
+                else
+                    throw new RuntimeException("Search service did not start properly");
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+            catch (CommandException e)
+            {
+                if (e.getStatusCode() == 404)
+                    return; //Search service is not available.
+                WebDriverWrapper.sleep(500); //poll the re-request
+            }
+        }
+        while (!timer.isTimedOut());
     }
 
     private static void executeWaitForIndexer(PostCommand cmd)
