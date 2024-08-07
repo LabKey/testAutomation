@@ -48,9 +48,9 @@ public class Activity
         private RequestParams(TestCaseType testCase)
         {
             _name = testCase.getName().trim();
-            // Add dummy '_debug' parameter to differentiate similar requests in request logs
+            // Add dummy '_test' parameter to differentiate similar requests in request logs
             String url = testCase.getUrl().trim();
-            String debugParam = (url.contains("?") ? "&" : "?") + "_debug=" + debugCount.incrementAndGet();
+            String debugParam = (url.contains("?") ? "&" : "?") + "_test=" + debugCount.incrementAndGet();
             _url = url + debugParam;
             _type = testCase.getType().trim();
             _formData = StringUtils.trimToEmpty(testCase.getFormData());

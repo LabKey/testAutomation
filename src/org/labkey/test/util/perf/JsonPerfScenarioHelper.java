@@ -96,17 +96,17 @@ public class JsonPerfScenarioHelper
         {
             ImportDataResponse response = command.execute(connection, containerPath);
             msgSuffix = "Imported %d rows".formatted(response.getRowCount());
-            return new Result(response.getStatusCode(), timer.elapsed());
+            return new Result(perfScenario.getName(), response.getStatusCode(), timer.elapsed());
         }
         catch (IOException e)
         {
             msgSuffix = "IOException: " + e.getMessage();
-            return new Result(e, timer.elapsed());
+            return new Result(perfScenario.getName(), e, timer.elapsed());
         }
         catch (CommandException e)
         {
             msgSuffix = e.getStatusCode() + " CommandException: " + e.getMessage();
-            return new Result(e, timer.elapsed());
+            return new Result(perfScenario.getName(), e, timer.elapsed());
         }
         finally
         {
@@ -117,37 +117,45 @@ public class JsonPerfScenarioHelper
 
     public static class Result
     {
-        private final Integer statusCode;
-        private final Exception exception;
-        private final Duration duration;
+        private final String _name;
+        private final Integer _statusCode;
+        private final Exception _exception;
+        private final Duration _duration;
 
-        public Result(Integer statusCode, Duration duration)
+        public Result(String name, Integer statusCode, Duration duration)
         {
-            this.statusCode = statusCode;
-            this.exception = null;
-            this.duration = duration;
+            _name = name;
+            _statusCode = statusCode;
+            _exception = null;
+            _duration = duration;
         }
 
-        public Result(Exception exception, Duration duration)
+        public Result(String name, Exception exception, Duration duration)
         {
-            this.statusCode = exception instanceof CommandException ce ? ce.getStatusCode() : null;
-            this.exception = exception;
-            this.duration = duration;
+            _name = name;
+            _statusCode = exception instanceof CommandException ce ? ce.getStatusCode() : null;
+            _exception = exception;
+            _duration = duration;
+        }
+
+        public String getName()
+        {
+            return _name;
         }
 
         public Integer getStatusCode()
         {
-            return statusCode;
+            return _statusCode;
         }
 
         public Exception getException()
         {
-            return exception;
+            return _exception;
         }
 
         public Duration getDuration()
         {
-            return duration;
+            return _duration;
         }
     }
 }
