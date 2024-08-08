@@ -1,12 +1,16 @@
 package org.labkey.test.stress;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.util.TestLogger;
 
+import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,15 +21,19 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractScenario<T>
 {
-    private final UUID scenarioUuid = UUID.randomUUID();
+    public static final String SCENARIO_UUID = "scenarioUuid";
+    public static final String SCENARIO_NAME = "scenarioName";
+
+    private final String scenarioUuid = UUID.randomUUID().toString();
+    private final List<Simulation<T>> simulations = new ArrayList<>();
     private final String _scenarioName;
     private final List<Simulation.Definition> _simulationDefinitions;
-    private final List<Simulation<T>> simulations = new ArrayList<>();
+    private final File _resultsFile;
 
     private int baselineDataCollectionDuration = 10_000;
     private ScenarioState state = ScenarioState.READY;
 
-    public AbstractScenario(List<Simulation.Definition> simulationDefinitions, String scenarioName)
+    public AbstractScenario(List<Simulation.Definition> simulationDefinitions, String scenarioName, File resultsFile)
     {
         if (simulationDefinitions.isEmpty())
         {
@@ -33,11 +41,12 @@ public abstract class AbstractScenario<T>
         }
         _simulationDefinitions = simulationDefinitions;
         _scenarioName = scenarioName;
+        _resultsFile = resultsFile == null ? null : (resultsFile.isDirectory() ? new File(resultsFile, scenarioName + "-" + scenarioUuid + ".tsv") : resultsFile);
     }
 
     public AbstractScenario(List<Simulation.Definition> simulationDefinitions)
     {
-        this(simulationDefinitions, "Unnamed");
+        this(simulationDefinitions, "Unnamed", null);
     }
 
     public AbstractScenario<T> setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
@@ -46,13 +55,18 @@ public abstract class AbstractScenario<T>
         return this;
     }
 
+    public File getResultsFile()
+    {
+        return _resultsFile;
+    }
+
     protected abstract Simulation.ResultCollector<T> getResultsCollector(Connection connection);
 
     public final void startBackgroundSimulations() throws InterruptedException
     {
         if (state != ScenarioState.READY)
         {
-            throw new IllegalStateException("Scenario not ready to start: " + state);
+            throw new IllegalStateException("Unable to start scenario, already " + state);
         }
         state = ScenarioState.STARTING;
         TestLogger.log("Starting background simulations");
@@ -91,6 +105,12 @@ public abstract class AbstractScenario<T>
         state = ScenarioState.RUNNING;
     }
 
+    @NotNull
+    protected Map<String, String> getScenarioProperties()
+    {
+        return Map.of(SCENARIO_UUID, scenarioUuid, SCENARIO_NAME, _scenarioName);
+    }
+
     public final Set<T> collectBaselinePerfAndStopSimulations() throws InterruptedException
     {
         state = ScenarioState.FINISHING;
@@ -113,8 +133,8 @@ public abstract class AbstractScenario<T>
         finally
         {
             state = ScenarioState.DONE;
+            afterDone();
         }
-
     }
 
     private void shutdownNow()
@@ -127,8 +147,11 @@ public abstract class AbstractScenario<T>
         finally
         {
             state = ScenarioState.DONE;
+            afterDone();
         }
     }
+
+    protected void afterDone() { }
 
     public enum ScenarioState
     {
@@ -149,5 +172,10 @@ public abstract class AbstractScenario<T>
         {
             return _active;
         }
+    }
+
+    public interface TsvResultsWriter<T> extends Closeable
+    {
+        void writeRow(T resultsObject, Map<String, String> resultMetadata);
     }
 }

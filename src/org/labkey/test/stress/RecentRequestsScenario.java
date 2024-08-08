@@ -56,7 +56,7 @@ public class RecentRequestsScenario extends AbstractScenario<RequestInfo>
     }
 
     @Override
-    protected RecentRequestsResultsCollector getResultsCollector(Connection connection)
+    protected Simulation.ResultCollector<RequestInfo> getResultsCollector(Connection connection)
     {
         verifyAndAddMiniProfilerConnection(connection);
         return requestGates.computeIfAbsent(connection.getBaseURI(), uri -> new RecentRequestsResultsCollector(miniProfilerConnections.get(connection.getBaseURI())));

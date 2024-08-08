@@ -21,7 +21,7 @@ public class RequestInfo
     private final Long id;
     private final String url;
     private final String date;
-    private final long duration;
+    private final Long duration;
     private final Timing root;
     private final JSONObject objects;
     private final String sessionId;
@@ -52,7 +52,7 @@ public class RequestInfo
         return date;
     }
 
-    public long getDuration()
+    public Long getDuration()
     {
         return duration;
     }

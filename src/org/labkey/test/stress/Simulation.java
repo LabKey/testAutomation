@@ -5,7 +5,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.xmlbeans.XmlException;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.api.collections.ArrayListMap;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.remoteapi.CommandException;
@@ -21,10 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,9 +41,12 @@ import java.util.stream.Collectors;
  */
 public class Simulation<T>
 {
+    public static final String SIMULATION_ID = "simulationId";
+    public static final String SERVER_URI = "serverUri";
+
     private final ExecutorService simulationExecutor = Executors.newSingleThreadExecutor();
     private final AtomicBoolean stopped = new AtomicBoolean(false);
-    private final Map<String, String> simulationProperties;
+    private final Map<String, String> simulationMetadata;
     private final Connection _connection;
     private final List<Activity> _activities;
     private final int _delayBetweenActivities;
@@ -55,7 +55,7 @@ public class Simulation<T>
     private final ResultCollector<T> _resultCollector;
     private final boolean _runOnce;
 
-    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector, boolean runOnce, Map<String, String> scenarioProperties)
+    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector, boolean runOnce)
     {
         _connection = connection;
         _activities = activities;
@@ -64,10 +64,9 @@ public class Simulation<T>
         _runningSimulation = simulationExecutor.submit(this::run);
         _resultCollector = resultCollector;
         _runOnce = runOnce;
-        Map<String, String> temp = new ArrayListMap<>();
-        temp.putAll(scenarioProperties);
-        temp.put("simulationUuid", UUID.randomUUID().toString());
-        simulationProperties = Collections.unmodifiableMap(temp);
+        simulationMetadata = Map.of(
+                SIMULATION_ID, _connection.getBaseURI().toString(),
+                SERVER_URI, _connection.getBaseURI().toString());
     }
 
     public boolean isStopped()
@@ -171,7 +170,7 @@ public class Simulation<T>
         finally
         {
             timer.stop();
-            _resultCollector.postRequest(new RequestResult(testCase, statusCode, timer));
+            _resultCollector.postRequest(new RequestResult(testCase, statusCode, timer, simulationMetadata));
         }
     }
 
@@ -183,7 +182,6 @@ public class Simulation<T>
         private int delayBetweenActivities = 5_000;
         private List<Activity> activityDefinitions = Collections.emptyList();
         private boolean runOnce = false;
-        private Map<String, String> scenarioProperties = new LinkedHashMap<>();
 
         public Definition(Supplier<Connection> connectionSupplier)
         {
@@ -217,12 +215,6 @@ public class Simulation<T>
             return this;
         }
 
-        public Definition setScenarioProperties(Map<String, String> scenarioProperties)
-        {
-            this.scenarioProperties.putAll(scenarioProperties);
-            return this;
-        }
-
         public Definition setActivityFiles(File... activityFiles)
         {
             return setActivityFilesWithReplacements(
@@ -248,7 +240,7 @@ public class Simulation<T>
             Connection connection = _connectionSupplier.get();
             // Prime connection before starting simulation so that resultCollectorSupplier can know to ignore this request
             new WhoAmICommand().execute(connection, null);
-            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorSupplier.apply(connection), runOnce, scenarioProperties);
+            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorSupplier.apply(connection), runOnce);
         }
 
         public Simulation<RequestResult> startSimulation() throws IOException, CommandException
@@ -325,12 +317,14 @@ public class Simulation<T>
         private final Activity.RequestParams _requestParams;
         private final int _statusCode;
         private final StopWatch _timer;
+        private final Map<String, String> _simulationMetadata;
 
-        public RequestResult(Activity.RequestParams requestParams, int statusCode, StopWatch timer)
+        public RequestResult(Activity.RequestParams requestParams, int statusCode, StopWatch timer, Map<String, String> simulationMetadata)
         {
             _requestParams = requestParams;
             _statusCode = statusCode;
             _timer = timer;
+            _simulationMetadata = simulationMetadata;
         }
 
         public Activity.RequestParams getRequestParams()
@@ -346,6 +340,11 @@ public class Simulation<T>
         public StopWatch getTimer()
         {
             return _timer;
+        }
+
+        public Map<String, String> getSimulationMetadata()
+        {
+            return _simulationMetadata;
         }
     }
 }
