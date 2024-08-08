@@ -53,6 +53,115 @@
             ]]>
         </response>
     </test>
+    <test name="experiment lineage test with default parameters" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                run <- labkey.selectRows(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  schemaName="exp", queryName="Runs", colSelect="LSID",
+                  colFilter=makeFilter(c("Name", "EQUAL", "new run with materials")),
+                  colNameOpt="rname"
+                )
+
+                m1 <- labkey.selectRows(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  schemaName="exp", queryName="Materials", colSelect="LSID",
+                  colFilter=makeFilter(c("Name", "EQUAL", "87444063.2604.625")),
+                  colNameOpt="rname"
+                )
+
+                m2 <- labkey.selectRows(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  schemaName="exp", queryName="Materials", colSelect="LSID",
+                  colFilter=makeFilter(c("Name", "EQUAL", "87444063.2604.626")),
+                  colNameOpt="rname"
+                )
+
+                response = labkey.experiment.lineage(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  lsids=c(run$lsid)
+                )
+
+                print(paste("Seed length = ", length(response$seeds), sep=""))
+                print(paste("Nodes length = ", length(response$nodes), sep=""))
+                print(paste("Name = ", response$nodes[[m1$lsid]]$name, sep=""))
+                print(paste("Type = ", response$nodes[[m1$lsid]]$type, sep=""))
+                print(paste("Material lineage type = ", response$nodes[[m1$lsid]]$materialLineageType, sep=""))
+                print(paste("Name = ", response$nodes[[m2$lsid]]$name, sep=""))
+                print(paste("Type = ", response$nodes[[m2$lsid]]$type, sep=""))
+                print(paste("Material lineage type = ", response$nodes[[m2$lsid]]$materialLineageType, sep=""))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "Seed length = 1"
+                [1] "Nodes length = 3"
+                [1] "Name = 87444063.2604.625"
+                [1] "Type = Material"
+                [1] "Material lineage type = Derivative"
+                [1] "Name = 87444063.2604.626"
+                [1] "Type = Material"
+                [1] "Material lineage type = RootMaterial"
+            ]]>
+        </response>
+    </test>
+    <test name="experiment lineage test with custom parameters" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                run <- labkey.selectRows(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  schemaName="exp", queryName="Runs", colSelect="LSID",
+                  colFilter=makeFilter(c("Name", "EQUAL", "new run with materials")),
+                  colNameOpt="rname"
+                )
+
+                m1 <- labkey.selectRows(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  schemaName="exp", queryName="Materials", colSelect="LSID",
+                  colFilter=makeFilter(c("Name", "EQUAL", "87444063.2604.625")),
+                  colNameOpt="rname"
+                )
+
+                m2 <- labkey.selectRows(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  schemaName="exp", queryName="Materials", colSelect="LSID",
+                  colFilter=makeFilter(c("Name", "EQUAL", "87444063.2604.626")),
+                  colNameOpt="rname"
+                )
+
+                response = labkey.experiment.lineage(
+                  baseUrl=labkey.url.base, folderPath="%projectName%",
+                  lsids=c(run$lsid),
+                  options=list(
+                    parents=FALSE,
+                    expType="Material",
+                    includeProperties=TRUE
+                  )
+                )
+
+                print(paste("Seed length = ", length(response$seeds), sep=""))
+                print(paste("Nodes length = ", length(response$nodes), sep=""))
+                print(paste("Name = ", response$nodes[[m1$lsid]]$name, sep=""))
+                print(paste("Type = ", response$nodes[[m1$lsid]]$type, sep=""))
+                print(paste("Material lineage type = ", response$nodes[[m1$lsid]]$materialLineageType, sep=""))
+                print(paste("M2 excluded = ", is.null(response$nodes[[m2$lsid]]$name), sep=""))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "Seed length = 1"
+                [1] "Nodes length = 2"
+                [1] "Name = 87444063.2604.625"
+                [1] "Type = Material"
+                [1] "Material lineage type = Derivative"
+                [1] "M2 excluded = TRUE"
+            ]]>
+        </response>
+    </test>
     <test name="labkey.saveBatch for assay with space in name" type="post">
         <url>
             <![CDATA[
