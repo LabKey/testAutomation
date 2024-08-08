@@ -19,6 +19,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
 
@@ -128,6 +129,12 @@ public class ApiBootstrapHelper
     {
         Connection cn = WebTestHelper.getRemoteApiConnection(false);
         SimpleGetCommand command = new SimpleGetCommand("admin", "startupStatus");
+        /*
+            Waiting for search service to boot up
+            Issue 50601: PDF indexing is slow on first file after server startup on Windows
+         */
+        SimpleGetCommand searchCmd = new SimpleGetCommand("search", "json");
+        searchCmd.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
         Exception lastException = null;
 
         Timer timer = new Timer(Duration.ofMinutes(5));
@@ -136,7 +143,8 @@ public class ApiBootstrapHelper
             try
             {
                 CommandResponse response = command.execute(cn, null);
-                if ((Boolean) response.getParsedData().getOrDefault("startupComplete", false))
+                CommandResponse searchResponse = searchCmd.execute(cn, "/");
+                if ((Boolean) response.getParsedData().getOrDefault("startupComplete", false) && searchResponse.getStatusCode() == 200)
                 {
                     return;
                 }
@@ -145,7 +153,8 @@ public class ApiBootstrapHelper
             {
                 lastException = e;
             }
-        } while (!timer.isTimedOut());
+        }
+        while (!timer.isTimedOut());
 
         throw new RuntimeException("Server didn't finish starting.", lastException);
     }
