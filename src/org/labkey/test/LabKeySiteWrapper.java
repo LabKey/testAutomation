@@ -33,6 +33,7 @@ import org.apache.hc.core5.http.ProtocolException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -79,6 +80,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -134,7 +136,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (!Locator.tagWithName("form", "login").existsIn(getDriver()) || !Locator.name("email").existsIn(getDriver()))
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
-            beginAt(WebTestHelper.buildURL("login", "login"));
+            beginAt(buildURL("login", "login"));
             waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
                     UserMenu.appUserMenu());
         }
@@ -218,7 +220,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void signOutHTTP()
     {
-        String logOutUrl = WebTestHelper.buildURL("login", "logout");
+        String logOutUrl = buildURL("login", "logout");
         SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
         logOutRequest.copySession(getDriver());
 
@@ -235,7 +237,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void stopImpersonatingHTTP()
     {
-        String stopImpersonatingUrl = WebTestHelper.buildURL("login", "stopImpersonating.api");
+        String stopImpersonatingUrl = buildURL("login", "stopImpersonating.api");
         SimpleHttpRequest logOutRequest = new SimpleHttpRequest(stopImpersonatingUrl, "POST");
         logOutRequest.copySession(getDriver());
 
@@ -274,7 +276,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void deleteSiteWideTermsOfUsePage()
     {
-        getHttpResponse(WebTestHelper.buildURL("wiki", "delete", Maps.of("name", "_termsOfUse")), "POST").getResponseCode();
+        getHttpResponse(buildURL("wiki", "delete", Maps.of("name", "_termsOfUse")), "POST").getResponseCode();
     }
 
     protected void bypassSecondaryAuthentication()
@@ -357,7 +359,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void signIn(String email, String password)
     {
         attemptSignIn(email, password);
-        Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
+        assertEquals("Logged in as wrong user", email, getCurrentUser());
         WebTestHelper.saveSession(email, getDriver());
     }
 
@@ -424,7 +426,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected String getPasswordResetUrl(String username)
     {
-        beginAt(WebTestHelper.buildURL("security", "showResetEmail", Map.of("email", username)));
+        beginAt(buildURL("security", "showResetEmail", Map.of("email", username)));
 
         WebElement resetLink = Locator.xpath("//a[contains(@href, 'setPassword.view')]").findElement(getDriver());
         shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
@@ -720,6 +722,33 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     // Note: leave the self-report setting unchanged
                     customizeSitePage.save();
                 }
+
+                /*
+                    Waiting for search service to boot up
+                    Issue 50601: PDF indexing is slow on first file after server startup on Windows
+                 */
+                Connection connection = createDefaultConnection();
+                SimpleGetCommand command = new SimpleGetCommand("search", "json");
+                command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
+                Timer timer = new Timer(Duration.ofMinutes(3));
+                do
+                {
+                    try
+                    {
+                        CommandResponse response = command.execute(connection, "/");
+                        if (response.getStatusCode() == 200) break; // Server is up, we can exit the loop
+                        else throw new RuntimeException("Search service did not start properly");
+                    }
+                    catch (IOException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                    catch (CommandException e)
+                    {
+                        sleep(500); //poll the re-request
+                    }
+                }
+                while (!timer.isTimedOut());
             }
             else // Just upgrading
             {
@@ -958,7 +987,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public String getServerErrors()
     {
-        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SimpleHttpResponse httpResponse = getHttpResponse(buildURL("admin", "showErrorsSinceMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
         return httpResponse.getResponseBody();
     }
@@ -1023,7 +1052,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         urlParams.put("test", "true");
         if (!taskName.isEmpty())
             urlParams.put("taskName", taskName);
-        String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
+        String maintenanceTriggerUrl = buildURL("admin", "systemMaintenance", urlParams);
 
         smStart = System.currentTimeMillis();
         SimpleHttpRequest request = new SimpleHttpRequest(maintenanceTriggerUrl);
@@ -1234,7 +1263,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void deleteAuthenticationConfiguration(@LoggedParam String id)
     {
-        String url = WebTestHelper.buildURL("login", "deleteConfiguration", Maps.of("configuration", id));
+        String url = buildURL("login", "deleteConfiguration", Maps.of("configuration", id));
         SimpleHttpRequest deleteRequest = new SimpleHttpRequest(url, "POST");
         deleteRequest.copySession(getDriver());
 
@@ -1284,7 +1313,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public int setAuthenticationParameter(String parameter, boolean enabled)
     {
-        return WebTestHelper.getHttpResponse(WebTestHelper.buildURL("login", "setAuthenticationParameter", Map.of("parameter", parameter, "enabled", String.valueOf(enabled))), "POST").getResponseCode();
+        return getHttpResponse(buildURL("login", "setAuthenticationParameter", Map.of("parameter", parameter, "enabled", String.valueOf(enabled))), "POST").getResponseCode();
     }
 
     public ProjectMenu projectMenu()
@@ -1417,7 +1446,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void goToHome()
     {
-        beginAt(WebTestHelper.buildURL("project", "home", "begin"));
+        beginAt(buildURL("project", "home", "begin"));
         waitFor(this::onLabKeyPage, "Home project didn't seem to load. JavaScript 'LABKEY' namespace not found.", 10000);
     }
 
