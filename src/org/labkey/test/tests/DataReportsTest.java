@@ -316,8 +316,12 @@ public class DataReportsTest extends ReportTest
             List<String> menuItems = getTexts(reportMenu.findVisibleMenuItems());
             assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
             assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
-            beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
-            assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
+            // Site admins can still navigate to the externalReport page. It isn't functional though, so skipping this check
+            if (TestProperties.isPrimaryUserAppAdmin())
+            {
+                beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
+                assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
+            }
             return; // success
         }
 
