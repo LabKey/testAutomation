@@ -1,7 +1,6 @@
 package org.labkey.test.stress;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.xmlbeans.XmlException;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
@@ -13,9 +12,12 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.WhoAmICommand;
 import org.labkey.test.credentials.Login;
 import org.labkey.test.credentials.Server;
+import org.labkey.test.util.Timer;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -152,7 +154,7 @@ public class Simulation<T>
     private void makeRequest(Activity.RequestParams testCase) throws InterruptedException
     {
         ApiTestCommand command = new ApiTestCommand(testCase);
-        StopWatch timer = StopWatch.createStarted();
+        Timer timer = new Timer();
         int statusCode = 0;
         try
         {
@@ -316,14 +318,17 @@ public class Simulation<T>
     {
         private final Activity.RequestParams _requestParams;
         private final int _statusCode;
-        private final StopWatch _timer;
+        private final LocalDateTime _startTime;
+        private final Duration _duration;
         private final Map<String, String> _simulationMetadata;
 
-        public RequestResult(Activity.RequestParams requestParams, int statusCode, StopWatch timer, Map<String, String> simulationMetadata)
+        public RequestResult(Activity.RequestParams requestParams, int statusCode, Timer timer, Map<String, String> simulationMetadata)
         {
             _requestParams = requestParams;
             _statusCode = statusCode;
-            _timer = timer;
+            timer.stop();
+            _startTime = timer.getStartTime();
+            _duration = timer.elapsed();
             _simulationMetadata = simulationMetadata;
         }
 
@@ -337,9 +342,14 @@ public class Simulation<T>
             return _statusCode;
         }
 
-        public StopWatch getTimer()
+        public LocalDateTime getStartTime()
         {
-            return _timer;
+            return _startTime;
+        }
+
+        public Duration getDuration()
+        {
+            return _duration;
         }
 
         public Map<String, String> getSimulationMetadata()

@@ -15,29 +15,52 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class Timer
 {
-    private final Instant _startTime;
+    private final StopWatch _stopWatch;
     private final Duration _timeout;
     private boolean _cancelled = false;
 
     public Timer(Duration timeout)
     {
         _timeout = timeout;
-        _startTime = Instant.now();
+        _stopWatch = StopWatch.createStarted();
+    }
+
+    public Timer()
+    {
+        this(Duration.ZERO);
+    }
+
+    public LocalDateTime getStartTime()
+    {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(_stopWatch.getStartTime()), ZoneId.systemDefault());
     }
 
     public Duration elapsed()
     {
-        return Duration.between(_startTime, Instant.now());
+        return Duration.ofMillis(_stopWatch.getTime());
     }
 
     public Duration timeRemaining()
     {
         return _timeout.minus(elapsed());
+    }
+
+    public void stop()
+    {
+        if (!_stopWatch.isStopped())
+        {
+            _stopWatch.stop();
+            cancel();
+        }
     }
 
     public void cancel()

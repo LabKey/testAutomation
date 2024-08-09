@@ -18,6 +18,8 @@ public class RequestInfo
         "name" : "project\/begin"
      */
 
+    public static final RequestInfo BLANK = new RequestInfo(null, null, null, null, null, null, null);
+
     private final Long id;
     private final String url;
     private final String date;
@@ -35,6 +37,17 @@ public class RequestInfo
         root = new Timing(json.getJSONObject("root"));
         objects = json.getJSONObject("objects");
         sessionId = json.getString("sessionId");
+    }
+
+    public RequestInfo(Long id, String url, String date, Long duration, Timing root, JSONObject objects, String sessionId)
+    {
+        this.id = id;
+        this.url = url;
+        this.date = date;
+        this.duration = duration;
+        this.root = root;
+        this.objects = objects;
+        this.sessionId = sessionId;
     }
 
     public Long getId()

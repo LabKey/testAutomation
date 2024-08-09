@@ -5,7 +5,7 @@ import org.labkey.serverapi.writer.PrintWriters;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
@@ -19,45 +19,49 @@ import static org.labkey.test.stress.Simulation.SIMULATION_ID;
 
 public class RequestInfoTsvWriter implements AbstractScenario.TsvResultsWriter<RequestInfo>
 {
+    public static final String REQUEST_ID = "requestId";
+    public static final String REQUEST_URL = "requestUrl";
+    public static final String START_TIME = "startTime";
+    public static final String DURATION = "duration";
+    public static final String QUERY_COUNT = "queryCount";
+
     // scenarioUuid (pk) | scenarioName | serverUri (pk) | simulationId | requestId (pk) | requestUrl | startTime | duration | queryCount
     private static final List<String> FIELDS = List.of(
             SCENARIO_UUID,
             SCENARIO_NAME,
             SERVER_URI,
             SIMULATION_ID,
-            "requestId",
-            "requestUrl",
-            "startTime",
-            "duration",
-            "queryCount");
+            REQUEST_ID,
+            REQUEST_URL,
+            START_TIME,
+            DURATION,
+            QUERY_COUNT);
 
-    private static final Map<String, Function<RequestInfo, String>> REQUEST_INFO_MAPPER = Map.of(
+    private static final Map<String, Function<RequestInfo, Object>> REQUEST_INFO_MAPPER = Map.of(
             SIMULATION_ID, RequestInfo::getSessionId,
-            "requestId", ri -> ri.getId().toString(),
-            "requestUrl", RequestInfo::getUrl,
-            "startTime", RequestInfo::getDate,
-            "duration", ri -> ri.getDuration().toString(),
-            "queryCount", ri -> String.valueOf(ri.getRoot().getCustomTimings().getOrDefault("sql", Collections.emptyList()).size())
+            REQUEST_ID, RequestInfo::getId,
+            REQUEST_URL, RequestInfo::getUrl,
+            START_TIME, RequestInfo::getDate,
+            DURATION, RequestInfo::getDuration,
+            QUERY_COUNT, ri -> ri.getRoot() != null ? ri.getRoot().getCustomTimings().getOrDefault("sql", Collections.emptyList()) : null
     );
 
-    private final File _file;
     private final PrintWriter printWriter;
 
     public RequestInfoTsvWriter(File file) throws FileNotFoundException
     {
-        _file = file;
-        printWriter = PrintWriters.getPrintWriter(_file);
+        printWriter = PrintWriters.getPrintWriter(new FileOutputStream(file));
         writeHeader();
     }
 
     @Override
-    public void writeRow(RequestInfo requestInfo, Map<String, String> resultMetadata)
+    public void writeRow(RequestInfo requestInfo, Map<String, ?> resultMetadata)
     {
         printWriter.println(formatRow(requestInfo, resultMetadata));
     }
 
     @Override
-    public void close() throws IOException
+    public void close()
     {
         printWriter.close();
     }
@@ -67,7 +71,7 @@ public class RequestInfoTsvWriter implements AbstractScenario.TsvResultsWriter<R
         printWriter.println(String.join("\t", FIELDS));
     }
 
-    private String formatRow(RequestInfo ri, Map<String, String> resultMetadata)
+    private String formatRow(RequestInfo ri, Map<String, ?> resultMetadata)
     {
         StringBuilder row = new StringBuilder();
         for (int i = 0; i < FIELDS.size(); i++)
@@ -76,14 +80,18 @@ public class RequestInfoTsvWriter implements AbstractScenario.TsvResultsWriter<R
                 row.append("\t");
 
             String field = FIELDS.get(i);
+            Object value = null;
             if (resultMetadata.containsKey(field))
             {
-                row.append(resultMetadata.get(field));
+                value = resultMetadata.get(field);
             }
-            else
+            else if (REQUEST_INFO_MAPPER.containsKey(field))
             {
-                row.append(REQUEST_INFO_MAPPER.get(field).apply(ri));
+                value = REQUEST_INFO_MAPPER.get(field).apply(ri);
             }
+
+            if (value != null)
+                row.append(value);
         }
         return row.toString();
     }

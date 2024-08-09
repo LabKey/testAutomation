@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class SessionDataScenario extends AbstractScenario<RequestInfo>
 {
@@ -28,7 +29,7 @@ public class SessionDataScenario extends AbstractScenario<RequestInfo>
         super(simulationDefinitions);
     }
 
-    private synchronized TsvResultsWriter<RequestInfo> getResultsWriter()
+    public synchronized TsvResultsWriter<RequestInfo> getResultsWriter()
     {
         if (resultsWriter == null && getResultsFile() != null)
         {
@@ -42,6 +43,12 @@ public class SessionDataScenario extends AbstractScenario<RequestInfo>
             }
         }
         return resultsWriter;
+    }
+
+    @Override
+    protected void afterDone()
+    {
+        Optional.ofNullable(getResultsWriter()).ifPresent(TsvResultsWriter::close);
     }
 
     @Override
@@ -76,9 +83,12 @@ public class SessionDataScenario extends AbstractScenario<RequestInfo>
             if (_resultsWriter != null)
             {
                 _resultsWriter.writeRow(requestInfo, _metadata);
+                return RequestInfo.BLANK;
             }
-
-            return super.processNewRequest(requestInfo);
+            else
+            {
+                return super.processNewRequest(requestInfo);
+            }
         }
     }
 }

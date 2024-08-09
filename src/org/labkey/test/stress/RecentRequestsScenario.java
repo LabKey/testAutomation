@@ -10,6 +10,7 @@ import org.labkey.remoteapi.miniprofiler.RequestsResponse;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +28,7 @@ public class RecentRequestsScenario extends AbstractScenario<RequestInfo>
     }
 
     @Override
-    public RecentRequestsScenario setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
+    public RecentRequestsScenario setBaselineDataCollectionDuration(Duration baselineDataCollectionDuration)
     {
         super.setBaselineDataCollectionDuration(baselineDataCollectionDuration);
         return this;

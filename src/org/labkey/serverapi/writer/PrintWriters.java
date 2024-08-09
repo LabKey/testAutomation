@@ -59,7 +59,7 @@ public class PrintWriters
 
         public StandardPrintWriter(File file) throws FileNotFoundException
         {
-            super(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)));
+            this(new FileOutputStream(file));
         }
     }
 }

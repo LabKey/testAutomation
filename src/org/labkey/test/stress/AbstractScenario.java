@@ -3,11 +3,12 @@ package org.labkey.test.stress;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public abstract class AbstractScenario<T>
     private final List<Simulation.Definition> _simulationDefinitions;
     private final File _resultsFile;
 
-    private int baselineDataCollectionDuration = 10_000;
+    private Duration baselineDataCollectionDuration = Duration.ofSeconds(10);
     private ScenarioState state = ScenarioState.READY;
 
     public AbstractScenario(List<Simulation.Definition> simulationDefinitions, String scenarioName, File resultsFile)
@@ -41,7 +42,7 @@ public abstract class AbstractScenario<T>
         }
         _simulationDefinitions = simulationDefinitions;
         _scenarioName = scenarioName;
-        _resultsFile = resultsFile == null ? null : (resultsFile.isDirectory() ? new File(resultsFile, scenarioName + "-" + scenarioUuid + ".tsv") : resultsFile);
+        _resultsFile = resultsFile == null ? null : (resultsFile.isDirectory() ? new File(resultsFile, scenarioName + "-" + TestDateUtils.dateTimeFileName() + ".tsv") : resultsFile);
     }
 
     public AbstractScenario(List<Simulation.Definition> simulationDefinitions)
@@ -49,7 +50,7 @@ public abstract class AbstractScenario<T>
         this(simulationDefinitions, "Unnamed", null);
     }
 
-    public AbstractScenario<T> setBaselineDataCollectionDuration(int baselineDataCollectionDuration)
+    public AbstractScenario<T> setBaselineDataCollectionDuration(Duration baselineDataCollectionDuration)
     {
         this.baselineDataCollectionDuration = baselineDataCollectionDuration;
         return this;
@@ -89,8 +90,12 @@ public abstract class AbstractScenario<T>
             throw new RuntimeException("Failed to start simulation", e);
         }
 
-        TestLogger.log("Starting background simulations to collect baseline performance data");
-        Thread.sleep(baselineDataCollectionDuration);
+        if (baselineDataCollectionDuration.toMillis() > 0)
+        {
+            TestLogger.log("Letting background simulations run for %s to collect baseline performance data"
+                    .formatted(TestDateUtils.durationString(baselineDataCollectionDuration)));
+            Thread.sleep(baselineDataCollectionDuration.toMillis());
+        }
 
         // Verify that simulations haven't already errored out
         for (Simulation<?> simulation : simulations)
@@ -106,7 +111,7 @@ public abstract class AbstractScenario<T>
     }
 
     @NotNull
-    protected Map<String, String> getScenarioProperties()
+    public Map<String, String> getScenarioProperties()
     {
         return Map.of(SCENARIO_UUID, scenarioUuid, SCENARIO_NAME, _scenarioName);
     }
@@ -116,8 +121,11 @@ public abstract class AbstractScenario<T>
         state = ScenarioState.FINISHING;
         if (!simulations.isEmpty())
         {
-            TestLogger.log("Allow background simulations to collect baseline performance data before terminating");
-            Thread.sleep(baselineDataCollectionDuration);
+            if (baselineDataCollectionDuration.toMillis() > 0)
+            {
+                TestLogger.log("Allow background simulations to collect baseline performance data before terminating");
+                Thread.sleep(baselineDataCollectionDuration.toMillis());
+            }
             TestLogger.log("Stop background simulations");
         }
         return stopBackgroundSimulations();
@@ -174,8 +182,9 @@ public abstract class AbstractScenario<T>
         }
     }
 
-    public interface TsvResultsWriter<T> extends Closeable
+    public interface TsvResultsWriter<T>
     {
-        void writeRow(T resultsObject, Map<String, String> resultMetadata);
+        void writeRow(T resultsObject, Map<String, ?> resultMetadata);
+        void close();
     }
 }

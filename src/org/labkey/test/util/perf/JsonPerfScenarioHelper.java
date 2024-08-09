@@ -2,16 +2,22 @@ package org.labkey.test.util.perf;
 
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.miniprofiler.RequestInfo;
 import org.labkey.remoteapi.query.ImportDataCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.perf.PerfScenario;
+import org.labkey.test.stress.AbstractScenario;
+import org.labkey.test.stress.RequestInfoTsvWriter;
+import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.Timer;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +34,8 @@ public class JsonPerfScenarioHelper
     private final String containerPath;
     private final Connection connection;
     private final Function<String, File> perfDataFileSupplier;
+    private Function<Result, Result> resultHandler = Function.identity();
+    private int importThreads = 3;
 
     public JsonPerfScenarioHelper(String containerPath, Connection connection, File perfDataDir)
     {
@@ -36,22 +44,19 @@ public class JsonPerfScenarioHelper
         this.perfDataFileSupplier = perfDataDir == null ? TestFileUtils::getSampleData : name -> new File(perfDataDir, name);
     }
 
-    public JsonPerfScenarioHelper(String containerPath, Connection connection)
+    public JsonPerfScenarioHelper setResultHandler(Function<Result, Result> resultHandler)
     {
-        this(containerPath, connection, null);
+        this.resultHandler = resultHandler;
+        return this;
     }
 
-    public Map<String, Result> runPerfScenariosSerial(List<PerfScenario> scenarios) throws Exception
+    public JsonPerfScenarioHelper setImportThreads(int importThreads)
     {
-        Map<String, Result> results = new LinkedHashMap<>();
-        for (PerfScenario perfScenario : scenarios)
-        {
-            results.put(perfScenario.getName(), startImport(perfScenario, 1));
-        }
-        return results;
+        this.importThreads = importThreads;
+        return this;
     }
 
-    public Map<String, Result> runPerfScenarios(List<PerfScenario> scenarios, int importThreads) throws Exception
+    public Map<String, Result> runPerfScenarios(List<PerfScenario> scenarios) throws Exception
     {
         final ExecutorService importExecutor = Executors.newFixedThreadPool(importThreads);
 
@@ -61,7 +66,7 @@ public class JsonPerfScenarioHelper
             Integer expectedDuration = 0;
             for (PerfScenario perfScenario : scenarios)
             {
-                futures.put(perfScenario.getName(), importExecutor.submit(() -> startImport(perfScenario, importThreads)));
+                futures.put(perfScenario.getName(), importExecutor.submit(() -> resultHandler.apply(startImport(perfScenario))));
                 expectedDuration += perfScenario.getAverage();
             }
             importExecutor.shutdown();
@@ -79,7 +84,7 @@ public class JsonPerfScenarioHelper
         }
     }
 
-    private Result startImport(PerfScenario perfScenario, int importThreads)
+    private Result startImport(PerfScenario perfScenario)
     {
         TestLogger.log("Starting perf scenario: [%s]".formatted(perfScenario.getName()));
         String schemaName = SCHEMA_NAMES.get(perfScenario.getType());
@@ -90,57 +95,61 @@ public class JsonPerfScenarioHelper
         ImportDataCommand command = new ImportDataCommand(schemaName, perfScenario.getTypeName());
         command.setFile(perfDataFileSupplier.apply(perfScenario.getFileName()));
         command.setTimeout(Math.max(connection.getTimeout(), perfScenario.getAverage() * importThreads));
-        Timer timer = new Timer(Duration.ofSeconds(0));
+        Timer timer = new Timer();
         String msgSuffix = "";
         try
         {
             ImportDataResponse response = command.execute(connection, containerPath);
             msgSuffix = "Imported %d rows".formatted(response.getRowCount());
-            return new Result(perfScenario.getName(), response.getStatusCode(), timer.elapsed());
+            return new Result(perfScenario, response.getStatusCode(), timer);
         }
         catch (IOException e)
         {
             msgSuffix = "IOException: " + e.getMessage();
-            return new Result(perfScenario.getName(), e, timer.elapsed());
+            return new Result(perfScenario, e, timer);
         }
         catch (CommandException e)
         {
             msgSuffix = e.getStatusCode() + " CommandException: " + e.getMessage();
-            return new Result(perfScenario.getName(), e, timer.elapsed());
+            return new Result(perfScenario, e, timer);
         }
         finally
         {
             TestLogger.log("Finished perf scenario [%s] in %s. %s".formatted(perfScenario.getName(),
-                    timer.elapsed().toString().replace("PT", ""), msgSuffix));
+                    TestDateUtils.durationString(timer.elapsed()), msgSuffix));
         }
     }
 
     public static class Result
     {
-        private final String _name;
+        private final PerfScenario _scenario;
         private final Integer _statusCode;
         private final Exception _exception;
+        private final LocalDateTime _startTime;
         private final Duration _duration;
 
-        public Result(String name, Integer statusCode, Duration duration)
+        private Result(PerfScenario scenario, Integer statusCode, Exception exception, Timer timer)
         {
-            _name = name;
+            _scenario = scenario;
             _statusCode = statusCode;
-            _exception = null;
-            _duration = duration;
-        }
-
-        public Result(String name, Exception exception, Duration duration)
-        {
-            _name = name;
-            _statusCode = exception instanceof CommandException ce ? ce.getStatusCode() : null;
             _exception = exception;
-            _duration = duration;
+            _startTime = timer.getStartTime();
+            _duration = timer.elapsed();
         }
 
-        public String getName()
+        public Result(PerfScenario scenario, Integer statusCode, Timer stopWatch)
         {
-            return _name;
+            this(scenario, statusCode, null, stopWatch);
+        }
+
+        public Result(PerfScenario scenario, Exception exception, Timer stopWatch)
+        {
+            this(scenario, exception instanceof CommandException ce ? ce.getStatusCode() : null, exception, stopWatch);
+        }
+
+        public PerfScenario getScenario()
+        {
+            return _scenario;
         }
 
         public Integer getStatusCode()
@@ -153,9 +162,37 @@ public class JsonPerfScenarioHelper
             return _exception;
         }
 
+        public LocalDateTime getStartTime()
+        {
+            return _startTime;
+        }
+
         public Duration getDuration()
         {
             return _duration;
+        }
+    }
+
+    public static class RequestInfoTsvWriterWrapper implements Function<JsonPerfScenarioHelper.Result, JsonPerfScenarioHelper.Result>
+    {
+        private final AbstractScenario.TsvResultsWriter<RequestInfo> _requestInfoTsvWriter;
+        private final Map<String, String> _scenarioMetadata;
+
+        public RequestInfoTsvWriterWrapper(AbstractScenario.TsvResultsWriter<RequestInfo> requestInfoTsvWriter, Map<String, String> scenarioMetadata)
+        {
+            _requestInfoTsvWriter = requestInfoTsvWriter;
+            _scenarioMetadata = scenarioMetadata;
+        }
+
+        @Override
+        public JsonPerfScenarioHelper.Result apply(JsonPerfScenarioHelper.Result result)
+        {
+            Map<String, Object> values = new HashMap<>(_scenarioMetadata);
+            values.put(RequestInfoTsvWriter.REQUEST_URL, result.getScenario().getFileName());
+            values.put(RequestInfoTsvWriter.DURATION, result.getDuration().toMillis());
+            values.put(RequestInfoTsvWriter.START_TIME, result.getStartTime().toString());
+            _requestInfoTsvWriter.writeRow(RequestInfo.BLANK, values);
+            return result;
         }
     }
 }
