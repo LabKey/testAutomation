@@ -3,7 +3,6 @@ package org.labkey.test.util;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -11,12 +10,10 @@ import org.labkey.remoteapi.GuestCredentialsProvider;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
-import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.core.login.SetPasswordForm;
-import org.openqa.selenium.WebDriver;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
+import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
 /**
  * Bootstrap a server without the initial user validation done by {@link LabKeySiteWrapper#signIn()}
@@ -41,6 +39,11 @@ public class ApiBootstrapHelper
             createInitialUser();
             waitForBootstrap();
             new APIUserHelper(this::createDefaultConnection).setInjectionDisplayName(PasswordUtil.getUsername());
+            /*
+                    Waiting for search service to boot up
+                    Issue 50601: PDF indexing is slow on first file after server startup on Windows
+            */
+            SearchAdminAPIHelper.waitForSearchServiceBootstrap(getRemoteApiConnection());
         }
         else
         {
@@ -149,7 +152,8 @@ public class ApiBootstrapHelper
             {
                 lastException = e;
             }
-        } while (!timer.isTimedOut());
+        }
+        while (!timer.isTimedOut());
 
         throw new RuntimeException("Server didn't finish starting.", lastException);
     }
