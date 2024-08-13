@@ -43,7 +43,7 @@ public class RequestInfoTsvWriter implements AbstractScenario.TsvResultsWriter<R
             REQUEST_URL, RequestInfo::getUrl,
             START_TIME, RequestInfo::getDate,
             DURATION, RequestInfo::getDuration,
-            QUERY_COUNT, ri -> ri.getRoot() != null ? ri.getRoot().getCustomTimings().getOrDefault("sql", Collections.emptyList()) : null
+            QUERY_COUNT, ri -> ri.getRoot() != null ? ri.getRoot().getCustomTimings().getOrDefault("sql", Collections.emptyList()).size() : null
     );
 
     private final PrintWriter printWriter;

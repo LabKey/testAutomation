@@ -23,17 +23,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class MiniProfilerResultsCollector implements Simulation.ResultCollector<RequestInfo>
 {
     private final Connection _connection;
-    private final AbstractScenario.TsvResultsWriter<RequestInfo> _resultsWriter;
     private final String sessionId;
     private final long initialRequestId;
     private final AtomicBoolean lock = new AtomicBoolean(false);
     private final Map<Long, RequestInfo> requestInfos = new ConcurrentHashMap<>();
     private final AtomicInteger requestCount = new AtomicInteger(0);
 
-    public MiniProfilerResultsCollector(Connection connection, AbstractScenario.TsvResultsWriter<RequestInfo> resultsWriter)
+    public MiniProfilerResultsCollector(Connection connection)
     {
         _connection = connection;
-        _resultsWriter = resultsWriter;
         // Get initial request Id
         RequestsResponse sessionRequests = getRequestInfosFromServer();
         sessionId = sessionRequests.getSessionId();
@@ -41,13 +39,8 @@ public abstract class MiniProfilerResultsCollector implements Simulation.ResultC
         requestInfos.clear();
     }
 
-    public MiniProfilerResultsCollector(Connection connection)
-    {
-        this(connection, null);
-    }
-
     @Override
-    public void postRequest(Simulation.RequestResult requestResult) throws InterruptedException
+    public void submitResult(Simulation.RequestResult requestResult) throws InterruptedException
     {
         requestCount.incrementAndGet();
 

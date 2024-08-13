@@ -10,34 +10,35 @@ import org.labkey.remoteapi.miniprofiler.RequestsResponse;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This scenario uses the 'mini-profiler-recentRequests' API to collect request info for multiple simulations.<br>
+ * All simulations targeting a particular server will share a single data collector.<br>
+ * It is not fully implemented yet; {@link SessionDataScenario} should be used until such time as we discover a
+ * scenario that it doesn't work for.
+ */
 public class RecentRequestsScenario extends AbstractScenario<RequestInfo>
 {
-    private final Map<URI, RecentRequestsResultsCollector> requestGates = new ConcurrentHashMap<>();
+    private final Map<URI, RecentRequestsResultsCollector> resultsCollectors = new ConcurrentHashMap<>();
     private final Map<URI, Connection> miniProfilerConnections = new ConcurrentHashMap<>();
 
-    public RecentRequestsScenario(List<Simulation.Definition> simulationDefinitions)
+    /**
+     * @param simulationDefinitions Background simulation definitions
+     * @param miniProfilerConnections Sets {@link Connection}s to be used to collect {@link RequestInfo}s from server.
+     *                               There should be one per server. Any duplicates will be ignored.<br>
+     *                               When the scenario is started, if Simulations are found to target servers without a
+     *                               {@code Connection}, the {@code Connection} used by that simulation will be used to
+     *                               collect {@code RequestInfo}.
+     */
+    public RecentRequestsScenario(List<Simulation.Definition> simulationDefinitions, Connection... miniProfilerConnections)
     {
         super(simulationDefinitions);
-    }
-
-    @Override
-    public RecentRequestsScenario setBaselineDataCollectionDuration(Duration baselineDataCollectionDuration)
-    {
-        super.setBaselineDataCollectionDuration(baselineDataCollectionDuration);
-        return this;
-    }
-
-    public RecentRequestsScenario setMiniProfilerConnections(Connection... miniProfilerConnections)
-    {
         Arrays.stream(miniProfilerConnections).forEach(this::verifyAndAddMiniProfilerConnection);
-        return this;
     }
 
     private void verifyAndAddMiniProfilerConnection(Connection connection)
@@ -46,6 +47,7 @@ public class RecentRequestsScenario extends AbstractScenario<RequestInfo>
         {
             try
             {
+                // This action should make sure the connection can access recent requests from other users
                 new RecentRequestsCommand(Long.MAX_VALUE).execute(connection, null);
                 miniProfilerConnections.put(connection.getBaseURI(), connection);
             }
@@ -57,10 +59,10 @@ public class RecentRequestsScenario extends AbstractScenario<RequestInfo>
     }
 
     @Override
-    protected Simulation.ResultCollector<RequestInfo> getResultsCollector(Connection connection)
+    protected Simulation.ResultCollector<RequestInfo> getResultsCollectorForSimulation(Connection connection)
     {
         verifyAndAddMiniProfilerConnection(connection);
-        return requestGates.computeIfAbsent(connection.getBaseURI(), uri -> new RecentRequestsResultsCollector(miniProfilerConnections.get(connection.getBaseURI())));
+        return resultsCollectors.computeIfAbsent(connection.getBaseURI(), uri -> new RecentRequestsResultsCollector(miniProfilerConnections.get(connection.getBaseURI())));
     }
 
     public static class RecentRequestsResultsCollector extends MiniProfilerResultsCollector

@@ -57,7 +57,17 @@ public class Simulation<T>
     private final ResultCollector<T> _resultCollector;
     private final boolean _runOnce;
 
-    Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector, boolean runOnce)
+    /**
+     * Simulation will start running immediately upon instantiation. Created by {@link Definition#startSimulation()}
+     * @param connection connection used for simulation
+     * @param activities activities to cycle through
+     * @param delayBetweenActivities milliseconds to sleep between activities
+     * @param maximumActivityThreads maximum number of threads to split activities across. 6 simulates browser behavior
+     * @param resultCollector will be invoked after each request and at the end of the simulation
+     * @param runOnce Setting to true will cause the simulation to run once then stop
+     * @see Definition
+     */
+    private Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector, boolean runOnce)
     {
         _connection = connection;
         _activities = activities;
@@ -76,10 +86,17 @@ public class Simulation<T>
         return stopped.get();
     }
 
+    /**
+     * Stop simulation gracefully and return results
+     * @return results collected by {@link #_resultCollector}
+     */
     public Collection<T> collectResults()
     {
         simulationExecutor.shutdown();
-        stopped.set(true);
+        if (!_runOnce)
+        {
+            stopped.set(true);
+        }
         try
         {
             return _runningSimulation.get(60, TimeUnit.SECONDS);
@@ -90,6 +107,9 @@ public class Simulation<T>
         }
     }
 
+    /**
+     * Force simulation threads to terminate
+     */
     public void shutdownNow()
     {
         stopped.set(true);
@@ -97,6 +117,12 @@ public class Simulation<T>
         _activityExecutor.shutdownNow();
     }
 
+    /**
+     * Loops through activities until the simulation is {@link #stopped} or once if {@code _runOnce == true}.<br>
+     * Runs in a separate thread, submitted to {@link #simulationExecutor} in
+     * {@link #Simulation(Connection, List, int, int, ResultCollector, boolean)}
+     * @return simulation results collected by {@link #_resultCollector}
+     */
     private Collection<T> run() throws ExecutionException, InterruptedException
     {
         // Random sleep to stagger simulations
@@ -131,6 +157,11 @@ public class Simulation<T>
         return _resultCollector.getResults();
     }
 
+    /**
+     * Execute all requests in a given activity. Submits requests via a thread pool
+     * @param activity an activity definition
+     * @see Activity
+     */
     private void runActivity(Activity activity) throws ExecutionException, InterruptedException
     {
         List<Future<?>> futures = new ArrayList<>();
@@ -151,9 +182,13 @@ public class Simulation<T>
         }
     }
 
-    private void makeRequest(Activity.RequestParams testCase) throws InterruptedException
+    /**
+     * Make a single API request and submit the results to {@link #_resultCollector}
+     * @param requestParams parameters defining the API request
+     */
+    private void makeRequest(Activity.RequestParams requestParams) throws InterruptedException
     {
-        ApiTestCommand command = new ApiTestCommand(testCase);
+        ApiTestCommand command = new ApiTestCommand(requestParams);
         Timer timer = new Timer();
         int statusCode = 0;
         try
@@ -171,23 +206,43 @@ public class Simulation<T>
         }
         finally
         {
-            timer.stop();
-            _resultCollector.postRequest(new RequestResult(testCase, statusCode, timer, simulationMetadata));
+            _resultCollector.submitResult(new RequestResult(requestParams, statusCode, timer, simulationMetadata));
         }
     }
 
+    /**
+     * Builder class to define the parameters of a simulation
+     * <ul>
+     *     <li>
+     *         {@link #_connectionFactory} - used to generate an API connection for the simulation to use
+     *     </li>
+     *     <li>
+     *         {@link #activityDefinitions} - {@link Activity} list that defines the simulation. These are deserialized from {@link ApiTestsDocument} XML files.
+     *     </li>
+     *     <li>
+     *         {@link #maxActivityThreads} - the size of thread pool to use for requests
+     *     </li>
+     *     <li>
+     *         {@link #delayBetweenActivities} - the number of milliseconds to pause between activities
+     *     </li>
+     *     <li>
+     *         {@link #runOnce} - this will cause the simulation to stop after running through the activities once
+     *     </li>
+     * </ul>
+     * {@link #startSimulation(Function)} is the primary entry point once all parameters have been set
+     */
     public static class Definition
     {
-        private final Supplier<Connection> _connectionSupplier;
+        private final Supplier<Connection> _connectionFactory;
 
+        private List<Activity> activityDefinitions = Collections.emptyList();
         private int maxActivityThreads = 6; // This seems to be the number of parallel requests browsers handle
         private int delayBetweenActivities = 5_000;
-        private List<Activity> activityDefinitions = Collections.emptyList();
         private boolean runOnce = false;
 
-        public Definition(Supplier<Connection> connectionSupplier)
+        public Definition(Supplier<Connection> connectionFactory)
         {
-            _connectionSupplier = connectionSupplier;
+            _connectionFactory = connectionFactory;
         }
 
         public Definition(String baseUrl, String username, String password)
@@ -237,12 +292,18 @@ public class Simulation<T>
             return this;
         }
 
-        public <T> Simulation<T> startSimulation(Function<Connection, ResultCollector<T>> resultCollectorSupplier) throws IOException, CommandException
+        /**
+         * Start the simulation according to this definition
+         * @param resultCollectorFactory The simulation will submit results to the supplied {@link ResultCollector}
+         * @return the running simulation
+         * @param <T> type returned by {@link ResultCollector#collectResults()}
+         */
+        public <T> Simulation<T> startSimulation(Function<Connection, ResultCollector<T>> resultCollectorFactory) throws IOException, CommandException
         {
-            Connection connection = _connectionSupplier.get();
+            Connection connection = _connectionFactory.get();
             // Prime connection before starting simulation so that resultCollectorSupplier can know to ignore this request
             new WhoAmICommand().execute(connection, null);
-            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorSupplier.apply(connection), runOnce);
+            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorFactory.apply(connection), runOnce);
         }
 
         public Simulation<RequestResult> startSimulation() throws IOException, CommandException
@@ -302,18 +363,24 @@ public class Simulation<T>
 
     public interface ResultCollector<T>
     {
-        void postRequest(RequestResult requestResult) throws InterruptedException;
+        void submitResult(RequestResult requestResult) throws InterruptedException;
 
         @NotNull Collection<T> getResults();
     }
 
+    /**
+     * Allows simulations to run but ignores the results
+     */
     public static final ResultCollector<Void> RESULTS_NOOP = new ResultCollector<>(){
         @Override
-        public void postRequest(RequestResult requestResult) { }
+        public void submitResult(RequestResult requestResult) { }
         @Override
         public @NotNull Collection<Void> getResults() { return Collections.emptyList(); }
     };
 
+    /**
+     * Client-side request results
+     */
     public static class RequestResult
     {
         private final Activity.RequestParams _requestParams;

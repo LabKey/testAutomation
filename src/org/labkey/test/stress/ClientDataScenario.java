@@ -8,6 +8,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Collects perf data solely from client-side information
+ * @see AbstractScenario
+ */
 public class ClientDataScenario extends AbstractScenario<Simulation.RequestResult>
 {
     public ClientDataScenario(List<Simulation.Definition> simulationDefinitions)
@@ -16,7 +20,7 @@ public class ClientDataScenario extends AbstractScenario<Simulation.RequestResul
     }
 
     @Override
-    protected Simulation.ResultCollector<Simulation.RequestResult> getResultsCollector(Connection connection)
+    protected Simulation.ResultCollector<Simulation.RequestResult> getResultsCollectorForSimulation(Connection connection)
     {
         return new ClientSideResultsCollector(connection);
     }
@@ -28,7 +32,7 @@ public class ClientDataScenario extends AbstractScenario<Simulation.RequestResul
         public ClientSideResultsCollector(Connection ignored) { }
 
         @Override
-        public void postRequest(Simulation.RequestResult requestResult) throws InterruptedException
+        public void submitResult(Simulation.RequestResult requestResult) throws InterruptedException
         {
             results.add(requestResult);
         }

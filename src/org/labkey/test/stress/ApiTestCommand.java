@@ -6,8 +6,10 @@ import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.labkey.query.xml.TestCaseType;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -36,6 +38,11 @@ class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
         this(requestParams.getUrl(), requestParams.getType(), requestParams.getFormData());
     }
 
+    public ApiTestCommand(TestCaseType requestParams)
+    {
+        this(requestParams.getUrl(), requestParams.getType(), requestParams.getFormData());
+    }
+
     public CommandResponse execute(Connection connection) throws IOException, CommandException
     {
         return execute(connection, null);
@@ -58,7 +65,16 @@ class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
                 // Read entire response body and parse into JSON object
                 try (Reader reader = response.getReader())
                 {
-                    json = new JSONObject(new JSONTokener(reader));
+                    JSONTokener tokener = new JSONTokener(reader);
+                    if (tokener.nextClean() == '{')
+                    {
+                        json = new JSONObject(tokener);
+                    }
+                    else
+                    {
+                        json = new JSONObject();
+                        json.put("jsonArray", new JSONArray(tokener));
+                    }
                 }
                 catch (Exception ignore) { } // Some APIs return JSON that the Java API can't handle (e.g. 'product-menuSections.api')
             }

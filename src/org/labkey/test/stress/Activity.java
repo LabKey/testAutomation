@@ -2,19 +2,22 @@ package org.labkey.test.stress;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Activity: A single user action in the app (e.g. viewing the SM dashboard). These will often trigger numerous API calls.
+ * These are generally deserialized from {@link ApiTestsDocument} XML files.
+ * @see org.labkey.test.util.APITestHelper
  */
 public class Activity
 {
     private final String _name;
     private final List<RequestParams> _requests;
-    private final AtomicInteger debugCount = new AtomicInteger();
 
     Activity(String name, List<TestCaseType> requests)
     {
@@ -38,7 +41,7 @@ public class Activity
         Assertions.assertThat(_requests.stream().map(RequestParams::getName)).as("Request names").doesNotHaveDuplicates();
     }
 
-    public class RequestParams
+    public static class RequestParams
     {
         private final String _name;
         private final String _url;
@@ -50,7 +53,7 @@ public class Activity
             _name = testCase.getName().trim();
             // Add dummy '_test' parameter to differentiate similar requests in request logs
             String url = testCase.getUrl().trim();
-            String debugParam = (url.contains("?") ? "&" : "?") + "_test=" + debugCount.incrementAndGet();
+            String debugParam = (url.contains("?") ? "&" : "?") + "_test=" + URLEncoder.encode(_name, StandardCharsets.UTF_8);
             _url = url + debugParam;
             _type = testCase.getType().trim();
             _formData = StringUtils.trimToEmpty(testCase.getFormData());

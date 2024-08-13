@@ -176,18 +176,23 @@ public class JsonPerfScenarioHelper
     public static class RequestInfoTsvWriterWrapper implements Function<JsonPerfScenarioHelper.Result, JsonPerfScenarioHelper.Result>
     {
         private final AbstractScenario.TsvResultsWriter<RequestInfo> _requestInfoTsvWriter;
-        private final Map<String, String> _scenarioMetadata;
+        private final List<Map<String, ?>> _scenarioMetadata;
 
-        public RequestInfoTsvWriterWrapper(AbstractScenario.TsvResultsWriter<RequestInfo> requestInfoTsvWriter, Map<String, String> scenarioMetadata)
+        @SafeVarargs
+        public RequestInfoTsvWriterWrapper(AbstractScenario.TsvResultsWriter<RequestInfo> requestInfoTsvWriter, Map<String, ?>... scenarioMetadata)
         {
             _requestInfoTsvWriter = requestInfoTsvWriter;
-            _scenarioMetadata = scenarioMetadata;
+            _scenarioMetadata = List.of(scenarioMetadata);
         }
 
         @Override
         public JsonPerfScenarioHelper.Result apply(JsonPerfScenarioHelper.Result result)
         {
-            Map<String, Object> values = new HashMap<>(_scenarioMetadata);
+            Map<String, Object> values = new HashMap<>();
+            for (Map<String, ?> metadata : _scenarioMetadata)
+            {
+                values.putAll(metadata);
+            }
             values.put(RequestInfoTsvWriter.REQUEST_URL, result.getScenario().getFileName());
             values.put(RequestInfoTsvWriter.DURATION, result.getDuration().toMillis());
             values.put(RequestInfoTsvWriter.START_TIME, result.getStartTime().toString());

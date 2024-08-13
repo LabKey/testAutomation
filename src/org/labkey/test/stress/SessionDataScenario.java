@@ -15,13 +15,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This scenario uses the 'mini-profiler-sessionRequest' API to collect request info for multiple simulations.<br>
+ * Each simulation will have a separate results collector instance that will collect request info using that
+ * simulation's {@link Connection}, thus sharing its session ID.<br>
+ */
 public class SessionDataScenario extends AbstractScenario<RequestInfo>
 {
     private TsvResultsWriter<RequestInfo> resultsWriter;
 
-    public SessionDataScenario(List<Simulation.Definition> simulationDefinitions, String scenarioName, File resultsFile)
+    /**
+     * @see AbstractScenario#AbstractScenario(List, String, File)
+     */
+    public SessionDataScenario(List<Simulation.Definition> simulationDefinitions, String scenarioName, File resultsDir)
     {
-        super(simulationDefinitions, scenarioName, resultsFile);
+        super(simulationDefinitions, scenarioName, resultsDir);
     }
 
     public SessionDataScenario(List<Simulation.Definition> simulationDefinitions)
@@ -52,9 +60,9 @@ public class SessionDataScenario extends AbstractScenario<RequestInfo>
     }
 
     @Override
-    protected Simulation.ResultCollector<RequestInfo> getResultsCollector(Connection connection)
+    protected Simulation.ResultCollector<RequestInfo> getResultsCollectorForSimulation(Connection connection)
     {
-        return new SessionResultsCollector(connection, getResultsWriter(), getScenarioProperties());
+        return new SessionResultsCollector(connection, getResultsWriter(), getScenarioMetadata());
     }
 
     public static class SessionResultsCollector extends MiniProfilerResultsCollector
@@ -83,7 +91,7 @@ public class SessionDataScenario extends AbstractScenario<RequestInfo>
             if (_resultsWriter != null)
             {
                 _resultsWriter.writeRow(requestInfo, _metadata);
-                return RequestInfo.BLANK;
+                return RequestInfo.BLANK; // Don't store requestInfos in memory
             }
             else
             {
