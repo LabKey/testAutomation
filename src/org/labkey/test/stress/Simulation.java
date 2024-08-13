@@ -363,8 +363,15 @@ public class Simulation<T>
 
     public interface ResultCollector<T>
     {
+        /**
+         * Invoked after each request made by a simulation
+         */
         void submitResult(RequestResult requestResult) throws InterruptedException;
 
+        /**
+         * Invoked by a simulation after it has been stopped
+         * @return all results collected
+         */
         @NotNull Collection<T> getResults();
     }
 

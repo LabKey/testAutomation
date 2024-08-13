@@ -66,17 +66,19 @@ class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
                 try (Reader reader = response.getReader())
                 {
                     JSONTokener tokener = new JSONTokener(reader);
-                    if (tokener.nextClean() == '{')
+                    char firstChar = tokener.nextClean();
+                    tokener.back();
+                    if (firstChar == '{')
                     {
                         json = new JSONObject(tokener);
                     }
-                    else
+                    else if (firstChar == '[')
                     {
                         json = new JSONObject();
                         json.put("jsonArray", new JSONArray(tokener));
                     }
                 }
-                catch (Exception ignore) { } // Some APIs return JSON that the Java API can't handle (e.g. 'product-menuSections.api')
+                catch (Exception ignore) { }
             }
             if (json == null)
             {
