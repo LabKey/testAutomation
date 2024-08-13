@@ -301,7 +301,7 @@ public class Simulation<T>
         public <T> Simulation<T> startSimulation(Function<Connection, ResultCollector<T>> resultCollectorFactory) throws IOException, CommandException
         {
             Connection connection = _connectionFactory.get();
-            // Prime connection before starting simulation so that resultCollectorSupplier can know to ignore this request
+            // Prime connection before starting simulation to ensure credentials are good
             new WhoAmICommand().execute(connection, null);
             return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorFactory.apply(connection), runOnce);
         }

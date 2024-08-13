@@ -10,11 +10,11 @@ import org.labkey.test.util.TestLogger;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +41,7 @@ public abstract class AbstractScenario<T>
 
     private final String _scenarioUuid = UUID.randomUUID().toString();
     private final String _scenarioName;
-    private final List<Simulation<T>> _simulations = new ArrayList<>();
+    private final List<Simulation<T>> _simulations = new CopyOnWriteArrayList<>();
     private final List<Simulation.Definition> _simulationDefinitions;
     private final File _resultsFile;
 
