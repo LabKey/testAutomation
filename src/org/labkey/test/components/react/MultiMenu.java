@@ -59,7 +59,7 @@ public class MultiMenu extends BootstrapMenu
      */
     public boolean isMenuItemDisabled(String menuItem)
     {
-        return !getMenuItem(menuItem).isEnabled();
+        return getMenuItem(menuItem).getAttribute("class").contains("disabled");
     }
 
     /**
@@ -70,7 +70,7 @@ public class MultiMenu extends BootstrapMenu
      */
     public boolean isMenuItemUnderToggleDisabled(String toggle, String menuItem)
     {
-        return !getMenuItemUnderToggle(toggle, menuItem).isEnabled();
+        return getMenuItemUnderToggle(toggle, menuItem).getAttribute("class").contains("disabled");
     }
 
     /**
