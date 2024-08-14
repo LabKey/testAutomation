@@ -20,7 +20,6 @@ project.tasks.register("distribution", ModuleDistribution) {
         dist.description = "Make a LabKey modules distribution for 'test'"
 
         dist.subDirName = "test"
-        dist.includeTarGZArchive = true
         dist.embeddedArchiveType = "tar.gz"
         dist.extraFileIdentifier = '-test'
         dist.versionPrefix = 'Test'
