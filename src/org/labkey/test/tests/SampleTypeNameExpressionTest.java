@@ -72,6 +72,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_03 = "#parent03";
     private static final String PARENT_SAMPLE_04 = "#parent04";
     private static final String PARENT_SAMPLE_05 = "\"parent05";
+    private static final String PARENT_SAMPLE_06 = "parent,06";
 
     private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
 
@@ -148,6 +149,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 "Int", 5,
                 "Str", "Parent Sample E",
                 "Date", "12/28/2023");
+        dataGenerator.addCustomRow(sampleData);
+
+        sampleData = Map.of(
+                "name", PARENT_SAMPLE_06,
+                "Int", 6,
+                "Str", "Parent Sample F",
+                "Date", "12/31/2023");
         dataGenerator.addCustomRow(sampleData);
 
         dataGenerator.insertRows();
@@ -260,18 +268,19 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         log("generated sample names:");
         names.forEach(this::log);
 
-        assertEquals(8, names.size());
-        assertEquals(PARENT_SAMPLE_05 + "-child", names.get(0));
-        assertEquals("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_04 + "]-child", names.get(1));
-        assertEquals("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(2));
-        assertEquals(PARENT_SAMPLE_04 + "-child", names.get(3));
+        assertEquals(9, names.size());
+        assertEquals(PARENT_SAMPLE_06 + "-child", names.get(0));
+        assertEquals(PARENT_SAMPLE_05 + "-child", names.get(1));
+        assertEquals("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_04 + "]-child", names.get(2));
+        assertEquals("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(3));
+        assertEquals(PARENT_SAMPLE_04 + "-child", names.get(4));
 
         log("Verify importing tsv to create sample with # should work, as long as this is not the 1st field in the row");
         data = "Description\tName\n";
         data += "should succeed\t#RootSample1\n";
         sampleHelper.bulkImport(data);
         names = materialTable.getColumnDataAsText("Name");
-        assertEquals(9, names.size());
+        assertEquals(10, names.size());
         assertEquals("#RootSample1", names.get(0));
 
         log("Verify importing tsv to create sample should ignore lines starting with #");
