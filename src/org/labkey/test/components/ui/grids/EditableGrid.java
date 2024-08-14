@@ -1096,6 +1096,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public WebElement inputCell()
         {
+            // Wait for the input to appear because there are some cases where we type into a cell to trigger the input
+            // to appear, and then immediately try to type into the input and it may not be there.
+            Locators.inputCell.waitForElement(table, WAIT_FOR_JAVASCRIPT);
             return Locators.inputCell.findElement(table);
         }
 
