@@ -205,7 +205,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         if(found)
         {
-            multiMenu.doMenuAction(menuActions);
+            if (menuActions.size() == 1)
+                multiMenu.doMenuAction(menuActions.get(0));
+            else
+                multiMenu.doMenuAction(menuActions.get(0), menuActions.get(1));
         }
         else
         {
