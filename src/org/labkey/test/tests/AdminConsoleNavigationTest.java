@@ -2,14 +2,16 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebElement;
 
@@ -17,35 +19,64 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @Category({Git.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 3)
+@BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AdminConsoleNavigationTest extends BaseWebDriverTest
 {
+    private static final String TROUBLESHOOTER = "troubleshooter@adminconsolelinks.test";
+    private static final String NON_ADMIN = "nonadmin@adminconsolelinks.test";
+
+    public ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        AdminConsoleNavigationTest init = (AdminConsoleNavigationTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        _userHelper.createUser(TROUBLESHOOTER);
+        _apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, "Troubleshooter", PermissionsHelper.MemberType.user, "/");
+
+        _userHelper.createUser(NON_ADMIN);
+        _apiPermissionsHelper.setUserPermissions(NON_ADMIN, "Reader");
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        _userHelper.deleteUsers(false, TROUBLESHOOTER, NON_ADMIN);
+    }
+
     @Test
     public void testAdminNavTrails()
     {
         Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinks.addAll(List.of(
-            "LDAP Sync Admin",                  // An HTML view -- difficult to customize navtrail
-            "Authentication",                   // Slow to load
-            "Change User Properties",           // Generic domain action -- difficult to customize navtrail
-            "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
-            "Dump Heap",                        // Undesired consequences
-            "Memory Usage",                     // Slow to load
-            "Reset Site Errors",                // Undesired consequences
-            "Running Threads",                  // Undesired consequences
-            "View All Site Errors",             // No nav trail
-            "View All Site Errors Since Reset", // No nav trail
-            "View Primary Site Log File"        // No nav trail
+                "LDAP Sync Admin",                  // An HTML view -- difficult to customize navtrail
+                "Authentication",                   // Slow to load
+                "Change User Properties",           // Generic domain action -- difficult to customize navtrail
+                "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
+                "Dump Heap",                        // Undesired consequences
+                "Memory Usage",                     // Slow to load
+                "Reset Site Errors",                // Undesired consequences
+                "Running Threads",                  // Undesired consequences
+                "View All Site Errors",             // No nav trail
+                "View All Site Errors Since Reset", // No nav trail
+                "View Primary Site Log File"        // No nav trail
         ));
-        ShowAdminPage.beginAt(this);
-        WebElement adminLinksContainer = Locator.id("links").findElement(getDriver()); // Maybe put this in 'ShowAdminPage'
-        List<WebElement> adminLinks = Locator.tag("a").findElements(adminLinksContainer);
-        Assert.assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 10);
+        List<WebElement> adminLinks = ShowAdminPage.beginAt(this).getAllAdminConsoleLinks();
+        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 10);
         Map<String, String> linkHrefs = new HashMap<>();
 
         for (WebElement link : adminLinks)
@@ -71,7 +102,77 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         }
 
         pagesMissingNavTrail.sort(Comparator.naturalOrder());
-        Assert.assertTrue("The following " + pagesMissingNavTrail.size() + " pages are missing Admin Console navtrails:\n" + String.join("\n", pagesMissingNavTrail), pagesMissingNavTrail.isEmpty());
+        assertTrue("The following " + pagesMissingNavTrail.size() + " pages are missing Admin Console navtrails:\n" + String.join("\n",
+                pagesMissingNavTrail), pagesMissingNavTrail.isEmpty());
+    }
+
+    @Test
+    public void testTroubleshooterLinkAccess()
+    {
+        ShowAdminPage adminConsole = goToAdminConsole();
+        impersonate(TROUBLESHOOTER);
+        Map<String, String> linkHrefs = new LinkedHashMap<>();
+        List<WebElement> troubleshooterLinks = adminConsole.getAllAdminConsoleLinks();
+        for (WebElement link : troubleshooterLinks)
+            linkHrefs.put(link.getText(), link.getAttribute("href"));
+
+        for (Map.Entry<String, String> link : linkHrefs.entrySet())
+        {
+            if (!link.getKey().equalsIgnoreCase("SignUp")           //Signup link shows up to the troubleshooter but throws 403 while accessing it.
+                    && !link.getKey().equalsIgnoreCase("Profiler")) //Profiler can be edited by the troubleshooter
+            {
+                log("Verifying link " + link.getKey() + " with URL " + link.getValue());
+                verifyReadOnlyLinks(link.getKey(), link.getValue());
+            }
+        }
+        goToHome();
+        stopImpersonating();
+    }
+
+    @Test
+    public void testAdminConsoleLinksForAdminAndNonAdmin()
+    {
+        ShowAdminPage adminConsole = goToAdminConsole();
+        List<WebElement> adminLinks = adminConsole.getAllAdminConsoleLinks();
+        Map<String, String> linkHrefs = new LinkedHashMap<>();
+        for (WebElement link : adminLinks)
+            linkHrefs.put(link.getText(), link.getAttribute("href"));
+
+        log("Verifying links can be access by admin");
+        for (Map.Entry<String, String> link : linkHrefs.entrySet())
+        {
+            log("Verifying link " + link.getKey() + " with URL " + link.getValue());
+            verifyLinks(link.getKey(), link.getValue(), 200);
+        }
+
+        log("Verifying links cannot be access by non admin");
+        goToHome();
+        impersonate(NON_ADMIN);
+        for (Map.Entry<String, String> link : linkHrefs.entrySet())
+        {
+            if (!link.getKey().equalsIgnoreCase("merge sync admin") && !link.getKey().equalsIgnoreCase("Credits")) //Can be accessed by non admin
+            {
+                log("Verifying link " + link.getKey() + " with URL " + link.getValue());
+                verifyLinks(link.getKey(), link.getValue(), 403);
+            }
+        }
+        goToHome();
+        stopImpersonating();
+    }
+
+    private void verifyReadOnlyLinks(String text, String url)
+    {
+        beginAt(url);
+        Assert.assertEquals("URL " + url + " is broken for " + text, 200, getResponseCode());
+        Locator.XPathLocator updateButtonLoc = Locator.XPathLocator.union(
+                Locator.linkWithText("Submit"), Locator.linkWithText("Save"), Locator.linkWithText("Update"));
+        assertFalse("Either Save/Submit/Update button exists in the page " + text, isElementPresent(updateButtonLoc));
+    }
+
+    private void verifyLinks(String text, String url, int expectedResponseCode)
+    {
+        beginAt(url);
+        Assert.assertEquals("URL " + url + " is broken for " + text, expectedResponseCode, getResponseCode());
     }
 
     @Override
