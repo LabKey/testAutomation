@@ -33,10 +33,8 @@ import org.apache.hc.core5.http.ProtocolException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.labkey.api.data.dialect.DatabaseNotSupportedException;
 import org.labkey.remoteapi.CommandException;
@@ -72,6 +70,7 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
 import org.labkey.test.util.core.login.DbLoginUtils;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
@@ -80,7 +79,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -101,6 +99,7 @@ import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
+import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
@@ -722,33 +721,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     // Note: leave the self-report setting unchanged
                     customizeSitePage.save();
                 }
-
                 /*
                     Waiting for search service to boot up
                     Issue 50601: PDF indexing is slow on first file after server startup on Windows
-                 */
-                Connection connection = createDefaultConnection();
-                SimpleGetCommand command = new SimpleGetCommand("search", "json");
-                command.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
-                Timer timer = new Timer(Duration.ofMinutes(3));
-                do
-                {
-                    try
-                    {
-                        CommandResponse response = command.execute(connection, "/");
-                        if (response.getStatusCode() == 200) break; // Server is up, we can exit the loop
-                        else throw new RuntimeException("Search service did not start properly");
-                    }
-                    catch (IOException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                    catch (CommandException e)
-                    {
-                        sleep(500); //poll the re-request
-                    }
-                }
-                while (!timer.isTimedOut());
+                */
+                SearchAdminAPIHelper.waitForSearchServiceBootstrap(getRemoteApiConnection());
             }
             else // Just upgrading
             {
