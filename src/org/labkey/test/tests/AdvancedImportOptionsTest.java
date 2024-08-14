@@ -319,7 +319,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         pushLocation();
         impersonate(LIMITED_USER);
         clickFolder(IMPORT_FOLDER_MULTI01);
-        log("Get to the import page and validate that is looks as expected.");
+        log("Get to the import page and validate that it looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, false);
         importPage.setSelectSpecificImportOptions(true);
         importPage.setApplyToMultipleFoldersCheckBox(true);
