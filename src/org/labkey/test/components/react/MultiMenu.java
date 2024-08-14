@@ -40,44 +40,43 @@ public class MultiMenu extends BootstrapMenu
         return Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
     }
 
-    /*
-        finds the first menu item with the specified text
-     */
-    public WebElement getMenuItem(String text)
-    {
-        return Locators.menuItem().withText(text).waitForElement(getMenuList(), _menuWaitTmeout);
-    }
-
     /**
-     * Find the first item with specified text under the path of the
-     * @param menuText Text of the menu to expand
-     * @param itemText  Text of the item to find under its path
+     * finds the first menu item with the specified text.
+     * If there are duplicate items in the menu by text and the one you want isn't the first in the menu,
+     * consider using getMenuItemUnderToggle or getMenuItemUnderHeading
+     * @param menuItem Text of the intended menuItem
      * @return
      */
-    public WebElement getMenuItem(String menuText, String itemText)
+    public WebElement getMenuItem(String menuItem)
     {
-        return getItemUnderToggle(menuText, itemText);
+        return Locators.menuItem().withText(menuItem).waitForElement(getMenuList(), _menuWaitTmeout);
     }
 
     /**
      * Checks whether the specified menu item is disabled
-     * @param text Text of the menu item
-     * @return  true if class contains 'disabled'
+     * @param menuItem Text of the menu item
+     * @return  true if the item is not enabled
      */
-    public boolean isMenuItemDisabled(String text)
+    public boolean isMenuItemDisabled(String menuItem)
     {
-        return getMenuItem(text).getAttribute("class").toLowerCase().contains("disabled");
+        return !getMenuItem(menuItem).isEnabled();
     }
 
-    public boolean isMenuItemDisabled(String menuText, String itemText)
+    /**
+     * Checks whether the specified menu item is disabled
+     * @param toggle Text of the toggle under which to find the menu item
+     * @param menuItem  Text of the menu item
+     * @return  true if the item is not enabled
+     */
+    public boolean isMenuItemUnderToggleDisabled(String toggle, String menuItem)
     {
-        return getItemUnderToggle(menuText, itemText).getAttribute("class").toLowerCase().contains("disabled");
+        return !getMenuItemUnderToggle(toggle, menuItem).isEnabled();
     }
 
     /**
      * gets all list-items currently appearing in the menu.  This includes header and separator items,
-     * which are special and don't have links
-     * @return
+     * which are special and don't have links and can have classes other than lk-menu-item, such as divider
+     * @return all list-item elements in the menu-list container
      */
     protected List<WebElement> getListItems()
     {
@@ -100,13 +99,13 @@ public class MultiMenu extends BootstrapMenu
 
     /**
      *  Click a menu item under a menu
-     * @param toggleText Text of the menu to expand
+     * @param toggleText Text of the toggle to expand
      * @param menuAction Text of the menu item to click
      */
     public void doMenuAction(@LoggedParam String toggleText, @LoggedParam String menuAction)
     {
         expand();
-        clickItemUnderToggle(toggleText, menuAction);
+        clickMenuItemUnderToggle(toggleText, menuAction);
     }
 
     private List<WebElement> waitForData()
@@ -206,52 +205,52 @@ public class MultiMenu extends BootstrapMenu
         return menuText;
     }
 
-    /*
-       Finds and expands (if it is collapsed) a menu's dropdown-section toggle.
-       (Expanding a collapsed dropdown-section-toggle causes items hidden while collapsed
-       to be shown as dom peers after it in the list)
-    */
-    public WebElement expandToggle(String label)
+    /**
+     * Finds and expands (if collapsed) a menu's dropdown-section-toggle
+     * @param toggle Text of the toggle to expand
+     * @return  The toggle element
+     */
+    public WebElement expandToggle(String toggle)
     {
         expand();
         int listItemCount = getListItems().size();
 
         // find the toggle-item; it may be expanded already
-        WebElement toggle = Locators.menuToggle(label).waitForElement(this, 1000);
-        if (Locators.menuToggleClosed().existsIn(toggle))
+        WebElement toggleElement = Locators.menuToggle(toggle).waitForElement(this, 1000);
+        if (Locators.menuToggleClosed().existsIn(toggleElement))
         {
-            toggle.click(); // expand the toggle
-            WebDriverWrapper.waitFor(() ->
-                            Locator.tagWithClass("span", "fa-chevron-up").existsIn(toggle),
+            toggleElement.click(); // expand the toggle
+            WebDriverWrapper.waitFor(() -> Locators.menuToggleOpened().existsIn(toggleElement),
                     "the toggle-item did not expand in time", 1000);
             WebDriverWrapper.waitFor(()-> getListItems().size() > listItemCount,
                     "the list-items did not appear in the list after expanding", 1000);
         }
 
-        return toggle;
+        return toggleElement;
     }
 
     /**
-     * gets the names of dropdown-section__menu-items between a heading and the next divider
+     * gets the names of dropdown-section__menu-items between a heading and the next separator
      *
-     * @param heading
+     * @param heading Text of the lk-dropdown-header under which to find menu items
+     * @param collapse  whether to collapse the menu after
      * @return
      */
-    public List<String> getItemsUnderHeading(String heading, boolean collapse)
+    public List<String> getMenuItemsUnderHeading(String heading, boolean collapse)
     {
-        var itemTexts = getWrapper().getTexts(getItemsUnderHeading(heading));
+        var menuItemTexts = getWrapper().getTexts(getMenuItemsUnderHeading(heading));
         if (collapse)
             collapse();
-        return itemTexts;
+        return menuItemTexts;
     }
 
     /**
      * gets the dropdown-section__menu-items between a heading and the next separator
      *
-     * @param heading
+     * @param heading Text of the lk-dropdown-header under which to find menu items
      * @return
      */
-    protected List<WebElement> getItemsUnderHeading(String heading)
+    protected List<WebElement> getMenuItemsUnderHeading(String heading)
     {
         expandAll();
         boolean headingFound = false;
@@ -280,56 +279,55 @@ public class MultiMenu extends BootstrapMenu
         return itemsUnderHeading;
     }
 
-    private WebElement getItemUnderHeading(String toggleLabel, String label)
+    public WebElement getMenuItemUnderHeading(String heading, String menuItem)
     {
-        var itemsUnderHeading = getItemsUnderHeading(toggleLabel);
+        var itemsUnderHeading = getMenuItemsUnderHeading(heading);
         for (WebElement item : itemsUnderHeading)
         {
-            if (item.getText().trim().equals(label))
+            if (item.getText().trim().equals(menuItem))
                 return item;
         }
-        throw new NoSuchElementException("No item '" + label + "' under toggle '" + toggleLabel + "' found.");
+        throw new NoSuchElementException("No item '" + menuItem + "' under heading '" + heading + "' found.");
     }
 
     /**
      * Clicks the specified item under the specified heading
      *
      * @param heading heading under which to find the item
-     * @param label   text of the item
+     * @param menuItem   text of the menuItem
      */
-    public void clickItemUnderHeading(String heading, String label)
+    public void clickMenuItemUnderHeading(String heading, String menuItem)
     {
-        WebElement item = getItemUnderHeading(heading, label);
+        WebElement item = getMenuItemUnderHeading(heading, menuItem);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(item));
         item.click();
     }
 
     /**
-     * gets the names of dropdown-section__menu-items between a heading and the next divider
+     * gets the names of dropdown-section__menu-items between a toggle and the next toggle or divider
      *
-     * @param heading The text of the heading
+     * @param toggle The text of the toggle
      * @param collapse Whether to collapse the menu when finished
-     * @return
+     * @return texts of menu items under toggle
      */
-    public List<String> getItemsUnderToggle(String heading, boolean collapse)
+    public List<String> getMenuItemsUnderToggle(String toggle, boolean collapse)
     {
-        var itemTexts = getWrapper().getTexts(getItemsUnderToggle(heading));
+        var itemTexts = getWrapper().getTexts(getMenuItemsUnderToggle(toggle));
         if (collapse)
             collapse();
         return itemTexts;
     }
 
     /**
-     * Gets a list of dropdown-section__menu-items under a given toggle. For cases where the menu has duplicate
-     * menu-items and you need to select one under a specific toggle, use this to find it
+     * Gets a list of dropdown-section__menu-items under a given toggle.
      *
-     * @param label Text of the toggle item
+     * @param toggle Text of the toggle item
      * @return A list of menu items under the specified toggle.
      */
-    protected List<WebElement> getItemsUnderToggle(String label)
+    protected List<WebElement> getMenuItemsUnderToggle(String toggle)
     {
         expand();
-        expandToggle(label);
+        expandToggle(toggle);
         waitForData();
 
         List<WebElement> itemsUnderToggle = new ArrayList<>();
@@ -343,7 +341,7 @@ public class MultiMenu extends BootstrapMenu
             String className = item.getAttribute("class");
             String text = item.getText().trim();
 
-            if (className.contains("dropdown-section-toggle") && text.equalsIgnoreCase(label))
+            if (className.contains("dropdown-section-toggle") && text.equalsIgnoreCase(toggle))
                 headingFound = true;
 
             // Once we've found our toggle we know that all dropdown-section__menu-item elements belong to the heading
@@ -352,34 +350,39 @@ public class MultiMenu extends BootstrapMenu
                 itemsUnderToggle.add(item);
 
             // Once we hit another divider or another toggle we're done looking at menu items related to the toggle, so we can stop iterating
-            if (headingFound && !text.equalsIgnoreCase(label) && className.contains("dropdown-section-toggle"))
+            if (headingFound && !text.equalsIgnoreCase(toggle) && className.contains("dropdown-section-toggle"))
                 break;
         }
 
         return itemsUnderToggle;
     }
 
-    private WebElement getItemUnderToggle(String toggleLabel, String label)
+    /**
+     * Gets the first menu item with the specified text under the specifed toggle
+     * @param toggle    Text of the toggle to expand
+     * @param menuItem  Text of the menu-item to get
+     * @return  The menu-item element, if found
+     */
+    public WebElement getMenuItemUnderToggle(String toggle, String menuItem)
     {
-        waitForData();
-        var itemsUnderToggle = getItemsUnderToggle(toggleLabel);
+        var itemsUnderToggle = getMenuItemsUnderToggle(toggle);
         for (WebElement item : itemsUnderToggle)
         {
-            if (item.getText().trim().equals(label))
+            if (item.getText().trim().equals(menuItem))
                 return item;
         }
-        throw new NoSuchElementException("No item '" + label + "' under toggle '" + toggleLabel + "' found.");
+        throw new NoSuchElementException("No item '" + menuItem + "' under toggle '" + toggle + "' found.");
     }
 
     /**
      * clicks the dropdown-section__menu_item under the specified toggle
      *
-     * @param toggleLabel text of the toggle under which to find the item
-     * @param label       text of the item to click
+     * @param toggle text of the toggle under which to find the item
+     * @param menuItem       text of the item to click
      */
-    protected void clickItemUnderToggle(String toggleLabel, String label)
+    protected void clickMenuItemUnderToggle(String toggle, String menuItem)
     {
-        var item = getItemUnderToggle(toggleLabel, label);
+        var item = getMenuItemUnderToggle(toggle, menuItem);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(item));
         item.click();
     }
@@ -425,17 +428,23 @@ public class MultiMenu extends BootstrapMenu
         }
 
         // finds a menu-item that is also an expand/collapse, by name
-        public static Locator.XPathLocator menuToggle(String text)
+        public static Locator.XPathLocator menuToggle(String toggle)
         {
             return Locator.tagWithClass("li", "dropdown-section-toggle")
                     .withDescendant(Locator.tagWithClass("span", "dropdown-section-toggle__text")
-                            .withText(text));
+                            .withText(toggle));
         }
 
         // finds the chevron-down span in a menuToggle, if present
         public static Locator.XPathLocator menuToggleClosed()
         {
             return Locator.tagWithClass("span", "fa-chevron-down");
+        }
+
+        // finds the chevron-up span in a menuToggle, if present
+        public static Locator.XPathLocator menuToggleOpened()
+        {
+            return Locator.tagWithClass("span", "fa-chevron-up");
         }
     }
 

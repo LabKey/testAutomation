@@ -207,8 +207,10 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         {
             if (menuActions.size() == 1)
                 multiMenu.doMenuAction(menuActions.get(0));
-            else
+            else if (menuActions.size() == 2)
                 multiMenu.doMenuAction(menuActions.get(0), menuActions.get(1));
+            else
+                throw new IllegalArgumentException("There should be either 1 or 2 menu actions, but was:" + menuActions);
         }
         else
         {
