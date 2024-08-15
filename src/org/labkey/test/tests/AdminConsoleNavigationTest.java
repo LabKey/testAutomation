@@ -109,6 +109,16 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     @Test
     public void testTroubleshooterLinkAccess()
     {
+        Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        ignoredLinks.addAll(List.of(
+                "SignUp",                   //link shows up to the troubleshooter but throws 403 while accessing it.
+                "Notebook Settings",        //link shows up to the troubleshooter but throws 403 while accessing it.
+                "Puppeteer Service",        //link shows up to the troubleshooter but throws 403 while accessing it.
+                "Dump Heap",                // Undesired consequences
+                "Reset Site Errors",        // Undesired consequences
+                "Running Threads",          // Undesired consequences
+                "Profiler"                  //Profiler can be edited by the troubleshooter
+        ));
         ShowAdminPage adminConsole = goToAdminConsole();
         impersonate(TROUBLESHOOTER);
         Map<String, String> linkHrefs = new LinkedHashMap<>();
@@ -118,8 +128,9 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
 
         for (Map.Entry<String, String> link : linkHrefs.entrySet())
         {
-            if (!link.getKey().equalsIgnoreCase("SignUp")           //Signup link shows up to the troubleshooter but throws 403 while accessing it.
-                    && !link.getKey().equalsIgnoreCase("Profiler")) //Profiler can be edited by the troubleshooter
+            if (ignoredLinks.contains(link.getKey()))
+                TestLogger.log("Skipping admin link: " + link.getKey());
+            else
             {
                 log("Verifying link " + link.getKey() + " with URL " + link.getValue());
                 verifyReadOnlyLinks(link.getKey(), link.getValue());
@@ -132,25 +143,47 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     @Test
     public void testAdminConsoleLinksForAdminAndNonAdmin()
     {
+        Set<String> ignoredLinksNonAdmin = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        ignoredLinksNonAdmin.addAll(List.of(
+                "Merge sync admin",     //Can be accessed by non admin
+                "Dump Heap",            // Undesired consequences
+                "Reset Site Errors",    // Undesired consequences
+                "Running Threads",      // Undesired consequences
+                "Credits"               //Can be accessed by non admin
+        ));
+
+        Set<String> ignoredLinksAdmin = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        ignoredLinksAdmin.addAll(List.of(
+                "Dump Heap",            // Undesired consequences
+                "Reset Site Errors",    // Undesired consequences
+                "Running Threads"      // Undesired consequences
+        ));
         ShowAdminPage adminConsole = goToAdminConsole();
         List<WebElement> adminLinks = adminConsole.getAllAdminConsoleLinks();
         Map<String, String> linkHrefs = new LinkedHashMap<>();
         for (WebElement link : adminLinks)
             linkHrefs.put(link.getText(), link.getAttribute("href"));
 
-        log("Verifying links can be access by admin");
+        log("Verifying links can be accessed by admin");
         for (Map.Entry<String, String> link : linkHrefs.entrySet())
         {
-            log("Verifying link " + link.getKey() + " with URL " + link.getValue());
-            verifyLinks(link.getKey(), link.getValue(), 200);
+            if (ignoredLinksAdmin.contains(link.getKey()))
+                TestLogger.log("Skipping admin link: " + link.getKey());
+            else
+            {
+                log("Verifying link " + link.getKey() + " with URL " + link.getValue());
+                verifyLinks(link.getKey(), link.getValue(), 200);
+            }
         }
 
-        log("Verifying links cannot be access by non admin");
+        log("Verifying links cannot be accessed by non admin");
         goToHome();
         impersonate(NON_ADMIN);
         for (Map.Entry<String, String> link : linkHrefs.entrySet())
         {
-            if (!link.getKey().equalsIgnoreCase("merge sync admin") && !link.getKey().equalsIgnoreCase("Credits")) //Can be accessed by non admin
+            if (ignoredLinksNonAdmin.contains(link.getKey()))
+                TestLogger.log("Skipping admin link: " + link.getKey());
+            else
             {
                 log("Verifying link " + link.getKey() + " with URL " + link.getValue());
                 verifyLinks(link.getKey(), link.getValue(), 403);
