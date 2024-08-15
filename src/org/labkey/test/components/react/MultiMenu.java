@@ -49,6 +49,8 @@ public class MultiMenu extends BootstrapMenu
      */
     public WebElement getMenuItem(String menuItem)
     {
+        expand();
+        waitForData();
         return Locators.menuItem().withText(menuItem).waitForElement(getMenuList(), _menuWaitTmeout);
     }
 
@@ -91,7 +93,6 @@ public class MultiMenu extends BootstrapMenu
     @LogMethod(quiet = true)
     public void doMenuAction(@LoggedParam String menuAction)
     {
-        expand();
         var item = getMenuItem(menuAction);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(item));
         item.click();
@@ -104,7 +105,6 @@ public class MultiMenu extends BootstrapMenu
      */
     public void doMenuAction(@LoggedParam String toggleText, @LoggedParam String menuAction)
     {
-        expand();
         clickMenuItemUnderToggle(toggleText, menuAction);
     }
 
@@ -213,6 +213,7 @@ public class MultiMenu extends BootstrapMenu
     public WebElement expandToggle(String toggle)
     {
         expand();
+        waitForData();
         int listItemCount = getListItems().size();
 
         // find the toggle-item; it may be expanded already
@@ -326,8 +327,6 @@ public class MultiMenu extends BootstrapMenu
      */
     protected List<WebElement> getMenuItemsUnderToggle(String toggle)
     {
-        expand();
-        waitForData();
         expandToggle(toggle);
 
         List<WebElement> itemsUnderToggle = new ArrayList<>();
