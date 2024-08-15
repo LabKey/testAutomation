@@ -327,8 +327,8 @@ public class MultiMenu extends BootstrapMenu
     protected List<WebElement> getMenuItemsUnderToggle(String toggle)
     {
         expand();
-        expandToggle(toggle);
         waitForData();
+        expandToggle(toggle);
 
         List<WebElement> itemsUnderToggle = new ArrayList<>();
 
