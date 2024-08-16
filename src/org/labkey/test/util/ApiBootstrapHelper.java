@@ -13,15 +13,16 @@ import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
+import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
 
 /**
  * Bootstrap a server without the initial user validation done by {@link LabKeySiteWrapper#signIn()}
@@ -38,6 +39,11 @@ public class ApiBootstrapHelper
             createInitialUser();
             waitForBootstrap();
             new APIUserHelper(this::createDefaultConnection).setInjectionDisplayName(PasswordUtil.getUsername());
+            /*
+                    Waiting for search service to boot up
+                    Issue 50601: PDF indexing is slow on first file after server startup on Windows
+            */
+            SearchAdminAPIHelper.waitForSearchServiceBootstrap(getRemoteApiConnection());
         }
         else
         {
@@ -129,12 +135,6 @@ public class ApiBootstrapHelper
     {
         Connection cn = WebTestHelper.getRemoteApiConnection(false);
         SimpleGetCommand command = new SimpleGetCommand("admin", "startupStatus");
-        /*
-            Waiting for search service to boot up
-            Issue 50601: PDF indexing is slow on first file after server startup on Windows
-         */
-        SimpleGetCommand searchCmd = new SimpleGetCommand("search", "json");
-        searchCmd.setParameters(Map.of("q", "pinging to check server is started", "scope", "All"));
         Exception lastException = null;
 
         Timer timer = new Timer(Duration.ofMinutes(5));
@@ -143,8 +143,7 @@ public class ApiBootstrapHelper
             try
             {
                 CommandResponse response = command.execute(cn, null);
-                CommandResponse searchResponse = searchCmd.execute(cn, "/");
-                if ((Boolean) response.getParsedData().getOrDefault("startupComplete", false) && searchResponse.getStatusCode() == 200)
+                if ((Boolean) response.getParsedData().getOrDefault("startupComplete", false))
                 {
                     return;
                 }
