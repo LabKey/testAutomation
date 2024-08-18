@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -199,7 +200,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         Assert.assertEquals("URL " + url + " is broken for " + text, 200, getResponseCode());
         Locator.XPathLocator updateButtonLoc = Locator.XPathLocator.union(
                 Locator.linkWithText("Submit"), Locator.linkWithText("Save"), Locator.linkWithText("Update"));
-        checker().withScreenshot("Failed_" + text).verifyFalse("Either Save/Submit/Update button exists in the page " + text, isElementPresent(updateButtonLoc));
+        assertFalse("Either Save/Submit/Update button exists in the page " + text, isElementPresent(updateButtonLoc));
     }
 
     private void verifyLinks(String text, String url, int expectedResponseCode)
