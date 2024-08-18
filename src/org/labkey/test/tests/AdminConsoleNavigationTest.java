@@ -199,7 +199,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         Assert.assertEquals("URL " + url + " is broken for " + text, 200, getResponseCode());
         Locator.XPathLocator updateButtonLoc = Locator.XPathLocator.union(
                 Locator.linkWithText("Submit"), Locator.linkWithText("Save"), Locator.linkWithText("Update"));
-        checker().verifyFalse("Either Save/Submit/Update button exists in the page " + text, isElementPresent(updateButtonLoc));
+        checker().withScreenshot("Failed_" + text).verifyFalse("Either Save/Submit/Update button exists in the page " + text, isElementPresent(updateButtonLoc));
     }
 
     private void verifyLinks(String text, String url, int expectedResponseCode)
