@@ -6,15 +6,21 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -135,6 +140,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
             {
                 log("Verifying link " + link.getKey() + " with URL " + link.getValue());
                 verifyReadOnlyLinks(link.getKey(), link.getValue());
+                verifyPostCommandFails(link.getValue());
             }
         }
         goToHome();
@@ -199,8 +205,31 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         beginAt(url);
         Assert.assertEquals("URL " + url + " is broken for " + text, 200, getResponseCode());
         Locator.XPathLocator updateButtonLoc = Locator.XPathLocator.union(
-                Locator.linkWithText("Submit"), Locator.linkWithText("Save"), Locator.linkWithText("Update"));
+                Locator.linkWithText("Submit"), Locator.linkWithText("Save"), Locator.linkWithText("Update")).notHidden();
         assertFalse("Either Save/Submit/Update button exists in the page " + text, isElementPresent(updateButtonLoc));
+    }
+
+    private void verifyPostCommandFails(String url)
+    {
+        String[] actionController = url.substring(url.lastIndexOf('/') + 1).split("-");
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        SimplePostCommand command = new SimplePostCommand(actionController[0], actionController[1]);
+        try
+        {
+            command.execute(connection, getCurrentContainerPath());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (CommandException e)
+        {
+            Assert.assertEquals("Post command should not go through", 404, e.getStatusCode());
+        }
+        catch (JavascriptException e)
+        {
+            return; //Do nothing for admin-showAllErrors.view for error LABKEY is not defined
+        }
     }
 
     private void verifyLinks(String text, String url, int expectedResponseCode)
