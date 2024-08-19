@@ -6,6 +6,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class SampleTypeAPIHelper
 {
@@ -65,6 +67,55 @@ public class SampleTypeAPIHelper
                 new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
     }
 
+    public static Map<Integer, String> getSortedRowIdToSamplesMap(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
+    {
+        Connection connection = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
+        cmd.setColumns(Arrays.asList("RowId", "Name"));
+        cmd.addFilter("Name", String.join(";", sampleNames), Filter.Operator.IN);
+        cmd.addSort("RowId", Sort.Direction.ASCENDING);
+
+        SelectRowsResponse response = cmd.execute(connection, containerPath);
+
+        String errorMsg = "The sample names returned from the query do not match the sample names sent in.";
+
+        // There have been some TC failures where selectRows is not returning anything when it should. Adding this
+        // logging to help get more logging when/if it happens again.
+        if(response.getRowCount().intValue() == 0)
+        {
+            cmd = new SelectRowsCommand("samples", sampleTypeName);
+            cmd.setColumns(Arrays.asList("Name"));
+
+            SelectRowsResponse responseCount = cmd.execute(connection, containerPath);
+
+            errorMsg = errorMsg + "\n" + String.format("No rows were returned with filter. The sample type '%s' has %d rows.",
+                    sampleTypeName, responseCount.getRowCount().intValue());
+
+            List<String> names = new ArrayList<>();
+            for(Map<String, Object> row : responseCount.getRows())
+            {
+                Object tempName = row.get("Name");
+                names.add(tempName.toString());
+            }
+
+            errorMsg = errorMsg + "\n Sample Names: " + names;
+        }
+
+        Map<Integer, String> rowIds = new TreeMap<>();
+
+        for(Map<String, Object> row : response.getRows())
+        {
+            Object name = row.get("Name");
+            Object value = row.get("RowId");
+            rowIds.put(Integer.parseInt(value.toString()), name.toString());
+        }
+
+        // Check that the names returned from the query match the names sent in.
+        Assert.assertEquals(errorMsg,
+                new HashSet<>(sampleNames), new HashSet<>(rowIds.values()));
+
+        return rowIds;
+    }
     /**
      * Given a folder name, the name of a sample type, and a list of sample names return the list of row ids.
      * Row ids are useful when interacting with a sample/sample type using the command apis.
@@ -109,7 +160,7 @@ public class SampleTypeAPIHelper
             errorMsg = errorMsg + "\n Sample Names: " + names;
         }
 
-        Map<String, Integer> rowIds = new HashMap<>();
+        Map<String, Integer> rowIds = new TreeMap<>();
 
         for(Map<String, Object> row : response.getRows())
         {
