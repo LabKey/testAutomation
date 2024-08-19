@@ -2,6 +2,7 @@ package org.labkey.test.stress;
 
 import org.labkey.remoteapi.miniprofiler.RequestInfo;
 import org.labkey.serverapi.writer.PrintWriters;
+import org.labkey.test.util.TestDataUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,6 +48,7 @@ public class RequestInfoTsvWriter implements AbstractScenario.TsvResultsWriter<R
     );
 
     private final PrintWriter printWriter;
+    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter();
 
     public RequestInfoTsvWriter(File file) throws FileNotFoundException
     {
@@ -90,8 +92,7 @@ public class RequestInfoTsvWriter implements AbstractScenario.TsvResultsWriter<R
                 value = REQUEST_INFO_MAPPER.get(field).apply(ri);
             }
 
-            if (value != null)
-                row.append(value);
+            row.append(_tsvQuoter.quoteValue(value));
         }
         return row.toString();
     }

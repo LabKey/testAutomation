@@ -54,7 +54,7 @@ public class SessionDataScenario extends AbstractScenario<RequestInfo>
     }
 
     @Override
-    protected void afterDone()
+    protected void afterComplete()
     {
         Optional.ofNullable(getResultsWriter()).ifPresent(TsvResultsWriter::close);
     }

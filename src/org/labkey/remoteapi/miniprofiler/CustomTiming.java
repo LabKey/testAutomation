@@ -17,10 +17,10 @@ public class CustomTiming
      */
 
     private final String message;
-    private final Long duration;
+    private final long duration;
     private final String stackTrace;
     private final String detailsURL;
-    private final Long startOffset;
+    private final long startOffset;
 
     public CustomTiming(JSONObject json)
     {
@@ -35,5 +35,30 @@ public class CustomTiming
     {
         return StreamSupport.stream(array.spliterator(), false)
                 .map(o -> new CustomTiming((JSONObject)o)).toList();
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public long getDuration()
+    {
+        return duration;
+    }
+
+    public String getStackTrace()
+    {
+        return stackTrace;
+    }
+
+    public String getDetailsURL()
+    {
+        return detailsURL;
+    }
+
+    public long getStartOffset()
+    {
+        return startOffset;
     }
 }

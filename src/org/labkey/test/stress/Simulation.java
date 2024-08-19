@@ -92,11 +92,7 @@ public class Simulation<T>
      */
     public Collection<T> collectResults()
     {
-        simulationExecutor.shutdown();
-        if (!_runOnce)
-        {
-            stopped.set(true);
-        }
+        stopSimulation();
         try
         {
             return _runningSimulation.get(60, TimeUnit.SECONDS);
@@ -105,12 +101,29 @@ public class Simulation<T>
         {
             throw new RuntimeException(e);
         }
+        finally
+        {
+            forceShutdown();
+        }
+    }
+
+    /**
+     * Stop simulation gracefully. Allows parallel simulation shutdown without waiting for results yet
+     */
+    public void stopSimulation()
+    {
+        simulationExecutor.shutdown();
+        if (!_runOnce)
+        {
+            // Let the simulation finish all activities if it is set to run once
+            stopped.set(true);
+        }
     }
 
     /**
      * Force simulation threads to terminate
      */
-    public void shutdownNow()
+    public void forceShutdown()
     {
         stopped.set(true);
         simulationExecutor.shutdownNow();
@@ -147,7 +160,7 @@ public class Simulation<T>
                 }
                 catch (Exception e)
                 {
-                    shutdownNow();
+                    forceShutdown();
                     throw e;
                 }
             }

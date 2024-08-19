@@ -2,19 +2,21 @@ package org.labkey.test.stress;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.remoteapi.CommandException;
+import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -103,52 +105,45 @@ public abstract class AbstractScenario<T>
 
     /**
      * Starts all background simulations and waits for them to collect some baseline performance data
-     * @throws InterruptedException thrown by {@link Thread#sleep(long)}
      * @see #setBaselineDataCollectionDuration(Duration)
      */
-    public final void startScenario() throws InterruptedException
+    public final void startScenario()
     {
-        if (state != ScenarioState.READY)
-        {
-            throw new IllegalStateException("Unable to start scenario, already " + state);
-        }
+        ensureState("start", ScenarioState.READY);
+
         state = ScenarioState.STARTING;
         TestLogger.log("Starting %d background simulations".formatted(_simulationDefinitions.size()));
         try
         {
-            _simulationDefinitions.parallelStream().forEach(definition -> {
-                try
-                {
-                    _simulations.add(definition.startSimulation(this::getResultsCollectorForSimulation));
-                }
-                catch (IOException | CommandException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-        catch (Exception e)
-        {
-            stopBackgroundSimulations();
-            throw new RuntimeException("Failed to start simulation", e);
-        }
-
-        if (baselineDataCollectionDuration.toMillis() > 0)
-        {
-            TestLogger.log("Letting background simulations run for %s to collect baseline performance data"
-                    .formatted(TestDateUtils.durationString(baselineDataCollectionDuration)));
-            Thread.sleep(baselineDataCollectionDuration.toMillis());
-        }
-
-        // Verify that simulations haven't already errored out
-        for (Simulation<?> simulation : _simulations)
-        {
-            if (simulation.isStopped())
+            ExecutorService simulationStartService = Executors.newCachedThreadPool();
+            for (Simulation.Definition definition : _simulationDefinitions)
             {
-                // Something probably went wrong. This should throw an error.
-                stopBackgroundSimulations();
+                simulationStartService.submit(() -> _simulations.add(definition.startSimulation(this::getResultsCollectorForSimulation)));
+            }
+            simulationStartService.shutdown();
+            if (!simulationStartService.awaitTermination(2, TimeUnit.MINUTES))
+            {
+                simulationStartService.shutdownNow();
+            }
+            Assert.assertEquals("Some simulation(s) failed to start", _simulationDefinitions.size(), _simulations.size());
+
+            if (baselineDataCollectionDuration.toMillis() > 0)
+            {
+                TestLogger.log("Letting background simulations run for %s to collect baseline performance data"
+                        .formatted(TestDateUtils.durationString(baselineDataCollectionDuration)));
+                Thread.sleep(baselineDataCollectionDuration.toMillis());
+            }
+
+            // Verify that simulations haven't already errored out
+            if (_simulations.stream().anyMatch(Simulation::isStopped))
+            {
                 throw new IllegalStateException("Background simulation(s) stopped prematurely");
             }
+        }
+        catch (Throwable e)
+        {
+            shutdownNow();
+            throw new RuntimeException("Failed to start scenario", e);
         }
 
         state = ScenarioState.RUNNING;
@@ -170,34 +165,48 @@ public abstract class AbstractScenario<T>
      */
     public final Set<T> finishScenario() throws InterruptedException
     {
-        state = ScenarioState.FINISHING;
-        if (!_simulations.isEmpty())
+        ensureState("stop", ScenarioState.RUNNING);
+
+        try
         {
+            state = ScenarioState.FINISHING;
             if (baselineDataCollectionDuration.toMillis() > 0)
             {
                 TestLogger.log("Allow background simulations to collect baseline performance data before terminating");
                 Thread.sleep(baselineDataCollectionDuration.toMillis());
             }
             TestLogger.log("Stop background simulations");
+            return collectResults();
         }
-        return stopBackgroundSimulations();
+        catch (Throwable t)
+        {
+            shutdownNow();
+            throw t;
+        }
     }
 
     /**
      * Stop all background simulations gracefully
      * @return Combined results of all simulations
      */
-    private Set<T> stopBackgroundSimulations()
+    private Set<T> collectResults()
     {
-        state = ScenarioState.FINISHING;
+        ensureState("collect results from", ScenarioState.RUNNING, ScenarioState.COMPLETE, ScenarioState.FINISHING);
         try
         {
-            return _simulations.parallelStream().flatMap(simulation -> simulation.collectResults().stream()).collect(Collectors.toSet());
+            _simulations.parallelStream().forEach(Simulation::stopSimulation);
+            Set<T> results = _simulations.parallelStream().flatMap(simulation -> simulation.collectResults().stream()).collect(Collectors.toSet());
+            state = ScenarioState.COMPLETE;
+            return results;
+        }
+        catch (Throwable t)
+        {
+            shutdownNow();
+            throw t;
         }
         finally
         {
-            state = ScenarioState.DONE;
-            afterDone();
+            afterComplete();
         }
     }
 
@@ -209,12 +218,12 @@ public abstract class AbstractScenario<T>
         state = ScenarioState.FINISHING;
         try
         {
-            _simulations.parallelStream().forEach(Simulation::shutdownNow);
+            _simulations.parallelStream().forEach(Simulation::forceShutdown);
         }
         finally
         {
-            state = ScenarioState.DONE;
-            afterDone();
+            state = ScenarioState.SHUTDOWN;
+            afterComplete();
         }
     }
 
@@ -222,27 +231,24 @@ public abstract class AbstractScenario<T>
      * Called after stopping background simulations (gracefully or not).<br>
      * Allows cleanup such as closing output streams.
      */
-    protected void afterDone() { }
+    protected void afterComplete() { }
+
+    private void ensureState(String action, ScenarioState... expectedStates)
+    {
+        if (!List.of(expectedStates).contains(state))
+        {
+            throw new IllegalStateException("Unable to " + action + " scenario, it is " + state);
+        }
+    }
 
     public enum ScenarioState
     {
-        READY(false),
-        STARTING(true),
-        RUNNING(true),
-        FINISHING(true),
-        DONE(false);
-
-        private final boolean _active;
-
-        ScenarioState(boolean active)
-        {
-            _active = active;
-        }
-
-        public boolean isActive()
-        {
-            return _active;
-        }
+        READY,
+        STARTING,
+        RUNNING,
+        FINISHING,
+        SHUTDOWN,
+        COMPLETE;
     }
 
     public interface TsvResultsWriter<T>

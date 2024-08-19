@@ -74,6 +74,7 @@ class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
                     }
                     else if (firstChar == '[')
                     {
+                        // Some APIs return JSON that the Java API can't handle (e.g. 'product-menuSections.api')
                         json = new JSONObject();
                         json.put("jsonArray", new JSONArray(tokener));
                     }

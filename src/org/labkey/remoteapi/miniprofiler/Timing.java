@@ -26,8 +26,8 @@ public class Timing
 
     private final String name;
     private final String id;
-    private final Long duration;
-    private final Long durationExclusive;
+    private final long duration;
+    private final long durationExclusive;
     private final List<Timing> children;
     private final JSONObject objects;
     private final Map<String, List<CustomTiming>> customTimings;
