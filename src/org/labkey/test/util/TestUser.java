@@ -4,7 +4,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.core.login.SetPasswordForm;
 
 import java.io.IOException;
 
@@ -67,14 +66,22 @@ public class TestUser
      */
     public TestUser setInitialPassword()
     {
-        return setPassword(PasswordUtil.getPassword());
+        if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
+        {
+            _password = _apiUserHelper.setInitialPassword(_email);
+        }
+        else
+        {
+            throw new IllegalStateException("User " +_email+ "has already selected a password.");
+        }
+        return this;
     }
 
     /**
      * Uses the UI to reset the randomly-generated password a user gets when created, by following the reset link they'll
      * receive in mail. Also stores the provided password in the bean for later use.
      *  Note: this can only be done once for a given user account
-     * @param password  The password
+     * @param password  The password (ignored)
      * @return  The current instance
      * @deprecated There is no need to specify a particular password for most test scenarios.
      *  Such scenarios should not use this class.
@@ -83,18 +90,7 @@ public class TestUser
     @Deprecated (since = "24.6")
     public TestUser setPassword(String password)
     {
-        if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
-        {
-            SetPasswordForm.goToInitialPasswordForUser(getWrapper(), _email)
-                    .setNewPassword(password)
-                    .clickSubmit();
-        }
-        else
-        {
-            throw new IllegalStateException("User " +_email+ "has already selected a password.");
-        }
-        _password = password;
-        return this;
+        return setInitialPassword();
     }
 
     public String getPassword()
