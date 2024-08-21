@@ -75,6 +75,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Change User Properties",           // Generic domain action -- difficult to customize navtrail
                 "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
                 "Dump Heap",                        // Undesired consequences
+                "Reset Site Errors",                // Undesired consequences
                 "Memory Usage",                     // Slow to load
                 "View All Site Errors",             // No nav trail
                 "View All Site Errors Since Reset", // No nav trail
@@ -218,10 +219,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         catch (CommandException e)
         {
             Assert.assertEquals("Post command should not go through", 403, e.getStatusCode());
-        }
-        catch (JavascriptException e)
-        {
-            return; //Do nothing for admin-showAllErrors.view for error LABKEY is not defined
         }
     }
 
