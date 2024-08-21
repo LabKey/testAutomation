@@ -15,6 +15,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.JavascriptException;
@@ -75,8 +76,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
                 "Dump Heap",                        // Undesired consequences
                 "Memory Usage",                     // Slow to load
-                "Reset Site Errors",                // Undesired consequences
-                "Running Threads",                  // Undesired consequences
                 "View All Site Errors",             // No nav trail
                 "View All Site Errors Since Reset", // No nav trail
                 "View Primary Site Log File"        // No nav trail
@@ -96,7 +95,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         {
             if (ignoredLinks.contains(link.getKey()))
             {
-                TestLogger.log("Skipping admin link: " + link.getKey());
+                log("Skipping admin link: " + link.getKey());
             }
             else
             {
@@ -121,8 +120,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Notebook Settings",        //link shows up to the troubleshooter but throws 403 while accessing it.
                 "Puppeteer Service",        //link shows up to the troubleshooter but throws 403 while accessing it.
                 "Dump Heap",                // Undesired consequences
-                "Reset Site Errors",        // Undesired consequences
-                "Running Threads",          // Undesired consequences
                 "Profiler"                  //Profiler can be edited by the troubleshooter
         ));
         ShowAdminPage adminConsole = goToAdminConsole();
@@ -139,7 +136,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
             else
             {
                 log("Verifying link " + link.getKey() + " with URL " + link.getValue());
-                verifyReadOnlyLinks(link.getKey(), link.getValue());
+                verifyReadOnlyLink(link.getKey(), link.getValue());
                 verifyPostCommandFails(link.getValue());
             }
         }
@@ -154,16 +151,12 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         ignoredLinksNonAdmin.addAll(List.of(
                 "Merge sync admin",     //Can be accessed by non admin
                 "Dump Heap",            // Undesired consequences
-                "Reset Site Errors",    // Undesired consequences
-                "Running Threads",      // Undesired consequences
                 "Credits"               //Can be accessed by non admin
         ));
 
         Set<String> ignoredLinksAdmin = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinksAdmin.addAll(List.of(
-                "Dump Heap",            // Undesired consequences
-                "Reset Site Errors",    // Undesired consequences
-                "Running Threads"      // Undesired consequences
+                "Dump Heap"           // Undesired consequences
         ));
         ShowAdminPage adminConsole = goToAdminConsole();
         List<WebElement> adminLinks = adminConsole.getAllAdminConsoleLinks();
@@ -179,7 +172,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
             else
             {
                 log("Verifying link " + link.getKey() + " with URL " + link.getValue());
-                verifyLinks(link.getKey(), link.getValue(), 200);
+                verifyLink(link.getKey(), link.getValue(), 200);
             }
         }
 
@@ -193,14 +186,14 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
             else
             {
                 log("Verifying link " + link.getKey() + " with URL " + link.getValue());
-                verifyLinks(link.getKey(), link.getValue(), 403);
+                verifyLink(link.getKey(), link.getValue(), 403);
             }
         }
         goToHome();
         stopImpersonating();
     }
 
-    private void verifyReadOnlyLinks(String text, String url)
+    private void verifyReadOnlyLink(String text, String url)
     {
         beginAt(url);
         Assert.assertEquals("URL " + url + " is broken for " + text, 200, getResponseCode());
@@ -211,12 +204,12 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
 
     private void verifyPostCommandFails(String url)
     {
-        String[] actionController = url.substring(url.lastIndexOf('/') + 1).split("-");
+        Crawler.ControllerActionId controllerActionId = new Crawler.ControllerActionId(url);
         Connection connection = WebTestHelper.getRemoteApiConnection();
-        SimplePostCommand command = new SimplePostCommand(actionController[0], actionController[1]);
+        SimplePostCommand command = new SimplePostCommand(controllerActionId.getController(), controllerActionId.getAction());
         try
         {
-            command.execute(connection, getCurrentContainerPath());
+            command.execute(connection, "/");
         }
         catch (IOException e)
         {
@@ -224,7 +217,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Post command should not go through", 404, e.getStatusCode());
+            Assert.assertEquals("Post command should not go through", 403, e.getStatusCode());
         }
         catch (JavascriptException e)
         {
@@ -232,7 +225,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         }
     }
 
-    private void verifyLinks(String text, String url, int expectedResponseCode)
+    private void verifyLink(String text, String url, int expectedResponseCode)
     {
         beginAt(url);
         Assert.assertEquals("URL " + url + " is broken for " + text, expectedResponseCode, getResponseCode());
