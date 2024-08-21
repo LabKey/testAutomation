@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -74,7 +75,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "SampleTypeExportFolderTest";
     private static final String IMPORT_PROJECT_NAME = "SampleTypeImportFolderTest";
 
-    protected final static File CREST_2_FILE = TestFileUtils.getSampleData("InlineImages/crest-2.png");
+    protected final static File SAMPLE_TXT_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
 
 
     @Override
@@ -577,7 +578,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         DataRegionTable sourceSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
         sourceSamplesTable.clickEditRow(1);
         waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
-        setFormElement(Locator.tagWithAttribute("input", "type", "file"), CREST_2_FILE);
+        setFormElement(Locator.tagWithAttribute("input", "type", "file"), SAMPLE_TXT_FILE);
         clickAndWait(Locator.lkButton("Submit"));
 
         goToProjectFolder(getProjectName(), subfolder);
@@ -682,7 +683,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         // verify sample file are round-tripped as expected
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
         clickAndWait(Locator.linkWithText(testSamples));
-        assertElementPresent("Did not find the expected number of icons for images for " + CREST_2_FILE.getName() + " from the imported samples.", Locator.xpath("//img[contains(@title, '" + CREST_2_FILE.getName() + "')]"), 1);
+        File downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
+        assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " from the imported samples.", Locator.tagContainingText("a", "sample.txt"), 1);
+        checker().verifyTrue("Incorrect file content for sample.txt after folder import", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
     }
 
 

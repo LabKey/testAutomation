@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -89,7 +90,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     private final File RUN04_XLSX_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run4.xlsx");
 
     protected final static File HELP_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
-    protected final static File CREST_2_FILE = TestFileUtils.getSampleData("InlineImages/crest-2.png");
+    protected final static File SAMPLE_TXT_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
     protected final static File SCREENSHOT_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
 
     private final String RUN01_NAME = "Run01";
@@ -392,7 +393,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         runProperties.add(Maps.of("name", RUN04_NAME, "comments", COMMENT_BASIC_01 + RUN04_NAME, "instrumentSetting", INSTRUMENT_SETTING_01));
 
         log("Populate the assay '" + SIMPLE_ASSAY_FOR_EXPORT + "' by using files in the Files WebPart.");
-        populateAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, runFiles, batchProperties, runProperties, CREST_2_FILE);
+        populateAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, runFiles, batchProperties, runProperties, SAMPLE_TXT_FILE);
 
         log("Add a new field that has a missing value indicator.");
         addNewField(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, new FieldDefinition("missingValue", FieldDefinition.ColumnType.String).setMvEnabled(true));
@@ -451,7 +452,9 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN01_NAME));
 
-        assertElementPresent("Did not find the expected number of icons for images for " + CREST_2_FILE.getName() + " from the imported runs.", Locator.xpath("//img[contains(@title, '" + CREST_2_FILE.getName() + "')]"), 1);
+        File downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
+        assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " from the imported run.", Locator.tagContainingText("a", "sample.txt"), 1);
+        checker().verifyTrue("Incorrect file content for sample.txt after folder import", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
 
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, run01ColumnData);
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN04_NAME, run04ColumnData);
@@ -567,8 +570,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN02_NAME));
         clickAndWait(Locator.linkWithText(RUN02_NAME));
-        assertElementPresent("Did not find the expected number of icons for images (referenced, relative path) for " + HELP_FILE.getName() + " from the imported results.", Locator.xpath("//img[contains(@title, '" + HELP_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images (uploaded, full path) for " + SCREENSHOT_FILE.getName() + " from the imported results.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images (referenced, relative path) for " + HELP_FILE.getName() + " from the imported results.", Locator.xpath("//a//img[contains(@title, '" + HELP_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images (uploaded, full path) for " + SCREENSHOT_FILE.getName() + " from the imported results.", Locator.xpath("//a//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN03_NAME, run03ColumnData);
 
     }
