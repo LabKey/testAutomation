@@ -145,6 +145,7 @@ public abstract class AbstractUserHelper
 
     public abstract void ensureUsersExist(List<String> userEmails);
     public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
+    public abstract String setInitialPassword(String email);
     protected abstract void _deleteUser(String userEmail);
     protected abstract void _deleteUsers(boolean failIfNotFound, String... userEmails);
 }

@@ -238,6 +238,7 @@ public abstract class AbstractContainerHelper
                 fail(moduleName + " module was not found. Check that the module is installed and the server is on a supported database." + supportedDbMessage);
             }
         }
+        _test.scrollIntoView(Locator.tagWithId("div","UpdateFolderButtonDiv"));
         _test.clickButton("Update Folder");
     }
 

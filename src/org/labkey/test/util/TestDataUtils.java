@@ -1,6 +1,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.serverapi.reader.TabLoader;
 
 import java.io.IOException;
@@ -36,13 +37,13 @@ public class TestDataUtils
     public static String tsvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
                                               boolean includeHeaders)
     {
-        return toTabular(rowMaps, columns, "\t", includeHeaders);
+        return toTabular(rowMaps, columns, '\t', includeHeaders);
     }
 
     public static String csvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
                                               boolean includeHeaders)
     {
-        return toTabular(rowMaps, columns, ",", includeHeaders);
+        return toTabular(rowMaps, columns, ',', includeHeaders);
     }
 
 
@@ -100,27 +101,93 @@ public class TestDataUtils
      * @return
      */
     private static String toTabular(List<Map<String, Object>> rowMaps, List<String> columns,
-                                    String delimiter, boolean includeHeaders)
+                                    char delimiter, boolean includeHeaders)
     {
         StringBuilder builder = new StringBuilder();
 
         if (includeHeaders)
         {
-            builder.append(String.join(delimiter, columns));
+            builder.append(String.join(String.valueOf(delimiter), columns));
             builder.append("\n");
         }
+
+        TsvQuoter q = new TsvQuoter(delimiter);
 
         for (Map<String, Object> row : rowMaps)
         {
             List<String> values = new ArrayList<>();
             for (String name : columns)
             {
-                Object value = row.get(name);
-                values.add(value != null ? String.valueOf(value) : "");
+                String value = q.quoteValue(row.get(name));
+                values.add(value);
             }
-            builder.append(String.join(delimiter, values));
+            builder.append(String.join(String.valueOf(delimiter), values));
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    /**
+     * Used to quote values to be written to a TSV file
+     * @see org.labkey.api.data.TSVWriter
+     */
+    public static class TsvQuoter
+    {
+        private static final char _chQuote = '"';
+        private final char[] _escapedChars;
+
+        public TsvQuoter(char delimiterChar)
+        {
+            _escapedChars = new char[] {'\r', '\n', _chQuote, delimiterChar};
+        }
+
+        public TsvQuoter()
+        {
+            this('\t');
+        }
+
+        public String quoteValue(Object o)
+        {
+            if (o == null)
+                return "";
+
+            String value = o.toString();
+
+            String escaped = value;
+            if (shouldQuote(value))
+            {
+                StringBuilder sb = new StringBuilder(value.length() + 10);
+                sb.append(_chQuote);
+                int i;
+                int lastMatch = 0;
+
+                while (-1 != (i = value.indexOf(_chQuote, lastMatch)))
+                {
+                    sb.append(value, lastMatch, i);
+                    sb.append(_chQuote).append(_chQuote);
+                    lastMatch = i + 1;
+                }
+
+                if (lastMatch < value.length())
+                    sb.append(value.substring(lastMatch));
+
+                sb.append(_chQuote);
+                escaped = sb.toString();
+            }
+
+            return escaped;
+        }
+
+        protected boolean shouldQuote(String value)
+        {
+            int len = value.length();
+            if (len == 0)
+                return false;
+            char firstCh = value.charAt(0);
+            char lastCh = value.charAt(len - 1);
+            if (Character.isSpaceChar(firstCh) || Character.isSpaceChar(lastCh))
+                return true;
+            return StringUtils.containsAny(value, _escapedChars);
+        }
     }
 }
