@@ -1,5 +1,8 @@
 package org.labkey.test.util;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -52,5 +55,29 @@ public class TestDateUtils
     public static Date buildDate(int year, int month, int dayOfMonth)
     {
         return new Calendar.Builder().setDate(year, month - 1, dayOfMonth).build().getTime();
+    }
+
+    /**
+     * Remove the leading "PT" from {@link Duration#toString()}
+     * @param duration duration value
+     * @return Human-readable duration string
+     */
+    public static String durationString(Duration duration)
+    {
+        if (duration == null)
+            return null;
+        else
+            return duration.toString().replace("PT", "");
+    }
+
+    private static final DateTimeFormatter fileDateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+
+    /**
+     * Get a string representing the current time, appropriate for uniquifying file names
+     * @return The current time, formatted like "yyyy_MM_dd_HH_mm"
+     */
+    public static String dateTimeFileName()
+    {
+        return fileDateFormat.format(LocalDateTime.now());
     }
 }

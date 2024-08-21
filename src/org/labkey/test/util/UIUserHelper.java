@@ -20,6 +20,7 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.pages.security.AddUsersPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.pages.user.UpdateUserDetailsPage;
@@ -196,5 +197,16 @@ public class UIUserHelper extends AbstractUserHelper
         getWrapper().clickButton("Deactivate");
         getWrapper().clickButton("Deactivate");
         getWrapper().assertTextNotPresent(userEmail);
+    }
+
+    @Override
+    public String setInitialPassword(String user)
+    {
+        String password = PasswordUtil.getPassword();
+        SetPasswordForm.goToInitialPasswordForUser(getWrapper(), user)
+                .setNewPassword(password)
+                .clickSubmit();
+
+        return password;
     }
 }
