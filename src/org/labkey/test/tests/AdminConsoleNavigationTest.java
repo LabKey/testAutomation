@@ -75,7 +75,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Change User Properties",           // Generic domain action -- difficult to customize navtrail
                 "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
                 "Dump Heap",                        // Undesired consequences
-                "Reset Site Errors",                // Undesired consequences
+                "Reset Site Errors",                // No nav trail
                 "Memory Usage",                     // Slow to load
                 "View All Site Errors",             // No nav trail
                 "View All Site Errors Since Reset", // No nav trail
@@ -117,9 +117,9 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     {
         Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinks.addAll(List.of(
-                "SignUp",                   //link shows up to the troubleshooter but throws 403 while accessing it.
-                "Notebook Settings",        //link shows up to the troubleshooter but throws 403 while accessing it.
-                "Puppeteer Service",        //link shows up to the troubleshooter but throws 403 while accessing it.
+                "SignUp",                   //Issue 51100: SignUp link from admin console shows up to the troubleshooter but throws 403 while accessing it.
+                "Notebook Settings",        //Issue 51099: Notebook Settings and Puppeteer Service admin console link show up for troubleshooter but throws 403 while accessing it.
+                "Puppeteer Service",
                 "Dump Heap",                // Undesired consequences
                 "Profiler"                  //Profiler can be edited by the troubleshooter
         ));
@@ -150,7 +150,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     {
         Set<String> ignoredLinksNonAdmin = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinksNonAdmin.addAll(List.of(
-                "Merge sync admin",     //Can be accessed by non admin
+                "Merge sync admin",     //Issue 51114: Merge Sync Admin link can seen to Non admin roles
                 "Dump Heap",            // Undesired consequences
                 "Credits"               //Can be accessed by non admin
         ));
