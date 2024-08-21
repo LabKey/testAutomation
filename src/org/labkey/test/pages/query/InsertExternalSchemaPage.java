@@ -3,6 +3,7 @@ package org.labkey.test.pages.query;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +33,12 @@ public class InsertExternalSchemaPage extends LabKeyPage<InsertExternalSchemaPag
         return this;
     }
 
+    public InsertExternalSchemaPage setEditable(boolean enable)
+    {
+        elementCache().editableCheckbox.set(enable);
+        return this;
+    }
+
     public InsertExternalSchemaPage setDataSource(String dataSourceName)
     {
         _extHelper.selectComboBoxItem("Data Source:", dataSourceName);
@@ -40,7 +47,7 @@ public class InsertExternalSchemaPage extends LabKeyPage<InsertExternalSchemaPag
 
     public InsertExternalSchemaPage setSourceSchema(String sourceSchemaName)
     {
-        elementCache().sourceSchemaNameCombo.set(sourceSchemaName);
+        _extHelper.selectComboBoxItem("Database Schema Name :", sourceSchemaName);
         return this;
     }
 
@@ -55,6 +62,22 @@ public class InsertExternalSchemaPage extends LabKeyPage<InsertExternalSchemaPag
         clickAndWait(elementCache().createButton);
     }
 
+    public void clickUpdate()
+    {
+        clickAndWait(elementCache().updateButton);
+    }
+
+    public void clickDelete()
+    {
+        clickAndWait(elementCache().deleteButton);
+        clickButton("Delete"); // Confirmation page
+    }
+
+    public void clickCancel()
+    {
+        clickAndWait(elementCache().cancelButton);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -64,11 +87,11 @@ public class InsertExternalSchemaPage extends LabKeyPage<InsertExternalSchemaPag
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         Input userSchemaNameInput = Input.Input(Locator.name("userSchemaName"), getDriver()).findWhenNeeded();
-        //Input dataSourceCombo = Input.Input(Locator.name("dataSource"), getDriver()).findWhenNeeded(this);
-        Input sourceSchemaNameCombo = Input.Input(Locator.name("sourceSchemaName"), getDriver()).findWhenNeeded(this);
         Input metaDataInput = Input.Input(Locator.name("metaData"), getDriver()).findWhenNeeded();
-
+        Checkbox editableCheckbox = Checkbox.Checkbox(Locator.id("myeditable")).findWhenNeeded(this);
         WebElement createButton = Locator.button("Create").findWhenNeeded(this);
+        WebElement updateButton = Locator.button("Update").findWhenNeeded(this);
+        WebElement deleteButton = Locator.button("Delete").findWhenNeeded(this);
         WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
     }
 }
