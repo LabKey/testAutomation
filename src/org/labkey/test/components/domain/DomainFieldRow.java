@@ -201,6 +201,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
     }
 
+    public boolean isRemoveFieldBtnPresent()
+    {
+        return elementCache().removeFieldLoc.existsIn(this);
+    }
+
     public DomainFieldRow setAdvancedSettings(List<AdvancedFieldSetting> settings)
     {
         if (!settings.isEmpty())
