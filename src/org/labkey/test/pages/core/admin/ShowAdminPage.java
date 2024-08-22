@@ -226,6 +226,13 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().creditsLink);
     }
 
+    public List<WebElement> getAllAdminConsoleLinks()
+    {
+        goToSettingsSection();
+        WebElement adminLinksContainer = Locator.id("links").findElement(getDriver());
+        return Locator.tag("a").findElements(adminLinksContainer);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
