@@ -928,6 +928,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public String getValueExpression()
+    {
+        if (!isExpanded())
+            expand();
+
+        return getWrapper().getFormElement(elementCache().expressionInput);
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
