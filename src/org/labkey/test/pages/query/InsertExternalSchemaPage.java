@@ -39,9 +39,22 @@ public class InsertExternalSchemaPage extends LabKeyPage<InsertExternalSchemaPag
         return this;
     }
 
+    public InsertExternalSchemaPage showSystemSchemas()
+    {
+        elementCache().systemSchemasCheckbox.check();
+        return this;
+    }
+
     public InsertExternalSchemaPage setDataSource(String dataSourceName)
     {
         _extHelper.selectComboBoxItem("Data Source:", dataSourceName);
+        return this;
+    }
+
+    public InsertExternalSchemaPage setSourceSystemSchema(String sourceSchemaName)
+    {
+        showSystemSchemas();
+        _extHelper.selectComboBoxItem("Database Schema Name :", sourceSchemaName);
         return this;
     }
 
@@ -88,6 +101,7 @@ public class InsertExternalSchemaPage extends LabKeyPage<InsertExternalSchemaPag
     {
         Input userSchemaNameInput = Input.Input(Locator.name("userSchemaName"), getDriver()).findWhenNeeded();
         Input metaDataInput = Input.Input(Locator.name("metaData"), getDriver()).findWhenNeeded();
+        Checkbox systemSchemasCheckbox = Checkbox.Checkbox(Locator.id("myincludeSystem")).findWhenNeeded(this);
         Checkbox editableCheckbox = Checkbox.Checkbox(Locator.id("myeditable")).findWhenNeeded(this);
         WebElement createButton = Locator.button("Create").findWhenNeeded(this);
         WebElement updateButton = Locator.button("Update").findWhenNeeded(this);
