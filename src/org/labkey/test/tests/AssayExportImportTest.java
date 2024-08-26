@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -88,6 +89,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
     private final File RUN04_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run4.xls");
     private final File RUN04_XLSX_FILE = new File(SAMPLE_DATA_LOCATION, "GenericAssay_Run4.xlsx");
 
+    protected final static File HELP_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
+    protected final static File SAMPLE_TXT_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
+    protected final static File SCREENSHOT_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
+
     private final String RUN01_NAME = "Run01";
     private final String RUN02_NAME = "Run02";
     private final String RUN03_NAME = "Run03";
@@ -140,13 +145,17 @@ public class AssayExportImportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private Integer createSimpleProjectAndAssay(String projectName, String assayName) throws IOException, CommandException
+    private Integer createSimpleProjectAndAssay(String projectName, String assayName, boolean hasRunFileField, boolean hasResultFileField) throws IOException, CommandException
     {
         final String PERL_SCRIPT = "modifyColumnInAssayRun.pl";
 
         log("Create a project named: '" + projectName + "' with an assay named: '" + assayName + "'.");
 
         _containerHelper.createProject(projectName, "Assay");
+
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(HELP_FILE);
+
         goToProjectHome(projectName);
 
         Connection cn = createDefaultConnection();
@@ -166,8 +175,13 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 .setDescription("The diagnostic test instrument."));
 
         Domain runDomain = domains.get("Run Fields");
-        runDomain.getFields().add(new FieldDefinition("instrumentSetting", ColumnType.Integer)
+        List<PropertyDescriptor>  runFields = runDomain.getFields();
+        runFields.add(new FieldDefinition("instrumentSetting", ColumnType.Integer)
                 .setDescription("The configuration setting on the instrument."));
+        if (hasRunFileField)
+            runFields.add(new FieldDefinition("runFileField", ColumnType.File)
+                .setDescription("File for the run."));
+        domains.get("Run Fields").setFields(runFields);
 
         InferDomainCommand inferDomainCommand = new InferDomainCommand(RUN01_FILE, "Assay");
         InferDomainResponse inferDomainResponse = inferDomainCommand.execute(cn, projectName);
@@ -176,6 +190,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
 
         List<PropertyDescriptor> resultsFields = new ArrayList<>(inferredResultsFields);
         resultsFields.add(new FieldDefinition("adjustedM1", FieldDefinition.ColumnType.Integer));
+        if (hasResultFileField)
+            resultsFields.add(new FieldDefinition("resultFileField", ColumnType.File));
         domains.get("Data Fields").setFields(resultsFields);
 
         return new SaveProtocolCommand(protocol).execute(cn, projectName).getProtocol().getProtocolId();
@@ -195,7 +211,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         assayDesignerPage.clickFinish();
     }
 
-    public void populateAssay(String projectName, String assayName, boolean useFilesWebPart, List<File> runFiles, @Nullable Map<String, String> batchProperties, @Nullable List<Map<String, String>> runProperties)
+    public void populateAssay(String projectName, String assayName, boolean useFilesWebPart, List<File> runFiles, @Nullable Map<String, String> batchProperties, @Nullable List<Map<String, String>> runProperties, @Nullable File runFieldFile)
     {
 
         goToProjectHome(projectName);
@@ -231,9 +247,16 @@ public class AssayExportImportTest extends BaseWebDriverTest
         waitForElement(Locator.lkButton("Save and Finish"));
 
         int fileIndex = 0;
+        int runInd = 0;
         for(Map<String, String> runProperty : runProperties)
         {
             runProperty.keySet().forEach((property)->setFormElement(Locator.name(property), runProperty.get(property)));
+
+            if (runFieldFile != null && runInd == 0) // set file field for just one run for testing purpose
+            {
+                waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
+                setFormElement(Locator.tagWithAttribute("input", "type", "file"), runFieldFile);
+            }
 
             if(!useFilesWebPart)
             {
@@ -256,6 +279,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
                     waitForElement(Locator.tagWithName("input", "instrumentSetting"));
                 }
             }
+
+            runInd++;
         }
 
         clickAndWait(Locator.lkButton("Save and Finish"));
@@ -349,7 +374,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         final String INSTRUMENT_SETTING_01 = "456";
         final String COMMENT_BASIC_01 = "This is a comment for run where the data was imported by the FileWeb Part. This is for run: ";
 
-        createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT);
+        createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, false);
 
         List<File> runFiles = Arrays.asList(
                 RUN01_XLSX_FILE,
@@ -368,7 +393,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         runProperties.add(Maps.of("name", RUN04_NAME, "comments", COMMENT_BASIC_01 + RUN04_NAME, "instrumentSetting", INSTRUMENT_SETTING_01));
 
         log("Populate the assay '" + SIMPLE_ASSAY_FOR_EXPORT + "' by using files in the Files WebPart.");
-        populateAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, runFiles, batchProperties, runProperties);
+        populateAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, runFiles, batchProperties, runProperties, SAMPLE_TXT_FILE);
 
         log("Add a new field that has a missing value indicator.");
         addNewField(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, new FieldDefinition("missingValue", FieldDefinition.ColumnType.String).setMvEnabled(true));
@@ -427,6 +452,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
         waitForElement(Locator.linkWithText(RUN01_NAME));
 
+        File downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
+        assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " from the imported run.", Locator.tagContainingText("a", "sample.txt"), 1);
+        checker().verifyTrue("Incorrect file content for sample.txt after folder import", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
+
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN01_NAME, run01ColumnData);
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_01, SIMPLE_ASSAY_FOR_EXPORT, RUN04_NAME, run04ColumnData);
 
@@ -440,11 +469,11 @@ public class AssayExportImportTest extends BaseWebDriverTest
         final String INSTRUMENT_SETTING_02 = "890";
         final String COMMENT_BASIC_02 = "This is a comment for run where the data was imported in the Run Details. This is for run: ";
 
-        createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT);
+        createSimpleProjectAndAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, false, true);
 
         List<File> runFiles = Arrays.asList(
                 RUN01_FILE,
-                RUN02_XLSX_FILE,
+                RUN02_XLSX_FILE, // RUN02_XLSX_FILE include a file link to help.jpg, this should create a relative ref to @files
                 RUN03_FILE,
                 RUN04_FILE);
 
@@ -459,7 +488,16 @@ public class AssayExportImportTest extends BaseWebDriverTest
         runProperties.add(Maps.of("name", RUN04_NAME, "comments", COMMENT_BASIC_02 + RUN04_NAME, "instrumentSetting", INSTRUMENT_SETTING_02));
 
         log("Populate the assay '" + SIMPLE_ASSAY_FOR_EXPORT + "' by importing the file through the 'Run Properties'.");
-        populateAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, false, runFiles, batchProperties, runProperties);
+        populateAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, false, runFiles, batchProperties, runProperties, null);
+
+        // upload a result file field, this should create an absolute file path reference to @assayfiles
+        waitForElement(Locator.linkWithText(RUN02_NAME));
+        clickAndWait(Locator.linkWithText(RUN02_NAME));
+        DataRegionTable drt = new DataRegionTable("Data", getDriver());
+        drt.clickEditRow(2);
+        waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
+        setFormElement(Locator.tagWithAttribute("input", "type", "file"), SCREENSHOT_FILE);
+        clickAndWait(Locator.lkButton("Submit"));
 
         log("Add a new field that has a missing value indicator.");
         addNewField(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, new FieldDefinition("missingValue", FieldDefinition.ColumnType.String).setMvEnabled(true));
@@ -529,6 +567,11 @@ public class AssayExportImportTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(RUN01_NAME));
 
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN02_NAME, run02ColumnData);
+        clickAndWait(Locator.linkWithText(SIMPLE_ASSAY_FOR_EXPORT));
+        waitForElement(Locator.linkWithText(RUN02_NAME));
+        clickAndWait(Locator.linkWithText(RUN02_NAME));
+        assertElementPresent("Did not find the expected number of icons for images (referenced, relative path) for " + HELP_FILE.getName() + " from the imported results.", Locator.xpath("//a//img[contains(@title, '" + HELP_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images (uploaded, full path) for " + SCREENSHOT_FILE.getName() + " from the imported results.", Locator.xpath("//a//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
         compareRunColumnsWithExpected(ASSAY_PROJECT_FOR_IMPORT_02, SIMPLE_ASSAY_FOR_EXPORT, RUN03_NAME, run03ColumnData);
 
     }
@@ -615,7 +658,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         final String instrumentSetting = "456";
         final String commentPrefix = "This is a comment for run to be exported via XAR. This is for run: ";
 
-        int assayId = createSimpleProjectAndAssay(exportProject, assayName);
+        int assayId = createSimpleProjectAndAssay(exportProject, assayName, false, false);
 
         Connection cn = createDefaultConnection();
 
