@@ -60,7 +60,7 @@ public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
         goToManageViews().clickAddReport("Link Report");
         setFormElement(Locator.name("viewName"), REPORT_NAME);
         setFormElement(Locator.name("linkUrl"), WebTestHelper.getContextPath() + LINK_REPORT_URL);
-        clickButton("Save");
+        waitAndClickAndWait(Locator.linkWithText("Save"));
         waitForText("Manage Views");
 
         log("Clicking on the report - No XSS");
