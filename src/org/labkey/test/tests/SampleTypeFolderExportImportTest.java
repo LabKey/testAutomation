@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
@@ -72,6 +74,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeExportFolderTest";
     private static final String IMPORT_PROJECT_NAME = "SampleTypeImportFolderTest";
+
+    protected final static File SAMPLE_TXT_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
+
 
     @Override
     public List<String> getAssociatedModules()
@@ -430,7 +435,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
-        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
+        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(false);
         DataClassDefinition dataClassType = new DataClassDefinition(dataClass).setFields(DataClassAPIHelper.dataClassTestFields());
         SampleTypeDefinition parentType = new SampleTypeDefinition(parentSampleType).setFields(testFields);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
@@ -551,7 +556,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         // create a test sampleType
-        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields();
+        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(true);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
@@ -560,6 +565,23 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         parentDgen.addCustomRow(Map.of("Name", "sample2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
         parentDgen.addCustomRow(Map.of("Name", "sample3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three"));
         parentDgen.insertRows();
+
+        goToProjectFolder(getProjectName(), subfolder);
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Experiment Runs");
+        portalHelper.addWebPart("Assay List");
+
+        // upload a file for a sample's file field
+        clickAndWait(Locator.linkWithText(testSamples));
+        DataRegionTable sourceSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
+        sourceSamplesTable.clickEditRow(1);
+        waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
+        setFormElement(Locator.tagWithAttribute("input", "type", "file"), SAMPLE_TXT_FILE);
+        clickAndWait(Locator.lkButton("Submit"));
+
+        goToProjectFolder(getProjectName(), subfolder);
 
         // now define an assay that references it
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand("General");
@@ -611,12 +633,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         importRunCommand2.setBatchId(124);
         importRunCommand2.execute(createDefaultConnection(), subfolderPath);
 
-        //
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.addWebPart("Experiment Runs");
-        portalHelper.addWebPart("Assay List");
-
+        goToProjectFolder(getProjectName(), subfolder);
         // capture the run data pre-export
         clickAndWait(Locator.linkWithText(assayName));
         DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
@@ -634,6 +651,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         Checkbox checkbox = new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
                 .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
         checkbox.check();
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
@@ -661,6 +679,13 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             assertThat("expect export and import values to be equivalent",
                     exportedRow.get("resultData"), equalTo(matchingMap.get("resultData")));
         }
+
+        // verify sample file are round-tripped as expected
+        goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
+        clickAndWait(Locator.linkWithText(testSamples));
+        File downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
+        assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " from the imported samples.", Locator.tagContainingText("a", "sample.txt"), 1);
+        checker().verifyTrue("Incorrect file content for sample.txt after folder import", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
     }
 
 

@@ -57,14 +57,17 @@ public class SampleTypeAPIHelper
      * A set of FieldDefinition provided for convenience
      * @return
      */
-    public static List<FieldDefinition> sampleTypeTestFields()
+    public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
-        return Arrays.asList(
+        List<FieldDefinition> fields = new ArrayList<>(Arrays.asList(
                 new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
                 new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
                 new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
                 new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
+                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean)));
+        if (withFileField)
+            fields.add(new FieldDefinition("fileColumn", FieldDefinition.ColumnType.File));
+        return fields;
     }
 
     public static Map<Integer, String> getSortedRowIdToSamplesMap(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
