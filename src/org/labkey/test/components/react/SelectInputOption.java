@@ -78,7 +78,7 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
             for (WebElement el : elements)
             {
                 WebElement keyEl = Locator.tagWithClass("span", "identifying_field_label").findElement(el);
-                WebElement valEl = Locator.tag("span").findElement(el);
+                WebElement valEl = Locator.tag("span").findElements(el).get(1);
                 data.put(StringUtils.stripEnd(keyEl.getText(), ":"), valEl.getText());
             }
             return data;
