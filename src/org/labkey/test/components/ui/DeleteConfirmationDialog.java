@@ -19,9 +19,9 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
      * @deprecated Use a constructor that provides some synchronization
      */
     @Deprecated (since = "24.8")
-    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage)
+    public DeleteConfirmationDialog(@NotNull ConfirmPage sourcePage)
     {
-        this(sourcePage, () -> null);
+        this(sourcePage, () -> sourcePage);
     }
 
     public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
