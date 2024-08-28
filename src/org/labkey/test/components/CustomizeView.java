@@ -383,6 +383,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
         new Checkbox(checkbox).check();
+        itemXPath(type, fieldKeyParts).waitForElement(this, 2_000);
     }
 
     public void addColumn(String[] fieldKeyParts, String label)
