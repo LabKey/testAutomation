@@ -117,9 +117,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     {
         Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinks.addAll(List.of(
-                "SignUp",                   //Issue 51100: SignUp link from admin console shows up to the troubleshooter but throws 403 while accessing it.
-                "Notebook Settings",        //Issue 51099: Notebook Settings and Puppeteer Service admin console link show up for troubleshooter but throws 403 while accessing it.
-                "Puppeteer Service",
                 "Dump Heap",                // Undesired consequences
                 "Profiler"                  //Profiler can be edited by the troubleshooter
         ));
