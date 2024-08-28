@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCache>
 {
@@ -928,6 +929,21 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public String getValueExpressionStatusMessage()
+    {
+        // Need to remove focus from the expression field to have the updated status message show up.
+        getWrapper().fireEvent(elementCache().expressionInput, WebDriverWrapper.SeleniumEvent.blur);
+        WebDriverWrapper.sleep(500);
+
+        String statusMsg = "";
+        if(Boolean.TRUE.equals(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000)))
+        {
+            statusMsg = elementCache().expressionStatusMsg.getText();
+        }
+
+        return statusMsg;
+    }
+
     public String getValueExpression()
     {
         if (!isExpanded())
@@ -1040,6 +1056,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         WebDriverWrapper.waitFor(this::hasFieldWarning, WAIT_FOR_JAVASCRIPT);
         return this;
+    }
+
+    public String getWarningMessage()
+    {
+        String warningMsg = "";
+        WebElement warningMsgElement = Locator.byClass("domain-row-warning").findWhenNeeded(this);
+        if(warningMsgElement.isDisplayed())
+            warningMsg = warningMsgElement.getText();
+
+        return warningMsg;
     }
 
     // conditional formatting and validation options
@@ -1288,6 +1314,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // calculations field options
         public final WebElement expressionInput = Locator.name("domainpropertiesrow-valueExpression")
                 .findWhenNeeded(this);
+        public final WebElement expressionStatusMsg = Locator.tagWithClass("div", "domain-field-calc-footer")
+                .childTag("div").refindWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
