@@ -9,6 +9,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.reports.ManageViewsPage;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +61,9 @@ public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
         goToManageViews().clickAddReport("Link Report");
         setFormElement(Locator.name("viewName"), REPORT_NAME);
         setFormElement(Locator.name("linkUrl"), WebTestHelper.getContextPath() + LINK_REPORT_URL);
-        waitAndClickAndWait(Locator.linkWithText("Save"));
+        var saveBtn = Locator.linkWithText("Save").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        shortWait().until(ExpectedConditions.elementToBeClickable(saveBtn));
+        clickAndWait(saveBtn);
         waitForText("Manage Views");
 
         log("Clicking on the report - No XSS");
