@@ -1,12 +1,13 @@
 package org.labkey.test.components.ui;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -14,15 +15,6 @@ import java.util.function.Supplier;
 public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends ModalDialog
 {
     private final Function<Runnable, ConfirmPage> _confirmPageSupplier;
-
-    /**
-     * @deprecated Use a constructor that provides some synchronization
-     */
-    @Deprecated (since = "24.8")
-    public DeleteConfirmationDialog(@NotNull ConfirmPage sourcePage)
-    {
-        this(sourcePage, () -> sourcePage);
-    }
 
     public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
@@ -32,6 +24,19 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
     public DeleteConfirmationDialog(@NotNull ConfirmPage sourcePage, UpdatingComponent updatingComponent)
     {
         this(sourcePage, updatingComponent, () -> sourcePage);
+    }
+
+    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement)
+    {
+        this(sourcePage, staleOnConfirmElement, () -> null);
+    }
+
+    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        this(sourcePage, runnable -> {
+            runnable.run();
+            sourcePage.shortWait().until(ExpectedConditions.stalenessOf(staleOnConfirmElement));
+        }, confirmPageSupplier);
     }
 
     public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, UpdatingComponent updatingComponent, Supplier<ConfirmPage> confirmPageSupplier)
@@ -51,15 +56,6 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
     {
         super(finder);
         _confirmPageSupplier = confirmPageSupplier;
-    }
-
-    @Override
-    protected void waitForReady()
-    {
-        WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
-                !elementCache().title.getText().isEmpty() &&
-                !BootstrapLocators.loadingSpinner.existsIn(this),
-                "The delete confirmation dialog did not become ready.", 1_000);
     }
 
     public void cancelDelete()
@@ -97,7 +93,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
         this.dismiss("Dismiss");
     }
 
-    public DeleteConfirmationDialog setUserComment(String comment)
+    public DeleteConfirmationDialog<ConfirmPage> setUserComment(String comment)
     {
 
         WebDriverWrapper.waitFor(()-> elementCache().commentInput.getComponentElement().isDisplayed(),
@@ -121,11 +117,8 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-
         Input commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
                 .refindWhenNeeded(this);
 
     }
-
-
 }

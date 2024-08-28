@@ -1,54 +1,31 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.pages.LabKeyPage;
 
-import java.util.function.Supplier;
-
-public class UserActivateDeactivateConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
+public class UserActivateDeactivateConfirmationDialog extends ModalDialog
 {
-    private final SourcePage _sourcePage;
-    private final Supplier<ConfirmPage> _confirmPageSupplier;
+    private final UpdatingComponent _grid;
 
-    public UserActivateDeactivateConfirmationDialog(SourcePage sourcePage)
+    public UserActivateDeactivateConfirmationDialog(WebDriverWrapper wdw, UpdatingComponent grid)
     {
-        this(sourcePage, () -> null);
+        super(new ModalDialog.ModalDialogFinder(wdw.getDriver()).withTitleIgnoreCase("user"));
+        _grid = grid;
     }
 
-    public UserActivateDeactivateConfirmationDialog(SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public void confirmDeactivate()
     {
-        this("user", sourcePage, confirmPageSupplier);
+        _grid.doAndWaitForUpdate(() -> this.dismiss("Yes, Deactivate"));
     }
 
-    protected UserActivateDeactivateConfirmationDialog(String partialTitle, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public void confirmReactivate()
     {
-        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), sourcePage, confirmPageSupplier);
+        _grid.doAndWaitForUpdate(() -> this.dismiss("Yes, Reactivate"));
     }
 
-    protected UserActivateDeactivateConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
-    {
-        super(finder);
-        _sourcePage = sourcePage;
-        _confirmPageSupplier = confirmPageSupplier;
-    }
-
-    public ConfirmPage confirmDeactivate()
-    {
-        this.dismiss("Yes, Deactivate");
-        return _confirmPageSupplier.get();
-    }
-
-    public ConfirmPage confirmReactivate()
-    {
-        this.dismiss("Yes, Reactivate");
-        return _confirmPageSupplier.get();
-    }
-
-    public SourcePage cancelDelete()
+    public void cancel()
     {
         this.dismiss("Cancel");
-        return _sourcePage;
     }
-
 }

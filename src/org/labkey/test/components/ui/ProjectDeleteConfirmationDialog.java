@@ -12,9 +12,9 @@ import java.util.function.Supplier;
 
 public class ProjectDeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends DeleteConfirmationDialog<ConfirmPage>
 {
-    public ProjectDeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public ProjectDeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        super(sourcePage, confirmPageSupplier);
+        super(sourcePage, staleOnConfirmElement, confirmPageSupplier);
     }
 
 
