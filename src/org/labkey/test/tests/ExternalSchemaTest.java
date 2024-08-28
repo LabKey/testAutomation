@@ -195,7 +195,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText("new external schema"));
             new InsertExternalSchemaPage(getDriver())
                 .setName(USER_SCHEMA_NAME)
-                .setSourceSchema(DB_SCHEMA_NAME)
+                .setSourceSystemSchema(DB_SCHEMA_NAME)
                 .setMetadata(TestFileUtils.getFileContents("server/modules/platform/core/resources/schemas/test.xml"))
                 .clickCreate();
         }
