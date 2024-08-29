@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
@@ -56,6 +57,15 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
     {
         super(finder);
         _confirmPageSupplier = confirmPageSupplier;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
+                        !elementCache().title.getText().isEmpty() &&
+                        !BootstrapLocators.loadingSpinner.existsIn(this),
+                "The delete confirmation dialog did not become ready.", 1_000);
     }
 
     public void cancelDelete()
