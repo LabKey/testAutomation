@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
 
@@ -81,27 +82,27 @@ public abstract class TestProperties
 
     public static boolean isTestCleanupSkipped()
     {
-        return "false".equals(System.getProperty("clean", "false"));
+        return !getBooleanProperty("clean", false);
     }
 
     public static boolean isLinkCheckEnabled()
     {
-        return "true".equals(System.getProperty("linkCheck", "false")) || isInjectionCheckEnabled();
+        return getBooleanProperty("linkCheck", false) || isInjectionCheckEnabled();
     }
 
     public static boolean isInjectionCheckEnabled()
     {
-        return "true".equals(System.getProperty("injectCheck", "false"));
+        return getBooleanProperty("injectCheck", false);
     }
 
     public static boolean isScriptCheckEnabled()
     {
-        return "true".equals(System.getProperty("scriptCheck", "true"));
+        return getBooleanProperty("scriptCheck", true);
     }
 
     public static boolean isDevModeEnabled()
     {
-        return "true".equals(System.getProperty("devMode", "true"));
+        return getBooleanProperty("devMode", true);
     }
 
     public static boolean isTestRunningOnTeamCity()
@@ -113,33 +114,32 @@ public abstract class TestProperties
 
     public static boolean isServerRemote()
     {
-        return "true".equals(System.getProperty("webtest.server.remote", "false"));
+        return getBooleanProperty("webtest.server.remote", false);
     }
 
     public static boolean isLeakCheckSkipped()
     {
-        return "false".equals(System.getProperty("memCheck", "true"));
+        return !getBooleanProperty("memCheck", true);
     }
 
     public static boolean isQueryCheckSkipped()
     {
-        return "false".equals(System.getProperty("queryCheck", "true"));
+        return !getBooleanProperty("queryCheck", true);
     }
 
     public static boolean isCspCheckSkipped()
     {
-        // Skip by default
-        return "false".equals(System.getProperty("webtest.cspCheck", "false"));
+        return !getBooleanProperty("webtest.cspCheck", false);
     }
 
     public static boolean isNewWebDriverForEachTest()
     {
-        return !"true".equals(System.getProperty("selenium.reuseWebDriver", "false"));
+        return !getBooleanProperty("selenium.reuseWebDriver", false);
     }
 
     public static boolean isViewCheckSkipped()
     {
-        return "false".equals(System.getProperty("viewCheck", "true"));
+        return !getBooleanProperty("viewCheck", true);
     }
 
     public static boolean isSystemMaintenanceDisabled()
@@ -149,22 +149,22 @@ public abstract class TestProperties
 
     public static boolean isHeapDumpCollectionEnabled()
     {
-        return "true".equals(System.getProperty("webtest.enable.heap.dump"));
+        return getBooleanProperty("webtest.enable.heap.dump", false);
     }
 
     public static boolean isDiagnosticsExportEnabled()
     {
-        return "true".equals(System.getProperty("webtest.enable.export.diagnostics"));
+        return getBooleanProperty("webtest.enable.export.diagnostics", false);
     }
 
     public static boolean isRunWebDriverHeadless()
     {
-        return "true".equals(System.getProperty("webtest.webdriver.headless"));
+        return getBooleanProperty("webtest.webdriver.headless", false);
     }
 
     public static boolean isDumpBrowserConsole()
     {
-        return "true".equals(System.getProperty("webtest.dump.browser.console"));
+        return getBooleanProperty("webtest.dump.browser.console", false);
     }
 
     public static double getTimeoutMultiplier()
@@ -193,7 +193,7 @@ public abstract class TestProperties
 
     public static boolean isCloudPipelineEnabled()
     {
-        return "true".equals(System.getProperty("use.cloud.pipeline"));
+        return getBooleanProperty("use.cloud.pipeline", false);
     }
 
     public static String getCloudPipelineBucketName()
@@ -203,37 +203,37 @@ public abstract class TestProperties
 
     public static boolean isWebDriverLoggingEnabled()
     {
-        return "true".equals(System.getProperty("webtest.webdriver.logging"));
+        return getBooleanProperty("webtest.webdriver.logging", true);
     }
 
     public static boolean isTroubleshootingStacktracesEnabled()
     {
-        return "true".equals(System.getProperty("webtest.troubleshooting.stacktraces"));
+        return getBooleanProperty("webtest.troubleshooting.stacktraces", false);
     }
 
     public static boolean isDebugLoggingEnabled()
     {
-        return "true".equals(System.getProperty("webtest.logging.debug"));
+        return getBooleanProperty("webtest.logging.debug", false);
     }
 
     public static boolean isPrimaryUserAppAdmin()
     {
-        return "true".equals(System.getProperty("webtest.primary.app.admin"));
+        return getBooleanProperty("webtest.primary.app.admin", false);
     }
 
     public static boolean isWithoutTestModules()
     {
-        return "true".equals(System.getProperty("webtest.without.test.modules"));
+        return getBooleanProperty("webtest.without.test.modules", false);
     }
 
     public static boolean isTrialServer()
     {
-        return "true".equals(System.getProperty("webtest.server.trial"));
+        return getBooleanProperty("webtest.server.trial", false);
     }
 
     public static boolean isEmbeddedTomcat()
     {
-        return !System.getProperty("useEmbeddedTomcat", "false").equals("false") || new File(TestFileUtils.getDefaultDeployDir(), "embedded").isDirectory();
+        return getBooleanProperty("useEmbeddedTomcat", false) || new File(TestFileUtils.getDefaultDeployDir(), "embedded").isDirectory();
     }
 
     public static boolean isCheckerFatal()
@@ -342,5 +342,25 @@ public abstract class TestProperties
             TestLogger.log("Using " + dumpDir + " to store test output");
         }
         return dumpDir;
+    }
+
+    /**
+     * Interpret system property as boolean. If property is blank or unset, return the specified default value.
+     * Otherwise, parse property with {@link Boolean#parseBoolean(String)}
+     * @param key System property name
+     * @param def Default value
+     * @return value of the specified property
+     */
+    private static boolean getBooleanProperty(String key, boolean def)
+    {
+        String prop = System.getProperty(key);
+        if (!StringUtils.isBlank(prop))
+        {
+            return Boolean.parseBoolean(prop);
+        }
+        else
+        {
+            return def;
+        }
     }
 }
