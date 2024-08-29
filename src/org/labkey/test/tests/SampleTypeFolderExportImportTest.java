@@ -48,6 +48,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.exp.DataClassAPIHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
@@ -686,6 +687,18 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         File downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
         assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " from the imported samples.", Locator.tagContainingText("a", "sample.txt"), 1);
         checker().verifyTrue("Incorrect file content for sample.txt after folder import", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
+
+        // Issue 51117: After folder rename, files in sample file fields no longer resolve
+        UIContainerHelper containerHelper = new UIContainerHelper(this);
+        String importFolderRenamed = "assaySamplesImportTarget";
+        containerHelper.renameFolder(IMPORT_PROJECT_NAME, importFolder, importFolderRenamed, true);
+
+        goToProjectFolder(IMPORT_PROJECT_NAME, importFolderRenamed);
+        clickAndWait(Locator.linkWithText(testSamples));
+        downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
+        assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " after renaming folder.", Locator.tagContainingText("a", "sample.txt"), 1);
+        checker().verifyTrue("Incorrect file content for sample.txt after renaming folder", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
+
     }
 
 
