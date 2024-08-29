@@ -767,6 +767,7 @@ public class FieldDefinition extends PropertyDescriptor
             super.setTableType(lookupType);
         }
 
+        @Deprecated (since = "22.10")
         @Override
         public LookupInfo setTableType(ColumnType tableType)
         {
