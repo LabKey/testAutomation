@@ -76,6 +76,8 @@ import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -364,6 +366,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         binary.addCommandLineOptions("--headless");
                     }
                     capabilities.setBinary(binary);
+                    // Firefox 128: UnhandledAlertException doesn't include alert text. Need to leave alerts to get text manually.
+                    capabilities.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
 
                     newDriverService = GeckoDriverService.createDefaultService();
@@ -1009,8 +1013,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         for (int i = 1; i < windows.size(); i++)
         {
             getDriver().switchTo().window(windows.get(i));
-            executeScript("window.onbeforeunload = null;");
-            getDriver().close();
+            try
+            {
+                getDriver().close();
+            }
+            catch (UnhandledAlertException uae)
+            {
+                Optional.ofNullable(getAlertIfPresent()).ifPresent(Alert::accept);
+            }
         }
         if (windows.size() > 1)
         {
@@ -1387,7 +1397,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         getDriver().switchTo().defaultContent();
         if (alertCount == 10)
         {
-            log("Too many alerts. Alert loop in JavaScript?");
+            throw new IllegalStateException("Too many alerts. Alert loop in JavaScript?");
         }
         return alertCount;
     }
