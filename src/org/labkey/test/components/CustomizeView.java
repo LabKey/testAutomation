@@ -369,7 +369,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         }
 
         WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
-        return _driver.scrollIntoView(tr, false);
+        return _driver.scrollIntoView(tr, true);
     }
 
     private void addItem(String[] fieldKeyParts, String columnName, ViewItemType type)
@@ -382,7 +382,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
-        getWrapper().scrollIntoView(checkbox);
         new Checkbox(checkbox).check();
         itemXPath(type, fieldKeyParts).waitForElement(this, 2_000);
     }
