@@ -372,15 +372,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String getNumberFormat()
     {
-        expand();
-        return elementCache().numericFormatInput.getValue();
+        return getFormat();
     }
 
-    public DomainFieldRow setNumberFormat(String format)
+    public DomainFieldRow setNumberFormat(String formatString)
     {
-        expand();
-        elementCache().numericFormatInput.set(format);
-        return this;
+        return setFormat(formatString);
     }
 
     public FieldDefinition.ScaleType getScaleType()
@@ -395,6 +392,76 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.getText());
         return this;
+    }
+
+    // date field options.
+
+    public String getDateFormat()
+    {
+        return getFormat();
+    }
+
+    public DomainFieldRow setDateFormat(String formatString)
+    {
+        return setFormat(formatString);
+    }
+
+    // generic set format.
+    public DomainFieldRow setFormat(String formatString)
+    {
+        expand();
+
+        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        {
+            elementCache().formatInput.setValue(formatString);
+        }
+        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            elementCache().charScaleInput.setValue(formatString);
+        }
+        else
+        {
+            throw new NullPointerException("No 'Format' input present to set.");
+        }
+
+        return this;
+    }
+
+    public String getFormat()
+    {
+        expand();
+
+        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        {
+            return elementCache().formatInput.getValue();
+        }
+        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            return elementCache().charScaleInput.getValue();
+        }
+        else
+        {
+            throw new NullPointerException("No 'Format' input present to get.");
+        }
+    }
+
+    public WebElement getFormatControl()
+    {
+        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        {
+            return elementCache().formatInput.getComponentElement();
+        }
+        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            return elementCache().charScaleInput.getComponentElement();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     //
@@ -473,21 +540,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
         return elementCache().scannableCheckboxLoc.existsIn(this);
-    }
-
-    // date field options.
-
-    public String getDateFormat()
-    {
-        expand();
-        return elementCache().dateFormatInput.getValue();
-    }
-
-    public DomainFieldRow setDateFormat(String formatString)
-    {
-        expand();
-        elementCache().dateFormatInput.setValue(formatString);
-        return this;
     }
 
     // lookup options.
@@ -1283,8 +1335,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
 
         // numeric field options
-        public final Input numericFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
-                .refindWhenNeeded(this), getDriver());
         public final Select defaultScaleTypeSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-defaultScale"))
                 .findWhenNeeded(this);
 
@@ -1300,8 +1350,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         protected final Locator scannableCheckboxLoc = Locator.input("domainpropertiesrow-scannable");
         public final Checkbox scannableCheckbox = new Checkbox(scannableCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
-        // date field options
-        public final Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
+        public final Input formatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
         // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
