@@ -70,10 +70,8 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     {
         Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinks.addAll(List.of(
-                "LDAP Sync Admin",                  // An HTML view -- difficult to customize navtrail
                 "Authentication",                   // Slow to load
                 "Change User Properties",           // Generic domain action -- difficult to customize navtrail
-                "Puppeteer Service",                // An HTML view -- difficult to customize navtrail
                 "Dump Heap",                        // Undesired consequences
                 "Reset Site Errors",                // No nav trail
                 "Memory Usage",                     // Slow to load
