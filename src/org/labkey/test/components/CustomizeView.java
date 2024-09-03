@@ -382,7 +382,8 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
-        getWrapper().mouseOver(checkbox);
+        WebElement rowLabel = Locator.css("span").findElement(fieldRow);
+        rowLabel.click();
         new Checkbox(checkbox).check();
         itemXPath(type, fieldKeyParts).waitForElement(this, 2_000);
     }
