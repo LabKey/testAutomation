@@ -28,6 +28,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -112,7 +113,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 new FieldDefinition("resultTxt", FieldDefinition.ColumnType.String),
                 new FieldDefinition("resultFile", ColumnType.File));
         var protocol = makeGeneralAssay(ASSAY_NAME, runFields, dataFields, EXPORT_FOLDER_PATH);
-        //addRunData(protocol.getProtocolId(), EXPORT_FOLDER_PATH);
+        addRunData(protocol.getProtocolId(), EXPORT_FOLDER_PATH);
         // issue 51176, addRunData isn't resolving files
 
         // make another in a different folder with the same fields
@@ -259,7 +260,47 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         clickButton("Save and Finish");
 
-        log("foo");
+        // make sure the run file can be downloaded
+        AssayRunsPage runsPage = new AssayRunsPage(getDriver());
+        var runFileLink = runsPage.getTable().link(0, "Run File");
+        doAndWaitForDownload(()-> runFileLink.click());
+        var assayIdLink = runsPage.getTable().link(0, "Assay ID");
+        Integer runId = Integer.parseInt(assayIdLink.getAttribute("href").split("runId=")[1]);
+
+        var resultsPage = runsPage.clickAssayIdLink(runName);
+        var assayHelper = new APIAssayHelper(this);
+        Integer assayId = assayHelper.getIdFromAssayName(SUB_A_ASSAY, SUBFOLDER_A_PATH);
+
+        var resultTxts = resultsPage.getDataTable().getColumnDataAsText("Result Txt");
+        var runTxts = resultsPage.getDataTable().getColumnDataAsText("Run Txt");
+        var resultFileTexts = resultsPage.getDataTable().getColumnDataAsText("Result File");
+        var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run File");
+        var expectedRunFileLinkTexts = new ArrayList<String>();
+        {
+            for (File file : resultFiles)
+            {
+                expectedRunFileLinkTexts.add(String.format("AssayId_%d%sRunId_%d%s%s", assayId, File.separatorChar, runId, File.separatorChar, file.getName()));
+            }
+        }
+
+        checker().withScreenshot("unexpected_results_texts")
+                .wrapAssertion(()-> Assertions.assertThat(resultTxts)
+                        .as("expect complete results")
+                        .containsExactlyInAnyOrder("result-0", "result-1", "result-2", "result-3", "result-4"));
+        checker().withScreenshot("unexpected_run_texts")
+                .wrapAssertion(()-> Assertions.assertThat(runTxts)
+                        .as("expect complete results")
+                        .containsOnly("run text")
+                        .hasSize(5));
+        checker().withScreenshot("unexpected_results_files")
+                .wrapAssertion(()-> Assertions.assertThat(resultFileTexts)
+                        .as("expect complete result files")
+                        .containsExactlyInAnyOrderElementsOf(expectedRunFileLinkTexts));
+        checker().withScreenshot("unexpected_run_file_links")
+                .wrapAssertion(()-> Assertions.assertThat(runFileTexts)
+                        .as("expect complete run files")
+                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, assayId))
+                        .hasSize(5));
     }
 
     private void createListWithData(String containerPath)
