@@ -162,6 +162,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public boolean hasRequiredField()
+    {
+        return elementCache().fieldRequiredCheckbox.isDisplayed();
+    }
+
     public DomainFieldRow setSelectRowField(boolean checked)
     {
         elementCache().fieldSelectCheckbox.set(checked);
