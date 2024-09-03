@@ -40,7 +40,9 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
@@ -65,8 +67,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String SUB_A_ASSAY = "Sub_A_Assay";
     private final String LIST_NAME = "TestList";
     private final String LIST_KEY = "TestListId";
-    private final String SAMPLETYPE_NAME = "FileSamples";
-    private final String ASSAY_NAME = "FileSampleAssay";
+    private final String EXPORT_SAMPLETYPE_NAME = "ExportSamples";
+    private final String SUBA_SAMPLETYPE_NAME = "SubASamples";
+    private final String EXPORT_ASSAY_NAME = "Export Assay";
     private final File DATAFILE_DIRECTORY = TestFileUtils.getSampleData("fileTypes");
     private final File SAMPLE_CSV = new File(DATAFILE_DIRECTORY, "csv_sample.csv");
     private final File SAMPLE_JPG = new File(DATAFILE_DIRECTORY, "jpg_sample.jpg");
@@ -75,6 +78,10 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
     private final File SAMPLE_ZIP = new File(DATAFILE_DIRECTORY, "zip_sample.zip");
     private final List<File> SAMPLE_FILES = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_TRICKY_PDF, SAMPLE_PDF, SAMPLE_TIF, SAMPLE_ZIP);
+    private final String RUN_TXT_COL = "runTxt";
+    private final String RUN_FILE_COL = "runFile";
+    private final String RESULT_TXT_COL = "resultTxt";
+    private final String RESULT_FILE_COL = "resultFile";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -95,24 +102,24 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), EXPORT_FOLDER_NAME);
         _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
         _containerHelper.createSubfolder(getProjectName(), IMPORT_FOLDER_NAME);
-        _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
+        //_containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_A);
         _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
 
         //create list with attachment columns
         createListWithData(EXPORT_FOLDER_PATH);
 
-        //create sample type with file columns
-        createSampleTypeWithData(EXPORT_FOLDER_PATH);
+        //create sample types with file columns
+        createSampleTypeWithData(EXPORT_SAMPLETYPE_NAME, EXPORT_FOLDER_PATH);
 
-        // create an assay in the test folder
+        // create an assay in the export folder
         List<PropertyDescriptor> runFields = List.of(
-                new FieldDefinition("runTxt", FieldDefinition.ColumnType.String),
-                new FieldDefinition("runFile", ColumnType.File));
+                new FieldDefinition(RUN_TXT_COL, FieldDefinition.ColumnType.String),
+                new FieldDefinition(RUN_FILE_COL, ColumnType.File));
         List<PropertyDescriptor> dataFields = List.of(
-                new FieldDefinition("resultTxt", FieldDefinition.ColumnType.String),
-                new FieldDefinition("resultFile", ColumnType.File));
-        var protocol = makeGeneralAssay(ASSAY_NAME, runFields, dataFields, EXPORT_FOLDER_PATH);
+                new FieldDefinition(RESULT_TXT_COL, FieldDefinition.ColumnType.String),
+                new FieldDefinition(RESULT_FILE_COL, ColumnType.File));
+        var protocol = makeGeneralAssay(EXPORT_ASSAY_NAME, runFields, dataFields, EXPORT_FOLDER_PATH);
         addRunData(protocol.getProtocolId(), EXPORT_FOLDER_PATH);
         // issue 51176, addRunData isn't resolving files
 
@@ -127,10 +134,14 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_NAME));
         DataRegionTable testListRegion = new DataRegionTable("query", getDriver()); // Just make sure the DRT is ready
 
-        // verify file download behavior for csv, tif
-        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_CSV.getName())));
-        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_TIF.getName())));
-        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
+        List<File> downloadTestFiles = List.of(SAMPLE_CSV, SAMPLE_TIF, SAMPLE_TRICKY_PDF);
+
+        for (File testFile : downloadTestFiles)
+        {
+            int rowIndex = testListRegion.getRowIndex("Name", testFile.getName());
+            var downloadLink = testListRegion.link(rowIndex, "File");
+            doAndWaitForDownload(()-> downloadLink.click());
+        }
 
         // verify popup/sprite for jpeg
         mouseOver(Locator.tagWithAttribute("img", "title", SAMPLE_JPG.getName()));
@@ -139,19 +150,23 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     }
 
     // sampleType
+    /*
+
+     */
     @Test
     public void verifySampleFileFields()
     {
-        // give the sampleType actual files via editing
+        createSampleTypeWithData(SUBA_SAMPLETYPE_NAME, SUBFOLDER_A_PATH);
+        // give the sampleType actual files via editing; for the nonce not all files are resolving on import
 
-        SampleTypeHelper.beginAtSampleTypesList(this, EXPORT_FOLDER_PATH);
-        clickAndWait(Locator.linkWithText(SAMPLETYPE_NAME));
+        SampleTypeHelper.beginAtSampleTypesList(this, SUBFOLDER_A_PATH);
+        clickAndWait(Locator.linkWithText(SUBA_SAMPLETYPE_NAME));
         DataRegionTable samplesRegion = new DataRegionTable("Material", getDriver());
         List<String> fileNames = SAMPLE_FILES.stream().map(File::getName).toList();
 
         for (File file : SAMPLE_FILES)
         {
-            int rowIndex = samplesRegion.getRowIndexStrict("Name", file.getName());
+            int rowIndex = samplesRegion.getRowIndex("Name", file.getName());
             var fileFieldText = samplesRegion.getRowDataAsText(rowIndex, "File").get(0);
 
             // due to the current state of file import via file, expect no content in the File field
@@ -160,10 +175,16 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                             .as("expect bulk-imported file to be empty: Issue 51176")
                             .isEqualTo(" "));
 
-            // now edit the row to remove the broken/imported file and replace it via row edit
+            // edit the row to remove the broken/imported file and replace it via row edit
             var queryUpdatePage = samplesRegion.clickEditRow(rowIndex);
             queryUpdatePage.setField("file", file)
                     .submit();
+        }
+
+        for (File file : SAMPLE_FILES)
+        {
+            int rowIndex = samplesRegion.getRowIndex("Name", file.getName());
+            //
 
             if (file == SAMPLE_JPG) // jpg don't appear to get name shown as text, just thumbnail
             {
@@ -174,9 +195,10 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             }
             else
             {
+                WebElement fileLink = samplesRegion.link(rowIndex, "File");
                 checker().withScreenshot("unexpected_file_state")
                         .awaiting(Duration.ofSeconds(2),
-                                () -> Assertions.assertThat(samplesRegion.getRowDataAsText(rowIndex, "File").get(0))
+                                () -> Assertions.assertThat(fileLink.getText())
                                         .as("expect the uploaded file to be fixed")
                                         .endsWith(String.format("sampletype%s%s", File.separatorChar, file.getName())));
             }
@@ -191,8 +213,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + SAMPLE_JPG.getName() + "')]")));
         mouseOut();
 
-        var fileContentPage = FileContentPage.beginAt(this, EXPORT_FOLDER_PATH);
-        fileContentPage.fileBrowserHelper().expandFileBrowserRootNode();
+        var fileContentPage = FileContentPage.beginAt(this, SUBFOLDER_A_PATH);
         fileContentPage.fileBrowserHelper().selectFileBrowserItem("/sampletype/csv_sample.csv");
         var files = fileContentPage.fileBrowserHelper().getFileList(true);
         checker().withScreenshot("unexpected_davfile_state")
@@ -209,22 +230,24 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // generate some resultFiles
         var resultFiles = new ArrayList<File>();
-        Random r = new Random();
+        WebDavUploadHelper uploadHelper = new WebDavUploadHelper(SUBFOLDER_A_PATH);
         List<Map<String, Object>> importData = new ArrayList<>();
         for (int i = 0; i < 5; i++)
         {
             String fileName = String.format("field_file_for_results_domain-%d.tsv", i);
             String result = String.format("result-%d", i);
-            String fileText = "resultTxt\tresultFile\n"+result+"\t\""+TestFileUtils.getTestTempDir() + File.separatorChar + fileName+"\"\n";
+            String fileText = "resultTxt\tresultFile\n"+
+                        result+"\t" + fileName;
             var fieldFile = TestFileUtils.writeTempFile(fileName, fileText);
+            uploadHelper.uploadFile(fieldFile);
             resultFiles.add(fieldFile);
 
-            importData.add(Map.of("resultText", result, "resultFile", fieldFile.getPath()));
+            importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, fieldFile.getName()));
         }
 
         // generate a run file, referencing the result files
         String importDataFileContents = TestDataUtils.tsvStringFromRowMaps(importData,
-                List.of("resultText", "resultFile"), true);
+                List.of(RESULT_TXT_COL, RESULT_FILE_COL), true);
         File importFile = TestFileUtils.writeTempFile(runName, importDataFileContents);
 
         beginAt(SUBFOLDER_A_PATH + "/project-begin.view");
@@ -235,8 +258,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // run properties
         setFormElement(Locator.input("name"), runName);
-        setFormElement(Locator.input("runTxt"), "run text");
-        setFormElement(Locator.input("runFile"), importFile);
+        setFormElement(Locator.input(RUN_TXT_COL), "run text");
+        setFormElement(Locator.input(RUN_FILE_COL), importFile);
         checkRadioButton(Locator.inputById("Fileupload"));
         int addIndex = 0;
         for (File file : resultFiles)
@@ -262,26 +285,18 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // make sure the run file can be downloaded
         AssayRunsPage runsPage = new AssayRunsPage(getDriver());
-        var runFileLink = runsPage.getTable().link(0, "Run File");
+        var runFileLink = runsPage.getTable().link(0, RUN_FILE_COL);
         doAndWaitForDownload(()-> runFileLink.click());
-        var assayIdLink = runsPage.getTable().link(0, "Assay ID");
-        Integer runId = Integer.parseInt(assayIdLink.getAttribute("href").split("runId=")[1]);
 
         var resultsPage = runsPage.clickAssayIdLink(runName);
         var assayHelper = new APIAssayHelper(this);
         Integer assayId = assayHelper.getIdFromAssayName(SUB_A_ASSAY, SUBFOLDER_A_PATH);
 
-        var resultTxts = resultsPage.getDataTable().getColumnDataAsText("Result Txt");
-        var runTxts = resultsPage.getDataTable().getColumnDataAsText("Run Txt");
-        var resultFileTexts = resultsPage.getDataTable().getColumnDataAsText("Result File");
-        var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run File");
-        var expectedRunFileLinkTexts = new ArrayList<String>();
-        {
-            for (File file : resultFiles)
-            {
-                expectedRunFileLinkTexts.add(String.format("AssayId_%d%sRunId_%d%s%s", assayId, File.separatorChar, runId, File.separatorChar, file.getName()));
-            }
-        }
+        var resultTxts = resultsPage.getDataTable().getColumnDataAsText(RESULT_TXT_COL);
+        var runTxts = resultsPage.getDataTable().getColumnDataAsText("Run/runTxt");
+        var resultFileTexts = resultsPage.getDataTable().getColumnDataAsText(RESULT_FILE_COL);
+        var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run/runFile");
+        var expectedRunFileLinkTexts = resultFiles.stream().map(File::getName).toList();
 
         checker().withScreenshot("unexpected_results_texts")
                 .wrapAssertion(()-> Assertions.assertThat(resultTxts)
@@ -293,14 +308,42 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                         .containsOnly("run text")
                         .hasSize(5));
         checker().withScreenshot("unexpected_results_files")
-                .wrapAssertion(()-> Assertions.assertThat(resultFileTexts)
+                .wrapAssertion(()-> Assertions.assertThat(resultFileTexts.stream().map(String::trim).toList())
                         .as("expect complete result files")
                         .containsExactlyInAnyOrderElementsOf(expectedRunFileLinkTexts));
         checker().withScreenshot("unexpected_run_file_links")
-                .wrapAssertion(()-> Assertions.assertThat(runFileTexts)
+                .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
                         .as("expect complete run files")
-                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, assayId))
+                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, importFile.getName()))
                         .hasSize(5));
+    }
+
+    // exportImport
+    /*
+        exports a folder with a list, sampletype, assay, and imports them to the import folder
+        Then, validates expected data in source and destination
+     */
+    @Test
+    public void testExportImportData()
+    {
+        beginAt(EXPORT_FOLDER_PATH + "/project-begin.view");
+        var exportZip = goToFolderManagement()
+                .goToExportTab()
+                .includeFiles(true)
+                .exportToBrowserAsZipFile();
+        beginAt(IMPORT_FOLDER_PATH + "/project-begin.view");
+        goToFolderManagement()
+                .goToImportTab()
+                .selectLocalZipArchive()
+                .chooseFile(exportZip)
+                .clickImportFolder();
+        waitForPipelineJobsToFinish(1);
+
+        // validate list items
+
+        // samples
+
+        // assay run and result domains
     }
 
     private void createListWithData(String containerPath)
@@ -322,7 +365,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         }
     }
 
-    private void createSampleTypeWithData(String containerPath)
+    private void createSampleTypeWithData(String sampleTypeName, String containerPath)
     {
         beginAt(containerPath + "/project-begin.view");
         clickTab("Portal");
@@ -340,7 +383,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         }
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(SAMPLETYPE_NAME)
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName)
                 .setFields(List.of(new FieldDefinition("color", ColumnType.String),
                         new FieldDefinition("file", ColumnType.File)));
         sampleHelper.createSampleType(sampleTypeDefinition, sampleFileData);
@@ -363,32 +406,33 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private void addRunData(Integer protocolId, String folderPath) throws Exception
     {
         var resultFiles = new ArrayList<File>();
-        Random r = new Random();
         List<Map<String, Object>> importData = new ArrayList<>();
-        String tempDirPath = String.format("%s%s", TestFileUtils.getTestTempDir(), File.separatorChar);
+        var uploadHelper = new WebDavUploadHelper(folderPath);  // put the files in the folder root so assay can resolve them
         for (int i = 0; i < 5; i++)
         {
             String fileName = String.format("results_file-%d.tsv", i);
             String result = String.format("result-%d", i);
-            String fileText = "runTxt\trunFile\tresultTxt\tresultFile\n" +
-                    "runText\t" + tempDirPath + "runFile.tsv\t" +result + "\t\""+tempDirPath+fileName+"\"\n";
+            String fileText = "resultTxt\tresultFile\n"+
+                    result+"\t" + fileName;
             var fieldFile = TestFileUtils.writeTempFile(fileName, fileText);
+            uploadHelper.uploadFile(fieldFile);
             resultFiles.add(fieldFile);
 
-            importData.add(Map.of("resultText", result, "resultFile", fieldFile.getPath()));
+            importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, fieldFile.getName()));
         }
 
         // generate a run file, referencing the result files
         String importDataFileContents = TestDataUtils.tsvStringFromRowMaps(importData,
-                List.of("resultText", "resultFile"), true);
+                List.of(RESULT_TXT_COL, RESULT_FILE_COL), true);
         File runFile = TestFileUtils.writeTempFile("runFile.tsv", importDataFileContents);
+        uploadHelper.uploadFile(runFile);
 
         // build the import data
         List<Map<String, Object>> runRecords = new ArrayList<>();
-        for (File file : resultFiles)
+        for (File resultFile : resultFiles)
         {
-            runRecords.add(Map.of("runTxt", "\""+runFile.getName()+"\"", "runFile", runFile,
-                    "resultTxt", "\""+file.getName()+"\"", "resultFile", file));
+            runRecords.add(Map.of(RUN_TXT_COL, runFile.getName(), RUN_FILE_COL, runFile.getName(),
+                    RESULT_TXT_COL, resultFile.getName(), RESULT_FILE_COL, resultFile.getName()));
         }
 
         ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runRecords);
