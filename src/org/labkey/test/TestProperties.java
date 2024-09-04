@@ -262,15 +262,6 @@ public abstract class TestProperties
         }
     }
 
-    public static File getTomcatHome()
-    {
-        String tomcatHome = System.getProperty("tomcat.home", System.getenv("CATALINA_HOME"));
-        if (tomcatHome != null && !tomcatHome.isEmpty())
-            return new File(tomcatHome);
-        else
-            return null;
-    }
-
     public static String getAdditionalPipelineTools()
     {
         return System.getProperty("additional.pipeline.tools");
