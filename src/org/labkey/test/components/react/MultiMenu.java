@@ -22,7 +22,7 @@ import java.util.Optional;
 
 public class MultiMenu extends BootstrapMenu
 {
-    private int _menuWaitTimeout = 500;
+    private int _menuWaitTimeout = 2000;
 
     protected MultiMenu(WebElement element, WebDriver driver)
     {
