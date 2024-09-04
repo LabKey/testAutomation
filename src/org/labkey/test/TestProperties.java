@@ -224,11 +224,6 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.server.trial"));
     }
 
-    public static boolean isEmbeddedTomcat()
-    {
-        return !System.getProperty("useEmbeddedTomcat", "false").equals("false") || new File(TestFileUtils.getDefaultDeployDir(), "embedded").isDirectory();
-    }
-
     public static boolean isCheckerFatal()
     {
         return "true".equals(System.getProperty("webtest.checker.fatal"));
