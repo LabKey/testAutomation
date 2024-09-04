@@ -22,13 +22,18 @@ import java.util.Optional;
 
 public class MultiMenu extends BootstrapMenu
 {
-    private int _menuWaitTmeout = 500;
+    private int _menuWaitTmeout = 2000;
 
     protected MultiMenu(WebElement element, WebDriver driver)
     {
         super(driver, element);
     }
 
+    /**
+     * Sets the amount of time the component will wait for menu or toggle items to appear when interacting with them
+     * @param menuWait time in milliseconds to wait for menu items or toggle items to appear
+     * @return the current instance
+     */
     public MultiMenu setMenuWait(int menuWait)
     {
         _menuWaitTmeout = menuWait;
@@ -217,7 +222,7 @@ public class MultiMenu extends BootstrapMenu
         int listItemCount = getListItems().size();
 
         // find the toggle-item; it may be expanded already
-        WebElement toggleElement = Locators.menuToggle(toggle).waitForElement(this, 1000);
+        WebElement toggleElement = Locators.menuToggle(toggle).waitForElement(this, _menuWaitTmeout);
         if (Locators.menuToggleClosed().existsIn(toggleElement))
         {
             toggleElement.click(); // expand the toggle
