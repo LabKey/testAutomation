@@ -58,10 +58,9 @@ import java.util.Random;
 public class FileAttachmentColumnTest extends BaseWebDriverTest
 {
     private final String PROJECT_NAME = "FileAndAttachmentColumns Project";
+    private final String IMPORT_PROJECT_NAME = "FileAndAttachmentColumns Import Project";
     private final String EXPORT_FOLDER_NAME = "ExportFolder";
     private final String EXPORT_FOLDER_PATH = String.format("%s/%s", PROJECT_NAME, EXPORT_FOLDER_NAME);
-    private final String IMPORT_FOLDER_NAME = "ImportFolder";
-    private final String IMPORT_FOLDER_PATH = String.format("%s/%s", PROJECT_NAME, IMPORT_FOLDER_NAME);
     private final String SUBFOLDER_A = "SubFolderA";
     private final String SUBFOLDER_A_PATH = String.format("%s/%s", PROJECT_NAME, SUBFOLDER_A);
     private final String SUB_A_ASSAY = "Sub_A_Assay";
@@ -87,6 +86,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(IMPORT_PROJECT_NAME, afterTest);
     }
 
     @BeforeClass
@@ -98,11 +98,11 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void doSetup() throws Exception
     {
+        _containerHelper.createProject(IMPORT_PROJECT_NAME);
+        _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
         _containerHelper.createProject(getProjectName(), "Custom");
         _containerHelper.createSubfolder(getProjectName(), EXPORT_FOLDER_NAME);
         _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
-        _containerHelper.createSubfolder(getProjectName(), IMPORT_FOLDER_NAME);
-        //_containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_A);
         _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
 
@@ -320,7 +320,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     // exportImport
     /*
-        exports a folder with a list, sampletype, assay, and imports them to the import folder
+        exports a folder with a list, sampletype, assay, and imports them to the import project
         Then, validates expected data in source and destination
      */
     @Test
@@ -331,14 +331,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 .goToExportTab()
                 .includeFiles(true)
                 .exportToBrowserAsZipFile();
-        beginAt(IMPORT_FOLDER_PATH + "/project-begin.view");
+        beginAt(IMPORT_PROJECT_NAME + "/project-begin.view");
         goToFolderManagement()
                 .goToImportTab()
                 .selectLocalZipArchive()
                 .chooseFile(exportZip)
                 .clickImportFolder();
         waitForPipelineJobsToFinish(1);
-
         // validate list items
 
         // samples
@@ -431,8 +430,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         List<Map<String, Object>> runRecords = new ArrayList<>();
         for (File resultFile : resultFiles)
         {
-            runRecords.add(Map.of(RUN_TXT_COL, runFile.getName(), RUN_FILE_COL, runFile.getName(),
-                    RESULT_TXT_COL, resultFile.getName(), RESULT_FILE_COL, resultFile.getName()));
+            runRecords.add(Map.of(RUN_TXT_COL, runFile.getName(), RUN_FILE_COL, runFile,
+                    RESULT_TXT_COL, resultFile.getName(), RESULT_FILE_COL, resultFile));
         }
 
         ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runRecords);
