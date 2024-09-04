@@ -369,7 +369,8 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         }
 
         WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
-        return _driver.scrollIntoView(tr, false);
+        Locator.byClass("x4-tree-node-text").findElement(tr).click();
+        return tr;
     }
 
     private void addItem(String[] fieldKeyParts, String columnName, ViewItemType type)
