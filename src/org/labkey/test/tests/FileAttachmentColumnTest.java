@@ -110,6 +110,11 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         createListWithData(EXPORT_FOLDER_PATH);
 
         //create sample types with file columns
+        WebDavUploadHelper uploadHelper = new WebDavUploadHelper(EXPORT_FOLDER_PATH);
+        for (File file : DATAFILE_DIRECTORY.listFiles())
+        {
+            uploadHelper.uploadFile(file);
+        }
         createSampleTypeWithData(EXPORT_SAMPLETYPE_NAME, EXPORT_FOLDER_PATH);
 
         // create an assay in the export folder
@@ -378,7 +383,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         for (File file : DATAFILE_DIRECTORY.listFiles())
         {
             sampleFileData.add(Map.of("Name", file.getName(), "Color", "green",
-                    "File", String.format("\"%s\"",file.getAbsolutePath())));
+                    "File", file.getName()));
         }
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
