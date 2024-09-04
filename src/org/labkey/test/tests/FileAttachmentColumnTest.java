@@ -276,7 +276,6 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         var otherResultFileTexts = resultsPage.getDataTable().getColumnDataAsText(OTHER_RESULT_FILE_COL);
         var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run/runFile");
         var expectedRunFileLinkTexts = resultFiles.stream().map(File::getName).toList();
-        var expectedOtherResultFiles = SAMPLE_FILES.stream().map(File::getName).toList();
 
         checker().withScreenshot("unexpected_results_texts")
                 .wrapAssertion(()-> Assertions.assertThat(resultTxts)
@@ -295,7 +294,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 .wrapAssertion(()-> Assertions.assertThat(otherResultFileTexts.stream().map(String::trim).toList())
                         .as("expect other results files to have resolved")
                         .containsExactlyInAnyOrder("csv_sample.csv", "pdf_sample.pdf",
-                                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif"));
+                                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", ""));  // empty value is for jpg, which doesn't get text/is rendered inline
         checker().withScreenshot("unexpected_run_file_links")
                 .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
                         .as("expect complete run files")
