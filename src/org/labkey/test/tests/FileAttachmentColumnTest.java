@@ -41,6 +41,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -51,7 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Optional;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -81,6 +82,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String RUN_FILE_COL = "runFile";
     private final String RESULT_TXT_COL = "resultTxt";
     private final String RESULT_FILE_COL = "resultFile";
+    private final String OTHER_RESULT_FILE_COL = "otherResultFile";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -109,13 +111,19 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         //create list with attachment columns
         createListWithData(EXPORT_FOLDER_PATH);
 
-        //create sample types with file columns
+        // upload all files that may be used in export domains so importing them to file-fields works
         WebDavUploadHelper uploadHelper = new WebDavUploadHelper(EXPORT_FOLDER_PATH);
         for (File file : DATAFILE_DIRECTORY.listFiles())
         {
             uploadHelper.uploadFile(file);
         }
-        createSampleTypeWithData(EXPORT_SAMPLETYPE_NAME, EXPORT_FOLDER_PATH);
+
+        //create sample types with file columns, add some files
+        SampleTypeDefinition exportSampleType = new SampleTypeDefinition(EXPORT_SAMPLETYPE_NAME)
+                .setFields(List.of(new FieldDefinition("color", ColumnType.String),
+                        new FieldDefinition("file", ColumnType.File)));
+        SampleTypeAPIHelper.createEmptySampleType(EXPORT_FOLDER_PATH, exportSampleType);
+        importSampleDataUI(EXPORT_SAMPLETYPE_NAME, EXPORT_FOLDER_PATH, SAMPLE_FILES);
 
         // create an assay in the export folder
         List<PropertyDescriptor> runFields = List.of(
@@ -123,12 +131,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 new FieldDefinition(RUN_FILE_COL, ColumnType.File));
         List<PropertyDescriptor> dataFields = List.of(
                 new FieldDefinition(RESULT_TXT_COL, FieldDefinition.ColumnType.String),
-                new FieldDefinition(RESULT_FILE_COL, ColumnType.File));
+                new FieldDefinition(RESULT_FILE_COL, ColumnType.File),
+                new FieldDefinition(OTHER_RESULT_FILE_COL, ColumnType.File));
         var protocol = makeGeneralAssay(EXPORT_ASSAY_NAME, runFields, dataFields, EXPORT_FOLDER_PATH);
         addRunData(protocol.getProtocolId(), EXPORT_FOLDER_PATH);
         // issue 51176, addRunData isn't resolving files
 
-        // make another in a different folder with the same fields
+        // make another assay in a different folder with the same fields, to test via UI
         makeGeneralAssay(SUB_A_ASSAY, runFields, dataFields, SUBFOLDER_A_PATH);
     }
 
@@ -161,9 +170,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     @Test
     public void verifySampleFileFields()
     {
-        createSampleTypeWithData(SUBA_SAMPLETYPE_NAME, SUBFOLDER_A_PATH);
-        // give the sampleType actual files via editing; for the nonce not all files are resolving on import
+        SampleTypeDefinition subASampleType = new SampleTypeDefinition(SUBA_SAMPLETYPE_NAME)
+                .setFields(List.of(new FieldDefinition("color", ColumnType.String),
+                        new FieldDefinition("file", ColumnType.File)));
+        SampleTypeAPIHelper.createEmptySampleType(SUBFOLDER_A_PATH, subASampleType);
 
+        // give the sampleType actual files by adding individual rows; for the nonce not all files are resolving on import
         SampleTypeHelper.beginAtSampleTypesList(this, SUBFOLDER_A_PATH);
         clickAndWait(Locator.linkWithText(SUBA_SAMPLETYPE_NAME));
         DataRegionTable samplesRegion = new DataRegionTable("Material", getDriver());
@@ -171,52 +183,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         for (File file : SAMPLE_FILES)
         {
-            int rowIndex = samplesRegion.getRowIndex("Name", file.getName());
-            var fileFieldText = samplesRegion.getRowDataAsText(rowIndex, "File").get(0);
-
-            // due to the current state of file import via file, expect no content in the File field
-            checker().withScreenshot("unexpected_file_state")
-                    .wrapAssertion(()-> Assertions.assertThat(fileFieldText)
-                            .as("expect bulk-imported file to be empty: Issue 51176")
-                            .isEqualTo(" "));
-
-            // edit the row to remove the broken/imported file and replace it via row edit
-            var queryUpdatePage = samplesRegion.clickEditRow(rowIndex);
+            var queryUpdatePage = samplesRegion.clickInsertNewRow();
+            queryUpdatePage.setField("Name", file.getName());
             queryUpdatePage.setField("file", file)
                     .submit();
         }
-
-        for (File file : SAMPLE_FILES)
-        {
-            int rowIndex = samplesRegion.getRowIndex("Name", file.getName());
-            //
-
-            if (file == SAMPLE_JPG) // jpg don't appear to get name shown as text, just thumbnail
-            {
-                checker().withScreenshot("unexpected_file_state")
-                        .verifyTrue("expect jpg to be visible",
-                                Locator.tagWithAttribute("img", "title",
-                                        String.format("sampletype%s%s", File.separatorChar, file.getName())).existsIn(getDriver()));
-            }
-            else
-            {
-                WebElement fileLink = samplesRegion.link(rowIndex, "File");
-                checker().withScreenshot("unexpected_file_state")
-                        .awaiting(Duration.ofSeconds(2),
-                                () -> Assertions.assertThat(fileLink.getText())
-                                        .as("expect the uploaded file to be fixed")
-                                        .endsWith(String.format("sampletype%s%s", File.separatorChar, file.getName())));
-            }
-        }
-
-        // verify file download behavior for csv, pdf
-        doAndWaitForDownload(()->click(Locator.linkContainingText(String.format("sampletype%s%s", File.separatorChar, SAMPLE_CSV.getName()))));
-        doAndWaitForDownload(()->click(Locator.linkContainingText(String.format("sampletype%s%s", File.separatorChar, SAMPLE_PDF.getName()))));
-
-        // verify popup/sprite for jpeg
-        mouseOver(Locator.tagWithAttribute("img", "title", String.format("sampletype%s%s", File.separatorChar, SAMPLE_JPG.getName())));
-        shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + SAMPLE_JPG.getName() + "')]")));
-        mouseOut();
+        validateSampleData(SUBA_SAMPLETYPE_NAME, SUBFOLDER_A_PATH, SAMPLE_FILES);
 
         var fileContentPage = FileContentPage.beginAt(this, SUBFOLDER_A_PATH);
         fileContentPage.fileBrowserHelper().selectFileBrowserItem("/sampletype/csv_sample.csv");
@@ -241,10 +213,11 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         {
             String fileName = String.format("field_file_for_results_domain-%d.tsv", i);
             String result = String.format("result-%d", i);
-            String fileText = "resultTxt\tresultFile\n"+
-                        result+"\t" + fileName;
+            String fileText = "resultTxt\tresultFile\totherResultFile\n"+
+                        result+"\t" + fileName +"\t" + SAMPLE_FILES.get(i).getName();
             var fieldFile = TestFileUtils.writeTempFile(fileName, fileText);
             uploadHelper.uploadFile(fieldFile);
+            uploadHelper.uploadFile(SAMPLE_FILES.get(i));
             resultFiles.add(fieldFile);
 
             importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, fieldFile.getName()));
@@ -300,8 +273,10 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         var resultTxts = resultsPage.getDataTable().getColumnDataAsText(RESULT_TXT_COL);
         var runTxts = resultsPage.getDataTable().getColumnDataAsText("Run/runTxt");
         var resultFileTexts = resultsPage.getDataTable().getColumnDataAsText(RESULT_FILE_COL);
+        var otherResultFileTexts = resultsPage.getDataTable().getColumnDataAsText(OTHER_RESULT_FILE_COL);
         var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run/runFile");
         var expectedRunFileLinkTexts = resultFiles.stream().map(File::getName).toList();
+        var expectedOtherResultFiles = SAMPLE_FILES.stream().map(File::getName).toList();
 
         checker().withScreenshot("unexpected_results_texts")
                 .wrapAssertion(()-> Assertions.assertThat(resultTxts)
@@ -316,6 +291,11 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 .wrapAssertion(()-> Assertions.assertThat(resultFileTexts.stream().map(String::trim).toList())
                         .as("expect complete result files")
                         .containsExactlyInAnyOrderElementsOf(expectedRunFileLinkTexts));
+        checker().withScreenshot("unexpected_other_result_files")
+                .wrapAssertion(()-> Assertions.assertThat(otherResultFileTexts.stream().map(String::trim).toList())
+                        .as("expect other results files to have resolved")
+                        .containsExactlyInAnyOrder("csv_sample.csv", "pdf_sample.pdf",
+                                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif"));
         checker().withScreenshot("unexpected_run_file_links")
                 .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
                         .as("expect complete run files")
@@ -332,10 +312,26 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     public void testExportImportData()
     {
         beginAt(EXPORT_FOLDER_PATH + "/project-begin.view");
+
+        clickPortalTab("Portal");
+        PortalHelper portalHelper = new PortalHelper(getDriver());
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.addWebPart("Assay List");
+
+        // validate list data
+        log("validate list attachment data prior to export");
+        validateListData(LIST_NAME, EXPORT_FOLDER_PATH, SAMPLE_FILES);
+
+        log("validate sample file field data prior to export");
+        validateSampleData(EXPORT_SAMPLETYPE_NAME, EXPORT_FOLDER_PATH, SAMPLE_FILES);
+
+        // validate assay data
+
         var exportZip = goToFolderManagement()
                 .goToExportTab()
                 .includeFiles(true)
                 .exportToBrowserAsZipFile();
+
         beginAt(IMPORT_PROJECT_NAME + "/project-begin.view");
         goToFolderManagement()
                 .goToImportTab()
@@ -343,9 +339,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 .chooseFile(exportZip)
                 .clickImportFolder();
         waitForPipelineJobsToFinish(1);
-        // validate list items
 
-        // samples
+        log("validate list attachment data in import location");
+        validateListData(LIST_NAME, IMPORT_PROJECT_NAME, SAMPLE_FILES);
+
+        log("validate sample file field data in import location");
+        validateSampleData(EXPORT_SAMPLETYPE_NAME, IMPORT_PROJECT_NAME, SAMPLE_FILES);
 
         // assay run and result domains
     }
@@ -369,28 +368,18 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         }
     }
 
-    private void createSampleTypeWithData(String sampleTypeName, String containerPath)
+    private void importSampleDataUI(String sampleTypeName, String containerPath, List<File> files)
     {
-        beginAt(containerPath + "/project-begin.view");
-        clickTab("Portal");
-
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.addWebPart("Sample Types");
-
-        log("adding sample type with file column");
+        var helper = SampleTypeHelper.beginAtSampleTypesList(this, containerPath);
+        clickAndWait(Locator.linkWithText(sampleTypeName));
 
         List<Map<String, String>> sampleFileData = new ArrayList<>();
-        for (File file : DATAFILE_DIRECTORY.listFiles())
+        for (File file : files)
         {
             sampleFileData.add(Map.of("Name", file.getName(), "Color", "green",
                     "File", file.getName()));
         }
-
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName)
-                .setFields(List.of(new FieldDefinition("color", ColumnType.String),
-                        new FieldDefinition("file", ColumnType.File)));
-        sampleHelper.createSampleType(sampleTypeDefinition, sampleFileData);
+        helper.bulkImport(sampleFileData);
     }
 
     private Protocol makeGeneralAssay(String assayName, List<PropertyDescriptor> runFields, List<PropertyDescriptor> dataFields,
@@ -416,8 +405,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         {
             String fileName = String.format("results_file-%d.tsv", i);
             String result = String.format("result-%d", i);
-            String fileText = "resultTxt\tresultFile\n"+
-                    result+"\t" + fileName;
+            String fileText = "resultTxt\tresultFile\totherResultFile\n"+
+                    result+"\t" + fileName + "\t"+ SAMPLE_FILES.get(i).getName();
             var fieldFile = TestFileUtils.writeTempFile(fileName, fileText);
             uploadHelper.uploadFile(fieldFile);
             resultFiles.add(fieldFile);
@@ -427,7 +416,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // generate a run file, referencing the result files
         String importDataFileContents = TestDataUtils.tsvStringFromRowMaps(importData,
-                List.of(RESULT_TXT_COL, RESULT_FILE_COL), true);
+                List.of(RESULT_TXT_COL, RESULT_FILE_COL, OTHER_RESULT_FILE_COL), true);
         File runFile = TestFileUtils.writeTempFile("runFile.tsv", importDataFileContents);
         uploadHelper.uploadFile(runFile);
 
@@ -442,6 +431,69 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runRecords);
         importRunCommand.setName("firstRun");
         importRunCommand.execute(createDefaultConnection(), folderPath);
+    }
+
+    private void validateListData(String listName, String folderPath, List<File> expectedFiles)
+    {
+        beginAt(folderPath + "/project-begin.view");
+        clickAndWait(Locator.linkWithText(listName));
+        DataRegionTable testListRegion = new DataRegionTable("query", getDriver()); // Just make sure the DRT is ready
+
+        for (File testFile : expectedFiles)
+        {
+            if (testFile.getName().endsWith(".jpg"))
+            {
+                // verify popup/sprite for jpeg
+                mouseOver(Locator.tagWithAttribute("img", "title", SAMPLE_JPG.getName()));
+                shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + SAMPLE_JPG.getName() + "')]")));
+                mouseOut();
+            }
+            else
+            {
+                int rowIndex = testListRegion.getRowIndex("Name", testFile.getName());
+                var downloadLink = testListRegion.link(rowIndex, "File");
+                doAndWaitForDownload(() -> downloadLink.click());
+            }
+        }
+    }
+
+    private void validateSampleData(String sampleType, String folderPath, List<File> expectedFiles)
+    {
+        SampleTypeHelper.beginAtSampleTypesList(this, folderPath);
+        clickAndWait(Locator.linkWithText(sampleType));
+        DataRegionTable samplesRegion = new DataRegionTable("Material", getDriver());
+        for (File file : expectedFiles)
+        {
+            int rowIndex = samplesRegion.getRowIndex("Name", file.getName());
+            if (file.getName().endsWith(".jpg")) // jpg don't appear to get name shown as text, just thumbnail
+            {
+                checker().withScreenshot("unexpected_file_state")
+                        .verifyTrue("expect jpg to be visible",
+                                Locator.tagWithAttributeContaining("img", "title", file.getName()).existsIn(getDriver()));
+                // verify popup/sprite for jpeg
+                mouseOver(Locator.tagWithAttributeContaining("img", "title", file.getName()));
+                shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + file.getName() + "')]")));
+                mouseOut();
+            }
+            else
+            {
+                WebElement fileLinkCell = samplesRegion.findCell(rowIndex, "file");
+                Optional<WebElement> optionalFileLink = Locator.tag("a").findOptionalElement(fileLinkCell);
+                checker().withScreenshot("unexpected_file_state")
+                        .awaiting(Duration.ofSeconds(2),
+                                () -> Assertions.assertThat(optionalFileLink.isPresent())
+                                        .as("expect file "+file.getName()+" to be present")
+                                        .isTrue());
+                 if (optionalFileLink.isPresent())
+                 {
+                     // verify fie download behavior
+                     File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
+                     checker().wrapAssertion(() -> Assertions.assertThat(downloadedFile.getName())
+                             .as("expect the downloaded file to be the expected file")
+                             .startsWith(file.getName().substring(0, file.getName().lastIndexOf('.'))));   // guard against renames like file2.xyz
+                 }
+            }
+        }
     }
 
     @Before
