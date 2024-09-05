@@ -29,7 +29,9 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
+import org.labkey.test.components.domain.ConditionalFormatPanel;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.RangeValidatorDialog;
@@ -37,9 +39,12 @@ import org.labkey.test.components.domain.RegexValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorPanel;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.query.QueryMetadataEditorPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1728,6 +1733,138 @@ public class DomainDesignerTest extends BaseWebDriverTest
         PropertyDescriptor keyField = sampleFields.get("Key");
         assertFalse("Expect field import to disregard PK on fields imported to SampleType",
                 (Boolean) keyField.getAllProperties().get("isPrimaryKey"));
+    }
+
+    /**
+     *<p>
+     *     Test the calculated column in the domain designer (for a sample type). Specifically test that attributes set
+     *     on a field before it is changed to a calculated column are not persisted if not appropriate.
+     *</p>
+     */
+    @Test
+    public void testCalculatedColumn()
+    {
+
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        String sampleTypeName = "Calculated Column Designer";
+
+        clickProject(getCurrentProject());
+        CreateSampleTypePage createPage = sampleHelper
+                .goToCreateNewSampleType();
+
+        createPage.setName(sampleTypeName);
+
+        String intField01 = "Int01";
+        String intField02 = "Int02";
+        String calcSum = "Sum";
+
+        DomainFormPanel formPanel = createPage.getFieldsPanel();
+        formPanel.addFields(List.of(new FieldDefinition(intField01, FieldDefinition.ColumnType.Integer),
+                new FieldDefinition(intField02, FieldDefinition.ColumnType.Integer)));
+        DomainFieldRow fieldRow = formPanel.addField(calcSum);
+
+        log("Add a new 'Integer' type field and set multiple field options that won't be available to a calculated column.");
+
+        fieldRow.setType(FieldDefinition.ColumnType.Integer);
+        AdvancedSettingsDialog advancedSettings = fieldRow.clickAdvancedSettings();
+        fieldRow = advancedSettings.showInDefaultView(true)
+                .showInUpdateView(true)
+                .showInInsertView(true)
+                .showInDetailsView(true)
+                .setPHILevel(FieldDefinition.PhiSelectType.Restricted)
+                .setMeasure(true)
+                .setDimension(true)
+                .setRecommendedVariable(true)
+                .setMissingValuesEnabled(true)
+                .setUniqueConstraint(true)
+                .apply();
+        fieldRow.setRequiredField(true);
+        fieldRow.setImportAliases("S");
+        fieldRow.setLabel("CalcSum");
+
+        ConditionalFormatDialog formatDialog = fieldRow.clickConditionalFormatButton();
+        ConditionalFormatPanel formatPanel = formatDialog.getOpenFormatPanel();
+        formatPanel.setFirstCondition(Filter.Operator.GT)
+                .setFirstValue("5")
+                .setFillColor("#F44E3B");
+        fieldRow = formatDialog.clickApply();
+
+        RangeValidatorDialog rangeDialog = fieldRow.clickRangeButton();
+        var conditionPanel = rangeDialog.getValidationPanel(0);
+        conditionPanel.setFirstCondition(Filter.Operator.GT)
+                .setFirstValue("10")
+                .setErrorMessage("Out of range.")
+                .setName("ORange");
+        fieldRow = rangeDialog.clickApply();
+
+        log("Now change the field type to calculation.");
+        fieldRow = fieldRow.setType(FieldDefinition.ColumnType.Calculation);
+
+        fieldRow.setValueExpression(String.format("%s + %s", intField01, intField02));
+        fieldRow.collapse();
+
+        createPage.clickSave();
+
+        WebElement smLink = Locator.linkWithText(sampleTypeName).findWhenNeeded(getDriver());
+        waitFor(smLink::isDisplayed, "Doesn't look like the sample type was created.", 2_500);
+
+        sampleHelper = sampleHelper.goToSampleType(sampleTypeName);
+        List<String> actualValues = sampleHelper.getSamplesDataRegionTable().getColumnNames();
+
+        checker().withScreenshot()
+                .verifyTrue(String.format("Calculated column '%s' not present in sample type grid.", calcSum),
+                        actualValues.contains(calcSum));
+
+        log("Create a sample with only one value. Will validate calculated column is not 'required'.");
+        sampleHelper.insertRow(Map.of("Name", "S-1",
+                "Int01", "9"));
+
+        sampleHelper.insertRow(Map.of("Name", "S-2",
+                "Int01", "100",
+                "Int02", "101"));
+
+        WebElement formattedCell = Locator.tagWithAttributeContaining("td", "style", "background-color: #f44e3b")
+                .findWhenNeeded(getDriver());
+        checker().verifyTrue("Doesn't look like the cell has been fomratted as expected.",
+                formattedCell.isDisplayed());
+
+        actualValues = sampleHelper.getSamplesDataRegionTable().getColumnDataAsText(calcSum);
+        List<String> expectedValues = List.of("201", " ");
+        checker().verifyEquals("Values in calculated column not as expected.",
+                expectedValues, actualValues);
+
+        checker().screenShotIfNewError("Calculated_Column_DataRegion_Error");
+
+        log("Use the query data to validate that the calculated column has the expected metadata values.");
+        SourceQueryPage queryPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "samples", sampleTypeName)
+                .clickEditSource();
+        String xmlText = queryPage.getMetadataXml();
+
+        String expectedXML = """
+                <tables xmlns="http://labkey.org/data/xml">
+                  <table tableName="Calculated Column Designer" tableDbType="NOT_IN_DB">
+                    <columns>
+                      <column columnName="Sum">
+                        <recommendedVariable>true</recommendedVariable>
+                        <columnTitle>CalcSum</columnTitle>
+                        <conditionalFormats>
+                          <conditionalFormat>
+                            <filters>
+                              <filter operator="gt" value="5"/>
+                            </filters>
+                            <backgroundColor>f44e3b</backgroundColor>
+                          </conditionalFormat>
+                        </conditionalFormats>
+                        <conceptURI>http://www.labkey.org/exp/xml#calculated</conceptURI>
+                        <valueExpression>Int01 + Int02</valueExpression>
+                      </column>
+                    </columns>
+                  </table>
+                </tables>""";
+
+            checker().verifyEquals("XML not as expected.",
+                    expectedXML, xmlText);
+
     }
 
     private List<PropertyDescriptor> importExportTestFields()
