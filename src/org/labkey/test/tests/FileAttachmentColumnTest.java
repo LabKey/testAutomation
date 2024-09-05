@@ -168,7 +168,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
      */
     @Test
-    public void verifySampleFileFields()
+    public void testSampleFileFields()
     {
         SampleTypeDefinition subASampleType = new SampleTypeDefinition(SUBA_SAMPLETYPE_NAME)
                 .setFields(List.of(new FieldDefinition("color", ColumnType.String),
@@ -261,45 +261,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         clickButton("Save and Finish");
 
-        // make sure the run file can be downloaded
-        AssayRunsPage runsPage = new AssayRunsPage(getDriver());
-        var runFileLink = runsPage.getTable().link(0, RUN_FILE_COL);
-        doAndWaitForDownload(()-> runFileLink.click());
+        List<String> expectedResultTexts = List.of("result-0", "result-1", "result-2", "result-3", "result-4");
+        List<String> expectedOtherFiles = List.of("csv_sample.csv", "pdf_sample.pdf",
+                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", "");
+        List<String> expectedResultFiles = resultFiles.stream().map(File::getName).toList();
 
-        var resultsPage = runsPage.clickAssayIdLink(runName);
-        var assayHelper = new APIAssayHelper(this);
-        Integer assayId = assayHelper.getIdFromAssayName(SUB_A_ASSAY, SUBFOLDER_A_PATH);
-
-        var resultTxts = resultsPage.getDataTable().getColumnDataAsText(RESULT_TXT_COL);
-        var runTxts = resultsPage.getDataTable().getColumnDataAsText("Run/runTxt");
-        var resultFileTexts = resultsPage.getDataTable().getColumnDataAsText(RESULT_FILE_COL);
-        var otherResultFileTexts = resultsPage.getDataTable().getColumnDataAsText(OTHER_RESULT_FILE_COL);
-        var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run/runFile");
-        var expectedRunFileLinkTexts = resultFiles.stream().map(File::getName).toList();
-
-        checker().withScreenshot("unexpected_results_texts")
-                .wrapAssertion(()-> Assertions.assertThat(resultTxts)
-                        .as("expect complete results")
-                        .containsExactlyInAnyOrder("result-0", "result-1", "result-2", "result-3", "result-4"));
-        checker().withScreenshot("unexpected_run_texts")
-                .wrapAssertion(()-> Assertions.assertThat(runTxts)
-                        .as("expect complete results")
-                        .containsOnly("run text")
-                        .hasSize(5));
-        checker().withScreenshot("unexpected_results_files")
-                .wrapAssertion(()-> Assertions.assertThat(resultFileTexts.stream().map(String::trim).toList())
-                        .as("expect complete result files")
-                        .containsExactlyInAnyOrderElementsOf(expectedRunFileLinkTexts));
-        checker().withScreenshot("unexpected_other_result_files")
-                .wrapAssertion(()-> Assertions.assertThat(otherResultFileTexts.stream().map(String::trim).toList())
-                        .as("expect other results files to have resolved")
-                        .containsExactlyInAnyOrder("csv_sample.csv", "pdf_sample.pdf",
-                                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", ""));  // empty value is for jpg, which doesn't get text/is rendered inline
-        checker().withScreenshot("unexpected_run_file_links")
-                .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
-                        .as("expect complete run files")
-                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, importFile.getName()))
-                        .hasSize(5));
+        validateAssayRun(SUB_A_ASSAY, SUBFOLDER_A_PATH, runName, importFile, expectedResultTexts, expectedResultFiles, expectedOtherFiles);
     }
 
     // exportImport
@@ -325,6 +292,18 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         validateSampleData(EXPORT_SAMPLETYPE_NAME, EXPORT_FOLDER_PATH, SAMPLE_FILES);
 
         // validate assay data
+        goToModule("FileContent");  // get the run file created during class setup
+        var fileContentPage = new FileContentPage(getDriver());
+        fileContentPage.fileBrowserHelper().selectFileBrowserItem("runFile.tsv");
+        File runFile = fileContentPage.fileBrowserHelper().downloadSelectedFiles();
+
+        List<String> expectedResultTexts = List.of("result-0", "result-1", "result-2", "result-3", "result-4");
+        List<String> expectedOtherFiles = List.of("csv_sample.csv", "pdf_sample.pdf",
+                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", "");
+        List<String> expectedResultFiles = List.of("results_file-0.tsv", "results_file-1.tsv", "results_file-2.tsv", "results_file-3.tsv",
+                "results_file-4.tsv");
+        validateAssayRun(EXPORT_ASSAY_NAME, EXPORT_FOLDER_PATH, "firstRun", runFile, expectedResultTexts,
+                expectedResultFiles, expectedOtherFiles);
 
         var exportZip = goToFolderManagement()
                 .goToExportTab()
@@ -345,7 +324,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         log("validate sample file field data in import location");
         validateSampleData(EXPORT_SAMPLETYPE_NAME, IMPORT_PROJECT_NAME, SAMPLE_FILES);
 
-        // assay run and result domains
+        log("validate assay file field data in import location");
+        validateAssayRun(EXPORT_ASSAY_NAME, IMPORT_PROJECT_NAME, "firstRun", runFile, expectedResultTexts,
+                expectedResultFiles, expectedOtherFiles);
     }
 
     private void createListWithData(String containerPath)
@@ -404,13 +385,15 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         {
             String fileName = String.format("results_file-%d.tsv", i);
             String result = String.format("result-%d", i);
+            File otherResultFile = SAMPLE_FILES.get(i);
             String fileText = "resultTxt\tresultFile\totherResultFile\n"+
-                    result+"\t" + fileName + "\t"+ SAMPLE_FILES.get(i).getName();
-            var fieldFile = TestFileUtils.writeTempFile(fileName, fileText);
-            uploadHelper.uploadFile(fieldFile);
-            resultFiles.add(fieldFile);
+                    result+"\t" + fileName + "\t"+ otherResultFile.getName();
+            var resultFile = TestFileUtils.writeTempFile(fileName, fileText);
+            uploadHelper.uploadFile(resultFile);
+            resultFiles.add(resultFile);
 
-            importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, fieldFile.getName()));
+            importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, resultFile.getName(),
+                    OTHER_RESULT_FILE_COL, otherResultFile.getName()));
         }
 
         // generate a run file, referencing the result files
@@ -419,15 +402,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         File runFile = TestFileUtils.writeTempFile("runFile.tsv", importDataFileContents);
         uploadHelper.uploadFile(runFile);
 
-        // build the import data
-        List<Map<String, Object>> runRecords = new ArrayList<>();
-        for (File resultFile : resultFiles)
-        {
-            runRecords.add(Map.of(RUN_TXT_COL, runFile.getName(), RUN_FILE_COL, runFile,
-                    RESULT_TXT_COL, resultFile.getName(), RESULT_FILE_COL, resultFile));
-        }
-
-        ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runRecords);
+        ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runFile);
         importRunCommand.setName("firstRun");
         importRunCommand.execute(createDefaultConnection(), folderPath);
     }
@@ -487,12 +462,67 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                  {
                      // verify fie download behavior
                      File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                     checker().wrapAssertion(() -> Assertions.assertThat(downloadedFile.getName())
+                     checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getFileContents(downloadedFile))
                              .as("expect the downloaded file to be the expected file")
-                             .startsWith(file.getName().substring(0, file.getName().lastIndexOf('.'))));   // guard against renames like file2.xyz
+                             .isEqualTo(TestFileUtils.getFileContents(file)));   // guard against renames like file2.xyz
                  }
             }
         }
+    }
+
+    private void validateAssayRun(String assayName, String folderPath, String runName, File runFile,
+                                  List<String> expectedResultTexts, List<String> expectedResultFiles, List<String> otherExpectedFiles)
+    {
+        beginAt(folderPath + "/project-begin.view");
+        goToModule("Assay");
+        clickAndWait(Locator.linkWithText(assayName));
+
+        AssayRunsPage runsPage = new AssayRunsPage(getDriver());
+        int runRowIndex = runsPage.getTable().getRowIndex("Name", runName);
+        WebElement fileLinkCell = runsPage.getTable().findCell(runRowIndex, RUN_FILE_COL);
+        Optional<WebElement> optionalFileLink = Locator.tag("a").findOptionalElement(fileLinkCell);
+        checker().withScreenshot("unexpected_run_file_state")
+                .awaiting(Duration.ofSeconds(2), ()-> Assertions.assertThat(optionalFileLink.isPresent())
+                        .as("expect file link for ["+runFile.getName()+"] to be present in the runs grid")
+                        .isTrue());
+        if (optionalFileLink.isPresent())
+        {
+            var file = doAndWaitForDownload(()-> optionalFileLink.get().click());
+            checker().wrapAssertion(()-> Assertions.assertThat(TestFileUtils.getFileContents(file))
+                    .as("expect the downloaded file to have equivalent content")
+                    .isEqualTo(TestFileUtils.getFileContents(runFile)));
+        }
+
+        var resultsPage = runsPage.clickAssayIdLink(runName);
+
+        var resultTxts = resultsPage.getDataTable().getColumnDataAsText(RESULT_TXT_COL);
+        var runTxts = resultsPage.getDataTable().getColumnDataAsText("Run/runTxt");
+        var resultFileTexts = resultsPage.getDataTable().getColumnDataAsText(RESULT_FILE_COL);
+        var otherResultFileTexts = resultsPage.getDataTable().getColumnDataAsText(OTHER_RESULT_FILE_COL);
+        var runFileTexts = resultsPage.getDataTable().getColumnDataAsText("Run/runFile");
+
+        checker().withScreenshot("unexpected_results_texts")
+                .wrapAssertion(()-> Assertions.assertThat(resultTxts)
+                        .as("expect complete results")
+                        .containsExactlyInAnyOrderElementsOf(expectedResultTexts));
+        checker().withScreenshot("unexpected_run_texts")
+                .wrapAssertion(()-> Assertions.assertThat(runTxts)
+                        .as("expect complete run texts in results view")
+                        .containsOnly("run text")
+                        .hasSize(5));
+        checker().withScreenshot("unexpected_results_files")
+                .wrapAssertion(()-> Assertions.assertThat(resultFileTexts.stream().map(String::trim).toList())
+                        .as("expect complete result files")
+                        .containsExactlyInAnyOrderElementsOf(expectedResultFiles));
+        checker().withScreenshot("unexpected_other_result_files")
+                .wrapAssertion(()-> Assertions.assertThat(otherResultFileTexts.stream().map(String::trim).toList())
+                        .as("expect other results files to have resolved")
+                        .containsExactlyInAnyOrderElementsOf(otherExpectedFiles));  // empty value is for jpg, which doesn't get text/is rendered inline
+        checker().withScreenshot("unexpected_run_file_links")
+                .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
+                        .as("expect complete run files")
+                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, runFile.getName()))
+                        .hasSize(5));
     }
 
     @Before
