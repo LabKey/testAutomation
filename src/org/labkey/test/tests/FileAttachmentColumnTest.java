@@ -393,12 +393,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             resultFiles.add(resultFile);
 
             importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, resultFile.getName(),
-                    OTHER_RESULT_FILE_COL, otherResultFile.getName()));
+                    OTHER_RESULT_FILE_COL, otherResultFile.getName(),
+                    RUN_TXT_COL,"run text", RUN_FILE_COL, "runFile.tsv"));
         }
 
         // generate a run file, referencing the result files
         String importDataFileContents = TestDataUtils.tsvStringFromRowMaps(importData,
-                List.of(RESULT_TXT_COL, RESULT_FILE_COL, OTHER_RESULT_FILE_COL), true);
+                List.of(RUN_TXT_COL, RUN_FILE_COL, RESULT_TXT_COL, RESULT_FILE_COL, OTHER_RESULT_FILE_COL), true);
         File runFile = TestFileUtils.writeTempFile("runFile.tsv", importDataFileContents);
         uploadHelper.uploadFile(runFile);
 
