@@ -159,14 +159,7 @@ public abstract class TestFileUtils
 
     public static File getServerLogDir()
     {
-        if (TestProperties.isEmbeddedTomcat())
-        {
-            return new File(getDefaultDeployDir(), "embedded/logs");
-        }
-        else
-        {
-            return new File(TestProperties.getTomcatHome(), "logs");
-        }
+        return new File(getDefaultDeployDir(), "embedded/logs");
     }
 
     public static File getTestRoot()
@@ -217,7 +210,7 @@ public abstract class TestFileUtils
         if (_modulesDir == null)
         {
             _modulesDir = new File(getDefaultDeployDir(), "modules");
-            if (TestProperties.isEmbeddedTomcat() && !_modulesDir.isDirectory())
+            if (!_modulesDir.isDirectory())
             {
                 // Module root when deploying from embedded distribution
                 _modulesDir = new File(getDefaultDeployDir(), "embedded/modules");
