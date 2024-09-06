@@ -993,7 +993,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         WebDriverWrapper.sleep(500);
 
         String statusMsg = "";
-        if(Boolean.TRUE.equals(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000)))
+        if(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
         {
             statusMsg = elementCache().expressionStatusMsg.getText();
         }
