@@ -233,7 +233,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName2 + "/" + renamedFile);
         File download = _fileBrowserHelper.downloadSelectedFiles();
         Assertions.assertThat(download.getName()).as("Downloaded file with special characters")
-                .isIn(uploadFileName, uploadFileName.replace("%", "_")); // Firefox 128+ replaces '%'s in downloaded file name
+                .isIn(renamedFile, renamedFile.replace("%", "_")); // Firefox 128+ replaces some characters in downloaded file name
 
         log("Setting description " + fileDescription + " for '" + renamedFile + "'");
         _fileBrowserHelper.setDescription(renamedFile, fileDescription);
