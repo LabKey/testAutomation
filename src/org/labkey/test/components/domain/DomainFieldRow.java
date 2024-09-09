@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCache>
 {
@@ -159,6 +160,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         elementCache().fieldRequiredCheckbox.set(checked);
         return this;
+    }
+
+    public boolean hasRequiredField()
+    {
+        return elementCache().fieldRequiredCheckbox.isDisplayed();
     }
 
     public DomainFieldRow setSelectRowField(boolean checked)
@@ -371,15 +377,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String getNumberFormat()
     {
-        expand();
-        return elementCache().numericFormatInput.getValue();
+        return getFormat();
     }
 
-    public DomainFieldRow setNumberFormat(String format)
+    public DomainFieldRow setNumberFormat(String formatString)
     {
-        expand();
-        elementCache().numericFormatInput.set(format);
-        return this;
+        return setFormat(formatString);
     }
 
     public FieldDefinition.ScaleType getScaleType()
@@ -394,6 +397,76 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         elementCache().defaultScaleTypeSelect.selectByVisibleText(scaleType.getText());
         return this;
+    }
+
+    // date field options.
+
+    public String getDateFormat()
+    {
+        return getFormat();
+    }
+
+    public DomainFieldRow setDateFormat(String formatString)
+    {
+        return setFormat(formatString);
+    }
+
+    // generic set format.
+    public DomainFieldRow setFormat(String formatString)
+    {
+        expand();
+
+        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        {
+            elementCache().formatInput.setValue(formatString);
+        }
+        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            elementCache().charScaleInput.setValue(formatString);
+        }
+        else
+        {
+            throw new NullPointerException("No 'Format' input present to set.");
+        }
+
+        return this;
+    }
+
+    public String getFormat()
+    {
+        expand();
+
+        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        {
+            return elementCache().formatInput.getValue();
+        }
+        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            return elementCache().charScaleInput.getValue();
+        }
+        else
+        {
+            throw new NullPointerException("No 'Format' input present to get.");
+        }
+    }
+
+    public WebElement getFormatControl()
+    {
+        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        {
+            return elementCache().formatInput.getComponentElement();
+        }
+        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            return elementCache().charScaleInput.getComponentElement();
+        }
+        else
+        {
+            return null;
+        }
     }
 
     //
@@ -474,21 +547,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().scannableCheckboxLoc.existsIn(this);
     }
 
-    //
-    // date field options.
-
-    public String getDateFormat()
-    {
-        expand();
-        return elementCache().dateFormatInput.getValue();
-    }
-
-    public DomainFieldRow setDateFormat(String formatString)
-    {
-        expand();
-        elementCache().dateFormatInput.setValue(formatString);
-        return this;
-    }
+    // lookup options.
 
     public DomainFieldRow setLookup(FieldDefinition.LookupInfo lookupInfo)
     {
@@ -916,6 +975,40 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    // Calculations field settings
+
+    public DomainFieldRow setValueExpression(String expression)
+    {
+        if (!isExpanded())
+            expand();
+
+        getWrapper().setFormElement(elementCache().expressionInput, expression);
+        return this;
+    }
+
+    public String getValueExpressionStatusMessage()
+    {
+        // Need to remove focus from the expression field to have the updated status message show up.
+        getWrapper().fireEvent(elementCache().expressionInput, WebDriverWrapper.SeleniumEvent.blur);
+        WebDriverWrapper.sleep(500);
+
+        String statusMsg = "";
+        if(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
+        {
+            statusMsg = elementCache().expressionStatusMsg.getText();
+        }
+
+        return statusMsg;
+    }
+
+    public String getValueExpression()
+    {
+        if (!isExpanded())
+            expand();
+
+        return getWrapper().getFormElement(elementCache().expressionInput);
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
@@ -1020,6 +1113,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         WebDriverWrapper.waitFor(this::hasFieldWarning, WAIT_FOR_JAVASCRIPT);
         return this;
+    }
+
+    public String getWarningMessage()
+    {
+        String warningMsg = "";
+        WebElement warningMsgElement = Locator.byClass("domain-row-warning").findWhenNeeded(this);
+        if(warningMsgElement.isDisplayed())
+            warningMsg = warningMsgElement.getText();
+
+        return warningMsg;
     }
 
     // conditional formatting and validation options
@@ -1237,8 +1340,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
 
         // numeric field options
-        public final Input numericFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
-                .refindWhenNeeded(this), getDriver());
         public final Select defaultScaleTypeSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-defaultScale"))
                 .findWhenNeeded(this);
 
@@ -1254,16 +1355,21 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         protected final Locator scannableCheckboxLoc = Locator.input("domainpropertiesrow-scannable");
         public final Checkbox scannableCheckbox = new Checkbox(scannableCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
-        // date field options
-        public final Input dateFormatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
+        public final Input formatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
-        //lookup field options
+        // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
                 .findWhenNeeded(this);
         Locator.XPathLocator selectVocabularyBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
                 .withText("Expected Vocabulary");
         Locator.XPathLocator selectConceptBtnLoc = Locator.tagWithAttribute("button", "name", "domainpropertiesrow-principalConceptCode")
                 .withText("Select Concept");
+
+        // calculations field options
+        public final WebElement expressionInput = Locator.name("domainpropertiesrow-valueExpression")
+                .findWhenNeeded(this);
+        public final WebElement expressionStatusMsg = Locator.tagWithClass("div", "domain-field-calc-footer")
+                .childTag("div").refindWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
