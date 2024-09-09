@@ -20,8 +20,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.FileUtil;
+import org.labkey.api.util.Path;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.Protocol;
+import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -30,15 +33,16 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.FileContentPage;
+import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
@@ -55,7 +59,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 5)
+@BaseWebDriverTest.ClassTimeout(minutes = 12)
 public class FileAttachmentColumnTest extends BaseWebDriverTest
 {
     private final String PROJECT_NAME = "FileAndAttachmentColumns Project";
@@ -66,23 +70,23 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String SUBFOLDER_A_PATH = String.format("%s/%s", PROJECT_NAME, SUBFOLDER_A);
     private final String SUB_A_ASSAY = "Sub_A_Assay";
     private final String LIST_NAME = "TestList";
-    private final String LIST_KEY = "TestListId";
     private final String EXPORT_SAMPLETYPE_NAME = "ExportSamples";
     private final String SUBA_SAMPLETYPE_NAME = "SubASamples";
     private final String EXPORT_ASSAY_NAME = "Export Assay";
     private final File DATAFILE_DIRECTORY = TestFileUtils.getSampleData("fileTypes");
-    private final File SAMPLE_CSV = new File(DATAFILE_DIRECTORY, "csv_sample.csv");
-    private final File SAMPLE_JPG = new File(DATAFILE_DIRECTORY, "jpg_sample.jpg");
-    private final File SAMPLE_TRICKY_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample_with+%$@+%%+#-+=.pdf");
-    private final File SAMPLE_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample.pdf");
-    private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
-    private final File SAMPLE_ZIP = new File(DATAFILE_DIRECTORY, "zip_sample.zip");
+    private final File SAMPLE_CSV = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("csv_sample.csv"));
+    private final File SAMPLE_JPG = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("jpg_sample.jpg"));
+    private final File SAMPLE_TRICKY_PDF = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("pdf_sample_with+%$@+%%+#-+=.pdf"));
+    private final File SAMPLE_PDF = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("pdf_sample.pdf"));
+    private final File SAMPLE_TIF = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("tif_sample.tif"));
+    private final File SAMPLE_ZIP = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("zip_sample.zip"));
     private final List<File> SAMPLE_FILES = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_TRICKY_PDF, SAMPLE_PDF, SAMPLE_TIF, SAMPLE_ZIP);
     private final String RUN_TXT_COL = "runTxt";
     private final String RUN_FILE_COL = "runFile";
     private final String RESULT_TXT_COL = "resultTxt";
     private final String RESULT_FILE_COL = "resultFile";
     private final String OTHER_RESULT_FILE_COL = "otherResultFile";
+    private final String STUDY_DATASET_NAME = "ogreSpiteLevels";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -101,10 +105,10 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private void doSetup() throws Exception
     {
         _containerHelper.createProject(IMPORT_PROJECT_NAME);
-        _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
+        _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal", "Study"));
         _containerHelper.createProject(getProjectName(), "Custom");
         _containerHelper.createSubfolder(getProjectName(), EXPORT_FOLDER_NAME);
-        _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
+        _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal", "Study"));
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_A);
         _containerHelper.enableModules(Arrays.asList("Experiment", "Pipeline", "Portal"));
 
@@ -113,7 +117,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // upload all files that may be used in export domains so importing them to file-fields works
         WebDavUploadHelper uploadHelper = new WebDavUploadHelper(EXPORT_FOLDER_PATH);
-        for (File file : DATAFILE_DIRECTORY.listFiles())
+        for (File file : SAMPLE_FILES)
         {
             uploadHelper.uploadFile(file);
         }
@@ -135,7 +139,23 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 new FieldDefinition(OTHER_RESULT_FILE_COL, ColumnType.File));
         var protocol = makeGeneralAssay(EXPORT_ASSAY_NAME, runFields, dataFields, EXPORT_FOLDER_PATH);
         addRunData(protocol.getProtocolId(), EXPORT_FOLDER_PATH);
-        // issue 51176, addRunData isn't resolving files
+
+        // add a study
+        beginAt(EXPORT_FOLDER_PATH + "/project-begin.view");
+        clickPortalTab("Study");
+        CreateStudyPage createStudyPage = new StudyHelper(this).startCreateStudy();
+        createStudyPage.setSubjectNounSingular("Ogre");
+        createStudyPage.setSubjectNounPlural("Ogres");
+        createStudyPage.setSubjectColumnName("OgreId");
+        createStudyPage.setTimepointType(StudyHelper.TimepointType.DATE);
+        createStudyPage.createStudy();
+
+        List<PropertyDescriptor> studyDatasetFields = List.of(
+                new FieldDefinition("spiteAmount", ColumnType.Decimal),
+                new FieldDefinition("file", ColumnType.File));
+        CreateDomainCommand cmd = new CreateDomainCommand("StudyDatasetDate", STUDY_DATASET_NAME);
+        cmd.getDomainDesign().setFields(studyDatasetFields);
+        cmd.execute(this.createDefaultConnection(), EXPORT_FOLDER_PATH);
 
         // make another assay in a different folder with the same fields, to test via UI
         makeGeneralAssay(SUB_A_ASSAY, runFields, dataFields, SUBFOLDER_A_PATH);
@@ -164,9 +184,6 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     }
 
     // sampleType
-    /*
-
-     */
     @Test
     public void testSampleFileFields()
     {
@@ -271,7 +288,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     // exportImport
     /*
-        exports a folder with a list, sampletype, assay, and imports them to the import project
+        exports a folder with a list, sampletype, assay, a dataset, and imports them to the import project
         Then, validates expected data in source and destination
      */
     @Test
@@ -294,7 +311,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         // validate assay data
         goToModule("FileContent");  // get the run file created during class setup
         var fileContentPage = new FileContentPage(getDriver());
-        fileContentPage.fileBrowserHelper().selectFileBrowserItem("runFile.tsv");
+        fileContentPage.fileBrowserHelper().selectFileBrowserItem("assaydata/runFile-1.tsv");
         File runFile = fileContentPage.fileBrowserHelper().downloadSelectedFiles();
 
         List<String> expectedResultTexts = List.of("result-0", "result-1", "result-2", "result-3", "result-4");
@@ -304,6 +321,24 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 "results_file-4.tsv");
         validateAssayRun(EXPORT_ASSAY_NAME, EXPORT_FOLDER_PATH, "firstRun", runFile, expectedResultTexts,
                 expectedResultFiles, expectedOtherFiles);
+
+        // set up dataset data and verify it is as expected
+        beginAt(EXPORT_FOLDER_PATH + "/study-datasets.view");
+        clickAndWait(Locator.linkWithText(STUDY_DATASET_NAME));
+        DataRegionTable dataSetTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("Dataset").waitFor();
+        int ogreId = 1;
+        for (File file : SAMPLE_FILES)
+        {
+            var updatePage = dataSetTable.clickInsertNewRow();
+            updatePage.setField("OgreId", ogreId);
+            updatePage.setField("date", "11-11-2024");
+            updatePage.setField("spiteAmount", "34985762");
+            updatePage.setField("file", file);
+            updatePage.submit();
+            ogreId++;
+        }
+        validateDatasetData(STUDY_DATASET_NAME, EXPORT_FOLDER_PATH, SAMPLE_FILES);
+
 
         var exportZip = goToFolderManagement()
                 .goToExportTab()
@@ -327,6 +362,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         log("validate assay file field data in import location");
         validateAssayRun(EXPORT_ASSAY_NAME, IMPORT_PROJECT_NAME, "firstRun", runFile, expectedResultTexts,
                 expectedResultFiles, expectedOtherFiles);
+
+        log("validate dataset data in import location");
+        validateDatasetData(STUDY_DATASET_NAME, IMPORT_PROJECT_NAME, SAMPLE_FILES);
     }
 
     private void createListWithData(String containerPath)
@@ -335,6 +373,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickTab("Portal");
 
         ListHelper listHelper = new ListHelper(getDriver());
+        String LIST_KEY = "TestListId";
         listHelper.createList(getProjectName() + "/" + EXPORT_FOLDER_NAME, LIST_NAME, LIST_KEY,
                 new FieldDefinition("Name", ColumnType.String),
                 new FieldDefinition("File", ColumnType.Attachment));
@@ -406,6 +445,16 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runFile);
         importRunCommand.setName("firstRun");
         importRunCommand.execute(createDefaultConnection(), folderPath);
+
+        // edit the run text and file fields via the UI; the API doesn't support this
+        beginAt(EXPORT_FOLDER_PATH + "/project-begin.view");
+        goToModule("Assay");
+        clickAndWait(Locator.linkContainingText(EXPORT_ASSAY_NAME));
+        var runsPage = new AssayRunsPage(getDriver());
+        var updatePage = runsPage.getTable().clickEditRow(0);
+        updatePage.setField(RUN_TXT_COL, "run text");
+        updatePage.setField(RUN_FILE_COL, runFile);
+        updatePage.submit();
     }
 
     private void validateListData(String listName, String folderPath, List<File> expectedFiles)
@@ -524,6 +573,45 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                         .as("expect complete run files")
                         .containsOnly(String.format("assaydata%s%s", File.separatorChar, runFile.getName()))
                         .hasSize(5));
+    }
+
+    private void validateDatasetData(String datasetName, String folderPath, List<File> expectedFiles)
+    {
+        beginAt(folderPath + "/study-datasets.view");
+        clickAndWait(Locator.linkWithText(datasetName));
+        DataRegionTable dataRegionTable = new DataRegionTable("Dataset", getDriver()); // Just make sure the DRT is ready
+
+        for (File file : expectedFiles)
+        {
+            if (file.getName().endsWith(".jpg")) // jpg don't appear to get name shown as text, just thumbnail
+            {
+                checker().withScreenshot("unexpected_file_state")
+                        .verifyTrue("expect jpg to be visible",
+                                Locator.tagWithAttributeContaining("img", "title", file.getName()).existsIn(dataRegionTable));
+                // verify popup/sprite for jpeg
+                mouseOver(Locator.tagWithAttributeContaining("img", "title", file.getName()));
+                shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + file.getName() + "')]")));
+                mouseOut();
+            }
+            else
+            {
+                Optional<WebElement> optionalFileLink = Locator.linkContainingText(String.format("datasetdata%s%s", File.separatorChar, file.getName()))
+                        .findOptionalElement(dataRegionTable);
+                checker().withScreenshot("unexpected_file_state")
+                        .awaiting(Duration.ofSeconds(2),
+                                () -> Assertions.assertThat(optionalFileLink.isPresent())
+                                        .as("expect file "+file.getName()+" to be present")
+                                        .isTrue());
+                if (optionalFileLink.isPresent())
+                {
+                    // verify fie download behavior
+                    File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
+                    checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getFileContents(downloadedFile))
+                            .as("expect the downloaded file to be the expected file")
+                            .isEqualTo(TestFileUtils.getFileContents(file)));   // guard against renames like file2.xyz
+                }
+            }
+        }
     }
 
     @Before
