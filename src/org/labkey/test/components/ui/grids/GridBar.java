@@ -9,7 +9,6 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
@@ -197,25 +196,26 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             }
             catch (NoSuchElementException nse)
             {
-                getWrapper().log("Couldn't find menu button with caption '" + buttonText + "', trying again.");
                 tries++;
                 sleep(500);
             }
         }
 
-        if(found)
+        // If the button still wasn't found try the 'More' button.
+        if(!found)
         {
-            if (menuActions.size() == 1)
-                multiMenu.doMenuAction(menuActions.get(0));
-            else if (menuActions.size() == 2)
-                multiMenu.doMenuAction(menuActions.get(0), menuActions.get(1));
-            else
-                throw new IllegalArgumentException("There should be either 1 or 2 menu actions, but was:" + menuActions);
+            multiMenu = elementCache().findMenu("More");
+            Assert.assertTrue(String.format("Could not find a menu button '%s' or 'More', don't know what to click.", buttonText),
+                    multiMenu.getComponentElement().isDisplayed());
+            getWrapper().log(String.format("Couldn't find menu button '%s', clicking the 'More' menu button.", buttonText));
         }
+
+        if (menuActions.size() == 1)
+            multiMenu.doMenuAction(menuActions.get(0));
+        else if (menuActions.size() == 2)
+            multiMenu.doMenuAction(menuActions.get(0), menuActions.get(1));
         else
-        {
-            throw new NoSuchElementException("Couldn't find menu button with caption '" + buttonText + "'.");
-        }
+            throw new IllegalArgumentException("There should be either 1 or 2 menu actions, but was:" + menuActions);
     }
 
     public List<String> getMenuButtonsText()

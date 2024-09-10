@@ -16,6 +16,7 @@ import org.labkey.test.components.ui.ontology.ConceptPickerDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -983,21 +984,21 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             expand();
 
         getWrapper().setFormElement(elementCache().expressionInput, expression);
+        WebDriverWrapper.sleep(500);
+
+        // Remove focus from the input, this should cause the status message to update.
+        elementCache().expressionInput.sendKeys(Keys.TAB);
+
         return this;
     }
 
     public String getValueExpressionStatusMessage()
     {
-        // Need to remove focus from the expression field to have the updated status message show up.
-        getWrapper().fireEvent(elementCache().expressionInput, WebDriverWrapper.SeleniumEvent.blur);
-        WebDriverWrapper.sleep(500);
-
         String statusMsg = "";
         if(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
         {
             statusMsg = elementCache().expressionStatusMsg.getText();
         }
-
         return statusMsg;
     }
 
