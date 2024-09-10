@@ -74,12 +74,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String SUBA_SAMPLETYPE_NAME = "SubASamples";
     private final String EXPORT_ASSAY_NAME = "Export Assay";
     private final File DATAFILE_DIRECTORY = TestFileUtils.getSampleData("fileTypes");
-    private final File SAMPLE_CSV = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("csv_sample.csv"));
-    private final File SAMPLE_JPG = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("jpg_sample.jpg"));
-    private final File SAMPLE_TRICKY_PDF = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("pdf_sample_with+%$@+%%+#-+=.pdf"));
-    private final File SAMPLE_PDF = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("pdf_sample.pdf"));
-    private final File SAMPLE_TIF = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("tif_sample.tif"));
-    private final File SAMPLE_ZIP = FileUtil.appendPath(DATAFILE_DIRECTORY, Path.parse("zip_sample.zip"));
+    private final File SAMPLE_CSV = new File(DATAFILE_DIRECTORY, "csv_sample.csv");
+    private final File SAMPLE_JPG = new File(DATAFILE_DIRECTORY, "jpg_sample.jpg");
+    private final File SAMPLE_TRICKY_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample_with+%$@+%%+#-+=.pdf");
+    private final File SAMPLE_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample.pdf");
+    private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
+    private final File SAMPLE_ZIP = new File(DATAFILE_DIRECTORY, "zip_sample.zip");
     private final List<File> SAMPLE_FILES = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_TRICKY_PDF, SAMPLE_PDF, SAMPLE_TIF, SAMPLE_ZIP);
     private final String RUN_TXT_COL = "runTxt";
     private final String RUN_FILE_COL = "runFile";
