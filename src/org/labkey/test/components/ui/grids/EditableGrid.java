@@ -483,23 +483,23 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             String str = value.toString();
             WebElement inputCell = elementCache().inputCell();
 
-            // Select any text that is present.
-            new Actions(getDriver()).sendKeys(Keys.HOME)
-                    .keyDown(Keys.SHIFT)
-                    .sendKeys(Keys.END)
-                    .keyUp(Keys.SHIFT)
-                    .perform();
+            // Remove the text that is there.
+            inputCell.clear();
+
+            // If the cell had text calling '.clear()' requires a reactivation of the cell.
+            if(!inputCell.isDisplayed())
+            {
+                gridCell.click();
+                activateCell(gridCell);
+                inputCell = elementCache().inputCell();
+            }
 
             if(!str.isEmpty())
             {
-                inputCell.sendKeys(str, Keys.TAB); // Add the TAB to close the inputCell.
+                inputCell.sendKeys(str);
             }
-            else
-            {
-                new Actions(getDriver()).sendKeys(Keys.DELETE)
-                        .sendKeys(Keys.TAB)
-                        .perform();
-            }
+
+            inputCell.sendKeys(Keys.RETURN); // Close the inputCell.
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
@@ -706,7 +706,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         int initialRowCount = getRowCount();
         WebElement gridCell = getCell(row, columnName);
         String indexValue = gridCell.getText();
-        activateCell(gridCell);
+        selectCell(gridCell);
 
         getWrapper().actionPaste(null, pasteText);
 
@@ -1111,7 +1111,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public WebElement inputCell()
         {
-            return Locators.inputCell.findElement(table);
+            return Locators.inputCell.refindWhenNeeded(table);
         }
 
         public ReactSelect lookupSelect(WebElement cell)
