@@ -487,21 +487,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             new Actions(getDriver()).sendKeys(Keys.HOME)
                     .keyDown(Keys.SHIFT)
                     .sendKeys(Keys.END)
-                    .keyDown(Keys.UP)
+                    .keyUp(Keys.SHIFT)
                     .perform();
 
             if(!str.isEmpty())
             {
-                inputCell.sendKeys(str); // Add the RETURN to close the inputCell.
+                inputCell.sendKeys(str, Keys.TAB); // Add the TAB to close the inputCell.
             }
             else
             {
                 new Actions(getDriver()).sendKeys(Keys.DELETE)
+                        .sendKeys(Keys.TAB)
                         .perform();
-
             }
-
-            new Actions(getDriver()).sendKeys(Keys.RETURN).perform(); // Finish the edit.
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
