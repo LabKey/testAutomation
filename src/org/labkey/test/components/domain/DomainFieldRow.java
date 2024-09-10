@@ -984,7 +984,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             expand();
 
         getWrapper().setFormElement(elementCache().expressionInput, expression);
-        WebDriverWrapper.sleep(500);
 
         // Remove focus from the input, this should cause the status message to update.
         elementCache().expressionInput.sendKeys(Keys.TAB);
