@@ -521,9 +521,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         WebElement textArea = activateCellUsingDoubleClick(row, columnName);
 
-        // Using setFormElement won't call the blur even to remove focus and set the field.
-        getWrapper().setFormElementJS(textArea, value);
-        getWrapper().fireEvent(textArea, WebDriverWrapper.SeleniumEvent.blur);
+        textArea.sendKeys(value, Keys.RETURN); // Add the RETURN to close the inputCell.
 
         waitFor(()->getWrapper().shortWait().until(ExpectedConditions.stalenessOf(textArea)),
                 "TextArea did not go away.", 500);
