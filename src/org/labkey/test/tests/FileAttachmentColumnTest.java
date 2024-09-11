@@ -80,7 +80,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final File SAMPLE_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample.pdf");
     private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
     private final File SAMPLE_ZIP = new File(DATAFILE_DIRECTORY, "zip_sample.zip");
+    private final File SAMPLE_DOC = new File(DATAFILE_DIRECTORY, "doc_sample.doc");
+    private final File SAMPLE_7z = new File(DATAFILE_DIRECTORY, "7z_sample.7z");
+    private final File SAMPLE_JAVA = new File(DATAFILE_DIRECTORY, "java_sample.java");
+    private final File SAMPLE_JAR = new File(DATAFILE_DIRECTORY, "jar_sample.jar");
     private final List<File> SAMPLE_FILES = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_TRICKY_PDF, SAMPLE_PDF, SAMPLE_TIF, SAMPLE_ZIP);
+    private final List<File> OTHER_SAMPLE_FILES = List.of(SAMPLE_DOC, SAMPLE_7z, SAMPLE_JAVA, SAMPLE_JAR);
     private final String RUN_TXT_COL = "runTxt";
     private final String RUN_FILE_COL = "runFile";
     private final String RESULT_TXT_COL = "resultTxt";
@@ -184,6 +189,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     }
 
     // sampleType
+    /*
+        This test exercises file fields but sets up the data by inserting each row individually
+     */
     @Test
     public void testSampleFileFields()
     {
@@ -192,7 +200,6 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                         new FieldDefinition("file", ColumnType.File)));
         SampleTypeAPIHelper.createEmptySampleType(SUBFOLDER_A_PATH, subASampleType);
 
-        // give the sampleType actual files by adding individual rows; for the nonce not all files are resolving on import
         SampleTypeHelper.beginAtSampleTypesList(this, SUBFOLDER_A_PATH);
         clickAndWait(Locator.linkWithText(SUBA_SAMPLETYPE_NAME));
         DataRegionTable samplesRegion = new DataRegionTable("Material", getDriver());
@@ -221,29 +228,50 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     public void testAssayFileFieldsUI() throws Exception
     {
         String runName = "assay_run.tsv";
+        WebDavUploadHelper uploadHelper = new WebDavUploadHelper(SUBFOLDER_A_PATH);
+
+        // upload the files we'll be using as results so they can be resolved
+        for (File file : SAMPLE_FILES)
+        {
+            uploadHelper.uploadFile(file);
+        }
+        for (File file : OTHER_SAMPLE_FILES)
+        {
+            uploadHelper.uploadFile(file);
+        }
 
         // generate some resultFiles
         var resultFiles = new ArrayList<File>();
-        WebDavUploadHelper uploadHelper = new WebDavUploadHelper(SUBFOLDER_A_PATH);
-        List<Map<String, Object>> importData = new ArrayList<>();
-        for (int i = 0; i < 5; i++)
-        {
-            String fileName = String.format("field_file_for_results_domain-%d.tsv", i);
-            String result = String.format("result-%d", i);
-            String fileText = "resultTxt\tresultFile\totherResultFile\n"+
-                        result+"\t" + fileName +"\t" + SAMPLE_FILES.get(i).getName();
-            var fieldFile = TestFileUtils.writeTempFile(fileName, fileText);
-            uploadHelper.uploadFile(fieldFile);
-            uploadHelper.uploadFile(SAMPLE_FILES.get(i));
-            resultFiles.add(fieldFile);
 
-            importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, fieldFile.getName()));
-        }
 
-        // generate a run file, referencing the result files
-        String importDataFileContents = TestDataUtils.tsvStringFromRowMaps(importData,
-                List.of(RESULT_TXT_COL, RESULT_FILE_COL), true);
-        File importFile = TestFileUtils.writeTempFile(runName, importDataFileContents);
+        String runFileContent = """
+                resultTxt	resultFile
+                result-0	field_file_for_results_domain-0.tsv
+                result-1	field_file_for_results_domain-1.tsv
+                """;
+        File runFileFieldFile = TestFileUtils.writeTempFile("runFileFieldFile.tsv", runFileContent);
+        uploadHelper.uploadFile(runFileFieldFile);
+
+        // note: files in otherResultFile column are
+        String resultsFile0Content = """
+                resultTxt	resultFile	otherResultFile
+                result-0	field_file_for_results_domain-0.tsv	csv_sample.csv
+                result-1	doc_sample.doc	jpg_sample.jpg
+                result-2	7z_sample.7z	pdf_sample_with+%$@+%%+#-+=.pdf
+                """;
+        String resultsFile1Content = """
+                resultTxt	resultFile	otherResultFile
+                result-3	java_sample.java	pdf_sample.pdf
+                result-4	jar_sample.jar	tif_sample.tif
+                """;
+
+        File resultFile0 = TestFileUtils.writeTempFile("field_file_for_results_domain-0.tsv", resultsFile0Content);
+        resultFiles.add(resultFile0);
+        File resultFile1 = TestFileUtils.writeTempFile("field_file_for_results_domain-1.tsv", resultsFile1Content);
+        resultFiles.add(resultFile1);
+
+        for (File file : resultFiles)
+            uploadHelper.uploadFile(file);
 
         beginAt(SUBFOLDER_A_PATH + "/project-begin.view");
         goToModule("Assay");
@@ -254,7 +282,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         // run properties
         setFormElement(Locator.input("name"), runName);
         setFormElement(Locator.input(RUN_TXT_COL), "run text");
-        setFormElement(Locator.input(RUN_FILE_COL), importFile);
+        setFormElement(Locator.input(RUN_FILE_COL), runFileFieldFile);
         checkRadioButton(Locator.inputById("Fileupload"));
         int addIndex = 0;
         for (File file : resultFiles)
@@ -275,15 +303,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             }
             addIndex ++;
         }
-
         clickButton("Save and Finish");
 
         List<String> expectedResultTexts = List.of("result-0", "result-1", "result-2", "result-3", "result-4");
-        List<String> expectedOtherFiles = List.of("csv_sample.csv", "pdf_sample.pdf",
-                "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", "");
-        List<String> expectedResultFiles = resultFiles.stream().map(File::getName).toList();
+        List<String> expectedOtherFiles = List.of("csv_sample.csv", "pdf_sample.pdf", "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", "");
+        List<String> expectedResultFiles = List.of("field_file_for_results_domain-0.tsv", "7z_sample.7z", "doc_sample.doc", "jar_sample.jar", "java_sample.java");
 
-        validateAssayRun(SUB_A_ASSAY, SUBFOLDER_A_PATH, runName, importFile, expectedResultTexts, expectedResultFiles, expectedOtherFiles);
+        validateAssayRun(SUB_A_ASSAY, SUBFOLDER_A_PATH, runName, runFileFieldFile, expectedResultTexts, expectedResultFiles, expectedOtherFiles);
     }
 
     // exportImport
