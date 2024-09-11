@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.filecontent;
 
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -231,7 +232,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         log("Downloading file '" + renamedFile + "'");
         _fileBrowserHelper.selectFileBrowserItem("/" + folderName2 + "/" + renamedFile);
         File download = _fileBrowserHelper.downloadSelectedFiles();
-        assertEquals(renamedFile, download.getName());
+        Assertions.assertThat(download.getName()).as("Downloaded file with special characters")
+                .isIn(renamedFile, renamedFile.replace("%", "_")); // Firefox 128+ replaces some characters in downloaded file name
 
         log("Setting description " + fileDescription + " for '" + renamedFile + "'");
         _fileBrowserHelper.setDescription(renamedFile, fileDescription);

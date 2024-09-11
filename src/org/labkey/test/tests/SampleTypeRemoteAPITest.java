@@ -470,7 +470,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         DataRegionTable assayList = DataRegionTable.DataRegion(getDriver()).withName("AssayList").waitFor();
         CustomizeView customizeView = assayList.openCustomizeGrid();
         customizeView.showHiddenItems();
-        customizeView.addColumn("ROWID");
+        customizeView.addColumn("RowId");
         customizeView.clickSave().save();   // make this the default view
         String assayIdStringValue = assayList.getRowDataAsMap(0).get("RowId");
 
@@ -606,7 +606,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         DataRegionTable assayList = DataRegionTable.DataRegion(getDriver()).withName("AssayList").waitFor();
         CustomizeView customizeView = assayList.openCustomizeGrid();
         customizeView.showHiddenItems();
-        customizeView.addColumn("ROWID");
+        customizeView.addColumn("RowId");
         customizeView.clickSave().save();   // make this the default view
         String assayIdStringValue = assayList.getRowDataAsMap(0).get("RowId");
 
