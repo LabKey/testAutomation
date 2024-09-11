@@ -126,6 +126,10 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         {
             uploadHelper.uploadFile(file);
         }
+        for (File file : OTHER_SAMPLE_FILES)
+        {
+            uploadHelper.uploadFile(file);
+        }
 
         //create sample types with file columns, add some files
         SampleTypeDefinition exportSampleType = new SampleTypeDefinition(EXPORT_SAMPLETYPE_NAME)
@@ -343,8 +347,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         List<String> expectedResultTexts = List.of("result-0", "result-1", "result-2", "result-3", "result-4");
         List<String> expectedOtherFiles = List.of("csv_sample.csv", "pdf_sample.pdf",
                 "pdf_sample_with+%$@+%%+#-+=.pdf", "tif_sample.tif", "");
-        List<String> expectedResultFiles = List.of("results_file-0.tsv", "results_file-1.tsv", "results_file-2.tsv", "results_file-3.tsv",
-                "results_file-4.tsv");
+        List<String> expectedResultFiles = List.of("java_sample.java", "doc_sample.doc", "zip_sample.zip", "7z_sample.7z",
+                "jar_sample.jar");
         validateAssayRun(EXPORT_ASSAY_NAME, EXPORT_FOLDER_PATH, "firstRun", runFile, expectedResultTexts,
                 expectedResultFiles, expectedOtherFiles);
 
@@ -443,29 +447,18 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
     private void addRunData(Integer protocolId, String folderPath) throws Exception
     {
-        var resultFiles = new ArrayList<File>();
-        List<Map<String, Object>> importData = new ArrayList<>();
         var uploadHelper = new WebDavUploadHelper(folderPath);  // put the files in the folder root so assay can resolve them
-        for (int i = 0; i < 5; i++)
-        {
-            String fileName = String.format("results_file-%d.tsv", i);
-            String result = String.format("result-%d", i);
-            File otherResultFile = SAMPLE_FILES.get(i);
-            String fileText = "resultTxt\tresultFile\totherResultFile\n"+
-                    result+"\t" + fileName + "\t"+ otherResultFile.getName();
-            var resultFile = TestFileUtils.writeTempFile(fileName, fileText);
-            uploadHelper.uploadFile(resultFile);
-            resultFiles.add(resultFile);
 
-            importData.add(Map.of(RESULT_TXT_COL, result, RESULT_FILE_COL, resultFile.getName(),
-                    OTHER_RESULT_FILE_COL, otherResultFile.getName(),
-                    RUN_TXT_COL,"run text", RUN_FILE_COL, "runFile.tsv"));
-        }
+        String runDataFileContent = """
+                runTxt	runFile	resultTxt	resultFile	otherResultFile
+                run text	runFile.tsv	result-0	java_sample.java	csv_sample.csv
+                run text	runFile.tsv	result-1	doc_sample.doc	jpg_sample.jpg
+                run text	runFile.tsv	result-2	zip_sample.zip	pdf_sample_with+%$@+%%+#-+=.pdf
+                run text	runFile.tsv	result-3	7z_sample.7z	pdf_sample.pdf
+                run text	runFile.tsv	result-4	jar_sample.jar	tif_sample.tif
+                """;
 
-        // generate a run file, referencing the result files
-        String importDataFileContents = TestDataUtils.tsvStringFromRowMaps(importData,
-                List.of(RUN_TXT_COL, RUN_FILE_COL, RESULT_TXT_COL, RESULT_FILE_COL, OTHER_RESULT_FILE_COL), true);
-        File runFile = TestFileUtils.writeTempFile("runFile.tsv", importDataFileContents);
+        File runFile = TestFileUtils.writeTempFile("runFile.tsv", runDataFileContent);
         uploadHelper.uploadFile(runFile);
 
         ImportRunCommand importRunCommand = new ImportRunCommand(protocolId, runFile);
@@ -494,8 +487,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             if (testFile.getName().endsWith(".jpg"))
             {
                 // verify popup/sprite for jpeg
-                mouseOver(Locator.tagWithAttribute("img", "title", SAMPLE_JPG.getName()));
-                shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + SAMPLE_JPG.getName() + "')]")));
+                mouseOver(Locator.tagWithAttribute("img", "title", testFile.getName()));
+                Locator.tagWithClass("span", "labkey-wp-title").withText(testFile.getName()).waitForElement(getDriver(), 1500);
                 mouseOut();
             }
             else
