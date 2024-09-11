@@ -39,11 +39,6 @@ public abstract class TestProperties
 
     static
     {
-        if (System.getenv("FIREFOX128") != null)
-        {
-            System.setProperty("selenium.firefox.binary", System.getenv("FIREFOX128"));
-        }
-
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
