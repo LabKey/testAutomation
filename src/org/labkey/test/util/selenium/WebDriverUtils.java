@@ -17,10 +17,7 @@ package org.labkey.test.util.selenium;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.labkey.test.Locator;
-import org.labkey.test.Locators;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.TestLogger;
+import org.intellij.lang.annotations.Language;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -32,11 +29,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
-import org.openqa.selenium.interactions.Locatable;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public abstract class WebDriverUtils
 {
@@ -66,89 +60,6 @@ public abstract class WebDriverUtils
      */
     public static final Keys MODIFIER_KEY = SystemUtils.IS_OS_MAC ? Keys.COMMAND : Keys.CONTROL;
 
-    public static class ScrollUtil
-    {
-        private final WebDriver _webDriver;
-
-        public ScrollUtil(WebDriver webDriver)
-        {
-            _webDriver = webDriver;
-        }
-
-        public boolean scrollUnderStickyFormButtons(WebElement blockedElement)
-        {
-            Optional<WebElement> formButtons = Locator.css(".form-buttons").findOptionalElement(_webDriver);
-
-            if (formButtons.isPresent())
-            {
-                int elY = blockedElement.getLocation().getY();
-                int height = blockedElement.getSize().getHeight();
-                int bottom = elY + height;
-                int formButtonsY = formButtons.get().getLocation().getY();
-
-                // If the bottom of our element is past the top of the FormButtons element, then it's at least partially
-                // obscured, so we should scroll the element into view.
-                if (bottom > formButtonsY)
-                {
-                    TestLogger.debug("Scrolled under sticky form buttons");
-                    scrollIntoView(blockedElement);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public boolean scrollUnderFloatingHeader(WebElement blockedElement)
-        {
-            List<WebElement> floatingHeaders = Locator.findElements(_webDriver,
-                Locators.floatingHeaderContainer(),
-                Locators.appFloatingHeader(),
-                Locators.domainDesignerFloatingHeader(),
-                DataRegionTable.Locators.floatingHeader().notHidden());
-
-            int headerHeight = 0;
-            for (WebElement floatingHeader : floatingHeaders)
-            {
-                headerHeight += floatingHeader.getSize().getHeight();
-            }
-            if (headerHeight > 0)
-            {
-                int elYInViewPort = blockedElement.getLocation().getY() - getWindowScrollY().intValue();
-                if (headerHeight > elYInViewPort)
-                {
-                    TestLogger.debug("Scrolled under floating headers:\n" + floatingHeaders.stream().map(WebElement::toString).collect(Collectors.joining("\n")));
-                    ((Locatable) blockedElement).getCoordinates().inViewPort(); // 'inViewPort()' will scroll element into view
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private Long getWindowScrollY()
-        {
-            Number N = (Number) ((JavascriptExecutor)_webDriver).executeScript("return window.scrollY;");
-            return null==N ? null : N.longValue();
-        }
-
-        public WebElement scrollIntoView(WebElement el)
-        {
-            ((JavascriptExecutor)_webDriver).executeScript("arguments[0].scrollIntoView();", el);
-            return el;
-        }
-
-        public WebElement scrollIntoView(WebElement el, Boolean alignToTop)
-        {
-            ((JavascriptExecutor)_webDriver).executeScript("arguments[0].scrollIntoView(arguments[1]);", el, alignToTop);
-            return el;
-        }
-
-        public void scrollBy(Integer x, Integer y)
-        {
-            ((JavascriptExecutor)_webDriver).executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
-        }
-    }
-
     /**
      * Extract a WebDriver instance from an arbitrarily wrapped object
      * @param peeling Object that wraps a WebDriver. Typically a Component, SearchContext, or WebElement
@@ -156,16 +67,16 @@ public abstract class WebDriverUtils
      */
     public static WebDriver extractWrappedDriver(Object peeling)
     {
-        while (peeling instanceof WrapsElement)
+        while (peeling instanceof WrapsElement wrapsElement)
         {
-            peeling = ((WrapsElement) peeling).getWrappedElement();
+            peeling = wrapsElement.getWrappedElement();
         }
-        while (peeling instanceof WrapsDriver)
+        while (peeling instanceof WrapsDriver wrapsDriver)
         {
-            peeling = ((WrapsDriver) peeling).getWrappedDriver();
+            peeling = wrapsDriver.getWrappedDriver();
         }
-        if (peeling instanceof WebDriver)
-            return (WebDriver) peeling;
+        if (peeling instanceof WebDriver webDriver)
+            return webDriver;
         else
             return null;
     }
@@ -183,7 +94,7 @@ public abstract class WebDriverUtils
      *     <span>D</span>
      * </div>
      * }</pre>
-     * This method will return a list containing {@code ("B", "D")}
+     * This method will return a list containing {@code ["B", "D"]}
      * @param element element to search
      * @return text from all child text nodes
      */
@@ -192,6 +103,7 @@ public abstract class WebDriverUtils
     {
         JavascriptExecutor executor = (JavascriptExecutor) extractWrappedDriver(element);
 
+        @Language("JavaScript")
         final String script = """
                 var iterator = document.evaluate("text()", arguments[0]);
                 var texts = [];

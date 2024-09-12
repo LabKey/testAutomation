@@ -60,6 +60,7 @@ import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -2762,32 +2763,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement scrollIntoView(WebElement el, Boolean alignToTop)
     {
-        executeScript("arguments[0].scrollIntoView(arguments[1]);", el, alignToTop);
-        return el;
-    }
-
-    public void scrollTo(Integer x, Integer y)
-    {
-        executeScript("window.scrollTo(" + x.toString() +", " + y.toString() + ");");
+        return ScrollUtils.scrollIntoView(el, alignToTop);
     }
 
     public void scrollToMiddle(WebElement element)
     {
-        String scrollYToMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
-                + "var elementTop = arguments[0].getBoundingClientRect().top;"
-                + "window.scrollBy(0, elementTop-(viewPortHeight/2));";
-
-       executeScript(scrollYToMiddle, element);
+        ScrollUtils.scrollToMiddle(element);
     }
 
     public void scrollToTop()
     {
-        executeScript("window.scrollTo(0,0);");
+        ScrollUtils.scrollTo(getDriver(), 0, 0);
     }
 
     public void scrollBy(Integer x, Integer y)
     {
-        executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
+        ScrollUtils.scrollBy(getDriver(), x, y);
     }
 
     /**
@@ -2917,7 +2908,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
-            scrollTo(0, 0);
+            scrollToTop();
             WebElement root = Locators.documentRoot.findElement(getDriver());
             final Dimension rootSize = root.getSize();
             new Actions(getDriver()).moveToElement(root, - (rootSize.getWidth() / 2), - (rootSize.getHeight() / 2)).perform();
@@ -2934,6 +2925,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void mouseOver(WebElement el)
     {
         scrollIntoView(el);
+        mouseOverWithoutScrolling(el);
+    }
+
+    public void mouseOverWithoutScrolling(WebElement el)
+    {
         Actions builder = new Actions(getDriver());
         builder.moveToElement(el)
                 // Add a little wiggle to make sure tooltips notice

@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -199,14 +200,13 @@ public class ReclickingWebElement extends WebElementDecorator
         }
         catch (WebDriverException ignore) {}
 
-        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
         // Check that we're not blocked by sticky form buttons
-        boolean blockResolved = scrollUtil.scrollUnderStickyFormButtons(el);
+        boolean blockResolved = ScrollUtils.scrollUnderStickyFormButtons(el);
 
         if (!blockResolved)
         {
             // Then check that we're not blocked by a floating header
-            blockResolved = new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
+            blockResolved = ScrollUtils.scrollUnderFloatingHeader(el);
         }
 
         if (!blockResolved)
