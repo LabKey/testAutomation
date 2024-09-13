@@ -478,11 +478,28 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             String beforeText = gridCell.getText();
 
-            new Actions(getDriver()).sendKeys(" ").perform(); // Type into no particular element to activate input
+            activateCell(gridCell);
 
             String str = value.toString();
             WebElement inputCell = elementCache().inputCell();
-            inputCell.sendKeys(Keys.BACK_SPACE, str, Keys.RETURN); // Add the RETURN to close the inputCell.
+
+            // Remove the text that is there.
+            inputCell.clear();
+
+            // If the cell had text calling '.clear()' requires a reactivation of the cell.
+            if(!inputCell.isDisplayed())
+            {
+                gridCell.click();
+                activateCell(gridCell);
+                inputCell = elementCache().inputCell();
+            }
+
+            if(!str.isEmpty())
+            {
+                inputCell.sendKeys(str);
+            }
+
+            inputCell.sendKeys(Keys.RETURN); // Close the inputCell.
 
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(inputCell));
 
@@ -1094,7 +1111,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         public WebElement inputCell()
         {
-            return Locators.inputCell.findElement(table);
+            return Locators.inputCell.refindWhenNeeded(table);
         }
 
         public ReactSelect lookupSelect(WebElement cell)
