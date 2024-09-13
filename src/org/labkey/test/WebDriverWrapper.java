@@ -2766,9 +2766,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ScrollUtils.scrollIntoView(el, alignToTop);
     }
 
-    public void scrollToMiddle(WebElement element)
+    public WebElement scrollToMiddle(WebElement element)
     {
-        ScrollUtils.scrollToMiddle(element);
+        return ScrollUtils.scrollToMiddle(element);
     }
 
     public void scrollToTop()

@@ -79,6 +79,16 @@ public class ScrollUtils
         return null == N ? null : N.longValue();
     }
 
+    public static void scrollBy(WebDriver webDriver, Integer x, Integer y)
+    {
+        executeScript(webDriver, "window.scrollBy(arguments[0], arguments[1]);", x, y);
+    }
+
+    public static void scrollTo(WebDriver webDriver, Integer x, Integer y)
+    {
+        executeScript(webDriver, "window.scrollTo(arguments[0], arguments[1]);", x, y);
+    }
+
     public static WebElement scrollIntoView(WebElement webElement)
     {
         executeScript(webElement, "arguments[0].scrollIntoView();", webElement);
@@ -100,17 +110,13 @@ public class ScrollUtils
 
     public static WebElement scrollToMiddle(WebElement webElement)
     {
-        return scrollIntoView(webElement, Alignment.center, Alignment.center);
-    }
+        String scrollYToMiddle = """
+                var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                var elementTop = arguments[0].getBoundingClientRect().top;
+                window.scrollBy(0, elementTop-(viewPortHeight/2));""";
 
-    public static void scrollBy(WebDriver webDriver, Integer x, Integer y)
-    {
-        executeScript(webDriver, "window.scrollBy(arguments[0], arguments[1]);", x, y);
-    }
-
-    public static void scrollTo(WebDriver webDriver, Integer x, Integer y)
-    {
-        executeScript(webDriver, "window.scrollTo(arguments[0], arguments[1]);", x, y);
+        executeScript(webElement, scrollYToMiddle, webElement);
+        return webElement;
     }
 
     private static Object executeScript(WebDriver _webDriver, @Language("JavaScript") String script, Object... args)
