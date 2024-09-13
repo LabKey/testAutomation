@@ -15,14 +15,18 @@
  */
 package org.labkey.test.util.selenium;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -228,5 +232,30 @@ public abstract class WebDriverUtils
             throw new NoSuchElementException("Element does not have any text children: " + element.toString());
         }
         return textChildren.get(0);
+    }
+
+    /**
+     * Attempts to get alert text from an {@link UnhandledAlertException}. If exception does not supply the alert text,
+     * attempt to get it from the alert directly (requires {@link org.openqa.selenium.UnexpectedAlertBehaviour#IGNORE}).
+     * Either way, the alert will be dismissed if present.
+     * @param uae UnhandledAlertException
+     * @param driver WebDriver
+     * @return Best attempt at alert text
+     */
+    public static String getUnhandledAlertText(UnhandledAlertException uae, WebDriver driver)
+    {
+        String alertText = StringUtils.trimToEmpty(uae.getAlertText());
+        try
+        {
+            Alert alert = driver.switchTo().alert();
+            if (alertText.isEmpty())
+            {
+                alertText = alert.getText();
+            }
+            alert.dismiss(); // Dismiss alert even if exception contains alert text
+        }
+        catch (NoAlertPresentException ignore) {}
+
+        return StringUtils.isBlank(alertText) ? uae.getMessage() : alertText;
     }
 }

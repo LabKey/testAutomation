@@ -76,6 +76,8 @@ import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -364,6 +366,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         binary.addCommandLineOptions("--headless");
                     }
                     capabilities.setBinary(binary);
+                    // Firefox 128: UnhandledAlertException doesn't include alert text. Need to leave alerts to get text manually.
+                    capabilities.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
 
                     newDriverService = GeckoDriverService.createDefaultService();
@@ -1009,8 +1013,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         for (int i = 1; i < windows.size(); i++)
         {
             getDriver().switchTo().window(windows.get(i));
-            executeScript("window.onbeforeunload = null;");
-            getDriver().close();
+            try
+            {
+                getDriver().close();
+            }
+            catch (UnhandledAlertException uae)
+            {
+                Optional.ofNullable(getAlertIfPresent()).ifPresent(Alert::accept);
+            }
         }
         if (windows.size() > 1)
         {
@@ -1119,7 +1129,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return beginAt(url, defaultWaitForPage);
     }
 
+    public long beginAtAcceptingAlerts(String url)
+    {
+        return beginAt(url, defaultWaitForPage, true);
+    }
+
     public long beginAt(String url, int millis)
+    {
+        return beginAt(url, millis, false);
+    }
+
+    public long beginAt(String url, int millis, boolean acceptAlerts)
     {
         String relativeURL = makeRelativeUrl(url);
         String logMessage = "";
@@ -1145,6 +1165,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 catch (TimeoutException ex)
                 {
                     throw new TestTimeoutException(ex); // Triggers thread dump.
+                }
+                catch (UnhandledAlertException uae)
+                {
+                    Alert alert;
+                    if (acceptAlerts && (alert = getAlertIfPresent()) != null)
+                    {
+                        TestLogger.warn("Unhandled alert: " + alert.getText());
+                        alert.accept();
+                    }
+                    else
+                    {
+                        throw uae;
+                    }
                 }
             }, expectPageLoad ? millis : 0);
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
@@ -1387,7 +1420,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         getDriver().switchTo().defaultContent();
         if (alertCount == 10)
         {
-            log("Too many alerts. Alert loop in JavaScript?");
+            throw new IllegalStateException("Too many alerts. Alert loop in JavaScript?");
         }
         return alertCount;
     }

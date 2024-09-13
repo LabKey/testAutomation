@@ -310,8 +310,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         CustomizeView customizeView = samplesTable.getCustomizeView();
         customizeView.openCustomizeViewPanel();
         customizeView.showHiddenItems();
-        customizeView.addColumn("INPUTS/MATERIALS/BLOOD/VisitDate");
-        customizeView.addColumn("INPUTS/MATERIALS/BLOOD/ParticipantId");
+        customizeView.addColumn("Inputs/Materials/Blood/VisitDate");
+        customizeView.addColumn("Inputs/Materials/Blood/ParticipantId");
         customizeView.saveCustomView();
         samplesTable.checkCheckbox(samplesTable.getRowIndex("Name", derivedSampleName));
         samplesTable.clickHeaderButtonAndWait("Link to Study");
@@ -617,9 +617,9 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         CustomizeView customizeView = samplesTable.getCustomizeView();
         customizeView.openCustomizeViewPanel();
         customizeView.showHiddenItems();
-        customizeView.addColumn("INPUTS/MATERIALS/" + parentSampleType + "/VisitId");
-        customizeView.addColumn("INPUTS/MATERIALS/" + parentSampleType + "/VisitDate");
-        customizeView.addColumn("INPUTS/MATERIALS/" + parentSampleType + "/ParticipantId");
+        customizeView.addColumn("Inputs/Materials/" + parentSampleType + "/VisitId");
+        customizeView.addColumn("Inputs/Materials/" + parentSampleType + "/VisitDate");
+        customizeView.addColumn("Inputs/Materials/" + parentSampleType + "/ParticipantId");
         customizeView.saveCustomView();
 
         log("Bulk importing in the child sample");

@@ -134,8 +134,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         if (!Locator.tagWithName("form", "login").existsIn(getDriver()) || !Locator.name("email").existsIn(getDriver()))
         {
-            executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
-            beginAt(buildURL("login", "login"));
+            beginAtAcceptingAlerts(buildURL("login", "login"));
             waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
                     UserMenu.appUserMenu());
         }
@@ -1423,7 +1422,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void goToHome()
     {
-        beginAt(buildURL("project", "home", "begin"));
+        beginAtAcceptingAlerts(buildURL("project", "home", "begin"));
         waitFor(this::onLabKeyPage, "Home project didn't seem to load. JavaScript 'LABKEY' namespace not found.", 10000);
     }
 

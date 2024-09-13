@@ -92,6 +92,7 @@ import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -803,6 +804,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             protected void succeeded(Description description)
             {
                 closeExtraWindows();
+                dismissAllAlerts();
                 checker().withScreenshot(description.getMethodName() + "_serverErrors").wrapAssertion(() -> checkErrors());
                 checker().reportResults();
             }
@@ -1011,8 +1013,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     }
                     catch (MalformedURLException e)
                     {
-                        log("Unable to construct debug URL");
-                        e.printStackTrace();
+                        TestLogger.log().error("Unable to construct debug URL", e);
                     }
                 }
             }
@@ -1054,7 +1055,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     }
                     catch (UnhandledAlertException alert)
                     {
-                        TestLogger.warn("Alert was triggered by iframe: " + alert.getAlertText());
+                        TestLogger.warn("Alert was triggered by iframe: " + WebDriverUtils.getUnhandledAlertText(alert, getDriver()));
                     }
                 }
                 // Don't take screenshots if error was deferred and any screenshots were taken

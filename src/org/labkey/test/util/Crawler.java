@@ -41,7 +41,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.ProjectMenu;
-import org.openqa.selenium.Alert;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
@@ -1263,26 +1263,9 @@ public class Crawler
         }
         catch (UnhandledAlertException ex)
         {
-            String alertText = ex.getAlertText();
-            if (alertText == null)
-                alertText = test.cancelAlert();
-            else if (alertText.isBlank())
-                alertText = ex.getMessage();
+            String alertText = WebDriverUtils.getUnhandledAlertText(ex, test.getDriver());
 
             checkForJavaScriptInjection(alertText);
-
-            checkForSqlInjection(test);
-
-            throw ex;
-        }
-        catch (Exception ex)
-        {
-            Alert alert;
-            while (null != (alert = test.getAlertIfPresent()))
-            {
-                checkForJavaScriptInjection(alert.getText());
-                alert.dismiss();
-            }
 
             checkForSqlInjection(test);
 

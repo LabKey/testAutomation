@@ -93,6 +93,14 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
                     {
                         return Locator.tagWithClass("img", Ext4Helper.getCssPrefix() + "grid-checkcolumn");
                     }
+                },
+        TREE
+                {
+                    @Override
+                    protected Locator.XPathLocator itemLoc()
+                    {
+                        return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "tree-checkbox");
+                    }
                 };
 
         protected abstract Locator.XPathLocator itemLoc();
