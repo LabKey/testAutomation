@@ -75,8 +75,7 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         return counts;
     }
 
-
-    private boolean isSelected(String tabText)
+    public boolean isSelected(String tabText)
     {
         String tabClass = elementCache().navTab(tabText).getAttribute("class");
         return tabClass.toLowerCase().contains("active");
