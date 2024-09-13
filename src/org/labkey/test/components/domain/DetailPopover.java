@@ -32,7 +32,8 @@ public class DetailPopover extends WebDriverComponent<DetailPopover.ElementCache
 
     public DetailPopover collapse()
     {
-        getWrapper().mouseOut();
+        // mouseOver the app header icon, instead of calling geWrapper.mouseOut() as that does not always work
+        getWrapper().mouseOver(Locator.byClass("navbar-left-icon").findElement(getDriver()));
         clearElementCache();
         return this;
     }
