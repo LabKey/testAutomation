@@ -35,7 +35,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
-import org.labkey.test.util.selenium.WebDriverUtils;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -498,13 +498,13 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             {
                 try
                 {
-                    new WebDriverUtils.ScrollUtil(getDriver()).scrollIntoView(el);
+                    ScrollUtils.scrollIntoView(el);
                     builder.moveToElement(el).click().build().perform();
                 }
                 catch (StaleElementReferenceException ignore) {}
                 catch (WebDriverException ignore)
                 {
-                    new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
+                    ScrollUtils.scrollUnderFloatingHeader(el);
                 }
             }
             _driver.shortWait().until(ExpectedConditions.stalenessOf(el));
