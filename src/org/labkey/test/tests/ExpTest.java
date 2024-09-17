@@ -189,5 +189,14 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("edit metadata"));
         designerPage = new QueryMetadataEditorPage(getDriver());
         designerPage.resetToDefault();
+
+        // Issue 51024: When materialLSIDprefix is set via XAR, naming collisions can happen
+        clickFolder(FOLDER_NAME);
+        clickButton("Process and Import Data");
+        _fileBrowserHelper.importFile("sample_types_bad_materiallsidprefix.xar.xml", "Import Experiment");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
+        waitForPipelineJobsToComplete(2, true);
+        assertTrue("Error message for duplicate MaterialLsidPrefix not as expected", getServerErrors().contains("Duplicate 'MaterialLSIDPrefix' found"));
+        resetErrors();
     }
 }
