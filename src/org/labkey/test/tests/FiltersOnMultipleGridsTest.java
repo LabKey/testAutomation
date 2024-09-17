@@ -75,7 +75,7 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
         DataRegionTable queryTable = DataRegionTable.findDataRegionWithinWebpart(this, QUERY_WEBPART_TITLE);
         CustomizeView customizeView = queryTable.openCustomizeGrid();
         customizeView.addColumn("UserId");
-        customizeView.clickViewGrid();
+        customizeView.applyCustomView();
 
         queryTable = DataRegionTable.findDataRegionWithinWebpart(this, QUERY_WEBPART_TITLE);
         checker().verifyEquals("Incorrect columns on query webparts", Arrays.asList("Name", "Type", "Container", "UserId"),

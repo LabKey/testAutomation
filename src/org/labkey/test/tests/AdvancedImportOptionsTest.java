@@ -352,20 +352,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         Locator.tagWithClass("span", "x4-tree-node-text").notHidden().withText(IMPORT_FOLDER_MULTI01).waitForElement(shortWait());
 
         log("Select sub folders to import into");
-        /* new UI behavior: clicking on the text doesn't toggle the box, but clicking the checkbox does.
-         * Also, using a checkbox to wrap this has issues; checkBox.get() always returns false, so
-         * set(true) unchecks the box.  Todo: salvage this logic into a component someplace.
-          * Todo: wonder if being already-selected here is a problem.*/
-        WebElement checkbox01 = Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01)
-                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
-        if (checkbox01.getAttribute("aria-checked") == null || !checkbox01.getAttribute("aria-checked").equals("true"))
-            checkbox01.click();
-        sleep(250);
-        WebElement checkBox03 = Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03)
-                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
-        if (checkBox03.getAttribute("aria-checked") == null || !checkBox03.getAttribute("aria-checked").equals("true"))
-            checkBox03.click();
-        sleep(250);
+        importPage.checkTargetFolders(IMPORT_FOLDER_MULTI01, IMPORT_FOLDER_MULTI03);
 
         log("Start the import and verify the confirmation dialog");
         importPage.clickStartImport("The import archive will be applied to 2 selected target folders. A separate pipeline import job will be created for each. This action cannot be undone.\n\nWould you like to proceed?");
