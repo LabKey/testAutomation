@@ -77,7 +77,7 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
     public static class SsoLogoInputPanelFinder extends WebDriverComponentFinder<SsoLogoInputPanel, SsoLogoInputPanelFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "sso-logo-pane-container")
-                .withChild(Locator.tagWithClass("div", "sso-fields__label"));
+                .withChild(Locator.tagWithClass("div", "sso-fields-label"));
         private String _label = null;
         private String _inputId = null;
 
@@ -108,7 +108,7 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
         protected Locator locator()
         {
             if (_label != null)
-                return _baseLocator.withChild(Locator.tagWithClass("div", "sso-fields__label").withText(_label));
+                return _baseLocator.withChild(Locator.tagWithClass("div", "auth-config-input-row__caption").withText(_label));
             if (_inputId != null)
                 return _baseLocator.withDescendant(Locator.id(_inputId));
             else
