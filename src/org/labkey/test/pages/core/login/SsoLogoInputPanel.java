@@ -44,7 +44,7 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
     public SsoLogoInputPanel clearLogo()
     {
         elementCache().logoImageRemoveBtn.click();
-        WebDriverWrapper.waitFor(()-> elementCache().nullImageLoc.existsIn(this),
+        WebDriverWrapper.waitFor(()-> elementCache().fileDropLoc.existsIn(this),
                 "did not clear logo icon", 2000);
         return this;
     }
@@ -71,7 +71,7 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
         {
             return Locator.tagWithClass("div", "attached-file--container").containing(file.getName());
         }
-        Locator nullImageLoc = Locator.tagWithClass("div", "sso-fields__null-image");
+        Locator fileDropLoc = Locator.tagWithClass("div", "sso-fields__file-attachment");
     }
 
     public static class SsoLogoInputPanelFinder extends WebDriverComponentFinder<SsoLogoInputPanel, SsoLogoInputPanelFinder>
