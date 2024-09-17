@@ -988,6 +988,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // Remove focus from the input, this should cause the status message to update.
         elementCache().expressionInput.sendKeys(Keys.TAB);
 
+        getWrapper().shortWait().until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOf(elementCache().expressionStatusValidated),
+                ExpectedConditions.visibilityOf(elementCache().expressionStatusError)));
+
         return this;
     }
 
@@ -1368,8 +1372,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         // calculations field options
         public final WebElement expressionInput = Locator.name("domainpropertiesrow-valueExpression")
                 .findWhenNeeded(this);
-        public final WebElement expressionStatusMsg = Locator.tagWithClass("div", "domain-field-calc-footer")
-                .childTag("div").refindWhenNeeded(this);
+        private final Locator.XPathLocator expressionStatusMsgLoc = Locator.tagWithClass("div", "domain-field-calc-footer");
+        public final WebElement expressionStatusValidated = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validated")).refindWhenNeeded(this);
+        public final WebElement expressionStatusError = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "error")).refindWhenNeeded(this);
+        public final WebElement expressionStatusMsg = expressionStatusMsgLoc.childTag("div").refindWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
