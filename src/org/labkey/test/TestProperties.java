@@ -164,26 +164,12 @@ public abstract class TestProperties
 
     public static double getTimeoutMultiplier()
     {
-        try
-        {
-            return Math.max(0, Double.parseDouble(System.getProperty("webtest.timeout.multiplier", "")));
-        }
-        catch (NumberFormatException badProp)
-        {
-            return 1.0;
-        }
+        return Math.max(0, getDoubleProperty("webtest.timeout.multiplier", 1.0));
     }
 
     public static Duration getCrawlerTimeout()
     {
-        try
-        {
-            return Duration.ofSeconds(Integer.parseInt(System.getProperty("crawlerTimeout")));
-        }
-        catch (NumberFormatException ignore)
-        {
-            return Duration.ofSeconds(90);
-        }
+        return Duration.ofSeconds(getIntegerProperty("crawlerTimeout", 90));
     }
 
     public static boolean isCloudPipelineEnabled()
@@ -194,6 +180,16 @@ public abstract class TestProperties
     public static String getCloudPipelineBucketName()
     {
         return System.getProperty("cloud.pipeline.bucket");
+    }
+
+    public static int getBrowserWidth()
+    {
+        return getIntegerProperty("webtest.browser.width", 1280);
+    }
+
+    public static int getBrowserHeight()
+    {
+        return getIntegerProperty("webtest.browser.height", 1024);
     }
 
     public static boolean isWebDriverLoggingEnabled()
@@ -258,15 +254,7 @@ public abstract class TestProperties
      */
     public static int getServerStartupTimeout()
     {
-        String property = System.getProperty("webtest.server.startup.timeout");
-        try
-        {
-            return Integer.parseInt(property);
-        }
-        catch (NumberFormatException nfe)
-        {
-            return 120;
-        }
+        return getIntegerProperty("webtest.server.startup.timeout", 120);
     }
 
     public static File getTomcatHome()
@@ -357,5 +345,53 @@ public abstract class TestProperties
         {
             return def;
         }
+    }
+
+    /**
+     * Interpret system property as an integer. If property is blank or unset, return the specified default value.
+     * Otherwise, parse property with {@link Integer#parseInt(String)}
+     * @param key System property name
+     * @param def Default value
+     * @return value of the specified property
+     */
+    private static int getIntegerProperty(String key, int def)
+    {
+        String prop = System.getProperty(key);
+        if (!StringUtils.isBlank(prop))
+        {
+            try
+            {
+                return Integer.parseInt(prop);
+            }
+            catch (NumberFormatException e)
+            {
+                TestLogger.warn("Invalid value for property %s: '%s'".formatted(key, prop), e);
+            }
+        }
+        return def;
+    }
+
+    /**
+     * Interpret system property as a double. If property is blank or unset, return the specified default value.
+     * Otherwise, parse property with {@link Double#parseDouble(String)}
+     * @param key System property name
+     * @param def Default value
+     * @return value of the specified property
+     */
+    private static double getDoubleProperty(String key, double def)
+    {
+        String prop = System.getProperty(key);
+        if (!StringUtils.isBlank(prop))
+        {
+            try
+            {
+                return Double.parseDouble(prop);
+            }
+            catch (NumberFormatException e)
+            {
+                TestLogger.warn("Invalid value for property %s: '%s'".formatted(key, prop), e);
+            }
+        }
+        return def;
     }
 }
