@@ -16,6 +16,7 @@
 
 package org.labkey.crawlertest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.action.SimpleErrorView;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
@@ -31,6 +32,9 @@ public class CrawlerTestController extends SpringActionController
 {
     private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(CrawlerTestController.class);
     public static final String NAME = "crawlertest";
+    static final String injectScriptBlock1 = "\">'>'\"<script>alert('8(')</script>";
+    static final String injectScriptBlock2 = "\">'>'\"</script><img src=\"x\" onerror=\"alert('8(')\">";
+    static final String safeParam = "OK!";
 
     public CrawlerTestController()
     {
@@ -50,6 +54,10 @@ public class CrawlerTestController extends SpringActionController
             if (!getViewContext().getUser().getEmail().equals("injectiontester@labkey.injection.test"))
             {
                 errors.reject(ERROR_MSG, "This action only responds to a specific test user.");
+            }
+            if (!form.getInject().equals(injectScriptBlock1) && !form.getInject().equals(injectScriptBlock2) && !form.getInject().equals(safeParam) && !StringUtils.isBlank(form.getInject()))
+            {
+                errors.reject(ERROR_MSG, "This action only responds to specific inject values.");
             }
         }
 
