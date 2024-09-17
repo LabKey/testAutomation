@@ -40,18 +40,15 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.serverapi.reader.Readers;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -659,31 +657,37 @@ public abstract class TestFileUtils
         return Streams.readAll(ld.getInputStream());
     }
 
+    public static File writeColumnToXlsx(List<String> columnData, String xlsxFileName) throws IOException
+    {
+        return writeXlsxWorkbook(columnData.stream().map(List::of).toList(), xlsxFileName);
+    }
 
-    public static File convertTabularToXlsx(File tabularFile, String delimiter, String sheetName, String xlsxFileName) throws IOException, PGPException
+    public static File writeXlsxWorkbook(List<List<String>> worksheetData, String xlsxFileName) throws IOException
+    {
+        return writeXlsxWorkbook(Map.of("data", worksheetData), xlsxFileName);
+    }
+
+    public static File writeXlsxWorkbook(Map<String, List<List<String>>> workbookData, String xlsxFileName) throws IOException
     {
         File excelFile = new File(getTestTempDir(), xlsxFileName);
         FileUtils.forceMkdirParent(excelFile);
 
         try(SXSSFWorkbook workBook = new SXSSFWorkbook(1000); // holds 1000 rows at a time
-            BufferedReader br = Readers.getReader(tabularFile);
             FileOutputStream out =  new FileOutputStream(excelFile))
         {
-            var sheet = workBook.createSheet(sheetName);
+            workbookData.forEach((sheetName, sheetData) -> {
+                var sheet = workBook.createSheet(sheetName);
 
-            String currentLine;
-            int rowNum=0;
-
-            while ((currentLine = br.readLine()) != null)
-            {
-                String str[] = currentLine.split(delimiter);
-                SXSSFRow currentRow = sheet.createRow(rowNum);
-                for (int i = 0; i < str.length; i++)
+                for (int rowNum = 0; rowNum < sheetData.size(); rowNum++)
                 {
-                    currentRow.createCell(i).setCellValue(str[i]);
+                    List<String> rowData = sheetData.get(rowNum);
+                    SXSSFRow currentRow = sheet.createRow(rowNum);
+                    for (int i = 0; i < rowData.size(); i++)
+                    {
+                        currentRow.createCell(i).setCellValue(rowData.get(i));
+                    }
                 }
-                rowNum++;
-            }
+            });
             workBook.write(out);    // flush remaining rows
         }
 

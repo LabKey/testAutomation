@@ -16,7 +16,6 @@ import org.labkey.test.util.TestDataGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -177,16 +176,5 @@ public class SampleTypeAPIHelper
                 new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
-    }
-
-    /**
-     * This method has a misleading name. "Name" and "Sample ID" refer to the same column. This is actually fetching
-     * row IDs of the specified samples.
-     * @deprecated Use {@link #getRowIdsForSamples(String, String, List)}
-     */
-    @Deprecated(since = "22.4")
-    public static Map<String, Integer> getSampleIdFromName(String folder, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
-    {
-        return getRowIdsForSamples(folder, sampleTypeName, sampleNames);
     }
 }

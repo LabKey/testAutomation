@@ -27,12 +27,13 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.ui.domainproperties.EntityTypeDesigner;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -65,7 +66,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
     private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
 
-    private static final String PARENT_SAMPLE_TYPE = "Parent_SampleType";
+    private static final String TRICKY_CHARACTERS_FOR_SAMPLE_TYPE_NAME = " \u2603~!@$&()_-:+-=[],.#\u00E4";
+    private static final String PARENT_SAMPLE_TYPE = "Parent_SampleType" + TRICKY_CHARACTERS_FOR_SAMPLE_TYPE_NAME;
 
     private static final String PARENT_SAMPLE_01 = "parent01";
     private static final String PARENT_SAMPLE_02 = "parent02";
@@ -73,8 +75,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_04 = "#parent04";
     private static final String PARENT_SAMPLE_05 = "\"parent05";
     private static final String PARENT_SAMPLE_06 = "parent,06";
-
-    private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
 
     @Override
     public List<String> getAssociatedModules()
@@ -211,7 +211,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     // Issue 50924: LKSM: Importing samples using naming expression referencing parent inputs with # result in error
     @Test
-    public void testDeriveFromCommentLikeParents()
+    public void testDeriveFromCommentLikeParents() throws IOException
     {
         final String sampleTypeName = "ParentNamesExprTest";
 
@@ -261,8 +261,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 isElementPresent(Locator.linkWithText("Derive sample from " + PARENT_SAMPLE_03)));
         clickAndWait(Locator.linkWithText(sampleTypeName));
 
+        List<String> xlsData = List.of("MaterialInputs/" + PARENT_SAMPLE_TYPE,
+                PARENT_SAMPLE_04,
+                PARENT_SAMPLE_04 + "," + PARENT_SAMPLE_03,
+                PARENT_SAMPLE_01 + "," + PARENT_SAMPLE_04,
+                PARENT_SAMPLE_05,
+                "\"" + PARENT_SAMPLE_06 + "\"");
+
+        File xlsFile = TestFileUtils.writeColumnToXlsx(xlsData, "ParentSamples.xlsx");
         log("Verify import EXCEL should not ignore lines starting with #, and should work with sample containing double quotes");
-        sampleHelper.bulkImport(PARENT_EXCEL);
+        sampleHelper.bulkImport(xlsFile);
 
         names = materialTable.getColumnDataAsText("Name");
         log("generated sample names:");
@@ -446,19 +454,18 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testLookupNameExpression() throws Exception
     {
         String lookupList = "Colors";
-        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList)
-                .setTableType(FieldDefinition.ColumnType.Integer);
         String nameExpSamples = "NameExpressionSamples";
 
         // begin by creating a lookupList of colors, the sampleType will reference it
-        TestDataGenerator colorsGen = new TestDataGenerator(colorsLookup)
-                .withColumns(List.of(new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
+        ListDefinition listDefinition = new IntListDefinition(lookupList, "Key")
+                .setFields(List.of(
+                        new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
                         new FieldDefinition("ColorCode", FieldDefinition.ColumnType.String)));
+        TestDataGenerator colorsGen = listDefinition.create(createDefaultConnection(), getProjectName());
         colorsGen.addCustomRow(Map.of("ColorName", "green", "ColorCode", "gr"));
         colorsGen.addCustomRow(Map.of("ColorName", "yellow", "ColorCode", "yl"));
         colorsGen.addCustomRow(Map.of("ColorName", "red", "ColorCode", "rd"));
         colorsGen.addCustomRow(Map.of("ColorName", "blue", "ColorCode", "bl"));
-        colorsGen.createList(createDefaultConnection(), "Key");
         colorsGen.insertRows();
 
         String pasteData = """
@@ -470,7 +477,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         // now create a sampleType with a Color column that looks up to Colors
         var sampleTypeDef = new SampleTypeDefinition(nameExpSamples)
-                .setFields(List.of(new FieldDefinition("ColorLookup", colorsLookup),
+                .setFields(List.of(new FieldDefinition("ColorLookup", new FieldDefinition.IntLookup("lists", lookupList)),
                         new FieldDefinition("Noun", FieldDefinition.ColumnType.String)))
                 .setNameExpression("TEST-${ColorLookup/ColorCode}");   // hopefully this will resolve the 'ColorCode' column from the list
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDef);
@@ -649,7 +656,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, String strVal, String intVal) throws IOException, CommandException
     {
         log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", parentSampleName, parentSampleType));
-        Integer sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
+        Integer sampleRowNum = SampleTypeAPIHelper.getRowIdsForSamples(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
 
         String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
         beginAt(url);
@@ -986,7 +993,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         nextGenId = 501;
         log(String.format("Update genId to '%d'.", nextGenId));
 
-        EntityTypeDesigner.GenIdDialog idDialog = updatePage.clickEditGenId();
+        UpdateSampleTypePage.GenIdDialog idDialog = updatePage.clickEditGenId();
         idDialog.setGenId(Integer.toString(nextGenId));
         idDialog.dismiss("Update");
 
@@ -1265,7 +1272,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         nextGenId = 100;
         log(String.format("Update genId to a larger value '%d'", nextGenId));
 
-        EntityTypeDesigner.GenIdDialog idDialog = updatePage.clickEditGenId();
+        UpdateSampleTypePage.GenIdDialog idDialog = updatePage.clickEditGenId();
         idDialog.setGenId(Integer.toString(nextGenId));
         idDialog.dismiss("Update");
 
