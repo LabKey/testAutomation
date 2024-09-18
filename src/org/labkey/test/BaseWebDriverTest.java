@@ -315,8 +315,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
         try
         {
-            // Similar dimensions to what is on TeamCity. A little bit shorter than most dev machines.
-            getDriver().manage().window().setSize(new Dimension(1280, 900));
+            getDriver().manage().window().setSize(new Dimension(TestProperties.getBrowserWidth(), TestProperties.getBrowserHeight()));
         }
         catch (WebDriverException ex)
         {
