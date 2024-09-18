@@ -113,6 +113,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
         // verify that all the following links are visible to AppAdmin:
         goToAdminConsole().goToSettingsSection();
         List<String> expectedLinkTexts = new ArrayList<>(Arrays.asList("change user properties",
+                "experimental features",
+                "deprecated features",
                 "folder types",
                 "look and feel settings",
                 "missing value indicators",
@@ -146,7 +148,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
         List<String> notShownLinks = Arrays.asList(
                 "files",
                 "flow cytometry",
-                "experimental features",
                 "mascot server",
                 "ldap sync admin",
                 "notification service",
