@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -98,11 +99,6 @@ public class ReclickingWebElement extends WebElementDecorator
                 else if ("a".equals(tagName) && classes.contains("point")) // probably an SVG point
                 {
                     actionClick();
-                }
-                else if (e.getRawMessage().contains("could not be scrolled into view"))
-                {
-                    // Add some information to help test developer find a better element.
-                    throw new ElementNotInteractableException("Click failed; try clicking a child element. Firefox doesn't like clicking certain wrapping elements\n" + e.getRawMessage(), e);
                 }
                 else
                 {
@@ -204,14 +200,13 @@ public class ReclickingWebElement extends WebElementDecorator
         }
         catch (WebDriverException ignore) {}
 
-        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
         // Check that we're not blocked by sticky form buttons
-        boolean blockResolved = scrollUtil.scrollUnderStickyFormButtons(el);
+        boolean blockResolved = ScrollUtils.scrollUnderStickyFormButtons(el);
 
         if (!blockResolved)
         {
             // Then check that we're not blocked by a floating header
-            blockResolved = new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
+            blockResolved = ScrollUtils.scrollUnderFloatingHeader(el);
         }
 
         if (!blockResolved)

@@ -501,6 +501,13 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
+        public ElementCache()
+        {
+            // Wait for selects to finish loading
+            getWrapper().shortWait().until(ExpectedConditions
+                    .invisibilityOfAllElements(Locator.byClass("select-input__loading-indicator").findElements(this)));
+        }
+
         public WebElement header = Locator.tagWithClass("div", "panel-heading")
                 .findWhenNeeded(this);
         public WebElement editPanel = Locator.tagWithClass("div", "detail__editing")

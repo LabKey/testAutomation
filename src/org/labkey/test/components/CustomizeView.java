@@ -35,7 +35,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
-import org.labkey.test.util.selenium.WebDriverUtils;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -368,8 +368,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             nodePath += "/";
         }
 
-        WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
-        return _driver.scrollIntoView(tr, false);
+        return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
     }
 
     private void addItem(String[] fieldKeyParts, String columnName, ViewItemType type)
@@ -382,7 +381,10 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
+        WebElement rowLabel = Locator.byClass("x4-tree-node-text").findElement(fieldRow);
+        rowLabel.click();
         new Checkbox(checkbox).check();
+        itemXPath(type, fieldKeyParts).waitForElement(this, 2_000);
     }
 
     public void addColumn(String[] fieldKeyParts, String label)
@@ -496,13 +498,13 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             {
                 try
                 {
-                    new WebDriverUtils.ScrollUtil(getDriver()).scrollIntoView(el);
+                    ScrollUtils.scrollIntoView(el);
                     builder.moveToElement(el).click().build().perform();
                 }
                 catch (StaleElementReferenceException ignore) {}
                 catch (WebDriverException ignore)
                 {
-                    new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
+                    ScrollUtils.scrollUnderFloatingHeader(el);
                 }
             }
             _driver.shortWait().until(ExpectedConditions.stalenessOf(el));

@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -195,7 +196,8 @@ public class FolderExportTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.selectFileBrowserItem(dir + "/" + uploadFileName);
         File downloadedFile = _fileBrowserHelper.downloadSelectedFiles();
-        assertEquals("Expected file '" + uploadFileName + "' did not get downloaded", uploadFileName, downloadedFile.getName());
+        Assertions.assertThat(downloadedFile.getName()).as("Downloaded file with special characters")
+                .isIn(uploadFileName, uploadFileName.replace("%", "_")); // Firefox 128+ replaces '%'s in downloaded file name
 
         log("Test Drag and Drop zip folder '" + sourceZip.getName() + "'");
         _fileBrowserHelper.dragDropUpload(sourceZip);
