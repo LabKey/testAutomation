@@ -50,7 +50,7 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     private static final String LIST_NAME = "NIMHDemographics";
 
     private static final String VIEW_NAME = "My View";
-    private static final String COLUMN_NAME = "Container";
+    private static final String COLUMN_NAME = "container";
     private static final String COLUMN_LABEL = "Folder";
 
     @Override

@@ -1,7 +1,6 @@
 package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -461,7 +460,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         table.openCustomizeGrid();
         _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.addColumn(new String[]{"Inputs", "Materials", parentSampleType});
-        _customizeViewsHelper.clickViewGrid();
+        _customizeViewsHelper.applyCustomView();
         waitAndClickAndWait(Locator.linkWithText("SampleSetBVT4"));
 
         // Check out the run
