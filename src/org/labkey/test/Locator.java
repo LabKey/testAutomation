@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -166,6 +167,12 @@ public abstract class Locator extends By
         {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    protected WebDriver getWebDriver(SearchContext context)
+    {
+        return Objects.requireNonNullElseGet(WebDriverUtils.extractWrappedDriver(context), () -> super.getWebDriver(context));
     }
 
     /**
@@ -323,7 +330,7 @@ public abstract class Locator extends By
     public String getLoggableDescription()
     {
         return (_description == null ? "" : _description + "\n") +
-            toString() +
+                this +
             (_index == null ? "" : "\nIndex: " + _index) +
             (_contains == null ? "" : "\nContaining: " + _contains) +
             (_text == null ? "" : "\nWith Text: " + _text);
@@ -455,7 +462,7 @@ public abstract class Locator extends By
         // The method invisibilityOfAllElements returns true/false, but visibilityOfAllElements returns a list or null.
         // Dealing with a true/false response, and taking the not of it, is easier than having to deal with a list that
         // may or may not be null.
-        return !ExpectedConditions.invisibilityOfAllElements(elements).apply(getWebDriver(context));
+        return !ExpectedConditions.invisibilityOfAllElements(elements).apply(null);
     }
 
     protected final List<WebElement> decorateWebElements(List<WebElement> elements)
