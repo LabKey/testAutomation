@@ -60,6 +60,7 @@ import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -76,6 +77,8 @@ import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -364,6 +367,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         binary.addCommandLineOptions("--headless");
                     }
                     capabilities.setBinary(binary);
+                    // Firefox 128: UnhandledAlertException doesn't include alert text. Need to leave alerts to get text manually.
+                    capabilities.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
 
                     newDriverService = GeckoDriverService.createDefaultService();
@@ -1009,8 +1014,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         for (int i = 1; i < windows.size(); i++)
         {
             getDriver().switchTo().window(windows.get(i));
-            executeScript("window.onbeforeunload = null;");
-            getDriver().close();
+            try
+            {
+                getDriver().close();
+            }
+            catch (UnhandledAlertException uae)
+            {
+                Optional.ofNullable(getAlertIfPresent()).ifPresent(Alert::accept);
+            }
         }
         if (windows.size() > 1)
         {
@@ -1119,7 +1130,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return beginAt(url, defaultWaitForPage);
     }
 
+    public long beginAtAcceptingAlerts(String url)
+    {
+        return beginAt(url, defaultWaitForPage, true);
+    }
+
     public long beginAt(String url, int millis)
+    {
+        return beginAt(url, millis, false);
+    }
+
+    public long beginAt(String url, int millis, boolean acceptAlerts)
     {
         String relativeURL = makeRelativeUrl(url);
         String logMessage = "";
@@ -1145,6 +1166,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 catch (TimeoutException ex)
                 {
                     throw new TestTimeoutException(ex); // Triggers thread dump.
+                }
+                catch (UnhandledAlertException uae)
+                {
+                    Alert alert;
+                    if (acceptAlerts && (alert = getAlertIfPresent()) != null)
+                    {
+                        TestLogger.warn("Unhandled alert: " + alert.getText());
+                        alert.accept();
+                    }
+                    else
+                    {
+                        throw uae;
+                    }
                 }
             }, expectPageLoad ? millis : 0);
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
@@ -1387,7 +1421,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         getDriver().switchTo().defaultContent();
         if (alertCount == 10)
         {
-            log("Too many alerts. Alert loop in JavaScript?");
+            throw new IllegalStateException("Too many alerts. Alert loop in JavaScript?");
         }
         return alertCount;
     }
@@ -2729,32 +2763,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement scrollIntoView(WebElement el, Boolean alignToTop)
     {
-        executeScript("arguments[0].scrollIntoView(arguments[1]);", el, alignToTop);
-        return el;
+        return ScrollUtils.scrollIntoView(el, alignToTop);
     }
 
-    public void scrollTo(Integer x, Integer y)
+    public WebElement scrollToMiddle(WebElement element)
     {
-        executeScript("window.scrollTo(" + x.toString() +", " + y.toString() + ");");
-    }
-
-    public void scrollToMiddle(WebElement element)
-    {
-        String scrollYToMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
-                + "var elementTop = arguments[0].getBoundingClientRect().top;"
-                + "window.scrollBy(0, elementTop-(viewPortHeight/2));";
-
-       executeScript(scrollYToMiddle, element);
+        return ScrollUtils.scrollToMiddle(element);
     }
 
     public void scrollToTop()
     {
-        executeScript("window.scrollTo(0,0);");
+        ScrollUtils.scrollTo(getDriver(), 0, 0);
     }
 
     public void scrollBy(Integer x, Integer y)
     {
-        executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
+        ScrollUtils.scrollBy(getDriver(), x, y);
     }
 
     /**
@@ -2884,7 +2908,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
-            scrollTo(0, 0);
+            scrollToTop();
             WebElement root = Locators.documentRoot.findElement(getDriver());
             final Dimension rootSize = root.getSize();
             new Actions(getDriver()).moveToElement(root, - (rootSize.getWidth() / 2), - (rootSize.getHeight() / 2)).perform();
@@ -2901,6 +2925,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void mouseOver(WebElement el)
     {
         scrollIntoView(el);
+        mouseOverWithoutScrolling(el);
+    }
+
+    public void mouseOverWithoutScrolling(WebElement el)
+    {
         Actions builder = new Actions(getDriver());
         builder.moveToElement(el)
                 // Add a little wiggle to make sure tooltips notice

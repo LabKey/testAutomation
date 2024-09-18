@@ -16,6 +16,7 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.PermissionsHelper.MemberType;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.UnhandledAlertException;
 
 import java.time.Duration;
@@ -80,7 +81,7 @@ public class CrawlerTest extends BaseWebDriverTest
         }
         catch (UnhandledAlertException alert)
         {
-            if (!alert.getMessage().contains(Crawler.injectedAlert))
+            if (!WebDriverUtils.getUnhandledAlertText(alert, getDriver()).contains(Crawler.injectedAlert))
             {
                 throw alert; // Wrong alert
             }
@@ -92,7 +93,7 @@ public class CrawlerTest extends BaseWebDriverTest
         }
         catch (UnhandledAlertException alert)
         {
-            if (!alert.getMessage().contains(Crawler.injectedAlert))
+            if (!WebDriverUtils.getUnhandledAlertText(alert, getDriver()).contains(Crawler.injectedAlert))
             {
                 throw alert; // Wrong alert
             }

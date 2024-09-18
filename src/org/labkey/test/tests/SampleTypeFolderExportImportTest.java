@@ -483,8 +483,8 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         DataRegionTable sourceTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
         CustomizeView cv = sourceTable.openCustomizeGrid();
         cv.showHiddenItems();
-        cv.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
-        cv.addColumn("INPUTS/DATA/PARENTDATACLASS");
+        cv.addColumn("Inputs/Materials/parentSamples");
+        cv.addColumn("Inputs/Data/parentDataClass");
         cv.clickSave().save();
         List<Map<String, String>> sourceRowData = sourceTable.getTableData();
 
@@ -507,11 +507,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         // we expect the sample types and experiment runs webparts to come across along with the folder import
         clickAndWait(Locator.linkWithText(testSamples));
         DataRegionTable destSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
-        CustomizeView cv2 = destSamplesTable.openCustomizeGrid();
-        cv2.showHiddenItems();
-        cv2.addColumn("INPUTS/MATERIALS/PARENTSAMPLES");
-        cv.addColumn("INPUTS/DATA/PARENTDATACLASS");
-        cv2.clickSave().save();
+        cv = destSamplesTable.openCustomizeGrid();
+        cv.showHiddenItems();
+        cv.addColumn("Inputs/Materials/parentSamples");
+        cv.addColumn("Inputs/Data/parentDataClass");
+        cv.clickSave().save();
 
         // capture the data in the exported sampleType
         List<Map<String, String>> destRowData = destSamplesTable.getTableData();
