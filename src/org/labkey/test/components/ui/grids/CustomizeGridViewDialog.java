@@ -37,7 +37,7 @@ public class CustomizeGridViewDialog extends ModalDialog
         waitForReady();
     }
 
-    protected CustomizeGridViewDialog(WebDriver driver)
+    public CustomizeGridViewDialog(WebDriver driver)
     {
         super(new ModalDialogFinder(driver));
         waitForReady();
