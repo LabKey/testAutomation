@@ -11,6 +11,8 @@ import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class AdvancedListSettingsDialog extends ModalDialog
 {
     private final EditListDefinitionPage _page;
@@ -159,6 +161,11 @@ public class AdvancedListSettingsDialog extends ModalDialog
         return _page;
     }
 
+    public List<String> getTitleColumnOptions()
+    {
+        return elementCache().titleColumnSelector.getOptions();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -206,6 +213,8 @@ public class AdvancedListSettingsDialog extends ModalDialog
         {
             return collapsibleFieldLoc(checkboxLabelText).waitForElement(this, 2000);
         }
+
+        final ReactSelect titleColumnSelector = ReactSelect.finder(getDriver()).findWhenNeeded(this);
     }
 
     public enum SearchIncludeOptions
