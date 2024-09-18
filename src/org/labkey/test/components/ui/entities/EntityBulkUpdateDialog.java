@@ -12,7 +12,6 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
-import org.labkey.test.components.ui.files.FileUploadField;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -165,18 +164,18 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public String getErrorAlertText()
     {
-        return BootstrapLocators.errorBanner.waitForElement(this, getWrapper().defaultWaitForPage).getText();
+        return BootstrapLocators.errorBanner.waitForElement(elementCache(), getWrapper().defaultWaitForPage).getText();
     }
 
     public String getWarningAlertText()
     {
-        return BootstrapLocators.warningBanner.waitForElement(this, getWrapper().defaultWaitForPage).getText();
+        return BootstrapLocators.warningBanner.waitForElement(elementCache(), getWrapper().defaultWaitForPage).getText();
     }
 
     public List<String> getColumns()
     {
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
-                .findElements(this);
+                .findElements(elementCache());
         List<String> columns = new ArrayList<>();
         labels.stream().forEach(a -> columns.add(a.getAttribute("for")));
         return columns;
@@ -299,7 +298,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
-        final WebElement commentInput = commentInputLocator.refindWhenNeeded(getDriver());
+        final WebElement commentInput = commentInputLocator.refindWhenNeeded(this);
 
         final WebElement updateButton = Locator.tagWithClass("button", "btn-success").findWhenNeeded(this);
     }
