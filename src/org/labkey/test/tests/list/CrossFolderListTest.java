@@ -9,7 +9,6 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.pages.LabkeyErrorPage;
-import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
@@ -220,7 +219,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
         var customizeView = subFolderListPage.getGrid().openCustomizeGrid();
         customizeView.showHiddenItems();
         customizeView.addColumn("Key");
-        customizeView.addColumn("Container");   // fun fact: the label is 'Folder'
+        customizeView.addColumn("container");   // fun fact: the label is 'Folder'
         customizeView.saveDefaultView();
 
         // now ensure we got the metadata

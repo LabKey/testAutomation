@@ -17,6 +17,8 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Checkbox.CheckboxFinder;
+import org.labkey.test.components.ext4.Checkbox.CheckboxType;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.FileBrowserHelper;
@@ -102,6 +104,21 @@ public class StartImportPage extends LabKeyPage<StartImportPage.ElementCache>
     {
         elementCache().applyToMultipleFoldersCheckbox.set(check);
         shortWait().until(LabKeyExpectedConditions.visibilityOf(elementCache().applyMultiplePanel, check));
+    }
+
+    public void checkTargetFolders(String... folders)
+    {
+        for (String folder : folders)
+        {
+            WebElement rowEl = Locator.tagWithClass("tr", "x4-grid-row")
+                    .withDescendant(Locator.tagWithClass("span", "x4-tree-node-text").withText(folder))
+                    .findElement(elementCache().applyMultiplePanel);
+            shortWait().until(LabKeyExpectedConditions.animationIsDone(rowEl));
+            Locator.tag("span").findElement(rowEl).click(); // get row into view
+            Checkbox checkbox = new CheckboxFinder(CheckboxType.TREE).refindWhenNeeded(rowEl); // Checkbox goes stale sometimes
+            checkbox.check();
+            shortWait().until(ignored -> checkbox.isChecked());
+        }
     }
 
     public boolean isMultipleFolderImportAvailable()
