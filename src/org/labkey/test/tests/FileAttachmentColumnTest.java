@@ -31,6 +31,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.study.CreateStudyPage;
@@ -395,6 +396,30 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         log("validate dataset data in import location");
         validateDatasetData(STUDY_DATASET_NAME, IMPORT_PROJECT_NAME, SAMPLE_FILES);
+
+        /*
+            Regression coverage for Issue 51117
+         */
+        log("rename export folder to verify file and attachment fields still resolve");
+        String newFolderName = "ExportFolder_Renamed";
+        String newFolderPath = String.format("%s/%s", getProjectName(), newFolderName);
+        var folderManagementPage = FolderManagementPage.beginAt(this, EXPORT_FOLDER_PATH);
+        folderManagementPage.clickFolderRename()
+                .setProjectName(newFolderName)
+                .save();
+
+        log("validate list attachment data in renamed export location");
+        validateListData(LIST_NAME, newFolderPath, SAMPLE_FILES);
+
+        log("validate sample file field data in renamed export location");
+        validateSampleData(EXPORT_SAMPLETYPE_NAME, newFolderPath, SAMPLE_FILES);
+
+        log("validate assay file field data in renamed export location");
+        validateAssayRun(EXPORT_ASSAY_NAME, newFolderPath, "firstRun", runFile, expectedResultTexts,
+                expectedResultFiles, expectedOtherFiles);
+
+        log("validate dataset data in renamed export location");
+        validateDatasetData(STUDY_DATASET_NAME, newFolderPath, SAMPLE_FILES);
     }
 
     private void createListWithData(String containerPath)
