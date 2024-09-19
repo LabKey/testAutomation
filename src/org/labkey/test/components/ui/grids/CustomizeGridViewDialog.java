@@ -114,6 +114,12 @@ public class CustomizeGridViewDialog extends ModalDialog
         return addFieldByFieldKeyToGrid(expandAvailableFields(fieldName));
     }
 
+    public WebElement getAvailableFieldElement(String fieldName)
+    {
+        String fieldKey = expandAvailableFields(fieldName);
+        return elementCache().getListItemElementByFieldKey(fieldKey);
+    }
+
     /**
      * Private helper to add a field to the 'Shown in Grid' list. Use the data-fieldkey value to identify the item.
      *
@@ -291,6 +297,18 @@ public class CustomizeGridViewDialog extends ModalDialog
         return this;
     }
 
+    public boolean canColumnBeRemoved(String column)
+    {
+        return canColumnBeRemoved(column, 0);
+    }
+
+    public boolean canColumnBeRemoved(String column, int index)
+    {
+        WebElement listItem = getShownInGridListItems(column).get(index);
+        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+        return removeIcon.isDisplayed();
+    }
+
     /**
      * Remove all the columns with the given name from the grid.
      *
@@ -446,6 +464,53 @@ public class CustomizeGridViewDialog extends ModalDialog
                 listItems.isEmpty());
 
         return listItems;
+    }
+
+    public CustomizeGridViewDialog repositionSelectedFields(String fieldToMove, String targetField, boolean beforeTarget)
+    {
+        WebElement elementToMove = elementCache().getListItemElement(elementCache().shownInGridPanel, fieldToMove);
+        WebElement elementTarget = elementCache().getListItemElement(elementCache().shownInGridPanel, targetField);
+
+        int yBefore =  elementToMove.getRect().getY();
+
+        int offset;
+
+        if(beforeTarget)
+        {
+            if(elementTarget.getRect().getY() < elementToMove.getRect().getY())
+            {
+                // If the target is above the field being moved.
+                offset = -1 * elementTarget.getSize().getHeight();
+            }
+            else
+            {
+                // If the target is below the field being moved.
+                offset = -1 * elementTarget.getSize().getHeight() / 2;
+            }
+        }
+        else
+        {
+            offset = elementTarget.getSize().getHeight() / 2 + 10;
+        }
+
+        WebElement dragHandle = Locator.tagWithAttribute("div", "role", "button").findWhenNeeded(elementToMove);
+        getWrapper().mouseOver(dragHandle);
+        new Actions(getDriver())
+                .clickAndHold(dragHandle)
+                .moveToElement(elementTarget)
+                .moveByOffset(2, offset)
+                .release()
+                .perform();
+
+        // Maybe I don't need to wait?
+        WebDriverWrapper.sleep(1_000);
+
+        int yAfter =  elementToMove.getRect().getY();
+
+        WebDriverWrapper.waitFor(()-> yAfter != yBefore, "I don't think I repositioned the field in the list.",
+                1_000);
+
+        return this;
     }
 
     /**
