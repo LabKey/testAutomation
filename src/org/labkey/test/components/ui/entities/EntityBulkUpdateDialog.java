@@ -175,9 +175,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public List<String> getColumns()
     {
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
-                .findElements(elementCache());
+                .waitForElements(elementCache(), 2_000);
         List<String> columns = new ArrayList<>();
-        labels.stream().forEach(a -> columns.add(a.getAttribute("for")));
+        labels.forEach(a -> columns.add(a.getAttribute("for")));
         return columns;
     }
 
