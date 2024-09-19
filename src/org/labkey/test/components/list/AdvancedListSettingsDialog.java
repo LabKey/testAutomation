@@ -214,7 +214,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
             return collapsibleFieldLoc(checkboxLabelText).waitForElement(this, 2000);
         }
 
-        final ReactSelect titleColumnSelector = ReactSelect.finder(getDriver()).findWhenNeeded(this);
+        final ReactSelect titleColumnSelector = ReactSelect.finder(getDriver()).withName("titleColumn").findWhenNeeded(this);
     }
 
     public enum SearchIncludeOptions
