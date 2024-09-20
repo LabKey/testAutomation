@@ -258,6 +258,10 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
     // find ptid column select
     // find visit column select
 
+    public List<String> getKeyPropertyNameOptions()
+    {
+        return elementCache().keyPropertyName.getOptions();
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -282,6 +286,7 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
 
         private WebElement rowUniquenessContainer = Locator.tagWithClass("div", "dataset_data_row_uniqueness_container")
                 .findWhenNeeded(propertiesPanel);
+        final ReactSelect keyPropertyName = ReactSelect.finder(getDriver()).withName("keyPropertyName").findWhenNeeded(this);
         protected Locator dataRowRadioBtn(Integer index)
         {
             return Locator.tag("label").child(Locator.input("dataRowSetting")
