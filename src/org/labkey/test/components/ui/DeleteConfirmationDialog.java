@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends ModalDialog
 {
-    private final Function<Runnable, ConfirmPage> _confirmPageSupplier;
+    private final Function<Runnable, ConfirmPage> _confirmationSynchronizationFunction;
 
     public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
@@ -36,7 +36,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
     {
         this(sourcePage, runnable -> {
             runnable.run();
-            sourcePage.shortWait().until(ExpectedConditions.stalenessOf(staleOnConfirmElement));
+            sourcePage.longWait().until(ExpectedConditions.stalenessOf(staleOnConfirmElement));
         }, confirmPageSupplier);
     }
 
@@ -48,15 +48,15 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
         });
     }
 
-    protected DeleteConfirmationDialog(String partialTitle, @NotNull WebDriverWrapper sourcePage, Function<Runnable, ConfirmPage> confirmPageSupplier)
+    protected DeleteConfirmationDialog(String partialTitle, @NotNull WebDriverWrapper sourcePage, Function<Runnable, ConfirmPage> confirmationSynchronizationFunction)
     {
-        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), confirmPageSupplier);
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), confirmationSynchronizationFunction);
     }
 
-    protected DeleteConfirmationDialog(ModalDialogFinder finder, Function<Runnable, ConfirmPage> confirmPageSupplier)
+    protected DeleteConfirmationDialog(ModalDialogFinder finder, Function<Runnable, ConfirmPage> confirmationSynchronizationFunction)
     {
         super(finder);
-        _confirmPageSupplier = confirmPageSupplier;
+        _confirmationSynchronizationFunction = confirmationSynchronizationFunction;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        return _confirmPageSupplier.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
+        return _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
     }
 
     public Boolean isDeleteEnabled()
@@ -95,7 +95,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmPermanentlyDelete(Integer waitSeconds)
     {
-        return _confirmPageSupplier.apply(() -> this.dismiss("Yes, Permanently Delete", waitSeconds));
+        return _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Permanently Delete", waitSeconds));
     }
 
     public void clickDismiss()
