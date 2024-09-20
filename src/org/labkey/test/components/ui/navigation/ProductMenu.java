@@ -4,7 +4,6 @@
  */
 package org.labkey.test.components.ui.navigation;
 
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -54,8 +53,12 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         TestLogger.debug(String.format("Product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b.",
                 ariaExpanded, menuContentDisplayed));
 
-        return  ariaExpanded && menuContentDisplayed &&
-                ExpectedConditions.invisibilityOfAllElements(BootstrapLocators.loadingSpinner.findElements(this)).apply(getDriver());
+        return ariaExpanded && menuContentDisplayed;
+    }
+
+    protected boolean isLoaded()
+    {
+        return isExpanded() && Locator.tagWithClass("li", "menu-section-header").existsIn(elementCache().sectionContent);
     }
 
     public void expand()
@@ -64,7 +67,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         {
             clearElementCache();
             elementCache().toggle.click();
-            WebDriverWrapper.waitFor(this::isExpanded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            WebDriverWrapper.waitFor(this::isLoaded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
     }
 
@@ -234,8 +237,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        private final WebElement rootElement = rootLocator.findElement(getDriver());
-        private final WebElement toggle = Locator.byClass("product-menu-button").findElement(rootElement);
+        private final WebElement toggle = Locator.byClass("product-menu-button").findWhenNeeded(this);
         private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").findWhenNeeded(this);
         private final WebElement folderColumn = Locator.tagWithClass("div", "col-folders").findWhenNeeded(menuContent);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").findWhenNeeded(menuContent);
