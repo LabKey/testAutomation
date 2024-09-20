@@ -309,8 +309,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doTearDown();
         }
 
-        SingletonWebDriver.getInstance().setUp(this);
+        SingletonWebDriver.getInstance().setUpWebDriver(this);
 
+        initWebDriverTimeoutsAndSize();
+        closeExtraWindows();
+
+        if (!TestProperties.isCspCheckSkipped() && cspFailFast())
+        {
+            addPageLoadListener(_cspCheckPageLoadListener);
+        }
+    }
+
+    @LogMethod
+    private void initWebDriverTimeoutsAndSize()
+    {
         getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
         try
@@ -322,12 +334,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             // Ignore occasional error from attempting to resize maximized window
             if (!ex.getMessage().contains("current state is maximized"))
                 throw ex;
-        }
-        closeExtraWindows();
-
-        if (!TestProperties.isCspCheckSkipped() && cspFailFast())
-        {
-            addPageLoadListener(_cspCheckPageLoadListener);
         }
     }
 
@@ -365,6 +371,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return BROWSER_TYPE;
     }
 
+    @LogMethod
     private static void doTearDown()
     {
         boolean closeWindow = !_testFailed || isRunWebDriverHeadless() || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
@@ -2766,7 +2773,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return _downloadDir;
         }
 
-        private void setUp(BaseWebDriverTest test)
+        @LogMethod
+        private void setUpWebDriver(BaseWebDriverTest test)
         {
             WebDriver oldWebDriver = getWebDriver();
             File newDownloadDir = new File(ArtifactCollector.ensureDumpDir(test.getClass().getSimpleName()), "downloads");
