@@ -324,16 +324,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void initWebDriverTimeoutsAndSize()
     {
         getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
+        TestLogger.info("script timeout set");
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
+        TestLogger.info("page load timeout set");
         try
         {
             getDriver().manage().window().setSize(new Dimension(TestProperties.getBrowserWidth(), TestProperties.getBrowserHeight()));
+            TestLogger.info("size set");
         }
         catch (WebDriverException ex)
         {
             // Ignore occasional error from attempting to resize maximized window
             if (!ex.getMessage().contains("current state is maximized"))
                 throw ex;
+            TestLogger.info("failed to set window size");
         }
     }
 
