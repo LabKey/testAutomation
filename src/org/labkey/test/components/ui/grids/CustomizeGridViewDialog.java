@@ -534,6 +534,14 @@ public class CustomizeGridViewDialog extends ModalDialog
         return elementCache().updateGridButton.isEnabled();
     }
 
+    /**
+     * Update the tool-tip view.
+     */
+    public void clickUpdateView()
+    {
+        dismiss("Update");
+    }
+
     @Override
     protected ElementCache elementCache()
     {
