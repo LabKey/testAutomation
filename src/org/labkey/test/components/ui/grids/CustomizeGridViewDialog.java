@@ -484,6 +484,14 @@ public class CustomizeGridViewDialog extends ModalDialog
         return listItems;
     }
 
+    /**
+     * Helper function to reposition a field in the selected list.
+     *
+     * @param fieldToMove The name / label of the field to move.
+     * @param targetField The name / label of the field currently occuping the desired position.
+     * @param beforeTarget Will the field being moved go before (above) or after (below) the target field.
+     * @return This dialog.
+     */
     public CustomizeGridViewDialog repositionSelectedFields(String fieldToMove, String targetField, boolean beforeTarget)
     {
         WebElement elementToMove = elementCache().getListItemElement(elementCache().selectedFieldsPanel, fieldToMove);
