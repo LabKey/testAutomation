@@ -16,7 +16,6 @@ dist.description = "Distribution that includes all modules, for use in the conti
 
 project.tasks.register("distribution", ModuleDistribution) {
     ModuleDistribution dist ->
-        dist.group = GroupNames.DISTRIBUTION
         dist.description = "Make a LabKey modules distribution for 'test'"
 
         dist.subDirName = "test"
