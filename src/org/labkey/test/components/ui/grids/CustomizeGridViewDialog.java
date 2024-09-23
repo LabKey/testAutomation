@@ -492,7 +492,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param beforeTarget Will the field being moved go before (above) or after (below) the target field.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog repositionSelectedFields(String fieldToMove, String targetField, boolean beforeTarget)
+    public CustomizeGridViewDialog repositionField(String fieldToMove, String targetField, boolean beforeTarget)
     {
         WebElement elementToMove = elementCache().getListItemElement(elementCache().selectedFieldsPanel, fieldToMove);
         WebElement elementTarget = elementCache().getListItemElement(elementCache().selectedFieldsPanel, targetField);
