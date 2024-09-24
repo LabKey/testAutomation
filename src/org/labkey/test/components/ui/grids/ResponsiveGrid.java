@@ -887,7 +887,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         }
     }
 
-    public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid, ResponsiveGridFinder>
+    public static class ResponsiveGridFinder extends WebDriverComponentFinder<ResponsiveGrid<?>, ResponsiveGridFinder>
     {
         private Locator _locator;
 
