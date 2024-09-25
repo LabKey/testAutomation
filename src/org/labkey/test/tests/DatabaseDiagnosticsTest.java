@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -26,10 +27,12 @@ import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
+import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -64,6 +67,39 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         statusTable.clickStatusLink(0)
                 .waitForComplete(300_000)
                 .assertLogTextContains("Check complete, 0 errors found");
+    }
+
+    @Test
+    public void siteValidatorTest()
+    {
+        goToAdminConsole().goToSettingsSection();
+
+        clickAndWait(Locator.linkWithText("site validation"));
+
+        WebElement formEl = Locator.id("form").findElement(getDriver());
+
+        // Enable all validators
+        Locator.tagWithAttribute("input", "type", "checkbox")
+                .findElements(formEl).forEach(this::checkCheckbox);
+
+        // Validate projects and subfolders
+        checkRadioButton(Locator.radioButtonByNameAndValue("includeSubfolders", "true"));
+
+        // Run in background
+        checkCheckbox(Locator.id("background"));
+
+        clickAndWait(Locator.lkButton("Validate"));
+
+        new PipelineStatusDetailsPage(getDriver())
+                .waitForComplete(300_000)
+                .assertLogTextContains("Site validation complete");
+
+        clickAndWait(Locator.lkButton("Data"));
+
+        TextSearcher textSearcher = new TextSearcher(getText(Locators.bodyPanel()));
+        assertTextPresent(textSearcher, "Site Level Validation Results", "Folder Validation Results", "Module: core", "Module: Pipeline");
+        assertNoLabKeyErrors();
+        assertTextNotPresent(textSearcher, "Error", "Warning");
     }
 
     @Test
