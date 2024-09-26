@@ -70,7 +70,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     }
 
     @Test
-    public void siteValidatorTest()
+    public void testSiteValidator()
     {
         goToAdminConsole().goToSettingsSection();
 
