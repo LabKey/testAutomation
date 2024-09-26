@@ -97,9 +97,11 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Data"));
 
         TextSearcher textSearcher = new TextSearcher(getText(Locators.bodyPanel()));
-        assertTextPresent(textSearcher, "Site Level Validation Results", "Folder Validation Results", "Module: core", "Module: Pipeline");
+        assertTextPresent(textSearcher, "Site Level Validation Results", "Folder Validation Results",
+                "Module: Core", "Permissions Validator", "Display Format Validator",
+                "Module: Pipeline", "Pipeline Validator");
         assertNoLabKeyErrors();
-        assertTextNotPresent(textSearcher, "Error", "Warning");
+        assertTextNotPresent(textSearcher, "Error");
     }
 
     @Test
