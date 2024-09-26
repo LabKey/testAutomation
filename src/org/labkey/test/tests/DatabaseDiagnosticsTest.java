@@ -15,12 +15,14 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.CustomModules;
@@ -96,11 +98,12 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 
         clickAndWait(Locator.lkButton("Data"));
 
+        assertNoLabKeyErrors();
         TextSearcher textSearcher = new TextSearcher(getText(Locators.bodyPanel()));
-        assertTextPresent(textSearcher, "Site Level Validation Results", "Folder Validation Results",
+        assertTextPresent(textSearcher,
+                "Site Level Validation Results", "Folder Validation Results",
                 "Module: Core", "Permissions Validator", "Display Format Validator",
                 "Module: Pipeline", "Pipeline Validator");
-        assertNoLabKeyErrors();
         assertTextNotPresent(textSearcher, "Error");
     }
 
@@ -116,6 +119,8 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void testTomcatLogs() throws Exception
     {
+        Assume.assumeFalse("Can't check log files on remote server", TestProperties.isServerRemote());
+
         File logDir = TestFileUtils.getServerLogDir();
         assertTrue("Server log directory does not exist: " + logDir, logDir.isDirectory());
         File[] logs = logDir.listFiles();
@@ -125,7 +130,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 file -> failureFiles.put(file.getName(), "line " + contaminatedLogs.get(file)));
 
         assertTrue(String.format("These tomcat logs (in %s) contained unwanted text [%s]:\n%s",
-                logDir.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles.toString()),
+                logDir.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles),
                 failureFiles.isEmpty());
     }
 
