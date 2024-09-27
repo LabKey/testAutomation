@@ -99,9 +99,9 @@ public class MenuBarTest extends BaseWebDriverTest
 
         //Make sure that the menus are shown, but the content is not yet loaded.
         assertElementPresent(Locator.tagWithClass("div", "navbar-header"));
-        assertElementPresent(Locator.menuBarItem("Assays"));
-        assertElementPresent(Locator.menuBarItem("Studies"));
-        assertElementPresent(Locator.menuBarItem(WIKI_PAGE_TITLE));
+        assertElementPresent(menuBarItem("Assays"));
+        assertElementPresent(menuBarItem("Studies"));
+        assertElementPresent(menuBarItem(WIKI_PAGE_TITLE));
 
         log("Assert wiki, assay, and study portals not loaded");
         assertTextNotPresent(WIKI_PAGE_CONTENT);
@@ -195,9 +195,10 @@ public class MenuBarTest extends BaseWebDriverTest
 
         clickFolder(DEM_STUDY_FOLDER);
         assertTextPresent("Demo Study", "Study Overview");
-        openMenu("Folders");
+        menu = openMenu("Folders");
         waitForElement(Locator.linkWithText(DEM_STUDY_FOLDER));
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER));
+        menu.click(); // close menu
 
         // Issue 47841: verify that menu config comes through with folder export/import (via create from template)
         UIContainerHelper uiContainerHelper = new UIContainerHelper(this);
@@ -208,6 +209,21 @@ public class MenuBarTest extends BaseWebDriverTest
         openMenu("Wiki Render Types");
         openMenu("Participant Reports");
         openMenu("Folders");
+    }
+
+    protected WebElement openMenu(String menuText)
+    {
+        WebElement menu = menuBarItem(menuText).findElement(getDriver());
+        menu.click();
+        return menu;
+    }
+
+    public static Locator.XPathLocator menuBarItem(String text)
+    {
+        return Locator.id("nav_dropdowns")
+                .childTag("ul")
+                .childTag("li").withClass("dropdown")
+                .childTag("a").withText(text);
     }
 
     @Override

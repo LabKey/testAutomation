@@ -747,14 +747,6 @@ public abstract class Locator extends By
         return tag("a").child(tag("span").withAttributeContaining("class", "menu-item-text").withText(text)).notHidden();
     }
 
-    public static XPathLocator menuBarItem(String text)
-    {
-        return tagWithClass("div", "navbar-header")
-                .childTag("ul")
-                .childTag("li").withClass("dropdown")
-                .childTag("a").withText(text);
-    }
-
     public static XPathLocator linkWithTitle(String title)
     {
         return tag("a").withAttribute("title", title);
