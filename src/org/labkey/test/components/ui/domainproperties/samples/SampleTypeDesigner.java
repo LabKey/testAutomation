@@ -46,7 +46,7 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         expandPropertiesPanel();
 
         WebDriverWrapper.waitFor(elementCache().addAliasButton::isDisplayed,
-                "'Add Parent Alias' button is not visible.", 2_500);
+                "'Add a Parent' button is not visible.", 2_500);
 
         elementCache().addAliasButton.click();
         int initialCount = findEmptyAlias();
