@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 
-public class ProjectDeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends DeleteConfirmationDialog<ConfirmPage>
+public class FolderDeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends DeleteConfirmationDialog<ConfirmPage>
 {
-    public ProjectDeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement, Supplier<ConfirmPage> confirmPageSupplier)
+    public FolderDeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement, Supplier<ConfirmPage> confirmPageSupplier)
     {
         super(sourcePage, staleOnConfirmElement, confirmPageSupplier);
     }
@@ -21,7 +21,7 @@ public class ProjectDeleteConfirmationDialog<ConfirmPage extends WebDriverWrappe
     public Map<String, String> getConfirmationData()
     {
         Map<String, String> data = new CaseInsensitiveHashMap<>();
-        WebElement tableEl = Locator.tagWithClass("table", "delete-project-modal__table")
+        WebElement tableEl = Locator.tagWithClass("table", "delete-folder-modal__table")
                 .waitForElement(this, 2000);
         var rows = Locator.tag("tbody").child("tr").findElements(tableEl);
         for (WebElement row : rows)
