@@ -15,21 +15,26 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
+import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -67,6 +72,42 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testSiteValidator()
+    {
+        goToAdminConsole().goToSettingsSection();
+
+        clickAndWait(Locator.linkWithText("site validation"));
+
+        WebElement formEl = Locator.id("form").findElement(getDriver());
+
+        // Enable all validators
+        Locator.tagWithAttribute("input", "type", "checkbox")
+                .findElements(formEl).forEach(this::checkCheckbox);
+
+        // Validate projects and subfolders
+        checkRadioButton(Locator.radioButtonByNameAndValue("includeSubfolders", "true"));
+
+        // Run in background
+        checkCheckbox(Locator.id("background"));
+
+        clickAndWait(Locator.lkButton("Validate"));
+
+        new PipelineStatusDetailsPage(getDriver())
+                .waitForComplete(300_000)
+                .assertLogTextContains("Site validation complete");
+
+        clickAndWait(Locator.lkButton("Data"));
+
+        assertNoLabKeyErrors();
+        TextSearcher textSearcher = new TextSearcher(getText(Locators.bodyPanel()));
+        assertTextPresent(textSearcher,
+                "Site Level Validation Results", "Folder Validation Results",
+                "Module: Core", "Permissions Validator", "Display Format Validator",
+                "Module: Pipeline", "Pipeline Validator");
+        assertTextNotPresent(textSearcher, "Error");
+    }
+
+    @Test
     public void databaseCheckTest()
     {
         // This can take very long depending on what modules are present
@@ -78,6 +119,8 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void testTomcatLogs() throws Exception
     {
+        Assume.assumeFalse("Can't check log files on remote server", TestProperties.isServerRemote());
+
         File logDir = TestFileUtils.getServerLogDir();
         assertTrue("Server log directory does not exist: " + logDir, logDir.isDirectory());
         File[] logs = logDir.listFiles();
@@ -87,7 +130,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 file -> failureFiles.put(file.getName(), "line " + contaminatedLogs.get(file)));
 
         assertTrue(String.format("These tomcat logs (in %s) contained unwanted text [%s]:\n%s",
-                logDir.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles.toString()),
+                logDir.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles),
                 failureFiles.isEmpty());
     }
 
