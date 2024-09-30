@@ -885,7 +885,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         checker().verifyTrue(String.format("Warning dialog does not have example text '%s'.", nameExpression),
                 actualMsg.contains(nameExpression));
 
-        expectedMsg = "'genId' is recognized as a field. Use ${genId} if you want to include the field value in the naming pattern.";
+        expectedMsg = "'genId' is recognized as a substitution token. Use ${genId} if you want to include the substitution token value in the naming pattern.";
 
         checker().verifyTrue(String.format("Warning dialog does not have expected warning message '%s'.", expectedMsg),
                 actualMsg.contains(expectedMsg));
