@@ -341,7 +341,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         if(null != dialog)
         {
             log("Verify that you can save with the warning.");
-            dialog.dismiss("Save anyways...", 2_500);
+            dialog.dismiss("Save anyway", 2_500);
         }
 
         log("Validate save worked. Should be sent back to the project begin page and there should be a link with the sample type name.");
@@ -885,7 +885,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         checker().verifyTrue(String.format("Warning dialog does not have example text '%s'.", nameExpression),
                 actualMsg.contains(nameExpression));
 
-        expectedMsg = "The 'genId' substitution pattern starting at position 6 should be preceded by the string '${'.";
+        expectedMsg = "The 'genId' substitution pattern starting at position 6 should be preceded by the string '${'.";//
 
         checker().verifyTrue(String.format("Warning dialog does not have expected warning message '%s'.", expectedMsg),
                 actualMsg.contains(expectedMsg));
@@ -893,7 +893,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         checker().screenShotIfNewError("Warning_Dialog_Error");
 
         log("Verify that you can save with the warning.");
-        dialog.dismiss("Save anyways...", 2_500);
+        dialog.dismiss("Save anyway", 2_500);
 
         log("Validate save worked by looking for a link with the sample type name.");
         waitForElement(Locator.linkWithText(sampleType));
