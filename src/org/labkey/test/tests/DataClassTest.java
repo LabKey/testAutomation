@@ -119,8 +119,7 @@ public class DataClassTest extends BaseWebDriverTest
         updatePage = updatePage.setName(name);
 
         assertEquals("Data class name conflict error", Arrays.asList(
-                        "DataClass 'Name Already Exists Test' already exists.",
-                        "Please correct errors in Name Already Exists Test before saving."),
+                        "DataClass 'Name Already Exists Test' already exists."),
                 updatePage.clickSaveExpectingErrors());
         updatePage.clickCancel();
     }

@@ -10,7 +10,7 @@ public class ChangeTargetFolderDialog extends ModalDialog
     private final UpdatesTargetFolder _updatingComponent;
     public ChangeTargetFolderDialog(WebDriver driver, UpdatesTargetFolder updatingComponent)
     {
-        super(new ModalDialogFinder(driver).withTitle("Change projects and reset form?"));
+        super(new ModalDialogFinder(driver).withTitle("Change folders and reset form?"));
         this._updatingComponent = updatingComponent;
     }
 
@@ -20,10 +20,10 @@ public class ChangeTargetFolderDialog extends ModalDialog
         dismiss("Cancel");
     }
 
-    public void clickChangeProjects()
+    public void clickChangeFolders()
     {
         _updatingComponent.doAndWaitForFolderUpdate(()->
-                dismiss("Change Projects"));
+                dismiss("Change Folders"));
 
     }
 
