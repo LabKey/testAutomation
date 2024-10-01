@@ -54,6 +54,17 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().sharedCheckbox.get();
     }
 
+    public QueryChartDialog setInheritable(boolean checked)
+    {
+        elementCache().inheritableCheckbox.set(checked);
+        return this;
+    }
+
+    public boolean getInheritable()
+    {
+        return elementCache().inheritableCheckbox.get();
+    }
+
     // field selects
 
     public QueryChartDialog clearFieldValue(String fieldLabel)
@@ -321,6 +332,7 @@ public class QueryChartDialog extends ModalDialog
     {
         final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(this);
         final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(this);
+        final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(this);
 
         Locator.XPathLocator chartBuilderType = Locator.tagWithClass("div", "chart-builder-type");
 
