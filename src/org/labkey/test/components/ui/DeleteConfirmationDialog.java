@@ -4,52 +4,73 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, ConfirmPage extends LabKeyPage> extends ModalDialog
+public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends ModalDialog
 {
-    private final SourcePage _sourcePage;
-    private final Supplier<ConfirmPage> _confirmPageSupplier;
+    private final Function<Runnable, ConfirmPage> _confirmationSynchronizationFunction;
 
-    public DeleteConfirmationDialog(@NotNull SourcePage sourcePage)
+    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
-        this(sourcePage, () -> null);
+        this(sourcePage, UpdatingComponent.NO_OP, confirmPageSupplier);
     }
 
-    public DeleteConfirmationDialog(@NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public DeleteConfirmationDialog(@NotNull ConfirmPage sourcePage, UpdatingComponent updatingComponent)
     {
-        this("delete", sourcePage, confirmPageSupplier);
+        this(sourcePage, updatingComponent, () -> sourcePage);
     }
 
-    protected DeleteConfirmationDialog(String partialTitle, @NotNull SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement)
     {
-        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), sourcePage, confirmPageSupplier);
+        this(sourcePage, staleOnConfirmElement, () -> null);
     }
 
-    protected DeleteConfirmationDialog(ModalDialogFinder finder, SourcePage sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
+    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, WebElement staleOnConfirmElement, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        this(sourcePage, runnable -> {
+            runnable.run();
+            sourcePage.longWait().until(ExpectedConditions.stalenessOf(staleOnConfirmElement));
+        }, confirmPageSupplier);
+    }
+
+    public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, UpdatingComponent updatingComponent, Supplier<ConfirmPage> confirmPageSupplier)
+    {
+        this("delete", sourcePage, runnable -> {
+            updatingComponent.doAndWaitForUpdate(runnable);
+            return confirmPageSupplier.get();
+        });
+    }
+
+    protected DeleteConfirmationDialog(String partialTitle, @NotNull WebDriverWrapper sourcePage, Function<Runnable, ConfirmPage> confirmationSynchronizationFunction)
+    {
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), confirmationSynchronizationFunction);
+    }
+
+    protected DeleteConfirmationDialog(ModalDialogFinder finder, Function<Runnable, ConfirmPage> confirmationSynchronizationFunction)
     {
         super(finder);
-        _sourcePage = sourcePage;
-        _confirmPageSupplier = confirmPageSupplier;
+        _confirmationSynchronizationFunction = confirmationSynchronizationFunction;
     }
 
     @Override
     protected void waitForReady()
     {
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
-                !elementCache().title.getText().isEmpty() &&
-                !BootstrapLocators.loadingSpinner.existsIn(this),
+                        !elementCache().title.getText().isEmpty() &&
+                        !BootstrapLocators.loadingSpinner.existsIn(this),
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
-    public SourcePage cancelDelete()
+    public void cancelDelete()
     {
         this.dismiss("Cancel");
-        return _sourcePage;
     }
 
     public ConfirmPage confirmDelete()
@@ -59,8 +80,7 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        this.dismiss("Yes, Delete", waitSeconds);
-        return _confirmPageSupplier.get();
+        return _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
     }
 
     public Boolean isDeleteEnabled()
@@ -75,17 +95,15 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     public ConfirmPage confirmPermanentlyDelete(Integer waitSeconds)
     {
-        this.dismiss("Yes, Permanently Delete", waitSeconds);
-        return _confirmPageSupplier.get();
+        return _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Permanently Delete", waitSeconds));
     }
 
-    public SourcePage clickDismiss()
+    public void clickDismiss()
     {
         this.dismiss("Dismiss");
-        return _sourcePage;
     }
 
-    public DeleteConfirmationDialog setUserComment(String comment)
+    public DeleteConfirmationDialog<ConfirmPage> setUserComment(String comment)
     {
 
         WebDriverWrapper.waitFor(()-> elementCache().commentInput.getComponentElement().isDisplayed(),
@@ -109,11 +127,8 @@ public class DeleteConfirmationDialog<SourcePage extends WebDriverWrapper, Confi
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-
         Input commentInput = Input.Input(Locator.tagWithClass("textarea", "form-control"), getDriver()).timeout(2000)
                 .refindWhenNeeded(this);
 
     }
-
-
 }

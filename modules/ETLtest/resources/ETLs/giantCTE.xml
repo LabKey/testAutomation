@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Giant CTE</name>
+    <description>Processes a million rows, so it's gonna take a long time</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target</description>
+            <source schemaName="etltest" queryName="giantCTE" />
+            <destination schemaName="lists" queryName="Target" targetOption="merge">
+            </destination>
+        </transform>
+    </transforms>
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>

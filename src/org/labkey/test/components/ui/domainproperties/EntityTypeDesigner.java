@@ -425,7 +425,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         public WebElement removeParentAliasIcon(int index)
         {
-            return Locator.tagWithClass("i","container--removal-icon").findElements(propertiesPanel).get(index);
+            return Locator.tagWithClass("span","domain-field-delete-icon").findElements(propertiesPanel).get(index);
         }
 
         public ReactSelect parentAliasSelect(int index)

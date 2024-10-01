@@ -1435,7 +1435,7 @@ public class EditableGridTest extends BaseWebDriverTest
         List<List<String>> expectedCellWarnings = List.of(
                 Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
                 Arrays.asList(null, REQ_STR_FIELD_NAME + " is required.", null, REQ_INT_FIELD_NAME + " is required.", null, REQ_DATETIME_FIELD_NAME + " is required.", null, REQ_TIME_FIELD_NAME + " is required.", null, null, null, REQ_TEXTCHOICE_FIELD_NAME + " is required.", null, REQ_LOOKUP_FIELD_NAME + " is required."),
-                Arrays.asList("22/10 characters", "22/10 characters", "Invalid integer", "Invalid integer", "Invalid date", "Invalid date time", "Invalid time", "Invalid time", "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find data for \"bad lookup\"", "Could not find data for \"bad lookup\"")
+                Arrays.asList("22/10 characters", "22/10 characters", "Invalid integer", "Invalid integer", "Invalid date, use format yyyy-MM-dd", "Invalid date time, use format yyyy-MM-dd HH:mm", "Invalid time", "Invalid time", "Invalid boolean", "Invalid decimal", "'wrong text choice' is not a valid choice", "'bad choice' is not a valid choice", "Could not find \"bad lookup\"", "Could not find \"bad lookup\"")
         );
 
         log("Verify pasted values triggers cell warnings");
@@ -1563,8 +1563,8 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.dragFill(fillFrom, fillTo);
 
         List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD_NAME + " is required.", "Invalid integer", "Invalid integer",
-                "Invalid date", REQ_DATETIME_FIELD_NAME + " is required.", "Invalid time", REQ_TIME_FIELD_NAME + " is required.",
-                "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find data for \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
+                "Invalid date, use format yyyy-MM-dd", REQ_DATETIME_FIELD_NAME + " is required.", "Invalid time", REQ_TIME_FIELD_NAME + " is required.",
+                "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
 
         log("Verify filled down cells have warnings");
         for (int i = 0; i < 3; i++)
