@@ -311,9 +311,7 @@ public class DataReportsTest extends ReportTest
         // Note: Enabling this feature flag requires a server restart
         if (TestProperties.isPrimaryUserAppAdmin() || !OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
         {
-            BootstrapMenu reportMenu = dataRegion.getReportMenu();
-            reportMenu.expand();
-            List<String> menuItems = getTexts(reportMenu.findVisibleMenuItems());
+            List<String> menuItems = dataRegion.getHeaderMenuOptions("Charts / Reports");
             assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
             assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
             // Site admins can still navigate to the externalReport page. It isn't functional though, so skipping this check
