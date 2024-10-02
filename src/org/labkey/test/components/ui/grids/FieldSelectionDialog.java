@@ -20,25 +20,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// This class should be renamed to FieldSelectionDialog, or something that removes the reference to grid customization.
 /**
  * Wraps ColumnSelectionModal.tsx in UI components.
  */
-public class CustomizeGridViewDialog extends ModalDialog
+public class FieldSelectionDialog extends ModalDialog
 {
     private final UpdatingComponent linkedComponent;
 
     private static final String FIELD_NOT_AVAILABLE = "Field name '%s' is not visible in the 'Available Fields' list.";
     private static final String FIELD_NOT_SELECTED = "Field with label '%s' is not visible in the selected fields list.";
 
-    public CustomizeGridViewDialog(WebDriver driver, UpdatingComponent linkedComponent)
+    public FieldSelectionDialog(WebDriver driver, UpdatingComponent linkedComponent)
     {
         super(new ModalDialogFinder(driver));
         this.linkedComponent = linkedComponent;
         waitForReady();
     }
 
-    public CustomizeGridViewDialog(WebDriver driver)
+    public FieldSelectionDialog(WebDriver driver)
     {
         super(new ModalDialogFinder(driver));
         waitForReady();
@@ -59,7 +58,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param checked Set to true to check the box, false to uncheck it.
      * @return This dialog
      */
-    public CustomizeGridViewDialog setShowAll(boolean checked)
+    public FieldSelectionDialog setShowAll(boolean checked)
     {
         elementCache().checkbox.set(checked);
         return this;
@@ -110,7 +109,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldName Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog selectAvailableField(String... fieldName)
+    public FieldSelectionDialog selectAvailableField(String... fieldName)
     {
         return addFieldByFieldKeyToGrid(expandAvailableFields(fieldName));
     }
@@ -127,7 +126,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldKey The value in the data-fieldkay attribute for the row.
      * @return This dialog.
      */
-    private CustomizeGridViewDialog addFieldByFieldKeyToGrid(String fieldKey)
+    private FieldSelectionDialog addFieldByFieldKeyToGrid(String fieldKey)
     {
         WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
 
@@ -181,7 +180,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldName Name of the field to collapse.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog collapseAvailableField(String fieldName)
+    public FieldSelectionDialog collapseAvailableField(String fieldName)
     {
         expandOrCollapseByFieldKey(fieldName.replace(" ", ""), false);
         return this;
@@ -279,7 +278,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param field The field name to click on.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog selectFieldFromSelectedFields(String field)
+    public FieldSelectionDialog selectFieldFromSelectedFields(String field)
     {
         return selectFieldFromSelectedFields(field, 0);
     }
@@ -292,7 +291,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param index If multiple fields have the same name this will identify which one to click.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog selectFieldFromSelectedFields(String field, int index)
+    public FieldSelectionDialog selectFieldFromSelectedFields(String field, int index)
     {
         getSelectedListItems(field).get(index).click();
         return this;
@@ -328,7 +327,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fields List of fields to remove.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeFieldsFromSelected(List<String> fields)
+    public FieldSelectionDialog removeFieldsFromSelected(List<String> fields)
     {
         for(String field : fields)
         {
@@ -344,7 +343,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param field The field to remove.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeFieldFromSelected(String field)
+    public FieldSelectionDialog removeFieldFromSelected(String field)
     {
         return removeFieldFromSelected(field, 0);
     }
@@ -357,7 +356,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param index If multiple fields have the same value this identifies which one to remove.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeFieldFromSelected(String field, int index)
+    public FieldSelectionDialog removeFieldFromSelected(String field, int index)
     {
         WebElement listItem = getSelectedListItems(field).get(index);
         WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findElement(listItem);
@@ -379,7 +378,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeAllSelectedFields()
+    public FieldSelectionDialog removeAllSelectedFields()
     {
         List<WebElement> allItems = elementCache().getListItemElements(elementCache().selectedFieldsPanel);
 
@@ -407,7 +406,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog setFieldLabel(String currentFieldLabel, String newFieldLabel)
+    public FieldSelectionDialog setFieldLabel(String currentFieldLabel, String newFieldLabel)
     {
         return setFieldLabel(currentFieldLabel, 0, newFieldLabel);
     }
@@ -421,7 +420,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog setFieldLabel(String currentFieldLabel, int index, String newFieldLabel)
+    public FieldSelectionDialog setFieldLabel(String currentFieldLabel, int index, String newFieldLabel)
     {
 
         WebElement listItem = getSelectedListItems(currentFieldLabel).get(index);
@@ -454,7 +453,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public CustomizeGridViewDialog clickUndoEdits()
+    public FieldSelectionDialog clickUndoEdits()
     {
         elementCache().undoEditsButton.click();
         return this;
@@ -492,7 +491,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param beforeTarget Will the field being moved go before (above) or after (below) the target field.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog repositionField(String fieldToMove, String targetField, boolean beforeTarget)
+    public FieldSelectionDialog repositionField(String fieldToMove, String targetField, boolean beforeTarget)
     {
         WebElement elementToMove = elementCache().getListItemElement(elementCache().selectedFieldsPanel, fieldToMove);
         WebElement elementTarget = elementCache().getListItemElement(elementCache().selectedFieldsPanel, targetField);

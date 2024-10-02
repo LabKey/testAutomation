@@ -11,7 +11,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.labkey.test.components.ui.grids.CustomizeGridViewDialog;
+import org.labkey.test.components.ui.grids.FieldSelectionDialog;
 import org.labkey.test.components.ui.grids.GridFilterModal;
 import org.labkey.test.components.ui.grids.ManageViewsDialog;
 import org.labkey.test.components.ui.grids.QueryGrid;
@@ -885,7 +885,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         String selectedColumn = COL_STRING2;
         log(String.format("Click the grid menu above column '%s' and validate that insertion happens to the right of the column.", selectedColumn));
-        CustomizeGridViewDialog customizeModal = grid.insertColumn(selectedColumn);
+        FieldSelectionDialog customizeModal = grid.insertColumn(selectedColumn);
 
         log("Validate that the 'Available Fields' and 'Shown in Grid' panels are as expected.");
 
@@ -949,7 +949,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
-        CustomizeGridViewDialog customizeModal = grid.customizeView();
+        FieldSelectionDialog customizeModal = grid.customizeView();
 
         checker().verifyFalse("The 'Update' button is enabled, it should not be.",
                 customizeModal.isUpdateGridEnabled());
@@ -1061,7 +1061,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
-        CustomizeGridViewDialog customizeModal = grid.customizeView();
+        FieldSelectionDialog customizeModal = grid.customizeView();
 
         String fieldRemoved1 = COL_INT;
 
