@@ -145,7 +145,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
         protected Locator locator()
         {
             if (_label != null)
-                return _baseLocator.withChild(Locator.tagWithClass("span", "modal__field-label").containing( _label));
+                return _baseLocator.withChild(Locator.tagWithClass("span", "auth-config-input-row__caption").containing( _label));
             else if (_inputId != null)
                 return _baseLocator.withDescendant(Locator.id(_inputId));
             else
