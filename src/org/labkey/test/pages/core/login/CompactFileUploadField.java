@@ -113,7 +113,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
 
     public static class CompactFileUploadFieldFinder extends WebDriverComponentFinder<CompactFileUploadField, CompactFileUploadFieldFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "modal__compact-file-upload-field");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload-field");
         private String _label = null;
         private String _inputId = null;
 
