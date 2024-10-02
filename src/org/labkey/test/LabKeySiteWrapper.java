@@ -56,11 +56,11 @@ import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
@@ -1092,13 +1092,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void goToExternalToolPage()
     {
         clickUserMenuItem("External Tool Access");
-    }
-
-    protected WebElement openMenu(String menuText)
-    {
-        WebElement menu = Locator.menuBarItem(menuText).findElement(getDriver());
-        menu.click();
-        return menu;
     }
 
     private static Map<String, Boolean> _originalFeatureFlags = new HashMap<>();
