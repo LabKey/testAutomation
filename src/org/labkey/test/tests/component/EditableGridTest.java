@@ -1564,7 +1564,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD_NAME + " is required.", "Invalid integer", "Invalid integer",
                 "Invalid date, use format yyyy-MM-dd", REQ_DATETIME_FIELD_NAME + " is required.", "Invalid time", REQ_TIME_FIELD_NAME + " is required.",
-                "Invalid boolean", "Invalid decimal", "Invalid text choice", "Invalid text choice", "Could not find \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
+                "Invalid boolean", "Invalid decimal", "'wrong text choice' is not a valid choice", "'bad choice' is not a valid choice", "Could not find \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
 
         log("Verify filled down cells have warnings");
         for (int i = 0; i < 3; i++)
