@@ -273,14 +273,14 @@ public class FieldSelectionDialog extends ModalDialog
 
     /**
      * Click on a field in the list of selected fields. Fields added from the Available Fields panel will be added
-     * underneath the selected field.
+     * underneath the highlighted field.
      *
      * @param field The field name to click on.
      * @return This dialog.
      */
-    public FieldSelectionDialog selectFieldFromSelectedFields(String field)
+    public FieldSelectionDialog highlightFieldInSelectedFields(String field)
     {
-        return selectFieldFromSelectedFields(field, 0);
+        return highlightFieldInSelectedFields(field, 0);
     }
 
     /**
@@ -291,7 +291,7 @@ public class FieldSelectionDialog extends ModalDialog
      * @param index If multiple fields have the same name this will identify which one to click.
      * @return This dialog.
      */
-    public FieldSelectionDialog selectFieldFromSelectedFields(String field, int index)
+    public FieldSelectionDialog highlightFieldInSelectedFields(String field, int index)
     {
         getSelectedListItems(field).get(index).click();
         return this;
