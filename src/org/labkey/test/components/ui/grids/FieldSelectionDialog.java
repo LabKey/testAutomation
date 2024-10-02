@@ -52,6 +52,11 @@ public class FieldSelectionDialog extends ModalDialog
                 "Customize Grid dialog did not render in time.", 1_500);
     }
 
+    public boolean isShowAllVisible()
+    {
+        return elementCache().checkbox.isDisplayed();
+    }
+
     /**
      * Check or uncheck the 'Show all system and user-defined fields' checkbox.
      *
