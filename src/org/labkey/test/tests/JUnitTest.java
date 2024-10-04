@@ -44,7 +44,6 @@ import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Runner;
 import org.labkey.test.SuiteFactory;
 import org.labkey.test.TestProperties;
@@ -134,7 +133,9 @@ public class JUnitTest extends TestSuite
         {
             if (bootstrapBrowser.getWrappedDriver() != null)
             {
-                new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName()).dumpPageSnapshot("ServerBootstrap", null);
+                ArtifactCollector artifactCollector = new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName());
+                artifactCollector.dumpPageSnapshot("ServerBootstrap", null);
+                artifactCollector.publishDumpedArtifacts();
             }
             throw t;
         }
