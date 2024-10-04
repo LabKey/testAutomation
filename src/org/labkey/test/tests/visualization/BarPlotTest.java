@@ -27,6 +27,7 @@ import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelBarPlot;
+import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -35,6 +36,10 @@ import org.labkey.test.util.LogMethod;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -73,6 +78,7 @@ public class BarPlotTest extends GenericChartsTest
     protected void testPlots()
     {
         doBasicBarPlotTest();
+        doInheritedPlotTest();
         doGroupedBarPlotTest();
         doColumnPlotClickThrough();
         doExportOfBarPlot();
@@ -171,6 +177,53 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Save the plot.");
         savePlot(BAR_PLOT_SAVE_NAME, "This is a bar plot from the simple bar plot test.");
+    }
+
+    @LogMethod
+    private void doInheritedPlotTest()
+    {
+        String chartName = "InheritedPlotTest";
+        String subfolderName = chartName + "Folder";
+        String SVG_TEXT = "normal\n0\n0.1\n0.2\n0.3\n0.4\n0.5\n0.6\n0.7\n0.8\n0.9\n1\nContainers\nType";
+
+        goToProjectHome();
+        clickFolder(getFolderName());
+
+        // create a bar chart on a schema/query that is shared across folders
+        ChartTypeDialog chartTypeDialog = clickAddChart("core", "Containers");
+        TimeChartWizard chartWizard = chartTypeDialog.setXAxis("Type").clickApply();
+        SaveChartDialog saveChartDialog = chartWizard.clickSave();
+        saveChartDialog.setReportName(chartName);
+        saveChartDialog.clickSave();
+        assertSVG(SVG_TEXT);
+
+        // create subfolder and initially verify that the chart is not inherited
+        _containerHelper.createSubfolder(getProjectName() + "/" + getFolderName(), subfolderName, "Collaboration");
+        clickFolder(subfolderName);
+        goToSchemaBrowser();
+        viewQueryData("core", "Containers");
+        DataRegionTable table = new DataRegionTable("query", this);
+        List<String> menuItems = table.getHeaderMenuOptions("Charts / Reports");
+        assertFalse("Report should not be visible in subfolder", menuItems.contains(chartName));
+
+        // verify that the chart is inherited when the inherit flag is set
+        clickFolder(getFolderName());
+        goToChart(chartName);
+        chartWizard = openSavedPlotInEditMode(chartName);
+        saveChartDialog = chartWizard.clickSaveAs();
+        saveChartDialog.setReportName(chartName + "_Inherited");
+        saveChartDialog.setInherit(true);
+        saveChartDialog.clickSave();
+
+        clickFolder(subfolderName);
+        goToSchemaBrowser();
+        viewQueryData("core", "Containers");
+        table = new DataRegionTable("query", this);
+        menuItems = table.getHeaderMenuOptions("Charts / Reports");
+        assertFalse("Report should not be visible in subfolder", menuItems.contains(chartName));
+        assertTrue("Inherited report should be visible in subfolder", menuItems.contains(chartName + "_Inherited"));
+        table.goToReport(chartName + "_Inherited");
+        assertSVG(SVG_TEXT);
     }
 
     @LogMethod
@@ -292,12 +345,17 @@ public class BarPlotTest extends GenericChartsTest
         final String EXPORTED_SCRIPT_CHECK_YAXIS = "Sum of " + BP_DIASTOLIC;
 
         log("Validate that export of the bar plot works.");
+        goToChart(BAR_PLOT_SAVE_NAME);
+        export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, EXPORTED_SCRIPT_CHECK_YAXIS);
+    }
+
+    private void goToChart(String chartName)
+    {
         goToProjectHome();
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
-        waitForElement(Locator.linkWithText(BAR_PLOT_SAVE_NAME));
-        clickAndWait(Locator.linkWithText(BAR_PLOT_SAVE_NAME), WAIT_FOR_PAGE);
-        export(EXPORTED_SCRIPT_CHECK_TYPE, EXPORTED_SCRIPT_CHECK_XAXIS, EXPORTED_SCRIPT_CHECK_YAXIS);
+        waitForElement(Locator.linkWithText(chartName));
+        clickAndWait(Locator.linkWithText(chartName), WAIT_FOR_PAGE);
     }
 
     @LogMethod
