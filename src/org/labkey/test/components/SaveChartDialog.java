@@ -17,12 +17,15 @@ package org.labkey.test.components;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class SaveChartDialog extends Window<SaveChartDialog.Elements>
 {
@@ -99,6 +102,12 @@ public class SaveChartDialog extends Window<SaveChartDialog.Elements>
         return this;
     }
 
+    public SaveChartDialog setInherit(boolean checked)
+    {
+        elementCache().inheritCheckbox.set(checked);
+        return this;
+    }
+
     public TimeChartWizard clickCancel()
     {
         clickButton("Cancel", true);
@@ -152,6 +161,7 @@ public class SaveChartDialog extends Window<SaveChartDialog.Elements>
         private final RadioButton autoThumbnail = new RadioButton.RadioButtonFinder().withLabel("Auto-generate").findWhenNeeded(this);
         private final RadioButton allReaders = new RadioButton.RadioButtonFinder().withLabel("All readers").findWhenNeeded(this);
         private final RadioButton onlyMe = new RadioButton.RadioButtonFinder().withLabel("Only me").findWhenNeeded(this);
+        private final Checkbox inheritCheckbox = Ext4Checkbox().withLabel("Make this report available in child folders").findWhenNeeded(this);
     }
 
     public enum ViewableBy

@@ -311,9 +311,7 @@ public class DataReportsTest extends ReportTest
         // Note: Enabling this feature flag requires a server restart
         if (TestProperties.isPrimaryUserAppAdmin() || !OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
         {
-            BootstrapMenu reportMenu = dataRegion.getReportMenu();
-            reportMenu.expand();
-            List<String> menuItems = getTexts(reportMenu.findVisibleMenuItems());
+            List<String> menuItems = dataRegion.getHeaderMenuOptions("Charts / Reports");
             assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
             assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
             // Site admins can still navigate to the externalReport page. It isn't functional though, so skipping this check
@@ -509,6 +507,18 @@ public class DataReportsTest extends ReportTest
 
         // TODO: Issue 36040: Unable to download PDF for R report run as pipeline job
         // verifyReportPdfDownload("study", 4500d);
+
+        // delete report and then verify audit events
+        deleteReport(R_SCRIPTS[0]);
+        goToSchemaBrowser();
+        viewQueryData("auditLog", "ReportEvent");
+        DataRegionTable table = new DataRegionTable("query", this);
+        table.setFilter("ReportName", "Equals", R_SCRIPTS[0]);
+        assertEquals("Number of audit events for report not as expected", 3, table.getDataRowCount());
+        assertEquals("Report name for audit events not as expected", List.of(R_SCRIPTS[0], R_SCRIPTS[0], R_SCRIPTS[0]), table.getColumnDataAsText("ReportName"));
+        assertEquals("Report key for audit events not as expected", List.of("study/DEM-1", "study/DEM-1", "study/DEM-1"), table.getColumnDataAsText("ReportKey"));
+        assertEquals("Report type for audit events not as expected", List.of("Study.rReport", "Study.rReport", "Study.rReport"), table.getColumnDataAsText("ReportType"));
+        assertEquals("Report comment for audit events not as expected", List.of("Report deleted", "Report updated", "Report created"), table.getColumnDataAsText("Comment"));
     }
 
     private void verifyReportPdfDownload(String schema, double expectedSize)
