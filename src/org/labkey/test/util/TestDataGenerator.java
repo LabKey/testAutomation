@@ -65,7 +65,7 @@ import java.util.function.Supplier;
 public class TestDataGenerator
 {
     // chose a Character random from this String
-    private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
+    private static final String CHARSET_STRING = "ABCD01234vxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
@@ -289,18 +289,30 @@ public class TestDataGenerator
         }
     }
 
-    public String randomString(int size)
+    public static String randomString(int size)
+    {
+        return randomString(size, null);
+    }
+
+    public static String randomString(int size, String exclusion)
     {
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
         {
-            int randIndex = (int)(ALPHANUMERIC_STRING.length() * Math.random());
-            val.append(ALPHANUMERIC_STRING.charAt(randIndex));
+            char selected;
+            do
+            {
+                int randIndex = (int)(CHARSET_STRING.length() * Math.random());
+                selected = CHARSET_STRING.charAt(randIndex);
+            }
+            while (exclusion != null && exclusion.contains(selected + ""));
+
+            val.append(selected);
         }
         return val.toString();
     }
 
-    public int randomInt(int min, int max)
+    public static int randomInt(int min, int max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
@@ -519,6 +531,31 @@ public class TestDataGenerator
     public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
+    }
+
+    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
+    {
+        return shuffleSelect(allFields, selectCount, false);
+    }
+
+    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount, boolean canRepeat)
+    {
+        if (!canRepeat)
+        {
+            List<T> shuffled = new ArrayList<>(allFields);
+            Collections.shuffle(shuffled);
+            return shuffled.subList(0, selectCount - 1);
+        }
+        else
+        {
+            List<T> selected = new ArrayList<>();
+            for (int i = 0; i < selectCount; i++)
+            {
+                selected.add(allFields.get(randomInt(0, allFields.size())));
+            }
+            return selected;
+        }
+
     }
 
     /**
