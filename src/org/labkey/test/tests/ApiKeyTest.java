@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,6 +41,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.ui.grids.QueryGrid;
+import org.labkey.test.credentials.ApiKeyDialog;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.TestUser;
@@ -178,11 +180,13 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         log("Log in as non-admin user.");
         signIn(EDITOR_USER.getEmail(), EDITOR_USER.getPassword());
-        String apiKey = generateAPIKey();
+        String keyDescription = "Key for editing";
+        String apiKey = generateAPIKey(keyDescription);
         verifyValidAPIKey(apiKey);
 
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
+        assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
         assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
         verifyInvalidAPIKey(apiKey);
@@ -199,15 +203,15 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
                 .save();
 
-        String apiKey = generateAPIKey(_generatedApiKeys);
+        String apiKey = generateAPIKeyAndRecord(_generatedApiKeys);
         log("Verify active API key via api authentication");
         verifyValidAPIKey(apiKey);
         log("Verify active API key via basic authentication");
         verifyValidAPIKey(apiKey, true);
 
         log("Generate two other keys for use in testing deletion.");
-        generateAPIKey();
-        generateAPIKey();
+        generateAPIKey(null);
+        generateAPIKey(null);
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
         grid = deleteAPIKeyViaUI();
@@ -244,7 +248,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .setAllowSessionKeys(true)
                 .save();
         List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
-        generateAPIKey(_generatedApiKeys);
+        generateAPIKeyAndRecord(_generatedApiKeys);
         goToProjectHome();
         impersonate(EDITOR_USER.getEmail());
         goToExternalToolPage();
@@ -371,21 +375,30 @@ public class ApiKeyTest extends BaseWebDriverTest
         goToExternalToolPage();
         waitForText("API keys are used to authorize");
         clickButton("Generate Session Key", 0);
+        ApiKeyDialog dialog = new ApiKeyDialog(this.getDriver(), ApiKeyDialog.SESSION_KEY_TITLE);
         waitForFormElementToNotEqual(Locator.inputByNameContaining("session_token"), "");
-        return Locator.inputByNameContaining("session_token").findElement(getDriver()).getAttribute("value");
+        String key = Locator.inputByNameContaining("session_token").findElement(getDriver()).getAttribute("value");
+        dialog.clickDone();
+        return key;
     }
 
-    private String generateAPIKey()
+    private String generateAPIKey(@Nullable String description)
     {
         goToExternalToolPage();
         clickButton("Generate API Key", 0);
+        ApiKeyDialog dialog = new ApiKeyDialog(this.getDriver(), ApiKeyDialog.API_KEY_TITLE);
+        if (description != null)
+            dialog.setDescription(description);
+        dialog = dialog.generateApiKey();
         waitForFormElementToNotEqual(Locator.inputByNameContaining("apikey_token"), "");
-        return Locator.inputByNameContaining("apikey_token").findElement(getDriver()).getAttribute("value");
+        String key = Locator.inputByNameContaining("apikey_token").findElement(getDriver()).getAttribute("value");
+        dialog.clickDone();
+        return key;
     }
 
-    private String generateAPIKey(List<Map<String, Object>> _generatedApiKeys) throws IOException
+    private String generateAPIKeyAndRecord(List<Map<String, Object>> _generatedApiKeys) throws IOException
     {
-        String apiKey = generateAPIKey();
+        String apiKey = generateAPIKey(null);
         // get record
         _generatedApiKeys.add(getLastAPIKeyRecord());
         return apiKey;
