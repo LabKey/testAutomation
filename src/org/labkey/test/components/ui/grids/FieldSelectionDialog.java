@@ -391,7 +391,7 @@ public class FieldSelectionDialog extends ModalDialog
         {
             WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
 
-            // For the tool-tip not all fields can be removed.
+            // For the tooltip not all fields can be removed.
             if(removeIcon.isDisplayed())
             {
                 removeIcon.click();
