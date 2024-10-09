@@ -393,6 +393,12 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
             return name.getText();
         }
 
+        public String getCardContent()
+        {
+            WebElement content = Locator.byClass("filter-card__card-content").findElement(this);
+            return content.getText();
+        }
+
         public FilterCardValues getFilterValues()
         {
             Map<String, WebElement> filters = new HashMap<>();
