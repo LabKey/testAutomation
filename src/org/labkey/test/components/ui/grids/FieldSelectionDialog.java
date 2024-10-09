@@ -21,23 +21,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Wraps CustomizeGridViewModal.tsx in UI components.
+ * Wraps ColumnSelectionModal.tsx in UI components.
  */
-public class CustomizeGridViewDialog extends ModalDialog
+public class FieldSelectionDialog extends ModalDialog
 {
     private final UpdatingComponent linkedComponent;
 
     private static final String FIELD_NOT_AVAILABLE = "Field name '%s' is not visible in the 'Available Fields' list.";
-    private static final String FIELD_NOT_IN_GRID = "Field with label '%s' is not visible in the 'Shown in Grid' list.";
+    private static final String FIELD_NOT_SELECTED = "Field with label '%s' is not visible in the selected fields list.";
 
-    public CustomizeGridViewDialog(WebDriver driver, UpdatingComponent linkedComponent)
+    public FieldSelectionDialog(WebDriver driver, UpdatingComponent linkedComponent)
     {
         super(new ModalDialogFinder(driver));
         this.linkedComponent = linkedComponent;
         waitForReady();
     }
 
-    protected CustomizeGridViewDialog(WebDriver driver)
+    public FieldSelectionDialog(WebDriver driver)
     {
         super(new ModalDialogFinder(driver));
         waitForReady();
@@ -52,13 +52,18 @@ public class CustomizeGridViewDialog extends ModalDialog
                 "Customize Grid dialog did not render in time.", 1_500);
     }
 
+    public boolean isShowAllVisible()
+    {
+        return elementCache().checkbox.isDisplayed();
+    }
+
     /**
      * Check or uncheck the 'Show all system and user-defined fields' checkbox.
      *
      * @param checked Set to true to check the box, false to uncheck it.
      * @return This dialog
      */
-    public CustomizeGridViewDialog setShowAll(boolean checked)
+    public FieldSelectionDialog setShowAll(boolean checked)
     {
         elementCache().checkbox.set(checked);
         return this;
@@ -87,12 +92,12 @@ public class CustomizeGridViewDialog extends ModalDialog
     }
 
     /**
-     * Check to see if the field listed is shown as added, has a checkmark, in the 'Available Fields' panel.
+     * Check to see if the available field listed is shown as selected, has a checkmark, in the 'Available Fields' panel.
      *
      * @param fieldName Can be an individual field or a path to a nested field.
      * @return True if row has the checkmark, false otherwise.
      */
-    public boolean isAvailableFieldAdded(String... fieldName)
+    public boolean isAvailableFieldSelected(String... fieldName)
     {
         WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldName));
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
@@ -104,14 +109,20 @@ public class CustomizeGridViewDialog extends ModalDialog
     }
 
     /**
-     * Add a field to the 'Shown in Grid' list. If more than one value is passed in it is assumed to be an expandable path.
+     * Select a field the list of available fields. If more than one value is passed in it is assumed to be an expandable path.
      *
      * @param fieldName Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog addAvailableField(String... fieldName)
+    public FieldSelectionDialog selectAvailableField(String... fieldName)
     {
         return addFieldByFieldKeyToGrid(expandAvailableFields(fieldName));
+    }
+
+    public WebElement getAvailableFieldElement(String fieldName)
+    {
+        String fieldKey = expandAvailableFields(fieldName);
+        return elementCache().getListItemElementByFieldKey(fieldKey);
     }
 
     /**
@@ -120,7 +131,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldKey The value in the data-fieldkay attribute for the row.
      * @return This dialog.
      */
-    private CustomizeGridViewDialog addFieldByFieldKeyToGrid(String fieldKey)
+    private FieldSelectionDialog addFieldByFieldKeyToGrid(String fieldKey)
     {
         WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
 
@@ -174,7 +185,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      * @param fieldName Name of the field to collapse.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog collapseAvailableField(String fieldName)
+    public FieldSelectionDialog collapseAvailableField(String fieldName)
     {
         expandOrCollapseByFieldKey(fieldName.replace(" ", ""), false);
         return this;
@@ -234,22 +245,22 @@ public class CustomizeGridViewDialog extends ModalDialog
     }
 
     /**
-     * Get the list of columns in the 'Shown in Grid' panel.
+     * Get the list of fields that have been selected.
      *
-     * @return The list of columns from the 'Shown in Grid' panel.
+     * @return The list of selected fields.
      */
-    public List<String> getShownInGridColumns()
+    public List<String> getSelectedFields()
     {
-        List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().shownInGridPanel);
+        List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().selectedFieldsPanel);
         return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     /**
-     * Get the column that is selected in the 'Sown in Grid' panel. If no column is selected an empty string is returned.
+     * Get the field that is highlighted (active) from the fields selected. If no field is highlighted an empty string is returned.
      *
-     * @return Text of selected column. Empty string if none is selected.
+     * @return Text of highlighted (active) selected field. Empty string if none is highlighted.
      */
-    public String getSelectedShownInGridColumn()
+    public String getActiveSelectedField()
     {
         WebElement active = Locator.tagWithClass("div", "list-group-item")
                 .withClass("active")
@@ -266,69 +277,93 @@ public class CustomizeGridViewDialog extends ModalDialog
     }
 
     /**
-     * Click on a column in the 'Shown in Grid' panel. Fields added from the Available Fields panel will be added
-     * underneath the selected column in the Shown in Grid panel.
+     * Click on a field in the list of selected fields. Fields added from the Available Fields panel will be added
+     * underneath the highlighted field.
      *
-     * @param column The column name to click on.
+     * @param field The field name to click on.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog selectShownInGridColumn(String column)
+    public FieldSelectionDialog highlightFieldInSelectedFields(String field)
     {
-        return selectShownInGridColumn(column, 0);
+        return highlightFieldInSelectedFields(field, 0);
     }
 
     /**
-     * Click on a column in the 'Shown in Grid' panel. If multiple columns have the same name the index parameter will
+     * Click on a field in the list of selected fields. If multiple fields have the same name the index parameter will
      * identify which one to click on.
      *
-     * @param column The column to click on.
-     * @param index If multiple columns have the same name this will identify which one to click.
+     * @param field The field to click on.
+     * @param index If multiple fields have the same name this will identify which one to click.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog selectShownInGridColumn(String column, int index)
+    public FieldSelectionDialog highlightFieldInSelectedFields(String field, int index)
     {
-        getShownInGridListItems(column).get(index).click();
+        getSelectedListItems(field).get(index).click();
         return this;
     }
 
     /**
-     * Remove all the columns with the given name from the grid.
+     * Check if a field can be removed from the list of selected fields.
+     * @param field Field name / label to remove.
+     * @return True if the field can be removed, false otherwise.
+     */
+    public boolean canFieldBeRemoved(String field)
+    {
+        return canFieldBeRemoved(field, 0);
+    }
+
+    /**
+     * Check if a field can be removed from the list of selected fields. If there are multiple fields with the same
+     * name use the index to identify the field.
+     * @param field Field name / label to remove.
+     * @param index Index for duplicate fields.
+     * @return True if the field can be removed, false otherwise.
+     */
+    public boolean canFieldBeRemoved(String field, int index)
+    {
+        WebElement listItem = getSelectedListItems(field).get(index);
+        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+        return removeIcon.isDisplayed();
+    }
+
+    /**
+     * Remove the fields from the list of selected fields.
      *
-     * @param columns List of columns to remove.
+     * @param fields List of fields to remove.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeColumns(List<String> columns)
+    public FieldSelectionDialog removeFieldsFromSelected(List<String> fields)
     {
-        for(String column : columns)
+        for(String field : fields)
         {
-            removeColumn(column, 0);
+            removeFieldFromSelected(field, 0);
         }
 
         return this;
     }
 
     /**
-     * Remove the given column from the 'Shown in Grid' list.
+     * Remove the given field from the list of selected fields.
      *
-     * @param column The column to remove.
+     * @param field The field to remove.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeColumn(String column)
+    public FieldSelectionDialog removeFieldFromSelected(String field)
     {
-        return removeColumn(column, 0);
+        return removeFieldFromSelected(field, 0);
     }
 
     /**
-     * Remove the given column from the 'Shown in Grid' list. If multiple columns have the same value the index parameter
+     * Remove the given field from the list of selected fields. If multiple fields have the same name the index parameter
      * will identify which one to remove.
      *
-     * @param column The column to remove.
-     * @param index If multiple columns have the same value this identifies which one to remove.
+     * @param field The field to remove.
+     * @param index If multiple fields have the same value this identifies which one to remove.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog removeColumn(String column, int index)
+    public FieldSelectionDialog removeFieldFromSelected(String field, int index)
     {
-        WebElement listItem = getShownInGridListItems(column).get(index);
+        WebElement listItem = getSelectedListItems(field).get(index);
         WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findElement(listItem);
         getWrapper().mouseOver(removeIcon);
         removeIcon.click();
@@ -337,78 +372,83 @@ public class CustomizeGridViewDialog extends ModalDialog
         getWrapper().mouseOver(Locator.tagWithClass("h4", "modal-title").findElement(this));
 
         getWrapper().shortWait()
-                .withMessage(String.format("Column '%s' was not removed from list.", column))
+                .withMessage(String.format("Field '%s' was not removed from list.", field))
                 .until(ExpectedConditions.stalenessOf(listItem));
 
         return this;
     }
 
     /**
-     * Remove all the columns in the 'SHown in Grid' panel.
+     * Remove all the fields from the list of selected fields.
      *
      * @return This dialog.
      */
-    public CustomizeGridViewDialog clearColumns()
+    public FieldSelectionDialog removeAllSelectedFields()
     {
-        List<WebElement> allItems = elementCache().getListItemElements(elementCache().shownInGridPanel);
+        List<WebElement> allItems = elementCache().getListItemElements(elementCache().selectedFieldsPanel);
 
         for(WebElement listItem : allItems)
         {
             WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
-            removeIcon.click();
+
+            // For the tooltip not all fields can be removed.
+            if(removeIcon.isDisplayed())
+            {
+                removeIcon.click();
+            }
         }
 
-        WebDriverWrapper.waitFor(()-> getShownInGridColumns().isEmpty(),
-                "Did not remove all of the 'Shown in Grid' columns.", 500);
+        WebDriverWrapper.waitFor(()-> getSelectedFields().isEmpty(),
+                "Did not remove all of the selected fields.", 500);
 
         return this;
     }
 
     /**
-     * Update the given column to a new value.
+     * Update the given field label to a new value.
      *
-     * @param currentColumnLabel The column to be updated.
-     * @param newColumnLabel The new value to set the column label to.
+     * @param currentFieldLabel The field to be updated.
+     * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog setColumnLabel(String currentColumnLabel, String newColumnLabel)
+    public FieldSelectionDialog setFieldLabel(String currentFieldLabel, String newFieldLabel)
     {
-        return setColumnLabel(currentColumnLabel, 0, newColumnLabel);
+        return setFieldLabel(currentFieldLabel, 0, newFieldLabel);
     }
 
     /**
-     * Update the given column to a new label. If there are multiple columnss with the same label in the list the index
+     * Update the given field to a new label. If there are multiple fields with the same label in the list the index
      * parameter identifies which one to update.
      *
-     * @param currentColumnLabel The column to be updated.
-     * @param index If multiple columns have the save label this identifies which one in the list to update.
-     * @param newColumnLabel The new value to set the column label to.
+     * @param currentFieldLabel The field to be updated.
+     * @param index If multiple fields have the save label this identifies which one in the list to update.
+     * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public CustomizeGridViewDialog setColumnLabel(String currentColumnLabel, int index, String newColumnLabel)
+    public FieldSelectionDialog setFieldLabel(String currentFieldLabel, int index, String newFieldLabel)
     {
 
-        WebElement listItem = getShownInGridListItems(currentColumnLabel).get(index);
+        WebElement listItem = getSelectedListItems(currentFieldLabel).get(index);
         WebElement updateIcon = Locator.tagWithClass("span", "edit-inline-field__toggle").findWhenNeeded(listItem);
         updateIcon.click();
 
-        WebDriverWrapper.waitFor(()->elementCache().columnLabelEdit.isDisplayed(),
-                String.format("Input for column '%s' was not shown.", currentColumnLabel), 1_500);
+        WebDriverWrapper.waitFor(()->elementCache().fieldLabelEdit.isDisplayed(),
+                String.format("Input for field '%s' was not shown.", currentFieldLabel), 1_500);
 
         // Unfortunately using setFormElement doesn't work in this case. That method calls WebElement.clear which clears
         // the current text but also causes the focus to the input control to be lost. When the focus is lost the input
         // goes away. Need to do update the control using the selenium actions.
 
         // Select the current text, type in the new value then change focus (tab) to commit the change.
-        getWrapper().actionClear(elementCache().columnLabelEdit);
+        getWrapper().actionClear(elementCache().fieldLabelEdit);
         Actions replaceCurrentText = new Actions(getDriver());
-        replaceCurrentText.sendKeys(newColumnLabel)
+        replaceCurrentText.sendKeys(newFieldLabel)
                 .sendKeys(Keys.TAB)
                 .perform();
 
-        WebDriverWrapper.waitFor(()->!elementCache().columnLabelEdit.isDisplayed() &&
-                        elementCache().getListItemElement(elementCache().shownInGridPanel, newColumnLabel).isDisplayed(),
-                String.format("New column label '%s' is not in the list.", newColumnLabel), 500);
+        WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed() &&
+                        elementCache().getListItemElement(elementCache().selectedFieldsPanel, newFieldLabel).isDisplayed(),
+                String.format("New field label '%s' is not in the list.", newFieldLabel), 500);
 
         return this;
     }
@@ -418,7 +458,7 @@ public class CustomizeGridViewDialog extends ModalDialog
      *
      * @return This dialog.
      */
-    public CustomizeGridViewDialog clickUndoEdits()
+    public FieldSelectionDialog clickUndoEdits()
     {
         elementCache().undoEditsButton.click();
         return this;
@@ -438,14 +478,69 @@ public class CustomizeGridViewDialog extends ModalDialog
                 .contains("disabled-action-text");
     }
 
-    private List<WebElement> getShownInGridListItems(String columnLabel)
+    private List<WebElement> getSelectedListItems(String fieldLabel)
     {
-        List<WebElement> listItems = elementCache().getListItemElements(elementCache().shownInGridPanel, columnLabel);
+        List<WebElement> listItems = elementCache().getListItemElements(elementCache().selectedFieldsPanel, fieldLabel);
 
-        Assert.assertFalse(String.format(FIELD_NOT_IN_GRID, columnLabel),
+        Assert.assertFalse(String.format(FIELD_NOT_SELECTED, fieldLabel),
                 listItems.isEmpty());
 
         return listItems;
+    }
+
+    /**
+     * Helper function to reposition a field in the selected list.
+     *
+     * @param fieldToMove The name / label of the field to move.
+     * @param targetField The name / label of the field currently occuping the desired position.
+     * @param beforeTarget Will the field being moved go before (above) or after (below) the target field.
+     * @return This dialog.
+     */
+    public FieldSelectionDialog repositionField(String fieldToMove, String targetField, boolean beforeTarget)
+    {
+        WebElement elementToMove = elementCache().getListItemElement(elementCache().selectedFieldsPanel, fieldToMove);
+        WebElement elementTarget = elementCache().getListItemElement(elementCache().selectedFieldsPanel, targetField);
+
+        int yBefore =  elementToMove.getRect().getY();
+
+        int offset;
+
+        if(beforeTarget)
+        {
+            if(elementTarget.getRect().getY() < elementToMove.getRect().getY())
+            {
+                // If the target is above the field being moved.
+                offset = -1 * elementTarget.getSize().getHeight();
+            }
+            else
+            {
+                // If the target is below the field being moved.
+                offset = -1 * elementTarget.getSize().getHeight() / 2;
+            }
+        }
+        else
+        {
+            offset = elementTarget.getSize().getHeight() / 2 + 10;
+        }
+
+        WebElement dragHandle = Locator.tagWithAttribute("div", "role", "button").findWhenNeeded(elementToMove);
+        getWrapper().mouseOver(dragHandle);
+        new Actions(getDriver())
+                .clickAndHold(dragHandle)
+                .moveToElement(elementTarget)
+                .moveByOffset(2, offset)
+                .release()
+                .perform();
+
+        // Maybe I don't need to wait?
+        WebDriverWrapper.sleep(1_000);
+
+        int yAfter =  elementToMove.getRect().getY();
+
+        WebDriverWrapper.waitFor(()-> yAfter != yBefore, "I don't think I repositioned the field in the list.",
+                1_000);
+
+        return this;
     }
 
     /**
@@ -469,6 +564,14 @@ public class CustomizeGridViewDialog extends ModalDialog
         return elementCache().updateGridButton.isEnabled();
     }
 
+    /**
+     * Update the tool-tip view.
+     */
+    public void clickUpdateView()
+    {
+        dismiss("Update");
+    }
+
     @Override
     protected ElementCache elementCache()
     {
@@ -487,7 +590,7 @@ public class CustomizeGridViewDialog extends ModalDialog
 
         protected WebElement availableFieldsPanel = contentPanelLocator.index(0).findWhenNeeded(this);
 
-        protected WebElement shownInGridPanel = contentPanelLocator.index(1).findWhenNeeded(this);
+        protected WebElement selectedFieldsPanel = contentPanelLocator.index(1).findWhenNeeded(this);
 
         // This is present to items in both panels.
         protected final Locator listItemName = Locator.tagWithClass("div", "field-name");
@@ -502,9 +605,9 @@ public class CustomizeGridViewDialog extends ModalDialog
         protected final WebElement updateGridButton = Locator.button("Update Grid")
                 .findWhenNeeded(this);
 
-        // The 'pencil' to edit a column label. Only in the Shown in Grid panel.
-        protected final WebElement columnLabelEdit = Locator.tagWithClass("input", "form-control")
-                .refindWhenNeeded(shownInGridPanel);
+        // The 'pencil' to edit a field label. Only in the Shown in Grid panel.
+        protected final WebElement fieldLabelEdit = Locator.tagWithClass("input", "form-control")
+                .refindWhenNeeded(selectedFieldsPanel);
 
         // Will get all the list items that match the fieldName.
         protected List<WebElement> getListItemElements(WebElement panel, String fieldName)
