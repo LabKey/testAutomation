@@ -65,7 +65,7 @@ import java.util.function.Supplier;
 public class TestDataGenerator
 {
     // chose a Character random from this String
-    private static final String CHARSET_STRING = "ABCD01234vxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
+    private static final String CHARSET_STRING = "ABCD01234abcvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
