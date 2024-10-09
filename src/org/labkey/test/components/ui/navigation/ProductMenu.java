@@ -165,6 +165,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
             clearElementCache();
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(menuSectionEl));
             getWrapper().shortWait().until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(elementCache().menuContent, menuSectionLoc));
+            WebDriverWrapper.waitFor(this::isLoaded, "App menu didn't switch containers as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
 
         return this;
