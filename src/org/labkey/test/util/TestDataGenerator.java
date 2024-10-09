@@ -78,6 +78,7 @@ public class TestDataGenerator
     private final String _schemaName;
     private final String _queryName;
     private final String _containerPath;
+    private String _excludedChars;
 
 
     /**
@@ -107,6 +108,11 @@ public class TestDataGenerator
     public String getQueryName()
     {
         return _queryName;
+    }
+
+    public void setExcludedChars(String excludedChars)
+    {
+        _excludedChars = excludedChars;
     }
 
     /**
@@ -161,7 +167,7 @@ public class TestDataGenerator
 
     public TestDataGenerator addStringSupplier(String columnName, int length)
     {
-        _dataSuppliers.put(columnName, ()-> randomString(length));
+        _dataSuppliers.put(columnName, ()-> randomString(length, _excludedChars));
         return this;
     }
 
@@ -272,7 +278,7 @@ public class TestDataGenerator
         switch (columnType.substring(columnType.indexOf('#') + 1).toLowerCase())
         {
             case "string":
-                return ()-> randomString(20);
+                return ()-> randomString(20, _excludedChars);
             case "int":
                 return ()-> randomInt(0, 20);
             case "float":
@@ -294,7 +300,7 @@ public class TestDataGenerator
         return randomString(size, null);
     }
 
-    public static String randomString(int size, String exclusion)
+    public static String randomString(int size, @Nullable String exclusion)
     {
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
