@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -55,8 +56,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 
 /**
@@ -66,6 +67,7 @@ public class TestDataGenerator
 {
     // chose a Character random from this String
     private static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
+    private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
@@ -79,7 +81,7 @@ public class TestDataGenerator
     private final String _queryName;
     private final String _containerPath;
     private String _excludedChars;
-
+    private boolean _alphaNumericStr;
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -113,6 +115,11 @@ public class TestDataGenerator
     public void setExcludedChars(String excludedChars)
     {
         _excludedChars = excludedChars;
+    }
+
+    public void setAlphaNumericStr(boolean alphaNumericStr)
+    {
+        _alphaNumericStr = alphaNumericStr;
     }
 
     /**
@@ -167,7 +174,7 @@ public class TestDataGenerator
 
     public TestDataGenerator addStringSupplier(String columnName, int length)
     {
-        _dataSuppliers.put(columnName, ()-> randomString(length, _excludedChars));
+        _dataSuppliers.put(columnName, ()-> randomString(length, _excludedChars, _alphaNumericStr ? ALPHANUMERIC_STRING : CHARSET_STRING));
         return this;
     }
 
@@ -278,7 +285,7 @@ public class TestDataGenerator
         switch (columnType.substring(columnType.indexOf('#') + 1).toLowerCase())
         {
             case "string":
-                return ()-> randomString(20, _excludedChars);
+                return ()-> randomString(20, _excludedChars, _alphaNumericStr ? ALPHANUMERIC_STRING : CHARSET_STRING);
             case "int":
                 return ()-> randomInt(0, 20);
             case "float":
@@ -302,18 +309,20 @@ public class TestDataGenerator
 
     public static String randomString(int size, @Nullable String exclusion)
     {
+        return randomString(size, exclusion, CHARSET_STRING);
+    }
+
+    public static String randomString(int size, @Nullable String exclusion, @Nullable String charSet)
+    {
+        String charSetFrom = StringUtils.isEmpty(charSet) ? CHARSET_STRING : charSet;
+        if (!StringUtils.isEmpty(exclusion))
+            charSetFrom = charSetFrom.replaceAll("[" + Pattern.quote(exclusion) + "]", "");
+
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
         {
-            char selected;
-            do
-            {
-                int randIndex = (int)(CHARSET_STRING.length() * Math.random());
-                selected = CHARSET_STRING.charAt(randIndex);
-            }
-            while (exclusion != null && exclusion.contains(selected + ""));
-
-            val.append(selected);
+            int randIndex = (int)(charSetFrom.length() * Math.random());
+            val.append(charSetFrom.charAt(randIndex));
         }
         return val.toString();
     }
