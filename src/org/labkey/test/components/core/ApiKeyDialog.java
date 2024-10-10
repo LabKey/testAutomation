@@ -1,10 +1,11 @@
-package org.labkey.test.credentials;
+package org.labkey.test.components.core;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -27,7 +28,10 @@ public class ApiKeyDialog extends ModalDialog
     public ApiKeyDialog generateApiKey()
     {
         elementCache().generateApiKeyButton.click();
-        return new ApiKeyDialog(getDriver(), _title);
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(elementCache().descriptionInput.getComponentElement()));
+        clearElementCache();
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().inputField.getComponentElement()));
+        return this;
     }
 
     public ApiKeyDialog copyKey()
@@ -109,8 +113,8 @@ public class ApiKeyDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        Input descriptionInput = Input.Input(Locator.tagWithId("input", "keyDescription"), getDriver()).refindWhenNeeded(this);
-        WebElement descriptionDisplay = Locator.tagWithClassContaining("div", "api-key__description").refindWhenNeeded(this);
+        Input descriptionInput = Input.Input(Locator.tagWithId("input", "keyDescription"), getDriver()).findWhenNeeded(this);
+        WebElement descriptionDisplay = Locator.tagWithClassContaining("div", "api-key__description").findWhenNeeded(this);
         WebElement generateApiKeyButton = Locator.tagWithText("button", "Generate API Key").findWhenNeeded(this);
         Input inputField = Input.Input(Locator.tagWithClass("input", "api-key__input"), getDriver()).findWhenNeeded(this);
         WebElement copyKeyButton = Locator.tagWithName("button", "copy_apikey_token").findWhenNeeded(this);
