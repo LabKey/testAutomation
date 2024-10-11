@@ -40,8 +40,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.core.ApiKeyPanel;
 import org.labkey.test.components.ui.grids.QueryGrid;
-import org.labkey.test.credentials.ApiKeyDialog;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.TestUser;
@@ -373,27 +373,13 @@ public class ApiKeyTest extends BaseWebDriverTest
     private String generateSessionKey()
     {
         goToExternalToolPage();
-        waitForText("API keys are used to authorize");
-        clickButton("Generate Session Key", 0);
-        ApiKeyDialog dialog = new ApiKeyDialog(this.getDriver(), ApiKeyDialog.SESSION_KEY_TITLE);
-        waitForFormElementToNotEqual(Locator.inputByNameContaining("session_token"), "");
-        String key = Locator.inputByNameContaining("session_token").findElement(getDriver()).getAttribute("value");
-        dialog.clickDone();
-        return key;
+        return ApiKeyPanel.panelFinder(getDriver()).find().generateSessionKey();
     }
 
     private String generateAPIKey(@Nullable String description)
     {
         goToExternalToolPage();
-        clickButton("Generate API Key", 0);
-        ApiKeyDialog dialog = new ApiKeyDialog(this.getDriver(), ApiKeyDialog.API_KEY_TITLE);
-        if (description != null)
-            dialog.setDescription(description);
-        dialog = dialog.generateApiKey();
-        waitForFormElementToNotEqual(Locator.inputByNameContaining("apikey_token"), "");
-        String key = Locator.inputByNameContaining("apikey_token").findElement(getDriver()).getAttribute("value");
-        dialog.clickDone();
-        return key;
+        return ApiKeyPanel.panelFinder(getDriver()).find().generateApiKey(description);
     }
 
     private String generateAPIKeyAndRecord(List<Map<String, Object>> _generatedApiKeys) throws IOException
