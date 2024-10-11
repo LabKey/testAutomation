@@ -10,7 +10,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ExportFolderPage;
-import org.labkey.test.pages.samplemanagement.assay.AssayResultsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
