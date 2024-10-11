@@ -68,7 +68,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
         }
         catch (ServerErrorAssertionError error)
         {
-            log("Ignoring server errors cause by cancelling pipeline job");
+            log("Ignoring server errors caused by cancelling the folder import pipeline job");
         }
     }
 
