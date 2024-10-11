@@ -264,6 +264,12 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         var dataRegion = DataRegionTable.DataRegion(getDriver()).waitFor();
 
         // expect 3 rows in this assay, p2 and p3 should get mv indicators in the count column
+        Map<String, List<String>> expectedData = new HashMap<>();
+        expectedData.put("Participant ID", List.of("p1", "p2", "p3"));
+        expectedData.put("Visit ID", List.of("1", "1", "1"));
+        expectedData.put("Count", List.of("4", "N", "Q"));
+        checkDataregionData(dataRegion, expectedData);
+
         Map<String, List<Integer>> expectedMVIndicators = new HashMap<>();
         expectedMVIndicators.put("Count", List.of(1, 2));
         checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
