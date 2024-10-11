@@ -1,3 +1,4 @@
+import org.labkey.gradle.plugin.Distribution
 import org.labkey.gradle.plugin.FileModule
 import org.labkey.gradle.task.ModuleDistribution
 import org.labkey.gradle.util.BuildUtils
@@ -15,12 +16,13 @@ dist.description = "Distribution that includes all modules, for use in the conti
 
 project.tasks.register("distribution", ModuleDistribution) {
     ModuleDistribution dist ->
-        dist.group = GroupNames.DISTRIBUTION
         dist.description = "Make a LabKey modules distribution for 'test'"
 
         dist.subDirName = "test"
         dist.extraFileIdentifier = '-test'
         dist.versionPrefix = 'Test'
+
+        dist.extraProperties = [supportedDatabases: "pgsql, mssql"]
 }
 
 
