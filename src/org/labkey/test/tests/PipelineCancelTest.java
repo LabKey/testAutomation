@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.ServerErrorAssertionError;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.categories.Daily;
@@ -52,10 +53,23 @@ public class PipelineCancelTest  extends BaseWebDriverTest
         startImportStudyFromZip(STUDY_ZIP);
 
         log("Cancel import");
-        new PipelineStatusTable(this).clickStatusLink(0).clickCancel();
+        new PipelineStatusTable(this).clickStatusLink(0)
+            .clickCancel()
+            .assertLogTextContains(
+                "Interrupting job by sending interrupt request.",
+                "Failed to complete task");
 
         goToProjectHome();
         assertTextPresent("This folder does not contain a study."); //part of the import will be done, but it shouldn't have gotten to participants.
+
+        try
+        {
+            checkErrors();
+        }
+        catch (ServerErrorAssertionError error)
+        {
+            log("Ignoring server errors caused by cancelling the folder import pipeline job");
+        }
     }
 
     @Override

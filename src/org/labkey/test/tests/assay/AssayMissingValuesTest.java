@@ -1,13 +1,17 @@
 package org.labkey.test.tests.assay;
 
+import org.intellij.lang.annotations.Language;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ExportFolderPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -215,6 +219,60 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         multiExpectedMVIndicators.put("Sex", List.of(2, 5, 8, 11));
         checkMvIndicatorPresent(dataRegion, multiExpectedMVIndicators);
         testMvFiltering(List.of("age", "sex"));
+    }
+
+    /**
+     * provides regression coverage for Issue 39496
+     * @throws Exception there was an exception creating the assay for this test
+     */
+    @Test
+    public void testSaveBatchAPIMissingValues() throws Exception
+    {
+        // create the assay
+        String assayName = "missingValueSaveBatchAPIAssay";
+        List<PropertyDescriptor> dataFields = List.of(
+                new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.String),
+                new FieldDefinition("VisitId", FieldDefinition.ColumnType.Integer),
+                new FieldDefinition("Count", FieldDefinition.ColumnType.Integer).setMvEnabled(true));
+
+        var serverProtocol = new GeneralAssayDesign(assayName)
+                .setBatchFields(List.of(new FieldDefinition("batchData", FieldDefinition.ColumnType.String)), false)
+                .setDataFields(dataFields, false)
+                .createAssay(getProjectName(), createDefaultConnection());
+
+        @Language("JavaScript") String saveBatch = """
+                LABKEY.Experiment.saveBatch({
+                    assayId: %protocolId%,
+                    batch: {
+                        runs: [{
+                            name: 'js api',
+                            dataRows : [
+                                {participantId : 'p1', visitId : 1, count : 4.0},
+                                {participantId : 'p2', visitId : 1, count : 'N'},
+                                {participantId : 'p3', visitId : 1, count : 5, countMVIndicator : 'Q'}
+                            ]
+                        }]
+                    }
+                });
+                """.replace("%protocolId%", serverProtocol.getProtocolId().toString());
+        executeScript(saveBatch);
+
+        // navigate to the results view
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(assayName));
+        clickAndWait(Locator.linkWithText("view results"));
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).waitFor();
+
+        // expect 3 rows in this assay, p2 and p3 should get mv indicators in the count column
+        Map<String, List<String>> expectedData = new HashMap<>();
+        expectedData.put("Participant ID", List.of("p1", "p2", "p3"));
+        expectedData.put("Visit ID", List.of("1", "1", "1"));
+        expectedData.put("Count", List.of("4", "N", "Q"));
+        checkDataregionData(dataRegion, expectedData);
+
+        Map<String, List<Integer>> expectedMVIndicators = new HashMap<>();
+        expectedMVIndicators.put("Count", List.of(1, 2));
+        checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
     }
 
     @Override
