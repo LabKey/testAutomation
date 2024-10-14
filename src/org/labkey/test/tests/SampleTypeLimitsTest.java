@@ -81,7 +81,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                     .withColumns(List.of(
                             TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                             TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
-            dgen.addDataSupplier("label", () -> dgen.randomString(10))
+            dgen.addDataSupplier("label", () -> TestDataGenerator.randomString(10))
                     .withGeneratedRows(10000);
             dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
             SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
@@ -235,7 +235,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                 ));
 
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-        Map indexRow = Map.of("name", "seed", "data", dgen.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
+        Map indexRow = Map.of("name", "seed", "data", TestDataGenerator.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
         SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
         SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(),
                 List.of("lsid", "name", "parent", "data", "testIndex"));
@@ -247,8 +247,8 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         int intendedGenerationDepth = 99;
         for (int i = 0; i < intendedGenerationDepth; i++)
         {
-            String name = dgen.randomString(30);
-            Map row = Map.of("name", name, "data", dgen.randomInt(3, 1395), "testIndex", testIndex , "MaterialInputs/bigLineage", previousName);
+            String name = TestDataGenerator.randomString(30);
+            Map row = Map.of("name", name, "data", TestDataGenerator.randomInt(3, 1395), "testIndex", testIndex , "MaterialInputs/bigLineage", previousName);
             dgen.addCustomRow(row);
             previousName = name;
             testIndex++;
