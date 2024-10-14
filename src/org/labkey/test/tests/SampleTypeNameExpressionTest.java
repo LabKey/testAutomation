@@ -73,6 +73,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_04 = "#parent04";
     private static final String PARENT_SAMPLE_05 = "\"parent05";
     private static final String PARENT_SAMPLE_06 = "parent,06";
+    private static final String PARENT_SAMPLE_07 = "\"parent07";
 
     private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
 
@@ -96,6 +97,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         test.doSetup();
     }
 
+    private void addDataRow(TestDataGenerator dataGenerator, String name, int intVal)
+    {
+        Map<String, Object> sampleData = Map.of(
+                "name", name,
+                "Int", intVal,
+                "Str", "Parent Sample " + ((char) (intVal + 95)),
+                "Date", intVal + "/14/2020");
+        dataGenerator.addCustomRow(sampleData);
+    }
+
     private void doSetup() throws IOException, CommandException
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -116,47 +127,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         log(String.format("Give the parent sample type '%1$s' three samples named '%2$s', '%3$s' and '%4$s'.",
                 PARENT_SAMPLE_TYPE, PARENT_SAMPLE_01, PARENT_SAMPLE_02, PARENT_SAMPLE_03));
 
-        Map<String, Object> sampleData = Map.of(
-                "name", PARENT_SAMPLE_01,
-                "Int", 1,
-                "Str", "Parent Sample A",
-                "Date", "7/14/2020");
-        dataGenerator.addCustomRow(sampleData);
-
-        sampleData = Map.of(
-                "name", PARENT_SAMPLE_02,
-                "Int", 2,
-                "Str", "Parent Sample B",
-                "Date", "11/21/2019");
-        dataGenerator.addCustomRow(sampleData);
-
-        sampleData = Map.of(
-                "name", PARENT_SAMPLE_03,
-                "Int", 3,
-                "Str", "Parent Sample C",
-                "Date", "12/25/2015");
-        dataGenerator.addCustomRow(sampleData);
-
-        sampleData = Map.of(
-                "name", PARENT_SAMPLE_04,
-                "Int", 4,
-                "Str", "Parent Sample D",
-                "Date", "12/25/2019");
-        dataGenerator.addCustomRow(sampleData);
-
-        sampleData = Map.of(
-                "name", PARENT_SAMPLE_05,
-                "Int", 5,
-                "Str", "Parent Sample E",
-                "Date", "12/28/2023");
-        dataGenerator.addCustomRow(sampleData);
-
-        sampleData = Map.of(
-                "name", PARENT_SAMPLE_06,
-                "Int", 6,
-                "Str", "Parent Sample F",
-                "Date", "12/31/2023");
-        dataGenerator.addCustomRow(sampleData);
+        addDataRow(dataGenerator, PARENT_SAMPLE_01, 1);
+        addDataRow(dataGenerator, PARENT_SAMPLE_02, 2);
+        addDataRow(dataGenerator, PARENT_SAMPLE_03, 3);
+        addDataRow(dataGenerator, PARENT_SAMPLE_04, 4);
+        addDataRow(dataGenerator, PARENT_SAMPLE_05, 5);
+        addDataRow(dataGenerator, PARENT_SAMPLE_06, 6);
+        addDataRow(dataGenerator, PARENT_SAMPLE_07, 7);
 
         dataGenerator.insertRows();
 
@@ -230,14 +207,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
+        Collections.reverse(names);
 
         log("generated sample names:");
         names.forEach(this::log);
 
         assertEquals(2, names.size());
 
-        assertEquals(PARENT_SAMPLE_01 + "-child", names.get(1));
-        assertEquals("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_02 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(0));
+        List<String> expectedNames = new ArrayList<>();
+        expectedNames.add(PARENT_SAMPLE_01 + "-child");
+        expectedNames.add("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_02 + ", " + PARENT_SAMPLE_03 + "]-child");
+        assertEquals("Sample names are not as expected", expectedNames, names);
 
         log("Verify import tsv should successfully create derivatives from parent starting with #, as long as this is not the 1st field in the row");
         data = "Description\tMaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
@@ -247,13 +227,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         sampleHelper.bulkImport(data);
 
         names = materialTable.getColumnDataAsText("Name");
+        Collections.reverse(names);
+
         log("generated sample names:");
         names.forEach(this::log);
 
         assertEquals(4, names.size());
 
-        assertEquals("[" + PARENT_SAMPLE_03 + ", " + PARENT_SAMPLE_02 + "]-child", names.get(0));
-        assertEquals(PARENT_SAMPLE_03 + "-child", names.get(1));
+        expectedNames.add(PARENT_SAMPLE_03 + "-child");
+        expectedNames.add("[" + PARENT_SAMPLE_03 + ", " + PARENT_SAMPLE_02 + "]-child");
+        assertEquals("Sample names are not as expected", expectedNames, names);
 
         log("Check that lineage is created as expected.");
         clickAndWait(Locator.linkWithText(PARENT_SAMPLE_03 + "-child"));
@@ -265,23 +248,27 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         sampleHelper.bulkImport(PARENT_EXCEL);
 
         names = materialTable.getColumnDataAsText("Name");
+        Collections.reverse(names);
         log("generated sample names:");
         names.forEach(this::log);
 
-        assertEquals(9, names.size());
-        assertEquals(PARENT_SAMPLE_06 + "-child", names.get(0));
-        assertEquals(PARENT_SAMPLE_05 + "-child", names.get(1));
-        assertEquals("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_04 + "]-child", names.get(2));
-        assertEquals("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child", names.get(3));
-        assertEquals(PARENT_SAMPLE_04 + "-child", names.get(4));
+        assertEquals(10, names.size());
+        expectedNames.add(PARENT_SAMPLE_04 + "-child");
+        expectedNames.add("[" + PARENT_SAMPLE_04 + ", " + PARENT_SAMPLE_03 + "]-child");
+        expectedNames.add("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_04 + "]-child");
+        expectedNames.add(PARENT_SAMPLE_05 + "-child");
+        expectedNames.add(PARENT_SAMPLE_06 + "-child");
+        expectedNames.add("[" + PARENT_SAMPLE_07 + ", " + PARENT_SAMPLE_05 + "]-child");
+        assertEquals("Sample names are not as expected", expectedNames, names);
 
         log("Verify importing tsv to create sample with # should work, as long as this is not the 1st field in the row");
         data = "Description\tName\n";
         data += "should succeed\t#RootSample1\n";
         sampleHelper.bulkImport(data);
         names = materialTable.getColumnDataAsText("Name");
-        assertEquals(10, names.size());
-        assertEquals("#RootSample1", names.get(0));
+        Collections.reverse(names);
+        assertEquals(11, names.size());
+        expectedNames.add("#RootSample1");
 
         log("Verify importing tsv to create sample should ignore lines starting with #");
         data = "Name\tDescription\n";

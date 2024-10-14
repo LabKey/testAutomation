@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -55,8 +56,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 
 /**
@@ -65,6 +66,7 @@ import java.util.function.Supplier;
 public class TestDataGenerator
 {
     // chose a Character random from this String
+    private static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
@@ -78,7 +80,8 @@ public class TestDataGenerator
     private final String _schemaName;
     private final String _queryName;
     private final String _containerPath;
-
+    private String _excludedChars;
+    private boolean _alphaNumericStr;
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -107,6 +110,16 @@ public class TestDataGenerator
     public String getQueryName()
     {
         return _queryName;
+    }
+
+    public void setExcludedChars(String excludedChars)
+    {
+        _excludedChars = excludedChars;
+    }
+
+    public void setAlphaNumericStr(boolean alphaNumericStr)
+    {
+        _alphaNumericStr = alphaNumericStr;
     }
 
     /**
@@ -161,7 +174,7 @@ public class TestDataGenerator
 
     public TestDataGenerator addStringSupplier(String columnName, int length)
     {
-        _dataSuppliers.put(columnName, ()-> randomString(length));
+        _dataSuppliers.put(columnName, ()-> randomString(length, _excludedChars, _alphaNumericStr ? ALPHANUMERIC_STRING : CHARSET_STRING));
         return this;
     }
 
@@ -272,7 +285,7 @@ public class TestDataGenerator
         switch (columnType.substring(columnType.indexOf('#') + 1).toLowerCase())
         {
             case "string":
-                return ()-> randomString(20);
+                return ()-> randomString(20, _excludedChars, _alphaNumericStr ? ALPHANUMERIC_STRING : CHARSET_STRING);
             case "int":
                 return ()-> randomInt(0, 20);
             case "float":
@@ -289,18 +302,32 @@ public class TestDataGenerator
         }
     }
 
-    public String randomString(int size)
+    public static String randomString(int size)
     {
+        return randomString(size, null);
+    }
+
+    public static String randomString(int size, @Nullable String exclusion)
+    {
+        return randomString(size, exclusion, CHARSET_STRING);
+    }
+
+    public static String randomString(int size, @Nullable String exclusion, @Nullable String charSet)
+    {
+        String charSetFrom = StringUtils.isEmpty(charSet) ? CHARSET_STRING : charSet;
+        if (!StringUtils.isEmpty(exclusion))
+            charSetFrom = charSetFrom.replaceAll("[" + Pattern.quote(exclusion) + "]", "");
+
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
         {
-            int randIndex = (int)(ALPHANUMERIC_STRING.length() * Math.random());
-            val.append(ALPHANUMERIC_STRING.charAt(randIndex));
+            int randIndex = (int)(charSetFrom.length() * Math.random());
+            val.append(charSetFrom.charAt(randIndex));
         }
         return val.toString();
     }
 
-    public int randomInt(int min, int max)
+    public static int randomInt(int min, int max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
@@ -519,6 +546,31 @@ public class TestDataGenerator
     public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
+    }
+
+    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
+    {
+        return shuffleSelect(allFields, selectCount, false);
+    }
+
+    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount, boolean canRepeat)
+    {
+        if (!canRepeat)
+        {
+            List<T> shuffled = new ArrayList<>(allFields);
+            Collections.shuffle(shuffled);
+            return shuffled.subList(0, selectCount - 1);
+        }
+        else
+        {
+            List<T> selected = new ArrayList<>();
+            for (int i = 0; i < selectCount; i++)
+            {
+                selected.add(allFields.get(randomInt(0, allFields.size())));
+            }
+            return selected;
+        }
+
     }
 
     /**
