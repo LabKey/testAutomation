@@ -953,9 +953,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 beginAt(buildURL("admin", "showErrorsSinceMark"));
                 resetErrors();
                 if (errorLogContents.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
-                    fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+                    throw new ClientErrorAssertionError("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
                 else
-                    fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+                    throw new ServerErrorAssertionError("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
             }
         }
         log("No new errors found.");
