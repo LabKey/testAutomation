@@ -644,6 +644,19 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 .child(Locator.tagWithClass("div", "grid-message")).findElements(this));
     }
 
+    public boolean hasGridError()
+    {
+        return getGridError() != null;
+    }
+
+    public String getGridError()
+    {
+        Locator.XPathLocator errorLocator = Locator.tagWithClass("div", "alert-danger");
+        if (errorLocator.existsIn(this))
+            return errorLocator.findElement(this).getText();
+        return null;
+    }
+
     /** The responsiveGrid now supports redacting fields
      *
      * @param columnText the column name.  (uses starts-with matching)
