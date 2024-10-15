@@ -109,15 +109,15 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("stringData", FieldDefinition.ColumnType.String)
                 ));
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-        dgen.addRow(List.of("A", 12, dgen.randomString(15)));
-        dgen.addRow(List.of("B", 13, dgen.randomString(15)));
-        dgen.addRow(List.of("C", 15, dgen.randomString(15)));
-        dgen.addCustomRow(Map.of("name", "D", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B"));
-        dgen.addCustomRow(Map.of("name", "E", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B"));
-        dgen.addCustomRow(Map.of("name", "F", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B"));
-        dgen.addCustomRow(Map.of("name", "G", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "C"));
-        dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
-        dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", dgen.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
+        dgen.addRow(List.of("A", 12, TestDataGenerator.randomString(15)));
+        dgen.addRow(List.of("B", 13, TestDataGenerator.randomString(15)));
+        dgen.addRow(List.of("C", 15, TestDataGenerator.randomString(15)));
+        dgen.addCustomRow(Map.of("name", "D", "data", 12, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "B"));
+        dgen.addCustomRow(Map.of("name", "E", "data", 14, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "B"));
+        dgen.addCustomRow(Map.of("name", "F", "data", 12, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "A,B"));
+        dgen.addCustomRow(Map.of("name", "G", "data", 12, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "C"));
+        dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
+        dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
 
         SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
