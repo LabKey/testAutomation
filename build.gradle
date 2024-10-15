@@ -198,7 +198,6 @@ if (project.hasProperty('doPublishing'))
                                 username = artifactory_user
                                 password = artifactory_password
                             }
-                            maven = true
                         }
                         defaults
                                 {
