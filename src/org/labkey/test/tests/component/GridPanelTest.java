@@ -156,7 +156,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
             sampleSetDataGenerator.addCustomRow(
                     Map.of(FILTER_NAME_COL, String.format("%s%d", SMALL_SAMPLE_PREFIX, rowCount),
-                            FILTER_INT_COL, sampleSetDataGenerator.randomInt(1, INT_MAX),
+                            FILTER_INT_COL, TestDataGenerator.randomInt(1, INT_MAX),
                             FILTER_STRING_COL, stringSets.get(setIndex++),
                             FILTER_DATE_COL, sampleSetDataGenerator.randomDateString(DateUtils.addWeeks(new Date(), -25), new Date()),
                             FILTER_BOOL_COL, sampleSetDataGenerator.randomBoolean())
