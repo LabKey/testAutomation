@@ -345,7 +345,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().parentAliasSelect(index).getOptions();
     }
 
-    protected T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
         expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
