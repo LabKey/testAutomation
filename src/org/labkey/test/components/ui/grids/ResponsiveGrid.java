@@ -652,9 +652,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public String getGridError()
     {
         Locator.XPathLocator errorLocator = Locator.tagWithClass("div", "alert-danger");
-        if (errorLocator.existsIn(this))
-            return errorLocator.findElement(this).getText();
-        return null;
+        return errorLocator.findOptionalElement(this).map(WebElement::getText).orElse(null);
     }
 
     /** The responsiveGrid now supports redacting fields
