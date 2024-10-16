@@ -9,9 +9,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.Panel;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.react.QueryChartPanel;
-import org.labkey.test.components.react.QueryChartDialog;
 import org.labkey.test.components.react.MultiMenu;
+import org.labkey.test.components.react.QueryChartDialog;
+import org.labkey.test.components.react.QueryChartPanel;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -390,14 +390,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     }
 
     /**
-     * Customize the view. Use the 'Customize Grid VIew' menu option.
+     * Customize the view. Use the 'Customize Grid View' menu option.
      *
-     * @return A {@link CustomizeGridViewDialog}.
+     * @return A {@link FieldSelectionDialog}.
      */
-    public CustomizeGridViewDialog customizeView()
+    public FieldSelectionDialog customizeView()
     {
         elementCache().viewMenu.clickSubMenu(false, "Customize Grid View");
-        return new CustomizeGridViewDialog(getDriver(), this);
+        return new FieldSelectionDialog(getDriver(), this);
     }
 
     public QueryGrid saveViewViaButton()
