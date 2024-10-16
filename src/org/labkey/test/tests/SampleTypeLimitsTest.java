@@ -32,6 +32,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.TestDataGenerator.ALPHANUMERIC_STRING;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DATA_REGION_NAME;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
@@ -81,7 +82,8 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                     .withColumns(List.of(
                             TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                             TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
-            dgen.addDataSupplier("label", () -> TestDataGenerator.randomString(10))
+            dgen.setAlphaNumericStr(true);
+            dgen.addDataSupplier("label", () -> TestDataGenerator.randomString(10, null, ALPHANUMERIC_STRING))
                     .withGeneratedRows(10000);
             dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
             SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
@@ -233,7 +235,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
                         TestDataGenerator.simpleFieldDef("data", FieldDefinition.ColumnType.Integer),
                         TestDataGenerator.simpleFieldDef("testIndex", FieldDefinition.ColumnType.Integer)
                 ));
-
+        dgen.setAlphaNumericStr(true);
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         Map indexRow = Map.of("name", "seed", "data", TestDataGenerator.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
         SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
@@ -247,7 +249,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         int intendedGenerationDepth = 99;
         for (int i = 0; i < intendedGenerationDepth; i++)
         {
-            String name = TestDataGenerator.randomString(30);
+            String name = TestDataGenerator.randomString(30, null, ALPHANUMERIC_STRING);
             Map row = Map.of("name", name, "data", TestDataGenerator.randomInt(3, 1395), "testIndex", testIndex , "MaterialInputs/bigLineage", previousName);
             dgen.addCustomRow(row);
             previousName = name;
