@@ -984,15 +984,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             expand();
 
         getWrapper().setFormElement(elementCache().expressionInput, expression);
+        clickValidateExpression();
+        return this;
+    }
 
-        // Remove focus from the input, this should cause the status message to update.
-        elementCache().expressionInput.sendKeys(Keys.TAB);
+    private void clickValidateExpression()
+    {
+        elementCache().expressionValidateLink.click();
 
         getWrapper().shortWait().until(ExpectedConditions.or(
                 ExpectedConditions.visibilityOf(elementCache().expressionStatusValidated),
                 ExpectedConditions.visibilityOf(elementCache().expressionStatusError)));
-
-        return this;
     }
 
     public String getValueExpressionStatusMessage()
@@ -1376,6 +1378,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public final WebElement expressionStatusValidated = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validated")).refindWhenNeeded(this);
         public final WebElement expressionStatusError = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "error")).refindWhenNeeded(this);
         public final WebElement expressionStatusMsg = expressionStatusMsgLoc.childTag("div").refindWhenNeeded(this);
+        public final WebElement expressionValidateLink = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validate-link")).refindWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
