@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Long Running Report ETL</name>
+    <description>run scheduled report</description>
+    <transforms>
+        <transform id="step1" type="TaskRefTransformStep">
+            <taskref ref="org.labkey.di.pipeline.RunReportTask">
+                <settings>
+                    <setting name="reportId" value="module:ETLtest/etlReportWithSleep.R"/>
+                    <setting name="greeter" value="STEP1"/>
+                </settings>
+            </taskref>
+        </transform>
+    </transforms>
+</etl>
