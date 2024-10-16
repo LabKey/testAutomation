@@ -22,6 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -31,22 +32,22 @@ import org.openqa.selenium.WebElement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
+public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
 {
-    public ETLScheduler(BaseWebDriverTest test)
+    public ETLSchedulerPage(BaseWebDriverTest test)
     {
         super(test);
     }
 
-    public static ETLScheduler beginAt(BaseWebDriverTest test)
+    public static ETLSchedulerPage beginAt(BaseWebDriverTest test)
     {
         return beginAt(test, test.getCurrentContainerPath());
     }
 
-    public static ETLScheduler beginAt(BaseWebDriverTest test, String containerPath)
+    public static ETLSchedulerPage beginAt(BaseWebDriverTest test, String containerPath)
     {
         test.beginAt(WebTestHelper.buildURL("dataintegration", containerPath, "begin"));
-        return new ETLScheduler(test);
+        return new ETLSchedulerPage(test);
     }
 
     public TransformRow transform(String transformId)
@@ -54,10 +55,10 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
         return elementCache().findTransformRow(transformId);
     }
 
-    public LabKeyPage viewProcessedJobs()
+    public LabKeyPage<?> viewProcessedJobs()
     {
-        _test.clickAndWait(elementCache().viewProcessedJobsButton);
-        return new LabKeyPage(_test);
+        clickAndWait(elementCache().viewProcessedJobsButton);
+        return new LabKeyPage<>(this);
     }
 
     public int rowCount()
@@ -71,9 +72,9 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
         return new Elements();
     }
 
-    protected class Elements extends LabKeyPage<?>.ElementCache
+    protected class Elements extends LabKeyPage<Elements>.ElementCache
     {
-        private Map<String, TransformRow> transformRows = new HashMap<>();
+        private final Map<String, TransformRow> transformRows = new HashMap<>();
 
         protected TransformRow findTransformRow(String transformId)
         {
@@ -116,7 +117,7 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
 
         public TransformRow setEnabled(boolean enable)
         {
-            _test.setCheckbox(elementCache().enabledCheckbox, enable);
+            setCheckbox(elementCache().enabledCheckbox, enable);
             return this;
         }
 
@@ -127,7 +128,7 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
 //
 //        public TransformRow setVerboseLoggingEnabled(boolean enable)
 //        {
-//            _test.setCheckbox(elements().verboseLoggingCheckbox, enable);
+//            setCheckbox(elements().verboseLoggingCheckbox, enable);
 //            return this;
 //        }
 
@@ -159,11 +160,11 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
             return elementCache().lastStatus.getText();
         }
 
-        public LabKeyPage clickLastStatus()
+        public PipelineStatusDetailsPage clickLastStatus()
         {
-            _test.clickAndWait(elementCache().lastStatus.findElement(By.cssSelector("a")));
+            clickAndWait(elementCache().lastStatus.findElement(By.cssSelector("a")));
 
-            return new LabKeyPage(_test);
+            return new PipelineStatusDetailsPage(getDriver());
         }
 
         public String getLastRun()
@@ -171,11 +172,11 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
             return elementCache().lastRun.getText();
         }
 
-        public LabKeyPage clickLastRun()
+        public PipelineStatusDetailsPage clickLastRun()
         {
-            _test.clickAndWait(elementCache().lastRun.findElement(By.cssSelector("a")));
+            clickAndWait(elementCache().lastRun.findElement(By.cssSelector("a")));
 
-            return new LabKeyPage(_test);
+            return new PipelineStatusDetailsPage(getDriver());
         }
 
         public String getLastChecked()
@@ -183,20 +184,20 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
             return elementCache().lastChecked.getText();
         }
 
-        public LabKeyPage runNow()
+        public PipelineStatusDetailsPage runNow()
         {
-            _test.clickAndWait(elementCache().runNowButton);
+            clickAndWait(elementCache().runNowButton);
 
-            return new LabKeyPage(_test);
+            return new PipelineStatusDetailsPage(getDriver());
         }
 
-        public LabKeyPage reset()
+        public ETLSchedulerPage reset()
         {
             new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
                             .withChild(Locator.lkButton("Reset State...")).findElement(this))
                     .clickSubMenu(true, "Reset");
 
-            return new LabKeyPage(_test);
+            return ETLSchedulerPage.this;
         }
 
         @LogMethod(quiet = true)
@@ -219,7 +220,7 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
         {
             public Confirm()
             {
-                _test.waitForElement(Ext4Helper.Locators.window("Confirm"));
+                waitForElement(Ext4Helper.Locators.window("Confirm"));
             }
 
             public Confirm assertMessageContains()
@@ -227,27 +228,27 @@ public class ETLScheduler extends LabKeyPage<ETLScheduler.Elements>
                 throw new NotImplementedException("");
             }
 
-            public ETLScheduler confirmNo()
+            public ETLSchedulerPage confirmNo()
             {
                 Locator.XPathLocator noButton = Ext4Helper.Locators.windowButton("Confirm", "No");
-                _test.click(noButton);
-                _test.waitForElementToDisappear(noButton);
+                click(noButton);
+                waitForElementToDisappear(noButton);
 
-                return ETLScheduler.this;
+                return ETLSchedulerPage.this;
             }
 
-            public ETLScheduler confirmYes()
+            public ETLSchedulerPage confirmYes()
             {
-                _test.click(Ext4Helper.Locators.windowButton("Confirm", "Yes"));
-                _test.waitForElement(Ext4Helper.Locators.window("Success"));
-                _test.click(Ext4Helper.Locators.windowButton("Success", "OK"));
-                _test.waitForElementToDisappear(Ext4Helper.Locators.window("Success"));
+                click(Ext4Helper.Locators.windowButton("Confirm", "Yes"));
+                waitForElement(Ext4Helper.Locators.window("Success"));
+                click(Ext4Helper.Locators.windowButton("Success", "OK"));
+                waitForElementToDisappear(Ext4Helper.Locators.window("Success"));
 
-                return ETLScheduler.this;
+                return ETLSchedulerPage.this;
             }
         }
 
-        private class RowElements extends Component<?>.ElementCache
+        protected class RowElements extends Component<RowElements>.ElementCache
         {
             // Column numbers
             private final int NAME = 1;

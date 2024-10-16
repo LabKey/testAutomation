@@ -2079,17 +2079,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
-    protected void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs)
+    public void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs)
     {
         importFolderFromZip(folderArchive, validateQueries, completedJobs, false);
     }
 
-    protected void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs, boolean expectErrors)
+    public void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs, boolean expectErrors)
     {
         importFolderFromZip(folderArchive, validateQueries, completedJobs, expectErrors, MAX_WAIT_SECONDS * 1000);
     }
 
-    protected void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
+    public void importFolderFromZip(File folderArchive, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
     {
         goToFolderManagement().goToImportTab();
         waitForElement(Locator.name("folderZip"));
