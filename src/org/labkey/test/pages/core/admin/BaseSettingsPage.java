@@ -301,7 +301,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
-        WebElement resetBtn = Locator.lkButton("Reset").findWhenNeeded(this);
+        WebElement resetBtn = Locator.lkButton("Reset to Defaults").findWhenNeeded(this);
     }
 
     /**
