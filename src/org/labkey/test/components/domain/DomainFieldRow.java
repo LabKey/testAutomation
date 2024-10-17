@@ -1293,6 +1293,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDateTimeInherited(boolean check)
     {
+        expand();
         elementCache().dateTimeInheritedCheckbox.set(check);
         return this;
     }
@@ -1309,6 +1310,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDateTimeFormatDate(String dateFormat)
     {
+        expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
         elementCache().dateTimeFormatDateSelect.typeAheadSelect(dateFormat + " (");
@@ -1317,6 +1319,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDateTimeFormatTime(String timeFormat)
     {
+        expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
         elementCache().dateTimeFormatTimeSelect.typeAheadSelect(timeFormat + " (");
@@ -1342,27 +1345,30 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDateTimeFormat(String dateTime)
     {
+        expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
 
         String[] parts = dateTime.split("\\s+", 2);
         if (parts.length == 2)
             return setDateTimeFormat(parts[0], parts[1]);
-        return setDateTimeFormatDate(parts[0]);
+        return setDateTimeFormat(parts[0], "<none>");
     }
 
     public DomainFieldRow setDateTimeFormat(String date, String time)
     {
+        expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
 
         elementCache().dateTimeFormatDateSelect.typeAheadSelect(date + " (");
-        elementCache().dateTimeFormatTimeSelect.typeAheadSelect(time + " (");
+        elementCache().dateTimeFormatTimeSelect.typeAheadSelect("<none>".equals(time) ? time : time + " (");
         return this;
     }
 
     public DomainFieldRow setDateInherited(boolean check)
     {
+        expand();
         elementCache().dateInheritedCheckbox.set(check);
         return this;
     }
@@ -1379,6 +1385,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setDateFormat(String dateFormat)
     {
+        expand();
         if (isDateInherited())
             setDateInherited(false);
         elementCache().dateFormatSelect.typeAheadSelect(dateFormat + " (");
@@ -1387,6 +1394,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setTimeInherited(boolean check)
     {
+        expand();
         elementCache().timeInheritedCheckbox.set(check);
         return this;
     }
@@ -1403,6 +1411,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public DomainFieldRow setTimeFormat(String timeFormat)
     {
+        expand();
         if (isTimeInherited())
             setTimeInherited(false);
         elementCache().timeFormatSelect.typeAheadSelect(timeFormat + " (");
