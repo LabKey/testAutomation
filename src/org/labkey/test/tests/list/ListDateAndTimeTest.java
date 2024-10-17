@@ -1199,9 +1199,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         validateListDataInUI(table, expectedData);
         checker().screenShotIfNewError("Format01_Error");
 
-        String dateFormat02 = "MM.dd.yy";
+        String dateFormat02 = "ddMMMyy";
         String timeFormat02 = "HH:mm:ss";
-        String dateTimeFormat02 = "dd/MM/yyyy HH:mm:ss";
+        String dateTimeFormat02 = "dd-MMM-yyyy HH:mm:ss";
 
         formatterDate = new SimpleDateFormat(dateFormat02);
         formatterTime = new SimpleDateFormat(timeFormat02);
@@ -1211,9 +1211,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
 
         DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
-        domainEditor.getField(timeCol).setDateFormat(timeFormat02);
+        domainEditor.getField(timeCol).setTimeFormat(timeFormat02);
         domainEditor.getField(dateCol).setDateFormat(dateFormat02);
-        domainEditor.getField(dateTimeCol).setDateFormat(dateTimeFormat02);
+        domainEditor.getField(dateTimeCol).setDateTimeFormat(dateTimeFormat02);
 
         listDefinitionPage.clickSave();
 

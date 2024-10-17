@@ -1,6 +1,7 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.api.exp.query.ExpSchema;
 import org.labkey.test.BootstrapLocators;
@@ -12,6 +13,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.ui.ontology.ConceptPickerDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -400,23 +402,34 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    // date field options.
-
-    public String getDateFormat()
-    {
-        return getFormat();
-    }
-
-    public DomainFieldRow setDateFormat(String formatString)
-    {
-        return setFormat(formatString);
-    }
-
     // generic set format.
     public DomainFieldRow setFormat(String formatString)
     {
+        return setFormat(formatString, null);
+    }
+
+    public DomainFieldRow setFormat(String formatString, @Nullable String dataType)
+    {
         expand();
 
+        if (!StringUtils.isEmpty(dataType))
+        {
+            if (FieldDefinition.ColumnType.DateAndTime.getRangeURI().equals(dataType))
+            {
+                setDateTimeFormat(formatString);
+                return this;
+            }
+            if (FieldDefinition.ColumnType.Date.getRangeURI().equals(dataType))
+            {
+                setDateFormat(formatString);
+                return this;
+            }
+            if (FieldDefinition.ColumnType.Time.getRangeURI().equals(dataType))
+            {
+                setTimeFormat(formatString);
+                return this;
+            }
+        }
         if(elementCache().formatInput.getComponentElement().isDisplayed())
         {
             elementCache().formatInput.setValue(formatString);
@@ -1268,6 +1281,134 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().aliquotWarningAlert.findElement(this).getText();
     }
 
+    // date field options.
+    private String getFormatWithoutExample(String format)
+    {
+        int index = format.indexOf(" (");
+        if (index == -1)
+            return format;
+
+        return format.substring(0, index);
+    }
+
+    public DomainFieldRow setDateTimeInherited(boolean check)
+    {
+        elementCache().dateTimeInheritedCheckbox.set(check);
+        return this;
+    }
+
+    public boolean isDateTimeInherited()
+    {
+        return elementCache().dateTimeInheritedCheckbox.get();
+    }
+
+    public String getDateTimeFormatDate()
+    {
+        return getFormatWithoutExample(elementCache().dateTimeFormatDateSelect.getValue());
+    }
+
+    public DomainFieldRow setDateTimeFormatDate(String dateFormat)
+    {
+        if (isDateTimeInherited())
+            setDateTimeInherited(false);
+        elementCache().dateTimeFormatDateSelect.typeAheadSelect(dateFormat + " (");
+        return this;
+    }
+
+    public DomainFieldRow setDateTimeFormatTime(String timeFormat)
+    {
+        if (isDateTimeInherited())
+            setDateTimeInherited(false);
+        elementCache().dateTimeFormatTimeSelect.typeAheadSelect(timeFormat + " (");
+        return this;
+    }
+
+    public String getDateTimeFormatTime()
+    {
+        return getFormatWithoutExample(elementCache().dateTimeFormatTimeSelect.getValue());
+    }
+
+    public String getDateTimeFormat()
+    {
+        String date = getDateTimeFormatDate();
+        String time = getDateTimeFormatTime();
+        if ("<none>".equals(time))
+            time = null;
+        if (StringUtils.isEmpty(time))
+            return date;
+
+        return date + " " + time;
+    }
+
+    public DomainFieldRow setDateTimeFormat(String dateTime)
+    {
+        if (isDateTimeInherited())
+            setDateTimeInherited(false);
+
+        String[] parts = dateTime.split("\\s+", 2);
+        if (parts.length == 2)
+            return setDateTimeFormat(parts[0], parts[1]);
+        return setDateTimeFormatDate(parts[0]);
+    }
+
+    public DomainFieldRow setDateTimeFormat(String date, String time)
+    {
+        if (isDateTimeInherited())
+            setDateTimeInherited(false);
+
+        elementCache().dateTimeFormatDateSelect.typeAheadSelect(date + " (");
+        elementCache().dateTimeFormatTimeSelect.typeAheadSelect(time + " (");
+        return this;
+    }
+
+    public DomainFieldRow setDateInherited(boolean check)
+    {
+        elementCache().dateInheritedCheckbox.set(check);
+        return this;
+    }
+
+    public boolean isDateInherited()
+    {
+        return elementCache().dateInheritedCheckbox.get();
+    }
+
+    public String getDateFormat()
+    {
+        return getFormatWithoutExample(elementCache().dateFormatSelect.getValue());
+    }
+
+    public DomainFieldRow setDateFormat(String dateFormat)
+    {
+        if (isDateInherited())
+            setDateInherited(false);
+        elementCache().dateFormatSelect.typeAheadSelect(dateFormat + " (");
+        return this;
+    }
+
+    public DomainFieldRow setTimeInherited(boolean check)
+    {
+        elementCache().timeInheritedCheckbox.set(check);
+        return this;
+    }
+
+    public boolean isTimeInherited()
+    {
+        return elementCache().timeInheritedCheckbox.get();
+    }
+
+    public String getTimeFormat()
+    {
+        return getFormatWithoutExample(elementCache().timeFormatSelect.getValue());
+    }
+
+    public DomainFieldRow setTimeFormat(String timeFormat)
+    {
+        if (isTimeInherited())
+            setTimeInherited(false);
+        elementCache().timeFormatSelect.typeAheadSelect(timeFormat + " (");
+        return this;
+    }
+
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClassContaining("div", "domain-field-row").withoutClass("domain-floating-hdr");
@@ -1363,6 +1504,26 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public final Input formatInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-format")
                 .refindWhenNeeded(this), getDriver());
+
+        public final Checkbox dateInheritedCheckbox = new Checkbox(Locator.input("domainpropertiesrow-format_inheritdate")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        public final Checkbox dateTimeInheritedCheckbox = new Checkbox(Locator.input("domainpropertiesrow-format_inheritdateTime")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        public final Checkbox timeInheritedCheckbox = new Checkbox(Locator.input("domainpropertiesrow-format_inherittime")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
+        public final FilteringReactSelect dateTimeFormatDateSelect = FilteringReactSelect.finder(getDriver())
+                .withNamedInput("domainpropertiesrow-format_datedateTime")
+                .refindWhenNeeded(this);
+        public final FilteringReactSelect dateTimeFormatTimeSelect = FilteringReactSelect.finder(getDriver())
+                .withNamedInput("domainpropertiesrow-format_timedateTime")
+                .refindWhenNeeded(this);
+        public final FilteringReactSelect dateFormatSelect = FilteringReactSelect.finder(getDriver())
+                .withNamedInput("domainpropertiesrow-format_datedate")
+                .refindWhenNeeded(this);
+        public final FilteringReactSelect timeFormatSelect = FilteringReactSelect.finder(getDriver())
+                .withNamedInput("domainpropertiesrow-format_timetime")
+                .refindWhenNeeded(this);
+
         // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
                 .findWhenNeeded(this);
