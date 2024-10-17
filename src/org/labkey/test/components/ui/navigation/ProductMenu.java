@@ -4,7 +4,6 @@
  */
 package org.labkey.test.components.ui.navigation;
 
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -54,16 +53,21 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         TestLogger.debug(String.format("Product menu expansion state: aria-expanded is %b, menuContentDisplayed is %b.",
                 ariaExpanded, menuContentDisplayed));
 
-        return  ariaExpanded && menuContentDisplayed &&
-                ExpectedConditions.invisibilityOfAllElements(BootstrapLocators.loadingSpinner.findElements(this)).apply(getDriver());
+        return ariaExpanded && menuContentDisplayed;
+    }
+
+    protected boolean isLoaded()
+    {
+        return isExpanded() && Locator.tagWithClass("li", "menu-section-header").existsIn(elementCache().sectionContent);
     }
 
     public void expand()
     {
         if (!isExpanded())
         {
+            clearElementCache();
             elementCache().toggle.click();
-            WebDriverWrapper.waitFor(this::isExpanded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            WebDriverWrapper.waitFor(this::isLoaded, "AppsMenu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
     }
 
@@ -73,6 +77,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         {
             elementCache().toggle.click();
         }
+        clearElementCache();
     }
 
     public List<String> getMenuSectionHeaders()
@@ -95,7 +100,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public void clickMenuColumnHeader(String headerText)
     {
         expand();
-        elementCache().menuSectionHeader(headerText).click();
+        clickNavLink(elementCache().menuSectionHeader(headerText));
     }
 
     public List<String> getMenuText(String headerText)
@@ -118,13 +123,13 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public void clickMenuItem(String headerText, String menuText)
     {
         expand();
-        elementCache().menuSectionLink(headerText, menuText).click();
+        clickNavLink(elementCache().menuSectionLink(headerText, menuText));
     }
 
     public boolean hasFolderColumn()
     {
         expand();
-        return elementCache().folderColumn().isDisplayed();
+        return elementCache().folderColumn.isDisplayed();
     }
 
     public List<String> getFolderList()
@@ -142,16 +147,26 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     {
         expand();
 
-        // clicking the folder item link should replace its containing li with an active one
-        elementCache().folderItemLink(folderName).click();
+        if (!elementCache().activeFolderMenuItemLocator.withText(folderName)
+                .existsIn(elementCache().folderColumn))
+        {
+            Locator.CssLocator menuSectionLoc = Locator.css(".sections-content .menu-section");
+            WebElement menuSectionEl = menuSectionLoc.findElement(elementCache().menuContent);
 
-        // await it becoming active
-        WebDriverWrapper.waitFor(()-> elementCache().activeFolderMenuItemLocator.withText(folderName)
-                .existsIn(elementCache().folderColumn()),
-                "the folder item did not become active in time", 2000);
+            // clicking the folder item link should replace its containing li with an active one
+            elementCache().folderItemLink(folderName).click();
 
-        // setting the folder item active (if it wasn't) may update contents if the user's permissions differ there
-        clearElementCache();
+            // await it becoming active
+            WebDriverWrapper.waitFor(() -> elementCache().activeFolderMenuItemLocator.withText(folderName)
+                            .existsIn(elementCache().folderColumn),
+                    "the folder item did not become active in time", 2000);
+
+            // setting the folder item active (if it wasn't) may update contents if the user's permissions differ there
+            clearElementCache();
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(menuSectionEl));
+            getWrapper().shortWait().until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(elementCache().menuContent, menuSectionLoc));
+            WebDriverWrapper.waitFor(this::isLoaded, "App menu didn't switch containers as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
 
         return this;
     }
@@ -159,7 +174,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public void goToFolderDashboard(String folderName)
     {
         clickFolderItem(folderName);
-        elementCache().activeDashboardIcon.click();
+        clickNavLink(elementCache().activeDashboardIcon);
     }
 
     public int getDashboardIconCount()
@@ -170,7 +185,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public void goToFolderAdministration(String folderName)
     {
         clickFolderItem(folderName);
-        elementCache().activeAdministrationIcon.click();
+        clickNavLink(elementCache().activeAdministrationIcon);
     }
 
     public int getAdministrationIconCount()
@@ -190,6 +205,29 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         return buttonSubtitle.getText();
     }
 
+    private void clickNavLink(WebElement link)
+    {
+        if (isCurrentFolderSelected())
+        {
+            link.click();
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(link));
+        }
+        else
+        {
+            getWrapper().clickAndWait(link);
+        }
+        clearElementCache();
+    }
+
+    private boolean isCurrentFolderSelected()
+    {
+        if (!elementCache().folderColumn.isDisplayed())
+            return true;
+
+        String folderName = elementCache().activeFolderMenuItemLocator.findElement(elementCache().folderColumn).getText();
+        return getWrapper().getCurrentContainerPath().endsWith("/" + folderName);
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -200,10 +238,10 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        private final WebElement rootElement = rootLocator.findElement(getDriver());
-        private final WebElement toggle = Locator.byClass("product-menu-button").findElement(rootElement);
-        private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").refindWhenNeeded(this);
-        private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").refindWhenNeeded(menuContent);
+        private final WebElement toggle = Locator.byClass("product-menu-button").findWhenNeeded(this);
+        private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").findWhenNeeded(this);
+        private final WebElement folderColumn = Locator.tagWithClass("div", "col-folders").findWhenNeeded(menuContent);
+        private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").findWhenNeeded(menuContent);
 
         public Locator.XPathLocator dashboardIconLoc = Locator.tagWithClass("i", "fa-home");
         public WebElement activeDashboardIcon = Locator.tagWithClass("div", "col-folders")
@@ -215,6 +253,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
                 .descendant(Locator.tagWithClass("li", "active"))
                 .descendant(administrationIconLoc)
                 .findWhenNeeded(menuContent);
+
 
         Locator.XPathLocator menuSectionHeaderLoc(String headerText)
         {
@@ -228,7 +267,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
 
         WebElement menuSectionHeader(String headerText)
         {
-            return menuSectionHeaderLoc(headerText).child(Locator.linkContainingText(headerText)).refindWhenNeeded(sectionContent);
+            return menuSectionHeaderLoc(headerText).child(Locator.linkContainingText(headerText)).findWhenNeeded(sectionContent);
         }
 
         WebElement menuSectionBody(String headerText)
@@ -246,22 +285,17 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
             return Locator.linkWithText(linkText).findElement(menuSectionBody(headerText));
         }
 
-        WebElement folderColumn()
-        {
-            return Locator.tagWithClass("div", "col-folders").refindWhenNeeded(menuContent);
-        }
-
         private final Locator.XPathLocator folderMenuItemLocator = Locator.tagWithClass("a", "menu-folder-item");
         private final Locator activeFolderMenuItemLocator = Locator.tagWithClass("li", "active").descendant(folderMenuItemLocator);
 
         List<WebElement> folderMenuItems()
         {
-            return folderMenuItemLocator.findElements(folderColumn());
+            return folderMenuItemLocator.findElements(folderColumn);
         }
 
         WebElement folderItemLink(String folderName)
         {
-            return folderMenuItemLocator.withText(folderName).findElement(folderColumn());
+            return folderMenuItemLocator.withText(folderName).findElement(folderColumn);
         }
     }
 }
