@@ -214,14 +214,14 @@ public class QueryMetadataTest extends BaseWebDriverTest
     {
         var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
         editPage.fieldsPanel().getField("Created")
-                .setDateFormat("Date");
+                .setDateFormat("ddMMMyy");
         editPage.clickSave();
 
         var queryXmlPage = editPage.clickEditSource();
         String expectedColumnPart = "<table tableName=\"queryMetadataTestList\" tableDbType=\"NOT_IN_DB\">\n" +
                 "    <columns>\n" +
                 "      <column columnName=\"Created\">\n" +
-                "        <formatString>Date</formatString>\n" +
+                "        <formatString>ddMMMyy</formatString>\n" +
                 "      </column>\n" +
                 "    </columns>\n" +
                 "  </table>";
@@ -240,7 +240,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     {
         var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
         editPage.fieldsPanel().getField("Created")
-                .setDateFormat("Date");
+                .setDateFormat("ddMMMyy");
         editPage.aliasField("Row Id");
         editPage.clickSave();
 
@@ -249,7 +249,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 "  <table tableName=\"Data\" tableDbType=\"NOT_IN_DB\">\n" +
                 "    <columns>\n" +
                 "      <column columnName=\"Created\">\n" +
-                "        <formatString>Date</formatString>\n" +
+                "        <formatString>ddMMMyy</formatString>\n" +
                 "      </column>\n" +
                 "      <column columnName=\"WrappedRowId\" wrappedColumnName=\"RowId\">\n" +
                 "        <isHidden>true</isHidden>\n" +

@@ -311,7 +311,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainFormPanel.addField("addedField")
                 .setType(FieldDefinition.ColumnType.DateAndTime)
                 .expand()
-                .setDateFormat("yyyy-MM-dd HH:mm")
+                .setDateTimeFormat("yyyy-MM-dd HH:mm")
                 .setExcludeFromDateShifting(false)
                 .setDescription("simplest date format of all")
                 .setLabel("DateTime");

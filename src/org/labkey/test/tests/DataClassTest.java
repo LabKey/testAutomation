@@ -304,16 +304,16 @@ public class DataClassTest extends BaseWebDriverTest
         log("Add a date-time field.");
 
         String dateTimeField = "DateTime";
-        String dateTimeFormat = "MMM dd, yyyy hh:mm:ss a";
+        String dateTimeFormat = "ddMMMyyyy hh:mm a";
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(dateTimeField)
                 .setType(FieldDefinition.ColumnType.DateAndTime)
-                .setDateFormat(dateTimeFormat);
+                .setDateTimeFormat(dateTimeFormat);
 
         log("Add a date-only field.");
 
         String dateField = "Date";
-        String dateFormat = "MMM dd, yyyy";
+        String dateFormat = "ddMMMyyyy";
         domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.addField(dateField)
                 .setType(FieldDefinition.ColumnType.Date)
@@ -322,11 +322,11 @@ public class DataClassTest extends BaseWebDriverTest
         log("Add a time-only field.");
 
         String timeField = "Time";
-        String timeFormat = "hh:mm:ss a";
+        String timeFormat = "hh:mm a";
         domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.addField(timeField)
                 .setType(FieldDefinition.ColumnType.Time)
-                .setDateFormat(timeFormat);
+                .setTimeFormat(timeFormat);
 
         createPage.clickSave();
 
@@ -354,25 +354,25 @@ public class DataClassTest extends BaseWebDriverTest
         insertRowPage.submit();
 
         List<String> expectedDateTimeCol = List.of(
-                "Feb 29, 2024 01:13:13 PM",
-                "Feb 03, 2005 12:00:00 AM",
-                "Mar 02, 1972 10:45:00 PM",
-                "Nov 19, 1999 09:32:06 AM",
-                "Dec 23, 2024 02:45:00 PM");
+                "29Feb2024 01:13 PM",
+                "03Feb2005 12:00 AM",
+                "02Mar1972 10:45 PM",
+                "19Nov1999 09:32 AM",
+                "23Dec2024 02:45 PM");
 
         List<String> expectedDateCol = List.of(
-                "Feb 29, 2024",
-                "Feb 03, 2005",
-                "Mar 02, 1972",
-                "Nov 19, 1999",
-                "Dec 23, 2024");
+                "29Feb2024",
+                "03Feb2005",
+                "02Mar1972",
+                "19Nov1999",
+                "23Dec2024");
 
         List<String> expectedTimeCol = List.of(
-                "01:13:13 PM",
-                "12:00:00 AM",
-                "10:45:00 PM",
-                "09:32:06 AM",
-                "02:45:00 PM");
+                "01:13 PM",
+                "12:00 AM",
+                "10:45 PM",
+                "09:32 AM",
+                "02:45 PM");
 
         listTable = new DataRegionTable("query", getDriver());
 

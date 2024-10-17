@@ -138,13 +138,13 @@ public class ExpTest extends BaseWebDriverTest
 
         DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
-        domainRow.setDateFormat("ddd MMM dd yyyy");
+        domainRow.setDateFormat("ddMMMyyyy");
         designerPage.clickSave();
 
         // Verify that it ended up in the XML version of the metadata
         designerPage.clickEditSource();
         _ext4Helper.clickExt4Tab("XML Metadata");
-        assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddd MMM dd yyyy</formatString>");
+        assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddMMMyyyy</formatString>");
 
         // Run it and see if we used the format correctly
         _ext4Helper.clickExt4Tab("Data");
