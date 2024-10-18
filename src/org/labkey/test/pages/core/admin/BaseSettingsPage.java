@@ -375,7 +375,6 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         HH_mm("HH:mm"),
         HH_mm_ss_SSS("HH:mm:ss.SSS"),
         hh_mm_a("hh:mm a"),
-        kk_mm("kk:mm"),
         Default("HH:mm:ss"),
         DTDefault("HH:mm");
 
