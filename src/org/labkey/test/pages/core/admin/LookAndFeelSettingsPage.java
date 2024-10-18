@@ -58,14 +58,14 @@ public class LookAndFeelSettingsPage extends BaseSettingsPage
         button.check();
     }
 
-    public String getAltLoginPage()
+    public String getAltWelcomePage()
     {
-        return getFormElement(elementCache().altLoginPageTxt);
+        return getFormElement(elementCache().altWelcomePageTxt);
     }
 
-    public void setAltLoginPage(String loginPage)
+    public void setAltWelcomePage(String welcomePage)
     {
-        setFormElement(elementCache().altLoginPageTxt,loginPage);
+        setFormElement(elementCache().altWelcomePageTxt, welcomePage);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class LookAndFeelSettingsPage extends BaseSettingsPage
     {
         WebElement usDateParsingRadio = Locator.xpath("//input[@name='dateParsingMode' and @value='US']").findWhenNeeded(this);
         WebElement nonUSDateParsingRadio = Locator.xpath("//input[@name='dateParsingMode' and @value='NON_US']").findWhenNeeded(this);
-        WebElement altLoginPageTxt = Locator.inputByNameContaining("customLogin").findWhenNeeded(this);
+        WebElement altWelcomePageTxt = Locator.inputById("customWelcome").findWhenNeeded(this);
         WebElement resetBtn = Locator.lkButton("Reset to Defaults").findWhenNeeded(this);
 
     }

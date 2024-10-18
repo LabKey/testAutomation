@@ -77,7 +77,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         // Use java's Date object and SimpleDateFormatter (not strings) to enter the data.
         _defaultDateFormat = new SimpleDateFormat(settingsPage.getDefaultDateDisplay());
         _defaultTimeFormat = new SimpleDateFormat(settingsPage.getDefaultTimeDisplay());
-        _defaultDateTimeFormat = new SimpleDateFormat(settingsPage.getDefaultDateTimeDisplay());
+        _defaultDateTimeFormat = new SimpleDateFormat(String.format("%s %s",
+                settingsPage.getDefaultDateTimeDateDisplay(), settingsPage.getDefaultDateTimeTimeDisplay()));
     }
 
     @AfterClass
@@ -1115,12 +1116,13 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     @Test
     public void testDateAndTimeFormat() throws IOException, CommandException
     {
-        String dateFormat01 = "MMMM dd, yyyy";
-        String timeFormat01 = "hh:mm:ss aa";
-        String dateTimeFormat01 = "MMMM dd, yyyy hh:mm aa";
+        BaseSettingsPage.DATE_FORMAT dateFormat01 = BaseSettingsPage.DATE_FORMAT.Default;
+        BaseSettingsPage.TIME_FORMAT timeFormat01 = BaseSettingsPage.TIME_FORMAT.hh_mm_a;
+        String dateTimeFormat01 = String.format("%s %s",
+                BaseSettingsPage.DATE_FORMAT.Default, BaseSettingsPage.TIME_FORMAT.hh_mm_a);
 
-        SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat01);
-        SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat01);
+        SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat01.toString());
+        SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat01.toString());
         SimpleDateFormat formatterDateTime = new SimpleDateFormat(dateTimeFormat01);
 
         String listName = "Date and Time Format List";
@@ -1131,8 +1133,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         log(String.format("Create a list named '%s' with date-only, time-only and dateTime fields.", listName));
 
         _listHelper.createList(PROJECT_NAME, listName, "key",
-                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date).setFormat(dateFormat01),
-                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time).setFormat(timeFormat01),
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date).setFormat(dateFormat01.toString()),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time).setFormat(timeFormat01.toString()),
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(dateTimeFormat01).setLabel(dateTimeCol)
         );
 
@@ -1251,8 +1253,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with two DateTime fields that will be converted to date-only and time-only fields.", listName));
 
-        String dtFormatDate = "yyyy-MM-dd HH:mm";
-        String dtFormatTime = "yyyy-MM-dd HH:mm:ss";
+        String dtFormatDate = String.format("%s %s",
+                BaseSettingsPage.DATE_FORMAT.yyyy_MMM_dd, BaseSettingsPage.TIME_FORMAT.HH_mm);
+        String dtFormatTime = String.format("%s %s",
+                BaseSettingsPage.DATE_FORMAT.yyyy_MMM_dd, BaseSettingsPage.TIME_FORMAT.HH_mm_ss);
 
         SimpleDateFormat formatterFormatTime = new SimpleDateFormat(dtFormatTime);
 
@@ -1342,11 +1346,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
-        String dateFormat = "yyyy-MM-dd";
-        String timeFormat = "HH:mm:ss";
+        // Update default format after changing the types.
+        BaseSettingsPage.DATE_FORMAT dateFormat = BaseSettingsPage.DATE_FORMAT.Default;
+        BaseSettingsPage.TIME_FORMAT timeFormat = BaseSettingsPage.TIME_FORMAT.Default;
 
-        SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat);
-        SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat);
+        SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat.toString());
+        SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat.toString());
 
         List<Map<String, String>> expectedData = new ArrayList<>();
 

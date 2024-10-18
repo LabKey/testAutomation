@@ -174,32 +174,48 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public String getDefaultDateDisplay()
     {
-        return getFormElement(elementCache().defaultDateFormat);
+        return getSelectedOptionValue(elementCache().defaultDateFormat);
     }
 
-    public void setDefaultDateDisplay(String displayFormat)
+    public void setDefaultDateDisplay(DATE_FORMAT dateFormat)
     {
-        setFormElement(elementCache().defaultDateFormat, displayFormat);
+        selectOptionByValue(elementCache().defaultDateFormat, dateFormat.format);
     }
 
-    public String getDefaultDateTimeDisplay()
+    public void setDefaultDateTimeDisplay(DATE_FORMAT dateFormat, TIME_FORMAT timeFormat)
     {
-        return getFormElement(elementCache().defaultDateTimeFormat);
+        setDefaultDateTimeDateDisplay(dateFormat);
+        setDefaultDateTimeTimeDisplay(timeFormat);
     }
 
-    public void setDefaultDateTimeDisplay(String displayFormat)
+    public String getDefaultDateTimeDateDisplay()
     {
-        setFormElement(elementCache().defaultDateTimeFormat, displayFormat);
+        return getSelectedOptionValue(elementCache().defaultDateTimeDateFormat);
+    }
+
+    public void setDefaultDateTimeDateDisplay(DATE_FORMAT dateFormat)
+    {
+        selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.format);
+    }
+
+    public String getDefaultDateTimeTimeDisplay()
+    {
+        return getSelectedOptionValue(elementCache().defaultDateTimeTimeFormat);
+    }
+
+    public void setDefaultDateTimeTimeDisplay(TIME_FORMAT timeFormat)
+    {
+        selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.format);
     }
 
     public String getDefaultTimeDisplay()
     {
-        return getFormElement(elementCache().defaultTimeFormat);
+        return getSelectedOptionValue(elementCache().defaultTimeFormat);
     }
 
-    public void setDefaultTimeDisplay(String displayFormat)
+    public void setDefaultTimeDisplay(TIME_FORMAT timeFormat)
     {
-        setFormElement(elementCache().defaultTimeFormat, displayFormat);
+        selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.format);
     }
 
     public String getDefaultNumberDisplay()
@@ -255,6 +271,16 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         return elementCache().restrictChartingColsChk.isSelected();
     }
 
+    public String getAltLoginPage()
+    {
+        return getFormElement(elementCache().altLoginPageTxt);
+    }
+
+    public void setAltLoginPage(String loginPage)
+    {
+        setFormElement(elementCache().altLoginPageTxt,loginPage);
+    }
+
     public void save()
     {
         clickAndWait(elementCache().saveBtn);
@@ -285,21 +311,25 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement showNavForAdmin = Locator.xpath("//input[@name='folderDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
         WebElement showAppNavAlways = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
         WebElement showAppNavForAdmin = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
-        WebElement helpMenuEnabledChk = Locator.name("helpMenuEnabled").findWhenNeeded(this);
+        WebElement helpMenuEnabledChk = Locator.checkboxByName("helpMenuEnabled").findWhenNeeded(this);
         WebElement discussionEnabledChk = Locator.name("discussionEnabled").findWhenNeeded(this);
         WebElement logoLinkTxt = Locator.inputByNameContaining("logoHref").findWhenNeeded(this);
         WebElement supportLinkTxt = Locator.inputByNameContaining("reportAProblemPath").findWhenNeeded(this);
         WebElement supportEmailTxt = Locator.inputByNameContaining("supportEmail").findWhenNeeded(this);
         WebElement systemEmailTxt = Locator.inputByNameContaining("systemEmailAddress").findWhenNeeded(this);
         WebElement organizationNameTxt = Locator.inputByNameContaining("companyName").findWhenNeeded(this);
-        WebElement defaultDateFormat = Locator.inputByNameContaining("defaultDateFormat").findWhenNeeded(this);
-        WebElement defaultTimeFormat = Locator.inputByNameContaining("defaultTimeFormat").findWhenNeeded(this);
-        WebElement defaultDateTimeFormat = Locator.inputByNameContaining("defaultDateTimeFormat").findWhenNeeded(this);
+
+        WebElement defaultDateFormat = Locator.id("defaultDateFormat").findWhenNeeded(this);
+        WebElement defaultTimeFormat = Locator.id("defaultTimeFormat").findWhenNeeded(this);
+        WebElement defaultDateTimeDateFormat = Locator.id("dateSelect").findWhenNeeded(this);
+        WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
+
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
         WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElement(this);
         WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findElement(this);
         WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
+        WebElement altLoginPageTxt = Locator.inputById("customLogin").findWhenNeeded(this);
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement resetBtn = Locator.lkButton("Inherit all").findWhenNeeded(this);
     }
@@ -313,6 +343,53 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
     {
         new SimplePostCommand("admin", "resetProperties")
                 .execute(cn, path);
+    }
+
+    public enum DATE_FORMAT
+    {
+        yyyy_MM_dd("yyyy-MM-dd"),
+        yyyy_MMM_dd("yyyy-MMM-dd"),
+        dd_MMM_yyyy("dd-MMM-yyyy"),
+        dd_MMM_yy("dd-MMM-yy"),
+        ddMMMyyyy("ddMMMyyyy"),
+        ddMMMyy("ddMMMyy"),
+        Default("yyyy-MM-dd"),
+        DTDefault("yyyy-MM-dd");
+
+        private final String format;
+
+        DATE_FORMAT(String format)
+        {
+            this.format = format;
+        }
+
+        @Override
+        public String toString() {
+            return this.format;
+        }
+    }
+
+    public enum TIME_FORMAT
+    {
+        HH_mm_ss("HH:mm:ss"),
+        HH_mm("HH:mm"),
+        HH_mm_ss_SSS("HH:mm:ss.SSS"),
+        hh_mm_a("hh:mm a"),
+        kk_mm("kk:mm"),
+        Default("HH:mm:ss"),
+        DTDefault("HH:mm");
+
+        private final String format;
+
+        TIME_FORMAT(String format)
+        {
+            this.format = format;
+        }
+
+        @Override
+        public String toString() {
+            return this.format;
+        }
     }
 
 }
