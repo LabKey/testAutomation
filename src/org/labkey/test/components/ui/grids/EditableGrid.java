@@ -373,6 +373,24 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     /**
      * <p>
+     *     For a given column, 'columnNameToSet', set the lookup cell in the first row where the value in column 'columnNameToSearch'
+     *     equals 'valueToSearch'. The value chosen will be at the specified index in the lookup options. Supply a 'value' in order to
+     *     filter the set of options shown.
+     * </p>
+     *
+     * @param columnNameToSearch The name of the column to check if a row should be updated or not.
+     * @param valueToSearch The value to check for in 'columnNameToSearch' to see if the row should be updated.
+     * @param columnNameToSet The column to update in a row.
+     * @param value Optional value to supply for filtering lookup options before selection
+     * @param index The 0-based index of the option to choose from the possibly filtered list of options.
+     */
+    public void setCellValueForLookup(String columnNameToSearch, String valueToSearch, String columnNameToSet, @Nullable String value, int index)
+    {
+        setCellValueForLookup(getRowIndex(columnNameToSearch, valueToSearch), columnNameToSet, value, index);
+    }
+
+    /**
+     * <p>
      *     For a given column, 'columnNameToSet', set the cell in the row if value in column 'columnNameToSearch'
      *     equals 'valueToSearch'.
      * </p>
@@ -412,6 +430,34 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public WebElement setCellValue(int row, String columnName, Object value)
     {
         return setCellValue(row, columnName, value, true);
+    }
+
+    /**
+     * <p>
+     * For the identified row set the value in the identified lookup column by selecting the given index in the lookup list.
+     * </p>
+     *
+     * @param row        Index of the row (0 based).
+     * @param columnName Name of the column to update.
+     * @param value      Optional value to type in to filter the options shown
+     * @param index      The index of the option to select for the lookup
+     * @return cell WebElement
+     */
+    public WebElement setCellValueForLookup(int row, String columnName, @Nullable String value, int index)
+    {
+        WebElement gridCell = selectCell(row, columnName);
+
+        ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
+
+        lookupSelect.open();
+        if (value != null)
+            lookupSelect.enterValueInTextbox(value);
+
+        List<WebElement> elements = lookupSelect.getOptionElements();
+        if (elements.size() < index)
+            throw new NotFoundException("Could not select option at index " + index + " in lookup for " + columnName + ". Only " + elements.size() + " options found.");
+        elements.get(index).click();
+        return gridCell;
     }
 
     /**
