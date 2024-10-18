@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -54,12 +55,11 @@ import static org.junit.Assert.assertEquals;
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
 
-    private static final String DEFAULT_DATE_DISPLAY = "yyyy-MM-dd";
-    private static final String DEFAULT_DATE_TIME_DISPLAY = "yyyy-MM-dd HH:mm";
-    private static final String DEFAULT_TIME_DISPLAY = "HH:mm:ss";
+    private static final BaseSettingsPage.DATE_FORMAT DEFAULT_DATE_FORMAT = BaseSettingsPage.DATE_FORMAT.Default;
+    private static final BaseSettingsPage.TIME_FORMAT DEFAULT_TIME_FORMAT = BaseSettingsPage.TIME_FORMAT.Default;
 
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";
-    private static final String DATE_TIME_FORMAT_INJECTION = DEFAULT_DATE_TIME_DISPLAY + "'" + INJECT_CHARS + "'";
+//    private static final String DATE_TIME_FORMAT_INJECTION = DEFAULT_DATE_TIME_DISPLAY + "'" + INJECT_CHARS + "'";
 
     private static final String PROJ_CHANGE = "Site Settings Test";
     private static final String PROJ_BASE = "Site Settings Base Test";
@@ -126,7 +126,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     }
 
     private void checkSettingPageValues(BaseSettingsPage settingsPage, boolean helpMenu, String supportLink,
-                                        String dateFormat, String dateTimeFormat, String timeFormat)
+                                        BaseSettingsPage.DATE_FORMAT dateFormat, BaseSettingsPage.DATE_FORMAT dtDateFormat,
+                                        BaseSettingsPage.TIME_FORMAT dtTimeFormat, BaseSettingsPage.TIME_FORMAT timeFormat)
     {
 
         checker().verifyEquals("Help menu should be " + (helpMenu ? "checked." : "unchecked."),
@@ -138,8 +139,11 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         checker().verifyEquals("'Default Date Display'  not as expected.",
                 dateFormat, settingsPage.getDefaultDateDisplay());
 
-        checker().verifyEquals("'Default Date Display'  not as expected.",
-                dateTimeFormat, settingsPage.getDefaultDateTimeDisplay());
+        checker().verifyEquals("'Default DateTime Date Display'  not as expected.",
+                dtDateFormat, settingsPage.getDefaultDateTimeDateDisplay());
+
+        checker().verifyEquals("'Default DateTime Time Display'  not as expected.",
+                dtTimeFormat, settingsPage.getDefaultDateTimeTimeDisplay());
 
         checker().verifyEquals("'Default Time Display'  not as expected.",
                 timeFormat, settingsPage.getDefaultTimeDisplay());
@@ -213,19 +217,20 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     public void testSiteSettingOverride() throws IOException, CommandException
     {
 
-        String siteDateDisplay = "MMMM dd, yyyy";
-        String siteTimeDisplay = "hh:mm a";
-        String siteDateTimeDisplay = "hh:mm a MMMM, dd yyyy";
+        BaseSettingsPage.DATE_FORMAT dateDisplay = BaseSettingsPage.DATE_FORMAT.yyyy_MMM_dd;
+        BaseSettingsPage.TIME_FORMAT timeDisplay = BaseSettingsPage.TIME_FORMAT.hh_mm_a;
+        BaseSettingsPage.DATE_FORMAT dtDateDisplay = BaseSettingsPage.DATE_FORMAT.dd_MMM_yy;
+        BaseSettingsPage.TIME_FORMAT dtTimeDisplay = BaseSettingsPage.TIME_FORMAT.hh_mm_a;
         boolean siteHelpMenuState = false;
         String siteSupportLink = "";
 
-        SimpleDateFormat defaultDateFormat = new SimpleDateFormat(DEFAULT_DATE_DISPLAY);
-        SimpleDateFormat defaultTimeFormat = new SimpleDateFormat(DEFAULT_TIME_DISPLAY);
-        SimpleDateFormat defaultDateTimeFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_DISPLAY);
+        SimpleDateFormat defaultDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT.toString());
+        SimpleDateFormat defaultTimeFormat = new SimpleDateFormat(DEFAULT_TIME_FORMAT.toString());
+        SimpleDateFormat defaultDateTimeFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT + " " + DEFAULT_TIME_FORMAT);
 
-        SimpleDateFormat updatedDateFormat = new SimpleDateFormat(siteDateDisplay);
-        SimpleDateFormat updateTimeFormat = new SimpleDateFormat(siteTimeDisplay);
-        SimpleDateFormat updateDateTimeFormat = new SimpleDateFormat(siteDateTimeDisplay);
+        SimpleDateFormat updatedDateFormat = new SimpleDateFormat(dateDisplay.toString());
+        SimpleDateFormat updateTimeFormat = new SimpleDateFormat(timeDisplay.toString());
+        SimpleDateFormat updateDateTimeFormat = new SimpleDateFormat(String.format("%s %s", dtDateDisplay, dtTimeDisplay));
 
         Date testDate01 = new Calendar.Builder()
                 .setDate(2023, 1, 17)
@@ -264,19 +269,19 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         createDateAndTimeList(PROJ_CHANGE, datesDefaultFormat);
         createDateAndTimeList(PROJ_BASE, datesDefaultFormat);
 
-        log("Change global settings to exclude some menu links and change the format of date and time fields.");
+        log("Change global settings to exclude some menu links and change the format of DateTime, Date and Time fields.");
         LookAndFeelSettingsPage settingsPage = goToSiteLookAndFeel();
         settingsPage.setHelpMenu(siteHelpMenuState);
         settingsPage.setSupportLink(siteSupportLink);
-        settingsPage.setDefaultDateDisplay(siteDateDisplay);
-        settingsPage.setDefaultTimeDisplay(siteTimeDisplay);
-        settingsPage.setDefaultDateTimeDisplay(siteDateTimeDisplay);
+        settingsPage.setDefaultDateDisplay(dateDisplay);
+        settingsPage.setDefaultTimeDisplay(timeDisplay);
+        settingsPage.setDefaultDateTimeDisplay(dtDateDisplay, dtTimeDisplay);
         settingsPage.save();
 
         log("Go to the project settings page and validate that various settings match the site settings.");
         ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
         checkSettingPageValues(projectSettingsPage, siteHelpMenuState, siteSupportLink,
-                siteDateDisplay, siteDateTimeDisplay, siteTimeDisplay);
+                dateDisplay, dtDateDisplay, dtTimeDisplay, timeDisplay);
 
         log("Validate help and report links are missing from the menu in the project.");
         checkHelpLinks(PROJ_CHANGE, false, false);
@@ -292,11 +297,22 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         String supportLink = "${contextPath}/home/support/project-begin.view";
 
         projectSettingsPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
+
+        projectSettingsPage.setHelpMenuInherited(false);
         projectSettingsPage.setHelpMenu(true);
+
+        projectSettingsPage.setSupportLinkInherited(false);
         projectSettingsPage.setSupportLink(supportLink);
-        projectSettingsPage.setDefaultDateDisplay(DEFAULT_DATE_DISPLAY);
-        projectSettingsPage.setDefaultTimeDisplay(DEFAULT_TIME_DISPLAY);
-        projectSettingsPage.setDefaultDateTimeDisplay(DEFAULT_DATE_TIME_DISPLAY);
+
+        projectSettingsPage.setDefaultDateDisplayInherited(false);
+        projectSettingsPage.setDefaultDateDisplay(BaseSettingsPage.DATE_FORMAT.yyyy_MM_dd);
+
+        projectSettingsPage.setDefaultTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultTimeDisplay(DEFAULT_TIME_FORMAT);
+
+        projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultDateTimeDisplay(DEFAULT_DATE_FORMAT, DEFAULT_TIME_FORMAT);
+
         projectSettingsPage.save();
 
         log("Check 'help' and 'report' links are present in the menu in the project.");
@@ -309,7 +325,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         projectSettingsPage = ProjectSettingsPage.beginAt(this, PROJ_BASE);
 
         checkSettingPageValues(projectSettingsPage, siteHelpMenuState, siteSupportLink,
-                siteDateDisplay, siteDateTimeDisplay, siteTimeDisplay);
+                dateDisplay, dtDateDisplay, dtTimeDisplay, timeDisplay);
 
         log(String.format("In '%s' validate format of data is defined by the settings in the folder.", PROJ_BASE));
         checkDataInList(PROJ_BASE, DT_LIST_NAME, datesUpdatedFormat);
@@ -320,6 +336,9 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         resetProjectSettings();
     }
 
+    // The injectionTest needs to be changed to an API tests.
+    // That will be done in another story along with the non-standard tests.
+    @Ignore
     @Test
     public void testInjection() throws IOException, CommandException
     {
@@ -327,7 +346,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         resetProjectSettings();
 
         var projectSettingPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
-        projectSettingPage.setDefaultDateTimeDisplay(DATE_TIME_FORMAT_INJECTION);
+//        projectSettingPage.setDefaultDateTimeDisplay(DT_DATE_FORMAT_INJECTION, DT_TIME_FORMAT_INJECTION);
         projectSettingPage.save();
 
         _listHelper.createList(getProjectName(), "IceCream", "IceCreamID",

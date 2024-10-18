@@ -124,7 +124,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         if (fieldDefinition.getLabel() != null)
             fieldRow.setLabel(fieldDefinition.getLabel());
         if (fieldDefinition.getFormat() != null)
-            fieldRow.setNumberFormat(fieldDefinition.getFormat());
+            fieldRow.setFormat(fieldDefinition.getFormat(), fieldDefinition.getRangeURI());
         if (fieldDefinition.getScale() != null)
             fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)
