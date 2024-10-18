@@ -346,8 +346,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         List<Integer> populatedRows = new ArrayList<>();
 
         // Need to look at an attribute of a cell to see if it has pre-populated data.
-        // But this info will not be in the select or row-number cells, so need to find a cell other than that.
-        int checkColumn = getColumnNames().size() - 1;
+        // But this info will not be in the select or row-number cells, so we'll use the last column
+        // (CSS selector is 1-based not 0-based).
+        int checkColumn = getColumnNames().size();
         int rowCount = 0;
 
         for (WebElement row : getRows())
