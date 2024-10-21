@@ -101,7 +101,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
                     // clear any value that may have been entered in the text box, this should protect against that as well.
                     enterValueInTextbox(option);
 
-                    // Don't know if this is will work as expected. It may take a moment for the list to populate
+                    // Don't know if this will work as expected. It may take a moment for the list to populate
                     // after typing in a value.
                     waitFor(()->!getOptions().contains("Loading..."), 1_000);
 
@@ -128,7 +128,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         }
 
         assertTrue("Expected '" + option + "' to be displayed.", optionEl.isDisplayed());
-        sleep(500); // either react or the test is moving to fast/slow for one another
+        sleep(500); // either react or the test is moving too fast/slow for one another
         TestLogger.debug("optionEl is displayed, clicking");
         optionEl.click();
 
