@@ -137,16 +137,16 @@ public class ProjectSettingsTest extends BaseWebDriverTest
                 supportLink, settingsPage.getSupportLink());
 
         checker().verifyEquals("'Default Date Display'  not as expected.",
-                dateFormat, settingsPage.getDefaultDateDisplay());
+                dateFormat.toString(), settingsPage.getDefaultDateDisplay());
 
         checker().verifyEquals("'Default DateTime Date Display'  not as expected.",
-                dtDateFormat, settingsPage.getDefaultDateTimeDateDisplay());
+                dtDateFormat.toString(), settingsPage.getDefaultDateTimeDateDisplay());
 
         checker().verifyEquals("'Default DateTime Time Display'  not as expected.",
-                dtTimeFormat, settingsPage.getDefaultDateTimeTimeDisplay());
+                dtTimeFormat.toString(), settingsPage.getDefaultDateTimeTimeDisplay());
 
         checker().verifyEquals("'Default Time Display'  not as expected.",
-                timeFormat, settingsPage.getDefaultTimeDisplay());
+                timeFormat.toString(), settingsPage.getDefaultTimeDisplay());
 
     }
 

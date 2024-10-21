@@ -26,7 +26,9 @@ import org.labkey.test.components.LookAndFeelTimeChart;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -128,7 +130,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
     private static final String PLOT_NAME = "Systolic over Diastolic";
     private static final String PARTICIPANTREPORT_NAME = "Participant Report: Vital Signs and Lymphocyte Levels";
     private static final String LINKREPORT_NAME = "Renal Study";
-    private static final String DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATEFORMAT = "yyyy-MM-dd";
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
     private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
@@ -167,7 +169,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         // change date format
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Formats"));
-        setFormElement(Locator.input("defaultDateFormat"), DATEFORMAT);
+        new Checkbox(Locator.name("defaultDateTimeFormatInherited").findElement(getDriver())).set(false);
+        selectOptionByValue(Locator.name("dateSelect"), BaseSettingsPage.DATE_FORMAT.yyyy_MM_dd.toString());
+        selectOptionByValue(Locator.name("timeSelect"), BaseSettingsPage.TIME_FORMAT.HH_mm_ss.toString());
         clickButton("Save");
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText("GenericAssay"));

@@ -4,6 +4,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -111,7 +112,8 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public boolean getObjectLevelDiscussions()
     {
-        return elementCache().discussionEnabledChk.isEnabled();
+
+        return new Checkbox(elementCache().discussionEnabledChk).isChecked();
     }
 
     public void setObjectLevelDiscussions(boolean enable)
@@ -312,7 +314,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement showAppNavAlways = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
         WebElement showAppNavForAdmin = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
         WebElement helpMenuEnabledChk = Locator.checkboxByName("helpMenuEnabled").findWhenNeeded(this);
-        WebElement discussionEnabledChk = Locator.name("discussionEnabled").findWhenNeeded(this);
+        WebElement discussionEnabledChk = Locator.checkboxByName("discussionEnabled").findWhenNeeded(this);
         WebElement logoLinkTxt = Locator.inputByNameContaining("logoHref").findWhenNeeded(this);
         WebElement supportLinkTxt = Locator.inputByNameContaining("reportAProblemPath").findWhenNeeded(this);
         WebElement supportEmailTxt = Locator.inputByNameContaining("supportEmail").findWhenNeeded(this);

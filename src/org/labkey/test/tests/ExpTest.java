@@ -27,6 +27,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
@@ -138,18 +139,19 @@ public class ExpTest extends BaseWebDriverTest
 
         DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
-        domainRow.setDateFormat("ddMMMyyyy");
+        domainRow.setDateTimeInherited(false);
+        domainRow.setDateTimeFormatDate(BaseSettingsPage.DATE_FORMAT.ddMMMyyyy.toString());
         designerPage.clickSave();
 
         // Verify that it ended up in the XML version of the metadata
         designerPage.clickEditSource();
         _ext4Helper.clickExt4Tab("XML Metadata");
-        assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddMMMyyyy</formatString>");
+        assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddMMMyyyy HH:mm</formatString>");
 
         // Run it and see if we used the format correctly
         _ext4Helper.clickExt4Tab("Data");
         waitForText(WAIT_FOR_JAVASCRIPT, "editedCreated");
-        dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
+        dateFormat = new SimpleDateFormat("ddMMMyyyy");
         waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(importDate));
 
         // Add a new wrapped column to the exp.Datas table
