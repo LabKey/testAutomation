@@ -224,11 +224,12 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         verifyImportedNonUSDate(expectedDateTimeCol, expectedDateCol, expectedTimeCol);
 
         ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
-        projectSettingsPage.setDefaultDateDisplay("MM-dd-yyyy");
+        projectSettingsPage.setDefaultDateDisplayInherited(false);
+        projectSettingsPage.setDefaultDateDisplay(BaseSettingsPage.DATE_FORMAT.dd_MMM_yyyy);
         projectSettingsPage.save();
         // Issue 50420: LKS/LKSM: Non US parsing doesn't seem to be respected: US parsing setting should be queried at Root folder level
         log("Change Project Settings - Default display format for dates");
-        expectedDateCol = List.of("12-23-2024", "11-19-1999", "03-02-1972", "02-03-2005", "07-19-1999");
+        expectedDateCol = List.of("23-Dec-2024", "19-Nov-1999", "02-Mar-1972", "03-Feb-2005", "19-Jul-1999");
 
         importBulkNonUSDate(bulkData);
         verifyImportedNonUSDate(expectedDateTimeCol, expectedDateCol, expectedTimeCol);
@@ -441,6 +442,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     private void setProjectAdditionalParsingPatterns(String dateTimePattern, String datePattern, String timePattern)
     {
         ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
+        enableAdditionalParsingPatterns(projectSettingsPage, dateTimePattern, datePattern, timePattern);
         setAdditionalParsingPatterns(projectSettingsPage, dateTimePattern, datePattern, timePattern);
     }
 
@@ -462,6 +464,24 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         }
 
         settingsPage.save();
+    }
+
+    private void enableAdditionalParsingPatterns(ProjectSettingsPage projectSettingsPage, String dateTimePattern, String datePattern, String timePattern)
+    {
+        if(null != dateTimePattern && !dateTimePattern.isEmpty())
+        {
+            projectSettingsPage.setAdditionalParsingPatternDateAndTimeInherited(false);
+        }
+
+        if(null != datePattern && !datePattern.isEmpty())
+        {
+            projectSettingsPage.setAdditionalParsingPatternDatesInherited(false);
+        }
+
+        if(null != timePattern && !timePattern.isEmpty())
+        {
+            projectSettingsPage.setAdditionalParsingPatternTimesInherited(false);
+        }
     }
 
 }

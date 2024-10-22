@@ -346,6 +346,21 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     }
 
     /**
+     * Opens the select menu and gets the web elements corresponding to the items in the dropdown list.
+     *
+     * @return List of web elements for the options in the opened select menu
+     */
+    public List<WebElement> getOptionElements()
+    {
+        boolean alreadyOpened = isExpanded();
+
+        // Can only get the list of items once the list has been opened.
+        if (!alreadyOpened)
+            open();
+        return Locators.listItems.findElements(getComponentElement());
+    }
+
+    /**
      * Get the items that are in the dropdown list. That is the items that may be selected.
      *
      * @return List of strings for the values in the list.

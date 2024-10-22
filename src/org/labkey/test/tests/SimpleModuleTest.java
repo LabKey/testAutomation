@@ -45,7 +45,9 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
+import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
@@ -124,8 +126,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private static final String KNITR_PEOPLE = "Knitr People";
     private static final String SUPER_COOL_R_REPORT = "Super Cool R Report";
     private static final String WANT_TO_BE_COOL = "Want To Be Cool";
-
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     private static final File DEFAULT_IMAGE =  TestFileUtils.getSampleData("thumbnails/default.jpg");
     private static final File PRIUS_THUMBNAIL =  TestFileUtils.getSampleData("thumbnails/prius.jpg");
@@ -231,9 +231,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
         for (int i = 0; i < 5; i ++)
             portalHelper.moveWebPart("Data Views", PortalHelper.Direction.UP);
 
-        goToProjectSettings();
-        setFormElement(Locator.name("defaultDateFormat"), DATE_FORMAT);
-        clickAndWait(Locator.lkButton("Save"));
+        ProjectSettingsPage projectSettingsPage = goToProjectSettings();
+        projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultDateTimeDisplay(BaseSettingsPage.DATE_FORMAT.yyyy_MM_dd, BaseSettingsPage.TIME_FORMAT.Default);
+        projectSettingsPage.save();
 
         // images for thumbnails
         goToModule("FileContent");
