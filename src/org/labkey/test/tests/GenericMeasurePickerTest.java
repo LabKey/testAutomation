@@ -29,6 +29,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebElement;
@@ -163,15 +164,19 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
     private void enableColumnRestricting()
     {
         goToProjectSettings();
-        checkCheckbox(Locator.name("restrictedColumnsEnabled"));
-        clickButton("Save");
+        ProjectSettingsPage projectSettingsPage = new ProjectSettingsPage(getDriver());
+        projectSettingsPage.setRestrictChartingColsInherited(false);
+        projectSettingsPage.setRestrictChartingCols(true);
+        projectSettingsPage.save();
     }
 
     private void disableColumnRestricting()
     {
         goToProjectSettings();
-        uncheckCheckbox(Locator.name("restrictedColumnsEnabled"));
-        clickButton("Save");
+        ProjectSettingsPage projectSettingsPage = new ProjectSettingsPage(getDriver());
+        projectSettingsPage.setRestrictChartingColsInherited(false);
+        projectSettingsPage.setRestrictChartingCols(false);
+        projectSettingsPage.save();
     }
 
     @Override

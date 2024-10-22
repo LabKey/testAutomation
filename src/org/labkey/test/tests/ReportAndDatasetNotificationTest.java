@@ -15,7 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.json.JSONObject;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -33,6 +37,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -72,7 +77,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
     }
 
     @Override
-    protected void doVerifySteps()
+    protected void doVerifySteps() throws IOException, CommandException
     {
         log("Subscribe to some categories");
         clickFolder(getFolderName());
@@ -128,7 +133,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
     private static final String PLOT_NAME = "Systolic over Diastolic";
     private static final String PARTICIPANTREPORT_NAME = "Participant Report: Vital Signs and Lymphocyte Levels";
     private static final String LINKREPORT_NAME = "Renal Study";
-    private static final String DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String NON_STANDARD_DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
     private static final File ATTACHMENT_REPORT_FILE = TestFileUtils.getSampleData("Microarray/test1.jpg"); // arbitrary image file
@@ -142,10 +147,10 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
             R_NAME, PARTICIPANTREPORT_NAME, LINKREPORT_NAME, ATTACHMENT_REPORT_NAME, TIMECHART_NAME
     };
 
-    protected final SimpleDateFormat _formatter = new SimpleDateFormat(DATEFORMAT);
+    protected final SimpleDateFormat _formatter = new SimpleDateFormat(NON_STANDARD_DATEFORMAT);
 
     @LogMethod
-    protected void verifyContentModified()
+    protected void verifyContentModified() throws IOException, CommandException
     {
         log("Modify various reports' contents");
         clickFolder(getFolderName());
@@ -164,11 +169,18 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         // save should return back to manage views page
         waitForText("Manage Views");
 
-        // change date format
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Formats"));
-        setFormElement(Locator.input("defaultDateFormat"), DATEFORMAT);
-        clickButton("Save");
+        // This test depends on a non-standard date format, one that contains a timestamp, to validate the reports are
+        // shown as updated. The non-standard format can only be set by an API call to UpdateContainerSettings.
+        Connection cn = createDefaultConnection();
+        SimplePostCommand command = new SimplePostCommand("admin", "UpdateContainerSettings");
+        JSONObject json = new JSONObject();
+        json.put("defaultDateFormat", NON_STANDARD_DATEFORMAT);
+        json.put("defaultDateFormatInherited", false);
+        json.put("defaultDateTimeFormatInherited", true);
+        json.put("defaultTimeFormatInherited", true);
+        command.setJsonObject(json);
+        command.execute(cn, getCurrentContainerPath());
+
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText("GenericAssay"));
 
