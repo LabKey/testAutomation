@@ -29,6 +29,7 @@ import org.labkey.test.components.ColumnChartComponent;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebElement;
@@ -565,6 +566,7 @@ public class ColumnChartTest extends BaseWebDriverTest
     private void enableColumnRestricting()
     {
         goToProjectSettings();
+        new Checkbox(Locator.name("restrictedColumnsEnabledInherited").findElement(getDriver())).set(false);
         checkCheckbox(Locator.name("restrictedColumnsEnabled"));
         clickButton("Save");
     }

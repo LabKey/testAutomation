@@ -372,14 +372,14 @@ public class FolderTest extends BaseWebDriverTest
             SelectRowsCommand sr = new SelectRowsCommand("core", "workbooks");
             sr.setColumns(Arrays.asList("EntityId"));
             SelectRowsResponse srr = sr.execute(cn, getProjectName() + "/WorkbookParent");
-            Object entityId = srr.getRows().get(0).get("EntityId");
+            Object rowId = srr.getRows().get(0).get("RowId");
 
             DeleteRowsCommand drc = new DeleteRowsCommand("core", "workbooks");
             Map<String, Object> row1 = new HashMap<>();
-            row1.put("EntityId", entityId);
+            row1.put("RowId", rowId);
             drc.addRow(row1);
 
-            SaveRowsResponse resp = drc.execute(new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword()), getContainerId());
+            SaveRowsResponse resp = drc.execute(cn, getContainerId());
 
             throw new Exception("That command should have failed");
         }
