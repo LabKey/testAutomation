@@ -167,7 +167,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         ProjectSettingsPage projectSettingsPage = new ProjectSettingsPage(getDriver());
         projectSettingsPage.setRestrictChartingColsInherited(false);
         projectSettingsPage.setRestrictChartingCols(true);
-        clickButton("Save");
+        projectSettingsPage.save();
     }
 
     private void disableColumnRestricting()
@@ -176,7 +176,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         ProjectSettingsPage projectSettingsPage = new ProjectSettingsPage(getDriver());
         projectSettingsPage.setRestrictChartingColsInherited(false);
         projectSettingsPage.setRestrictChartingCols(false);
-        clickButton("Save");
+        projectSettingsPage.save();
     }
 
     @Override

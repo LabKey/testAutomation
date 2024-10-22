@@ -59,7 +59,6 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     private static final BaseSettingsPage.TIME_FORMAT DEFAULT_TIME_FORMAT = BaseSettingsPage.TIME_FORMAT.Default;
 
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";
-//    private static final String DATE_TIME_FORMAT_INJECTION = DEFAULT_DATE_TIME_DISPLAY + "'" + INJECT_CHARS + "'";
 
     private static final String PROJ_CHANGE = "Site Settings Test";
     private static final String PROJ_BASE = "Site Settings Base Test";
