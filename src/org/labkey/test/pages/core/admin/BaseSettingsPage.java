@@ -392,7 +392,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         HH_mm("HH:mm"),
         HH_mm_ss_SSS("HH:mm:ss.SSS"),
         hh_mm_a("hh:mm a"),
-        none(""), // Valid only for a DateTime field.
+        none("<none>"), // Valid only for a DateTime field.
         Default("HH:mm:ss"),
         DTDefault("HH:mm");
 
@@ -417,13 +417,9 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         }
 
         public static TIME_FORMAT get(String format) {
-
-            if(format.equalsIgnoreCase("none") ||
-                    format.equalsIgnoreCase("<none>"))
-                format = "";
-
             return lookup.get(format);
         }
+
     }
 
 }
