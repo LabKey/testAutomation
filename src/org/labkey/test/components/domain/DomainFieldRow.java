@@ -417,17 +417,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             throw new UnsupportedOperationException("Setting the format for Date, Time or DateTime fields not supported in this method.");
         }
 
-        if (!StringUtils.isEmpty(dataType))
+        if (elementCache().formatInput.getComponentElement().isDisplayed())
         {
-            if (elementCache().formatInput.getComponentElement().isDisplayed())
-            {
-                elementCache().formatInput.setValue(formatString);
-            }
-            else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
-            {
-                // Formatting of Boolean types use the scale input.
-                elementCache().charScaleInput.setValue(formatString);
-            }
+            elementCache().formatInput.setValue(formatString);
+        }
+        else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
+        {
+            // Formatting of Boolean types use the scale input.
+            elementCache().charScaleInput.setValue(formatString);
         }
         else
         {
