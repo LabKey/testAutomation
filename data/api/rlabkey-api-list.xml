@@ -3,7 +3,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                df <- data.frame(intKey=c(1:3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"))
+                df <- data.frame(intKey=c(1:3), customInt=c(1:3), customString=c("aaa", "bbb", "ccc"), customDec=c(1.1, 2.2, 3.3))
                 fields <- labkey.domain.inferFields(baseUrl=labkey.url.base, folderPath="%projectName%", df)
                 indices = labkey.domain.createIndices(list("intKey", "customInt"), TRUE)
                 indices = labkey.domain.createIndices(list("customInt"), FALSE, indices)
@@ -26,7 +26,8 @@
                 library(Rlabkey)
                 newrow <- data.frame(
                     customInt=1
-                    , customString="custom string value")
+                    , customString="custom string value"
+                    , customDec="1.234E-5") # issue 51160
 
                 print(labkey.insertRows(baseUrl=labkey.url.base, folderPath="%projectName%", schemaName="lists", queryName="test list", toInsert=newrow))
             ]]>
@@ -41,6 +42,8 @@
                 [1] 1
                 $rows[[1]]$customString
                 [1] "custom string value"
+                $rows[[1]]$customDec
+                [1] 1.234e-05
             ]]>
         </response>
     </test>
