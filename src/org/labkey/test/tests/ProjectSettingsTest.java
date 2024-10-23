@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -28,12 +27,15 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -55,8 +57,8 @@ import static org.junit.Assert.assertEquals;
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
 
-    private static final BaseSettingsPage.DATE_FORMAT DEFAULT_DATE_FORMAT = BaseSettingsPage.DATE_FORMAT.Default;
-    private static final BaseSettingsPage.TIME_FORMAT DEFAULT_TIME_FORMAT = BaseSettingsPage.TIME_FORMAT.Default;
+    private static final DATE_FORMAT DEFAULT_DATE_FORMAT = DATE_FORMAT.Default;
+    private static final TIME_FORMAT DEFAULT_TIME_FORMAT = TIME_FORMAT.Default;
 
     private static final String INJECT_CHARS = "<script>alert(\"8(\");</script>";
 
@@ -125,8 +127,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     }
 
     private void checkSettingPageValues(BaseSettingsPage settingsPage, boolean helpMenu, String supportLink,
-                                        BaseSettingsPage.DATE_FORMAT dateFormat, BaseSettingsPage.DATE_FORMAT dtDateFormat,
-                                        BaseSettingsPage.TIME_FORMAT dtTimeFormat, BaseSettingsPage.TIME_FORMAT timeFormat)
+                                        DATE_FORMAT dateFormat, DATE_FORMAT dtDateFormat,
+                                        TIME_FORMAT dtTimeFormat, TIME_FORMAT timeFormat)
     {
 
         checker().verifyEquals("Help menu should be " + (helpMenu ? "checked." : "unchecked."),
@@ -216,10 +218,10 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     public void testSiteSettingOverride() throws IOException, CommandException
     {
 
-        BaseSettingsPage.DATE_FORMAT dateDisplay = BaseSettingsPage.DATE_FORMAT.yyyy_MMM_dd;
-        BaseSettingsPage.TIME_FORMAT timeDisplay = BaseSettingsPage.TIME_FORMAT.hh_mm_a;
-        BaseSettingsPage.DATE_FORMAT dtDateDisplay = BaseSettingsPage.DATE_FORMAT.dd_MMM_yy;
-        BaseSettingsPage.TIME_FORMAT dtTimeDisplay = BaseSettingsPage.TIME_FORMAT.hh_mm_a;
+        DATE_FORMAT dateDisplay = DATE_FORMAT.yyyy_MMM_dd;
+        TIME_FORMAT timeDisplay = TIME_FORMAT.hh_mm_a;
+        DATE_FORMAT dtDateDisplay = DATE_FORMAT.dd_MMM_yy;
+        TIME_FORMAT dtTimeDisplay = TIME_FORMAT.hh_mm_a;
         boolean siteHelpMenuState = false;
         String siteSupportLink = "";
 
@@ -304,7 +306,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         projectSettingsPage.setSupportLink(supportLink);
 
         projectSettingsPage.setDefaultDateDisplayInherited(false);
-        projectSettingsPage.setDefaultDateDisplay(BaseSettingsPage.DATE_FORMAT.yyyy_MM_dd);
+        projectSettingsPage.setDefaultDateDisplay(DATE_FORMAT.yyyy_MM_dd);
 
         projectSettingsPage.setDefaultTimeDisplayInherited(false);
         projectSettingsPage.setDefaultTimeDisplay(DEFAULT_TIME_FORMAT);
@@ -335,30 +337,45 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         resetProjectSettings();
     }
 
-    // The injectionTest needs to be changed to an API tests.
-    // That will be done in another story along with the non-standard tests.
-    @Ignore
     @Test
     public void testInjection() throws IOException, CommandException
     {
         resetSiteSettings();
         resetProjectSettings();
 
+        String dateFormatInjection = DATE_FORMAT.yyyy_MM_dd.toString() + "'" + INJECT_CHARS + "'";
+        String timeFormatInjection = TIME_FORMAT.HH_mm.toString() + "'" + INJECT_CHARS + "'";
+
+        new APIContainerHelper(this).setNonStandardDateAndTimeFormat(createDefaultConnection(), PROJ_CHANGE,
+                dateFormatInjection, timeFormatInjection, String.format("%s %s", dateFormatInjection, timeFormatInjection));
+
         var projectSettingPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);
-//        projectSettingPage.setDefaultDateTimeDisplay(DT_DATE_FORMAT_INJECTION, DT_TIME_FORMAT_INJECTION);
-        projectSettingPage.save();
+        log("DateTime format: " + projectSettingPage.getDefaultDateTimeDateDisplay() + " " + projectSettingPage.getDefaultDateTimeTimeDisplay());
+        log("Date format: " + projectSettingPage.getDefaultDateDisplay());
+        log("Time format: " + projectSettingPage.getDefaultTimeDisplay());
 
         _listHelper.createList(getProjectName(), "IceCream", "IceCreamID",
-                new FieldDefinition("IceCreamDate", ColumnType.DateAndTime));
+                new FieldDefinition("IceCreamDateTime", ColumnType.DateAndTime),
+                new FieldDefinition("IceCreamDate", ColumnType.Date),
+                new FieldDefinition("IceCreamTime", ColumnType.Time));
+
         goToProjectHome();
         clickAndWait(Locator.linkWithText("IceCream"));
         Map<String, String> testRow = new HashMap<>();
-        String testDate = "1800-05-10 10:32";
+        String testDate = "1800-05-10";
+        String testTime = "10:32";
+        String testDateTime = String.format("%s %s", testDate, testTime);
+        testRow.put("IceCreamDateTime", testDateTime);
         testRow.put("IceCreamDate", testDate);
+        testRow.put("IceCreamTime", testTime);
         _listHelper.insertNewRow(testRow);
         DataRegionTable list = new DataRegionTable("query", getDriver());
         String attemptedInjection = list.getDataAsText(0, 0);
-        assertEquals("Wrong list data from injection attempt", testDate + INJECT_CHARS, attemptedInjection);
+        assertEquals("Wrong list data from DateTime injection attempt", testDate + INJECT_CHARS + " " + testTime + INJECT_CHARS, attemptedInjection);
+        attemptedInjection = list.getDataAsText(0, 1);
+        assertEquals("Wrong list data from Date injection attempt", testDate + INJECT_CHARS, attemptedInjection);
+        attemptedInjection = list.getDataAsText(0, 2);
+        assertEquals("Wrong list data from Time injection attempt", testTime + INJECT_CHARS, attemptedInjection);
     }
 
     @Override
