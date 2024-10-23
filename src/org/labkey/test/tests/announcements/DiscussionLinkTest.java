@@ -72,9 +72,11 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         //goto l and feel
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         //confirm Enable discussion enabled checked
+        assertEquals("Enable Discussion should be inherited.", true, projectSettingsPage.getObjectLevelDiscInherited());
         assertEquals("Enable Discussion should be checked.", true, projectSettingsPage.getObjectLevelDiscussions());
 
         //un-check Enabled
+        projectSettingsPage.setObjectLevelDiscInherited(false);
         projectSettingsPage.setObjectLevelDiscussions(false);
         projectSettingsPage.save();
 

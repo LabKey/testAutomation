@@ -29,6 +29,7 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
@@ -441,8 +442,10 @@ public class FlowTest extends BaseFlowTest
     private void testChartMeasurePicker()
     {
         goToProjectSettings(getProjectName());
-        checkCheckbox(Locator.name("restrictedColumnsEnabled"));
-        clickButton("Save");
+        ProjectSettingsPage projectSettingsPage = new ProjectSettingsPage(getDriver());
+        projectSettingsPage.setRestrictChartingColsInherited(false);
+        projectSettingsPage.setRestrictChartingCols(true);
+        projectSettingsPage.save();
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));

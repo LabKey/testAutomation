@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.domain.DomainFieldRow;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -213,15 +215,16 @@ public class QueryMetadataTest extends BaseWebDriverTest
     public void testEnsureOnlyModifiedColumnAppearsInMetadataXML()
     {
         var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
-        editPage.fieldsPanel().getField("Created")
-                .setDateFormat("Date");
+        DomainFieldRow fieldRow = editPage.fieldsPanel().getField("Created");
+        fieldRow.setDateTimeInherited(false);
+        fieldRow.setDateTimeFormatDate(BaseSettingsPage.DATE_FORMAT.ddMMMyy.toString());
         editPage.clickSave();
 
         var queryXmlPage = editPage.clickEditSource();
         String expectedColumnPart = "<table tableName=\"queryMetadataTestList\" tableDbType=\"NOT_IN_DB\">\n" +
                 "    <columns>\n" +
                 "      <column columnName=\"Created\">\n" +
-                "        <formatString>Date</formatString>\n" +
+                "        <formatString>ddMMMyy HH:mm</formatString>\n" +
                 "      </column>\n" +
                 "    </columns>\n" +
                 "  </table>";
@@ -239,8 +242,9 @@ public class QueryMetadataTest extends BaseWebDriverTest
     public void testAssayQueryMetadata()
     {
         var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
-        editPage.fieldsPanel().getField("Created")
-                .setDateFormat("Date");
+        DomainFieldRow fieldRow = editPage.fieldsPanel().getField("Created");
+        fieldRow.setDateTimeInherited(false);
+        fieldRow.setDateTimeFormatDate(BaseSettingsPage.DATE_FORMAT.ddMMMyy.toString());
         editPage.aliasField("Row Id");
         editPage.clickSave();
 
@@ -249,7 +253,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
                 "  <table tableName=\"Data\" tableDbType=\"NOT_IN_DB\">\n" +
                 "    <columns>\n" +
                 "      <column columnName=\"Created\">\n" +
-                "        <formatString>Date</formatString>\n" +
+                "        <formatString>ddMMMyy HH:mm</formatString>\n" +
                 "      </column>\n" +
                 "      <column columnName=\"WrappedRowId\" wrappedColumnName=\"RowId\">\n" +
                 "        <isHidden>true</isHidden>\n" +
