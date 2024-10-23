@@ -8,6 +8,8 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
 import org.openqa.selenium.TimeoutException;
@@ -124,7 +126,36 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         if (fieldDefinition.getLabel() != null)
             fieldRow.setLabel(fieldDefinition.getLabel());
         if (fieldDefinition.getFormat() != null)
-            fieldRow.setFormat(fieldDefinition.getFormat(), fieldDefinition.getRangeURI());
+        {
+            if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Date))
+            {
+                fieldRow.setDateFormat(DATE_FORMAT.get(fieldDefinition.getFormat()));
+            }
+            else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Time))
+            {
+                fieldRow.setTimeFormat(TIME_FORMAT.get(fieldDefinition.getFormat()));
+            }
+            else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
+            {
+                String format = fieldDefinition.getFormat().trim();
+
+                int index = format.indexOf(" ");
+                if (index > 0)
+                {
+                    fieldRow.setDateTimeFormat(
+                            DATE_FORMAT.get(format.substring(0, index)),
+                            TIME_FORMAT.get(format.substring(index + 1)));
+                }
+                else
+                {
+                    fieldRow.setDateTimeFormat(DATE_FORMAT.get(format));
+                }
+            }
+            else
+            {
+                fieldRow.setFormat(fieldDefinition.getFormat(), fieldDefinition.getRangeURI());
+            }
+        }
         if (fieldDefinition.getScale() != null)
             fieldRow.setCharCount(fieldDefinition.getScale());
         if (fieldDefinition.getURL() != null)

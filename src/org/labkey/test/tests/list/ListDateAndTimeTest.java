@@ -22,6 +22,8 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -1116,10 +1118,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     @Test
     public void testDateAndTimeFormat() throws IOException, CommandException
     {
-        BaseSettingsPage.DATE_FORMAT dateFormat01 = BaseSettingsPage.DATE_FORMAT.Default;
-        BaseSettingsPage.TIME_FORMAT timeFormat01 = BaseSettingsPage.TIME_FORMAT.hh_mm_a;
+        DATE_FORMAT dateFormat01 = DATE_FORMAT.Default;
+        TIME_FORMAT timeFormat01 = TIME_FORMAT.hh_mm_a;
         String dateTimeFormat01 = String.format("%s %s",
-                BaseSettingsPage.DATE_FORMAT.Default, BaseSettingsPage.TIME_FORMAT.hh_mm_a);
+                DATE_FORMAT.Default, TIME_FORMAT.hh_mm_a);
 
         SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat01.toString());
         SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat01.toString());
@@ -1201,13 +1203,14 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         validateListDataInUI(table, expectedData);
         checker().screenShotIfNewError("Format01_Error");
 
-        String dateFormat02 = "ddMMMyy";
-        String timeFormat02 = "HH:mm:ss";
-        String dateTimeFormat02 = "dd-MMM-yyyy HH:mm:ss";
+        DATE_FORMAT dateFormat02 = DATE_FORMAT.ddMMMyy;
+        TIME_FORMAT timeFormat02 = TIME_FORMAT.HH_mm_ss;
+        DATE_FORMAT dateTimeDateFormat02 = DATE_FORMAT.dd_MMM_yyyy;
+        TIME_FORMAT dateTimeTimeFormat02 = TIME_FORMAT.HH_mm_ss;
 
-        formatterDate = new SimpleDateFormat(dateFormat02);
-        formatterTime = new SimpleDateFormat(timeFormat02);
-        formatterDateTime = new SimpleDateFormat(dateTimeFormat02);
+        formatterDate = new SimpleDateFormat(dateFormat02.toString());
+        formatterTime = new SimpleDateFormat(timeFormat02.toString());
+        formatterDateTime = new SimpleDateFormat(String.format("%s %s", dateTimeDateFormat02, dateTimeTimeFormat02));
 
         clickAndWait(table.getHeaderButton("Design"));
         EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
@@ -1215,7 +1218,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
         domainEditor.getField(timeCol).setTimeFormat(timeFormat02);
         domainEditor.getField(dateCol).setDateFormat(dateFormat02);
-        domainEditor.getField(dateTimeCol).setDateTimeFormat(dateTimeFormat02);
+        domainEditor.getField(dateTimeCol).setDateTimeFormat(dateTimeDateFormat02, dateTimeTimeFormat02);
 
         listDefinitionPage.clickSave();
 
@@ -1254,9 +1257,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         log(String.format("Create a list named '%s' with two DateTime fields that will be converted to date-only and time-only fields.", listName));
 
         String dtFormatDate = String.format("%s %s",
-                BaseSettingsPage.DATE_FORMAT.yyyy_MMM_dd, BaseSettingsPage.TIME_FORMAT.HH_mm);
+                DATE_FORMAT.yyyy_MMM_dd, TIME_FORMAT.HH_mm);
         String dtFormatTime = String.format("%s %s",
-                BaseSettingsPage.DATE_FORMAT.yyyy_MMM_dd, BaseSettingsPage.TIME_FORMAT.HH_mm_ss);
+                DATE_FORMAT.yyyy_MMM_dd, TIME_FORMAT.HH_mm_ss);
 
         SimpleDateFormat formatterFormatTime = new SimpleDateFormat(dtFormatTime);
 
@@ -1347,8 +1350,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         // Update default format after changing the types.
-        BaseSettingsPage.DATE_FORMAT dateFormat = BaseSettingsPage.DATE_FORMAT.Default;
-        BaseSettingsPage.TIME_FORMAT timeFormat = BaseSettingsPage.TIME_FORMAT.Default;
+        DATE_FORMAT dateFormat = DATE_FORMAT.Default;
+        TIME_FORMAT timeFormat = TIME_FORMAT.Default;
 
         SimpleDateFormat formatterDate = new SimpleDateFormat(dateFormat.toString());
         SimpleDateFormat formatterTime = new SimpleDateFormat(timeFormat.toString());

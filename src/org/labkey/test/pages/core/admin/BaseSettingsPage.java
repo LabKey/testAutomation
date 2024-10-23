@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 {
@@ -369,6 +371,19 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         public String toString() {
             return this.format;
         }
+
+        private static final Map<String, DATE_FORMAT> lookup = new HashMap<>();
+
+        static {
+            for (DATE_FORMAT d : DATE_FORMAT.values()) {
+                lookup.put(d.toString(), d);
+            }
+        }
+
+        public static DATE_FORMAT get(String format) {
+            return lookup.get(format);
+        }
+
     }
 
     public enum TIME_FORMAT
@@ -377,6 +392,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         HH_mm("HH:mm"),
         HH_mm_ss_SSS("HH:mm:ss.SSS"),
         hh_mm_a("hh:mm a"),
+        none(""), // Valid only for a DateTime field.
         Default("HH:mm:ss"),
         DTDefault("HH:mm");
 
@@ -390,6 +406,23 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         @Override
         public String toString() {
             return this.format;
+        }
+
+        private static final Map<String, TIME_FORMAT> lookup = new HashMap<>();
+
+        static {
+            for (TIME_FORMAT t : TIME_FORMAT.values()) {
+                lookup.put(t.toString(), t);
+            }
+        }
+
+        public static TIME_FORMAT get(String format) {
+
+            if(format.equalsIgnoreCase("none") ||
+                    format.equalsIgnoreCase("<none>"))
+                format = "";
+
+            return lookup.get(format);
         }
     }
 
