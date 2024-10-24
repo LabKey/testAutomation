@@ -287,7 +287,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @Test
     public void testFileNameCharacters() throws IOException
     {
-        String folderName = "Test folder names";
+        String folderName = "Test file name characters";
 
         goToProjectHome();
         goToModule("FileContent");
