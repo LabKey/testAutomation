@@ -1329,7 +1329,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String date = getDateTimeFormatDate();
         String time = getDateTimeFormatTime();
-        if ("<none>".equals(time) || StringUtils.isEmpty(time))
+        if (TIME_FORMAT.none.toString().equals(time) || StringUtils.isEmpty(time))
             return date;
 
         return date + " " + time;
