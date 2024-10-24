@@ -19,6 +19,7 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateContainerCommand;
@@ -279,4 +280,57 @@ public class APIContainerHelper extends AbstractContainerHelper
             throw new RuntimeException("Unable to get container ID for: " + containerPath, e);
         }
     }
+
+    public CommandResponse setNonStandardDateAndTimeFormat(Connection connection, String containerPath,
+                                                           @Nullable String dateFormat,
+                                                           @Nullable String timeFormat,
+                                                           @Nullable String dateTimeFormat) throws IOException, CommandException
+    {
+
+        JSONObject json = new JSONObject();
+
+        if(null != dateFormat)
+        {
+            json.put("defaultDateFormat", dateFormat);
+            json.put("defaultDateFormatInherited", false);
+        }
+        else
+        {
+            json.put("defaultDateFormatInherited", true);
+        }
+
+        if(null != timeFormat)
+        {
+            json.put("defaultTimeFormat", timeFormat);
+            json.put("defaultTimeFormatInherited", false);
+        }
+        else
+        {
+            json.put("defaultTimeFormatInherited", true);
+        }
+
+        if(null != dateTimeFormat)
+        {
+            json.put("defaultDateTimeFormat", dateTimeFormat);
+            json.put("defaultDateTimeFormatInherited", false);
+        }
+        else
+        {
+            json.put("defaultDateTimeFormatInherited", true);
+        }
+
+        return setNonStandardDateAndTimeFormat(connection, containerPath, json);
+
+    }
+
+    public CommandResponse setNonStandardDateAndTimeFormat(Connection connection, String containerPath, JSONObject json) throws IOException, CommandException
+    {
+
+        SimplePostCommand command = new SimplePostCommand("admin", "UpdateContainerSettings");
+        command.setJsonObject(json);
+
+        return command.execute(connection, containerPath);
+
+    }
+
 }

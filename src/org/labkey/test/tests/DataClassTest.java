@@ -26,6 +26,8 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
@@ -304,29 +306,26 @@ public class DataClassTest extends BaseWebDriverTest
         log("Add a date-time field.");
 
         String dateTimeField = "DateTime";
-        String dateTimeFormat = "ddMMMyyyy hh:mm a";
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(dateTimeField)
                 .setType(FieldDefinition.ColumnType.DateAndTime)
-                .setDateTimeFormat(dateTimeFormat);
+                .setDateTimeFormat(DATE_FORMAT.ddMMMyyyy, TIME_FORMAT.hh_mm_a);
 
         log("Add a date-only field.");
 
         String dateField = "Date";
-        String dateFormat = "ddMMMyyyy";
         domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.addField(dateField)
                 .setType(FieldDefinition.ColumnType.Date)
-                .setDateFormat(dateFormat);
+                .setDateFormat(DATE_FORMAT.ddMMMyyyy);
 
         log("Add a time-only field.");
 
         String timeField = "Time";
-        String timeFormat = "hh:mm a";
         domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.addField(timeField)
                 .setType(FieldDefinition.ColumnType.Time)
-                .setTimeFormat(timeFormat);
+                .setTimeFormat(TIME_FORMAT.hh_mm_a);
 
         createPage.clickSave();
 

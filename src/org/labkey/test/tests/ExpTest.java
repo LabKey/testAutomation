@@ -27,7 +27,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.lineage.LineageGraph;
-import org.labkey.test.pages.core.admin.BaseSettingsPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.PortalHelper;
@@ -140,7 +140,7 @@ public class ExpTest extends BaseWebDriverTest
         DomainFieldRow domainRow = designerPage.fieldsPanel().getField("Created");
         domainRow.setLabel("editedCreated");
         domainRow.setDateTimeInherited(false);
-        domainRow.setDateTimeFormatDate(BaseSettingsPage.DATE_FORMAT.ddMMMyyyy.toString());
+        domainRow.setDateTimeFormat(DATE_FORMAT.ddMMMyyyy);
         designerPage.clickSave();
 
         // Verify that it ended up in the XML version of the metadata

@@ -15,10 +15,11 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.ui.ontology.ConceptPickerDialog;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.ElementNotInteractableException;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -146,12 +147,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public ModalDialog setTypeWithDialog(FieldDefinition.ColumnType columnType)
     {
         elementCache().fieldTypeSelectInput.selectByVisibleText(columnType.getLabel());
-
-        ModalDialog confirmDialog = new ModalDialog.ModalDialogFinder(getDriver())
+        return new ModalDialog.ModalDialogFinder(getDriver())
                 .withTitle("Confirm Data Type Change").timeout(1000).waitFor();
-
-        return confirmDialog;
-
     }
 
     public boolean getRequiredField()
@@ -412,29 +409,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
 
-        if (!StringUtils.isEmpty(dataType))
+
+        if (FieldDefinition.ColumnType.DateAndTime.getRangeURI().equals(dataType) ||
+                FieldDefinition.ColumnType.Date.getRangeURI().equals(dataType) ||
+                (FieldDefinition.ColumnType.Time.getRangeURI().equals(dataType)))
         {
-            if (FieldDefinition.ColumnType.DateAndTime.getRangeURI().equals(dataType))
-            {
-                setDateTimeFormat(formatString);
-                return this;
-            }
-            if (FieldDefinition.ColumnType.Date.getRangeURI().equals(dataType))
-            {
-                setDateFormat(formatString);
-                return this;
-            }
-            if (FieldDefinition.ColumnType.Time.getRangeURI().equals(dataType))
-            {
-                setTimeFormat(formatString);
-                return this;
-            }
+            throw new UnsupportedOperationException("Setting the format for Date, Time or DateTime fields not supported in this method.");
         }
-        if(elementCache().formatInput.getComponentElement().isDisplayed())
+
+        if (elementCache().formatInput.getComponentElement().isDisplayed())
         {
             elementCache().formatInput.setValue(formatString);
         }
-        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
         {
             // Formatting of Boolean types use the scale input.
             elementCache().charScaleInput.setValue(formatString);
@@ -1308,7 +1295,14 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getFormatWithoutExample(elementCache().dateTimeFormatDateSelect.getValue());
     }
 
-    public DomainFieldRow setDateTimeFormatDate(String dateFormat)
+    public DomainFieldRow setDateTimeFormat(DATE_FORMAT date, TIME_FORMAT time)
+    {
+        setDateTimeFormat(date);
+        setDateTimeFormat(time);
+        return this;
+    }
+
+    public DomainFieldRow setDateTimeFormat(DATE_FORMAT dateFormat)
     {
         expand();
         if (isDateTimeInherited())
@@ -1317,12 +1311,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
-    public DomainFieldRow setDateTimeFormatTime(String timeFormat)
+    public DomainFieldRow setDateTimeFormat(TIME_FORMAT timeFormat)
     {
         expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
-        elementCache().dateTimeFormatTimeSelect.typeAheadSelect(timeFormat + " (");
+        elementCache().dateTimeFormatTimeSelect.typeAheadSelect("<none>".equals(timeFormat) ? timeFormat.toString() : timeFormat + " (");
         return this;
     }
 
@@ -1335,35 +1329,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String date = getDateTimeFormatDate();
         String time = getDateTimeFormatTime();
-        if ("<none>".equals(time))
-            time = null;
-        if (StringUtils.isEmpty(time))
+        if (TIME_FORMAT.none.toString().equals(time) || StringUtils.isEmpty(time))
             return date;
 
         return date + " " + time;
-    }
-
-    public DomainFieldRow setDateTimeFormat(String dateTime)
-    {
-        expand();
-        if (isDateTimeInherited())
-            setDateTimeInherited(false);
-
-        String[] parts = dateTime.split("\\s+", 2);
-        if (parts.length == 2)
-            return setDateTimeFormat(parts[0], parts[1]);
-        return setDateTimeFormat(parts[0], "<none>");
-    }
-
-    public DomainFieldRow setDateTimeFormat(String date, String time)
-    {
-        expand();
-        if (isDateTimeInherited())
-            setDateTimeInherited(false);
-
-        elementCache().dateTimeFormatDateSelect.typeAheadSelect(date + " (");
-        elementCache().dateTimeFormatTimeSelect.typeAheadSelect("<none>".equals(time) ? time : time + " (");
-        return this;
     }
 
     public DomainFieldRow setDateInherited(boolean check)
@@ -1383,7 +1352,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getFormatWithoutExample(elementCache().dateFormatSelect.getValue());
     }
 
-    public DomainFieldRow setDateFormat(String dateFormat)
+    public DomainFieldRow setDateFormat(DATE_FORMAT dateFormat)
     {
         expand();
         if (isDateInherited())
@@ -1409,7 +1378,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getFormatWithoutExample(elementCache().timeFormatSelect.getValue());
     }
 
-    public DomainFieldRow setTimeFormat(String timeFormat)
+    public DomainFieldRow setTimeFormat(TIME_FORMAT timeFormat)
     {
         expand();
         if (isTimeInherited())

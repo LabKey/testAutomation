@@ -31,6 +31,7 @@ import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.TimeChartWizard;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -171,15 +172,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
         // This test depends on a non-standard date format, one that contains a timestamp, to validate the reports are
         // shown as updated. The non-standard format can only be set by an API call to UpdateContainerSettings.
-        Connection cn = createDefaultConnection();
-        SimplePostCommand command = new SimplePostCommand("admin", "UpdateContainerSettings");
-        JSONObject json = new JSONObject();
-        json.put("defaultDateFormat", NON_STANDARD_DATEFORMAT);
-        json.put("defaultDateFormatInherited", false);
-        json.put("defaultDateTimeFormatInherited", true);
-        json.put("defaultTimeFormatInherited", true);
-        command.setJsonObject(json);
-        command.execute(cn, getCurrentContainerPath());
+        APIContainerHelper apiContainerHelper = new APIContainerHelper(this);
+        apiContainerHelper.setNonStandardDateAndTimeFormat(createDefaultConnection(), getCurrentContainerPath(),
+                NON_STANDARD_DATEFORMAT, null, null);
 
         clickTab("Clinical and Assay Data");
         waitForElement(Locator.linkWithText("GenericAssay"));
