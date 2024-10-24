@@ -16,6 +16,8 @@
 
 package org.labkey.test.tests.filecontent;
 
+import org.apache.hc.client5.http.utils.URIUtils;
+import org.eclipse.jetty.util.URIUtil;
 import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
@@ -46,10 +48,13 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.core.webdav.WebDavUtils;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,7 +97,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     {
         // Use a special exotic character in order to make sure we don't break
         // i18n. See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=5369
-        return "File Content T\u017Dst Project";
+        return "File Content T\u017Dst Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @BeforeClass
@@ -245,8 +250,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         assertThat("Absolute file path for file", absolutePath, CoreMatchers.containsString(s + "@files" + s + filename));
 
         log("Check Absolute File Path in WebDav");
-        URL webdavURL = new URL(WebTestHelper.getBaseURL() + "/_webdav" + getCurrentContainerPath() + "/@files");
-        goToURL(webdavURL, 5000);
+        beginAt(WebDavUtils.buildBaseWebDavUrl(getCurrentContainerPath()));
         waitForText("WebDav URL");
         absolutePath = Locator.byClass("fb-details")
                 .append(Locator.tagWithText("th", "Absolute Path:").followingSibling("td"))

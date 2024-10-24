@@ -121,7 +121,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
         for (int i = 0; i < parts.length; i++)
         {
-            parts[i] = URLEncoder.encode(parts[i], StandardCharsets.UTF_8).replace("+", "%20");
+            parts[i] = encodeFileNodeIdPart(parts[i]);
             nodeId.append(parts[i]);
             if (!parts[i].isEmpty())
             {
@@ -810,6 +810,11 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
+    private static String encodeFileNodeIdPart(String rawIdPart)
+    {
+        return URLEncoder.encode(rawIdPart, StandardCharsets.UTF_8).replace("+", "%20");
+    }
+
     public static abstract class Locators
     {
         static Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
@@ -840,7 +845,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
         public static Locator.XPathLocator gridRow(String fileName)
         {
-            return gridRowWithNodeId("/" + fileName);
+            return gridRowWithNodeId("/" + encodeFileNodeIdPart(fileName));
         }
 
         public static Locator.XPathLocator gridRowWithNodeId(String nodeIdEndsWith)
