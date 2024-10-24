@@ -251,7 +251,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    public void selectSingleFile(String fileName)
+    @LogMethod (quiet = true)
+    public void selectSingleFile(@LoggedParam String fileName)
     {
         WebElement row = scrollToGridRow(encodeFileNodeIdPart(fileName));
         WebElement nameCell = Locator.tagWithAttribute("td", "role", "gridcell").withText(fileName).findElement(row);
