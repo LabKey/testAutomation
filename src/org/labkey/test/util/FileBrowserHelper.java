@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -223,9 +224,9 @@ public class FileBrowserHelper extends WebDriverWrapper
     }
 
     @LogMethod(quiet = true)
-    public void checkFileBrowserFileCheckbox(@LoggedParam String fileName)
+    public void checkFileBrowserFileCheckbox(@LoggedParam String encodedFileName)
     {
-        checkFileBrowserFileCheckbox(fileName, true);
+        checkFileBrowserFileCheckbox(encodedFileName, true);
     }
 
     private void checkFileBrowserFileCheckbox(String fileName, boolean checkTheBox)
@@ -250,6 +251,14 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
+    public void selectSingleFile(String fileName)
+    {
+        WebElement row = scrollToGridRow(encodeFileNodeIdPart(fileName));
+        WebElement nameCell = Locator.tagWithAttribute("td", "role", "gridcell").withText(fileName).findElement(row);
+        String signalValue = doAndWaitForPageSignal(nameCell::click, IMPORT_SIGNAL_NAME);
+        Assert.assertEquals("Only one file should be selected", "1", signalValue);
+    }
+
     @LogMethod(quiet = true)
     public void uncheckFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
@@ -264,29 +273,30 @@ public class FileBrowserHelper extends WebDriverWrapper
     }
 
     //In case desired element is not present due to infinite scrolling
-    private void scrollToGridRow(String nodeIdEndsWith)
+    private WebElement scrollToGridRow(String nodeIdEndsWith)
     {
         Locator lastRowLoc = Locators.gridRow().last();
-        Locator targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith);
+        WebElement targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith).findWhenNeeded(getDriver());
 
         waitForFileGridReady();
         waitForElement(lastRowLoc);
 
         String previousLastItemText = null;
         String currentLastItemText = null;
-        while (!isElementPresent(targetFile) && (currentLastItemText == null || !currentLastItemText.equals(previousLastItemText)))
+        while (!targetFile.isDisplayed() && (currentLastItemText == null || !currentLastItemText.equals(previousLastItemText)))
         {
             try
             {
                 WebElement lastRow = lastRowLoc.findElementOrNull(getDriver());
                 if (lastRow == null)
-                    return;
+                    return targetFile;
                 scrollIntoView(lastRowLoc);
                 previousLastItemText = currentLastItemText;
                 currentLastItemText = lastRowLoc.findElement(getDriver()).getAttribute("data-recordid");
             }
             catch (StaleElementReferenceException ignore) {}
         }
+        return targetFile;
     }
 
     public void selectFileBrowserRoot()
@@ -347,6 +357,12 @@ public class FileBrowserHelper extends WebDriverWrapper
             }
             deleteSelectedFiles();
         }
+    }
+
+    public File downloadFile(String fileName)
+    {
+        selectSingleFile(fileName);
+        return downloadSelectedFiles();
     }
 
     public File downloadSelectedFiles()

@@ -16,8 +16,6 @@
 
 package org.labkey.test.tests.filecontent;
 
-import org.apache.hc.client5.http.utils.URIUtils;
-import org.eclipse.jetty.util.URIUtil;
 import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
@@ -27,13 +25,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.tests.MessagesLongTest;
@@ -52,16 +50,17 @@ import org.labkey.test.util.core.webdav.WebDavUtils;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -252,9 +251,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         log("Check Absolute File Path in WebDav");
         beginAt(WebDavUtils.buildBaseWebDavUrl(getCurrentContainerPath()));
         waitForText("WebDav URL");
-        absolutePath = Locator.byClass("fb-details")
-                .append(Locator.tagWithText("th", "Absolute Path:").followingSibling("td"))
-                .findElement(getDriver()).getText();
+        absolutePath = new WebDavPage(getDriver()).getAbsolutePath();
 
         assertThat("Absolute file path", absolutePath, CoreMatchers.containsString(s + "@files"));
     }
@@ -286,6 +283,51 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         Set<String> folders = new HashSet<>(_fileBrowserHelper.getFileList());
         assertEquals("Didn't create expected folders", expectedFolders, folders);
+    }
+    @Test
+    public void testFileNameCharacters() throws IOException
+    {
+        String folderName = "Test folder names";
+
+        goToProjectHome();
+        goToModule("FileContent");
+        List<String> stringsToCheck = folderSubstringsToVerify();
+        Map<String, String> expectedFiles = new HashMap<>();
+        _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
+
+        for (String check : stringsToCheck)
+        {
+            String fileName = "test_" + check + "_tset.txt";
+            String fileContents = "Test file contents: " + fileName;
+            File file = TestFileUtils.writeTempFile(fileName, fileContents);
+            expectedFiles.put(fileName, fileContents);
+            _fileBrowserHelper.uploadFile(file);
+        }
+
+        Set<String> files = new HashSet<>(_fileBrowserHelper.getFileList());
+        assertEquals("Didn't create expected files", expectedFiles.keySet(), files);
+
+        for (Map.Entry<String, String> entry : expectedFiles.entrySet())
+        {
+            String fileName = entry.getKey();
+            String fileContents = entry.getValue();
+
+            _fileBrowserHelper.selectSingleFile(fileName);
+            File downloadedFile = _fileBrowserHelper.downloadSelectedFiles();
+
+            // Newer Firefox versions replace '%' with '_' in download name
+            assertEquals("Didn't download expected file",
+                fileName.replace("%", "_"),
+                downloadedFile.getName().replace("%", "_"));
+            assertEquals("Downloaded file contents", fileContents, TestFileUtils.getFileContents(downloadedFile));
+
+            // Not really a WegDavPage, but it shares UI with the file browser
+            new WebDavPage(getDriver()).getWebDavUrl().click();
+            switchToWindow(1);
+            waitForText(fileContents);
+            closeExtraWindows();
+        }
     }
 
     @Test
