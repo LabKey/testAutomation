@@ -18,6 +18,10 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -26,12 +30,16 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -51,6 +59,74 @@ public class AdminConsoleTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testServerHttpHeaderSetting()
+    {
+        goToAdminConsole().clickSiteSettings();
+        waitForElement(Locator.name("includeServerHttpHeader"));
+        WebElement checkbox = Locator.checkboxByName("includeServerHttpHeader").findElement(getDriver());
+
+        boolean originalValue = "true".equals(checkbox.getAttribute("checked"));
+
+        // Try with the setting on
+        if (!originalValue)
+            click(Locator.checkboxByName("includeServerHttpHeader"));
+        clickButton("Save");
+
+        String serverHeader = getServerHeader();
+        assertTrue("Expected to get a Server header, but got " + serverHeader, serverHeader != null && serverHeader.startsWith("LabKey/"));
+
+        // Try with the setting off
+        goToAdminConsole().clickSiteSettings();
+        waitForElement(Locator.name("includeServerHttpHeader"));
+        click(Locator.checkboxByName("includeServerHttpHeader"));
+        clickButton("Save");
+
+        serverHeader = getServerHeader();
+        assertNull("Expected to get no Server header, but got " + serverHeader, serverHeader);
+
+        if (originalValue)
+        {
+            // Turn the setting back on
+            goToAdminConsole().clickSiteSettings();
+            waitForElement(Locator.name("includeServerHttpHeader"));
+            click(Locator.checkboxByName("includeServerHttpHeader"));
+            clickButton("Save");
+        }
+    }
+
+    private static class GetServerHeaderCommand extends SimpleGetCommand
+    {
+        private String _server;
+        public GetServerHeaderCommand()
+        {
+            super("project", "begin");
+        }
+
+        @Override
+        protected Response _execute(Connection connection, String folderPath) throws CommandException, IOException
+        {
+            Response response = super._execute(connection, folderPath);
+            _server = response.getHeaderValue("Server");
+            return response;
+        }
+    }
+
+    @LogMethod(quiet = true)
+    private String getServerHeader()
+    {
+        Connection cn = createDefaultConnection();
+        try
+        {
+            GetServerHeaderCommand command = new GetServerHeaderCommand();
+            command.execute(cn, "/home");
+            return command._server;
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to get Server HTTP response header", e);
+        }
+    }
+        @Test
     public void testRibbonBar()
     {
         goToAdminConsole().clickSiteSettings();
