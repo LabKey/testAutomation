@@ -346,7 +346,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         String dateFormatInjection = DATE_FORMAT.yyyy_MM_dd.toString() + "'" + INJECT_CHARS + "'";
         String timeFormatInjection = TIME_FORMAT.HH_mm.toString() + "'" + INJECT_CHARS + "'";
 
-        new APIContainerHelper(this).setNonStandardDateAndTimeFormat(createDefaultConnection(), PROJ_CHANGE,
+        new APIContainerHelper(this).setDateAndTimeFormats(createDefaultConnection(), PROJ_CHANGE,
                 dateFormatInjection, timeFormatInjection, String.format("%s %s", dateFormatInjection, timeFormatInjection));
 
         var projectSettingPage = ProjectSettingsPage.beginAt(this, PROJ_CHANGE);

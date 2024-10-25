@@ -15,11 +15,8 @@
  */
 package org.labkey.test.tests;
 
-import org.json.JSONObject;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -173,7 +170,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         // This test depends on a non-standard date format, one that contains a timestamp, to validate the reports are
         // shown as updated. The non-standard format can only be set by an API call to UpdateContainerSettings.
         APIContainerHelper apiContainerHelper = new APIContainerHelper(this);
-        apiContainerHelper.setNonStandardDateAndTimeFormat(createDefaultConnection(), getCurrentContainerPath(),
+        apiContainerHelper.setDateAndTimeFormats(createDefaultConnection(), getCurrentContainerPath(),
                 NON_STANDARD_DATEFORMAT, null, null);
 
         clickTab("Clinical and Assay Data");

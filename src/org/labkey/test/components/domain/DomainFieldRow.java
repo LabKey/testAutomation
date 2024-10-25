@@ -1290,11 +1290,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return elementCache().dateTimeInheritedCheckbox.get();
     }
 
-    public String getDateTimeFormatDate()
-    {
-        return getFormatWithoutExample(elementCache().dateTimeFormatDateSelect.getValue());
-    }
-
     public DomainFieldRow setDateTimeFormat(DATE_FORMAT date, TIME_FORMAT time)
     {
         setDateTimeFormat(date);
@@ -1320,9 +1315,46 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public String getDateTimeFormatDate()
+    {
+        String formatValue;
+
+        if(elementCache().dateTimeFormatDateSelect.isInteractive())
+        {
+            formatValue = getFormatWithoutExample(elementCache().dateTimeFormatDateSelect.getValue());
+        }
+        else
+        {
+            formatValue = getFormatWithoutExample(elementCache().disabledDateTimeDateFormat.getText());
+        }
+
+        return formatValue;
+    }
+
+    public boolean isDateTimeFormatDateEnabled()
+    {
+        return elementCache().dateTimeFormatDateSelect.isInteractive();
+    }
+
     public String getDateTimeFormatTime()
     {
-        return getFormatWithoutExample(elementCache().dateTimeFormatTimeSelect.getValue());
+        String formatValue;
+
+        if(elementCache().dateTimeFormatTimeSelect.isInteractive())
+        {
+            formatValue = getFormatWithoutExample(elementCache().dateTimeFormatTimeSelect.getValue());
+        }
+        else
+        {
+            formatValue = getFormatWithoutExample(elementCache().disabledDateTimeTimeFormat.getText());
+        }
+
+        return formatValue;
+    }
+
+    public boolean isDateTimeFormatTimeEnabled()
+    {
+        return elementCache().dateTimeFormatTimeSelect.isInteractive();
     }
 
     public String getDateTimeFormat()
@@ -1349,7 +1381,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String getDateFormat()
     {
-        return getFormatWithoutExample(elementCache().dateFormatSelect.getValue());
+        String formatValue;
+
+        if(elementCache().dateFormatSelect.isInteractive())
+        {
+            formatValue = getFormatWithoutExample(elementCache().dateFormatSelect.getValue());
+        }
+        else
+        {
+            formatValue = getFormatWithoutExample(elementCache().disabledDateFormat.getText());
+        }
+
+        return formatValue;
+    }
+
+    public boolean isDateFormatEnabled()
+    {
+        return elementCache().dateFormatSelect.isInteractive();
     }
 
     public DomainFieldRow setDateFormat(DATE_FORMAT dateFormat)
@@ -1375,7 +1423,23 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String getTimeFormat()
     {
-        return getFormatWithoutExample(elementCache().timeFormatSelect.getValue());
+        String formatValue;
+
+        if(elementCache().timeFormatSelect.isInteractive())
+        {
+            formatValue = getFormatWithoutExample(elementCache().timeFormatSelect.getValue());
+        }
+        else
+        {
+            formatValue = getFormatWithoutExample(elementCache().disabledTimeFormat.getText());
+        }
+
+        return formatValue;
+    }
+
+    public boolean isTimeFormatEnabled()
+    {
+        return elementCache().timeFormatSelect.isInteractive();
     }
 
     public DomainFieldRow setTimeFormat(TIME_FORMAT timeFormat)
@@ -1385,6 +1449,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             setTimeInherited(false);
         elementCache().timeFormatSelect.typeAheadSelect(timeFormat + " (");
         return this;
+    }
+
+    public boolean hasDomainWarningIcon()
+    {
+        return elementCache().domainWarningIcon.isDisplayed();
+    }
+
+    public WebElement getDomainWarningIcon()
+    {
+        return elementCache().domainWarningIcon;
     }
 
     public static class DomainFieldRowFinder extends WebDriverComponentFinder<DomainFieldRow, DomainFieldRowFinder>
@@ -1492,15 +1566,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public final FilteringReactSelect dateTimeFormatDateSelect = FilteringReactSelect.finder(getDriver())
                 .withNamedInput("domainpropertiesrow-format_datedateTime")
                 .refindWhenNeeded(this);
+        public final WebElement disabledDateTimeDateFormat = Locator.tagWithAttributeContaining("div", "id", "domainpropertiesrow-format_datedateTime")
+                .descendant("div[contains(@class,'select-input__single-value--is-disabled')]").findWhenNeeded(this);
         public final FilteringReactSelect dateTimeFormatTimeSelect = FilteringReactSelect.finder(getDriver())
                 .withNamedInput("domainpropertiesrow-format_timedateTime")
                 .refindWhenNeeded(this);
+        public final WebElement disabledDateTimeTimeFormat = Locator.tagWithAttributeContaining("div", "id", "domainpropertiesrow-format_timedateTime")
+                .descendant("div[contains(@class,'select-input__single-value--is-disabled')]").findWhenNeeded(this);
         public final FilteringReactSelect dateFormatSelect = FilteringReactSelect.finder(getDriver())
                 .withNamedInput("domainpropertiesrow-format_datedate")
                 .refindWhenNeeded(this);
+        public final WebElement disabledDateFormat = Locator.tagWithAttributeContaining("div", "id", "domainpropertiesrow-format_datedate")
+                .descendant("div[contains(@class,'select-input__single-value--is-disabled')]").findWhenNeeded(this);
         public final FilteringReactSelect timeFormatSelect = FilteringReactSelect.finder(getDriver())
                 .withNamedInput("domainpropertiesrow-format_timetime")
                 .refindWhenNeeded(this);
+        public final WebElement disabledTimeFormat = Locator.tagWithAttributeContaining("div", "id", "domainpropertiesrow-format_timetime")
+                .descendant("div[contains(@class,'select-input__single-value--is-disabled')]").findWhenNeeded(this);
+        public final WebElement domainWarningIcon = Locator.tagWithClass("span", "domain-warning-icon")
+                .findWhenNeeded(this);
 
         // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))

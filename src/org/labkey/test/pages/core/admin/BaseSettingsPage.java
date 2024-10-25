@@ -186,6 +186,11 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         selectOptionByValue(elementCache().defaultDateFormat, dateFormat.format);
     }
 
+    public boolean defaultDateDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultDateFormat).isDisplayed();
+    }
+
     public void setDefaultDateTimeDisplay(DATE_FORMAT dateFormat, TIME_FORMAT timeFormat)
     {
         setDefaultDateTimeDateDisplay(dateFormat);
@@ -202,6 +207,11 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.format);
     }
 
+    public boolean defaultDateTimeDateDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultDateTimeDateFormat).isDisplayed();
+    }
+
     public String getDefaultDateTimeTimeDisplay()
     {
         return getSelectedOptionValue(elementCache().defaultDateTimeTimeFormat);
@@ -212,6 +222,11 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.format);
     }
 
+    public boolean defaultDateTimeTimeDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultDateTimeTimeFormat).isDisplayed();
+    }
+
     public String getDefaultTimeDisplay()
     {
         return getSelectedOptionValue(elementCache().defaultTimeFormat);
@@ -220,6 +235,11 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
     public void setDefaultTimeDisplay(TIME_FORMAT timeFormat)
     {
         selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.format);
+    }
+
+    public boolean defaultTimeDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultTimeFormat).isDisplayed();
     }
 
     public String getDefaultNumberDisplay()
@@ -327,6 +347,13 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement defaultTimeFormat = Locator.id("defaultTimeFormat").findWhenNeeded(this);
         WebElement defaultDateTimeDateFormat = Locator.id("dateSelect").findWhenNeeded(this);
         WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
+
+        WebElement nonStandardWarning(WebElement field)
+        {
+            String id = field.getAttribute("id");
+            String xpath = String.format("//select[@id='%s']/following-sibling::span[@class='has-warning']", id);
+            return Locator.xpath(xpath).findWhenNeeded(this);
+        }
 
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
         WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElement(this);

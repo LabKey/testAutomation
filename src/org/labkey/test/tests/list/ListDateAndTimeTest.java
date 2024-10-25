@@ -81,6 +81,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         _defaultTimeFormat = new SimpleDateFormat(settingsPage.getDefaultTimeDisplay());
         _defaultDateTimeFormat = new SimpleDateFormat(String.format("%s %s",
                 settingsPage.getDefaultDateTimeDateDisplay(), settingsPage.getDefaultDateTimeTimeDisplay()));
+
     }
 
     @AfterClass

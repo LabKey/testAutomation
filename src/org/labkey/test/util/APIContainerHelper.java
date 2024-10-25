@@ -281,10 +281,10 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
     }
 
-    public CommandResponse setNonStandardDateAndTimeFormat(Connection connection, String containerPath,
-                                                           @Nullable String dateFormat,
-                                                           @Nullable String timeFormat,
-                                                           @Nullable String dateTimeFormat) throws IOException, CommandException
+    public CommandResponse setDateAndTimeFormats(Connection connection, String containerPath,
+                                                 @Nullable String dateFormat,
+                                                 @Nullable String timeFormat,
+                                                 @Nullable String dateTimeFormat) throws IOException, CommandException
     {
 
         JSONObject json = new JSONObject();
@@ -319,11 +319,11 @@ public class APIContainerHelper extends AbstractContainerHelper
             json.put("defaultDateTimeFormatInherited", true);
         }
 
-        return setNonStandardDateAndTimeFormat(connection, containerPath, json);
+        return setDateAndTimeFormats(connection, containerPath, json);
 
     }
 
-    public CommandResponse setNonStandardDateAndTimeFormat(Connection connection, String containerPath, JSONObject json) throws IOException, CommandException
+    public CommandResponse setDateAndTimeFormats(Connection connection, String containerPath, JSONObject json) throws IOException, CommandException
     {
 
         SimplePostCommand command = new SimplePostCommand("admin", "UpdateContainerSettings");
