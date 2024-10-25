@@ -206,7 +206,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         log("Verifying host cannot be blank ");
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("External redirect host name must not be blank."));
+        assertElementPresent(Locator.css(".labkey-error").withText("External host name must not be blank."));
 
         log("Setting the host URL");
         setFormElement(Locator.name("newExternalRedirectHost"), host);
@@ -219,7 +219,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
         setFormElement(Locator.name("newExternalRedirectHost"), host);
         clickButton("Save");
         assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
-
     }
 
     /*
