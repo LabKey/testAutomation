@@ -379,7 +379,7 @@ public class FolderTest extends BaseWebDriverTest
             row1.put("EntityId", entityId);
             drc.addRow(row1);
 
-            SaveRowsResponse resp = drc.execute(new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword()), getContainerId());
+            drc.execute(cn, getContainerId());
 
             throw new Exception("That command should have failed");
         }
