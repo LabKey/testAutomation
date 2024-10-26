@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,16 +15,22 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
+import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.URLBuilder;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +44,16 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
     private static final String PROJECT_DATE_FORMAT = "dd/MM/yy";
     private static final String PROJECT_TIME_FORMAT = "K:m:s a Z";
     private static final String PROJECT_DATETIME_FORMAT = "EEEE MMMM dd D yyyy k:mm:s X";
+
+    private static final List<String> PROJECT_WARNINGS = List.of(String.format("Project default display format for Dates: %s", PROJECT_DATE_FORMAT),
+            String.format("Project default display format for DateTimes: %s", PROJECT_DATETIME_FORMAT),
+            String.format("Project default display format for Times: %s", PROJECT_TIME_FORMAT));
+
+    private static final String TT_NS_DATE = "Non-standard date format.";
+    private static final String TT_NS_TIME = "Non-standard time format.";
+    private static final String TT_NS_DATETIME = "Non-standard date-time format.";
+
+    private final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -66,6 +83,11 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         new APIContainerHelper(this)
                 .setDateAndTimeFormats(createDefaultConnection(), PROJECT_NAME,
                         PROJECT_DATE_FORMAT, PROJECT_TIME_FORMAT, PROJECT_DATETIME_FORMAT);
+
+        _portalHelper.addWebPart("Lists");
+        _portalHelper.addWebPart("Data Classes");
+        _portalHelper.addWebPart("Assay List");
+
     }
 
     @AfterClass
@@ -135,14 +157,17 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         checker().verifyFalse("Default DateTime Time field should not have a non-standard warning, it does.",
                 projectSettingsPage.defaultDateTimeTimeDisplayWarning());
 
+        log("Check that Site Validation includes warnings from the project settings.");
+        checkSiteValidation(PROJECT_WARNINGS, true);
+
     }
 
     @Test
     public void testLists() throws IOException, CommandException
     {
 
-        String listFormat = "Non-Standard Formats";
-        String listInherit = "Inherit Project Formats";
+        String listFormat = "List Non-Standard Formats";
+        String listInherit = "List Inherit Project Formats";
         String dateCol01 = "Date01";
         String dateCol02 = "Date02";
         String timeCol01 = "Time01";
@@ -195,26 +220,24 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 dateTimeCol01, "May 01, 2005 06:32:00.00 PM",
                 dateTimeCol02, "10:00 AM PDT 2024-22 AD");
 
-        DataRegionTable table = new DataRegionTable("query", getDriver());
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listFormat);
+        DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
 
-        clickAndWait(table.getHeaderButton("Design"));
-        EditListDefinitionPage listDefinitionPage = new EditListDefinitionPage(getDriver());
-
-        checkField(listDefinitionPage, dateCol01, false, FieldDefinition.ColumnType.Date,
-                nsDateFormat01, "Non-standard date format.");
-        checkField(listDefinitionPage, dateCol02, false, FieldDefinition.ColumnType.Date,
-                nsDateFormat02, "Non-standard date format.");
-        checkField(listDefinitionPage, timeCol01, false, FieldDefinition.ColumnType.Time,
-                nsTimeFormat01, "Non-standard time format.");
-        checkField(listDefinitionPage, timeCol02, false, FieldDefinition.ColumnType.Time,
-                nsTimeFormat02, "Non-standard time format.");
-        checkField(listDefinitionPage, dateTimeCol01, false, FieldDefinition.ColumnType.DateAndTime,
-                String.format("%s %s", nsDateFormat01, nsTimeFormat01), "Non-standard date-time format.");
-        checkField(listDefinitionPage, dateTimeCol02, false, FieldDefinition.ColumnType.DateAndTime,
-                String.format("%s %s", nsTimeFormat02, nsDateFormat02), "Non-standard date-time format.");
+        checkField(domainEditor, dateCol01, false, FieldDefinition.ColumnType.Date,
+                nsDateFormat01, TT_NS_DATE);
+        checkField(domainEditor, dateCol02, false, FieldDefinition.ColumnType.Date,
+                nsDateFormat02, TT_NS_DATE);
+        checkField(domainEditor, timeCol01, false, FieldDefinition.ColumnType.Time,
+                nsTimeFormat01, TT_NS_TIME);
+        checkField(domainEditor, timeCol02, false, FieldDefinition.ColumnType.Time,
+                nsTimeFormat02, TT_NS_TIME);
+        checkField(domainEditor, dateTimeCol01, false, FieldDefinition.ColumnType.DateAndTime,
+                String.format("%s %s", nsDateFormat01, nsTimeFormat01), TT_NS_DATETIME);
+        checkField(domainEditor, dateTimeCol02, false, FieldDefinition.ColumnType.DateAndTime,
+                String.format("%s %s", nsTimeFormat02, nsDateFormat02), TT_NS_DATETIME);
 
         listDefinitionPage.clickCancel();
-        table = new DataRegionTable("query", getDriver());
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         Map<String, String> actualRowValues = table.getRowDataAsMap(0);
 
         checker().verifyEquals("Data in grid is not formatted as expected.",
@@ -231,17 +254,15 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 timeCol01, "0:32:0 AM -0800",
                 dateTimeCol01, "Sunday May 01 121 2005 18:32:0 -07");
 
-        table = new DataRegionTable("query", getDriver());
+        listDefinitionPage =  _listHelper.goToEditDesign(listInherit);
+        domainEditor = listDefinitionPage.getFieldsPanel();
 
-        clickAndWait(table.getHeaderButton("Design"));
-        listDefinitionPage = new EditListDefinitionPage(getDriver());
-
-        checkField(listDefinitionPage, dateCol01, true, FieldDefinition.ColumnType.Date,
-                PROJECT_DATE_FORMAT, "Non-standard date format.");
-        checkField(listDefinitionPage, timeCol01, true, FieldDefinition.ColumnType.Time,
-                PROJECT_TIME_FORMAT, "Non-standard time format.");
-        checkField(listDefinitionPage, dateTimeCol01, true, FieldDefinition.ColumnType.DateAndTime,
-                PROJECT_DATETIME_FORMAT, "Non-standard date-time format.");
+        checkField(domainEditor, dateCol01, true, FieldDefinition.ColumnType.Date,
+                PROJECT_DATE_FORMAT, TT_NS_DATE);
+        checkField(domainEditor, timeCol01, true, FieldDefinition.ColumnType.Time,
+                PROJECT_TIME_FORMAT, TT_NS_TIME);
+        checkField(domainEditor, dateTimeCol01, true, FieldDefinition.ColumnType.DateAndTime,
+                PROJECT_DATETIME_FORMAT, TT_NS_DATETIME);
 
         listDefinitionPage.clickCancel();
         table = new DataRegionTable("query", getDriver());
@@ -249,6 +270,142 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         checker().verifyEquals("Data in grid is not formatted as expected.",
                 expectedRowValues, actualRowValues);
+
+        log("Validate that the Site Validation contains the expected warnings.");
+
+        List<String> expectedWarnings = List.of(String.format("Date property \"lists.%s.%s\": %s",
+                        listFormat, dateCol01, nsDateFormat01),
+                String.format("Date property \"lists.%s.%s\": %s",
+                        listFormat, dateCol02, nsDateFormat02),
+                String.format("Time property \"lists.%s.%s\": %s",
+                        listFormat, timeCol01, nsTimeFormat01),
+                String.format("Time property \"lists.%s.%s\": %s",
+                        listFormat, timeCol02, nsTimeFormat02),
+                String.format("DateTime property \"lists.%s.%s\": %s %s",
+                        listFormat, dateTimeCol01, nsDateFormat01, nsTimeFormat01),
+                String.format("DateTime property \"lists.%s.%s\": %s %s",
+                        listFormat, dateTimeCol02, nsTimeFormat02, nsDateFormat02)
+        );
+
+        checkSiteValidation(expectedWarnings, true);
+
+        log("Validate that Site Validation does not contain warnings about inherited fields.");
+
+        expectedWarnings = List.of(String.format("Date property \"lists.%s.%s\": %s",
+                        listInherit, dateCol01, nsDateFormat01),
+                String.format("Time property \"lists.%s.%s\": %s",
+                        listInherit, timeCol01, nsTimeFormat01),
+                String.format("DateTime property \"lists.%s.%s\": %s %s",
+                        listInherit, dateTimeCol01, nsDateFormat01, nsTimeFormat01)
+        );
+
+        checkSiteValidation(expectedWarnings, false);
+
+    }
+
+    @Test
+    public void testEdit() throws IOException, CommandException
+    {
+        String listEdit = "List Edit Non-Standard Formats";
+        String dateCol = "Date";
+        String timeCol = "Time";
+        String dateTimeCol = "DateTime";
+
+        log(String.format("Create a list named '%s' with various Date, Time and DateTime columns.", listEdit));
+
+        String nsDateFormat = "MMMM dd, yyyy";
+        String nsTimeFormat = "hh:mm:ss.ss a";
+
+        List<FieldDefinition> listFields = List.of(
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date).setFormat(nsDateFormat),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time).setFormat(nsTimeFormat),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(String.format("%s %s", nsDateFormat, nsTimeFormat))
+        );
+
+        createListByAPI(listEdit, listFields);
+
+        log("Check that Site Validation tags the fields in the list.");
+
+        List<String> expectedWarnings = List.of(String.format("Date property \"lists.%s.%s\": %s",
+                        listEdit, dateCol, nsDateFormat),
+                String.format("Time property \"lists.%s.%s\": %s",
+                        listEdit, timeCol, nsTimeFormat),
+                String.format("DateTime property \"lists.%s.%s\": %s %s",
+                        listEdit, dateTimeCol, nsDateFormat, nsTimeFormat));
+
+        checkSiteValidation(expectedWarnings, true);
+
+        goToProjectHome();
+        _listHelper.goToList(listEdit);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listEdit);
+
+        log("Edit the Date, Time and DateTime fields but then cancel out of the edit.");
+
+        DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
+        DomainFieldRow fieldRow = domainEditor.getField(dateCol);
+        fieldRow.expand();
+        fieldRow.setDateFormat(DATE_FORMAT.yyyy_MM_dd);
+        checker().verifyFalse(String.format("Changing '%s' to a standard format should remove the warning icon.", dateCol),
+                fieldRow.hasDomainWarningIcon());
+
+        fieldRow = domainEditor.getField(timeCol);
+        fieldRow.expand();
+        fieldRow.setTimeFormat(TIME_FORMAT.HH_mm_ss);
+        checker().verifyFalse(String.format("Changing '%s' to a standard format should remove the warning icon.", timeCol),
+                fieldRow.hasDomainWarningIcon());
+
+        fieldRow = domainEditor.getField(dateTimeCol);
+        fieldRow.expand();
+        fieldRow.setDateTimeFormat(DATE_FORMAT.yyyy_MM_dd, TIME_FORMAT.hh_mm_a);
+        checker().verifyFalse(String.format("Changing '%s' to a standard format should remove the warning icon.", dateTimeCol),
+                fieldRow.hasDomainWarningIcon());
+
+        log("Cancel out of the edit.");
+        listDefinitionPage.clickCancel();
+
+        log("Go back to the design page and validate that the non-standard formats are still there.");
+        listDefinitionPage = _listHelper.goToEditDesign(listEdit);
+        domainEditor = listDefinitionPage.getFieldsPanel();
+
+        checkField(domainEditor, dateCol, false, FieldDefinition.ColumnType.Date,
+                nsDateFormat, TT_NS_DATE);
+        checkField(domainEditor, timeCol, false, FieldDefinition.ColumnType.Time,
+                nsTimeFormat, TT_NS_TIME);
+        checkField(domainEditor, dateTimeCol, false, FieldDefinition.ColumnType.DateAndTime,
+                String.format("%s %s", nsDateFormat, nsTimeFormat), TT_NS_DATETIME);
+
+        listDefinitionPage.clickCancel();
+
+        log("Now edit the field to a standard format.");
+        listDefinitionPage = _listHelper.goToEditDesign(listEdit);
+
+        domainEditor = listDefinitionPage.getFieldsPanel();
+        fieldRow = domainEditor.getField(dateCol);
+        fieldRow.expand();
+        fieldRow.setDateFormat(DATE_FORMAT.yyyy_MM_dd);
+        fieldRow = domainEditor.getField(timeCol);
+        fieldRow.expand();
+        fieldRow.setTimeFormat(TIME_FORMAT.HH_mm_ss);
+        fieldRow = domainEditor.getField(dateTimeCol);
+        fieldRow.expand();
+        fieldRow.setDateTimeFormat(DATE_FORMAT.yyyy_MM_dd, TIME_FORMAT.hh_mm_a);
+
+        listDefinitionPage.clickSave();
+
+        listDefinitionPage = _listHelper.goToEditDesign(listEdit);
+        domainEditor = listDefinitionPage.getFieldsPanel();
+
+        checkField(domainEditor, dateCol, false, FieldDefinition.ColumnType.Date,
+                DATE_FORMAT.yyyy_MM_dd.toString(), null);
+        checkField(domainEditor, timeCol, false, FieldDefinition.ColumnType.Time,
+                TIME_FORMAT.HH_mm_ss.toString(), null);
+        checkField(domainEditor, dateTimeCol, false, FieldDefinition.ColumnType.DateAndTime,
+                String.format("%s %s", DATE_FORMAT.yyyy_MM_dd, TIME_FORMAT.hh_mm_a), null);
+
+        log("Check that Site Validation Does not tag the fields in the list after they have been edited.");
+
+        checkSiteValidation(expectedWarnings, false);
+
     }
 
     private void createListByAPI(String listName, List<FieldDefinition> fields) throws IOException, CommandException
@@ -263,11 +420,154 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         listDef.create(connection, getProjectName());
     }
 
-    private void checkField(EditListDefinitionPage listDefinitionPage, String fieldName,
-                            boolean isInherited, FieldDefinition.ColumnType columnType,
-                            String expectedFormat, String expectedToolTipText)
+    @Test
+    public void testDataClass() throws IOException, CommandException
     {
-        DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
+        String dcFormat = "DC Non-Standard Formats";
+        String dcInherit = "DC Inherit Project Formats";
+        String dateCol = "Date";
+        String timeCol = "Time";
+        String dateTimeCol = "DateTime";
+
+        String nsDateFormat = "MMMM dd, yyyy";
+        String nsTimeFormat = "hh:mm:ss.ss a";
+
+        List<FieldDefinition> fields = List.of(
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date).setFormat(nsDateFormat),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time).setFormat(nsTimeFormat),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(String.format("%s %s", nsDateFormat, nsTimeFormat))
+        );
+
+        log(String.format("Create a Data Class named '%s' with non-standard format fields.", dcFormat));
+
+        DataClassDefinition dataClass = new DataClassDefinition(dcFormat);
+        for(FieldDefinition field : fields)
+        {
+            dataClass.addField(field);
+        }
+
+        dataClass.create(createDefaultConnection(), getProjectName());
+
+        fields = List.of(
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime)
+        );
+
+        log(String.format("Create a Data Class named '%s' that inherits non-standard format fields from the project.", dcFormat));
+
+        dataClass = new DataClassDefinition(dcInherit);
+        for(FieldDefinition field : fields)
+        {
+            dataClass.addField(field);
+        }
+
+        dataClass.create(createDefaultConnection(), getProjectName());
+
+        log("Add some data to both data classes as a sanity validation of the formats.");
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(dcFormat));
+
+        String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
+                + "A\t12/23/24 14:45\t12/23/24\t14:45\n";
+
+        Map<String, String> expectedFormatData = Map.of("Name", "A",
+                dateTimeCol, "December 23, 2024 02:45:00.00 PM",
+                dateCol, "December 23, 2024",
+                timeCol, "02:45:00.00 PM", "Flag", "");
+
+        Map<String, String> expectedInheritedData = Map.of("Name", "A",
+                dateTimeCol, "Monday December 23 358 2024 14:45:0 -08",
+                dateCol, "23/12/24",
+                timeCol, "2:45:0 PM -0800", "Flag", "");
+
+        DataRegionTable dataTable = new DataRegionTable("query", getDriver());
+        dataTable.clickImportBulkData()
+                .setText(bulkData);
+        clickButton("Submit");
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(dcInherit));
+
+        dataTable = new DataRegionTable("query", getDriver());
+        dataTable.clickImportBulkData()
+                .setText(bulkData);
+        clickButton("Submit");
+
+        log(String.format("Validate domain designer feedback for '%s'.", dcFormat));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(dcFormat));
+        clickAndWait(Locator.lkButton("Edit Data Class"));
+        CreateDataClassPage editPage = new CreateDataClassPage(getDriver());
+        DomainFormPanel domainEditor = editPage.getDomainEditor();
+
+        checkField(domainEditor, dateCol,
+        false, FieldDefinition.ColumnType.Date,
+                nsDateFormat, TT_NS_DATE);
+
+        checkField(domainEditor, timeCol,
+                false, FieldDefinition.ColumnType.Time,
+                nsTimeFormat, TT_NS_TIME);
+
+        checkField(domainEditor, dateTimeCol,
+                false, FieldDefinition.ColumnType.DateAndTime,
+                String.format("%s %s", nsDateFormat, nsTimeFormat), TT_NS_DATETIME);
+
+        editPage.clickCancel();
+
+        log("Validate the data (make sure we still respect non-standard formats).");
+
+        dataTable = new DataRegionTable("query", getDriver());
+        Map<String, String> actualData = dataTable.getRowDataAsMap(0);
+        checker().verifyEquals("Data with formatted fields is not as expected.",
+                expectedFormatData, actualData);
+
+        log("Validate that data sets are reported in Site Validation.");
+        List<String> expectedWarnings = List.of(String.format("Date property \"exp.data.%s.%s\": %s",
+                        dcFormat, dateCol, nsDateFormat),
+                String.format("Time property \"exp.data.%s.%s\": %s",
+                        dcFormat, timeCol, nsTimeFormat),
+                String.format("DateTime property \"exp.data.%s.%s\": %s %s",
+                        dcFormat, dateTimeCol, nsDateFormat, nsTimeFormat));
+
+        checkSiteValidation(expectedWarnings, true);
+
+        log(String.format("Validate domain designer feedback for '%s'.", dcInherit));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(dcInherit));
+        clickAndWait(Locator.lkButton("Edit Data Class"));
+        editPage = new CreateDataClassPage(getDriver());
+        domainEditor = editPage.getDomainEditor();
+
+        checkField(domainEditor, dateCol,
+                false, FieldDefinition.ColumnType.Date,
+                PROJECT_DATE_FORMAT, TT_NS_DATE);
+
+        checkField(domainEditor, timeCol,
+                false, FieldDefinition.ColumnType.Time,
+                PROJECT_TIME_FORMAT, TT_NS_TIME);
+
+        checkField(domainEditor, dateTimeCol,
+                false, FieldDefinition.ColumnType.DateAndTime,
+                PROJECT_DATETIME_FORMAT, TT_NS_DATETIME);
+
+        editPage.clickCancel();
+
+        log("Validate the data (make sure we still respect non-standard formats).");
+        dataTable = new DataRegionTable("query", getDriver());
+        actualData = dataTable.getRowDataAsMap(0);
+        checker().verifyEquals("Data with inherited fields is not as expected.",
+                expectedInheritedData, actualData);
+
+    }
+
+    private void checkField(DomainFormPanel domainEditor, String fieldName,
+                            boolean isInherited, FieldDefinition.ColumnType columnType,
+                            String expectedFormat, @Nullable String expectedToolTipText)
+    {
         DomainFieldRow fieldRow = domainEditor.getField(fieldName);
         fieldRow.expand();
 
@@ -319,30 +619,135 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                         fieldRow.isDateTimeFormatTimeEnabled());
             }
 
+            String expectedDateFormat;
+            String expectedTimeFormat;
+
+            // If expected tooltip text is not null treat the field as a non-standard format field.
+            if (null != expectedToolTipText)
+            {
+                expectedDateFormat = expectedFormat;
+                expectedTimeFormat = TIME_FORMAT.none.toString();
+            }
+            else
+            {
+                // None of the standard dates have a space. The first space will be between the date format and the time format.
+                int index = expectedFormat.indexOf(" ");
+
+                expectedDateFormat = expectedFormat.substring(0, index);
+                expectedTimeFormat = expectedFormat.substring(index+1);
+            }
+
             actualFormat = fieldRow.getDateTimeFormatDate();
             checker().verifyEquals(String.format("DateTime Date format for field '%s' not as expected.", fieldName),
-                    expectedFormat, actualFormat);
+                    expectedDateFormat, actualFormat);
 
             actualFormat = fieldRow.getDateTimeFormatTime();
             checker().verifyEquals(String.format("DateTime Time format for field '%s' not as expected.", fieldName),
-                    TIME_FORMAT.none.toString(), actualFormat);
+                    expectedTimeFormat, actualFormat);
         }
 
-        if(checker().verifyTrue("No warning icon present for field with non-standard date-time format.",
-                fieldRow.hasDomainWarningIcon()))
+        // If expected tooltip text is not null treat the field as a non-standard format field.
+        if (null != expectedToolTipText)
         {
-            WebElement icon = fieldRow.getDomainWarningIcon();
-            mouseOver(icon);
-            WebElement toolTip = Locator.tagWithClass("div", "tooltip-inner")
-                    .withText(expectedToolTipText)
-                    .findWhenNeeded(getDriver());
+            if (checker().verifyTrue("No warning icon present for field with non-standard date-time format.",
+                    fieldRow.hasDomainWarningIcon()))
+            {
+                WebElement icon = fieldRow.getDomainWarningIcon();
+                mouseOver(icon);
+                WebElement toolTip = Locator.tagWithClass("div", "tooltip-inner")
+                        .withText(expectedToolTipText)
+                        .findWhenNeeded(getDriver());
 
-            checker().verifyTrue("Tooltip not present or text not as expected.",
-                    waitFor(toolTip::isDisplayed, 1_000));
+                checker().verifyTrue("Tooltip not present or text not as expected.",
+                        waitFor(toolTip::isDisplayed, 1_000));
+            }
         }
-
+        else
+        {
+            checker().verifyFalse(String.format("Field '%s' should not have a warning icon present, but one is there.", fieldName),
+                    fieldRow.hasDomainWarningIcon());
+        }
         checker().screenShotIfNewError(String.format("Non_Standard_Field_%s_Error", fieldName));
 
+    }
+
+    private void checkSiteValidation(List<String> expectedWarnings, boolean shouldContain)
+    {
+        List<String> actualWarnings = getProjectValidationWarnings();
+
+        log("Found Warnings: " + actualWarnings);
+
+        if (shouldContain)
+        {
+            log("Should Contain Warnings: " + expectedWarnings);
+
+            if (!actualWarnings.isEmpty())
+            {
+                checker().verifyTrue("Did not find the expected warnings.",
+                        actualWarnings.containsAll(expectedWarnings));
+
+            }
+            else
+            {
+                log(String.format("No warnings found for project '%s'.", getProjectName()));
+            }
+        }
+        else
+        {
+            log("Should Not Contain Warnings: " + expectedWarnings);
+
+            boolean shouldBeFalse = actualWarnings.stream()
+                    .anyMatch(expectedWarnings::contains);
+
+            checker().verifyFalse("Found warning that should not be there.",
+                    shouldBeFalse);
+        }
+    }
+
+    private List<String> getProjectValidationWarnings()
+    {
+        List<String> warnings = new ArrayList<>();
+
+        URLBuilder urlBuilder = new URLBuilder("admin", "configureSiteValidation");
+        String url = urlBuilder.buildRelativeURL();
+        beginAt(url);
+
+        waitForElementToBeVisible(Locator.lkButton("Validate"));
+
+        // Disable all validators.
+        Locator.tagWithAttribute("input", "type", "checkbox")
+                .findElements(getDriver()).forEach(this::uncheckCheckbox);
+
+        // Enable Display Format validator.
+        WebElement formatValidation = Locator.checkboxByNameAndValue("providers", "Display Format Validator").findWhenNeeded(getDriver());
+        checkCheckbox(formatValidation);
+
+        // Validate projects and sub-folders.
+        checkRadioButton(Locator.radioButtonByNameAndValue("includeSubfolders", "true"));
+
+        // Don't run in the background.
+        uncheckCheckbox(Locator.id("background"));
+
+        clickAndWait(Locator.lkButton("Validate"));
+
+        waitForText("Folder Validation Results");
+
+        String xpath = String.format("//li[contains(text(),'Project: %s')]//li[contains(text(),'Warnings:')]//ul", getProjectName());
+        WebElement ul = Locator.xpath(xpath).findWhenNeeded(getDriver());
+
+        if (ul.isDisplayed())
+        {
+            List<String> actualWarnings = ul.findElements(Locator.tag("li")).stream().map(WebElement::getText).toList();
+
+            for(String warning : actualWarnings)
+            {
+                // Trim off the MORE INFO text.
+                String temp = warning.trim().substring(0, warning.length() - 10);
+                warnings.add(temp);
+            }
+        }
+
+        return warnings;
     }
 
 }
