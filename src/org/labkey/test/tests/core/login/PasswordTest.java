@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.core.login.SetPasswordForm.SHORT_PASSWORD;
 import static org.labkey.test.components.core.login.SetPasswordForm.VERY_STRONG_PASSWORD;
@@ -188,7 +189,8 @@ public class PasswordTest extends BaseWebDriverTest
         changePassword(currentPassword, VERY_STRONG_PASSWORD + 0);
         assertTextNotPresent("Choose a new password.");
 
-        stopImpersonating();
+        // Issue 51523: User's sessions are now invalidated on password change; user should be logged in, but no longer impersonating
+        assertFalse(isImpersonating());
     }
 
     @Test
@@ -279,7 +281,7 @@ public class PasswordTest extends BaseWebDriverTest
 
         signOut();
 
-        //attempt sign in with old password- should succeed
+        //attempt sign in with old password - should succeed
         signIn(username, password);
         signOut();
 
@@ -369,5 +371,4 @@ public class PasswordTest extends BaseWebDriverTest
         clickButton("Change Password");
         return new SetPasswordForm(getDriver());
     }
-
 }
