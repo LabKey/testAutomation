@@ -190,6 +190,7 @@ public class PasswordTest extends BaseWebDriverTest
         assertTextNotPresent("Choose a new password.");
 
         // Issue 51523: User's sessions are now invalidated on password change; user should be logged in, but no longer impersonating
+        assertTrue(isSignedIn());
         assertFalse(isImpersonating());
     }
 
