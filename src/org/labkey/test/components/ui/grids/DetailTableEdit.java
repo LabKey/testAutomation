@@ -535,7 +535,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         public FilteringReactSelect findSelect(String fieldCaption)
         {
             WebElement container = Locator.tag("td").withAttribute("data-caption", fieldCaption).findElement(this);
-            return FilteringReactSelect.finder(_driver).find(container);
+            return FilteringReactSelect.finder(_driver).timeout(_readyTimeout).waitFor(container);
         }
     }
 
