@@ -123,7 +123,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
             throw new RuntimeException("Failed to get Server HTTP response header", e);
         }
     }
-        @Test
+    
+    @Test
     public void testRibbonBar()
     {
         goToAdminConsole().clickSiteSettings();
