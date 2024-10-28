@@ -209,14 +209,14 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent(Locator.css(".labkey-error").withText("External host name must not be blank."));
 
         log("Setting the host URL");
-        setFormElement(Locator.name("newExternalRedirectHost"), host);
+        setFormElement(Locator.name("newExternalHost"), host);
         clickButton("Save");
 
         log("Verifying url got added correctly");
         assertEquals(host, getFormElement(Locator.name("existingExternalHost1")));
 
         log("Verifying cannot be duplicate");
-        setFormElement(Locator.name("newExternalRedirectHost"), host);
+        setFormElement(Locator.name("newExternalHost"), host);
         clickButton("Save");
         assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
     }
