@@ -19,7 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -32,14 +31,12 @@ import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper;
-import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -65,7 +62,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         waitForElement(Locator.name("includeServerHttpHeader"));
         WebElement checkbox = Locator.checkboxByName("includeServerHttpHeader").findElement(getDriver());
 
-        boolean originalValue = "true".equals(checkbox.getAttribute("checked"));
+        boolean originalValue = checkbox.isSelected();
 
         // Try with the setting on
         if (!originalValue)
@@ -136,7 +133,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         WebElement checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
 
         //only select if not already checked
-        if (!("true".equals(checkbox.getAttribute("checked"))))
+        if (!checkbox.isSelected())
             click(Locator.checkboxByName("showRibbonMessage"));
 
         clickButton("Save");
@@ -148,7 +145,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         //only check if not already checked
         checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
-        if (!("true".equals(checkbox.getAttribute("checked"))))
+        if (!checkbox.isSelected())
             click(Locator.checkboxByName("showRibbonMessage"));
 
         setFormElement(Locator.name("ribbonMessage"), html);
@@ -247,7 +244,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         //authentication
         LoginConfigurePage configurePage = goToAdminConsole().clickAuthentication();
         List<LoginConfigRow> configRows = configurePage.getPrimaryConfigurations();
-        assertFalse("expect 'edit' links not to be available for auth configs", configRows.stream().anyMatch(a-> a.canEdit()));
+        assertFalse("expect 'edit' links not to be available for auth configs", configRows.stream().anyMatch(LoginConfigRow::canEdit));
         assertFalse("expect 'add configuration' menu to be absent for AppAdmin", configurePage.canAddConfiguration());
         clickButton("Done");
         assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
