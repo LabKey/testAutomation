@@ -26,6 +26,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -58,25 +59,21 @@ public class AdminConsoleTest extends BaseWebDriverTest
     @Test
     public void testServerHttpHeaderSetting()
     {
-        goToAdminConsole().clickSiteSettings();
-        waitForElement(Locator.name("includeServerHttpHeader"));
-        WebElement checkbox = Locator.checkboxByName("includeServerHttpHeader").findElement(getDriver());
-
-        boolean originalValue = checkbox.isSelected();
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        boolean originalValue = customizeSitePage.isEnableServerHttpHeader();
 
         // Try with the setting on
         if (!originalValue)
-            click(Locator.checkboxByName("includeServerHttpHeader"));
-        clickButton("Save");
+        {
+            customizeSitePage.setEnableServerHttpHeader(true).save();
+        }
 
         String serverHeader = getServerHeader();
         assertTrue("Expected to get a Server header, but got " + serverHeader, serverHeader != null && serverHeader.startsWith("LabKey/"));
 
         // Try with the setting off
-        goToAdminConsole().clickSiteSettings();
-        waitForElement(Locator.name("includeServerHttpHeader"));
-        click(Locator.checkboxByName("includeServerHttpHeader"));
-        clickButton("Save");
+        customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setEnableServerHttpHeader(false).save();
 
         serverHeader = getServerHeader();
         assertNull("Expected to get no Server header, but got " + serverHeader, serverHeader);
@@ -84,10 +81,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
         if (originalValue)
         {
             // Turn the setting back on
-            goToAdminConsole().clickSiteSettings();
-            waitForElement(Locator.name("includeServerHttpHeader"));
-            click(Locator.checkboxByName("includeServerHttpHeader"));
-            clickButton("Save");
+            customizeSitePage = goToAdminConsole().clickSiteSettings();
+            customizeSitePage.setEnableServerHttpHeader(true).save();
         }
     }
 
@@ -127,30 +122,26 @@ public class AdminConsoleTest extends BaseWebDriverTest
     @Test
     public void testRibbonBar()
     {
-        goToAdminConsole().clickSiteSettings();
-        waitForElement(Locator.name("showRibbonMessage"));
-        Locator.name("ribbonMessage").findElement(getDriver()).clear();
-
-        WebElement checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setRibbonMessage(null);
 
         //only select if not already checked
-        if (!checkbox.isSelected())
-            click(Locator.checkboxByName("showRibbonMessage"));
+        if (!customizeSitePage.isShowRibbonMessage())
+            customizeSitePage.setShowRibbonMessage(true);
 
-        clickButton("Save");
+        customizeSitePage.save();
 
         waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message without providing a message to show')]"));
 
         String linkText = "and also click this...";
         String html = "READ ME!!!  <a href='<%=contextPath%>" + "/home/project-begin.view'>" + linkText + "</a>";
 
+        customizeSitePage = new CustomizeSitePage(getDriver());
         //only check if not already checked
-        checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
-        if (!checkbox.isSelected())
-            click(Locator.checkboxByName("showRibbonMessage"));
+        if (!customizeSitePage.isShowRibbonMessage())
+            customizeSitePage.setShowRibbonMessage(true);
 
-        setFormElement(Locator.name("ribbonMessage"), html);
-        clickButton("Save");
+        customizeSitePage.setRibbonMessage(html).save();
 
         Locator ribbon = Locator.tagWithClass("div", "alert alert-warning").containing("READ ME!!!");
         waitForElement(ribbon);
@@ -167,10 +158,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent(ribbonLink);
         stopImpersonating();
 
-        goToAdminConsole().clickSiteSettings();
-        waitForElement(Locator.name("showRibbonMessage"));
-        click(Locator.checkboxByName("showRibbonMessage"));
-        clickButton("Save");
+        customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setShowRibbonMessage(false).save();
         assertElementNotPresent(ribbon);
         assertElementNotPresent(ribbonLink);
     }
