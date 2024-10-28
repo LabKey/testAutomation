@@ -41,14 +41,17 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "Non-Standard Date And Time Formats Test";
 
+    // No standard Date, Time and DateTime formats set at the project level.
     private static final String PROJECT_DATE_FORMAT = "dd/MM/yy";
     private static final String PROJECT_TIME_FORMAT = "K:m:s a Z";
     private static final String PROJECT_DATETIME_FORMAT = "EEEE MMMM dd D yyyy k:mm:s X";
 
+    // Warning shown on the Validation page for project settings.
     private static final List<String> PROJECT_WARNINGS = List.of(String.format("Project default display format for Dates: %s", PROJECT_DATE_FORMAT),
             String.format("Project default display format for DateTimes: %s", PROJECT_DATETIME_FORMAT),
             String.format("Project default display format for Times: %s", PROJECT_TIME_FORMAT));
 
+    // Tooltips shown on the various designer pages for non-standard formats.
     private static final String TT_NS_DATE = "Non-standard date format.";
     private static final String TT_NS_TIME = "Non-standard time format.";
     private static final String TT_NS_DATETIME = "Non-standard date-time format.";
@@ -80,6 +83,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         goToProjectHome();
 
+        // Use the API to set non-standard formats for the project.
         new APIContainerHelper(this)
                 .setDateAndTimeFormats(createDefaultConnection(), PROJECT_NAME,
                         PROJECT_DATE_FORMAT, PROJECT_TIME_FORMAT, PROJECT_DATETIME_FORMAT);
@@ -114,6 +118,21 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    /**
+     * <p>
+     *     Test non-standard Date, Time and DateTime format settings at the project level. The non-standard formats are
+     *     set during project creation.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Validate that the Date, Time and DateTime fields are not inherited.</li>
+     *         <li>Validate the formats are as expected (non-standard)</li>
+     *         <li>Validate the tooltip message.</li>
+     *         <li>Validate the Site Validate report show the project settings.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
     public void testProjectSettingsPage()
     {
@@ -162,6 +181,25 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
+    /**
+     * <p>
+     *     Test non-standard Date, Time and DateTime formats with lists.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a list that has non-standard formats set for the fields.</li>
+     *         <li>Create a second list that has fields that inherit from the project settings.</li>
+     *         <li>Import data into the list to validate non-standard formats are used when display the data.</li>
+     *         <li>Validate the designer for fields that do not inherit from the project.</li>
+     *         <li>Validate the designer for fields that are inherited from the project (should see no warnings)</li>
+     *         <li>Check Site Validation report calls out the fields not inherited, but not the inherited fields.</li>
+     *     </ul>
+     * </p>
+     *
+     * @throws IOException Can be thrown by the API creation calls.
+     * @throws CommandException Can be thrown by the API creation calls.
+     */
     @Test
     public void testLists() throws IOException, CommandException
     {
@@ -303,6 +341,25 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
+    /**
+     * <p>
+     *     Validate editing Date, Time and DateTime fields with non-standard formats.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a list with a non-standard format.</li>
+     *         <li>Validate the list and fields are called out in the site validation.</li>
+     *         <li>Edit the various fields and change the formats to a standard format.</li>
+     *         <li>Cancel the edit and validate the at the non-standard format is retained.</li>
+     *         <li>Edit again and change the fields to a standard format.</li>
+     *         <li>Validate the list and fields are no longer called out in the Site Validation report.</li>
+     *     </ul>
+     * </p>
+     *
+     * @throws IOException Can be thrown by the API creation calls.
+     * @throws CommandException Can be thrown by the API creation calls.
+     */
     @Test
     public void testEdit() throws IOException, CommandException
     {
@@ -408,6 +465,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
+    // Private helper that will create a list through the APIs. This allows the list to have non-standard formats.
     private void createListByAPI(String listName, List<FieldDefinition> fields) throws IOException, CommandException
     {
         Connection connection = createDefaultConnection();
@@ -420,6 +478,23 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         listDef.create(connection, getProjectName());
     }
 
+    /**
+     * <p>
+     *     Validate non-standard Date, Time and DateTime formats in a DataClass
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a DataClass with non-standard formats.</li>
+     *         <li>Create a DataClass that inherits non-standard formats from the project settings.</li>
+     *         <li>Add some data to both as a sanity validation that non-standard formats are used.</li>
+     *         <li>Validate the designer scenarios for both DataClasses.</li>
+     *     </ul>
+     * </p>
+     *
+     * @throws IOException Can be thrown by the API creation calls.
+     * @throws CommandException Can be thrown by the API creation calls.
+     */
     @Test
     public void testDataClass() throws IOException, CommandException
     {
@@ -564,6 +639,10 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
+    // Private helper that validates Date, Time and DateTime fields in a domain designer.
+    // isInherited: Used to check the enabled / editable state of the field.
+    // columnType: Used to identify the expected field options and messages.
+    // expectedToolTipText: Used as a check for the warning icon. If null no warning icon is expected.
     private void checkField(DomainFormPanel domainEditor, String fieldName,
                             boolean isInherited, FieldDefinition.ColumnType columnType,
                             String expectedFormat, @Nullable String expectedToolTipText)
@@ -671,6 +750,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
+    // Private helper to check the Site Validation report. Checks to see if the report should, or should not, contain
+    // the list of warnings.
     private void checkSiteValidation(List<String> expectedWarnings, boolean shouldContain)
     {
         List<String> actualWarnings = getProjectValidationWarnings();
@@ -735,14 +816,16 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         String xpath = String.format("//li[contains(text(),'Project: %s')]//li[contains(text(),'Warnings:')]//ul", getProjectName());
         WebElement ul = Locator.xpath(xpath).findWhenNeeded(getDriver());
 
+        int linkTextLength = " more info".length();
+
         if (ul.isDisplayed())
         {
             List<String> actualWarnings = ul.findElements(Locator.tag("li")).stream().map(WebElement::getText).toList();
 
             for(String warning : actualWarnings)
             {
-                // Trim off the MORE INFO text.
-                String temp = warning.trim().substring(0, warning.length() - 10);
+                // Trim off the MORE INFO link text.
+                String temp = warning.trim().substring(0, warning.length() - linkTextLength);
                 warnings.add(temp);
             }
         }
