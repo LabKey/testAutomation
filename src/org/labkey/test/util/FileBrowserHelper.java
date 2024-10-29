@@ -324,7 +324,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             clickFileBrowserButton(BrowserAction.MOVE);
             Window<?> moveWindow = Window(getDriver()).withTitle("Choose Destination").waitFor();
             //NOTE:  this doesn't yet support nested folders
-            WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
+            WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 2000);
             shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
             sleep(500);
             folder.click();
