@@ -18,17 +18,23 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,32 +57,91 @@ public class AdminConsoleTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testServerHttpHeaderSetting()
+    {
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        boolean originalValue = customizeSitePage.isEnableServerHttpHeader();
+
+        // Try with the setting on
+        if (!originalValue)
+        {
+            customizeSitePage.setEnableServerHttpHeader(true).save();
+        }
+
+        String serverHeader = getServerHeader();
+        assertTrue("Expected to get a Server header, but got " + serverHeader, serverHeader != null && serverHeader.startsWith("LabKey/"));
+
+        // Try with the setting off
+        customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setEnableServerHttpHeader(false).save();
+
+        serverHeader = getServerHeader();
+        assertNull("Expected to get no Server header, but got " + serverHeader, serverHeader);
+
+        if (originalValue)
+        {
+            // Turn the setting back on
+            customizeSitePage = goToAdminConsole().clickSiteSettings();
+            customizeSitePage.setEnableServerHttpHeader(true).save();
+        }
+    }
+
+    private static class GetServerHeaderCommand extends SimpleGetCommand
+    {
+        private String _server;
+        public GetServerHeaderCommand()
+        {
+            super("project", "begin");
+        }
+
+        @Override
+        protected Response _execute(Connection connection, String folderPath) throws CommandException, IOException
+        {
+            Response response = super._execute(connection, folderPath);
+            _server = response.getHeaderValue("Server");
+            return response;
+        }
+    }
+
+    @LogMethod(quiet = true)
+    private String getServerHeader()
+    {
+        Connection cn = createDefaultConnection();
+        try
+        {
+            GetServerHeaderCommand command = new GetServerHeaderCommand();
+            command.execute(cn, "/home");
+            return command._server;
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to get Server HTTP response header", e);
+        }
+    }
+    
+    @Test
     public void testRibbonBar()
     {
-        goToAdminConsole().clickSiteSettings();
-        waitForElement(Locator.name("showRibbonMessage"));
-        Locator.name("ribbonMessage").findElement(getDriver()).clear();
-
-        WebElement checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setRibbonMessage(null);
 
         //only select if not already checked
-        if (!("true".equals(checkbox.getAttribute("checked"))))
-            click(Locator.checkboxByName("showRibbonMessage"));
+        if (!customizeSitePage.isShowRibbonMessage())
+            customizeSitePage.setShowRibbonMessage(true);
 
-        clickButton("Save");
+        customizeSitePage.save();
 
         waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message without providing a message to show')]"));
 
         String linkText = "and also click this...";
         String html = "READ ME!!!  <a href='<%=contextPath%>" + "/home/project-begin.view'>" + linkText + "</a>";
 
+        customizeSitePage = new CustomizeSitePage(getDriver());
         //only check if not already checked
-        checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
-        if (!("true".equals(checkbox.getAttribute("checked"))))
-            click(Locator.checkboxByName("showRibbonMessage"));
+        if (!customizeSitePage.isShowRibbonMessage())
+            customizeSitePage.setShowRibbonMessage(true);
 
-        setFormElement(Locator.name("ribbonMessage"), html);
-        clickButton("Save");
+        customizeSitePage.setRibbonMessage(html).save();
 
         Locator ribbon = Locator.tagWithClass("div", "alert alert-warning").containing("READ ME!!!");
         waitForElement(ribbon);
@@ -93,10 +158,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent(ribbonLink);
         stopImpersonating();
 
-        goToAdminConsole().clickSiteSettings();
-        waitForElement(Locator.name("showRibbonMessage"));
-        click(Locator.checkboxByName("showRibbonMessage"));
-        clickButton("Save");
+        customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setShowRibbonMessage(false).save();
         assertElementNotPresent(ribbon);
         assertElementNotPresent(ribbonLink);
     }
@@ -171,7 +234,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         //authentication
         LoginConfigurePage configurePage = goToAdminConsole().clickAuthentication();
         List<LoginConfigRow> configRows = configurePage.getPrimaryConfigurations();
-        assertFalse("expect 'edit' links not to be available for auth configs", configRows.stream().anyMatch(a-> a.canEdit()));
+        assertFalse("expect 'edit' links not to be available for auth configs", configRows.stream().anyMatch(LoginConfigRow::canEdit));
         assertFalse("expect 'add configuration' menu to be absent for AppAdmin", configurePage.canAddConfiguration());
         clickButton("Done");
         assertElementPresent("expect to return to admin console", siteAdminLoc, 1);
@@ -209,14 +272,14 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent(Locator.css(".labkey-error").withText("External host name must not be blank."));
 
         log("Setting the host URL");
-        setFormElement(Locator.name("newExternalRedirectHost"), host);
+        setFormElement(Locator.name("newExternalHost"), host);
         clickButton("Save");
 
         log("Verifying url got added correctly");
         assertEquals(host, getFormElement(Locator.name("existingExternalHost1")));
 
         log("Verifying cannot be duplicate");
-        setFormElement(Locator.name("newExternalRedirectHost"), host);
+        setFormElement(Locator.name("newExternalHost"), host);
         clickButton("Save");
         assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
     }

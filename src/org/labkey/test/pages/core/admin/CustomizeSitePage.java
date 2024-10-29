@@ -165,6 +165,11 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
+    public boolean isShowRibbonMessage()
+    {
+        return elementCache().showRibbonMessage.get();
+    }
+
     public CustomizeSitePage setRibbonMessage(String html)
     {
         elementCache().ribbonMessage.set(html);
@@ -193,6 +198,17 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     {
         elementCache().XFrameOption.selectByValue(value.name());
         return this;
+    }
+
+    public CustomizeSitePage setEnableServerHttpHeader(boolean enable)
+    {
+        elementCache().enableServerHttpHeader.set(enable);
+        return this;
+    }
+
+    public boolean isEnableServerHttpHeader()
+    {
+        return elementCache().enableServerHttpHeader.get();
     }
 
     @Override
@@ -257,6 +273,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         // HTTP Security Settings
         protected final Select CSRFCheck = Select(Locator.id("CSRFCheck")).findWhenNeeded(this);
         protected final Select XFrameOption = Select(Locator.id("XFrameOption")).findWhenNeeded(this);
+        protected final Checkbox enableServerHttpHeader = Checkbox(Locator.id("includeServerHttpHeader")).findWhenNeeded(this);
     }
 
     public enum ReportingLevel
