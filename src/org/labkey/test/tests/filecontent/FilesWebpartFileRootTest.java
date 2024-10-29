@@ -30,6 +30,7 @@ import org.labkey.test.pages.files.CustomizeFilesWebPartPage;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,7 +51,8 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return "FilesWebpartFileRootProject";
+        // TODO: Add tricky characters
+        return "FilesWebpartFileRootProject";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @BeforeClass
@@ -78,9 +80,19 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     @Test
     public void testCustomFileRoot()
     {
+        String folderName = "Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        File testFile = TestFileUtils.getSampleData("fileTypes/sample.txt");
+
+        _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
+        _fileBrowserHelper.uploadFile(testFile);
+
         portalHelper.clickWebpartMenuItem("Files", true, "Customize");
         CustomizeFilesWebPartPage customizePage = new CustomizeFilesWebPartPage(getDriver());
         Assert.assertEquals("Default webpart file root should be set at @files", "@files", customizePage.getFileRoot());
+        customizePage.setFileRoot("@files", folderName);
+        _fileBrowserHelper.selectFileBrowserRoot();
+        Assert.assertEquals("File in custom file root", List.of(testFile.getName()), _fileBrowserHelper.getFileList());
 
         goToProjectHome();
 

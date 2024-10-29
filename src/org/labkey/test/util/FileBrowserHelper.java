@@ -49,6 +49,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.Locators.pageSignal;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
@@ -56,7 +57,7 @@ import static org.labkey.test.components.ext4.Window.Window;
 public class FileBrowserHelper extends WebDriverWrapper
 {
     private static final String IMPORT_SIGNAL_NAME = "import-actions-updated";
-    private static final String FILE_LIST_SIGNAL_NAME = "file-list-updated";
+    public static final String FILE_LIST_SIGNAL_NAME = "file-list-updated";
 
     public static final String ABSOLUTE_FILE_PATH_COLUMN_ID = "10";
     private static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
@@ -805,10 +806,15 @@ public class FileBrowserHelper extends WebDriverWrapper
      */
     public int waitForFileGridReady()
     {
-        waitForElement(org.labkey.test.Locators.pageSignal(IMPORT_SIGNAL_NAME));
-        String signalValue = waitForElement(org.labkey.test.Locators.pageSignal(FILE_LIST_SIGNAL_NAME)).getAttribute("value");
+        String signalValue = waitForBrowserSignals();
         waitForGrid();
         return Integer.parseInt(signalValue);
+    }
+
+    public String waitForBrowserSignals()
+    {
+        waitForElement(pageSignal(IMPORT_SIGNAL_NAME));
+        return waitForElement(pageSignal(FILE_LIST_SIGNAL_NAME)).getAttribute("value");
     }
 
     public void openFolderTree()
@@ -827,7 +833,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    private static String encodeFileNodeIdPart(String rawIdPart)
+    public static String encodeFileNodeIdPart(String rawIdPart)
     {
         return URLEncoder.encode(rawIdPart, StandardCharsets.UTF_8).replace("+", "%20");
     }
