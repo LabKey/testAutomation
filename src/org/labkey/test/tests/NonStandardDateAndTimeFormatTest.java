@@ -10,6 +10,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -100,6 +101,22 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         ((NonStandardDateAndTimeFormatTest) getCurrentTest()).resetSiteSettings();
     }
 
+    @Override
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+
+        super.doCleanup(afterTest);
+
+        try
+        {
+            ((NonStandardDateAndTimeFormatTest) getCurrentTest()).resetSiteSettings();
+        }
+        catch (IOException | CommandException rethrow)
+        {
+            throw new RuntimeException(rethrow);
+        }
+    }
+
     private void resetSiteSettings() throws IOException, CommandException
     {
         log("Reset site settings.");
@@ -150,7 +167,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         checker().verifyFalse("DateTime format field should not be shown as inherited.",
                 projectSettingsPage.getDefaultDateDisplayInherited());
 
-        log("Check that the values in the fields are as expected.");
+        log("Check that the format and warnings in the designer are as expected.");
 
         checker().verifyEquals("Format of Default Date is not as expected.",
                 PROJECT_DATE_FORMAT, projectSettingsPage.getDefaultDateDisplay());
@@ -229,7 +246,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 new FieldDefinition(dateTimeCol02, FieldDefinition.ColumnType.DateAndTime).setFormat(String.format("%s %s", nsTimeFormat02, nsDateFormat02))
         );
 
-        createListByAPI(listFormat, listFields);
+        createListByAPI(getProjectName(), listFormat, listFields);
 
         log(String.format("Create a second list named '%s' that inherits formats from the project.", listInherit));
 
@@ -239,7 +256,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 new FieldDefinition(dateTimeCol01, FieldDefinition.ColumnType.DateAndTime)
         );
 
-        createListByAPI(listInherit, listFields);
+        createListByAPI(getProjectName(), listInherit, listFields);
 
         log(String.format("Validate the design and data of list '%s' (does not inherit formats).", listFormat));
         goToProjectHome();
@@ -379,7 +396,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime).setFormat(String.format("%s %s", nsDateFormat, nsTimeFormat))
         );
 
-        createListByAPI(listEdit, listFields);
+        createListByAPI(getProjectName(), listEdit, listFields);
 
         log("Check that Site Validation tags the fields in the list.");
 
@@ -465,19 +482,6 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
-    // Private helper that will create a list through the APIs. This allows the list to have non-standard formats.
-    private void createListByAPI(String listName, List<FieldDefinition> fields) throws IOException, CommandException
-    {
-        Connection connection = createDefaultConnection();
-        ListDefinition listDef = new IntListDefinition(listName, "Key");
-        for(FieldDefinition field : fields)
-        {
-            listDef.addField(field);
-        }
-
-        listDef.create(connection, getProjectName());
-    }
-
     /**
      * <p>
      *     Validate non-standard Date, Time and DateTime formats in a DataClass
@@ -515,13 +519,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         log(String.format("Create a Data Class named '%s' with non-standard format fields.", dcFormat));
 
-        DataClassDefinition dataClass = new DataClassDefinition(dcFormat);
-        for(FieldDefinition field : fields)
-        {
-            dataClass.addField(field);
-        }
-
-        dataClass.create(createDefaultConnection(), getProjectName());
+        createDataClass(getProjectName(), dcFormat, fields);
 
         fields = List.of(
                 new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
@@ -531,18 +529,9 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         log(String.format("Create a Data Class named '%s' that inherits non-standard format fields from the project.", dcFormat));
 
-        dataClass = new DataClassDefinition(dcInherit);
-        for(FieldDefinition field : fields)
-        {
-            dataClass.addField(field);
-        }
-
-        dataClass.create(createDefaultConnection(), getProjectName());
+        createDataClass(getProjectName(), dcInherit, fields);
 
         log("Add some data to both data classes as a sanity validation of the formats.");
-
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(dcFormat));
 
         String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
                 + "A\t12/23/24 14:45\t12/23/24\t14:45\n";
@@ -557,18 +546,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 dateCol, "23/12/24",
                 timeCol, "2:45:0 PM -0800", "Flag", "");
 
-        DataRegionTable dataTable = new DataRegionTable("query", getDriver());
-        dataTable.clickImportBulkData()
-                .setText(bulkData);
-        clickButton("Submit");
-
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(dcInherit));
-
-        dataTable = new DataRegionTable("query", getDriver());
-        dataTable.clickImportBulkData()
-                .setText(bulkData);
-        clickButton("Submit");
+        populateDataClass(getProjectName(), dcFormat, bulkData);
+        populateDataClass(getProjectName(), dcInherit, bulkData);
 
         log(String.format("Validate domain designer feedback for '%s'.", dcFormat));
 
@@ -594,7 +573,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         log("Validate the data (make sure we still respect non-standard formats).");
 
-        dataTable = new DataRegionTable("query", getDriver());
+        DataRegionTable dataTable = new DataRegionTable("query", getDriver());
         Map<String, String> actualData = dataTable.getRowDataAsMap(0);
         checker().verifyEquals("Data with formatted fields is not as expected.",
                 expectedFormatData, actualData);
@@ -636,6 +615,132 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         actualData = dataTable.getRowDataAsMap(0);
         checker().verifyEquals("Data with inherited fields is not as expected.",
                 expectedInheritedData, actualData);
+
+    }
+
+    @Test
+    public void testChildFolder() throws IOException, CommandException
+    {
+
+        String folderProject = "Non-Standard Sub-Folder Test";
+        String subFolder = "SubFolder_01";
+        String subFolderPath = folderProject + "/" + subFolder;
+
+        String dcInParent = "DC In Parent Folder";
+        String dcInChild = "DC In Child Folder";
+        String dateCol = "Date";
+        String timeCol = "Time";
+        String dateTimeCol = "DateTime";
+
+        log(String.format("Create a project '%s' with standard formatting.", folderProject));
+
+        _containerHelper.deleteProject(folderProject, false);
+        _containerHelper.createProject(folderProject, null);
+
+        // Use the API to set the formats for the project.
+//        new APIContainerHelper(this)
+//                .setDateAndTimeFormats(createDefaultConnection(), folderProject,
+//                        DATE_FORMAT.Default.toString(), TIME_FORMAT.Default.toString(), String.format("%s %s", DATE_FORMAT.Default, TIME_FORMAT.DTDefault));
+
+        log(String.format("Create a child folder '%s'.", folderProject));
+        _containerHelper.createSubfolder(folderProject, subFolder);
+
+        // Use the API to set the formats for the project.
+//        new APIContainerHelper(this)
+//                .setDateAndTimeFormats(createDefaultConnection(), subFolderPath,
+//                        DATE_FORMAT.Default.toString(), TIME_FORMAT.Default.toString(), String.format("%s %s", DATE_FORMAT.Default, TIME_FORMAT.DTDefault));
+
+        log(String.format("In the parent folder create a DataClass named '%s' with various Date, Time and DateTime columns some with non-standard formatting.", dcInParent));
+
+        goToProjectHome(folderProject);
+        _portalHelper.addWebPart("Data Classes");
+
+        List<FieldDefinition> fields = List.of(
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime)
+        );
+
+        createDataClass(folderProject, dcInParent, fields);
+
+        log("Add data to use for format validation.");
+        String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
+                + "P1\t12/23/24 14:45\t12/23/24\t14:45\n";
+
+        populateDataClass(folderProject, dcInParent, bulkData);
+
+        log(String.format("In the child folder '%s' create a DataClass named '%s' with various Date, Time and DateTime columns.", subFolder, dcInChild));
+
+        navigateToFolder(folderProject, subFolder);
+        _portalHelper.addWebPart("Data Classes");
+
+        fields = List.of(
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime)
+        );
+
+        createDataClass(subFolderPath, dcInChild, fields);
+
+        log("Add data to DataClass created in the subfolder as validation.");
+
+        bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
+                + "C1\t11/28/24 11:11\t11/28/24\t11:11\n";
+
+        populateDataClass(subFolderPath, dcInChild, bulkData);
+
+        log("In the subfolder add data to DataClass in the parent folder as validation.");
+
+        populateDataClass(subFolderPath, dcInParent, bulkData);
+
+        String nsDateFormat = "MMMM dd, yyyy";
+        String nsTimeFormat = "hh:mm a";
+
+        // Change the site setting to be non-standard and validate inheritance.
+        goToProjectSettings();
+        new APIContainerHelper(this)
+                .setDateAndTimeFormats(createDefaultConnection(), "/",
+                        nsDateFormat, nsTimeFormat, String.format("%s %s", nsDateFormat, nsTimeFormat));
+
+    }
+
+    // Private helper that will create a list through the APIs. This allows the list to have non-standard formats.
+    private void createListByAPI(String path, String listName, List<FieldDefinition> fields) throws IOException, CommandException
+    {
+        Connection connection = createDefaultConnection();
+        ListDefinition listDef = new IntListDefinition(listName, "Key");
+        for(FieldDefinition field : fields)
+        {
+            listDef.addField(field);
+        }
+
+        listDef.create(connection, path);
+    }
+
+    private void createDataClass(String path, String dcName, List<FieldDefinition> fields) throws IOException, CommandException
+    {
+        log(String.format("Create a Data Class named '%s' in '%s'.", dcName, path));
+
+        DataClassDefinition dataClass = new DataClassDefinition(dcName);
+        for(FieldDefinition field : fields)
+        {
+            dataClass.addField(field);
+        }
+
+        dataClass.create(createDefaultConnection(), path);
+
+    }
+
+    private void populateDataClass(String path, String dcName, String importData)
+    {
+        goToProjectHome(path);
+        clickAndWait(Locator.linkWithText(dcName));
+
+        DataRegionTable dataTable = new DataRegionTable("query", getDriver());
+        dataTable.clickImportBulkData()
+                .setText(importData);
+
+        clickButton("Submit");
 
     }
 
