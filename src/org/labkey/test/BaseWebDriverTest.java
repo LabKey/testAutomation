@@ -94,7 +94,6 @@ import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -323,22 +322,27 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     private void initWebDriverTimeoutsAndSize()
     {
+        TestLogger.debug("set script timeout");
         getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
-        TestLogger.info("script timeout set");
+        TestLogger.debug("page load timeout set");
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
-        TestLogger.info("page load timeout set");
-        try
-        {
-            getDriver().manage().window().setSize(new Dimension(TestProperties.getBrowserWidth(), TestProperties.getBrowserHeight()));
-            TestLogger.info("size set");
-        }
-        catch (WebDriverException ex)
-        {
-            // Ignore occasional error from attempting to resize maximized window
-            if (!ex.getMessage().contains("current state is maximized"))
-                throw ex;
-            TestLogger.info("failed to set window size");
-        }
+
+        TestProperties.getWindowSize().ifPresent(dimension -> {
+            try
+            {
+                TestLogger.info("set window size");
+                getDriver().manage().window().setSize(dimension);
+            }
+            catch (WebDriverException ex)
+            {
+                TestLogger.debug("failed to set window size");
+                // Ignore occasional error from attempting to resize maximized window
+                if (!ex.getMessage().contains("current state is maximized"))
+                {
+                    throw ex;
+                }
+            }
+        });
     }
 
     /**
