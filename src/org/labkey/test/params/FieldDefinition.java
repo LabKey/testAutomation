@@ -219,6 +219,12 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public FieldDefinition setValueExpression(String valueExpression)
+    {
+        setFieldProperty("valueExpression", valueExpression);
+        return this;
+    }
+
     public Integer getScale()
     {
         return (Integer) getFieldProperty("scale");

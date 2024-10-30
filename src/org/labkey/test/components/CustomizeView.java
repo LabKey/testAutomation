@@ -735,6 +735,11 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         return "on".equals(fieldRow.getAttribute("unselectable"));
     }
 
+    public WebElement getColumn(String fieldKey)
+    {
+        return expandPivots(fieldKey.split("/"));
+    }
+
     /** Check that a column is present and not hidden. Assumes that the 'show hidden columns' is unchecked. */
     public boolean isColumnVisible(String fieldKey)
     {
