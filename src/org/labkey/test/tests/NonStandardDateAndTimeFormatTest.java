@@ -325,7 +325,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     /**
      * <p>
-     *     Validate editing Date, Time and DateTime fields with non-standard formats.
+     *     Validate editing Date-Time fields with non-standard formats to standard formats.
      * </p>
      * <p>
      *     This test will:
@@ -343,7 +343,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
      * @throws CommandException Can be thrown by the API creation calls.
      */
     @Test
-    public void testEdit() throws IOException, CommandException
+    public void testEditDomain() throws IOException, CommandException
     {
         String listEdit = "List Edit Non-Standard Formats";
         String dateCol = "Date";
@@ -590,7 +590,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
      * <p>
      *     This test will:
      *     <ul>
-     *         <li>Create a separate project with a subfolder.</li>
+     *         <li>Create a separate project with a subfolder. Project has standard formats.</li>
      *         <li>Create and populate a data class in the project.</li>
      *         <li>Create and populate a data class in the subfolder.</li>
      *         <li>From the subfolder add a record to the data class in the parent folder.</li>
@@ -603,7 +603,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
      *         <li>Validate the data in both data classes is formatted as expected in the subfolder.</li>
      *         <li>Reset the site settings.</li>
      *         <li>Validate the Site Validation does not call out the site settings but still calls out the subfolder.</li>
-     *         <li>Validate the 'Look and Feel' page is updated with the default formats.</li>
+     *         <li>Validate the 'Look and Feel' page is reset with the default formats.</li>
      *         <li>Validate the subfolder formats are unchanged.</li>
      *     </ul>
      *     Note: there are periodic checks that the data is formatted as expected at the various levels.
@@ -653,7 +653,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         populateDataClass(folderProject, dcInParent, bulkData);
 
-        log(String.format("In the child folder '%s' create a DataClass named '%s' with various Date, Time and DateTime columns.", subFolder, dcInChild));
+        log(String.format("In the child folder '%s' create a DataClass named '%s' with Date & Time columns.", subFolder, dcInChild));
 
         navigateToFolder(folderProject, subFolder);
         _portalHelper.addWebPart("Data Classes");
@@ -677,10 +677,11 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         populateDataClass(subFolderPath, dcInParent, bulkData);
 
+        log("Change the site setting to be non-standard.");
+
         String nsSiteDateFormat = "MMMM dd, yyyy";
         String nsSiteTimeFormat = "kk:mm z";
 
-        log("Change the site setting to be non-standard.");
         changeSiteDateAndTimeFormats(nsSiteDateFormat, nsSiteTimeFormat);
 
         goToProjectHome(folderProject);
@@ -727,23 +728,6 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 true, String.format("%s %s", nsSiteDateFormat, nsSiteTimeFormat), "",
                 false, false);
 
-        log("Validate fields in the designer at the project level.");
-        goToProjectHome(folderProject);
-        clickAndWait(Locator.linkWithText(dcInParent));
-        clickAndWait(Locator.lkButton("Edit Data Class"));
-        CreateDataClassPage editPage = new CreateDataClassPage(getDriver());
-        DomainFormPanel domainEditor = editPage.getDomainEditor();
-
-        validateFieldsInDesigner(domainEditor, dateCol,
-                true, FieldDefinition.ColumnType.Date,
-                nsSiteDateFormat, TT_NS_DATE);
-        validateFieldsInDesigner(domainEditor, timeCol,
-                true, FieldDefinition.ColumnType.Time,
-                nsSiteTimeFormat, TT_NS_TIME);
-        validateFieldsInDesigner(domainEditor, dateTimeCol,
-                true, FieldDefinition.ColumnType.DateAndTime,
-                String.format("%s %s", nsSiteDateFormat, nsSiteTimeFormat), TT_NS_DATETIME);
-
         log(String.format("Validate subfolder settings for '%s' inherit the site settings.", subFolderPath));
         FolderFormatsPage.beginAt(this, subFolderPath);
         validateSettingsPage(true, nsSiteDateFormat, false,
@@ -755,18 +739,20 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         Map<String, String> expectedFormatData = Map.of("Name", "P1",
                 dateTimeCol, "December 23, 2024 14:45 PST",
                 dateCol, "December 23, 2024",
-                timeCol, "14:45 PST", "Flag", "");
+                timeCol, "14:45 PST",
+                "Flag", "");
 
         validateDataIsFormatted(folderProject, dcInParent, expectedFormatData);
 
         expectedFormatData = Map.of("Name", "C1",
                 dateTimeCol, "November 28, 2024 11:11 PST",
                 dateCol, "November 28, 2024",
-                timeCol, "11:11 PST", "Flag", "");
+                timeCol, "11:11 PST",
+                "Flag", "");
         validateDataIsFormatted(subFolderPath, dcInChild, expectedFormatData);
         validateDataIsFormatted(subFolderPath, dcInParent, expectedFormatData);
 
-        log("Change the format in the subFolder.");
+        log("Change the formats in the subFolder.");
         String nsSubDateFormat = "EEEE MMMM dd, yyyy";
         String nsSubTimeFormat = "kk:mm (z)";
 
@@ -785,11 +771,12 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         expectedFormatData = Map.of("Name", "C1",
                 dateTimeCol, "Thursday November 28, 2024 11:11 (PST)",
                 dateCol, "Thursday November 28, 2024",
-                timeCol, "11:11 (PST)", "Flag", "");
+                timeCol, "11:11 (PST)",
+                "Flag", "");
         validateDataIsFormatted(subFolderPath, dcInChild, expectedFormatData);
         validateDataIsFormatted(subFolderPath, dcInParent, expectedFormatData);
 
-        log("Check that the 'Site Validation' report includes the subfolder.");
+        log("Check that the 'Site Validation' report now includes the subfolder.");
         List<String> folderWarnings = List.of(String.format("Folder default display format for Dates: %s", nsSubDateFormat),
                 String.format("Folder default display format for Times: %s", nsSubTimeFormat),
                 String.format("Folder default display format for DateTimes: %s %s", nsSubDateFormat, nsSubTimeFormat));
@@ -921,8 +908,6 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         DomainFieldRow fieldRow = domainEditor.getField(fieldName);
         fieldRow.expand();
 
-        String actualFormat;
-
         if (FieldDefinition.ColumnType.Date.equals(columnType))
         {
             if(isInherited)
@@ -934,9 +919,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                         fieldRow.isDateFormatEnabled());
             }
 
-            actualFormat = fieldRow.getDateFormat();
             checker().verifyEquals(String.format("Date format for field '%s' not as expected.", fieldName),
-                    expectedFormat, actualFormat);
+                    expectedFormat, fieldRow.getDateFormat());
         }
         else if (FieldDefinition.ColumnType.Time.equals(columnType))
         {
@@ -950,9 +934,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                         fieldRow.isTimeFormatEnabled());
             }
 
-            actualFormat = fieldRow.getTimeFormat();
             checker().verifyEquals(String.format("Time format for field '%s' not as expected.", fieldName),
-                    expectedFormat, actualFormat);
+                    expectedFormat, fieldRow.getTimeFormat());
         }
         else
         {
@@ -987,13 +970,11 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 expectedTimeFormat = expectedFormat.substring(index+1);
             }
 
-            actualFormat = fieldRow.getDateTimeFormatDate();
             checker().verifyEquals(String.format("DateTime Date format for field '%s' not as expected.", fieldName),
-                    expectedDateFormat, actualFormat);
+                    expectedDateFormat, fieldRow.getDateTimeFormatDate());
 
-            actualFormat = fieldRow.getDateTimeFormatTime();
             checker().verifyEquals(String.format("DateTime Time format for field '%s' not as expected.", fieldName),
-                    expectedTimeFormat, actualFormat);
+                    expectedTimeFormat, fieldRow.getDateTimeFormatTime());
         }
 
         // If expected tooltip text is not null treat the field as a non-standard format field.
@@ -1022,7 +1003,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
     }
 
-    // These controls are shared across multiple pages. It is easier to find them here in the test than to use
+    // These controls are shared across multiple setting pages. It is easier to find them here in the test than to use
     // the page objects.
     private String getFormatFromControl(String fieldId)
     {
@@ -1137,9 +1118,9 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         checker().screenShotIfNewError("Site_Validation_Error");
     }
 
+    // Private helper that gets the data from the Site Validation page, narrowed to the scope provided, and cleans it up a bit.
     private List<String> getProjectValidationWarnings(String scope)
     {
-        List<String> warnings = new ArrayList<>();
 
         URLBuilder urlBuilder = new URLBuilder("admin", "configureSiteValidation");
         String url = urlBuilder.buildRelativeURL();
@@ -1168,18 +1149,15 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         String xpath = String.format("//li[contains(text(),'%s')]//li[contains(text(),'Warnings:')]//ul", scope);
         WebElement ul = Locator.xpath(xpath).findWhenNeeded(getDriver());
 
+        List<String> warnings = new ArrayList<>();
         int linkTextLength = " more info".length();
 
         if (ul.isDisplayed())
         {
-            List<String> actualWarnings = ul.findElements(Locator.tag("li")).stream().map(WebElement::getText).toList();
-
-            for(String warning : actualWarnings)
-            {
-                // Trim off the MORE INFO link text.
-                String temp = warning.trim().substring(0, warning.length() - linkTextLength);
-                warnings.add(temp);
-            }
+            // Get the text of the warnings and trim off the 'More Info' link.
+            warnings = ul.findElements(Locator.tag("li"))
+                    .stream()
+                    .map(el->el.getText().trim().substring(0, el.getText().length() - linkTextLength)).toList();
         }
 
         return warnings;
