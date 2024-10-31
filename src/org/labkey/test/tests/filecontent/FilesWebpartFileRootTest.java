@@ -90,7 +90,6 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
         CustomizeFilesWebPartPage customizePage = new CustomizeFilesWebPartPage(getDriver());
         Assert.assertEquals("Default webpart file root should be set at @files", "@files", customizePage.getFileRoot());
         customizePage.setFileRoot("@files", folderName);
-        _fileBrowserHelper.selectFileBrowserRoot();
         Assert.assertEquals("File in custom file root", List.of(testFile.getName()), _fileBrowserHelper.getFileList());
 
         goToProjectHome();
