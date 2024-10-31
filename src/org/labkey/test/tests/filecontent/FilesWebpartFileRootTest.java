@@ -51,8 +51,7 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        // TODO: Add tricky characters
-        return "FilesWebpartFileRootProject";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        return "FilesWebpartFileRoot Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @BeforeClass
