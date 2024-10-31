@@ -183,7 +183,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultDateDisplay(DATE_FORMAT dateFormat)
     {
-        selectOptionByValue(elementCache().defaultDateFormat, dateFormat.format);
+        selectOptionByValue(elementCache().defaultDateFormat, dateFormat.toString());
     }
 
     public boolean defaultDateDisplayWarning()
@@ -204,7 +204,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultDateTimeDateDisplay(DATE_FORMAT dateFormat)
     {
-        selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.format);
+        selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.toString());
     }
 
     public boolean defaultDateTimeDateDisplayWarning()
@@ -219,7 +219,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultDateTimeTimeDisplay(TIME_FORMAT timeFormat)
     {
-        selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.format);
+        selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.toString());
     }
 
     public boolean defaultDateTimeTimeDisplayWarning()
@@ -234,7 +234,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultTimeDisplay(TIME_FORMAT timeFormat)
     {
-        selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.format);
+        selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.toString());
     }
 
     public boolean defaultTimeDisplayWarning()
@@ -305,6 +305,23 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         setFormElement(elementCache().altLoginPageTxt,loginPage);
     }
 
+    /**
+     * If the warning banner is present return the text otherwise return an empty string.
+     *
+     * @return Text in warning banner, empty string if no banner is present.
+     */
+    public String getFormatWarningMessage()
+    {
+        if (elementCache().formatWarningBanner.isDisplayed())
+        {
+            return elementCache().formatWarningBanner.getText();
+        }
+        else
+        {
+            return "";
+        }
+    }
+
     public void save()
     {
         clickAndWait(elementCache().saveBtn);
@@ -347,6 +364,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement defaultTimeFormat = Locator.id("defaultTimeFormat").findWhenNeeded(this);
         WebElement defaultDateTimeDateFormat = Locator.id("dateSelect").findWhenNeeded(this);
         WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
+        WebElement formatWarningBanner = Locator.tagWithId("div", "dateFormatWarning").findWhenNeeded(this);
 
         WebElement nonStandardWarning(WebElement field)
         {

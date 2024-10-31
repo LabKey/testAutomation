@@ -287,62 +287,12 @@ public class APIContainerHelper extends AbstractContainerHelper
                                                  @Nullable String dateTimeFormat) throws IOException, CommandException
     {
 
-        boolean isRootPath = containerPath.equals("/");
-
         JSONObject json = new JSONObject();
-
-        if (isRootPath)
-        {
-            json.put("dateParsingMode", "US");
-//            json.put("customWelcome", "null");
-            json.put("shouldInherit", false);
-//            json.put("systemDescription", null);
-            json.put("systemDescriptionInherited", false);
-            json.put("systemShortName", "LabKey Server");
-            json.put("systemShortNameInherited", false);
-            json.put("themeName", "Seattle");
-            json.put("themeNameInherited", false);
-            json.put("folderDisplayMode", "ALWAYS");
-            json.put("folderDisplayModeInherited", false);
-            json.put("applicationMenuDisplayMode", "ALWAYS");
-            json.put("applicationMenuDisplayModeInherited", false);
-            json.put("helpMenuEnabled", true);
-            json.put("helpMenuEnabledInherited", false);
-            json.put("discussionEnabled", true);
-            json.put("discussionEnabledInherited", false);
-            json.put("logoHref", "${contextPath}/home/project-start.view");
-            json.put("logoHrefInherited", false);
-            json.put("companyName", "Demo Installation");
-            json.put("companyNameInherited", false);
-            json.put("systemEmailAddress", "danield@labkey.com");
-            json.put("systemEmailAddressInherited", false);
-            json.put("reportAProblemPath", "${contextPath}/home/support/project-begin.view");
-            json.put("reportAProblemPathInherited", false);
-//            json.put("supportEmail", null);
-            json.put("supportEmailInherited", false);
-//            json.put("customLogin", null);
-            json.put("customLoginInherited", false);
-            json.put("defaultDateFormatInherited", false);
-            json.put("defaultDateTimeFormatInherited", false);
-            json.put("defaultTimeFormatInherited", false);
-//            json.put("defaultNumberFormat", null);
-            json.put("defaultNumberFormatInherited", false);
-//            json.put("extraDateParsingPattern", null);
-            json.put("extraDateParsingPatternInherited", false);
-//            json.put("extraDateTimeParsingPattern", null);
-            json.put("extraDateTimeParsingPatternInherited", false);
-//            json.put("extraTimeParsingPattern", null);
-            json.put("extraTimeParsingPatternInherited", false);
-            json.put("restrictedColumnsEnabled", false);
-            json.put("restrictedColumnsEnabledInherited", false);
-        }
 
         if(null != dateFormat)
         {
             json.put("defaultDateFormat", dateFormat);
-
-            if(!isRootPath)
-                json.put("defaultDateFormatInherited", false);
+            json.put("defaultDateFormatInherited", false);
         }
         else
         {
@@ -352,9 +302,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         if(null != timeFormat)
         {
             json.put("defaultTimeFormat", timeFormat);
-
-            if(!isRootPath)
-                json.put("defaultTimeFormatInherited", false);
+            json.put("defaultTimeFormatInherited", false);
         }
         else
         {
@@ -364,9 +312,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         if(null != dateTimeFormat)
         {
             json.put("defaultDateTimeFormat", dateTimeFormat);
-
-            if(!isRootPath)
-                json.put("defaultDateTimeFormatInherited", false);
+            json.put("defaultDateTimeFormatInherited", false);
         }
         else
         {
@@ -380,16 +326,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     public CommandResponse setDateAndTimeFormats(Connection connection, String containerPath, JSONObject json) throws IOException, CommandException
     {
 
-        String actionName;
-        if (containerPath.equals("/"))
-        {
-            actionName = "ProjectSettings";
-        }
-        else
-        {
-            actionName = "UpdateContainerSettings";
-        }
-        SimplePostCommand command = new SimplePostCommand("admin", actionName);
+        SimplePostCommand command = new SimplePostCommand("admin", "UpdateContainerSettings");
         command.setJsonObject(json);
 
         return command.execute(connection, containerPath);
