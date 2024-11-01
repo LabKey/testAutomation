@@ -75,7 +75,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
                 BrowserAction.AUDIT_HISTORY,
-                BrowserAction.ADMIN)
+                BrowserAction.ADMIN,
+                BrowserAction.CREATE_RUN)
         );
 
         // All icons are present by default
@@ -106,7 +107,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.EDIT_PROPERTIES,
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
-                BrowserAction.EMAIL_SETTINGS
+                BrowserAction.EMAIL_SETTINGS,
+                BrowserAction.CREATE_RUN
         );
 
         stopImpersonatingRole();
@@ -126,7 +128,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.EDIT_PROPERTIES,
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
-                BrowserAction.EMAIL_SETTINGS
+                BrowserAction.EMAIL_SETTINGS,
+                BrowserAction.CREATE_RUN
         );
 
         stopImpersonatingRole();
@@ -146,7 +149,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.EDIT_PROPERTIES,
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
-                BrowserAction.EMAIL_SETTINGS
+                BrowserAction.EMAIL_SETTINGS,
+                BrowserAction.CREATE_RUN
         );
 
         stopImpersonatingRole();
@@ -251,7 +255,10 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
     private void assertActionsAvailable(BrowserAction... actions)
     {
-        assertEquals(Arrays.asList(actions), _fileBrowserHelper.getAvailableBrowserActions());
+        Set<String> allModules = _containerHelper.getAllModules();
+        List<BrowserAction> expectedActions = Arrays.stream(actions)
+            .filter(action -> action.getRequiredModule() == null || allModules.contains(action.getRequiredModule())).toList();
+        assertEquals(expectedActions, _fileBrowserHelper.getAvailableBrowserActions());
     }
 
     private void resetToDefaultToolbar()

@@ -712,7 +712,13 @@ public class FileBrowserHelper extends WebDriverWrapper
         EMAIL_SETTINGS("envelope", "Email Preferences", "emailPreferences"),
         AUDIT_HISTORY("users", "Audit History", "auditLog", true),
         ADMIN("cog", "Admin", "customize"),
-        CREATE_RUN("sitemap", "Create Run", "createRun");
+        CREATE_RUN("sitemap", "Create Run", "createRun"){
+            @Override
+            public String getRequiredModule()
+            {
+                return null;
+            }
+        };
 
         private final String _iconName;
         private final String _buttonText;
@@ -770,6 +776,11 @@ public class FileBrowserHelper extends WebDriverWrapper
         public Locator getButtonTextLocator()
         {
             return button().containing(_buttonText);
+        }
+
+        public String getRequiredModule()
+        {
+            return "Core";
         }
     }
 
