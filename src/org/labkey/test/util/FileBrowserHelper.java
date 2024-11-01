@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
@@ -44,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -833,9 +835,24 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
+    // See PageFlowUtil.encodeURIComponent()
+    private static final Map<String, String> DECODE_UNRESERVED_MARKS = Map.of(
+        "!", "%21",
+        "~", "%7E",
+        "'", "%27",
+        "(", "%28",
+        ")", "%29"
+    );
+
+    // See PageFlowUtil.encodeURIComponent()
     public static String encodeFileNodeIdPart(String rawIdPart)
     {
-        return URLEncoder.encode(rawIdPart, StandardCharsets.UTF_8).replace("+", "%20");
+        String encoded = URLEncoder.encode(rawIdPart, StandardCharsets.UTF_8).replace("+", "%20");
+
+        for (var entry : DECODE_UNRESERVED_MARKS.entrySet())
+            encoded = StringUtils.replace(encoded, entry.getValue(), entry.getKey());
+
+        return encoded;
     }
 
     public static abstract class Locators
