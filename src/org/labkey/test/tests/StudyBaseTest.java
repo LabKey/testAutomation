@@ -27,6 +27,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
+import org.labkey.test.pages.compliance.FolderManagementComplianceTab;
 import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -107,6 +108,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         if (_studyHelper.isSpecimenModulePresent())
             _containerHelper.enableModule("Specimen");
         new ApiPermissionsHelper(this).checkInheritedPermissions();
+
+        if (_containerHelper.getAllModules().contains("compliance"))
+        {
+            FolderManagementComplianceTab.beginAt(this, getProjectName()).setPhiRolesRequired(true).save();
+            new ApiPermissionsHelper(getProjectName()).setUserPermissions(getCurrentUser(), "Restricted PHI Reader");
+            FolderManagementComplianceTab.beginAt(this, getProjectName() + "/" + getFolderName()).setPhiRolesRequired(true).save();
+        }
     }
 
     // Start importing the specimen archive. This can load in the background while executing the first set of
