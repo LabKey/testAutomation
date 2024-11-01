@@ -1008,6 +1008,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    @LogMethod
     protected void closeExtraWindows()
     {
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());

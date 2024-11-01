@@ -94,7 +94,6 @@ import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -309,26 +308,41 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doTearDown();
         }
 
-        SingletonWebDriver.getInstance().setUp(this);
+        SingletonWebDriver.getInstance().setUpWebDriver(this);
 
-        getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
-        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
-        try
-        {
-            getDriver().manage().window().setSize(new Dimension(TestProperties.getBrowserWidth(), TestProperties.getBrowserHeight()));
-        }
-        catch (WebDriverException ex)
-        {
-            // Ignore occasional error from attempting to resize maximized window
-            if (!ex.getMessage().contains("current state is maximized"))
-                throw ex;
-        }
+        initWebDriverTimeoutsAndSize();
         closeExtraWindows();
 
         if (!TestProperties.isCspCheckSkipped() && cspFailFast())
         {
             addPageLoadListener(_cspCheckPageLoadListener);
         }
+    }
+
+    @LogMethod
+    private void initWebDriverTimeoutsAndSize()
+    {
+        TestLogger.debug("set script timeout");
+        getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
+        TestLogger.debug("page load timeout set");
+        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
+
+        TestProperties.getWindowSize().ifPresent(dimension -> {
+            try
+            {
+                TestLogger.info("set window size");
+                getDriver().manage().window().setSize(dimension);
+            }
+            catch (WebDriverException ex)
+            {
+                TestLogger.debug("failed to set window size");
+                // Ignore occasional error from attempting to resize maximized window
+                if (!ex.getMessage().contains("current state is maximized"))
+                {
+                    throw ex;
+                }
+            }
+        });
     }
 
     /**
@@ -365,6 +379,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return BROWSER_TYPE;
     }
 
+    @LogMethod
     private static void doTearDown()
     {
         boolean closeWindow = !_testFailed || isRunWebDriverHeadless() || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
@@ -2766,7 +2781,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return _downloadDir;
         }
 
-        private void setUp(BaseWebDriverTest test)
+        @LogMethod
+        private void setUpWebDriver(BaseWebDriverTest test)
         {
             WebDriver oldWebDriver = getWebDriver();
             File newDownloadDir = new File(ArtifactCollector.ensureDumpDir(test.getClass().getSimpleName()), "downloads");

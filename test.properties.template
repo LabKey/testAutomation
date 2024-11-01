@@ -86,6 +86,8 @@ selenium.reuseWebDriver=true
 #webtest.webdriver.logging=false
 ## Run test browser in headless mode (experimental)
 #webtest.webdriver.headless=false
+## Customize browser window size
+#webtest.window.size=1280x1024
 
 
 #==============================================================================
