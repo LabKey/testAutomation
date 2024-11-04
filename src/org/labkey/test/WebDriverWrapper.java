@@ -403,6 +403,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (newWebDriver != null)
         {
+
+            Optional<Dimension> windowSize = TestProperties.getWindowSize();
+            if (windowSize.isPresent())
+            {
+                TestLogger.info("Set window size: " + windowSize.get());
+                newWebDriver.manage().window().setSize(windowSize.get());
+            }
+
             Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getBrowserVersion();

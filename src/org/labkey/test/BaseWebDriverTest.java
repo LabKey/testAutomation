@@ -310,7 +310,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         SingletonWebDriver.getInstance().setUpWebDriver(this);
 
-        initWebDriverTimeoutsAndSize();
+        initWebDriverTimeouts();
         closeExtraWindows();
 
         if (!TestProperties.isCspCheckSkipped() && cspFailFast())
@@ -320,29 +320,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    private void initWebDriverTimeoutsAndSize()
+    private void initWebDriverTimeouts()
     {
         TestLogger.debug("set script timeout");
         getDriver().manage().timeouts().scriptTimeout(Duration.ofMillis(WAIT_FOR_PAGE));
         TestLogger.debug("page load timeout set");
         getDriver().manage().timeouts().pageLoadTimeout(Duration.ofMillis(defaultWaitForPage));
-
-        TestProperties.getWindowSize().ifPresent(dimension -> {
-            try
-            {
-                TestLogger.info("set window size");
-                getDriver().manage().window().setSize(dimension);
-            }
-            catch (WebDriverException ex)
-            {
-                TestLogger.debug("failed to set window size");
-                // Ignore occasional error from attempting to resize maximized window
-                if (!ex.getMessage().contains("current state is maximized"))
-                {
-                    throw ex;
-                }
-            }
-        });
     }
 
     /**
