@@ -839,7 +839,6 @@ public class FileBrowserHelper extends WebDriverWrapper
     private static final Map<String, String> DECODE_UNRESERVED_MARKS = Map.of(
         "!", "%21",
         "~", "%7E",
-        "'", "%27",
         "(", "%28",
         ")", "%29"
     );
