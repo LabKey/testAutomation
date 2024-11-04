@@ -16,6 +16,7 @@
 package org.labkey.test.tests.filecontent;
 
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -80,7 +81,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         );
 
         // All icons are present by default
-        for (BrowserAction action : BrowserAction.values())
+        for (BrowserAction action : filterActionsForAvailableModules(BrowserAction.values()))
         {
             assertElementPresent(action.getButtonIconLocator());
             if (buttonsWithText.contains(action))
@@ -255,10 +256,15 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
     private void assertActionsAvailable(BrowserAction... actions)
     {
+        assertEquals(filterActionsForAvailableModules(actions), _fileBrowserHelper.getAvailableBrowserActions());
+    }
+
+    @NotNull
+    private List<BrowserAction> filterActionsForAvailableModules(BrowserAction[] actions)
+    {
         Set<String> allModules = _containerHelper.getAllModules();
-        List<BrowserAction> expectedActions = Arrays.stream(actions)
-            .filter(action -> action.getRequiredModule() == null || allModules.contains(action.getRequiredModule())).toList();
-        assertEquals(expectedActions, _fileBrowserHelper.getAvailableBrowserActions());
+        return Arrays.stream(actions)
+                .filter(action -> allModules.contains(action.getRequiredModule())).toList();
     }
 
     private void resetToDefaultToolbar()

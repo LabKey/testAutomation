@@ -716,7 +716,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             @Override
             public String getRequiredModule()
             {
-                return null;
+                return "Provenance";
             }
         };
 
