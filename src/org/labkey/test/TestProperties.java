@@ -186,8 +186,8 @@ public abstract class TestProperties
 
     public static Optional<Dimension> getWindowSize()
     {
-        String dimensionStr = System.getProperty("webtest.window.size");
-        if (dimensionStr != null)
+        String dimensionStr = System.getProperty("webtest.window.size", "1280x1024");
+        if (!dimensionStr.isEmpty())
         {
             String[] dimensionParts = dimensionStr.split("x", 2);
             int browserWidth = Integer.parseInt(dimensionParts[0]);
