@@ -16,6 +16,7 @@
 package org.labkey.test.tests.filecontent;
 
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -75,11 +76,12 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
                 BrowserAction.AUDIT_HISTORY,
-                BrowserAction.ADMIN)
+                BrowserAction.ADMIN,
+                BrowserAction.CREATE_RUN)
         );
 
         // All icons are present by default
-        for (BrowserAction action : BrowserAction.values())
+        for (BrowserAction action : filterActionsForAvailableModules(BrowserAction.values()))
         {
             assertElementPresent(action.getButtonIconLocator());
             if (buttonsWithText.contains(action))
@@ -106,7 +108,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.EDIT_PROPERTIES,
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
-                BrowserAction.EMAIL_SETTINGS
+                BrowserAction.EMAIL_SETTINGS,
+                BrowserAction.CREATE_RUN
         );
 
         stopImpersonatingRole();
@@ -126,7 +129,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.EDIT_PROPERTIES,
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
-                BrowserAction.EMAIL_SETTINGS
+                BrowserAction.EMAIL_SETTINGS,
+                BrowserAction.CREATE_RUN
         );
 
         stopImpersonatingRole();
@@ -146,7 +150,8 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
                 BrowserAction.EDIT_PROPERTIES,
                 BrowserAction.UPLOAD,
                 BrowserAction.IMPORT_DATA,
-                BrowserAction.EMAIL_SETTINGS
+                BrowserAction.EMAIL_SETTINGS,
+                BrowserAction.CREATE_RUN
         );
 
         stopImpersonatingRole();
@@ -251,7 +256,15 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
     private void assertActionsAvailable(BrowserAction... actions)
     {
-        assertEquals(Arrays.asList(actions), _fileBrowserHelper.getAvailableBrowserActions());
+        assertEquals(filterActionsForAvailableModules(actions), _fileBrowserHelper.getAvailableBrowserActions());
+    }
+
+    @NotNull
+    private List<BrowserAction> filterActionsForAvailableModules(BrowserAction[] actions)
+    {
+        Set<String> allModules = _containerHelper.getAllModules();
+        return Arrays.stream(actions)
+                .filter(action -> allModules.contains(action.getRequiredModule())).toList();
     }
 
     private void resetToDefaultToolbar()
