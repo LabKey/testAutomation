@@ -117,6 +117,22 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return parentEntityTypeSelect(label);
     }
 
+    public EntityInsertPanel addSource(String label, String sourceType)
+    {
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource));
+        elementCache().addSource.click();
+        getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
+        parentEntityTypeSelect(label).select(sourceType);
+        return this;
+    }
+
+    public ReactSelect getSourceSelect(String label)
+    {
+        if (ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findOptional(this).isEmpty())
+            elementCache().addSource.click();
+        return parentEntityTypeSelect(label);
+    }
+
     public EntityInsertPanel clearParents()
     {
         Locator loc = Locator.tagWithClass("span", "container--action-button")
@@ -423,6 +439,8 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     {
         WebElement addParent = Locator.tagWithClass("span", "container--action-button")
                 .containing("Parent").findWhenNeeded(getDriver());
+        WebElement addSource = Locator.tagWithClass("span", "container--action-button")
+                .containing("Source").findWhenNeeded(getDriver());
 
         RadioButton allowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "true")).findWhenNeeded(this);
         RadioButton notAllowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "false")).findWhenNeeded(this);
