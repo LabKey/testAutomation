@@ -114,6 +114,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
             FolderManagementComplianceTab.beginAt(this, getProjectName()).setPhiRolesRequired(true).save();
             new ApiPermissionsHelper(getProjectName()).setUserPermissions(getCurrentUser(), "Restricted PHI Reader");
             FolderManagementComplianceTab.beginAt(this, getProjectName() + "/" + getFolderName()).setPhiRolesRequired(true).save();
+            goToProjectFolder(getProjectName(), getFolderName());
         }
     }
 
