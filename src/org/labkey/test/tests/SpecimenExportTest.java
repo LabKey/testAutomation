@@ -129,7 +129,7 @@ public class SpecimenExportTest extends SpecimenBaseTest
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Use Pipeline");
         _fileBrowserHelper.selectFileBrowserItem("/export/");
-        waitAndClick(Locator.tag("tr").withClass("x4-grid-data-row").withAttributeContaining("data-recordid", "My Study_"));
+        waitAndClick(Locator.tag("tr").withClass("x4-grid-data-row").withAttributeContaining("data-recordid", "My%20Study_"));
         _fileBrowserHelper.selectImportDataAction("Import Folder");
         clickButton("Start Import"); // Validate queries page
         waitForPipelineJobsToComplete(2, "Folder import", false);
