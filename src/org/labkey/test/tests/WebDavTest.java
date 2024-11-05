@@ -67,7 +67,7 @@ public class WebDavTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "WebDavTest Project";
+        return "WebDavTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @BeforeClass

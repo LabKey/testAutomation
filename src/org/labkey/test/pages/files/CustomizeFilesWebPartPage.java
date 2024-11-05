@@ -18,10 +18,15 @@ package org.labkey.test.pages.files;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.util.FileBrowserHelper;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import static org.labkey.test.Locators.pageSignal;
+import static org.labkey.test.util.FileBrowserHelper.FILE_LIST_SIGNAL_NAME;
+import static org.labkey.test.util.FileBrowserHelper.encodeFileNodeIdPart;
 
 /**
  * Created by susanh on 9/20/17.
@@ -31,6 +36,7 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
     public CustomizeFilesWebPartPage(WebDriver driver)
     {
         super(driver);
+        waitForElement(pageSignal(FILE_LIST_SIGNAL_NAME));
     }
 
     public String getTitle()
@@ -51,12 +57,10 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
         return getText(selectedNodeLoc);
     }
 
-    public CustomizeFilesWebPartPage setFileRoot(String... nodeParts)
+    public void setFileRoot(String... nodeParts)
     {
         selectFileRoot(true, nodeParts);
         submit();
-        sleep(3000);
-        return this;
     }
 
     public CustomizeFilesWebPartPage selectFileRoot(boolean nodeExist, String... nodeParts)
@@ -64,26 +68,32 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
         if (isExtTreeNodeSelected(nodeParts[nodeParts.length - 1]))
             return this;
 
-        String nodeWithParents = "";
+        StringBuilder nodeId = new StringBuilder();
+        StringBuilder nodeWithParents = new StringBuilder();
         String separator = "";
         for (String node : nodeParts)
         {
-            nodeWithParents += separator + node;
-            separator = ".";
+            nodeWithParents.append(separator).append(node);
+            separator = "/";
 
-            Locator.XPathLocator loc = Locators.fileRootTreeNode(node);
+            nodeId.append(encodeFileNodeIdPart(node));
+            if (!node.isEmpty())
+            {
+                nodeId.append('/');
+            }
+            WebElement nodeEl = Locators.fileRootTreeNode(nodeId.toString()).findWhenNeeded(getDriver());
 
             if (!nodeExist)
             {
                 sleep(1000);
-                if (!isElementPresent(loc))
+                if (!nodeEl.isDisplayed())
                     return this;
             }
 
-            shortWait().until(ExpectedConditions.elementToBeClickable(loc));
+            shortWait().until(ExpectedConditions.elementToBeClickable(nodeEl));
             Locator.XPathLocator selectedNode = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(node);
 
-            if (isElementPresent(selectedNode))
+            if (nodeEl.getDomAttribute("class").contains("selected"))
                 continue; // already selected
 
             log("Selecting node " + nodeWithParents + " ...");
@@ -91,15 +101,15 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
             // select/expand tree node
             try
             {
-                scrollIntoView(loc);
+                scrollIntoView(nodeEl);
             }
-            catch (StaleElementReferenceException ignore)
+            catch (StaleElementReferenceException log)
             {
-                log(ignore.getMessage());
+                log(log.getMessage());
             }
 
-            click(loc);
-            waitForElement(selectedNode, 2000);
+            doAndWaitForPageSignal(nodeEl::click, FILE_LIST_SIGNAL_NAME);
+            waitFor(() -> nodeEl.getDomAttribute("class").contains("selected"), "Node note selected: " + nodeWithParents, 2000);
         }
 
         if (!nodeExist)
@@ -108,10 +118,10 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
         return this;
     }
 
-    public CustomizeFilesWebPartPage submit()
+    public void submit()
     {
         clickAndWait(elementCache().submitButton);
-        return new CustomizeFilesWebPartPage(getDriver());
+        new FileBrowserHelper(this).waitForFileGridReady();
     }
 
     public void verifyFileRootNodePresent(String... nodeParts)
@@ -130,17 +140,18 @@ public class CustomizeFilesWebPartPage extends LabKeyPage<CustomizeFilesWebPartP
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
     {
-        protected WebElement title = new LazyWebElement(Locator.tagWithName("input", "title"), this);
+        protected WebElement title = new LazyWebElement<>(Locator.tagWithName("input", "title"), this);
         protected WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
     }
 
     public static class Locators
     {
-        public static Locator.XPathLocator fileRootTreeNode(String nodeName)
+        public static Locator.XPathLocator fileRootTreeNode(String nodeId)
         {
-            return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(nodeName);
+            Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
+            return fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
         }
     }
 }

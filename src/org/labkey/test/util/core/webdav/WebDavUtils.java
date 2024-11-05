@@ -19,6 +19,7 @@ import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.URIUtil;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
@@ -65,7 +66,7 @@ public class WebDavUtils
     public static String buildBaseWebDavUrl(String containerPath, String webDavDir)
     {
         return WebTestHelper.getBaseURL() + "/_webdav/"
-                + StringUtils.strip(containerPath, "/").replace(" ", "%20") + "/"
+                + URIUtil.encodePath(StringUtils.strip(containerPath, "/")) + "/"
                 + StringUtils.strip(webDavDir, "/") + "/";
     }
 
@@ -77,7 +78,7 @@ public class WebDavUtils
     public static String buildBaseWebfilesUrl(String containerPath)
     {
         return WebTestHelper.getBaseURL() + "/_webfiles/"
-                + StringUtils.strip(containerPath, "/").replace(" ", "%20") + "/";
+                + URIUtil.encodePath(StringUtils.strip(containerPath, "/")) + "/";
     }
 
     @LogMethod
