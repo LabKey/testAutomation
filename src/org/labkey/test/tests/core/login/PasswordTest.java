@@ -58,6 +58,8 @@ public class PasswordTest extends BaseWebDriverTest
 {
     private static final String USER = "user_passwordtest@password.test";
 
+    private int _userId;
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -83,7 +85,7 @@ public class PasswordTest extends BaseWebDriverTest
     public void resetUser()
     {
         _userHelper.deleteUsers(false, USER);
-        _userHelper.createUser(USER);
+        _userId = _userHelper.createUser(USER).getUserId();
     }
 
     @Test
@@ -121,7 +123,7 @@ public class PasswordTest extends BaseWebDriverTest
                 PasswordStrength.Strong,
                 PasswordExpiration.Never);
 
-        SetPasswordForm setPasswordForm = SetPasswordForm.goToInitialPasswordForUser(this, USER);
+        SetPasswordForm setPasswordForm = SetPasswordForm.goToInitialPasswordForUser(this, _userId);
         log("Verify strength gauge for 'SetPasswordAction'");
         setPasswordForm.verifyPasswordStrengthGauge(USER);
 
@@ -344,7 +346,7 @@ public class PasswordTest extends BaseWebDriverTest
 
     protected String setInitialPassword(String user, String password)
     {
-        SetPasswordForm.goToInitialPasswordForUser(this, user)
+        SetPasswordForm.goToInitialPasswordForUser(this, _userId)
                 .setNewPassword(password)
                 .clickSubmit();
 

@@ -412,12 +412,18 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 
-    protected String setInitialPassword(String user)
+    @Deprecated // TODO: Call the variant that takes a userId instead
+    protected String setInitialPassword(String email)
+    {
+        return setInitialPassword(_userHelper.getUserId(email));
+    }
+
+    protected String setInitialPassword(int userId)
     {
         String password = PasswordUtil.getPassword();
-        SetPasswordForm.goToInitialPasswordForUser(this, user)
-                .setNewPassword(password)
-                .clickSubmit();
+        SetPasswordForm.goToInitialPasswordForUser(this, userId)
+            .setNewPassword(password)
+            .clickSubmit();
 
         return password;
     }

@@ -49,6 +49,7 @@ import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.components.CustomizeView;
@@ -1946,15 +1947,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     /**
      * Create a user with the specified permissions for the specified project
      */
-    public void createUserWithPermissions(String userName, String projectName, String permissions)
+    public CreateUserResponse createUserWithPermissions(String userName, String projectName, String permissions)
     {
         if (projectName == null)
         {
             projectName = getProjectName();
         }
-        _userHelper.createUser(userName, true);
+        CreateUserResponse ret = _userHelper.createUser(userName, true);
         new ApiPermissionsHelper(this)
                 .addMemberToRole(userName, permissions, PermissionsHelper.MemberType.user, projectName);
+
+        return ret;
     }
 
     public ApiPermissionsHelper createSiteDeveloper(String userEmail)
