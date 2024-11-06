@@ -150,6 +150,13 @@ public class FieldDefinition extends PropertyDescriptor
     }
 
     @Override
+    public FieldDefinition setMeasure(Boolean measure)
+    {
+        super.setMeasure(measure);
+        return this;
+    }
+
+    @Override
     public FieldDefinition setHidden(Boolean hidden)
     {
         super.setHidden(hidden);
