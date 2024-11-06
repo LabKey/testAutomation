@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.Dimension;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -180,14 +182,20 @@ public abstract class TestProperties
         return System.getProperty("cloud.pipeline.bucket");
     }
 
-    public static int getBrowserWidth()
+    public static Optional<Dimension> getWindowSize()
     {
-        return getIntegerProperty("webtest.browser.width", 1280);
-    }
-
-    public static int getBrowserHeight()
-    {
-        return getIntegerProperty("webtest.browser.height", 1024);
+        String dimensionStr = System.getProperty("webtest.window.size", "1280x1024");
+        if (!dimensionStr.isEmpty())
+        {
+            String[] dimensionParts = dimensionStr.split("x", 2);
+            int browserWidth = Integer.parseInt(dimensionParts[0]);
+            int browserHeight = Integer.parseInt(dimensionParts[1]);
+            return Optional.of(new Dimension(browserWidth, browserHeight));
+        }
+        else
+        {
+            return Optional.empty();
+        }
     }
 
     public static boolean isWebDriverLoggingEnabled()
