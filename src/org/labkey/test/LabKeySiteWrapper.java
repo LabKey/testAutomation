@@ -608,8 +608,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             refresh(); // Clear form
 
             log("Testing bad email addresses");
-            verifyInitialUserError(null, null, null, "Invalid email address");
-            verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
+            verifyInitialUserError(null, null, null, "email: '' is not a valid email address. Please enter an email address in this form: user@domain.tld");
+            verifyInitialUserError("bogus@bogus@bogus", null, null, "email: 'bogus@bogus@bogus' is not a valid email address. Please enter an email address in this form: user@domain.tld");
+            // In the past, email address was getting double encoded
+            verifyInitialUserError("<>\"&%", null, null, "email: '<>\"&%' is not a valid email address. Please enter an email address in this form: user@domain.tld");
 
             log("Testing bad passwords");
             verifyInitialUserError(email, null, null, "You must enter a password.");
