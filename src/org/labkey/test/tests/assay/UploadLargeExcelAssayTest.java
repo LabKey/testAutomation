@@ -112,7 +112,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         clickButton("Save and Finish");
 
         // wait for import complete
-        waitForPipelineJobsToFinish(1);
+        waitForPipelineJobsToComplete(1, "200k", false);
 
         // export assay1 data to excel
         log("exporting samples fields to excel");
@@ -133,7 +133,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         setFormElement(Locator.input("__primaryFile__"), largeExportExcelFile);
         clickButton("Save and Finish");
 
-        waitForPipelineJobsToFinish(2);
+        waitForPipelineJobsToComplete(2, "200k take 2", false);
 
         var qPage = SourceQueryPage.beginAt(this, getProjectName(), "assay.General.large_assay_2", "Data");
         var dataregion  = qPage.viewData(Duration.ofSeconds(60));
