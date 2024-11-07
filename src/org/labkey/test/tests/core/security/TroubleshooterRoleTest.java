@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 public class TroubleshooterRoleTest extends BaseWebDriverTest
 {
     protected static final String TROUBLESHOOTER = "troubleshooter@troubleshooter.test";
+    protected int _troubleShooterId;
 
     @BeforeClass
     public static void setupProject()
@@ -44,7 +45,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
 
     protected void doSetup()
     {
-        _userHelper.createUser(TROUBLESHOOTER);
+        _troubleShooterId = _userHelper.createUser(TROUBLESHOOTER).getUserId();
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, getRole(), PermissionsHelper.MemberType.user,"/");
         _containerHelper.createProject(getProjectName());
