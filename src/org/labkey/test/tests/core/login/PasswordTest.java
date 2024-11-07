@@ -300,7 +300,7 @@ public class PasswordTest extends BaseWebDriverTest
         clickButtonContainingText("Reset", 0);
 
         signIn();
-        return getPasswordResetUrl(username);
+        return getPasswordResetUrl(_userId);
     }
 
     String[] wrongPasswordEntered =
@@ -324,11 +324,12 @@ public class PasswordTest extends BaseWebDriverTest
                 .getUsersTable()
                 .setFilter("Email", "Equals", username);
         clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(username)));
+        int userId = Integer.valueOf(getUrlParam("userId"));
         clickButton("Reset Password");
         assertTextPresent("You are about to clear the user's current password");
         clickAndWait(Locator.lkButton("OK"));
 
-        String url = getPasswordResetUrl(username);
+        String url = getPasswordResetUrl(userId);
 
         //make sure user can't log in with current password
         signOut();
