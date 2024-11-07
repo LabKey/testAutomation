@@ -37,7 +37,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
     protected void doSetup()
     {
         super.doSetup();
-        setInitialPassword(TROUBLESHOOTER);
+        setInitialPassword(_troubleShooterId);
     }
 
     @Override
