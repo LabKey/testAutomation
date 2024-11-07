@@ -172,7 +172,7 @@ public class PasswordTest extends BaseWebDriverTest
 
         String currentPassword = VERY_STRONG_PASSWORD + 0;
 
-        setInitialPassword(USER, currentPassword);
+        setInitialPassword(_userId, currentPassword);
         impersonate(USER);
 
         int i = 1;
@@ -223,7 +223,7 @@ public class PasswordTest extends BaseWebDriverTest
     @Test
     public void testPasswordParameter()
     {
-        setInitialPassword(USER, WEAK_PASSWORD);
+        setInitialPassword(_userId, WEAK_PASSWORD);
 
         // 31000: fail login actions if parameters present on URL
         SimplePostCommand command = new SimplePostCommand("login", "loginAPI");
@@ -345,9 +345,9 @@ public class PasswordTest extends BaseWebDriverTest
         return newPassword;
     }
 
-    protected String setInitialPassword(String user, String password)
+    protected String setInitialPassword(int userId, String password)
     {
-        SetPasswordForm.goToInitialPasswordForUser(this, _userId)
+        SetPasswordForm.goToInitialPasswordForUser(this, userId)
                 .setNewPassword(password)
                 .clickSubmit();
 
@@ -372,5 +372,4 @@ public class PasswordTest extends BaseWebDriverTest
         clickButton("Change Password");
         return new SetPasswordForm(getDriver());
     }
-
 }
