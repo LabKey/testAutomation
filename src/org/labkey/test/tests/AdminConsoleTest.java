@@ -32,7 +32,6 @@ import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -331,8 +330,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
     private void createTestUser()
     {
-        _userHelper.createUser(APP_ADMIN_USER, true, false);
-        setInitialPassword(APP_ADMIN_USER);
+        int userId = _userHelper.createUser(APP_ADMIN_USER, true, false).getUserId();
+        setInitialPassword(userId);
 
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");

@@ -23,7 +23,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
@@ -227,7 +226,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         impersonate(GAMMA_READER_USER);
         WebElement projectTree = projectMenu().expandProjectFully(PERM_PROJECT_NAME);
         assertNotNull("No link to subfolder: /" + PERM_PROJECT_NAME + "/" + GAMMA_SUB_FOLDER_NAME, Locator.linkWithText(GAMMA_SUB_FOLDER_NAME).findElementOrNull(projectTree));
-        assertNotNull("Link found to inaccessable subfolder: /" + PERM_PROJECT_NAME + "/" + GAMMA_SUB_FOLDER_NAME, Locator.linkWithText(GAMMA_SUB_FOLDER_NAME).findElementOrNull(projectTree)); // it will appear as a span, no link
+        assertNotNull("Link found to inaccessible subfolder: /" + PERM_PROJECT_NAME + "/" + GAMMA_SUB_FOLDER_NAME, Locator.linkWithText(GAMMA_SUB_FOLDER_NAME).findElementOrNull(projectTree)); // it will appear as a span, no link
         // Ensure only one project visible during project impersonation. Regression test 13346
         assertEquals("Only one project should be visible while impersonating", Arrays.asList(PERM_PROJECT_NAME), getTexts(projectMenu().projectMenuLinks()));
 

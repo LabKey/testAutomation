@@ -81,8 +81,8 @@ public class SecurityApiTest extends BaseWebDriverTest
         apiPermissionsHelper.setPermissions(GROUP_2, "Reader");
 
         // Create the admin user that will be used to call the APIs.
-        _userHelper.createUserAndNotify(ADMIN_USER);
-        setInitialPassword(ADMIN_USER);
+        int userId = _userHelper.createUserAndNotify(ADMIN_USER).getUserId();
+        setInitialPassword(userId);
         apiPermissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
 
     }
