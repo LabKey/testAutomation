@@ -58,6 +58,8 @@ public class PasswordTest extends BaseWebDriverTest
 {
     private static final String USER = "user_passwordtest@password.test";
 
+    private int _userId;
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -83,7 +85,7 @@ public class PasswordTest extends BaseWebDriverTest
     public void resetUser()
     {
         _userHelper.deleteUsers(false, USER);
-        _userHelper.createUser(USER);
+        _userId = _userHelper.createUser(USER).getUserId();
     }
 
     @Test
@@ -121,7 +123,7 @@ public class PasswordTest extends BaseWebDriverTest
                 PasswordStrength.Strong,
                 PasswordExpiration.Never);
 
-        SetPasswordForm setPasswordForm = SetPasswordForm.goToInitialPasswordForUser(this, USER);
+        SetPasswordForm setPasswordForm = SetPasswordForm.goToInitialPasswordForUser(this, _userId);
         log("Verify strength gauge for 'SetPasswordAction'");
         setPasswordForm.verifyPasswordStrengthGauge(USER);
 
@@ -170,7 +172,7 @@ public class PasswordTest extends BaseWebDriverTest
 
         String currentPassword = VERY_STRONG_PASSWORD + 0;
 
-        setInitialPassword(USER, currentPassword);
+        setInitialPassword(_userId, currentPassword);
         impersonate(USER);
 
         int i = 1;
@@ -221,7 +223,7 @@ public class PasswordTest extends BaseWebDriverTest
     @Test
     public void testPasswordParameter()
     {
-        setInitialPassword(USER, WEAK_PASSWORD);
+        setInitialPassword(_userId, WEAK_PASSWORD);
 
         // 31000: fail login actions if parameters present on URL
         SimplePostCommand command = new SimplePostCommand("login", "loginAPI");
@@ -298,7 +300,7 @@ public class PasswordTest extends BaseWebDriverTest
         clickButtonContainingText("Reset", 0);
 
         signIn();
-        return getPasswordResetUrl(username);
+        return getPasswordResetUrl(_userId);
     }
 
     String[] wrongPasswordEntered =
@@ -322,11 +324,12 @@ public class PasswordTest extends BaseWebDriverTest
                 .getUsersTable()
                 .setFilter("Email", "Equals", username);
         clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(username)));
+        int userId = Integer.valueOf(getUrlParam("userId"));
         clickButton("Reset Password");
         assertTextPresent("You are about to clear the user's current password");
         clickAndWait(Locator.lkButton("OK"));
 
-        String url = getPasswordResetUrl(username);
+        String url = getPasswordResetUrl(userId);
 
         //make sure user can't log in with current password
         signOut();
@@ -342,9 +345,9 @@ public class PasswordTest extends BaseWebDriverTest
         return newPassword;
     }
 
-    protected String setInitialPassword(String user, String password)
+    protected String setInitialPassword(int userId, String password)
     {
-        SetPasswordForm.goToInitialPasswordForUser(this, user)
+        SetPasswordForm.goToInitialPasswordForUser(this, userId)
                 .setNewPassword(password)
                 .clickSubmit();
 
@@ -369,5 +372,4 @@ public class PasswordTest extends BaseWebDriverTest
         clickButton("Change Password");
         return new SetPasswordForm(getDriver());
     }
-
 }

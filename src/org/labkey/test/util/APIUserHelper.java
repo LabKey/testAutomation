@@ -250,15 +250,16 @@ public class APIUserHelper extends AbstractUserHelper
     }
 
     private static final Pattern regEmailVerification = Pattern.compile("verification=([A-Za-z0-9]+)");
+
     @Override
-    public String setInitialPassword(String email)
+    public String setInitialPassword(int userId)
     {
         String verification;
 
         try
         {
             SimpleGetCommand getRegEmailCommand = new SimpleGetCommand("security", "showRegistrationEmail");
-            getRegEmailCommand.setParameters(Map.of("email", email));
+            getRegEmailCommand.setParameters(Map.of("userId", userId));
 
             String responseText = getRegEmailCommand.execute(connectionSupplier.get(), null).getText();
             Matcher matcher = regEmailVerification.matcher(responseText);
@@ -280,7 +281,7 @@ public class APIUserHelper extends AbstractUserHelper
         try
         {
             String password = PasswordUtil.getPassword();
-            new SetPasswordCommand(email, password, verification).execute(connectionSupplier.get(), null);
+            new SetPasswordCommand(password, verification).execute(connectionSupplier.get(), null);
             return password;
         }
         catch (IOException | CommandException e)
@@ -292,14 +293,12 @@ public class APIUserHelper extends AbstractUserHelper
 
 class SetPasswordCommand extends PostCommand<CommandResponse>
 {
-    private final String _email;
     private final String _password;
     private final String _verification;
 
-    public SetPasswordCommand(String email, String password, String verification)
+    public SetPasswordCommand(String password, String verification)
     {
         super("login", "setPassword");
-        _email = email;
         _password = password;
         _verification = verification;
     }
@@ -307,7 +306,6 @@ class SetPasswordCommand extends PostCommand<CommandResponse>
     protected List<BasicNameValuePair> getPostData()
     {
         List<BasicNameValuePair> postData = new ArrayList<>();
-        postData.add(new BasicNameValuePair("email", _email));
         postData.add(new BasicNameValuePair("password", _password));
         postData.add(new BasicNameValuePair("password2", _password));
         postData.add(new BasicNameValuePair("verification", _verification));

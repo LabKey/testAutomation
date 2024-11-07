@@ -94,13 +94,13 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
             domainFormPanel.addField(CUSTOM_USER_COLUMN).setType(FieldDefinition.ColumnType.String);
         domainDesignerPage.clickFinish();
 
-        _userHelper.createUser(ADMIN_USER, true, true);
-        _userHelper.createUser(USER_INFO_VIEWER, true, true);
-        _userHelper.createUser(IMPERSONATED_USER, true, true);
+        int adminId = _userHelper.createUser(ADMIN_USER, true, true).getUserId();
+        int userInfoId = _userHelper.createUser(USER_INFO_VIEWER, true, true).getUserId();
+        int impersonatedId = _userHelper.createUser(IMPERSONATED_USER, true, true).getUserId();
         _userHelper.createUser(CHECKED_USER, true, true);
-        setInitialPassword(ADMIN_USER);
-        setInitialPassword(USER_INFO_VIEWER);
-        setInitialPassword(IMPERSONATED_USER);
+        setInitialPassword(adminId);
+        setInitialPassword(userInfoId);
+        setInitialPassword(impersonatedId);
 
         _containerHelper.createProject(getProjectName(), null);
 
