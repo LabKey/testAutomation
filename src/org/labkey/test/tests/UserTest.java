@@ -79,7 +79,6 @@ public class UserTest extends BaseWebDriverTest
     private static final String SELF_SERVICE_EMAIL_USER_CHANGED = "newaddress@user.test";
 
     protected final UIUserHelper _userHelper = new UIUserHelper(this);
-    private int _normalUserId;
 
     @Nullable
     @Override
@@ -104,7 +103,7 @@ public class UserTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor").getUserId();
+        createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor");
     }
 
     @Override
@@ -251,7 +250,7 @@ public class UserTest extends BaseWebDriverTest
 
         log("Validate that trying to use the link from the email message again will result in an error.");
         goToURL(resetUrl, 30000);
-        assertTextPresent("This email address has already been verified.");
+        assertTextPresent("Verification failed.");
         goToHome();
 
         log("If you got here there were no errors using the new email account.");
@@ -264,7 +263,7 @@ public class UserTest extends BaseWebDriverTest
     public void testCustomFieldLogin()
     {
         String customFieldValue = "loginCredentials";
-        setInitialPassword(_normalUserId);
+        setInitialPassword(NORMAL_USER);
 
         goToSiteUsers();
         DataRegionTable table = new DataRegionTable("Users", getDriver());
