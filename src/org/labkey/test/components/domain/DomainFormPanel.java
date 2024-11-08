@@ -549,16 +549,16 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public String getPanelAlertText()
     {
-        WebElement alertEl = getPanelAlertWebElement();
-        if (alertEl != null)
-            return alertEl.getText();
-
-        return "";
+        return getPanelAlertText(0);
     }
 
     public String getPanelAlertText(int index)
     {
-        return getPanelAlertWebElement(index).getText();
+        WebElement panelAlertWebElement = getPanelAlertWebElement(index);
+        if (panelAlertWebElement != null)
+            return panelAlertWebElement.getText();
+        else
+            return "";
     }
 
     public List<String> getPanelAlertTexts()
@@ -577,17 +577,16 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public WebElement getPanelAlertWebElement(int index)
     {
-        return getPanelAlertElements().get(index);
+        List<WebElement> panelAlertElements = getPanelAlertElements();
+        if (panelAlertElements.size() > index)
+            return panelAlertElements.get(index);
+        else
+            return null;
     }
 
     public List<WebElement> getPanelAlertElements()
     {
-        if (!WebDriverWrapper.waitFor(() -> BootstrapLocators.infoBanner.existsIn(this), 1000))
-        {
-            return null;
-        }
-
-        return BootstrapLocators.infoBanner.findElements(this);
+        return BootstrapLocators.infoBanner.waitForElements(this, 1000);
     }
 
     @Override
