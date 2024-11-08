@@ -80,6 +80,8 @@ public class UserTest extends BaseWebDriverTest
 
     protected final UIUserHelper _userHelper = new UIUserHelper(this);
 
+    private static int _normalUserId;
+
     @Nullable
     @Override
     protected String getProjectName()
@@ -103,7 +105,7 @@ public class UserTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor");
+        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor").getUserId();
     }
 
     @Override
@@ -263,7 +265,7 @@ public class UserTest extends BaseWebDriverTest
     public void testCustomFieldLogin()
     {
         String customFieldValue = "loginCredentials";
-        setInitialPassword(NORMAL_USER);
+        setInitialPassword(_normalUserId);
 
         goToSiteUsers();
         DataRegionTable table = new DataRegionTable("Users", getDriver());
