@@ -290,7 +290,7 @@ public class StudyHelper
         _test.clickButton("Export Study");
         ExportFolderPage exportFolderPage = new ExportFolderPage(_test.getDriver());
 
-        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "Datasets: Study Dataset Definitions", "Datasets: Study Dataset Data", "Datasets: Assay Dataset Definitions", "Datasets: Assay Dataset Data", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", _test._containerHelper.getAllModules().contains("samplemanagement") ? "Sample Status and QC State Settings" : "QC State Settings", "Datasets: Study Dataset Definitions", "Datasets: Study Dataset Data", "Datasets: Assay Dataset Definitions", "Datasets: Assay Dataset Data", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         if (isSpecimenModuleActive())
         {
             studyObjects = new ArrayList<>(studyObjects);

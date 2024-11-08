@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -1357,7 +1358,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         DomainFormPanel domainForm = createPage
                 .getFieldsPanel()
                 .setInferFieldFile(inferenceFile);
-        checker().verifyEquals("Reserved field warning not as expected",  expectedInfoMsg, domainForm.getPanelAlertText());
+        checker().verifyThat("Reserved field warning not as expected", domainForm.getPanelAlertTexts(), CoreMatchers.hasItem(expectedInfoMsg));
         createPage.clickSave();
         DataRegionTable drt = DataRegion(getDriver()).find();
         checker().verifyTrue("Sample type not found in list of sample types", drt.getColumnDataAsText("Name").contains(name));

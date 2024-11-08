@@ -10,7 +10,6 @@ import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -531,6 +530,10 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         return getPanelAlertWebElement(index).getText();
     }
 
+    public List<String> getPanelAlertTexts()
+    {
+        return getWrapper().getTexts(getPanelAlertElements());
+    }
     /**
      * There may be an element in the alert that a test will need to interact with so return the alert element and let
      * the test find the control it needs.
@@ -543,19 +546,17 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public WebElement getPanelAlertWebElement(int index)
     {
-        try
-        {
-            getWrapper().waitFor(() -> BootstrapLocators.infoBanner.existsIn(getDriver()),
-                    "the info alert did not appear as expected", 1000);
-        }
-        catch (TimeoutException e)
+        return getPanelAlertElements().get(index);
+    }
+
+    public List<WebElement> getPanelAlertElements()
+    {
+        if (!WebDriverWrapper.waitFor(() -> BootstrapLocators.infoBanner.existsIn(this), 1000))
         {
             return null;
         }
 
-        // It would be better to not return a raw WebElement but who knows what the future holds, different alerts
-        // may show different controls.
-        return BootstrapLocators.infoBanner.index(index).findElement(this);
+        return BootstrapLocators.infoBanner.findElements(this);
     }
 
     @Override

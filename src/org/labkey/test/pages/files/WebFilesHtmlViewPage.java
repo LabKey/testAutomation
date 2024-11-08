@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages.files;
 
+import org.eclipse.jetty.util.URIUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -36,7 +37,7 @@ public class WebFilesHtmlViewPage extends LabKeyPage<WebFilesHtmlViewPage.Elemen
 
     public static WebFilesHtmlViewPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.getBaseURL() + "/_webfiles/" + containerPath + "/?listing=html");
+        driver.beginAt(WebTestHelper.getBaseURL() + "/_webfiles/" + URIUtil.encodePath(containerPath) + "/?listing=html");
         return new WebFilesHtmlViewPage(driver.getDriver());
     }
 

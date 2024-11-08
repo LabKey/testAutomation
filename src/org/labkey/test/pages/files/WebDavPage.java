@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
 
 public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
 {
-    private FileBrowserHelper _fileBrowserHelper;
+    private final FileBrowserHelper _fileBrowserHelper;
     public WebDavPage(WebDriver driver)
     {
         super(driver);
@@ -43,9 +43,14 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
         return _fileBrowserHelper;
     }
 
-    public String getWebDavUrl()
+    public WebElement getWebDavUrl()
     {
-        return elementCache().webDavUrlElement.getText();
+        return elementCache().webDavUrlElement;
+    }
+
+    public String getAbsolutePath()
+    {
+        return elementCache().absolutePathElement.getText();
     }
 
     @Override
@@ -54,12 +59,14 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
     {
         WebElement htmlViewButton = Locator.button("HTML View").findWhenNeeded(this);
 
         WebElement fbDetailsTable = Locator.tagWithClass("table", "fb-details").findWhenNeeded(this);
-        WebElement webDavUrlElement = Locator.tagWithText("th", "WebDav URL:").followingSibling("a")
+        WebElement webDavUrlElement = Locator.tagWithText("th", "WebDav URL:").followingSibling("td").childTag("a")
                 .findWhenNeeded(fbDetailsTable);
+        WebElement absolutePathElement = Locator.tagWithText("th", "Absolute Path:").followingSibling("td")
+            .findWhenNeeded(fbDetailsTable);
     }
 }
