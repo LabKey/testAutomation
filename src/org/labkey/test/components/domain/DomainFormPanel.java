@@ -10,6 +10,7 @@ import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -17,6 +18,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -555,7 +557,14 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public List<WebElement> getPanelAlertElements()
     {
-        return BootstrapLocators.infoBanner.waitForElements(this, 1000);
+        try
+        {
+            return BootstrapLocators.infoBanner.waitForElements(this, 1000);
+        }
+        catch (NoSuchElementException nothing)
+        {
+            return Collections.emptyList();
+        }
     }
 
     @Override
