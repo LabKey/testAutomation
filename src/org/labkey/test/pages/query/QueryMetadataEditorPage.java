@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import java.util.Map;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Automates the platform component defined in: query/src/client/QueryMetadataEditor/QueryMetadataEditor.tsx
@@ -34,6 +35,11 @@ public class QueryMetadataEditorPage extends WebDriverComponent<QueryMetadataEdi
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "metadataQuery",
                 Map.of("schemaName", schemaName, "query.queryName", queryName)));
+
+        // Wait for domain editor rows to show up.
+        waitFor(()->!Locator.tagWithClass("div", "domain-field-row domain-row-border-default").findElements(webDriverWrapper.getDriver()).isEmpty(),
+                "Query Metadata Editor Page did not load in time.", 2_500);
+
         return new QueryMetadataEditorPage(webDriverWrapper.getDriver());
     }
 
