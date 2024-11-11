@@ -319,59 +319,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * As best as possible get a list of row indices from the grid for editable rows. That is rows where the values can
-     * be entered or changed.
-     *
-     * @return A list of indices (0 based) for rows that can be edited.
-     */
-    public List<Integer> getEditableRowIndices()
-    {
-        return getRowTypes().get(0);
-    }
-
-    /**
-     * Some EditableGrids have read only rows. These are rows in the grid that display data but cannot be updated. As
-     * best as possible return a list of those rows.
-     *
-     * @return A list of indices (0 based) of rows that cannot be edited.
-     */
-    public List<Integer> getReadonlyRowIndices()
-    {
-        return getRowTypes().get(1);
-    }
-
-    private List<List<Integer>> getRowTypes()
-    {
-        List<Integer> unPopulatedRows = new ArrayList<>();
-        List<Integer> populatedRows = new ArrayList<>();
-
-        // Need to look at an attribute of a cell to see if it has pre-populated data.
-        // But this info will not be in the select or row-number cells, so we'll use the last column
-        // (CSS selector is 1-based not 0-based).
-        int checkColumn = getColumnNames().size();
-        int rowCount = 0;
-
-        for (WebElement row : getRows())
-        {
-            String classAttribute = row.findElement(By.cssSelector("td:nth-child(" + checkColumn + ") > div"))
-                    .getAttribute("class");
-
-            if ((!classAttribute.contains("cell-selection")) && (!classAttribute.contains("cell-read-only")))
-            {
-                unPopulatedRows.add(rowCount);
-            }
-            else
-            {
-                populatedRows.add(rowCount);
-            }
-
-            rowCount++;
-        }
-
-        return new ArrayList<>(Arrays.asList(unPopulatedRows, populatedRows));
-    }
-
-    /**
      * <p>
      *     For a given column, 'columnNameToSet', set the lookup cell in the first row where the value in column 'columnNameToSearch'
      *     equals 'valueToSearch'. The value chosen will be at the specified index in the lookup options. Supply a 'value' in order to
