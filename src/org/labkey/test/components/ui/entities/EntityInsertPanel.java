@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -140,18 +141,14 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         showGrid();
         elementCache().grid.addRows(records.size());
 
-        List<Integer> rowIndices = elementCache().grid.getEditableRowIndices();
-
-        if(rowIndices.size() < records.size())
-        {
-            throw new IllegalStateException("Trying to add more records than there are rows. Number of records to create: " + records.size() + " number of available rows: " + rowIndices.size());
-        }
+        Assert.assertFalse(String.format("Trying to add more records than there are rows. Number of records to create: %d number of available rows: %d",
+                        records.size(),  elementCache().grid.getRowCount()),
+                elementCache().grid.getRowCount() < records.size());
 
         int index = 0;
-
         for(Map<String, Object> record : records)
         {
-            setRecordValues(record, rowIndices.get(index));
+            setRecordValues(record, index);
             index++;
         }
 
@@ -160,8 +157,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public EntityInsertPanel setRecordValues(Map<String, Object> columnValues)
     {
-        int insertRowIndex = getEditableGrid().getEditableRowIndices().get(0);
-        return setRecordValues(columnValues, insertRowIndex);
+        return setRecordValues(columnValues, 0);
     }
 
     public EntityInsertPanel setRecordValues(Map<String, Object> columnValues, int row)

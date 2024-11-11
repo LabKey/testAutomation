@@ -452,8 +452,8 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         elementCache().saveButton.click();
 
         // If save causes some update, wait until it is completed.
-        WebDriverWrapper.waitFor(()->!BootstrapLocators.loadingSpinner.existsIn(getDriver()),
-                "Save has taken too long to complete.", 15_000);
+        getWrapper().longWait().withMessage("Update took too long to complete.")
+                .until(ExpectedConditions.stalenessOf(elementCache().saveButton));
 
         return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
     }
