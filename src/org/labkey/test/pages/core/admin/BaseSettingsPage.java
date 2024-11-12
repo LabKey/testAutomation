@@ -398,12 +398,19 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
     {
         yyyy_MM_dd("yyyy-MM-dd"),
         yyyy_MMM_dd("yyyy-MMM-dd"),
+        yyyy_MM("yyyy-MM"),
         dd_MMM_yyyy("dd-MMM-yyyy"),
         dd_MMM_yy("dd-MMM-yy"),
+        dd_MM_yyyy("dd-MM-yyyy"),
         ddMMMyyyy("ddMMMyyyy"),
         ddMMMyy("ddMMMyy"),
+        MMddyyyy("MM/dd/yyyy"),
+        MM_dd_yyyy("MM-dd-yyyy"),
+        MMMM_dd_yyyy("MMMM dd yyyy"),
         Default("yyyy-MM-dd"),
-        DTDefault("yyyy-MM-dd");
+        DTDefault("yyyy-MM-dd"),
+        DATE("Date"), // Valid only in a domain designer.
+        DATETIME("DATETIME"); // Valid only in a domain designer and only for the date part of a DateTime field.
 
         private final String format;
 
@@ -439,7 +446,8 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         hh_mm_a("hh:mm a"),
         none("<none>"), // Valid only for a DateTime field.
         Default("HH:mm:ss"),
-        DTDefault("HH:mm");
+        DTDefault("HH:mm"),
+        TIME("Time"); // Valid only in domain designer.
 
         private final String format;
 

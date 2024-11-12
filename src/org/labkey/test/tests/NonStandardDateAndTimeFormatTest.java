@@ -14,7 +14,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.pages.admin.FolderFormatsPage;
+import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
@@ -204,7 +206,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with various Date, Time and DateTime columns.", listFormat));
 
-        String nsDateFormat01 = "MMMM dd, yyyy";
+        String nsDateFormat01 = "MMMM dd, yyyy"; // Similar to a standard format, except this has a comma after the dd.
         String nsDateFormat02 = "yyyy-w G";
         String nsTimeFormat01 = "hh:mm:ss.ss a";
         String nsTimeFormat02 = "K:mm a z";
@@ -620,8 +622,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         String subFolder = "SubFolder_01";
         String subFolderPath = folderProject + "/" + subFolder;
 
-        String dcInParent = "DC In Parent Folder";
-        String dcInChild = "DC In Child Folder";
+        String dcInProj = "DC In Project Folder";
+        String dcInSub = "DC In Sub-Folder";
         String dateCol = "Date";
         String timeCol = "Time";
         String dateTimeCol = "DateTime";
@@ -631,10 +633,10 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         _containerHelper.deleteProject(folderProject, false);
         _containerHelper.createProject(folderProject, null);
 
-        log(String.format("Create a child folder '%s'.", folderProject));
+        log(String.format("Create a sub-folder '%s'.", folderProject));
         _containerHelper.createSubfolder(folderProject, subFolder);
 
-        log(String.format("In the parent folder create a DataClass named '%s' with various Date, Time and DateTime columns.", dcInParent));
+        log(String.format("In the parent folder create a DataClass named '%s' with various Date, Time and DateTime columns.", dcInProj));
 
         goToProjectHome(folderProject);
         _portalHelper.addWebPart("Data Classes");
@@ -645,15 +647,15 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime)
         );
 
-        createDataClass(folderProject, dcInParent, fields);
+        createDataClass(folderProject, dcInProj, fields);
 
         log("Add data to use for format validation.");
         String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
                 + "P1\t12/23/24 14:45\t12/23/24\t14:45\n";
 
-        populateDataClass(folderProject, dcInParent, bulkData);
+        populateDataClass(folderProject, dcInProj, bulkData);
 
-        log(String.format("In the child folder '%s' create a DataClass named '%s' with Date & Time columns.", subFolder, dcInChild));
+        log(String.format("In the sub-folder '%s' create a DataClass named '%s' with Date & Time columns.", subFolder, dcInSub));
 
         navigateToFolder(folderProject, subFolder);
         _portalHelper.addWebPart("Data Classes");
@@ -664,18 +666,18 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime)
         );
 
-        createDataClass(subFolderPath, dcInChild, fields);
+        createDataClass(subFolderPath, dcInSub, fields);
 
         log("Add data to DataClass created in the subfolder as validation.");
 
         bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
                 + "C1\t11/28/24 11:11\t11/28/24\t11:11\n";
 
-        populateDataClass(subFolderPath, dcInChild, bulkData);
+        populateDataClass(subFolderPath, dcInSub, bulkData);
 
         log("In the subfolder add data to DataClass from the parent folder as validation.");
 
-        populateDataClass(subFolderPath, dcInParent, bulkData);
+        populateDataClass(subFolderPath, dcInProj, bulkData);
 
         log("Change the site setting to be non-standard.");
 
@@ -742,15 +744,15 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 timeCol, "14:45 PST",
                 "Flag", "");
 
-        validateDataIsFormatted(folderProject, dcInParent, expectedFormatData);
+        validateDataIsFormatted(folderProject, dcInProj, expectedFormatData);
 
         expectedFormatData = Map.of("Name", "C1",
                 dateTimeCol, "November 28, 2024 11:11 PST",
                 dateCol, "November 28, 2024",
                 timeCol, "11:11 PST",
                 "Flag", "");
-        validateDataIsFormatted(subFolderPath, dcInChild, expectedFormatData);
-        validateDataIsFormatted(subFolderPath, dcInParent, expectedFormatData);
+        validateDataIsFormatted(subFolderPath, dcInSub, expectedFormatData);
+        validateDataIsFormatted(subFolderPath, dcInProj, expectedFormatData);
 
         log("Change the formats in the subFolder.");
         String nsSubDateFormat = "EEEE MMMM dd, yyyy";
@@ -773,8 +775,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 dateCol, "Thursday November 28, 2024",
                 timeCol, "11:11 (PST)",
                 "Flag", "");
-        validateDataIsFormatted(subFolderPath, dcInChild, expectedFormatData);
-        validateDataIsFormatted(subFolderPath, dcInParent, expectedFormatData);
+        validateDataIsFormatted(subFolderPath, dcInSub, expectedFormatData);
+        validateDataIsFormatted(subFolderPath, dcInProj, expectedFormatData);
 
         log("Check that the 'Site Validation' report now includes the subfolder.");
         List<String> folderWarnings = List.of(String.format("Folder default display format for Dates: %s", nsSubDateFormat),
@@ -808,6 +810,173 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         log("Validate the subfolder still appears in the Site Validation report.");
         scope = String.format("Folder: %s", subFolderPath);
         validateSiteValidationReport(scope, folderWarnings, true);
+
+    }
+
+    /**
+     * <p>
+     *     Use the text values 'Date', 'Time' and 'DateTime' as the format values in a domain designer. This will use a
+     *     DataClass because its design will be visible in the sub-folder.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a new project and set the Date-Time formats to some standard format.</li>
+     *         <li>Create a sub-folder and set the Date-Time formats to some other standard format.</li>
+     *         <li>Create a DataClass in parent folder.</li>
+     *         <li>Set the date field format to 'Date'.</li>
+     *         <li>Set the time field format to 'Time'.</li>
+     *         <li>Set the DateTime field format to 'DateTime' and 'none'.</li>
+     *         <li>Validate data is formatted as expected in the project.</li>
+     *         <li>In the sub-folder validate the data is formatted by the sub-folder settings.</li>
+     *         <li>Validate that setting the date part of a DateTime field only allows 'none' for the time format part.</li>
+     *     </ul>
+     * </p>
+     *
+     * @throws IOException Can be thrown by helpers that create the folders, etc...
+     * @throws CommandException Can be thrown by helpers that create the folders, etc...
+     */
+    @Test
+    public void testTextFormatValueOfDate() throws IOException, CommandException
+    {
+
+        String folderProject = "Text_Format_Test";
+        String subFolder = "SubFolder_01";
+        String subFolderPath = folderProject + "/" + subFolder;
+
+        log(String.format("Create a project '%s' with standard formatting.", folderProject));
+
+        _containerHelper.deleteProject(folderProject, false);
+        _containerHelper.createProject(folderProject, null);
+
+        log(String.format("Create a sub-folder '%s'.", folderProject));
+        _containerHelper.createSubfolder(folderProject, subFolder);
+
+        goToProjectHome(folderProject);
+        _portalHelper.addWebPart("Data Classes");
+
+        goToProjectHome(subFolderPath);
+        _portalHelper.addWebPart("Data Classes");
+
+        String dcSetFormats = "DC Use Text Format";
+        String dcCheckWarnings = "DC Check Warnings";
+
+        String dateCol = "Date01";
+        String timeCol = "Time01";
+        String dateTimeCol = "DateTime01";
+
+        log(String.format("Create a DataClass named '%s' with Date, Time and DateTime columns.", dcSetFormats));
+
+        List<FieldDefinition> fields = List.of(
+                new FieldDefinition(dateCol, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(timeCol, FieldDefinition.ColumnType.Time),
+                new FieldDefinition(dateTimeCol, FieldDefinition.ColumnType.DateAndTime)
+        );
+
+        createDataClass(folderProject, dcSetFormats, fields);
+        createDataClass(folderProject, dcCheckWarnings, fields);
+
+        log("Add data in the parent folder.");
+        String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
+                + "P1\t11/11/11 23:11\t11/11/11\t23:11\n";
+
+        populateDataClass(folderProject, dcSetFormats, bulkData);
+
+        log("Add data to the DataClasses in the subfolder.");
+
+        bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
+                + "C1\t11/11/11 23:11\t11/11/11\t23:11\n";
+
+        populateDataClass(subFolderPath, dcSetFormats, bulkData);
+
+        log("At the project level set the formats to something other than the default values.");
+        ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, folderProject);
+        projectSettingsPage.setDefaultDateDisplayInherited(false);
+        projectSettingsPage.setDefaultDateDisplay(DATE_FORMAT.dd_MMM_yyyy);
+        projectSettingsPage.setDefaultTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultTimeDisplay(TIME_FORMAT.hh_mm_a);
+        projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultDateTimeDisplay(DATE_FORMAT.dd_MMM_yyyy, TIME_FORMAT.hh_mm_a);
+        projectSettingsPage.save();
+
+        log("At the sub-folder level set the formats to something different as well.");
+        FolderFormatsPage folderFormatsPage = FolderManagementPage.beginAt(this, subFolderPath).goToFormatsTab();
+        folderFormatsPage.setDefaultDateDisplayInherited(false);
+        folderFormatsPage.setDefaultDateDisplay(DATE_FORMAT.ddMMMyy);
+        folderFormatsPage.setDefaultTimeDisplayInherited(false);
+        folderFormatsPage.setDefaultTimeDisplay(TIME_FORMAT.HH_mm_ss_SSS);
+        folderFormatsPage.setDefaultDateTimeDisplayInherited(false);
+        folderFormatsPage.setDefaultDateTimeDisplay(DATE_FORMAT.ddMMMyy, TIME_FORMAT.HH_mm_ss_SSS);
+        folderFormatsPage.clickSave();
+
+        log("Go to the project and change the formats in the DataClass.");
+        goToProjectHome(folderProject);
+
+        log(String.format("For DataClass '%s' in the parent folder, change the formats to use 'Date', 'Time' and 'DateTime'.", dcSetFormats));
+        clickAndWait(Locator.linkWithText(dcSetFormats));
+        clickAndWait(Locator.lkButton("Edit Data Class"));
+        CreateDataClassPage editPage = new CreateDataClassPage(getDriver());
+        DomainFormPanel domainEditor = editPage.getDomainEditor();
+        DomainFieldRow fieldRow = domainEditor.getField(dateCol);
+        fieldRow.setDateInherited(false);
+        fieldRow.setDateFormat(DATE_FORMAT.DATE);
+        fieldRow = domainEditor.getField(timeCol);
+        fieldRow.setTimeInherited(false);
+        fieldRow.setTimeFormat(TIME_FORMAT.TIME);
+        fieldRow = domainEditor.getField(dateTimeCol);
+        fieldRow.setDateTimeInherited(false);
+        fieldRow.setDateTimeFormat(DATE_FORMAT.DATETIME, TIME_FORMAT.none);
+        editPage.clickSave();
+
+        log("Validate that the values are formatted with the settings in the parent folder.");
+
+        Map<String, String> expectedFormatData = Map.of("Name", "P1",
+                dateTimeCol, "11-Nov-2011 11:11 PM",
+                dateCol, "11-Nov-2011",
+                timeCol, "11:11 PM", "Flag", "");
+
+        validateDataIsFormatted(folderProject, dcSetFormats, expectedFormatData);
+
+        log(String.format("Go to sub-folder '%s' and validate the data here is formatted according to sub-folder settings.", subFolder));
+
+        expectedFormatData = Map.of("Name", "C1",
+                dateTimeCol, "11Nov11 23:11:00.000",
+                dateCol, "11Nov11",
+                timeCol, "23:11:00.000", "Flag", "");
+
+        validateDataIsFormatted(subFolderPath, dcSetFormats, expectedFormatData);
+
+        log("Go back to parent folder and validate warnings for DateTime fields.");
+
+        goToProjectHome(folderProject);
+
+        clickAndWait(Locator.linkWithText(dcCheckWarnings));
+        clickAndWait(Locator.lkButton("Edit Data Class"));
+        editPage = new CreateDataClassPage(getDriver());
+        domainEditor = editPage.getDomainEditor();
+        fieldRow = domainEditor.getField(dateTimeCol);
+        fieldRow.setDateTimeInherited(false);
+        fieldRow.setDateTimeFormat(DATE_FORMAT.DATETIME, TIME_FORMAT.hh_mm_a);
+
+        checker().verifyTrue(String.format("When setting the date part of a DateTime to '%s', '%s' to should be the only allowed value for the time part.",
+                        DATE_FORMAT.DATETIME, TIME_FORMAT.none),
+                fieldRow.hasDomainWarningIcon());
+
+        List<String> actualValues = editPage.clickSaveExpectingErrors();
+
+        List<String> expectedValues = List.of(
+                String.format("Property %s: %s %s is an illegal format for type DateTime",
+                        dateTimeCol, DATE_FORMAT.DATETIME, TIME_FORMAT.hh_mm_a),
+                String.format("Please correct errors in %s before saving.",
+                        dcCheckWarnings));
+
+        checker().verifyEquals("Error messages are not as expected.",
+                expectedValues, actualValues);
+
+        checker().screenShotIfNewError("Warning_Errors");
+
+        log("Cancel out of the editor.");
+        editPage.clickCancel();
 
     }
 

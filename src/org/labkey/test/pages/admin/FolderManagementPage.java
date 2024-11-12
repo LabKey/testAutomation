@@ -59,7 +59,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public FolderFormatsPage goToFormatsTab()
     {
-        selectTab("formats");
+        selectTab("settings");
         return new FolderFormatsPage(getDriver());
     }
 

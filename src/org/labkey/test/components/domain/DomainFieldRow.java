@@ -1302,7 +1302,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
-        elementCache().dateTimeFormatDateSelect.typeAheadSelect(dateFormat + " (");
+
+        String txt;
+
+        if (dateFormat.equals(DATE_FORMAT.DATETIME))
+        {
+            txt = dateFormat.toString();
+        }
+        else
+        {
+            txt = dateFormat + " (";
+        }
+
+        elementCache().dateTimeFormatDateSelect.typeAheadSelect(txt);
         return this;
     }
 
@@ -1311,7 +1323,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         if (isDateTimeInherited())
             setDateTimeInherited(false);
-        elementCache().dateTimeFormatTimeSelect.typeAheadSelect("<none>".equals(timeFormat) ? timeFormat.toString() : timeFormat + " (");
+        elementCache().dateTimeFormatTimeSelect.typeAheadSelect(TIME_FORMAT.none.equals(timeFormat) ? timeFormat.toString() : timeFormat + " (");
         return this;
     }
 
@@ -1405,7 +1417,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         if (isDateInherited())
             setDateInherited(false);
-        elementCache().dateFormatSelect.typeAheadSelect(dateFormat + " (");
+
+        String txt;
+        if (dateFormat.equals(DATE_FORMAT.DATE))
+        {
+            txt = dateFormat.toString();
+        }
+        else
+        {
+            txt = dateFormat + " (";
+        }
+        elementCache().dateFormatSelect.typeAheadSelect(txt);
+
         return this;
     }
 
@@ -1447,7 +1470,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         expand();
         if (isTimeInherited())
             setTimeInherited(false);
-        elementCache().timeFormatSelect.typeAheadSelect(timeFormat + " (");
+
+        String txt;
+
+        if (timeFormat.equals(TIME_FORMAT.TIME))
+        {
+            txt = timeFormat.toString();
+        }
+        else
+        {
+            txt = timeFormat + " (";
+        }
+
+        elementCache().timeFormatSelect.typeAheadSelect(txt);
         return this;
     }
 

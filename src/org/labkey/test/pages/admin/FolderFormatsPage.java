@@ -239,6 +239,20 @@ public class FolderFormatsPage extends FolderManagementPage
         return elementCache().restrictChartingColsChk.isSelected();
     }
 
+    public FolderFormatsPage clickSave()
+    {
+        clickAndWait(elementCache().saveButton);
+        clearCache();
+        return this;
+    }
+
+    public FolderFormatsPage clickInheritAll()
+    {
+        clickAndWait(elementCache().inheritAll);
+        clearCache();
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -276,6 +290,10 @@ public class FolderFormatsPage extends FolderManagementPage
         WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findElement(this);
         WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
+
+        WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
+        WebElement inheritAll = Locator.lkButton("Inherit All").findWhenNeeded(this);
+
     }
 
 }
