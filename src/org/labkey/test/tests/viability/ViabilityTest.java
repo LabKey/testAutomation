@@ -93,6 +93,7 @@ public class ViabilityTest extends AbstractViabilityTest
         assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
         assertEquals("", getFormElement(Locator.name("_pool_1604505335_0_IntValue")));
 
+        sleep(500);
         clickButton(SAVE_AND_FINISH, 0);
         String alertText = cancelAlert();
         assertTrue(alertText.contains("Save anyway"));

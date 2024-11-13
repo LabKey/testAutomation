@@ -59,7 +59,7 @@ public class UIUserHelper extends AbstractUserHelper
         String email;
         Integer userId;
         List<WebElement> userInfo = Locator.css("meta").findElements(resultEl);
-        if (userInfo.size() > 0)
+        if (!userInfo.isEmpty())
         {
             email = userInfo.get(0).getAttribute("email");
             String userIdStr = userInfo.get(0).getAttribute("userId");
@@ -200,10 +200,10 @@ public class UIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public String setInitialPassword(String user)
+    public String setInitialPassword(int userId)
     {
         String password = PasswordUtil.getPassword();
-        SetPasswordForm.goToInitialPasswordForUser(getWrapper(), user)
+        SetPasswordForm.goToInitialPasswordForUser(getWrapper(), userId)
                 .setNewPassword(password)
                 .clickSubmit();
 
