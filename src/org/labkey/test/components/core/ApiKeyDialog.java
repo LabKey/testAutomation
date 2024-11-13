@@ -9,8 +9,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ApiKeyDialog extends ModalDialog
 {
@@ -42,8 +44,48 @@ public class ApiKeyDialog extends ModalDialog
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
     {
-        return  (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-                .getData(DataFlavor.stringFlavor);
+        DataFlavor[] flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
+        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+
+        // Adding debug info for TeamCity run.
+        // Windows is not giving DataFlavor (MIME Type) for the data on the clipboard.
+        getWrapper().log("Available flavors: " + Arrays.stream(flavors).toList());
+        getWrapper().log("Best flavor: " + DataFlavor.selectBestTextFlavor(flavors));
+
+        if (t != null)
+        {
+
+            // Adding debug info for TeamCity run.
+            getWrapper().log("Is DataFlavor.imageFlavor supported? " + t.isDataFlavorSupported(DataFlavor.imageFlavor));
+            getWrapper().log("Is DataFlavor.allHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.allHtmlFlavor));
+            getWrapper().log("Is DataFlavor.fragmentHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.fragmentHtmlFlavor));
+            getWrapper().log("Is DataFlavor.selectionHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.selectionHtmlFlavor));
+            getWrapper().log("Is DataFlavor.javaFileListFlavor supported? " + t.isDataFlavorSupported(DataFlavor.javaFileListFlavor));
+            getWrapper().log("Is DataFlavor.stringFlavor supported? " + t.isDataFlavorSupported(DataFlavor.stringFlavor));
+
+            DataFlavor[] transferFlavors = t.getTransferDataFlavors();
+            getWrapper().log("Transferable supported data flavors: " + Arrays.stream(transferFlavors).toList());
+
+            if (flavors.length > 0)
+            {
+                getWrapper().log("Best Text Flavor: " + DataFlavor.selectBestTextFlavor(flavors));
+                return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+                        .getData(DataFlavor.selectBestTextFlavor(flavors));
+            }
+            else
+            {
+                getWrapper().log("There are no DataFlavors to use.");
+                // Return a value to indicate something is on the clipboard but no DataFlavor was provided.
+                return "There are no DataFlavors to use.";
+            }
+
+        }
+        else
+        {
+            getWrapper().log("The clipboard is empty.");
+            return "";
+        }
+
     }
 
     public boolean isCopyButtonDisplayed()

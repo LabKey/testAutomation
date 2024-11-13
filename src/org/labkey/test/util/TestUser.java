@@ -68,7 +68,7 @@ public class TestUser
     {
         if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
         {
-            _password = _apiUserHelper.setInitialPassword(_email);
+            _password = _apiUserHelper.setInitialPassword(_createUserResponse.getUserId());
         }
         else
         {

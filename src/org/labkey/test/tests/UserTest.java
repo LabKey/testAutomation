@@ -80,6 +80,8 @@ public class UserTest extends BaseWebDriverTest
 
     protected final UIUserHelper _userHelper = new UIUserHelper(this);
 
+    private static int _normalUserId;
+
     @Nullable
     @Override
     protected String getProjectName()
@@ -103,7 +105,7 @@ public class UserTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor");
+        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor").getUserId();
     }
 
     @Override
@@ -164,8 +166,8 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testChangeUserEmail()
     {
-        new UIUserHelper(this).cloneUser(CHANGE_EMAIL_USER, NORMAL_USER);
-        setInitialPassword(CHANGE_EMAIL_USER);
+        int userId = new UIUserHelper(this).cloneUser(CHANGE_EMAIL_USER, NORMAL_USER).getUserId();
+        setInitialPassword(userId);
 
         //change their email address
         changeUserEmail(CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE);
@@ -198,8 +200,8 @@ public class UserTest extends BaseWebDriverTest
         assertEquals("Failed to set authentication param to enable self service email via http get", 200, getResponse);
 
         log("Create a new user.");
-        _userHelper.createUser(SELF_SERVICE_EMAIL_USER, true, true);
-        setInitialPassword(SELF_SERVICE_EMAIL_USER);
+        int selfServiceId = _userHelper.createUser(SELF_SERVICE_EMAIL_USER, true, true).getUserId();
+        setInitialPassword(selfServiceId);
 
         goToHome();
 
@@ -250,7 +252,7 @@ public class UserTest extends BaseWebDriverTest
 
         log("Validate that trying to use the link from the email message again will result in an error.");
         goToURL(resetUrl, 30000);
-        assertTextPresent("This email address has already been verified.");
+        assertTextPresent("Verification failed.");
         goToHome();
 
         log("If you got here there were no errors using the new email account.");
@@ -263,7 +265,7 @@ public class UserTest extends BaseWebDriverTest
     public void testCustomFieldLogin()
     {
         String customFieldValue = "loginCredentials";
-        setInitialPassword(NORMAL_USER);
+        setInitialPassword(_normalUserId);
 
         goToSiteUsers();
         DataRegionTable table = new DataRegionTable("Users", getDriver());
@@ -341,7 +343,7 @@ public class UserTest extends BaseWebDriverTest
             }
         }
 
-        assertTrue("Could not find a url in the email to follow.", urlString.length() > 0);
+        assertTrue("Could not find a url in the email to follow.", !urlString.isEmpty());
         try
         {
             resetUrl = new URL(urlString);
@@ -413,8 +415,8 @@ public class UserTest extends BaseWebDriverTest
         {
             ensureRequiredFieldsSet();
 
-            _userHelper.createUserAndNotify(BLANK_USER);
-            setInitialPassword(BLANK_USER);
+            int userId = _userHelper.createUserAndNotify(BLANK_USER).getUserId();
+            setInitialPassword(userId);
 
             DomainDesignerPage domainDesignerPage = goToSiteUsers().clickChangeUserProperties();
             DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
