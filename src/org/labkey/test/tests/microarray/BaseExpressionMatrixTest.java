@@ -24,6 +24,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
@@ -32,7 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseExpressionMatrixTest extends BaseWebDriverTest
+public class BaseExpressionMatrixTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
     protected static final String PIPELINE_NAME = "create-matrix";
     protected static final String ASSAY_NAME = "Test Expression Matrix";
