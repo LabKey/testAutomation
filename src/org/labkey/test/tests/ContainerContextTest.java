@@ -89,7 +89,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("query", "viscstudies");
+        return Arrays.asList("query");
     }
 
     @Override
@@ -122,13 +122,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         _RReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
+        _containerHelper.enableModules(Arrays.asList("simpletest"));
         _portalHelper.doInAdminMode(ph -> {
             ph.addWebPart("Workbooks");
             ph.addWebPart("Lists");
-            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "Wiki"});
             ph.addWebPart("Lists");
-            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies", "Wiki"});
+            _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "Wiki"});
             ph.addWebPart("Lists");
         });
     }
@@ -201,57 +201,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         href = getAttribute(Locator.linkWithText("200"), "href");
         assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
                 href.contains(getProjectName() + "/" + SUB_FOLDER_A) && href.contains("fake") && href.contains("action.view?key=2"));
-    }
-
-    // TODO: Move this to 'CAVDStudyTest'
-    // Issue 15610: viscstudieslist - URLs generated from lookups are broken
-    @Test
-    public void testIssue15610() throws Exception
-    {
-        log("** Creating study in " + SUB_FOLDER_A);
-        goToProjectHome();
-        clickFolder(SUB_FOLDER_A);
-        goToManageStudy();
-        clickButton("Create Study");
-        setFormElement(Locator.name("label"), SUB_FOLDER_A + "-Study");
-        clickButton("Create Study");
-
-        log("** Creating study in " + SUB_FOLDER_B);
-        goToProjectHome();
-        clickFolder(SUB_FOLDER_B);
-        goToManageStudy();
-        clickButton("Create Study");
-        setFormElement(Locator.name("label"), SUB_FOLDER_B + "-Study");
-        clickButton("Create Study");
-
-        log("** Creating list with lookup to viscstudies.studies");
-        List<FieldDefinition> cols = List.of(
-            new FieldDefinition("StudyLookup", new FieldDefinition.LookupInfo(null, "viscstudies", "studies").setTableType(FieldDefinition.ColumnType.String)).setDescription("Study Lookup")
-        );
-        new IntListDefinition("Issue15610-List", LIST_KEY_NAME).setFields(cols)
-                .create(createDefaultConnection(), getProjectName());
-
-        log("** Inserting row into list");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText("Issue15610-List"));
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
-        clickButton("Submit");
-
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
-        clickButton("Submit");
-
-        log("** Checking URLs go to correct container...");
-        String href = getAttribute(Locator.linkWithText(SUB_FOLDER_A + "-Study"), "href");
-        assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container: " + href,
-                href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_A + "/studySchedule.view") ||
-                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/study-studySchedule.view"));
-
-        href = getAttribute(Locator.linkWithText(SUB_FOLDER_B + "-Study"), "href");
-        assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_B + " container: " + href,
-                href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_B + "/studySchedule.view") ||
-                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_B + "/study-studySchedule.view"));
     }
 
     // Issue 15751: Pipeline job list generates URLs without correct container
