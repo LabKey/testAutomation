@@ -31,7 +31,7 @@ public class Server
     private String host;
     private List<Login> logins;
     private List<ApiKey> apiKeys;
-    private Map<String, Object> extraValues;
+    private Map<String, Object> extraValues = Map.of();
 
     public String getKey()
     {
