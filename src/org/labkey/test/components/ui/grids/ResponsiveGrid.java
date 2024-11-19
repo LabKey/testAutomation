@@ -304,7 +304,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 .withMessage("Column label edit text box did not go away.")
                 .until(ExpectedConditions.stalenessOf(textEdit));
 
-        // You can do this:
         doAndWaitForUpdate(()->
                 WebDriverWrapper.waitFor(()->headerCell.getText().equals(newColumnLabel),
                         "Column header not updated.", 1_000)
