@@ -1447,14 +1447,7 @@ public class EditableGridTest extends BaseWebDriverTest
         }
 
         // Dismiss warning popup by moving off the grid.
-        WebElement logo = Locator.tagWithClass("a", "brand-logo").findWhenNeeded(getDriver());
-        WebElement appDiv = Locator.tagWithId("div", "app").findWhenNeeded(getDriver());
-        new Actions(getDriver())
-                .moveToElement(logo)
-                .pause(java.time.Duration.ofMillis(500))
-                .moveToElement(appDiv)
-                .pause(java.time.Duration.ofMillis(500))
-                .perform();
+        mouseOver(Locator.tagWithClass("a", "brand-logo").findWhenNeeded(getDriver()));
 
         WebDriverWrapper.waitFor(()->!Locator.tagWithClass("div", "popover").findWhenNeeded(getDriver()).isDisplayed(),
                 "Bad value popup did not go away.", 500);
