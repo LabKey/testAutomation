@@ -669,12 +669,13 @@ public class Crawler
     {
         @NotNull private final String _controller;
         @NotNull private String _action = "";
-        private String _folder;
+        private final String _folder;
 
         public ControllerActionId(@NotNull String controller, @NotNull String action)
         {
             _controller = controller;
             _action = action;
+            _folder = "";
         }
 
         public ControllerActionId(@NotNull String url)
@@ -684,13 +685,13 @@ public class Crawler
             if (rootRelativeURL.startsWith("_webdav/"))
             {
                 _controller = "_webdav";
-                _folder = rootRelativeURL.substring("_webdav/".length());
+                _folder = EscapeUtil.decode(rootRelativeURL.substring("_webdav/".length()));
                 return;
             }
             if (rootRelativeURL.startsWith("_webfiles/"))
             {
                 _controller = "_webfiles";
-                _folder = rootRelativeURL.substring("_webfiles/".length());
+                _folder = EscapeUtil.decode(rootRelativeURL.substring("_webfiles/".length()));
                 return;
             }
 
@@ -723,7 +724,7 @@ public class Crawler
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
-            _folder = StringUtils.strip(rootRelativeURL, "/");
+            _folder = EscapeUtil.decode(StringUtils.strip(rootRelativeURL, "/"));
         }
 
         @NotNull public String getAction()
