@@ -32,6 +32,7 @@ import org.labkey.test.pages.study.ManageDatasetQCStatesPage;
 import org.labkey.test.pages.study.QCStateTableRow;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.PostgresOnlyTest;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -49,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
-public class AdvancedImportOptionsTest extends BaseWebDriverTest
+public class AdvancedImportOptionsTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
     private static final String LIMITED_USER = "limited@advancedimport.test";
 

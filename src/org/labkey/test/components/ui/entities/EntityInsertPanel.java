@@ -134,10 +134,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return parentEntityTypeSelect(label);
     }
 
-    public EntityInsertPanel clearParents()
+    private EntityInsertPanel clearParents(String typeText)
     {
         Locator loc = Locator.tagWithClass("span", "container--action-button")
-                .withChild(Locator.tagWithClass("i", "container--removal-icon")).withText("Remove Parent 1");
+                .withChild(Locator.tagWithClass("i", "container--removal-icon")).withText(typeText);
 
         getWrapper().waitFor(()-> loc.findElementOrNull(getDriver()) != null, 1500);  // it's okay if it isn't there
 
@@ -150,6 +150,16 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         }
 
         return this;
+    }
+
+    public EntityInsertPanel clearParents()
+    {
+        return clearParents("Remove Parent 1");
+    }
+
+    public EntityInsertPanel clearSources()
+    {
+        return clearParents("Remove Source Parent 1");
     }
 
     public EntityInsertPanel addRecords(List<Map<String, Object>> records)
