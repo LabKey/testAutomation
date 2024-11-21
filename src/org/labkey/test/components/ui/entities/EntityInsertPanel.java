@@ -197,6 +197,19 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
+    public EntityInsertPanel setRecordValues(List<Map<String, Object>> rowValues)
+    {
+        for (int i = 0; i < rowValues.size(); i++)
+        {
+            Map<String, Object> columnValues = rowValues.get(i);
+            for(String columnName : columnValues.keySet())
+            {
+                elementCache().grid.setCellValue(i, columnName, columnValues.get(columnName));
+            }
+        }
+        return this;
+    }
+
     public EditableGrid getEditableGrid()
     {
         showGrid();
