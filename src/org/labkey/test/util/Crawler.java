@@ -591,7 +591,7 @@ public class Crawler
             if (!st.hasMoreElements())
                 return false;
 
-            String currentProject = EscapeUtil.decode(st.nextToken());
+            String currentProject = st.nextToken();
             if (StringUtils.isEmpty(currentProject))
                 return false;
 
@@ -739,7 +739,7 @@ public class Crawler
 
         /**
          * Folder is parsed out for convenience only. Is ignored for equality and hash calculations.
-         * @return container path from parsed URL
+         * @return decoded containerPath from parsed URL
          */
         public String getFolder()
         {
