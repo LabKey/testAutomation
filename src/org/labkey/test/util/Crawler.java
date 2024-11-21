@@ -763,16 +763,6 @@ public class Crawler
             return _containerPath;
         }
 
-        /**
-         * @deprecated Use {@link #getContainerPath()}
-         */
-        @Nullable
-        @Deprecated (since = "24.12")
-        public String getFolder()
-        {
-            return getContainerPath();
-        }
-
         @Override
         public String toString()
         {
