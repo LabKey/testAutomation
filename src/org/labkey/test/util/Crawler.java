@@ -33,6 +33,7 @@ import org.assertj.core.api.Assertions;
 import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
@@ -525,7 +526,7 @@ public class Crawler
             if (null != getActionId() && _adminControllers.contains(getActionId().getController()))
                 p += (_prioritizeAdminPages ? -1 : 1);
             // demote root directory
-            if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getFolder(),"/")))
+            if (null != getActionId() && StringUtils.isBlank(StringUtils.strip(getActionId().getContainerPath(),"/")))
                 p += (_prioritizeAdminPages ? -1 : 1);
             priority = p + random.nextFloat();
 
@@ -586,7 +587,7 @@ public class Crawler
             if (null == getActionId())
                 return false;
 
-            String folder = StringUtils.strip(getActionId().getFolder(), "/");
+            String folder = StringUtils.strip(getActionId().getContainerPath(), "/");
             StringTokenizer st = new StringTokenizer(folder, "/");
 
             if (!st.hasMoreElements())
@@ -644,7 +645,7 @@ public class Crawler
 
             // in addition to test projects, we'll crawl all admin functionality as well
             // (otherwise this never gets covered).
-            if (_adminControllers.contains(getActionId().getController()) && !"home".equals(getActionId().getFolder()))
+            if (_adminControllers.contains(getActionId().getController()) && !"home".equals(getActionId().getContainerPath()))
                 return true;
 
             for (Function<UrlToCheck, Boolean> check : _specialCrawlExclusions)
@@ -670,13 +671,13 @@ public class Crawler
     {
         @NotNull private final String _controller;
         @NotNull private String _action = "";
-        private final String _folder;
+        private final String _containerPath;
 
         public ControllerActionId(@NotNull String controller, @NotNull String action)
         {
             _controller = controller;
             _action = action;
-            _folder = null;
+            _containerPath = null;
         }
 
         public ControllerActionId(@NotNull String url)
@@ -686,13 +687,27 @@ public class Crawler
             if (rootRelativeURL.startsWith("_webdav/"))
             {
                 _controller = "_webdav";
-                _folder = EscapeUtil.decode(rootRelativeURL.substring("_webdav/".length()));
+                String path = EscapeUtil.decode(rootRelativeURL.substring("_webdav/".length()));
+                if (path.startsWith("@"))
+                {
+                    _containerPath = "";
+                    _action = path;
+                }
+                else
+                {
+                    String[] splitPath = path.split("/@", 2); // container names can't begin with '@'
+                    _containerPath = splitPath[0];
+                    if (splitPath.length > 1)
+                    {
+                        _action = "@" + splitPath[1]; // Include file path as "action". e.g. "@files/folder/sample.txt"
+                    }
+                }
                 return;
             }
             if (rootRelativeURL.startsWith("_webfiles/"))
             {
                 _controller = "_webfiles";
-                _folder = EscapeUtil.decode(rootRelativeURL.substring("_webfiles/".length()));
+                _containerPath = EscapeUtil.decode(rootRelativeURL.substring("_webfiles/".length()));
                 return;
             }
 
@@ -725,7 +740,7 @@ public class Crawler
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
-            _folder = EscapeUtil.decode(StringUtils.strip(rootRelativeURL, "/"));
+            _containerPath = EscapeUtil.decode(StringUtils.strip(rootRelativeURL, "/"));
         }
 
         @NotNull public String getAction()
@@ -743,9 +758,19 @@ public class Crawler
          * @return decoded containerPath from parsed URL, with no leading or trailing '/'. `null` if instance was not generated from a URL.
          */
         @Nullable
+        public String getContainerPath()
+        {
+            return _containerPath;
+        }
+
+        /**
+         * @deprecated Use {@link #getContainerPath()}
+         */
+        @Nullable
+        @Deprecated (since = "24.12")
         public String getFolder()
         {
-            return _folder;
+            return getContainerPath();
         }
 
         @Override
@@ -775,34 +800,7 @@ public class Crawler
     public void crawlAllLinks()
     {
         // quick unit-test
-        {
-            ControllerActionId oldAction = new ControllerActionId("/controller/project/folder/action.view");
-            assertEquals("controller", oldAction.getController());
-            assertEquals("project/folder", oldAction.getFolder());
-            assertEquals("action", oldAction.getAction());
-            ControllerActionId containerRelativeAction = new ControllerActionId("/project/folder/controller-action.view");
-            assertEquals("controller", containerRelativeAction.getController());
-            assertEquals("project/folder", containerRelativeAction.getFolder());
-            assertEquals("action", containerRelativeAction.getAction());
-            assertEquals(oldAction, containerRelativeAction);
-            ControllerActionId subControllerOldAction = new ControllerActionId("/controller-sub/folder/action.view");
-            assertEquals("controller-sub", subControllerOldAction.getController());
-            assertEquals("folder", subControllerOldAction.getFolder());
-            assertEquals("action", subControllerOldAction.getAction());
-            ControllerActionId subControllerNewAction = new ControllerActionId("/folder/controller-sub-action.view");
-            assertEquals("controller-sub", subControllerNewAction.getController());
-            assertEquals("folder", subControllerNewAction.getFolder());
-            assertEquals("action", subControllerNewAction.getAction());
-            assertEquals(subControllerOldAction, subControllerNewAction);
-
-            ControllerActionId actionWithHash = new ControllerActionId("/project/folder/controller-app.view#/app/hash/path");
-            assertEquals("controller", actionWithHash.getController());
-            assertEquals("project/folder", actionWithHash.getFolder());
-            assertEquals("app", actionWithHash.getAction());
-
-            ControllerActionId webdavAction = new ControllerActionId("/_webdav/fred");
-            assertEquals("_webdav", webdavAction.getController());
-        }
+        new ControllerActionIdTest().testControllerActionIdParsing();
 
         TestLogger.log("Starting crawl...");
 
@@ -1448,5 +1446,64 @@ public class Crawler
         }
         );
         return sb.toString();
+    }
+
+    public static class ControllerActionIdTest
+    {
+        @Test
+        public void testControllerActionIdParsing()
+        {
+            ControllerActionId oldAction = verifyParsedUrl("/controller/test%20project/sub%20folder/action.view",
+                "controller",
+                "test project/sub folder",
+                "action");
+            ControllerActionId containerRelativeAction = verifyParsedUrl("/test%20project/sub%20folder/controller-action.view",
+                "controller",
+                "test project/sub folder",
+                "action");
+            assertEquals(oldAction, containerRelativeAction);
+
+            ControllerActionId subControllerOldAction = verifyParsedUrl("/controller-sub/test%20project/sub%20folder/action.view",
+                "controller-sub",
+                "test project/sub folder",
+                "action");
+            ControllerActionId subControllerNewAction = verifyParsedUrl("/test%20project/sub%20folder/controller-sub-action.view",
+                "controller-sub",
+                "test project/sub folder",
+                "action");
+            assertEquals(subControllerOldAction, subControllerNewAction);
+
+            verifyParsedUrl("/test%20project/sub%20folder/controller-app.view#/app/hash/path",
+                "controller",
+                "test project/sub folder",
+                "app");
+
+            // webdav, no file
+            verifyParsedUrl("/_webdav/fred",
+                "_webdav",
+                "fred",
+                "");
+
+            // webdav at root project
+            verifyParsedUrl("/_webdav/%40files/folder/sample.txt",
+                "_webdav",
+                "",
+                "@files/folder/sample.txt");
+
+            // webfiles
+            verifyParsedUrl("/_webfiles/project/sub%20folder/folder/sample.txt",
+                "_webfiles",
+                "project/sub folder/folder/sample.txt",
+                "");
+        }
+
+        private ControllerActionId verifyParsedUrl(String url, String expectedController, String expectedContainerPath, String expectedAction)
+        {
+            ControllerActionId actionId = new ControllerActionId(url);
+            assertEquals(expectedController, actionId.getController());
+            assertEquals(expectedContainerPath, actionId.getContainerPath());
+            assertEquals(expectedAction, actionId.getAction());
+            return actionId;
+        }
     }
 }
