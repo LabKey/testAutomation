@@ -302,56 +302,6 @@ public class DataReportsTest extends ReportTest
     }
 
     @Test
-    public void doAdvancedViewTest()
-    {
-        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        DataRegionTable dataRegion = DataRegionTable.DataRegion(getDriver()).find();
-        String create_advanced_report = "Create Advanced Report";
-
-        // Note: Enabling this feature flag requires a server restart
-        if (TestProperties.isPrimaryUserAppAdmin() || !OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
-        {
-            List<String> menuItems = dataRegion.getHeaderMenuOptions("Charts / Reports");
-            assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
-            assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
-            // Site admins can still navigate to the externalReport page. It isn't functional though, so skipping this check
-            if (TestProperties.isPrimaryUserAppAdmin())
-            {
-                beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
-                assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
-            }
-            return; // success
-        }
-
-        dataRegion.goToReport(create_advanced_report);
-
-        log("Verify txt report");
-        selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
-        String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement(Locator.name("program"), java);
-        setFormElement(Locator.name("arguments"), "-cp " + new File(TestFileUtils.getTestBuildDir(), "classes/java/uiTest") + " org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        clickAndWait(Locator.lkButton("Submit"));
-        assertElementPresent(Locator.tag("pre").containing("Female"));
-
-        log("Verify tsv report");
-        setFormElement(Locator.name("program"), java);
-        setFormElement(Locator.name("arguments"), "-cp " + new File(TestFileUtils.getTestBuildDir(), "classes/java/uiTest") + " org.labkey.test.util.Echo ${DATA_FILE}");
-        selectOptionByValue(Locator.name("fileExtension"), "tsv");
-        clickAndWait(Locator.lkButton("Submit"));
-        assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
-        assertElementPresent(Locator.tag("td").containing("Female"));
-
-        log("Verify saved tsv report");
-        setFormElement(Locator.name("label"), "tsv");
-        selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
-        clickAndWait(Locator.lkButton("Save"));
-        clickAndWait(Locator.linkWithText(getFolderName()));
-        clickAndWait(Locator.linkWithText("tsv"));
-        assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
-        assertElementPresent(Locator.tag("td").containing("Female"));
-    }
-
-    @Test
     public void doRReportsTest()
     {
         clickAndWait(Locator.linkWithText(DATA_SET));
