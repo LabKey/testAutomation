@@ -32,6 +32,7 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.assertj.core.api.Assertions;
 import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
@@ -643,7 +644,7 @@ public class Crawler
 
             // in addition to test projects, we'll crawl all admin functionality as well
             // (otherwise this never gets covered).
-            if (_adminControllers.contains(getActionId().getController()) && !"/home".equals(getActionId().getFolder()))
+            if (_adminControllers.contains(getActionId().getController()) && !"home".equals(getActionId().getFolder()))
                 return true;
 
             for (Function<UrlToCheck, Boolean> check : _specialCrawlExclusions)
@@ -675,7 +676,7 @@ public class Crawler
         {
             _controller = controller;
             _action = action;
-            _folder = "";
+            _folder = null;
         }
 
         public ControllerActionId(@NotNull String url)
@@ -739,8 +740,9 @@ public class Crawler
 
         /**
          * Folder is parsed out for convenience only. Is ignored for equality and hash calculations.
-         * @return decoded containerPath from parsed URL
+         * @return decoded containerPath from parsed URL, with no leading or trailing '/'. `null` if instance was not generated from a URL.
          */
+        @Nullable
         public String getFolder()
         {
             return _folder;
