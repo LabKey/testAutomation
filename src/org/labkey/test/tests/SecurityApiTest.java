@@ -24,7 +24,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.OptionalFeatureHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -121,7 +120,7 @@ public class SecurityApiTest extends BaseWebDriverTest
      * If you run the test locally from the command line you might be better able to understand what the differences are.
      * After running locally you should see a message at the end of the run output that looks like this:
      *
-     * There were failing tests. See the report at: file:///Users/janedoe/labkey/trunk/build/modules/testAutomation/test/logs/reports/html/index.html
+     * There were failing tests. See the report at: [LABKEY-ROOT]/build/modules/testAutomation/test/logs/reports/html/index.html
      *
      * Open this file in a browser, click on the test name, then click on the "Standard output" button. This presents the
      * output in a more readable way (basically a log). Near the top is an "Expected:" comment with the expected well formatted
@@ -144,12 +143,10 @@ public class SecurityApiTest extends BaseWebDriverTest
     @Test
     public void testApiUserRolesAndPermissions() throws Exception
     {
-        boolean previous = OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "restoreUseOfAcls");
         APITestHelper apiTester = new APITestHelper(this);
         apiTester.setTestFiles(getTestFiles());
         apiTester.setIgnoredElements(getIgnoredElements());
         apiTester.runApiTests(ADMIN_USER);
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "restoreUseOfAcls", previous);
     }
 
     @Override
