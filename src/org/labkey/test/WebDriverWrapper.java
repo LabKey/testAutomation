@@ -50,12 +50,12 @@ import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
@@ -3917,7 +3917,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (paramValue != null && decode)
         {
-            paramValue = paramValue.replace("+", "%20");
             paramValue = URLDecoder.decode(paramValue, StandardCharsets.UTF_8);
         }
 
