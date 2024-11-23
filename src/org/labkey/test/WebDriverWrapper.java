@@ -22,6 +22,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hc.client5.http.utils.URIUtils;
 import org.eclipse.jetty.util.URIUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;

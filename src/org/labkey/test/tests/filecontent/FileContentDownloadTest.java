@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.filecontent;
 
+import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -25,7 +26,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -186,7 +186,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         signOut();
         // Test that renderAs can be observed through a login
         log("Test renderAs through login and ensure that page is rendered inside of server UI");
-        beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/%40files/" + EscapeUtil.encode(folderName) + "/" + textFile.getName() + "?renderAs=INLINE");
+        beginAt("files/" + URIUtil.encodePath(getProjectName() + "/@files/" + folderName + "/" + textFile.getName()) + "?renderAs=INLINE");
         assertTitleContains("Sign In");
 
         // If this succeeds, then page has been rendered in frame
