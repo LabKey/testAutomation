@@ -9,6 +9,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
@@ -1444,7 +1445,12 @@ public class EditableGridTest extends BaseWebDriverTest
             List<String> expectedWarnings = expectedCellWarnings.get(row);
             verifyCellWarning(testGrid, expectedWarnings, row);
         }
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
+
+        // Dismiss warning popup by moving off the grid.
+        mouseOver(Locator.tagWithClass("a", "brand-logo").findWhenNeeded(getDriver()));
+
+        WebDriverWrapper.waitFor(()->!Locator.tagWithClass("div", "popover").findWhenNeeded(getDriver()).isDisplayed(),
+                "Bad value popup did not go away.", 500);
 
         log("Correct missing required fields should remove corresponding cell warnings");
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
