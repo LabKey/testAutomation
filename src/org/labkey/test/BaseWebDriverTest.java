@@ -277,9 +277,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return urlsSeen;
     }
 
-    public static BaseWebDriverTest getCurrentTest()
+    public static <T extends BaseWebDriverTest> T getCurrentTest()
     {
-        return currentTest;
+        return (T)currentTest;
     }
 
     private static Class<? extends BaseWebDriverTest> getCurrentTestClass()

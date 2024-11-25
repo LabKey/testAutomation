@@ -305,6 +305,16 @@ public class WikiHelper
         _test.clickButton("Copy Pages");
     }
 
+    public void setWikiName(String name)
+    {
+        _test.setFormElement(Locator.name("name"), name);
+    }
+
+    public void setWikiTitle(String title)
+    {
+        _test.setFormElement(Locator.name("title"), title);
+    }
+
     public enum WikiRendererType
     {
         RADEOX ("Wiki Page"),

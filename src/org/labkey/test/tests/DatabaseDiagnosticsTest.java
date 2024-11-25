@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -34,7 +35,9 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -50,10 +53,15 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
+    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "DatabaseDiagnosticsTest";
+    private static final String WIKI_PAGE_TITLE = "TOC_with_inline";
+    private static final String WIKI_PAGE_BODY = "${labkey.webPart(partName='Wiki TOC', showFrame='false')}\n" +
+            "<div onclick=\"alert('bad page')\">Click me</div>";
+
     @Override
     protected String getProjectName()
     {
-        return null;
+        return PROJECT_NAME;
     }
 
     @Test
@@ -71,9 +79,36 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 .assertLogTextContains("Check complete, 0 errors found");
     }
 
+    @BeforeClass
+    public static void setupProject()
+    {
+        DatabaseDiagnosticsTest init = getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.enableModules(Arrays.asList("Wiki"));
+
+        goToProjectHome();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addBodyWebPart("Wiki");
+    }
+
     @Test
     public void testSiteValidator()
     {
+        goToProjectHome(PROJECT_NAME);
+
+        // Issue 51749 - Create a CSP problem and a Wiki table of contents that caused a problem when checked in the background
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        wikiHelper.setWikiName(WIKI_PAGE_TITLE);
+        wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
+        wikiHelper.setWikiBody(WIKI_PAGE_BODY);
+        wikiHelper.saveWikiPage();
+
         goToAdminConsole().goToSettingsSection();
 
         clickAndWait(Locator.linkWithText("site validation"));
@@ -103,7 +138,10 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         assertTextPresent(textSearcher,
                 "Site Level Validation Results", "Folder Validation Results",
                 "Module: Core", "Permissions Validator", "Display Format Validator",
-                "Module: Pipeline", "Pipeline Validator");
+                "Module: Pipeline", "Pipeline Validator", "Wiki Validator");
+
+        // Issue 51749 - check for expected CSP problem
+        assertTextPresent(textSearcher, "CSP (CSP): onclick");
         assertTextNotPresent(textSearcher, "Error");
     }
 
