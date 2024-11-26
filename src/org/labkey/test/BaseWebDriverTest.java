@@ -198,7 +198,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static boolean _dumpedHeap = false;
     private final ArtifactCollector _artifactCollector;
     private final DeferredErrorCollector _errorCollector;
-    private final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
+    protected final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -2817,10 +2817,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    private static class CspCheckPageLoadListener implements PageLoadListener
+    public static class CspCheckPageLoadListener implements PageLoadListener
     {
         private final ArtifactCollector _artifactCollector;
         private final DeferredErrorCollector _checker;
+
+        private boolean _enabled = true;
 
         public CspCheckPageLoadListener(BaseWebDriverTest baseWebDriverTest)
         {
@@ -2828,16 +2830,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             _checker = baseWebDriverTest.checker();
         }
 
+        /** Allows test code to suppress expected CSP violations */
+        public void setEnabled(boolean enabled)
+        {
+            _enabled = enabled;
+        }
+
         @Override
         public void beforePageLoad()
         {
-            try
+            if (_enabled)
             {
-                CspLogUtil.checkNewCspWarnings(_artifactCollector);
-            }
-            catch (CspLogUtil.CspWarningDetectedException ex)
-            {
-                _checker.withScreenshot("csp_violation").recordError(ex);
+                try
+                {
+                    CspLogUtil.checkNewCspWarnings(_artifactCollector);
+                }
+                catch (CspLogUtil.CspWarningDetectedException ex)
+                {
+                    _checker.withScreenshot("csp_violation").recordError(ex);
+                }
             }
         }
 

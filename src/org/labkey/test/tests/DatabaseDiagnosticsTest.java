@@ -101,15 +101,24 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     {
         goToProjectHome(PROJECT_NAME);
 
-        // Issue 51749 - Create a CSP problem and a Wiki table of contents that caused a problem when checked in the background
-        WikiHelper wikiHelper = new WikiHelper(this);
-        wikiHelper.createNewWikiPage("HTML");
-        wikiHelper.setWikiName(WIKI_PAGE_TITLE);
-        wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
-        wikiHelper.setWikiBody(WIKI_PAGE_BODY);
-        wikiHelper.saveWikiPage();
+        try
+        {
+            _cspCheckPageLoadListener.setEnabled(false);
 
-        goToAdminConsole().goToSettingsSection();
+            // Issue 51749 - Create a CSP problem and a Wiki table of contents that caused a problem when checked in the background
+            WikiHelper wikiHelper = new WikiHelper(this);
+            wikiHelper.createNewWikiPage("HTML");
+            wikiHelper.setWikiName(WIKI_PAGE_TITLE);
+            wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
+            wikiHelper.setWikiBody(WIKI_PAGE_BODY);
+            wikiHelper.saveWikiPage();
+
+            goToAdminConsole().goToSettingsSection();
+        }
+        finally
+        {
+            _cspCheckPageLoadListener.setEnabled(true);
+        }
 
         clickAndWait(Locator.linkWithText("site validation"));
 
@@ -141,7 +150,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 "Module: Pipeline", "Pipeline Validator", "Wiki Validator");
 
         // Issue 51749 - check for expected CSP problem
-        assertTextPresent(textSearcher, "CSP (CSP): onclick");
+        assertTextPresent(textSearcher, WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + "): onclick");
         assertTextNotPresent(textSearcher, "Error");
     }
 
