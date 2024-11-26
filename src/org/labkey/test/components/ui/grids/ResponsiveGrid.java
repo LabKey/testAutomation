@@ -14,11 +14,13 @@ import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
@@ -276,6 +278,40 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
+    public void editColumnLabel(String columnLabel, String newColumnLabel)
+    {
+        // Get the column header.
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+
+        // Select the edit menu.
+        clickColumnMenuItem(columnLabel, "Edit Label", false);
+
+        // Get the textbox.
+        WebElement textEdit = Locator.tag("input").findWhenNeeded(headerCell);
+
+        // Clear the text box.
+        new Actions(getDriver())
+                .keyDown(Keys.SHIFT)
+                .sendKeys(Keys.HOME)
+                .sendKeys(Keys.DELETE)
+                .keyUp(Keys.SHIFT)
+                .perform();
+
+        // Enter the new text.
+        textEdit.sendKeys(newColumnLabel, Keys.RETURN);
+
+        getWrapper().shortWait()
+                .withMessage("Column label edit text box did not go away.")
+                .until(ExpectedConditions.stalenessOf(textEdit));
+
+        doAndWaitForUpdate(()->
+                WebDriverWrapper.waitFor(()->headerCell.getText().equals(newColumnLabel),
+                        "Column header not updated.", 1_000)
+        );
+        waitForLoaded();
+        clearElementCache();
+
+    }
 
     /**
      * Check/uncheck row at index
