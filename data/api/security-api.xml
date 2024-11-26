@@ -12,20 +12,15 @@
                     "groups": [
                         {
                             "id": -1,
-                            "roleLabel": "No Permissions",
                             "name": "Site Administrators",
                             "roles": [],
                             "isSystemGroup": true,
-                            "permissions": 0,
-                            "role": "NO_PERMISSIONS",
                             "isProjectGroup": false,
                             "type": "g",
                             "effectivePermissions": [],
                             "groups": []
                         },
                         {
-                            "role": "NO_PERMISSIONS",
-                            "permissions": 0,
                             "isSystemGroup": true,
                             "roles": [],
                             "name": "Developers",
@@ -34,16 +29,12 @@
                             "id": -4,
                             "type": "g",
                             "isProjectGroup": false,
-                            "roleLabel": "No Permissions"
                         },
                         {
                             "id": -3,
-                            "roleLabel": "No Permissions",
                             "name": "Guests",
                             "roles": [],
                             "isSystemGroup": true,
-                            "permissions": 0,
-                            "role": "NO_PERMISSIONS",
                             "isProjectGroup": false,
                             "type": "g",
                             "effectivePermissions": [],
@@ -51,12 +42,9 @@
                         },
                         {
                             "id": -2,
-                            "roleLabel": "No Permissions",
                             "name": "All Site Users",
                             "roles": [],
                             "isSystemGroup": true,
-                            "permissions": 0,
-                            "role": "NO_PERMISSIONS",
                             "isProjectGroup": false,
                             "type": "g",
                             "effectivePermissions": [],
@@ -64,12 +52,9 @@
                         },
                         {
                             "id": 1672,
-                            "roleLabel": "Editor",
                             "name": "testgroup1",
                             "roles": ["org.labkey.api.security.roles.EditorRole"],
                             "isSystemGroup": false,
-                            "permissions": 15,
-                            "role": "EDITOR",
                             "isProjectGroup": true,
                             "type": "g",
                             "effectivePermissions": [
@@ -97,12 +82,9 @@
                         },
                         {
                             "id": 1673,
-                            "roleLabel": "Reader",
                             "name": "testgroup2",
                             "roles": ["org.labkey.api.security.roles.ReaderRole"],
                             "isSystemGroup": false,
-                            "permissions": 1,
-                            "role": "READER",
                             "isProjectGroup": true,
                             "type": "g",
                             "effectivePermissions": [
@@ -117,12 +99,9 @@
                         },
                         {
                             "id": 1671,
-                            "roleLabel": "No Permissions",
                             "name": "Users",
                             "roles": [],
                             "isSystemGroup": false,
-                            "permissions": 0,
-                            "role": "NO_PERMISSIONS",
                             "isProjectGroup": true,
                             "type": "g",
                             "effectivePermissions": [],

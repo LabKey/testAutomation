@@ -24,19 +24,15 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
@@ -44,9 +40,6 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -299,56 +292,6 @@ public class DataReportsTest extends ReportTest
         clickButton("Create View");
         assertElementPresent(Locator.linkWithText("999320016"));
         deleteReport(viewName);
-    }
-
-    @Test
-    public void doAdvancedViewTest()
-    {
-        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        DataRegionTable dataRegion = DataRegionTable.DataRegion(getDriver()).find();
-        String create_advanced_report = "Create Advanced Report";
-
-        // Note: Enabling this feature flag requires a server restart
-        if (TestProperties.isPrimaryUserAppAdmin() || !OptionalFeatureHelper.isOptionalFeatureEnabled(createDefaultConnection(), "enableExternalReport"))
-        {
-            List<String> menuItems = dataRegion.getHeaderMenuOptions("Charts / Reports");
-            assertThat("App admin shouldn't be able to create an advanced report.", menuItems, not(hasItem(create_advanced_report)));
-            assertThat("Sanity check failed. Check menu text for advanced report.", menuItems, hasItem("Create Chart"));
-            // Site admins can still navigate to the externalReport page. It isn't functional though, so skipping this check
-            if (TestProperties.isPrimaryUserAppAdmin())
-            {
-                beginAt(WebTestHelper.buildURL("study-reports", getCurrentContainerPath(), "externalReport"));
-                assertEquals("App admin shouldn't be able to create an advanced report.", 403, getResponseCode());
-            }
-            return; // success
-        }
-
-        dataRegion.goToReport(create_advanced_report);
-
-        log("Verify txt report");
-        selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
-        String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement(Locator.name("program"), java);
-        setFormElement(Locator.name("arguments"), "-cp " + new File(TestFileUtils.getTestBuildDir(), "classes/java/uiTest") + " org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        clickAndWait(Locator.lkButton("Submit"));
-        assertElementPresent(Locator.tag("pre").containing("Female"));
-
-        log("Verify tsv report");
-        setFormElement(Locator.name("program"), java);
-        setFormElement(Locator.name("arguments"), "-cp " + new File(TestFileUtils.getTestBuildDir(), "classes/java/uiTest") + " org.labkey.test.util.Echo ${DATA_FILE}");
-        selectOptionByValue(Locator.name("fileExtension"), "tsv");
-        clickAndWait(Locator.lkButton("Submit"));
-        assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
-        assertElementPresent(Locator.tag("td").containing("Female"));
-
-        log("Verify saved tsv report");
-        setFormElement(Locator.name("label"), "tsv");
-        selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
-        clickAndWait(Locator.lkButton("Save"));
-        clickAndWait(Locator.linkWithText(getFolderName()));
-        clickAndWait(Locator.linkWithText("tsv"));
-        assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
-        assertElementPresent(Locator.tag("td").containing("Female"));
     }
 
     @Test

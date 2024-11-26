@@ -21,7 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
-import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -34,12 +33,11 @@ import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.UIUserHelper;
@@ -48,11 +46,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -136,7 +130,6 @@ public class SecurityTest extends BaseWebDriverTest
 
         useReturnDuringSignInTest();
         clonePermissionsTest();
-        tokenAuthenticationTest();
         if (!isQuickTest())
         {
             impersonationTest();
@@ -433,136 +426,6 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void tokenAuthenticationTest() throws IOException
-    {
-        // Remote Login API (aka, token authentication) is deprecated, but we'll continue to test it until it's removed
-        boolean previousSetting = OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "remoteLoginFeature");
-
-        beginAt("/SecurityVerifyProject/project-begin.view");
-        String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
-        String relUrl = getCurrentRelativeURL();
-        boolean newSchool = relUrl.contains("project-");
-        String baseUrl = removeUrlParameters(getCurrentRelativeURL()).replaceAll("/project/", "/login/");
-        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
-        if (newSchool)
-            baseUrl += "login-";
-        // Attempt to verify bogus token -- should result in failure
-        String xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=ABC");
-        assertFailureAuthenticationToken(xml);
-
-        beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
-        // Make sure we redirected to the right place
-        assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
-
-        String email = getUrlParam("labkeyEmail", true);
-        String emailName;
-        String userName = PasswordUtil.getUsername();
-        // If we are using IE, then the email will be stripped of its @etc.
-        if (!userName.contains("@"))
-        {
-            emailName = email.substring(0, email.indexOf("@"));
-        }
-        else
-        {
-            emailName = email;
-        }
-        assertEquals(userName, emailName);
-        String token = getUrlParam("labkeyToken", true);
-        xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 32783);
-
-        // Ensure we can POST to verify token action without CSRF token, #36450
-        // Ideally, we'd POST the token in the body, but our SimpleHttpRequest doesn't support parameters
-        xml = postToUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 32783);
-
-        beginAt(baseUrl + "invalidateToken.view?labkeyToken=" + token + "&returnUrl=" + homePageUrl);
-        // Make sure we redirected to the right place
-        assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
-        // Should fail now
-        xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertFailureAuthenticationToken(xml);
-
-        // #40884 - Verify that while impersonating, token authentication still resolves to admin user
-        impersonate(NORMAL_USER);
-
-        beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
-        // Make sure we redirected to the right place
-        assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
-
-        email = getUrlParam("labkeyEmail", true);
-        assertEquals("Wrong email", userName, email);
-        token = getUrlParam("labkeyToken", true);
-        xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 32783);
-
-        // Back to the admin user
-        stopImpersonating();
-
-        // Test that LabKey Server sign out invalidates the token
-        xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertFailureAuthenticationToken(xml);
-
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "remoteLoginFeature", previousSetting);
-    }
-
-    @LogMethod
-    public String postToUrl(String url) throws IOException
-    {
-        log("Posting to " + url);
-        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.getBaseURL() + url, "POST");
-        SimpleHttpResponse response = request.getResponse();
-
-        return response.getResponseBody();
-    }
-
-    protected void assertFailureAuthenticationToken(String xml)
-    {
-        assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
-    }
-
-    protected void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
-    {
-        String correct = "<TokenAuthentication success=\"true\" token=\"" + token + "\" email=\"" + email + "\" permissions=\"" + permissions + "\"/>";
-        assertTrue(xml, xml.startsWith(correct));
-    }
-
-    private String retrieveFromUrl(String relativeUrl)
-    {
-        log("Retrieving from " + relativeUrl);
-        String newline = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-        URL url;
-        try {url = new URL(WebTestHelper.getBaseURL() +  relativeUrl);}
-        catch (MalformedURLException ex) {throw new RuntimeException(ex);}
-
-        try (InputStream is = url.openStream(); BufferedReader reader = Readers.getReader(is))
-        {
-            String line;
-            while ((line = reader.readLine()) != null)
-            {
-                sb.append(line);
-                sb.append(newline);
-            }
-
-            return sb.toString();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failure attempting to retrieve " + relativeUrl, e);
-        }
-    }
-
-    private String removeUrlParameters(String url)
-    {
-        int index = url.indexOf('?');
-
-        if (-1 == index)
-            return url;
-        return url.substring(0, index);
-    }
-
-    @LogMethod
     protected void useReturnDuringSignInTest()
     {
         signOut();
@@ -580,7 +443,6 @@ public class SecurityTest extends BaseWebDriverTest
         input.sendKeys(Keys.ENTER);
         shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
         shortWait().until(ExpectedConditions.urlContains("/home/project-begin.view"));
-
     }
 
     @LogMethod
