@@ -30,6 +30,7 @@ import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
+import org.labkey.test.pages.core.admin.SiteValidationPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.Maps;
@@ -49,20 +50,16 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertTrue;
 
+/** Intended to be run at the end of suites to do some extra validation, without adding much extra overhead. */
 @Category({BVT.class, Daily.class, Git.class, CustomModules.class})
 @Order(1)
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "DatabaseDiagnosticsTest";
-    private static final String WIKI_PAGE_TITLE = "TOC_with_inline";
-    private static final String WIKI_PAGE_BODY = "${labkey.webPart(partName='Wiki TOC', showFrame='false')}\n" +
-            "<div onclick=\"alert('bad page')\">Click me</div>";
-
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return null;
     }
 
     @Test
@@ -80,78 +77,29 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 .assertLogTextContains("Check complete, 0 errors found");
     }
 
-    @BeforeClass
-    public static void setupProject()
-    {
-        DatabaseDiagnosticsTest init = getCurrentTest();
-        init.doSetup();
-    }
-
-    private void doSetup()
-    {
-        _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.enableModules(Arrays.asList("Wiki"));
-
-        goToProjectHome();
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addBodyWebPart("Wiki");
-    }
-
     @Test
     public void testSiteValidator()
     {
-        goToProjectHome(PROJECT_NAME);
+        SiteValidationPage validationPage = goToAdminConsole().clickSiteValidation();
 
-        try
-        {
-            _cspCheckPageLoadListener.setEnabled(false);
-
-            // Issue 51749 - Create a CSP problem and a Wiki table of contents that caused a problem when checked in the background
-            WikiHelper wikiHelper = new WikiHelper(this);
-            wikiHelper.createNewWikiPage("HTML");
-            wikiHelper.setWikiName(WIKI_PAGE_TITLE);
-            wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
-            wikiHelper.setWikiBody(WIKI_PAGE_BODY);
-            wikiHelper.saveWikiPage();
-
-            goToAdminConsole().goToSettingsSection();
-        }
-        finally
-        {
-            _cspCheckPageLoadListener.setEnabled(true);
-        }
-
-        clickAndWait(Locator.linkWithText("site validation"));
-
-        WebElement formEl = Locator.id("form").findElement(getDriver());
-
-        // Enable all validators
-        Locator.tagWithAttribute("input", "type", "checkbox")
-                .findElements(formEl).forEach(this::checkCheckbox);
+        validationPage.setAllValidators(true);
 
         // Validate projects and subfolders
-        checkRadioButton(Locator.radioButtonByNameAndValue("includeSubfolders", "true"));
+        validationPage.setWholeSite(true);
 
-        // Run in background
-        checkCheckbox(Locator.id("background"));
+        PipelineStatusDetailsPage jobPage = validationPage.clickValidateInBackground();
 
-        clickAndWait(Locator.lkButton("Validate"));
-
-        new PipelineStatusDetailsPage(getDriver())
-                .waitForComplete(300_000)
+        jobPage.waitForComplete(300_000)
                 .assertLogTextContains("Site validation complete");
-
-        clickAndWait(Locator.lkButton("Data"));
+        jobPage.clickDataLink();
 
         assertNoLabKeyErrors();
         TextSearcher textSearcher = new TextSearcher(getText(Locators.bodyPanel()));
         assertTextPresent(textSearcher,
                 "Site Level Validation Results", "Folder Validation Results",
                 "Module: Core", "Permissions Validator", "Display Format Validator",
-                "Module: Pipeline", "Pipeline Validator", "Wiki Validator");
+                "Module: Pipeline", "Pipeline Validator");
 
-        // Issue 51749 - check for expected CSP problem
-        assertTextPresent(textSearcher, WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + "): onclick");
         assertTextNotPresent(textSearcher, "Error");
     }
 
