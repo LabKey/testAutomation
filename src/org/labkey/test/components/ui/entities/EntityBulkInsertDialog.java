@@ -407,13 +407,13 @@ public class EntityBulkInsertDialog extends ModalDialog
         WebElement description = Locator.tagWithId("textarea", "Description")
                 .findWhenNeeded(getComponentElement());
 
-        RadioButton derivativesOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Derivatives")
+        RadioButton derivativesOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Derive")
                 .findWhenNeeded(getComponentElement());
 
-        RadioButton poolOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Pooled Samples")
+        RadioButton poolOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Pool")
                 .findWhenNeeded(getComponentElement());
 
-        RadioButton aliquotOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Aliquots")
+        RadioButton aliquotOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Aliquot")
                 .findWhenNeeded(getComponentElement());
 
         WebElement alert = Locator.tagWithClassContaining("div", "alert-danger")
