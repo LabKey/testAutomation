@@ -100,7 +100,6 @@ public class WikiTest extends BaseWebDriverTest
 
         wikiHelper.setWikiName(WIKI_PAGE_TITLE);
         wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
-        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
         wikiHelper.setWikiBody(WIKI_PAGE_CONTENT);
 
         log("test attachments in wiki");
