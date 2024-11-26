@@ -374,6 +374,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         String currentView = getViewName();
 
+        // The menu option (viewName) would be "Default" but the text on the grid id "Default View". They are the same.
+        if (currentView.equalsIgnoreCase("default view"))
+            currentView = "Default";
+
         // Clicking the view already shown will not cause a refresh of the grid.
         if(!currentView.equalsIgnoreCase(viewName))
             doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
