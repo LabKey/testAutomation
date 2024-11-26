@@ -246,7 +246,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _cspCheckPageLoadListener = new CspCheckPageLoadListener(this);
 
         String seleniumBrowser = System.getProperty("selenium.browser");
-        if (seleniumBrowser == null || seleniumBrowser.length() == 0)
+        if (seleniumBrowser == null || seleniumBrowser.isEmpty())
         {
             if (isTestRunningOnTeamCity())
                 BROWSER_TYPE = BrowserType.FIREFOX;
@@ -2833,6 +2833,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         /** Allows test code to suppress expected CSP violations */
         public void setEnabled(boolean enabled)
         {
+            if (enabled && !_enabled)
+            {
+                // Turning back on, so ignore anything that was logged in the interim
+                CspLogUtil.resetCspLogMark();
+            }
+
             _enabled = enabled;
         }
 
