@@ -2817,7 +2817,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public static class CspCheckPageLoadListener implements PageLoadListener
+    public class CspCheckPageLoadListener implements PageLoadListener
     {
         private final ArtifactCollector _artifactCollector;
         private final DeferredErrorCollector _checker;
@@ -2833,6 +2833,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         /** Allows test code to suppress expected CSP violations */
         public void setEnabled(boolean enabled)
         {
+            log("Setting CSP to " + enabled + " on " + this);
             if (enabled && !_enabled)
             {
                 // Turning back on, so ignore anything that was logged in the interim
@@ -2853,6 +2854,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 }
                 catch (CspLogUtil.CspWarningDetectedException ex)
                 {
+                    log("CSP problem detected on " + this);
                     _checker.withScreenshot("csp_violation").recordError(ex);
                 }
             }
