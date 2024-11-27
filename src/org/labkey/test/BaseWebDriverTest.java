@@ -2878,7 +2878,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         public String toString()
         {
-            return getClass().getSimpleName() + "-" + _artifactCollector.getDumpDirName();
+            return getClass().getSimpleName() + "-" + _artifactCollector.getDumpDirName() + "@" + System.identityHashCode(this);
         }
     }
 }
