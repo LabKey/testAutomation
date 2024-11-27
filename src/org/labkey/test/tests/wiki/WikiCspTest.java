@@ -1,6 +1,7 @@
 package org.labkey.test.tests.wiki;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,6 +11,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.core.admin.SiteValidationPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
+import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.WikiHelper;
 
@@ -51,29 +53,34 @@ public class WikiCspTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    @Override
+    protected void checkLeaks()
+    {
+        // No-op to avoid triggering the CSP violation during the crawl
+    }
+
     @Test
     public void testCspChecks()
     {
         goToProjectHome(PROJECT_NAME);
 
+        // Issue 51749 - Create a CSP problem and a Wiki table of contents that caused a problem when checked in the background
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        wikiHelper.setWikiName(WIKI_PAGE_TITLE);
+        wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
+        wikiHelper.setWikiBody(WIKI_PAGE_BODY);
+        wikiHelper.saveWikiPage();
+
+        waitForText("Click me");
+
         try
         {
-            _cspCheckPageLoadListener.setEnabled(false);
-
-            // Issue 51749 - Create a CSP problem and a Wiki table of contents that caused a problem when checked in the background
-            WikiHelper wikiHelper = new WikiHelper(this);
-            wikiHelper.createNewWikiPage("HTML");
-            wikiHelper.setWikiName(WIKI_PAGE_TITLE);
-            wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
-            wikiHelper.setWikiBody(WIKI_PAGE_BODY);
-            wikiHelper.saveWikiPage();
-
-            goToAdminConsole().goToSettingsSection();
+            CspLogUtil.checkNewCspWarnings(getArtifactCollector());
         }
-        finally
-        {
-            _cspCheckPageLoadListener.setEnabled(true);
-        }
+        catch (CspLogUtil.CspWarningDetectedException ignore) {}
+
+        goToAdminConsole().goToSettingsSection();
 
         SiteValidationPage validationPage = goToAdminConsole().clickSiteValidation();
         validationPage.setAllValidators(false);

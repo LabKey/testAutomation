@@ -198,7 +198,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static boolean _dumpedHeap = false;
     private final ArtifactCollector _artifactCollector;
     private final DeferredErrorCollector _errorCollector;
-    protected final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
+    private final CspCheckPageLoadListener _cspCheckPageLoadListener; // Need a strong reference to this
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public final CustomizeView _customizeViewsHelper;
@@ -2817,12 +2817,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public class CspCheckPageLoadListener implements PageLoadListener
+    private static class CspCheckPageLoadListener implements PageLoadListener
     {
         private final ArtifactCollector _artifactCollector;
         private final DeferredErrorCollector _checker;
-
-        private boolean _enabled = true;
 
         public CspCheckPageLoadListener(BaseWebDriverTest baseWebDriverTest)
         {
@@ -2830,33 +2828,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             _checker = baseWebDriverTest.checker();
         }
 
-        /** Allows test code to suppress expected CSP violations */
-        public void setEnabled(boolean enabled)
-        {
-            log("Setting CSP to " + enabled + " on " + this);
-            if (enabled && !_enabled)
-            {
-                // Turning back on, so ignore anything that was logged in the interim
-                CspLogUtil.resetCspLogMark();
-            }
-
-            _enabled = enabled;
-        }
-
         @Override
         public void beforePageLoad()
         {
-            if (_enabled)
+            try
             {
-                try
-                {
-                    CspLogUtil.checkNewCspWarnings(_artifactCollector);
-                }
-                catch (CspLogUtil.CspWarningDetectedException ex)
-                {
-                    log("CSP problem detected on " + this);
-                    _checker.withScreenshot("csp_violation").recordError(ex);
-                }
+                CspLogUtil.checkNewCspWarnings(_artifactCollector);
+            }
+            catch (CspLogUtil.CspWarningDetectedException ex)
+            {
+                _checker.withScreenshot("csp_violation").recordError(ex);
             }
         }
 
