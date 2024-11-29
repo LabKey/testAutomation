@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -18,6 +19,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -32,7 +34,6 @@ import java.util.Map;
 @Category({Daily.class})
 public class ParsingPatternForDateTest extends BaseWebDriverTest
 {
-
     private static final String LIST_SCHEMA = "lists";
     private static final String TEST_PARSING = "Additional Parsing Format List";
     private static final String TEST_MODE = "Date Parsing Mode List";
@@ -42,11 +43,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     private static final String COL_DATE = "dateCol";
     private static final String COL_TIME = "timeCol";
 
-    private static int completedPipelineJobs = 0;
-
     private static final String DATE_TIME_PATTERN = "ddMMMyyyy:HH:mm:ss";
     private static final String DATE_PATTERN = "dd/mm/yy";
     private static final String TIME_PATTERN = "hh:mm a";
+    private static final String DATE_PARSING_PATTERN_FLAG = "extraDateTimeParsingPatterns";
+
+    private static boolean previousDateParsingPatternFlag = false;
+    private static int completedPipelineJobs = 0;
 
     @BeforeClass
     public static void setupProject()
@@ -59,12 +62,20 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), "Study");
         _studyHelper.startCreateStudy()
-                .setTimepointType(StudyHelper.TimepointType.DATE)
-                .createStudy();
+            .setTimepointType(StudyHelper.TimepointType.DATE)
+            .createStudy();
 
         goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
+
+        Connection cn = createDefaultConnection();
+        previousDateParsingPatternFlag = OptionalFeatureHelper.enableOptionalFeature(cn, DATE_PARSING_PATTERN_FLAG);
+    }
+
+    private void restoreDateParsingPatternFlag()
+    {
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), DATE_PARSING_PATTERN_FLAG, previousDateParsingPatternFlag);
     }
 
     @AfterClass
@@ -72,7 +83,8 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     {
         try
         {
-        ((ParsingPatternForDateTest) getCurrentTest()).resetSiteSettings();
+            ((ParsingPatternForDateTest) getCurrentTest()).resetSiteSettings();
+            ((ParsingPatternForDateTest) getCurrentTest()).restoreDateParsingPatternFlag();
         }
         catch (IOException | CommandException e)
         {
@@ -101,12 +113,11 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
             throw new RuntimeException("Failed to reset project settings: " + e);
         }
 
-        log("Verify no patters are set for the project.");
+        log("Verify no patterns are set for the project.");
         verifyNoPatternsSet(ProjectSettingsPage.beginAt(this, getProjectName()));
 
-        log("Verify no patters are set for the site.");
+        log("Verify no patterns are set for the site.");
         verifyNoPatternsSet(LookAndFeelSettingsPage.beginAt(this));
-
     }
 
     private void resetSiteSettings() throws IOException, CommandException
@@ -141,7 +152,6 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     @Test
     public void testSiteAdditionalParsingPatternDateAndTime() throws IOException, CommandException
     {
-
         createList(TEST_PARSING);
         log("Setting the additional parsing patterns for the site.");
         testParsingPatternsList(true);
@@ -150,14 +160,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         ProjectSettingsPage projectSettingsPage = ProjectSettingsPage.beginAt(this, getProjectName());
 
         checker().verifyEquals("Parsing pattern for the DateTime field should show site level value.",
-                DATE_TIME_PATTERN, projectSettingsPage.getAdditionalParsingPatternDateAndTime());
+            DATE_TIME_PATTERN, projectSettingsPage.getAdditionalParsingPatternDateAndTime());
 
         checker().verifyEquals("Parsing pattern for the Date field should show site level value.",
-                DATE_PATTERN, projectSettingsPage.getAdditionalParsingPatternDates());
+            DATE_PATTERN, projectSettingsPage.getAdditionalParsingPatternDates());
 
         checker().verifyEquals("Parsing pattern for the Time field should show site level value.",
-                TIME_PATTERN, projectSettingsPage.getAdditionalParsingPatternTimes());
-
+            TIME_PATTERN, projectSettingsPage.getAdditionalParsingPatternTimes());
     }
 
     @Test
@@ -170,14 +179,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
     private void importBulkNonUSDate(String bulkData)
     {
-
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_MODE));
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
-        listTable.clickImportBulkData()
-                .setText(bulkData);
+        listTable
+            .clickImportBulkData()
+            .setText(bulkData);
         clickButton("Submit");
-
     }
 
     private void verifyImportedNonUSDate(List<String> expectedDateTimeCol, List<String> expectedDateCol, List<String> expectedTimeCol)
@@ -187,13 +195,13 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
 
         checker().verifyEquals("Values in " + COL_DATETIME + " are not as expected.",
-                expectedDateTimeCol, listTable.getColumnDataAsText(COL_DATETIME));
+            expectedDateTimeCol, listTable.getColumnDataAsText(COL_DATETIME));
 
         checker().verifyEquals("Values in " + COL_DATE + " are not as expected.",
-                expectedDateCol, listTable.getColumnDataAsText(COL_DATE));
+            expectedDateCol, listTable.getColumnDataAsText(COL_DATE));
 
         checker().verifyEquals("Values in " + COL_TIME + " are not as expected.",
-                expectedTimeCol, listTable.getColumnDataAsText(COL_TIME));
+            expectedTimeCol, listTable.getColumnDataAsText(COL_TIME));
 
         checker().screenShotIfNewError("Non_US_Mode_Error");
 
@@ -245,40 +253,38 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
         goToProjectHome();
         new IntListDefinition(listName, "id")
-                .setFields(List.of(
-                        new FieldDefinition(COL_NAME, FieldDefinition.ColumnType.String),
-                        new FieldDefinition(COL_DATETIME, FieldDefinition.ColumnType.DateAndTime),
-                        new FieldDefinition(COL_DATE, FieldDefinition.ColumnType.Date),
-                        new FieldDefinition(COL_TIME, FieldDefinition.ColumnType.Time)))
-                .create(createDefaultConnection(), getProjectName());
-
+            .setFields(List.of(
+                new FieldDefinition(COL_NAME, FieldDefinition.ColumnType.String),
+                new FieldDefinition(COL_DATETIME, FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition(COL_DATE, FieldDefinition.ColumnType.Date),
+                new FieldDefinition(COL_TIME, FieldDefinition.ColumnType.Time)
+            ))
+            .create(createDefaultConnection(), getProjectName());
     }
 
     private void verifyNoPatternsSet(BaseSettingsPage settingsPage)
     {
         checker().fatal()
-                .verifyTrue("No additional parsing pattern should be set for the DateTime field.",
-                        settingsPage.getAdditionalParsingPatternDateAndTime().isEmpty());
+            .verifyTrue("No additional parsing pattern should be set for the DateTime field.",
+                settingsPage.getAdditionalParsingPatternDateAndTime().isEmpty());
 
         checker().fatal()
-                .verifyTrue("No additional parsing pattern should be set for the Date field.",
-                        settingsPage.getAdditionalParsingPatternDates().isEmpty());
+            .verifyTrue("No additional parsing pattern should be set for the Date field.",
+                settingsPage.getAdditionalParsingPatternDates().isEmpty());
 
         checker().fatal()
-                .verifyTrue("No additional parsing pattern should be set for the Time field.",
-                        settingsPage.getAdditionalParsingPatternTimes().isEmpty());
-
+            .verifyTrue("No additional parsing pattern should be set for the Time field.",
+                settingsPage.getAdditionalParsingPatternTimes().isEmpty());
     }
 
     private void testParsingPatternsList(boolean changeSiteSettings) throws IOException, CommandException
     {
-
         // Pre-populate the list with one item that will be updated.
         TestDataGenerator dataGenerator = new TestDataGenerator(LIST_SCHEMA, TEST_PARSING, getProjectName());
         dataGenerator.addCustomRow(Map.of(COL_NAME, "First", COL_DATETIME, "05/10/2020", COL_DATE, "02/05/2024", COL_TIME, "16:43:32"));
         dataGenerator.insertRows(createDefaultConnection(), dataGenerator.getRows());
 
-        if(changeSiteSettings)
+        if (changeSiteSettings)
         {
             setSiteAdditionalParsingPatterns(DATE_TIME_PATTERN, DATE_PATTERN, TIME_PATTERN, true);
         }
@@ -316,10 +322,10 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         listTable.clickInsertNewRow();
 
         setValuesMap = Map.of(
-                COL_NAME, "Second",
-                COL_DATETIME, "2020-11-23 12:23",
-                COL_DATE, "2020-11-23",
-                COL_TIME, "12:23:00"
+            COL_NAME, "Second",
+            COL_DATETIME, "2020-11-23 12:23",
+            COL_DATE, "2020-11-23",
+            COL_TIME, "12:23:00"
         );
 
         expectedTableValues.add(setValuesMap);
@@ -347,31 +353,31 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
         listTable = new DataRegionTable("query", getDriver());
 
         expectedTableValues.add(Map.of(
-                COL_NAME, "Third",
-                COL_DATETIME, "2020-12-23 12:20",
-                COL_DATE, "2020-12-23",
-                COL_TIME, "12:20:34")
+            COL_NAME, "Third",
+            COL_DATETIME, "2020-12-23 12:20",
+            COL_DATE, "2020-12-23",
+            COL_TIME, "12:20:34")
         );
 
         expectedTableValues.add(Map.of(
-                COL_NAME, "Fourth",
-                COL_DATETIME, "2020-01-23 12:24",
-                COL_DATE, "2020-01-23",
-                COL_TIME, "00:24:35")
+            COL_NAME, "Fourth",
+            COL_DATETIME, "2020-01-23 12:24",
+            COL_DATE, "2020-01-23",
+            COL_TIME, "00:24:35")
         );
 
         expectedTableValues.add(Map.of(
-                COL_NAME, "Fifth",
-                COL_DATETIME, "2020-03-23 12:23",
-                COL_DATE, "2020-03-23",
-                COL_TIME, "12:23:36")
+            COL_NAME, "Fifth",
+            COL_DATETIME, "2020-03-23 12:23",
+            COL_DATE, "2020-03-23",
+            COL_TIME, "12:23:36")
         );
 
         expectedTableValues.add(Map.of(
-                COL_NAME, "Sixth",
-                COL_DATETIME, "2020-06-23 12:29",
-                COL_DATE, "2020-06-23",
-                COL_TIME, "11:29:37")
+            COL_NAME, "Sixth",
+            COL_DATETIME, "2020-06-23 12:29",
+            COL_DATE, "2020-06-23",
+            COL_TIME, "11:29:37")
         );
 
         int i = 0;
@@ -382,7 +388,6 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
                     expectedRowMap, actualRowMap);
             i++;
         }
-
     }
 
     @Test
@@ -401,7 +406,7 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
     {
         log("Setting the parsing pattern");
 
-        if(changeSiteSettings)
+        if (changeSiteSettings)
         {
             setSiteAdditionalParsingPatterns(DATE_TIME_PATTERN, DATE_PATTERN, TIME_PATTERN, true);
         }
@@ -417,17 +422,17 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
 
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("dataset"));
-        clickAndWait(Locator.linkContainingText("Dataset1")); // dataset with non standard date format.
+        clickAndWait(Locator.linkContainingText("Dataset1")); // dataset with non-standard date format.
 
         DataRegionTable table = new DataRegionTable("Dataset", getDriver());
-        checker().verifyEquals("Incorrect date-time parsed while importing", Arrays.asList("2020-11-29 00:23", "2020-11-28 00:23", "2024-02-05 16:36")
-                , table.getColumnDataAsText(COL_DATETIME));
+        checker().verifyEquals("Incorrect date-time parsed while importing", Arrays.asList("2020-11-29 00:23", "2020-11-28 00:23", "2024-02-05 16:36"),
+            table.getColumnDataAsText(COL_DATETIME));
 
-        checker().verifyEquals("Incorrect date parsed while importing", Arrays.asList("2020-11-29", "2020-11-28", "2024-02-05")
-                , table.getColumnDataAsText(COL_DATE));
+        checker().verifyEquals("Incorrect date parsed while importing", Arrays.asList("2020-11-29", "2020-11-28", "2024-02-05"),
+            table.getColumnDataAsText(COL_DATE));
 
-        checker().verifyEquals("Incorrect time parsed while importing", Arrays.asList("00:23:00", "00:23:00", "16:36:00")
-                , table.getColumnDataAsText(COL_TIME));
+        checker().verifyEquals("Incorrect time parsed while importing", Arrays.asList("00:23:00", "00:23:00", "16:36:00"),
+            table.getColumnDataAsText(COL_TIME));
     }
 
     private void setSiteAdditionalParsingPatterns(String dateTimePattern, String datePattern, String timePattern, boolean useUSMode)
@@ -483,5 +488,4 @@ public class ParsingPatternForDateTest extends BaseWebDriverTest
             projectSettingsPage.setAdditionalParsingPatternTimesInherited(false);
         }
     }
-
 }
