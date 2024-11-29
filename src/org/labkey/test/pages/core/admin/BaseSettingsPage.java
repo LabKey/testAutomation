@@ -327,9 +327,9 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
 
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
-        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElement(this);
-        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findElement(this);
-        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
+        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElementOrNull(this);
+        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findElementOrNull(this);
+        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElementOrNull(this);
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
         WebElement altLoginPageTxt = Locator.inputById("customLogin").findWhenNeeded(this);
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);
