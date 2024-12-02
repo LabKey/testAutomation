@@ -326,7 +326,8 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void beginAtList(String projectName, String listName)
     {
-        beginAt("/query/" + EscapeUtil.encode(projectName) + "/executeQuery.view?schemaName=lists&query.queryName=" + listName);
+        beginAt(WebTestHelper.buildURL("query", projectName, "executeQuery",
+            Map.of("schemaName", "lists", "query.queryName", listName)));
     }
 
     public void verifyListData(List<FieldDefinition> columns, String[][] data, DeferredErrorCollector checker)

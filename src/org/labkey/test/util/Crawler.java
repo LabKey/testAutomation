@@ -1357,7 +1357,7 @@ public class Crawler
             //noinspection SuspiciousListRemoveInLoop
             injectParams.remove(i);
             String xss = (random.nextInt()%2)==0 ? injectScriptBlock : injectAttributeScript;
-            xss = URLEncoder.encode(xss, StandardCharsets.US_ASCII);
+            xss = URLEncoder.encode(xss, StandardCharsets.UTF_8);
             String paramMalicious = key + "=" + xss;
             String queryMalicious = paramMalicious + "&" + queryStringFromEntries(injectParams);
             String urlMalicious = base + "?" + queryMalicious;

@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.URIUtil;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -69,16 +70,26 @@ public class EscapeUtil
         return js.toString();
     }
 
+    /**
+     * Encode a string to be used as a URL query key or value
+     * @param s to be encoded
+     * @return encoded value or empty string if provided string was `null`
+     * @apiNote Use {@link URIUtil#encodePath(String)} for URL paths
+     */
     public static String encode(String s)
     {
-        if (s == null)
-            return "";
-        return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
+        return s == null ? "" : URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Decode a string extracted from a URL query
+     * @param s to be decoded
+     * @return decoded value or empty string if provided string was `null`
+     * @apiNote Use {@link URIUtil#decodePath(String)} for URL paths
+     */
     public static String decode(String s)
     {
-        return null==s ? "" : URLDecoder.decode(s, StandardCharsets.UTF_8);
+        return null == s ? "" : URLDecoder.decode(s, StandardCharsets.UTF_8);
     }
 
     public static String fieldKeyEncodePart(String str)

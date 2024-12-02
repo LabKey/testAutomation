@@ -37,7 +37,6 @@ import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -510,7 +509,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         for (int i = 0; i < max; i++)
         {
-            String workbookContainer = EscapeUtil.encode(getProjectName()) + "/" + workbookIds[i];
+            String workbookContainer = getProjectName() + "/" + workbookIds[i];
             String href;
             String expectedHref;
 
@@ -560,7 +559,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
             {
                 String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
-                String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/" + parentTestWorkbookId;
+                String parentTestContainer = getProjectName() + "/" + parentTestWorkbookId;
                 expectedHref = WebTestHelper.buildRelativeUrl("query", parentTestContainer, parentDetailsAction,
                         Maps.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "RowId", parentRowIds[i]));
 
