@@ -133,6 +133,37 @@ public class WebDavUploadHelper
         uploadFile(file, "");
     }
 
+    public void deleteFile(@NotNull String file, boolean shouldFail)
+    {
+        try
+        {
+            if (_sardine.exists(file))
+                _sardine.delete(file);
+        }
+        catch (IOException e)
+        {
+            if (shouldFail)
+              ;
+            else
+                throw new RuntimeException(e);
+        }
+    }
+
+    public boolean fileExists(String file)
+    {
+        try
+        {
+            if (_sardine.exists(file))
+                return true;
+            else
+                return false;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void uploadFile(@NotNull File file, @NotNull String destPrefix)
     {
         if (file.isDirectory())
