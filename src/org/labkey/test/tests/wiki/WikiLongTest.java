@@ -191,9 +191,9 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Test new wiki page");
         _wikiHelper.createNewWikiPage("RADEOX");
 
-        setFormElement(Locator.name("name"), WIKI_PAGE1_NAME);
-        setFormElement(Locator.name("title"), WIKI_PAGE1_TITLE);
-        setFormElement(Locator.name("body"), WIKI_PAGE1_CONTENT);
+        _wikiHelper.setWikiName(WIKI_PAGE1_NAME);
+        _wikiHelper.setWikiTitle(WIKI_PAGE1_TITLE);
+        _wikiHelper.setWikiBody(WIKI_PAGE1_CONTENT);
         _wikiHelper.saveWikiPage();
 
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
@@ -206,8 +206,8 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("add content"));
         _wikiHelper.convertWikiFormat("RADEOX");
 
-        setFormElement(Locator.name("title"), WIKI_PAGE2_TITLE);
-        setFormElement(Locator.name("body"), WIKI_PAGE2_CONTENT);
+        _wikiHelper.setWikiTitle(WIKI_PAGE2_TITLE);
+        _wikiHelper.setWikiBody(WIKI_PAGE2_CONTENT);
         _wikiHelper.saveWikiPage();
 
         clickAndWait(Locator.linkWithText("Welcome to the WikiLongTest"));
@@ -217,9 +217,9 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Test new wiki page using markdown");
         _wikiHelper.createNewWikiPage("MARKDOWN");
-        setFormElement(Locator.name("name"), WIKI_PAGE7_NAME);
-        setFormElement(Locator.name("title"), WIKI_PAGE7_TITLE);
-        setFormElement(Locator.name("body"), WIKI_PAGE7_CONTENT);
+        _wikiHelper.setWikiName(WIKI_PAGE7_NAME);
+        _wikiHelper.setWikiTitle(WIKI_PAGE7_TITLE);
+        _wikiHelper.setWikiBody(WIKI_PAGE7_CONTENT);
         _wikiHelper.saveWikiPage();
         // verify that after saving the markdown that it is rendered as html that does not include the markdown symbols
         assertTextPresent("Title MD");
@@ -234,8 +234,8 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("test html wiki containing malformed javascript entities... we should allow this, see #12268");
         _wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), WIKI_PAGE5_NAME);
-        setFormElement(Locator.name("title"), WIKI_PAGE5_TITLE);
+        _wikiHelper.setWikiName(WIKI_PAGE5_NAME);
+        _wikiHelper.setWikiTitle(WIKI_PAGE5_TITLE);
         _wikiHelper.setWikiBody(WIKI_PAGE5_CONTENT);
         _wikiHelper.saveWikiPage();
         assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
@@ -243,8 +243,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test create new html page with a webpart");
         _wikiHelper.createNewWikiPage("HTML");
 
-        setFormElement(Locator.name("name"), WIKI_PAGE3_NAME_TITLE);
-        setFormElement(Locator.name("title"), WIKI_PAGE3_NAME_TITLE);
+        _wikiHelper.setWikiName(WIKI_PAGE3_NAME_TITLE);
+        _wikiHelper.setWikiTitle(WIKI_PAGE3_NAME_TITLE);
         selectOptionByText(Locator.name("parent"), WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
         _wikiHelper.setWikiBody(WIKI_PAGE3_CONTENT);
         log("test attachments in wiki");
@@ -261,7 +261,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("test edit");
         clickAndWait(Locator.linkWithText("Edit"));
-        setFormElement(Locator.name("title"), WIKI_PAGE3_ALTTITLE);
+        _wikiHelper.setWikiTitle(WIKI_PAGE3_ALTTITLE);
         String wikiPage3ContentEdited =
                 "<b>Some HTML content</b><br>\n" +
                 "<b>More HTML content</b><br>\n" +
@@ -272,7 +272,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("More HTML content");
         clickAndWait(Locator.linkWithText("Edit"));
         _wikiHelper.setWikiBody(WIKI_PAGE3_CONTENT_NO_QUERY);
-        setFormElement(Locator.name("title"), WIKI_PAGE3_NAME_TITLE);
+        _wikiHelper.setWikiTitle(WIKI_PAGE3_NAME_TITLE);
         _wikiHelper.saveWikiPage();
 
         log("test change renderer type");
@@ -329,7 +329,7 @@ public class WikiLongTest extends BaseWebDriverTest
         click(Locator.linkWithText("discussions"));
         waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
         clickAndWait(Locator.linkWithText("Start new discussion"));
-        setFormElement(Locator.name("title"), DISC1_TITLE);
+        _wikiHelper.setWikiTitle(DISC1_TITLE);
         setFormElement(Locator.id("body"), DISC1_BODY);
         submit();
         _ext4Helper.waitForOnReady();
@@ -341,7 +341,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check response on discussion board works");
         clickButton("Respond");
-        setFormElement(Locator.name("title"), RESP1_TITLE);
+        _wikiHelper.setWikiTitle(RESP1_TITLE);
         setFormElement(Locator.id("body"), RESP1_BODY);
         submit();
         assertTextPresent(RESP1_TITLE,
@@ -352,8 +352,8 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("test navTree and header");
         _wikiHelper.createNewWikiPage("RADEOX");
-        setFormElement(Locator.name("name"), "_navTree");
-        setFormElement(Locator.name("title"), WIKI_NAVTREE_TITLE);
+        _wikiHelper.setWikiName("_navTree");
+        _wikiHelper.setWikiTitle(WIKI_NAVTREE_TITLE);
         _wikiHelper.setWikiBody(NAVBAR1_CONTENT);
         _wikiHelper.saveWikiPage();
 
@@ -373,8 +373,8 @@ public class WikiLongTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(WIKI_NAVTREE_TITLE));
 
         _wikiHelper.createNewWikiPage("HTML");
-        setFormElement(Locator.name("name"), "_header");
-        setFormElement(Locator.name("title"), "Header");
+        _wikiHelper.setWikiName("_header");
+        _wikiHelper.setWikiTitle("Header");
         _wikiHelper.setWikiBody(HEADER_CONTENT);
         _wikiHelper.saveWikiPage();
 
@@ -510,7 +510,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("test fixup for unsafe _blank targets, see #33356");
         _wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), WIKI_PAGE9_NAME);
+        _wikiHelper.setWikiName(WIKI_PAGE9_NAME);
         _wikiHelper.setWikiBody(WIKI_PAGE9_CONTENT);
         _wikiHelper.saveWikiPage();
         assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
@@ -522,7 +522,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Ensure non-developer can't save script");
         _wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), "Unsaveable");
+        _wikiHelper.setWikiName("Unsaveable");
         _wikiHelper.setWikiBody(WIKI_PAGE5_CONTENT);
         _wikiHelper.saveWikiPage(false);
         waitForText("There was a problem while saving: Illegal element <script>. For permissions to use this element, contact your system administrator.");
@@ -540,7 +540,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test wiki TOC customize link");
         _portalHelper.addWebPart("Wiki Table of Contents");
         portalHelper.clickWebpartMenuItem("Pages", true, "Customize");
-        setFormElement(Locator.name("title"), "Test Customize TOC");
+        _wikiHelper.setWikiTitle("Test Customize TOC");
         log("check that container is set to current project");
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
@@ -561,7 +561,7 @@ public class WikiLongTest extends BaseWebDriverTest
         portalHelper.clickWebpartMenuItem("Test Customize TOC", true, "New");
         _wikiHelper.convertWikiFormat("HTML");
 
-        setFormElement(Locator.name("name"), WIKI_PAGE4_TITLE);
+        _wikiHelper.setWikiName(WIKI_PAGE4_TITLE);
         _wikiHelper.setWikiBody(WIKI_PAGE4_CONTENT);
         _wikiHelper.saveWikiPage();
         clickProject(PROJECT_NAME);
@@ -583,8 +583,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test delete subtree");
         // create child first
         _wikiHelper.createNewWikiPage();
-        setFormElement(Locator.name("name"), WIKI_PAGE8_NAME);
-        setFormElement(Locator.name("title"), WIKI_PAGE8_TITLE);
+        _wikiHelper.setWikiName(WIKI_PAGE8_NAME);
+        _wikiHelper.setWikiTitle(WIKI_PAGE8_TITLE);
         selectOptionByText(Locator.name("parent"), "  " + WIKI_PAGE3_ALTTITLE + " (" + WIKI_PAGE3_NAME_TITLE + ")");
         _wikiHelper.saveWikiPage();
 
@@ -603,8 +603,8 @@ public class WikiLongTest extends BaseWebDriverTest
 //        {
 //            //test create new html page
 //            clickAndWait(Locator.linkWithText("new page"));
-//            setFormElement(Locator.name("name"), "Page" + Integer.toString(i));
-//            setFormElement(Locator.name("title"), "Page" + Integer.toString(i));
+//            _wikiHelper.setWikiName("Page" + Integer.toString(i));
+//            _wikiHelper.setWikiTitle("Page" + Integer.toString(i));
 //
 //            if (i > 99)
 //            {
@@ -712,8 +712,8 @@ public class WikiLongTest extends BaseWebDriverTest
         //
         assertChecked(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
 
-        setFormElement(Locator.name("name"), WIKI_PAGE6_NAME);
-        setFormElement(Locator.name("title"), WIKI_PAGE6_TITLE);
+        _wikiHelper.setWikiName(WIKI_PAGE6_NAME);
+        _wikiHelper.setWikiTitle(WIKI_PAGE6_TITLE);
         _wikiHelper.setWikiBody(WIKI_PAGE6_CONTENT);
 
         if (!shouldIndex)
