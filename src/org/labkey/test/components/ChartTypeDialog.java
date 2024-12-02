@@ -124,6 +124,22 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         return this;
     }
 
+    public boolean hasTrendlineOption()
+    {
+        return getWrapper().isElementVisible(Ext4Helper.Locators.formItemWithInputNamed("trendlineType"));
+    }
+
+    public List<String> getTrendlineOptions()
+    {
+        return getWrapper()._ext4Helper.getComboBoxOptions(Ext4Helper.Locators.formItemWithInputNamed("trendlineType"));
+    }
+
+    public ChartTypeDialog selectTrendlineType(String type)
+    {
+        getWrapper()._ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithInputNamed("trendlineType"), type);
+        return this;
+    }
+
     public ChartTypeDialog setXCategory(String columnName)
     {
         setXCategory(columnName, false);
