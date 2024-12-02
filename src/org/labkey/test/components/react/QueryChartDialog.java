@@ -181,6 +181,23 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    /*
+        trendline is an option for line
+     */
+    public List<String> getTrendlineOptions()
+    {
+        return elementCache().reactSelectByLabel("Trendline").getOptions();
+    }
+
+    /*
+        trendline is an option for line
+     */
+    public QueryChartDialog selectTrendline(String field)
+    {
+        elementCache().reactSelectByLabel("Trendline").select(field);
+        return this;
+    }
+
     public String getSelectedSeries()
     {
         return elementCache().reactSelectByLabel("Series").getValue();
