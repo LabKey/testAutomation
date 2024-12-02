@@ -184,6 +184,14 @@ public class QueryChartDialog extends ModalDialog
     /*
         trendline is an option for line
      */
+    public boolean hasTrendlineOption()
+    {
+        return elementCache().reactSelectByLabel("Trendline", true) != null;
+    }
+
+    /*
+        trendline is an option for line
+     */
     public List<String> getTrendlineOptions()
     {
         return elementCache().reactSelectByLabel("Trendline").getOptions();
@@ -355,9 +363,16 @@ public class QueryChartDialog extends ModalDialog
 
         public ReactSelect reactSelectByLabel(String label)
         {
-            WebElement container = Locator.tag("div").withChild(Locator.tagContainingText("label", label))
-                    .waitForElement(this, 1500);
-            return ReactSelect.finder(getDriver()).find(container);
+            return reactSelectByLabel(label, false);
+        }
+
+        public ReactSelect reactSelectByLabel(String label, boolean allowNull)
+        {
+            Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
+            if (allowNull && loc.findElementOrNull(this) == null)
+                return null;
+            else
+                return ReactSelect.finder(getDriver()).find(loc.waitForElement(this, 1500));
         }
 
         private Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
