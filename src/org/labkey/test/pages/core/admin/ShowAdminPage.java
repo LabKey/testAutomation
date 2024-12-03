@@ -163,6 +163,13 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new FolderTypePages(getDriver());
     }
 
+    public SiteValidationPage clickSiteValidation()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().siteValidationLink);
+        return new SiteValidationPage(getDriver());
+    }
+
     public LookAndFeelSettingsPage clickLookAndFeelSettings()
     {
         goToSettingsSection();
@@ -259,6 +266,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
         protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
         protected WebElement folderTypeLink = Locator.linkWithText("folder types").findWhenNeeded(this);
+        protected WebElement siteValidationLink = Locator.linkWithText("site validation").findWhenNeeded(this);
         protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
         protected WebElement masterPatientIndex = Locator.linkWithText("Master Patient Index").findWhenNeeded(this);
         protected WebElement profilerLink = Locator.linkWithText("profiler").findWhenNeeded(this);

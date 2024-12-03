@@ -83,8 +83,8 @@ public class WikiHistoryTest extends BaseWebDriverTest
         log("test create new html page with a webpart");
         wikiHelper.createNewWikiPage("HTML");
 
-        setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
-        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
+        wikiHelper.setWikiName(WIKI_PAGE_TITLE);
+        wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
         wikiHelper.setWikiBody(WIKI_PAGE_CONTENT);
         wikiHelper.saveWikiPage();
 
