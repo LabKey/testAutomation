@@ -138,10 +138,13 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             }
             else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
             {
-                String format = fieldDefinition.getFormat().trim();
 
-                int index = format.indexOf(" ");
-                if (index > 0)
+                // Identify the part of the format that is the date and the part that is the time. Take into account
+                // a data format may include spaces (time does not).
+                String format = fieldDefinition.getFormat().trim();
+                int index = format.lastIndexOf(" ");
+
+                if (format.substring(index + 1).contains(":"))
                 {
                     fieldRow.setDateTimeFormat(
                             DATE_FORMAT.get(format.substring(0, index)),

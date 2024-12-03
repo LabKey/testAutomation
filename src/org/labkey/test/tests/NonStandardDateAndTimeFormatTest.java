@@ -936,6 +936,15 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         validateDataIsFormatted(folderProject, dcSetFormats, expectedFormatData);
 
+        log("Check that using the values DATE, TIME and DATETIME do not show up in the validation report.");
+        // Issue 51491
+        List<String> siteWarnings = List.of(String.format("Site default display format for Dates: %s", DATE_FORMAT.DATE),
+                String.format("Site default display format for Times: %s", TIME_FORMAT.TIME),
+                String.format("Site default display format for DateTimes: %s %s", DATE_FORMAT.DATETIME, TIME_FORMAT.none));
+
+        String scope = "Root: /";
+        validateSiteValidationReport(scope, siteWarnings, false);
+
         log(String.format("Go to sub-folder '%s' and validate the data here is formatted according to sub-folder settings.", subFolder));
 
         expectedFormatData = Map.of("Name", "C1",

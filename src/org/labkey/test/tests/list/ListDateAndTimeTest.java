@@ -1257,8 +1257,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log(String.format("Create a list named '%s' with two DateTime fields that will be converted to date-only and time-only fields.", listName));
 
+        // For dtFormatDate use a date format that has spaces.
         String dtFormatDate = String.format("%s %s",
-                DATE_FORMAT.yyyy_MMM_dd, TIME_FORMAT.HH_mm);
+                DATE_FORMAT.MMMM_dd_yyyy, TIME_FORMAT.HH_mm);
         String dtFormatTime = String.format("%s %s",
                 DATE_FORMAT.yyyy_MMM_dd, TIME_FORMAT.HH_mm_ss);
 
