@@ -82,6 +82,7 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
+    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter();
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -388,10 +389,23 @@ public class TestDataGenerator
     {
         StringBuilder builder = new StringBuilder();
         List<String> values = new ArrayList<>();
+        String firstField = fieldNames.get(0);
         for (String name : fieldNames)
         {
             Object value = row.get(name);
-            values.add(value != null ? String.valueOf(value) : "");
+            String strVal;
+            if (value instanceof String s)
+            {
+                strVal = _tsvQuoter.quoteValue(s);
+                if (strVal.startsWith("#") && name.equals(firstField)) // don't generate comment lines
+                    strVal = "\"" + strVal + "\"";
+            }
+            else
+            {
+                strVal = value != null ? String.valueOf(value) : "";
+            }
+
+            values.add(strVal);
         }
         builder.append(String.join("\t", values));
         builder.append("\n");
