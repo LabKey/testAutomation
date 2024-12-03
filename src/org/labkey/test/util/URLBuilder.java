@@ -107,7 +107,7 @@ public class URLBuilder
     public URLBuilder setAppResourcePath(Object... pathParts)
     {
         List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
-                .map(EscapeUtil::encode).collect(Collectors.toList());
+                .map(URIUtil::encodePath).collect(Collectors.toList());
         setFragment("/" + String.join("/", encodedParts));
         return this;
     }
