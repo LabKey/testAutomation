@@ -126,7 +126,10 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
 
     public boolean hasTrendlineOption()
     {
-        return getWrapper().isElementVisible(Ext4Helper.Locators.formItemWithInputNamed("trendlineType"));
+        Locator loc = Ext4Helper.Locators.formItemWithInputNamed("trendlineType");
+        if (getWrapper().isElementPresent(loc))
+            return getWrapper().isElementVisible(loc);
+        return false;
     }
 
     public List<String> getTrendlineOptions()
