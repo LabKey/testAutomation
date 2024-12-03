@@ -75,12 +75,12 @@ public class UserEditorWithoutDeleteTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "UserEditorWithoutDeleteTest Project";
+        return getClass().getSimpleName() + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Project";
     }
 
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("FileContent");
     }
 }

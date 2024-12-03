@@ -137,8 +137,7 @@ public class WebDavUploadHelper
     {
         try
         {
-            if (_sardine.exists(file))
-                _sardine.delete(file);
+            _sardine.delete(file);
         }
         catch (IOException e)
         {
