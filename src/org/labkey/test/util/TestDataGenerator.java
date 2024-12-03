@@ -385,25 +385,41 @@ public class TestDataGenerator
         return builder;
     }
 
+    public static String getTsvQuotedValue(Object value, TestDataUtils.TsvQuoter tsvQuoter)
+    {
+        String strVal;
+        if (value instanceof String s)
+            strVal = tsvQuoter.quoteValue(s);
+        else
+            strVal = value != null ? String.valueOf(value) : "";
+
+        return strVal;
+    }
+
+    public List<String> getPasteColumnValues(String fieldName)
+    {
+        List<String> values = new ArrayList<>();
+        for (Map<String, Object> row : _rows)
+        {
+            Object value = row.get(fieldName);
+            String strVal = getTsvQuotedValue(value, _tsvQuoter);
+            values.add(strVal);
+        }
+        return values;
+    }
+
     public String rowToString(List<String> fieldNames, Map<String, Object> row)
     {
         StringBuilder builder = new StringBuilder();
         List<String> values = new ArrayList<>();
         String firstField = fieldNames.get(0);
-        for (String name : fieldNames)
+        for (String fieldName : fieldNames)
         {
-            Object value = row.get(name);
-            String strVal;
-            if (value instanceof String s)
-            {
-                strVal = _tsvQuoter.quoteValue(s);
-                if (strVal.startsWith("#") && name.equals(firstField)) // don't generate comment lines
-                    strVal = "\"" + strVal + "\"";
-            }
-            else
-            {
-                strVal = value != null ? String.valueOf(value) : "";
-            }
+            Object value = row.get(fieldName);
+            String strVal = getTsvQuotedValue(value, _tsvQuoter);
+
+            if (strVal.startsWith("#") && fieldName.equals(firstField)) // don't generate comment lines
+                strVal = "\"" + strVal + "\"";
 
             values.add(strVal);
         }
