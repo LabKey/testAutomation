@@ -343,8 +343,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         resetSiteSettings();
         resetProjectSettings();
 
-        String dateFormatInjection = DATE_FORMAT.yyyy_MM_dd.toString() + "'" + INJECT_CHARS + "'";
-        String timeFormatInjection = TIME_FORMAT.HH_mm.toString() + "'" + INJECT_CHARS + "'";
+        String dateFormatInjection = DATE_FORMAT.yyyy_MM_dd + "'" + INJECT_CHARS + "'";
+        String timeFormatInjection = TIME_FORMAT.HH_mm + "'" + INJECT_CHARS + "'";
 
         new APIContainerHelper(this).setDateAndTimeFormats(createDefaultConnection(), PROJ_CHANGE,
                 dateFormatInjection, timeFormatInjection, String.format("%s %s", dateFormatInjection, timeFormatInjection));

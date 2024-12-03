@@ -14,7 +14,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
-import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.pages.admin.FolderFormatsPage;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
