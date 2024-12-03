@@ -165,7 +165,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         public WebElement editBtn = editBtnLoc.findWhenNeeded(panelHeading);
 
         public WebElement panelBody = Locator.tagWithClass("div", "panel-body").findWhenNeeded(this);
-        public WebElement parentsForElement = Locator.tagWithClass("div", "button-padding").child("b")
+        public WebElement parentsForElement = Locator.tagWithClass("div", "bottom-padding").child("b")
                 .findWhenNeeded(panelBody);
 
         // finds a webElement that will contain the detailTable and responsiveGrid for the specified source or parent type
