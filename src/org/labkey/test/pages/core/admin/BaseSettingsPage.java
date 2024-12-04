@@ -11,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 {
@@ -181,7 +183,12 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultDateDisplay(DATE_FORMAT dateFormat)
     {
-        selectOptionByValue(elementCache().defaultDateFormat, dateFormat.format);
+        selectOptionByValue(elementCache().defaultDateFormat, dateFormat.toString());
+    }
+
+    public boolean defaultDateDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultDateFormat).isDisplayed();
     }
 
     public void setDefaultDateTimeDisplay(DATE_FORMAT dateFormat, TIME_FORMAT timeFormat)
@@ -197,7 +204,12 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultDateTimeDateDisplay(DATE_FORMAT dateFormat)
     {
-        selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.format);
+        selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.toString());
+    }
+
+    public boolean defaultDateTimeDateDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultDateTimeDateFormat).isDisplayed();
     }
 
     public String getDefaultDateTimeTimeDisplay()
@@ -207,7 +219,12 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultDateTimeTimeDisplay(TIME_FORMAT timeFormat)
     {
-        selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.format);
+        selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.toString());
+    }
+
+    public boolean defaultDateTimeTimeDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultDateTimeTimeFormat).isDisplayed();
     }
 
     public String getDefaultTimeDisplay()
@@ -217,7 +234,12 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
 
     public void setDefaultTimeDisplay(TIME_FORMAT timeFormat)
     {
-        selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.format);
+        selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.toString());
+    }
+
+    public boolean defaultTimeDisplayWarning()
+    {
+        return elementCache().nonStandardWarning(elementCache().defaultTimeFormat).isDisplayed();
     }
 
     public String getDefaultNumberDisplay()
@@ -283,6 +305,23 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         setFormElement(elementCache().altLoginPageTxt,loginPage);
     }
 
+    /**
+     * If the warning banner is present return the text otherwise return an empty string.
+     *
+     * @return Text in warning banner, empty string if no banner is present.
+     */
+    public String getFormatWarningMessage()
+    {
+        if (elementCache().formatWarningBanner.isDisplayed())
+        {
+            return elementCache().formatWarningBanner.getText();
+        }
+        else
+        {
+            return "";
+        }
+    }
+
     public void save()
     {
         clickAndWait(elementCache().saveBtn);
@@ -325,6 +364,14 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement defaultTimeFormat = Locator.id("defaultTimeFormat").findWhenNeeded(this);
         WebElement defaultDateTimeDateFormat = Locator.id("dateSelect").findWhenNeeded(this);
         WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
+        WebElement formatWarningBanner = Locator.tagWithId("div", "dateFormatWarning").findWhenNeeded(this);
+
+        WebElement nonStandardWarning(WebElement field)
+        {
+            String id = field.getAttribute("id");
+            String xpath = String.format("//select[@id='%s']/following-sibling::span[@class='has-warning']", id);
+            return Locator.xpath(xpath).findWhenNeeded(this);
+        }
 
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
         WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findWhenNeeded(this);
@@ -351,12 +398,19 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
     {
         yyyy_MM_dd("yyyy-MM-dd"),
         yyyy_MMM_dd("yyyy-MMM-dd"),
+        yyyy_MM("yyyy-MM"),
         dd_MMM_yyyy("dd-MMM-yyyy"),
         dd_MMM_yy("dd-MMM-yy"),
+        dd_MM_yyyy("dd-MM-yyyy"),
         ddMMMyyyy("ddMMMyyyy"),
         ddMMMyy("ddMMMyy"),
+        MMddyyyy("MM/dd/yyyy"),
+        MM_dd_yyyy("MM-dd-yyyy"),
+        MMMM_dd_yyyy("MMMM dd yyyy"),
         Default("yyyy-MM-dd"),
-        DTDefault("yyyy-MM-dd");
+        DTDefault("yyyy-MM-dd"),
+        DATE("Date"), // Valid only in a domain designer.
+        DATETIME("DATETIME"); // Valid only in a domain designer and only for the date part of a DateTime field.
 
         private final String format;
 
@@ -369,6 +423,19 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         public String toString() {
             return this.format;
         }
+
+        private static final Map<String, DATE_FORMAT> lookup = new HashMap<>();
+
+        static {
+            for (DATE_FORMAT d : DATE_FORMAT.values()) {
+                lookup.put(d.toString(), d);
+            }
+        }
+
+        public static DATE_FORMAT get(String format) {
+            return lookup.get(format);
+        }
+
     }
 
     public enum TIME_FORMAT
@@ -377,8 +444,10 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         HH_mm("HH:mm"),
         HH_mm_ss_SSS("HH:mm:ss.SSS"),
         hh_mm_a("hh:mm a"),
+        none("<none>"), // Valid only for a DateTime field.
         Default("HH:mm:ss"),
-        DTDefault("HH:mm");
+        DTDefault("HH:mm"),
+        TIME("Time"); // Valid only in domain designer.
 
         private final String format;
 
@@ -391,6 +460,19 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         public String toString() {
             return this.format;
         }
+
+        private static final Map<String, TIME_FORMAT> lookup = new HashMap<>();
+
+        static {
+            for (TIME_FORMAT t : TIME_FORMAT.values()) {
+                lookup.put(t.toString(), t);
+            }
+        }
+
+        public static TIME_FORMAT get(String format) {
+            return lookup.get(format);
+        }
+
     }
 
 }
