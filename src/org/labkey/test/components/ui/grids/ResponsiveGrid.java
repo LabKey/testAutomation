@@ -12,6 +12,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.openqa.selenium.Keys;
@@ -176,6 +177,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             filterModal.confirm();
         });
 
+        return _this;
+    }
+
+    public T filterBooleanColumn(String columnLabel, boolean value)
+    {
+        T _this = getThis();
+        doAndWaitForUpdate(() -> {
+            clickColumnMenuItem(columnLabel, "Filter...", false);
+            GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
+            new RadioButton.RadioButtonFinder().withNameAndValue("field-value-bool-0", value?"true":"false").find(filterModal).set(true);
+            filterModal.confirm();
+        });
         return _this;
     }
 
