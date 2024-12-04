@@ -82,7 +82,7 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
-    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter();
+    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter(',');
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
