@@ -246,7 +246,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _cspCheckPageLoadListener = new CspCheckPageLoadListener(this);
 
         String seleniumBrowser = System.getProperty("selenium.browser");
-        if (seleniumBrowser == null || seleniumBrowser.length() == 0)
+        if (seleniumBrowser == null || seleniumBrowser.isEmpty())
         {
             if (isTestRunningOnTeamCity())
                 BROWSER_TYPE = BrowserType.FIREFOX;
@@ -277,9 +277,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return urlsSeen;
     }
 
-    public static BaseWebDriverTest getCurrentTest()
+    public static <T extends BaseWebDriverTest> T getCurrentTest()
     {
-        return currentTest;
+        return (T)currentTest;
     }
 
     private static Class<? extends BaseWebDriverTest> getCurrentTestClass()
@@ -2859,7 +2859,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         public String toString()
         {
-            return getClass().getSimpleName() + "-" + _artifactCollector.getDumpDirName();
+            return getClass().getSimpleName() + "-" + _artifactCollector.getDumpDirName() + "@" + System.identityHashCode(this);
         }
     }
 }

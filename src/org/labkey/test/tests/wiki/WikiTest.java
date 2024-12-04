@@ -54,7 +54,7 @@ public class WikiTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        WikiTest init = (WikiTest) getCurrentTest();
+        WikiTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -98,8 +98,8 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.createNewWikiPage("HTML");
         numberOfWikiCreated++;
 
-        setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
-        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
+        wikiHelper.setWikiName(WIKI_PAGE_TITLE);
+        wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
         wikiHelper.setWikiBody(WIKI_PAGE_CONTENT);
 
         log("test attachments in wiki");
@@ -168,8 +168,8 @@ public class WikiTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("RADEOX");
         numberOfWikiCreated++;
-        setFormElement(Locator.name("name"), wikiName);
-        setFormElement(Locator.name("title"), wikiTitle);
+        wikiHelper.setWikiName(wikiName);
+        wikiHelper.setWikiTitle(wikiTitle);
         wikiHelper.setWikiBody(wikiContent);
         wikiHelper.saveWikiPage();
 
@@ -185,8 +185,8 @@ public class WikiTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
         numberOfWikiCreated++;
-        setFormElement(Locator.name("name"), WIKI_PAGE_NAME);
-        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
+        wikiHelper.setWikiName(WIKI_PAGE_NAME);
+        wikiHelper.setWikiTitle(WIKI_PAGE_TITLE);
         wikiHelper.setWikiBody(WIKI_CHECK_CONTENT);
         wikiHelper.saveWikiPage();
 
@@ -213,8 +213,8 @@ public class WikiTest extends BaseWebDriverTest
         log("Creating the wiki " + wikiTitle);
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
-        setFormElement(Locator.name("name"), wikiName);
-        setFormElement(Locator.name("title"), wikiTitle);
+        wikiHelper.setWikiName(wikiName);
+        wikiHelper.setWikiTitle(wikiTitle);
         wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
         wikiHelper.saveWikiPage();
         numberOfWikiCreated++;
