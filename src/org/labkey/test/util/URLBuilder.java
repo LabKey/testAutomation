@@ -107,7 +107,7 @@ public class URLBuilder
     public URLBuilder setAppResourcePath(Object... pathParts)
     {
         List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
-                .map(URIUtil::encodePath).collect(Collectors.toList());
+                .map(s -> EscapeUtil.encode(s).replace("+", " ")).collect(Collectors.toList());
         setFragment("/" + String.join("/", encodedParts));
         return this;
     }
@@ -212,11 +212,11 @@ public class URLBuilder
                 if (null != param.getKey())
                 {
                     url.append(firstParam ? "?" : "&");
-                    url.append(param.getKey());
+                    url.append(EscapeUtil.encode(param.getKey()));
                     if (null != param.getValue())
                     {
                         url.append("=");
-                        url.append(param.getValue());
+                        url.append(EscapeUtil.encode(String.valueOf(param.getValue())));
                     }
                     firstParam = false;
                 }
