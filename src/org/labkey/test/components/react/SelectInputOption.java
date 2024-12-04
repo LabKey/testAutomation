@@ -51,7 +51,15 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
 
     public Map<String, String> getData()
     {
-        return elementCache().getData();
+        List<WebElement> fieldRows = elementCache().identifyingFieldLoc.findElements(this);
+        Map<String, String> data = new CaseInsensitiveHashMap<>();
+        for(WebElement fieldRow : fieldRows)
+        {
+            String fieldLabel = elementCache().fieldLabelLoc.findElement(fieldRow).getText();
+            String fieldValue = elementCache().fieldValueLoc.findElement(fieldRow).getText();
+            data.put(StringUtils.stripEnd(fieldLabel, ":"), fieldValue);
+        }
+        return data;
     }
 
     @Override
@@ -69,21 +77,10 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public Locator.XPathLocator text_truncatePairLoc = Locator.tagWithClass("div", "text__truncate");
-
-        public Map<String, String> getData()
-        {
-            Map<String, String> data = new CaseInsensitiveHashMap<>();
-            var elements = text_truncatePairLoc.findElements(this);
-            for (WebElement el : elements)
-            {
-                WebElement keyEl = Locator.tagWithClass("span", "identifying_field_label").findElement(el);
-                WebElement valEl = Locator.tag("span").findElements(el).get(1);
-                data.put(StringUtils.stripEnd(keyEl.getText(), ":"), valEl.getText());
-            }
-            return data;
-        }
-
+        public Locator.XPathLocator fieldLabelLoc = Locator.tagWithClass("span", "identifying_field_label");
+        public Locator.XPathLocator identifyingFieldLoc = Locator.tag("div")
+                .withChild(fieldLabelLoc);
+        public Locator fieldValueLoc = fieldLabelLoc.followingSibling("span");
     }
 
 
@@ -116,10 +113,11 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
         protected Locator locator()
         {
             if (_key != null)
-                return _baseLocator.withChild(Locator.tagWithClass("div", "text__truncate")
-                        .withChild(Locator.tagWithText("strong",_key))
-                        .parent()   // children are siblings
-                        .withChild(Locator.tagWithAttributeContaining("span", "title", _value)));
+                return _baseLocator.withChild(
+                        Locator.tag("div").withChild(
+                                Locator.tagWithClass("span", "identifying_field_label").withText(_key + ":")
+                        .parent())   // children are siblings
+                        .withChild(Locator.tagWithText("span", _value)));
             else
                 return _baseLocator;
         }
