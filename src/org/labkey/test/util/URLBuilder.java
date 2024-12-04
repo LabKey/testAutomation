@@ -212,11 +212,11 @@ public class URLBuilder
                 if (null != param.getKey())
                 {
                     url.append(firstParam ? "?" : "&");
-                    url.append(param.getKey());
+                    url.append(EscapeUtil.encode(param.getKey()));
                     if (null != param.getValue())
                     {
                         url.append("=");
-                        url.append(param.getValue());
+                        url.append(EscapeUtil.encode(String.valueOf(param.getValue())));
                     }
                     firstParam = false;
                 }
