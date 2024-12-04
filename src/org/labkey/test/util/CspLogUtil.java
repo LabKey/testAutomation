@@ -21,7 +21,7 @@ import java.util.List;
 
 public class CspLogUtil
 {
-    private static final List<String> ignoredVioloations = List.of(
+    private static final List<String> ignoredViolations = List.of(
             "/_rstudio/",
             "/_rstudioReport/",
             "/reports-createScriptReport.view?",
@@ -41,7 +41,7 @@ public class CspLogUtil
         if (TestProperties.isServerRemote() || missingLog)
             return;
 
-        BasicFileAttributes logFileAttributes = null;
+        BasicFileAttributes logFileAttributes;
         try
         {
             logFileAttributes = Files.readAttributes(logFile.toPath(), BasicFileAttributes.class);
@@ -94,7 +94,7 @@ public class CspLogUtil
                     {
                         foundVioloation = true;
                         String url = split[1];
-                        if (ignoredVioloations.stream().anyMatch(url::contains))
+                        if (ignoredViolations.stream().anyMatch(url::contains))
                         {
                             TestLogger.warn("Ignoring CSP warning on page: " + url);
                         }

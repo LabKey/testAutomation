@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -29,12 +30,16 @@ import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
+import org.labkey.test.pages.core.admin.SiteValidationPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
+import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -45,6 +50,7 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertTrue;
 
+/** Intended to be run at the end of suites to do some extra validation, without adding much extra overhead. */
 @Category({BVT.class, Daily.class, Git.class, CustomModules.class})
 @Order(1)
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -74,29 +80,18 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void testSiteValidator()
     {
-        goToAdminConsole().goToSettingsSection();
+        SiteValidationPage validationPage = goToAdminConsole().clickSiteValidation();
 
-        clickAndWait(Locator.linkWithText("site validation"));
-
-        WebElement formEl = Locator.id("form").findElement(getDriver());
-
-        // Enable all validators
-        Locator.tagWithAttribute("input", "type", "checkbox")
-                .findElements(formEl).forEach(this::checkCheckbox);
+        validationPage.setAllValidators(true);
 
         // Validate projects and subfolders
-        checkRadioButton(Locator.radioButtonByNameAndValue("includeSubfolders", "true"));
+        validationPage.setWholeSite(true);
 
-        // Run in background
-        checkCheckbox(Locator.id("background"));
+        PipelineStatusDetailsPage jobPage = validationPage.clickValidateInBackground();
 
-        clickAndWait(Locator.lkButton("Validate"));
-
-        new PipelineStatusDetailsPage(getDriver())
-                .waitForComplete(300_000)
+        jobPage.waitForComplete(300_000)
                 .assertLogTextContains("Site validation complete");
-
-        clickAndWait(Locator.lkButton("Data"));
+        jobPage.clickDataLink();
 
         assertNoLabKeyErrors();
         TextSearcher textSearcher = new TextSearcher(getText(Locators.bodyPanel()));
@@ -104,6 +99,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 "Site Level Validation Results", "Folder Validation Results",
                 "Module: Core", "Permissions Validator", "Display Format Validator",
                 "Module: Pipeline", "Pipeline Validator");
+
         assertTextNotPresent(textSearcher, "Error");
     }
 
