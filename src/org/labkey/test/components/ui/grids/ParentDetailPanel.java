@@ -165,13 +165,13 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         public WebElement editBtn = editBtnLoc.findWhenNeeded(panelHeading);
 
         public WebElement panelBody = Locator.tagWithClass("div", "panel-body").findWhenNeeded(this);
-        public WebElement parentsForElement = Locator.tagWithClass("div", "bottom-spacing").child("b")
+        public WebElement parentsForElement = Locator.tagWithClass("div", "bottom-padding").child("b")
                 .findWhenNeeded(panelBody);
 
         // finds a webElement that will contain the detailTable and responsiveGrid for the specified source or parent type
         public WebElement detailGroupContainer(String containingType)
         {
-            return Locator.tagWithClass("div", "top-spacing")
+            return Locator.tagWithClass("div", "top-padding")
                     .withChild(Locator.tagWithClass("table", "detail-component--table__fixed")
                             .withDescendant(Locator.tag("td").withChild(Locator.linkWithText(containingType))))
                     .waitForElement(panelBody, 2000);
@@ -179,7 +179,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         // finds the first link in each detail table in each detailGroupContainer; used to get a list of parent types
         public List<WebElement> gridParentTypesLinks()
         {
-            Locator detailGroupContainers = Locator.tagWithClass("div", "top-spacing")
+            Locator detailGroupContainers = Locator.tagWithClass("div", "top-padding")
                     .child(Locator.tagWithClass("table", "detail-component--table__fixed")
                             .descendant(Locator.tag("td").child(Locator.tag("a"))));
             return detailGroupContainers.findElements(elementCache().panelBody);
