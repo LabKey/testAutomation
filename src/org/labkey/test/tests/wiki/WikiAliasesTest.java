@@ -33,7 +33,7 @@ public class WikiAliasesTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        WikiAliasesTest init = (WikiAliasesTest) getCurrentTest();
+        WikiAliasesTest init = getCurrentTest();
         init.doSetup();
     }
 
