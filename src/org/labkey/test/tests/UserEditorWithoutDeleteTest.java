@@ -27,7 +27,7 @@ public class UserEditorWithoutDeleteTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        UserEditorWithoutDeleteTest init = (UserEditorWithoutDeleteTest) getCurrentTest();
+        UserEditorWithoutDeleteTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -62,10 +62,10 @@ public class UserEditorWithoutDeleteTest extends BaseWebDriverTest
         WebDavUploadHelper uploadHelper = new WebDavUploadHelper(WebDavUrlFactory.webDavUrlFactory(getProjectName()),
                 WebDavUtils.beginSardine(getCurrentUser()));
         uploadHelper.uploadFile(TEST_FILE);
-        SardineException sardineException = uploadHelper.deleteExpectingError(WebDavUtils.buildBaseWebDavUrl(getProjectName()) + TEST_FILE.getName());
-        Assert.assertEquals("Incorrect response for deletion", 404, sardineException.getStatusCode());
+        SardineException sardineException = uploadHelper.deleteExpectingError(TEST_FILE.getName());
+        Assert.assertEquals("Incorrect response for deletion", 403, sardineException.getStatusCode());
         Assert.assertTrue("File should not be deleted by " + EDITOR_WITHOUT_DELETE.getEmail(),
-                uploadHelper.fileExists(WebDavUtils.buildBaseWebDavUrl(getProjectName()) + TEST_FILE.getName()));
+                uploadHelper.fileExists(TEST_FILE.getName()));
 
         stopImpersonating();
 

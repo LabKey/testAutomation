@@ -167,7 +167,7 @@ public class WebDavUploadHelper
     {
         try
         {
-            return _sardine.exists(file);
+            return _sardine.exists(_urlFactory.getPath(file));
         }
         catch (IOException e)
         {
