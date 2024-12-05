@@ -386,20 +386,25 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog removeAllSelectedFields()
     {
         List<WebElement> allItems = elementCache().getListItemElements(elementCache().selectedFieldsPanel);
+        boolean removedAll = true;
 
-        for(WebElement listItem : allItems)
+        for (WebElement listItem : allItems)
         {
             WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
 
-            // For the tooltip not all fields can be removed.
-            if(removeIcon.isDisplayed())
+            // In some usages there may be fields that are not removable.
+            if (!removeIcon.isDisplayed())
             {
-                removeIcon.click();
+                removedAll = false;
+                continue;
             }
+
+            removeIcon.click();
         }
 
-        WebDriverWrapper.waitFor(()-> getSelectedFields().isEmpty(),
-                "Did not remove all of the selected fields.", 500);
+        // If a non-removable field is encountered, then skip check to see if all fields are removed.
+        if (removedAll)
+            WebDriverWrapper.waitFor(()-> getSelectedFields().isEmpty(), "Did not remove all of the selected fields.", 500);
 
         return this;
     }
