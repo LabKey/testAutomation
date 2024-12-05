@@ -1431,11 +1431,8 @@ public class Crawler
             if (!sb.isEmpty())
                 sb.append('&');
             sb.append(EscapeUtil.encode(e.getKey()));
-            if (e.getValue() != null)
-            {
-                sb.append('=');
-                sb.append(EscapeUtil.encode(e.getValue()));
-            }
+            sb.append('=');
+            sb.append(EscapeUtil.encode(e.getValue()));
         }
         );
         return sb.toString();
